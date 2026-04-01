@@ -17,14 +17,19 @@ vi.mock('react-hook-form', async () => {
     ...actual,
     useForm: () => ({
       register: vi.fn(() => ({})),
-      handleSubmit: vi.fn((cb: () => void) => (e: Event) => { e?.preventDefault?.(); cb(); }),
+      handleSubmit: vi.fn((cb: () => void) => (e: Event) => {
+        e?.preventDefault?.();
+        cb();
+      }),
       watch: vi.fn(),
       trigger: vi.fn().mockResolvedValue(true),
       getValues: vi.fn(() => ({})),
       formState: { errors: {}, isValid: true },
       control: {},
     }),
-    FormProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    FormProvider: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
   };
 });
 
@@ -33,21 +38,31 @@ vi.mock('@hookform/resolvers/zod', () => ({
 }));
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('./StepIndicator', () => ({
@@ -70,17 +85,29 @@ import { OrgSignupWizard } from './OrgSignupWizard';
 
 describe('OrgSignupWizard', () => {
   it('renders step indicator', () => {
-    render(<MemoryRouter><OrgSignupWizard /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <OrgSignupWizard />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('step-indicator')).toBeInTheDocument();
   });
 
   it('renders first step (account) by default', () => {
-    render(<MemoryRouter><OrgSignupWizard /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <OrgSignupWizard />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('account-step')).toBeInTheDocument();
   });
 
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><OrgSignupWizard /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <OrgSignupWizard />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

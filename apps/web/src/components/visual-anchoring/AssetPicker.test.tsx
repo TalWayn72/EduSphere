@@ -11,7 +11,12 @@ vi.mock('urql', async () => {
 
 // Mock AssetUploader to avoid its own dependencies
 vi.mock('./AssetUploader', () => ({
-  default: ({ onUploaded }: { courseId: string; onUploaded: (a: VisualAsset) => void }) => (
+  default: ({
+    onUploaded,
+  }: {
+    courseId: string;
+    onUploaded: (a: VisualAsset) => void;
+  }) => (
     <div data-testid="asset-uploader">
       <button
         onClick={() =>
@@ -141,8 +146,12 @@ describe('AssetPicker', () => {
 
     // Only diagram.png should be visible
     expect(screen.getByTestId('asset-option-asset-1')).toBeInTheDocument();
-    expect(screen.queryByTestId('asset-option-asset-2')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('asset-option-asset-3')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('asset-option-asset-2')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('asset-option-asset-3')
+    ).not.toBeInTheDocument();
   });
 
   it('shows "No images match your search" when filter yields no results', () => {
@@ -157,7 +166,9 @@ describe('AssetPicker', () => {
       target: { value: 'nonexistent-xyz' },
     });
 
-    expect(screen.getByText('No images match your search.')).toBeInTheDocument();
+    expect(
+      screen.getByText('No images match your search.')
+    ).toBeInTheDocument();
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
@@ -183,7 +194,13 @@ describe('AssetPicker', () => {
       vi.fn(),
     ] as never);
 
-    render(<AssetPicker {...DEFAULT_PROPS} selectedAssetId="asset-2" onSelect={onSelect} />);
+    render(
+      <AssetPicker
+        {...DEFAULT_PROPS}
+        selectedAssetId="asset-2"
+        onSelect={onSelect}
+      />
+    );
 
     fireEvent.click(screen.getByTestId('asset-option-asset-2'));
 
@@ -237,8 +254,12 @@ describe('AssetPicker', () => {
 
     render(<AssetPicker {...DEFAULT_PROPS} />);
 
-    expect(screen.queryByTestId('asset-option-asset-infected')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('asset-option-asset-pending')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('asset-option-asset-infected')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('asset-option-asset-pending')
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId('asset-option-asset-1')).toBeInTheDocument();
   });
 
@@ -281,12 +302,16 @@ describe('AssetPicker', () => {
 
   it('uses webpUrl for thumbnail when available, falls back to storageUrl', () => {
     const assetsWithWebp: VisualAsset[] = [
-      { ...MOCK_ASSETS[0], webpUrl: null },    // storageUrl only
+      { ...MOCK_ASSETS[0], webpUrl: null }, // storageUrl only
       { ...MOCK_ASSETS[2], webpUrl: 'http://minio/3-opt.webp' }, // has webpUrl
     ];
 
     mockUseQuery.mockReturnValue([
-      { fetching: false, data: { getVisualAssets: assetsWithWebp }, stale: false },
+      {
+        fetching: false,
+        data: { getVisualAssets: assetsWithWebp },
+        stale: false,
+      },
       vi.fn(),
     ] as never);
 
@@ -295,8 +320,8 @@ describe('AssetPicker', () => {
     const images = screen.getAllByRole('img');
     const srcs = images.map((img) => (img as HTMLImageElement).src);
 
-    expect(srcs).toContain('http://minio/1.png');           // fallback storageUrl
-    expect(srcs).toContain('http://minio/3-opt.webp');     // preferred webpUrl
+    expect(srcs).toContain('http://minio/1.png'); // fallback storageUrl
+    expect(srcs).toContain('http://minio/3-opt.webp'); // preferred webpUrl
   });
 
   it('marks selected asset with aria-selected="true"', () => {

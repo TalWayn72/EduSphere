@@ -48,14 +48,22 @@ const STATUS_LABELS: Record<string, string> = {
 function formatDate(iso: string | null): string {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('he-IL', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
-export function PipelineRunHistory({ lessonId, onRestore }: PipelineRunHistoryProps) {
+export function PipelineRunHistory({
+  lessonId,
+  onRestore,
+}: PipelineRunHistoryProps) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [selectedRunId, setSelectedRunId] = useState<string>('');
 
@@ -69,12 +77,17 @@ export function PipelineRunHistory({ lessonId, onRestore }: PipelineRunHistoryPr
   const selectedRun = runs.find((r) => r.id === selectedRunId) ?? null;
 
   if (!mounted || fetching) {
-    return <Skeleton className="h-10 w-56" data-testid="run-history-skeleton" />;
+    return (
+      <Skeleton className="h-10 w-56" data-testid="run-history-skeleton" />
+    );
   }
 
   if (runs.length === 0) {
     return (
-      <span className="text-xs text-muted-foreground" data-testid="run-history-empty">
+      <span
+        className="text-xs text-muted-foreground"
+        data-testid="run-history-empty"
+      >
         אין היסטוריית הרצות
       </span>
     );
@@ -92,7 +105,8 @@ export function PipelineRunHistory({ lessonId, onRestore }: PipelineRunHistoryPr
         <SelectContent>
           {runs.map((run) => (
             <SelectItem key={run.id} value={run.id}>
-              #{run.runNumber} — {STATUS_LABELS[run.status] ?? run.status} — {formatDate(run.completedAt)}
+              #{run.runNumber} — {STATUS_LABELS[run.status] ?? run.status} —{' '}
+              {formatDate(run.completedAt)}
             </SelectItem>
           ))}
         </SelectContent>

@@ -58,7 +58,11 @@ describe('NatsConsumer — concept extraction publishing', () => {
   it('publishes persisted count to knowledge.concepts.persisted after processing', async () => {
     const payload = JSON.stringify({
       concepts: [
-        { name: 'Epistemology', definition: 'Study of knowledge', relatedTerms: [] },
+        {
+          name: 'Epistemology',
+          definition: 'Study of knowledge',
+          relatedTerms: [],
+        },
         { name: 'Ontology', definition: 'Study of being', relatedTerms: [] },
       ],
       courseId: 'course-pub-1',
@@ -156,7 +160,7 @@ describe('NatsConsumer — concept extraction publishing', () => {
       expect.objectContaining({
         tenant_id: tenantId,
         name: 'Ethics',
-      }),
+      })
     );
   });
 
@@ -192,7 +196,11 @@ describe('NatsConsumer — concept extraction publishing', () => {
     const payload = JSON.stringify({
       concepts: [
         { name: 'FailConcept', definition: 'Will fail', relatedTerms: [] },
-        { name: 'SuccessConcept', definition: 'Will succeed', relatedTerms: [] },
+        {
+          name: 'SuccessConcept',
+          definition: 'Will succeed',
+          relatedTerms: [],
+        },
       ],
       courseId: 'course-fail',
       tenantId: 'tenant-fail',
@@ -219,16 +227,22 @@ describe('NatsConsumer — concept extraction publishing', () => {
     // Second concept should still be created
     expect(mockCypherService.createConcept).toHaveBeenCalledTimes(1);
     expect(mockCypherService.createConcept).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'SuccessConcept' }),
+      expect.objectContaining({ name: 'SuccessConcept' })
     );
   });
 
   it('does not publish persisted message when NATS connection is null', async () => {
     // Create consumer without connection init
     const orphanConsumer = new NatsConsumer(mockCypherService as CypherService);
-    const processConcepts = (orphanConsumer as unknown as { publishPersisted: (courseId: string, tenantId: string, count: number) => Promise<void> }).publishPersisted.bind(
-      orphanConsumer,
-    );
+    const processConcepts = (
+      orphanConsumer as unknown as {
+        publishPersisted: (
+          courseId: string,
+          tenantId: string,
+          count: number
+        ) => Promise<void>;
+      }
+    ).publishPersisted.bind(orphanConsumer);
     await processConcepts('c-1', 't-1', 5);
     expect(mockJsPublish).not.toHaveBeenCalled();
   });
@@ -238,7 +252,11 @@ describe('NatsConsumer — concept extraction publishing', () => {
 
     const payload = JSON.stringify({
       concepts: [
-        { name: 'Aesthetics', definition: 'Philosophy of beauty', relatedTerms: [] },
+        {
+          name: 'Aesthetics',
+          definition: 'Philosophy of beauty',
+          relatedTerms: [],
+        },
       ],
       courseId: 'course-pfail',
       tenantId: 'tenant-pfail',

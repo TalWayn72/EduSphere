@@ -11,6 +11,7 @@
 > The Orchestrator only monitors progress and relays the QA Lead's reports to the user.
 >
 > **Orchestrator's allowed actions during a bug fix:**
+>
 > - `Agent` — spawn the QA Lead Agent (with full bug context)
 > - `Read` — check OPEN_ISSUES.md status only
 > - Text output — relay progress to user in Hebrew
@@ -26,6 +27,7 @@ The `debugging-code` skill + `dap` CLI are globally installed. `dap` wraps the D
 **Supported languages:** Python, Go, Node.js/TypeScript, Rust/C/C++ (backend auto-detected from file extension)
 
 **Quick reference:**
+
 ```bash
 # Stop at a specific line and inspect
 dap debug apps/subgraph-core/src/main.ts --break user.service.ts:55
@@ -45,8 +47,9 @@ dap stop
 ```
 
 **Debugging mindset (mandatory):**
+
 1. Form a hypothesis: "I believe X fails because Y"
-2. Set breakpoint *where the problem begins*, not where it manifests
+2. Set breakpoint _where the problem begins_, not where it manifests
 3. Stop, read locals + call stack, confirm or disprove hypothesis
 4. Repeat until root cause confirmed
 
@@ -70,6 +73,7 @@ dap stop
 **Wave 2 — MANDATORY SIMILARITY SEARCH (NEVER SKIP):**
 
 MANDATORY CHECKLIST (mark each as you complete it):
+
 - Every file in `apps/web/src/pages/` — checked for same anti-pattern
 - Every file in `apps/web/src/hooks/` — checked for same anti-pattern
 - Every file in `apps/web/src/components/` — checked for same anti-pattern
@@ -91,13 +95,14 @@ Build a numbered **DISCOVERY LIST** before writing a single line of fix code.
 ## Phase 3 — Fix Rounds (one round per Wave group)
 
 **Round structure:**
+
 - **Round 1**: Fix the original bug + add Pino logging + **INVERT the reproducer test from Phase 0**
 - **Round 2**: Fix all similar issues found in Wave 2 (other pages/components with variations)
 - **Round 3**: Fix all class-of-bug issues found in Wave 3 (if different from Round 2 items)
 - **Round N**: Continue until the Discovery List is 100% empty
 
-**Round Completion Gate (MANDATORY after EVERY fix round):**
-0. Docker infrastructure UP — `docker ps` shows postgres, keycloak, nats, minio, jaeger healthy
+**Round Completion Gate (MANDATORY after EVERY fix round):** 0. Docker infrastructure UP — `docker ps` shows postgres, keycloak, nats, minio, jaeger healthy
+
 1. `pnpm turbo test` passes 100% for ALL affected packages
 2. `pnpm turbo typecheck` — zero TypeScript errors
 3. **Reproducer test INVERTED and GREEN** — proves the fix actually works
@@ -107,6 +112,7 @@ Build a numbered **DISCOVERY LIST** before writing a single line of fix code.
 7. All 5 test users can authenticate successfully
 
 **Required output per round (non-negotiable):**
+
 - Inverted reproducer test (from Phase 0) now GREEN
 - Unit test asserting the BAD behavior is GONE (regression guard)
 - **Playwright E2E test** with `page.route()` interception or mock

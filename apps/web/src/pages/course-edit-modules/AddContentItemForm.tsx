@@ -74,11 +74,7 @@ export function AddContentItemForm({
         className="h-8 text-sm"
       />
       <div className="flex gap-2">
-        <Button
-          size="sm"
-          onClick={handleSubmit}
-          disabled={!form.title.trim()}
-        >
+        <Button size="sm" onClick={handleSubmit} disabled={!form.title.trim()}>
           {t('add')}
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>

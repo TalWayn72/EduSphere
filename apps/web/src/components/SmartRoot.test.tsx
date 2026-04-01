@@ -5,7 +5,9 @@ import { MemoryRouter } from 'react-router-dom';
 // Mock auth
 vi.mock('@/lib/auth', () => ({ isAuthenticated: vi.fn() }));
 // Mock LandingPage
-vi.mock('@/pages/LandingPage', () => ({ LandingPage: () => <div data-testid="landing-page" /> }));
+vi.mock('@/pages/LandingPage', () => ({
+  LandingPage: () => <div data-testid="landing-page" />,
+}));
 
 import { SmartRoot } from './SmartRoot';
 import * as auth from '@/lib/auth';

@@ -77,7 +77,7 @@ describe('MinioUrlService', () => {
           Bucket: 'edusphere',
           Key: 'tenant-1/course-1/file.pdf',
         }),
-        { expiresIn: 900 },
+        { expiresIn: 900 }
       );
     });
 
@@ -86,7 +86,7 @@ describe('MinioUrlService', () => {
       expect(mockGetSignedUrl).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
-        { expiresIn: 3600 },
+        { expiresIn: 3600 }
       );
     });
 
@@ -95,7 +95,7 @@ describe('MinioUrlService', () => {
       expect(mockGetSignedUrl).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
-        { expiresIn: 900 },
+        { expiresIn: 900 }
       );
     });
 
@@ -105,15 +105,15 @@ describe('MinioUrlService', () => {
       expect(mockGetSignedUrl).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ Key: '' }),
-        expect.anything(),
+        expect.anything()
       );
     });
 
     it('propagates S3 errors', async () => {
       mockGetSignedUrl.mockRejectedValueOnce(new Error('S3 error'));
-      await expect(
-        service.getPresignedUrl('bad-key'),
-      ).rejects.toThrow('S3 error');
+      await expect(service.getPresignedUrl('bad-key')).rejects.toThrow(
+        'S3 error'
+      );
     });
   });
 
@@ -128,7 +128,7 @@ describe('MinioUrlService', () => {
           Body: buffer,
           ContentType: 'application/pdf',
           ContentLength: buffer.length,
-        }),
+        })
       );
     });
 
@@ -139,14 +139,14 @@ describe('MinioUrlService', () => {
         expect.objectContaining({
           Key: 'empty.txt',
           ContentLength: 0,
-        }),
+        })
       );
     });
 
     it('propagates upload errors', async () => {
       mockSend.mockRejectedValueOnce(new Error('Upload failed'));
       await expect(
-        service.uploadFile('key.pdf', Buffer.from('x'), 'application/pdf'),
+        service.uploadFile('key.pdf', Buffer.from('x'), 'application/pdf')
       ).rejects.toThrow('Upload failed');
     });
   });

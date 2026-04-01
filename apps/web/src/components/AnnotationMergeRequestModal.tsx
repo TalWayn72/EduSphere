@@ -41,12 +41,18 @@ export function AnnotationMergeRequestModal({
   };
 
   return (
-    <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onCancel(); }}>
+    <Dialog
+      open
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onCancel();
+      }}
+    >
       <DialogContent data-testid="merge-request-modal" className="max-w-md">
         <DialogHeader>
           <DialogTitle>Propose to Official Content</DialogTitle>
           <DialogDescription className="sr-only">
-            Submit a proposal to promote your annotation to official course content.
+            Submit a proposal to promote your annotation to official course
+            content.
           </DialogDescription>
         </DialogHeader>
 
@@ -81,7 +87,12 @@ export function AnnotationMergeRequestModal({
           </div>
 
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={onCancel}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onCancel}
+            >
               Cancel
             </Button>
             <Button

@@ -13,7 +13,10 @@ interface Props {
 }
 
 export function ImportProgressPanel({ job, onDone }: Props) {
-  const isDone = job.status === 'COMPLETE' || job.status === 'FAILED' || job.status === 'CANCELLED';
+  const isDone =
+    job.status === 'COMPLETE' ||
+    job.status === 'FAILED' ||
+    job.status === 'CANCELLED';
 
   return (
     <div
@@ -23,18 +26,28 @@ export function ImportProgressPanel({ job, onDone }: Props) {
       aria-label="Import progress"
     >
       {job.status === 'COMPLETE' && (
-        <CheckCircle className="mx-auto h-12 w-12 text-green-500 dark:text-green-400" aria-hidden="true" />
+        <CheckCircle
+          className="mx-auto h-12 w-12 text-green-500 dark:text-green-400"
+          aria-hidden="true"
+        />
       )}
       {job.status === 'FAILED' && (
-        <XCircle className="mx-auto h-12 w-12 text-destructive" aria-hidden="true" />
+        <XCircle
+          className="mx-auto h-12 w-12 text-destructive"
+          aria-hidden="true"
+        />
       )}
       {(job.status === 'PENDING' || job.status === 'RUNNING') && (
-        <Loader2 className="mx-auto h-12 w-12 text-primary animate-spin" aria-hidden="true" />
+        <Loader2
+          className="mx-auto h-12 w-12 text-primary animate-spin"
+          aria-hidden="true"
+        />
       )}
 
       <div>
         <p className="text-lg font-semibold">
-          {job.status === 'COMPLETE' && `Import complete — ${job.lessonCount} lessons imported`}
+          {job.status === 'COMPLETE' &&
+            `Import complete — ${job.lessonCount} lessons imported`}
           {job.status === 'FAILED' && 'Import failed'}
           {job.status === 'CANCELLED' && 'Import cancelled'}
           {job.status === 'PENDING' && 'Preparing import…'}
@@ -42,7 +55,8 @@ export function ImportProgressPanel({ job, onDone }: Props) {
         </p>
         {job.estimatedMinutes && !isDone && (
           <p className="text-sm text-muted-foreground mt-1">
-            Estimated time: ~{job.estimatedMinutes} minute{job.estimatedMinutes !== 1 ? 's' : ''}
+            Estimated time: ~{job.estimatedMinutes} minute
+            {job.estimatedMinutes !== 1 ? 's' : ''}
           </p>
         )}
       </div>

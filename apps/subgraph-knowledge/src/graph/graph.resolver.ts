@@ -37,8 +37,12 @@ export class GraphResolver {
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.createConcept(
-      input.name, input.definition, input.sourceIds || [],
-      tenantId, userId, role
+      input.name,
+      input.definition,
+      input.sourceIds || [],
+      tenantId,
+      userId,
+      role
     );
   }
 
@@ -53,7 +57,10 @@ export class GraphResolver {
   }
 
   @Mutation()
-  async deleteConcept(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async deleteConcept(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.deleteConcept(id, tenantId, userId, role);
   }
@@ -70,8 +77,14 @@ export class GraphResolver {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     const validatedType = assertRelationshipType(relationshipType);
     return this.graphService.linkConcepts(
-      fromId, toId, validatedType, strength, description,
-      tenantId, userId, role
+      fromId,
+      toId,
+      validatedType,
+      strength,
+      description,
+      tenantId,
+      userId,
+      role
     );
   }
 
@@ -81,7 +94,13 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
-    return this.graphService.createPerson(input.name, input.bio || null, tenantId, userId, role);
+    return this.graphService.createPerson(
+      input.name,
+      input.bio || null,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Mutation()
@@ -90,7 +109,13 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
-    return this.graphService.createTerm(input.name, input.definition, tenantId, userId, role);
+    return this.graphService.createTerm(
+      input.name,
+      input.definition,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Mutation()
@@ -100,7 +125,12 @@ export class GraphResolver {
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.createSource(
-      input.title, input.type, input.url || null, tenantId, userId, role
+      input.title,
+      input.type,
+      input.url || null,
+      tenantId,
+      userId,
+      role
     );
   }
 
@@ -111,7 +141,11 @@ export class GraphResolver {
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.createTopicCluster(
-      input.name, input.description || null, tenantId, userId, role
+      input.name,
+      input.description || null,
+      tenantId,
+      userId,
+      role
     );
   }
 
@@ -123,7 +157,14 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
-    return this.graphService.generateEmbedding(text, entityType, entityId, tenantId, userId, role);
+    return this.graphService.generateEmbedding(
+      text,
+      entityType,
+      entityId,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Mutation()
@@ -134,7 +175,11 @@ export class GraphResolver {
   ) {
     const { tenantId } = getGraphAuthContext(context);
     this.logger.log({ courseId, k }, '[GraphResolver] clusterTopics mutation');
-    return this.kMeansService.clusterConceptsByCourse(courseId, k ?? 5, tenantId);
+    return this.kMeansService.clusterConceptsByCourse(
+      courseId,
+      k ?? 5,
+      tenantId
+    );
   }
 
   @Mutation()
@@ -144,7 +189,10 @@ export class GraphResolver {
   ) {
     const { tenantId } = getGraphAuthContext(context);
     const validated = MergeConceptsInputSchema.parse(input);
-    this.logger.log({ input: validated, tenantId }, '[GraphResolver] mergeConceptGraphNodes mutation');
+    this.logger.log(
+      { input: validated, tenantId },
+      '[GraphResolver] mergeConceptGraphNodes mutation'
+    );
     return this.mergeConceptsService.mergeNodes(validated, tenantId);
   }
 }

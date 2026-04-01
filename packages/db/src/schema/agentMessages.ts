@@ -26,7 +26,9 @@ export const agentMessages = pgTable('agent_messages', {
   role: messageRoleEnum('role').notNull(),
   content: text('content').notNull(),
   metadata: jsonb('metadata'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   // EU AI Act transparency fields (Art.50 — effective Aug 2026)
   isAiGenerated: boolean('is_ai_generated').notNull().default(false),
   modelUsed: varchar('model_used', { length: 100 }),

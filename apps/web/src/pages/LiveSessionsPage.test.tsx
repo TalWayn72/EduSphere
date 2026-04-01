@@ -90,7 +90,13 @@ describe('LiveSessionsPage', () => {
   beforeEach(() => {
     vi.mocked(getCurrentUser).mockReturnValue(null);
     vi.mocked(useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     vi.mocked(useMutation).mockReturnValue([
@@ -122,11 +128,19 @@ describe('LiveSessionsPage', () => {
 
   it('shows loading skeleton while fetching', () => {
     vi.mocked(useQuery).mockReturnValue([
-      { data: undefined, fetching: true, error: undefined, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: true,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
-    expect(screen.getAllByTestId('session-skeleton').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByTestId('session-skeleton').length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('shows empty state when no sessions', () => {
@@ -453,7 +467,9 @@ describe('LiveSessionsPage', () => {
     });
     vi.mocked(useQuery).mockReturnValue([
       {
-        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        data: {
+          liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }],
+        },
         fetching: false,
         error: undefined,
         stale: false,
@@ -611,7 +627,9 @@ describe('LiveSessionsPage', () => {
     });
     vi.mocked(useQuery).mockReturnValue([
       {
-        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        data: {
+          liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }],
+        },
         fetching: false,
         error: undefined,
         stale: false,
@@ -714,7 +732,9 @@ describe('LiveSessionsPage', () => {
     });
     vi.mocked(useQuery).mockReturnValue([
       {
-        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        data: {
+          liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }],
+        },
         fetching: false,
         error: undefined,
         stale: false,
@@ -738,7 +758,9 @@ describe('LiveSessionsPage', () => {
     });
     vi.mocked(useQuery).mockReturnValue([
       {
-        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        data: {
+          liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }],
+        },
         fetching: false,
         error: undefined,
         stale: false,
@@ -754,9 +776,19 @@ describe('LiveSessionsPage', () => {
   // ─── REGRESSION BUG-057: liveSessions 400 Bad Request (not in supergraph) ──
 
   it('REGRESSION BUG-057: shows sessions-error when GraphQL returns error', () => {
-    const mockError = { message: '[GraphQL] liveSessions query failed', graphQLErrors: [], networkError: null };
+    const mockError = {
+      message: '[GraphQL] liveSessions query failed',
+      graphQLErrors: [],
+      networkError: null,
+    };
     vi.mocked(useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: mockError as never, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: false,
+        error: mockError as never,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -766,7 +798,13 @@ describe('LiveSessionsPage', () => {
 
   it('REGRESSION BUG-057: does NOT show sessions-error when GraphQL succeeds', () => {
     vi.mocked(useQuery).mockReturnValue([
-      { data: { liveSessions: [] }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { liveSessions: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();

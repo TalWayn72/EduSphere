@@ -57,7 +57,13 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Title field
-    await expect(page.locator('input[name="title"], input[placeholder*="שיעור"], input[placeholder*="title"]').first()).toBeVisible({ timeout: 8_000 });
+    await expect(
+      page
+        .locator(
+          'input[name="title"], input[placeholder*="שיעור"], input[placeholder*="title"]'
+        )
+        .first()
+    ).toBeVisible({ timeout: 8_000 });
   });
 
   test('step 1 — can fill form and proceed to step 2', async ({ page }) => {
@@ -265,9 +271,16 @@ const LESSON_RESULTS_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LE
 /** Route all GraphQL calls to return a mock lesson response. */
 async function routeLessonQuery(page: Page): Promise<void> {
   await page.route('**/graphql', async (route) => {
-    const body = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
+    const body = (route.request().postDataJSON() ?? {}) as Record<
+      string,
+      unknown
+    >;
     const query = String(body.query ?? '');
-    if (query.includes('lesson(') || query.includes('lesson {') || query.includes('lesson\n')) {
+    if (
+      query.includes('lesson(') ||
+      query.includes('lesson {') ||
+      query.includes('lesson\n')
+    ) {
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({ data: { lesson: MOCK_LESSON_BUG049 } }),
@@ -279,10 +292,15 @@ async function routeLessonQuery(page: Page): Promise<void> {
 }
 
 test.describe('BUG-049 — mounted guard prevents React setState-during-render', () => {
-  test('BUG-049: LessonDetailPage renders lesson title without React error', async ({ page }) => {
+  test('BUG-049: LessonDetailPage renders lesson title without React error', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+      if (
+        msg.type() === 'error' &&
+        msg.text().includes('Cannot update a component')
+      ) {
         reactErrors.push(msg.text());
       }
     });
@@ -291,15 +309,22 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
     await page.goto(LESSON_DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({
+      timeout: 10_000,
+    });
     // Iron rule: React must NOT emit setState-during-render warning
     expect(reactErrors).toHaveLength(0);
   });
 
-  test('BUG-049: LessonResultsPage renders empty state without React error', async ({ page }) => {
+  test('BUG-049: LessonResultsPage renders empty state without React error', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+      if (
+        msg.type() === 'error' &&
+        msg.text().includes('Cannot update a component')
+      ) {
         reactErrors.push(msg.text());
       }
     });
@@ -308,16 +333,23 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
     await page.goto(LESSON_RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({
+      timeout: 10_000,
+    });
     expect(reactErrors).toHaveLength(0);
   });
 
-  test('BUG-049: navigating LessonDetailPage → LessonResultsPage does NOT emit React render error', async ({ page }) => {
+  test('BUG-049: navigating LessonDetailPage → LessonResultsPage does NOT emit React render error', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const text = msg.text();
-        if (text.includes('Cannot update a component') || text.includes('while rendering a different component')) {
+        if (
+          text.includes('Cannot update a component') ||
+          text.includes('while rendering a different component')
+        ) {
           reactErrors.push(text);
         }
       }
@@ -333,10 +365,14 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
 
     // KEY ASSERTION: zero React setState-during-render errors
     expect(reactErrors).toHaveLength(0);
-    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
-  test('BUG-049: rapid consecutive navigation does not produce React "Cannot update" errors', async ({ page }) => {
+  test('BUG-049: rapid consecutive navigation does not produce React "Cannot update" errors', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error' && msg.text().includes('Cannot update')) {
@@ -354,7 +390,9 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
     expect(reactErrors).toHaveLength(0);
   });
 
-  test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({ page }) => {
+  test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({
+    page,
+  }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -365,22 +403,30 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
     expect(bodyText).not.toContain('while rendering a different component');
   });
 
-  test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({ page }) => {
+  test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({
+    page,
+  }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({
+      timeout: 10_000,
+    });
 
     await page.screenshot({
       path: 'test-results/screenshots/bug-049-lesson-detail-clean.png',
     });
   });
 
-  test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({ page }) => {
+  test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({
+    page,
+  }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({
+      timeout: 10_000,
+    });
 
     await page.screenshot({
       path: 'test-results/screenshots/bug-049-lesson-results-empty-clean.png',
@@ -389,10 +435,15 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
 });
 
 test.describe('BUG-049 — mounted guard prevents React setState-during-render (extended)', () => {
-  test('BUG-049: LessonDetailPage renders lesson title without React error', async ({ page }) => {
+  test('BUG-049: LessonDetailPage renders lesson title without React error', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+      if (
+        msg.type() === 'error' &&
+        msg.text().includes('Cannot update a component')
+      ) {
         reactErrors.push(msg.text());
       }
     });
@@ -401,15 +452,22 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
     await page.goto(LESSON_DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({
+      timeout: 10_000,
+    });
     // Iron rule: React must NOT emit setState-during-render warning
     expect(reactErrors).toHaveLength(0);
   });
 
-  test('BUG-049: LessonResultsPage renders empty state without React error', async ({ page }) => {
+  test('BUG-049: LessonResultsPage renders empty state without React error', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+      if (
+        msg.type() === 'error' &&
+        msg.text().includes('Cannot update a component')
+      ) {
         reactErrors.push(msg.text());
       }
     });
@@ -418,16 +476,23 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
     await page.goto(LESSON_RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({
+      timeout: 10_000,
+    });
     expect(reactErrors).toHaveLength(0);
   });
 
-  test('BUG-049: navigating LessonDetailPage → LessonResultsPage does NOT emit React render error', async ({ page }) => {
+  test('BUG-049: navigating LessonDetailPage → LessonResultsPage does NOT emit React render error', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const text = msg.text();
-        if (text.includes('Cannot update a component') || text.includes('while rendering a different component')) {
+        if (
+          text.includes('Cannot update a component') ||
+          text.includes('while rendering a different component')
+        ) {
           reactErrors.push(text);
         }
       }
@@ -443,10 +508,14 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
 
     // KEY ASSERTION: zero React setState-during-render errors
     expect(reactErrors).toHaveLength(0);
-    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
-  test('BUG-049: rapid consecutive navigation does not produce React "Cannot update" errors', async ({ page }) => {
+  test('BUG-049: rapid consecutive navigation does not produce React "Cannot update" errors', async ({
+    page,
+  }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error' && msg.text().includes('Cannot update')) {
@@ -464,7 +533,9 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
     expect(reactErrors).toHaveLength(0);
   });
 
-  test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({ page }) => {
+  test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({
+    page,
+  }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -475,7 +546,9 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
     expect(bodyText).not.toContain('while rendering a different component');
   });
 
-  test('BUG-049: CreateLessonPage shows auth error when user session is null', async ({ page }) => {
+  test('BUG-049: CreateLessonPage shows auth error when user session is null', async ({
+    page,
+  }) => {
     // Simulate a page where auth returns null (session expired) by manipulating sessionStorage
     await page.addInitScript(() => {
       // Clear dev auth so getCurrentUser returns null
@@ -488,27 +561,39 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render (
 
     // Even unauthenticated, the wizard page should load (auth check is at mutation time)
     // The "יצירת שיעור חדש" heading or a redirect should be visible
-    const isOnWizard = await page.getByText('יצירת שיעור חדש').isVisible().catch(() => false);
-    const isRedirected = page.url().includes('/login') || page.url().includes('/learn');
+    const isOnWizard = await page
+      .getByText('יצירת שיעור חדש')
+      .isVisible()
+      .catch(() => false);
+    const isRedirected =
+      page.url().includes('/login') || page.url().includes('/learn');
     expect(isOnWizard || isRedirected).toBe(true);
   });
 
-  test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({ page }) => {
+  test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({
+    page,
+  }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({
+      timeout: 10_000,
+    });
 
     await page.screenshot({
       path: 'test-results/screenshots/bug-049-lesson-detail-clean.png',
     });
   });
 
-  test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({ page }) => {
+  test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({
+    page,
+  }) => {
     await routeLessonQuery(page);
     await page.goto(LESSON_RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({
+      timeout: 10_000,
+    });
 
     await page.screenshot({
       path: 'test-results/screenshots/bug-049-lesson-results-empty-clean.png',

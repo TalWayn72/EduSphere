@@ -10,77 +10,77 @@
 
 ### 🔴 Open
 
-| ID | Issue | Severity | Est. |
-|----|-------|----------|------|
-| FEAT-VIDEO-CAPTIONS | Video captions for IS 5568 + EAA compliance | 🔴 Critical | ~40h |
-| FEAT-EU-AI-ACT | EU AI Act documentation and compliance | 🔴 Critical | ~80h |
-| FEAT-ADMIN-DASHBOARD | 5 missing admin screens | 🟡 Medium | ~120h |
+| ID                   | Issue                                       | Severity    | Est.  |
+| -------------------- | ------------------------------------------- | ----------- | ----- |
+| FEAT-VIDEO-CAPTIONS  | Video captions for IS 5568 + EAA compliance | 🔴 Critical | ~40h  |
+| FEAT-EU-AI-ACT       | EU AI Act documentation and compliance      | 🔴 Critical | ~80h  |
+| FEAT-ADMIN-DASHBOARD | 5 missing admin screens                     | 🟡 Medium   | ~120h |
 
 ### 🟡 In Progress
 
-| ID | Issue | Started |
-|----|-------|---------|
+| ID                 | Issue                                                                                                        | Started     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------ | ----------- |
 | FEAT-API-MUTATIONS | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
-| FEAT-AGENT-SANDBOX | Agent execution sandboxing (process isolation, resource limits) | 30 Mar 2026 |
+| FEAT-AGENT-SANDBOX | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026 |
 
 ### ✅ Fixed (31 Mar 2026 Session)
 
-| ID | Issue | Fixed In |
-|----|-------|----------|
-| BUG-111 | Language preference save failing — query-complexity heuristic applied 10× multiplier to camelCase fields ending in 's' (e.g. `updateUserPreferences`), pushing mutation over MAX_COMPLEXITY=1000 limit | 31 Mar 2026 |
-| BUG-065-GAPS | 6 test coverage gaps for language preference save flow — infrastructure failures undetected because all layers mocked | 31 Mar 2026 |
-| BUG-110 | Subgraphs killed every 15 min by cleanup script — "השרת אינו זמין" on /courses (10th+ occurrence) | 31 Mar 2026 |
+| ID           | Issue                                                                                                                                                                                                  | Fixed In    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| BUG-111      | Language preference save failing — query-complexity heuristic applied 10× multiplier to camelCase fields ending in 's' (e.g. `updateUserPreferences`), pushing mutation over MAX_COMPLEXITY=1000 limit | 31 Mar 2026 |
+| BUG-065-GAPS | 6 test coverage gaps for language preference save flow — infrastructure failures undetected because all layers mocked                                                                                  | 31 Mar 2026 |
+| BUG-110      | Subgraphs killed every 15 min by cleanup script — "השרת אינו זמין" on /courses (10th+ occurrence)                                                                                                      | 31 Mar 2026 |
 
 ### ✅ Fixed (30 Mar 2026 Session)
 
-| ID | Issue | Fixed In |
-|----|-------|----------|
+| ID                    | Issue                                                                                                                                              | Fixed In    |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | FEAT-PHASE-D-TECHDEBT | Phase D Technical Debt — 80 oversized files split, 33 console.log violations fixed, 27 lint warnings resolved, ~99 test files (~1,360 cases) added | 30 Mar 2026 |
-| FEAT-ORG-RESTRUCTURE | Agent hierarchy restructured (11 divisions, 42 specialists, BELead split, 12 new skills, 4 automation scripts, CLAUDE.md split) | 30 Mar 2026 |
-| FEAT-SI6-MTLS | mTLS infrastructure for inter-service communication (docker-compose.mtls.yml, cert generation, Helm values, 41 tests) | 30 Mar 2026 |
-| FEAT-IS5568-A11Y | IS 5568 accessibility fixes (dynamic html lang, keyboard drag-drop, 101 tests) | 30 Mar 2026 |
-| FEAT-GDPR-PROOF | Cryptographic proof of GDPR erasure (gdpr_erasure_log table, HMAC-SHA256 signing, verifyErasure query, 20 tests) | 30 Mar 2026 |
-| BUG-109 | Consent save fails — ConsentService missing withTenantContext(), RLS blocks silently (also closes BUG-088, BUG-092) | 30 Mar 2026 |
+| FEAT-ORG-RESTRUCTURE  | Agent hierarchy restructured (11 divisions, 42 specialists, BELead split, 12 new skills, 4 automation scripts, CLAUDE.md split)                    | 30 Mar 2026 |
+| FEAT-SI6-MTLS         | mTLS infrastructure for inter-service communication (docker-compose.mtls.yml, cert generation, Helm values, 41 tests)                              | 30 Mar 2026 |
+| FEAT-IS5568-A11Y      | IS 5568 accessibility fixes (dynamic html lang, keyboard drag-drop, 101 tests)                                                                     | 30 Mar 2026 |
+| FEAT-GDPR-PROOF       | Cryptographic proof of GDPR erasure (gdpr_erasure_log table, HMAC-SHA256 signing, verifyErasure query, 20 tests)                                   | 30 Mar 2026 |
+| BUG-109               | Consent save fails — ConsentService missing withTenantContext(), RLS blocks silently (also closes BUG-088, BUG-092)                                | 30 Mar 2026 |
 
 ### ✅ Fixed (Recent — 27–29 Mar 2026)
 
-| ID | Issue | Fixed In |
-|----|-------|----------|
-| FEAT-VISUAL-TESTING | Visual Testing Expansion — 499→2,054 assertions, 4,613 baselines, 46 failures fixed | 29 Mar 2026 |
-| FEAT-OBSERVABILITY | Observability — EmbeddingCoverageChart, EmbeddingActivityLog, admin dashboard | 27 Mar 2026 |
-| FEAT-PDF-VIEWER | PDF Experience — in-browser viewer, text annotation, sketch overlay, presigned URLs | 27 Mar 2026 |
+| ID                  | Issue                                                                                        | Fixed In    |
+| ------------------- | -------------------------------------------------------------------------------------------- | ----------- |
+| FEAT-VISUAL-TESTING | Visual Testing Expansion — 499→2,054 assertions, 4,613 baselines, 46 failures fixed          | 29 Mar 2026 |
+| FEAT-OBSERVABILITY  | Observability — EmbeddingCoverageChart, EmbeddingActivityLog, admin dashboard                | 27 Mar 2026 |
+| FEAT-PDF-VIEWER     | PDF Experience — in-browser viewer, text annotation, sketch overlay, presigned URLs          | 27 Mar 2026 |
 | FEAT-RAG-ACTIVATION | RAG Pipeline Activation — HNSW indexes, content indexing, concept publisher, seed embeddings | 27 Mar 2026 |
-| FEAT-COVERAGE-001 | Web Unit Test Coverage Boost to 95%+ (177 new test files) | 25 Mar 2026 |
-| FEAT-TEST-COVERAGE | Web Unit Test Coverage Improvement (57% → 95%+) | 24 Mar 2026 |
-| BUG-107 | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing) | 23 Mar 2026 |
-| BUG-106 | GraphQL 400 Bad Request errors on Lesson Pipeline page | 22 Mar 2026 |
-| BUG-104 | Knowledge Graph Page — "Invalid time value" GraphQL Error | 22 Mar 2026 |
-| BUG-105 | Cannot return null for AgentTemplate.templateType | 22 Mar 2026 |
+| FEAT-COVERAGE-001   | Web Unit Test Coverage Boost to 95%+ (177 new test files)                                    | 25 Mar 2026 |
+| FEAT-TEST-COVERAGE  | Web Unit Test Coverage Improvement (57% → 95%+)                                              | 24 Mar 2026 |
+| BUG-107             | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing)                | 23 Mar 2026 |
+| BUG-106             | GraphQL 400 Bad Request errors on Lesson Pipeline page                                       | 22 Mar 2026 |
+| BUG-104             | Knowledge Graph Page — "Invalid time value" GraphQL Error                                    | 22 Mar 2026 |
+| BUG-105             | Cannot return null for AgentTemplate.templateType                                            | 22 Mar 2026 |
 
 ### ✅ Fixed (Older — see archive for details)
 
-| ID | Issue | Fixed In |
-|----|-------|----------|
-| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform (F-01 through F-15) | 22 Mar 2026 |
-| F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI QGen, Browser Lockdown | Phase 68 |
-| BUG-103 | Delete Course fails silently — course not removed from list | `3dce63f4` |
-| BUG-101 | Delete Course: 400 Bad Request + accessibility console errors | `c7beef92` |
-| BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array vs Relay Connection | (pending) |
-| BUG-099 | i18n English content on Hebrew locale — 7 social/collab pages hardcoded | (pending) |
-| BUG-097 | Mixed Hebrew/English UI — i18n not applied + RTL layout broken (8 rounds) | 19 Mar 2026 |
-| BUG-096 | Knowledge Graph error banner shows on all errors | `c04ded08` |
-| BUG-095 | AI course creation fails end-to-end | (pending) |
-| BUG-093 | AI Course Creator — no progress text + timeout too short | (pending) |
-| BUG-092 | AI consent save fails (stale turbo cache + @ai-sdk/openai v3 mismatch) | Closed by BUG-109 |
-| BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec | (pending) |
-| BUG-088 | Consent toggle saves to localStorage only — backend never synced | Closed by BUG-109 |
-| BUG-087 | Settings page crashes at /settings?highlight=ai-consent | `66a0b79` |
-| BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | `a3995e5` |
-| BUG-081 | PDF source upload fails — pdfParse is not a function | `c4bb7ca` |
-| SEC-1 | Dev-token grants SUPER_ADMIN | `a13c080` |
-| SEC-3 | Subgraphs skip JWT audience | `a13c080` |
-| SI-7 | 15 services raw NATS without TLS | `e2a714d` |
-| INFRA-1 | HiveMind shared intelligence layer (3 MCP servers) | (pending) |
+| ID                  | Issue                                                                                | Fixed In          |
+| ------------------- | ------------------------------------------------------------------------------------ | ----------------- |
+| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform (F-01 through F-15)      | 22 Mar 2026       |
+| F-065               | Certification Exam System — Item Bank, CAT, Psychometrics, AI QGen, Browser Lockdown | Phase 68          |
+| BUG-103             | Delete Course fails silently — course not removed from list                          | `3dce63f4`        |
+| BUG-101             | Delete Course: 400 Bad Request + accessibility console errors                        | `c7beef92`        |
+| BUG-100             | GraphQL 400 Bad Request on Challenges page — flat array vs Relay Connection          | (pending)         |
+| BUG-099             | i18n English content on Hebrew locale — 7 social/collab pages hardcoded              | (pending)         |
+| BUG-097             | Mixed Hebrew/English UI — i18n not applied + RTL layout broken (8 rounds)            | 19 Mar 2026       |
+| BUG-096             | Knowledge Graph error banner shows on all errors                                     | `c04ded08`        |
+| BUG-095             | AI course creation fails end-to-end                                                  | (pending)         |
+| BUG-093             | AI Course Creator — no progress text + timeout too short                             | (pending)         |
+| BUG-092             | AI consent save fails (stale turbo cache + @ai-sdk/openai v3 mismatch)               | Closed by BUG-109 |
+| BUG-089             | AI course generation fails — agent_id mismatch + Ollama spec                         | (pending)         |
+| BUG-088             | Consent toggle saves to localStorage only — backend never synced                     | Closed by BUG-109 |
+| BUG-087             | Settings page crashes at /settings?highlight=ai-consent                              | `66a0b79`         |
+| BUG-082             | Footer/landing links use `<a href>` instead of `<Link>`                              | `a3995e5`         |
+| BUG-081             | PDF source upload fails — pdfParse is not a function                                 | `c4bb7ca`         |
+| SEC-1               | Dev-token grants SUPER_ADMIN                                                         | `a13c080`         |
+| SEC-3               | Subgraphs skip JWT audience                                                          | `a13c080`         |
+| SI-7                | 15 services raw NATS without TLS                                                     | `e2a714d`         |
+| INFRA-1             | HiveMind shared intelligence layer (3 MCP servers)                                   | (pending)         |
 
 > For full details on all 100+ completed items, see `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -95,12 +95,14 @@
 **Root Cause:** The `estimateComplexity` function in the gateway's query-complexity middleware used a naive heuristic: any field name ending in `'s'` was treated as a list field and had its subtree cost multiplied by 10×. This incorrectly flagged camelCase compound mutation names such as `updateUserPreferences` (ends in `s`), `emailNotifications`, `userPreferences` — pushing the `updateUserPreferences` mutation cost from ~5 to ~50+, which exceeded `MAX_COMPLEXITY=1000` after nesting.
 
 **Fix:** Added `isListField()` helper that rejects camelCase names. A field is considered a list field only if:
+
 1. Its name ends with `'s'` and has length > 1, AND
 2. It contains NO uppercase letters after position 0 (i.e., it is a simple lowercase plural noun like `users`, `courses`, `annotations`)
 
 This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferences`, etc.
 
 **Verification:**
+
 - Live API: `mutation { updateUserPreferences(input: { locale: "he" }) { id preferences { locale } } }` returns `{"data":{"updateUserPreferences":{"id":"00000000-0000-0000-0000-000000000005","preferences":{"locale":"he"}}}}` ✅
 - Unit tests: `query-complexity.spec.ts` — 17/17 pass, including `does not apply list multiplier for camelCase compound names ending in s` ✅
 - Gateway tests: 319/319 pass ✅
@@ -119,16 +121,19 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 - **Files Changed:** `apps/web/e2e/user-preferences-save.spec.ts`, `apps/web/e2e/language-error-paths.spec.ts`, `apps/web/e2e/visual-language-error.spec.ts`, `apps/web/e2e/language-save-regression.spec.ts`
 
 **Root Cause (combined with BUG-111):**
+
 1. **JWT issuer mismatch** — gateway `KEYCLOAK_ISSUER_URL` pointed to `keycloak:8080` (internal Docker hostname) while tokens were issued by `localhost:8080` (external). Added `KEYCLOAK_ISSUER_URL` separation in `apps/gateway/src/config/gateway-config.ts` so internal validation uses the correct Docker-internal hostname while tokens declare the external hostname.
 2. **Query complexity heuristic** — `isListField()` in `apps/gateway/src/middleware/query-complexity.ts` incorrectly applied 10× multiplier to camelCase mutation names ending in `s`. Fixed by checking for uppercase letters in the field name.
 
 **Fix Summary:**
+
 - `gateway-config.ts` — separated `KEYCLOAK_ISSUER_URL` from `KEYCLOAK_URL` for issuer validation
 - `query-complexity.ts` — `isListField()` helper that only applies multiplier to simple lowercase plural nouns
 - 4 new E2E spec files covering happy paths, error paths, visual regression, and regression guards
 - `apps/web/src/components/assessment/RadarChart.tsx` — TypeScript `formatter` type cast fixed (exit 2 → 0)
 
 **Verification:**
+
 - All 16 new E2E tests pass against live services: 5 + 5 + 4 + 2 = 16 ✅
 - Live mutation confirmed: `{"data":{"updateUserPreferences":{"id":"...","preferences":{"locale":"he"}}}}` ✅
 - TypeScript strict compilation: 0 errors ✅
@@ -145,6 +150,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Problem:** IS 5568 and European Accessibility Act (EAA) require captions/subtitles for all video content. Currently no caption support exists for uploaded or embedded videos.
 
 **Requirements:**
+
 - Auto-generated captions via faster-whisper transcription worker
 - Manual caption editing UI
 - Caption display overlay on video player
@@ -162,6 +168,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Problem:** EU AI Act requires transparency documentation for all AI systems. Current `tests/security/eu-ai-act.spec.ts` tests exist but the actual compliance documentation, risk classification, and transparency reports are missing.
 
 **Requirements:**
+
 - AI system risk classification (limited risk for educational AI)
 - Transparency documentation for all AI agents (assess, quiz, explain, debate)
 - Human oversight mechanisms documentation
@@ -179,6 +186,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Problem:** Admin dashboard is missing 5 critical management screens needed for production operations.
 
 **Missing screens:**
+
 1. User Management (CRUD, role assignment, suspension)
 2. Tenant Management (plan upgrades, domain config, white-label settings)
 3. Content Moderation (flagged content queue, review workflow)
@@ -196,6 +204,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Problem:** Gap analysis identified 4 missing GraphQL mutations that are referenced in the API contracts but not yet implemented.
 
 **Missing mutations:**
+
 1. `organizationDomains` — domain management for white-label orgs
 2. `updateTenantPlan` — plan tier changes (free → pro → enterprise)
 3. `mergeConceptGraphNodes` — knowledge graph node deduplication
@@ -212,6 +221,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Problem:** AI agent code execution currently lacks process-level isolation. gVisor sandboxing is documented in the architecture but not fully implemented.
 
 **Requirements:**
+
 - Process isolation for agent code execution
 - Resource limits (CPU, memory, network, filesystem)
 - Timeout enforcement (configurable per agent type)
@@ -235,18 +245,19 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 
 **4. Test Coverage Boost (~99 new test files, ~1,360 test cases):**
 
-| Package | Before | After | New Files |
-|---------|--------|-------|-----------|
-| subgraph-content | ~66% | ~90% | 25 test files |
-| subgraph-core | ~72% | ~92% | 24 test files |
-| subgraph-agent | ~64% | ~90% | 18 test files |
-| subgraph-knowledge | — | ~97% | 5 test files |
-| subgraph-annotation | — | — | 1 test file |
-| apps/web (frontend) | — | — | 12 test files |
-| packages/nats-client | — | — | 8 test files |
-| apps/gateway | — | — | 6 test files |
+| Package              | Before | After | New Files     |
+| -------------------- | ------ | ----- | ------------- |
+| subgraph-content     | ~66%   | ~90%  | 25 test files |
+| subgraph-core        | ~72%   | ~92%  | 24 test files |
+| subgraph-agent       | ~64%   | ~90%  | 18 test files |
+| subgraph-knowledge   | —      | ~97%  | 5 test files  |
+| subgraph-annotation  | —      | —     | 1 test file   |
+| apps/web (frontend)  | —      | —     | 12 test files |
+| packages/nats-client | —      | —     | 8 test files  |
+| apps/gateway         | —      | —     | 6 test files  |
 
 **Key test file locations:**
+
 - `apps/subgraph-content/src/**/*.spec.ts` (25 files — resolvers, services, validators)
 - `apps/subgraph-core/src/**/*.spec.ts` (24 files — user, tenant, org services)
 - `apps/subgraph-agent/src/**/*.spec.ts` (18 files — agent templates, workflows, sandboxing)
@@ -316,6 +327,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Root cause:** The cleanup script's `$protected` array contained only `@("vite", "mcp", "docker", "chromadb")`. Subgraph process command lines (`node --enable-source-maps .../apps/subgraph-core/dist/main`) did not match any of those patterns, so they were unconditionally killed after 15 minutes of uptime — the exact interval the scheduled task runs on.
 
 **Evidence from logs (`docs/logs/node-cleanup.log`):**
+
 ```
 2026-03-30 00:44:29 | Before: 159 | Killed: 1 node, 0 chrome-headless | After: 156 | Memory: 78.2%
 2026-03-30 05:43:38 | Before: 0  | Killed: 0 ...  (all subgraphs gone — machine restart or prior kill)

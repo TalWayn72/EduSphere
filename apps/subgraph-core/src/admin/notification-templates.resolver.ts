@@ -12,7 +12,10 @@ interface GraphQLContext {
 export class NotificationTemplatesResolver {
   constructor(private readonly svc: NotificationTemplatesService) {}
 
-  private requireAuth(ctx: GraphQLContext): { tenantId: string; userId: string } {
+  private requireAuth(ctx: GraphQLContext): {
+    tenantId: string;
+    userId: string;
+  } {
     if (!ctx.authContext?.userId) {
       throw new UnauthorizedException('Authentication required');
     }

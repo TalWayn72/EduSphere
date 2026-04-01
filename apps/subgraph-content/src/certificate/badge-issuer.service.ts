@@ -58,7 +58,7 @@ export class BadgeIssuerService implements OnModuleDestroy {
   async issueBadge(
     userId: string,
     courseId: string,
-    _ctx: TenantContext,
+    _ctx: TenantContext
   ): Promise<BadgeVC> {
     const issuedAt = new Date().toISOString();
     const assertionId = `urn:uuid:${this.generateId(userId, courseId)}`;
@@ -115,14 +115,14 @@ export class BadgeIssuerService implements OnModuleDestroy {
    */
   async getProofForAssertion(
     assertionId: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<BadgeVC['proof'] | null> {
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
       tx
         .select({ proof: schema.openBadgeAssertions.proof })
         .from(schema.openBadgeAssertions)
         .where(eq(schema.openBadgeAssertions.id, assertionId))
-        .limit(1),
+        .limit(1)
     );
 
     const raw = rows[0]?.proof;
@@ -134,7 +134,7 @@ export class BadgeIssuerService implements OnModuleDestroy {
   private signBadge(
     userId: string,
     courseId: string,
-    issuedAt: string,
+    issuedAt: string
   ): string {
     const key = process.env['BADGE_PRIVATE_KEY'] ?? 'dev-key';
     return createHash('sha256')

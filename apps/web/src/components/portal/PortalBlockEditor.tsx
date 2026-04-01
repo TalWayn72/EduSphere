@@ -29,7 +29,12 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { GripVertical, Trash2, Plus } from 'lucide-react';
 
-export type BlockType = 'hero' | 'courses' | 'features' | 'cta' | 'testimonials';
+export type BlockType =
+  | 'hero'
+  | 'courses'
+  | 'features'
+  | 'cta'
+  | 'testimonials';
 
 export interface PortalBlock {
   id: string;
@@ -127,7 +132,9 @@ function SortableBlock({ block, onUpdate, onRemove }: SortableBlockProps) {
           <Input
             placeholder="Button label"
             value={block.props.buttonLabel ?? ''}
-            onChange={(e) => onUpdate(block.id, { buttonLabel: e.target.value })}
+            onChange={(e) =>
+              onUpdate(block.id, { buttonLabel: e.target.value })
+            }
             className="text-sm h-8"
             aria-label={`${BLOCK_LABELS[block.type]} button label`}
           />
@@ -172,10 +179,7 @@ export function PortalBlockEditor({ value, onChange }: PortalBlockEditorProps) {
   const addBlock = useCallback(
     (type: BlockType) => {
       onChange({
-        blocks: [
-          ...value.blocks,
-          { id: generateId(), type, props: {} },
-        ],
+        blocks: [...value.blocks, { id: generateId(), type, props: {} }],
       });
     },
     [value.blocks, onChange]

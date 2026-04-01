@@ -16,9 +16,14 @@ export function useDashboardQueries() {
 
   // Mounted guard: prevent urql cache dispatch during sibling route render
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY, pause: !mounted });
+  const [meResult] = useQuery<MeQueryResult>({
+    query: ME_QUERY,
+    pause: !mounted,
+  });
   const [coursesResult] = useQuery<CoursesQueryResult>({
     query: COURSES_QUERY,
     variables: { limit: 100, offset: 0 },
@@ -39,25 +44,29 @@ export function useDashboardQueries() {
   const myStats = statsResult.data?.myStats;
 
   // --- Derived stats ---
-  const coursesEnrolled = statsResult.fetching && coursesResult.fetching
-    ? null
-    : (myStats?.coursesEnrolled
-        ?? coursesResult.data?.courses?.length
-        ?? MOCK_STATS.coursesEnrolled);
+  const coursesEnrolled =
+    statsResult.fetching && coursesResult.fetching
+      ? null
+      : (myStats?.coursesEnrolled ??
+        coursesResult.data?.courses?.length ??
+        MOCK_STATS.coursesEnrolled);
 
-  const annotationsCreated = statsResult.fetching && annotationsResult.fetching
-    ? null
-    : (myStats?.annotationsCreated
-        ?? annotationsResult.data?.annotationsByUser?.length
-        ?? MOCK_STATS.annotationsCreated);
+  const annotationsCreated =
+    statsResult.fetching && annotationsResult.fetching
+      ? null
+      : (myStats?.annotationsCreated ??
+        annotationsResult.data?.annotationsByUser?.length ??
+        MOCK_STATS.annotationsCreated);
 
-  const totalLearningMinutes = myStats?.totalLearningMinutes ?? MOCK_STATS.totalLearningMinutes;
+  const totalLearningMinutes =
+    myStats?.totalLearningMinutes ?? MOCK_STATS.totalLearningMinutes;
   const totalMinutesDisplay =
     totalLearningMinutes >= 60
       ? `${Math.floor(totalLearningMinutes / 60)}h ${totalLearningMinutes % 60}m`
       : `${totalLearningMinutes}m`;
 
-  const conceptsMastered = myStats?.conceptsMastered ?? MOCK_STATS.conceptsMastered;
+  const conceptsMastered =
+    myStats?.conceptsMastered ?? MOCK_STATS.conceptsMastered;
 
   const weeklyActivity = myStats?.weeklyActivity ?? MOCK_STATS.weeklyActivity;
   const deferredActivity = useDeferredValue(weeklyActivity);

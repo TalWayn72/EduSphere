@@ -73,7 +73,9 @@ describe('createQuizWorkflow', () => {
 
   describe('LOAD_CONTENT state', () => {
     it('transitions to GENERATE_QUESTIONS', async () => {
-      const result = await workflow.step(makeCtx({ currentState: 'LOAD_CONTENT' }));
+      const result = await workflow.step(
+        makeCtx({ currentState: 'LOAD_CONTENT' })
+      );
 
       expect(result.nextState).toBe('GENERATE_QUESTIONS');
       expect(result.isComplete).toBe(false);

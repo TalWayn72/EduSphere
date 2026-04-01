@@ -88,7 +88,9 @@ export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
             {initialRole?.id ? 'Edit Custom Role' : 'Create Custom Role'}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            {initialRole?.id ? 'Edit role name and permissions.' : 'Create a new custom role with specific permissions.'}
+            {initialRole?.id
+              ? 'Edit role name and permissions.'
+              : 'Create a new custom role with specific permissions.'}
           </DialogDescription>
         </DialogHeader>
 

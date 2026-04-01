@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { MY_BADGES_QUERY, VERIFY_BADGE_QUERY, BADGE_DEFINITIONS_QUERY, CREATE_BADGE_DEFINITION_MUTATION, ISSUE_BADGE_MUTATION, REVOKE_BADGE_MUTATION } from './badge.queries';
+import {
+  MY_BADGES_QUERY,
+  VERIFY_BADGE_QUERY,
+  BADGE_DEFINITIONS_QUERY,
+  CREATE_BADGE_DEFINITION_MUTATION,
+  ISSUE_BADGE_MUTATION,
+  REVOKE_BADGE_MUTATION,
+} from './badge.queries';
 
 describe('badge.queries', () => {
   it('exports MY_BADGES_QUERY as a query string', () => {
@@ -23,7 +30,9 @@ describe('badge.queries', () => {
   it('exports CREATE_BADGE_DEFINITION_MUTATION as a mutation string', () => {
     expect(CREATE_BADGE_DEFINITION_MUTATION).toBeDefined();
     expect(typeof CREATE_BADGE_DEFINITION_MUTATION).toBe('string');
-    expect(CREATE_BADGE_DEFINITION_MUTATION).toContain('mutation CreateBadgeDefinition');
+    expect(CREATE_BADGE_DEFINITION_MUTATION).toContain(
+      'mutation CreateBadgeDefinition'
+    );
   });
 
   it('exports ISSUE_BADGE_MUTATION as a mutation string', () => {
@@ -37,5 +46,4 @@ describe('badge.queries', () => {
     expect(typeof REVOKE_BADGE_MUTATION).toBe('string');
     expect(REVOKE_BADGE_MUTATION).toContain('mutation RevokeBadge');
   });
-
 });

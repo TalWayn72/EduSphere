@@ -26,7 +26,9 @@ import { AnnotationsPanel } from './AnnotationsPanel';
 import { AiChatPanel } from './AiChatPanel';
 
 export function ContentViewer() {
-  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{ contentId: string }>();
+  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{
+    contentId: string;
+  }>();
 
   // ── Video state ──
   const [currentTime, setCurrentTime] = useState(0);
@@ -79,18 +81,23 @@ export function ContentViewer() {
 
   // Derive bookmarks from PERSONAL annotations that have a video timestamp.
   const bookmarks = useMemo(
-    () => annotations
-      .filter(
-        (a) =>
-          a.layer === AnnotationLayer.PERSONAL && a.contentTimestamp !== undefined
-      )
-      .map((a) => ({
-        id: a.id,
-        timestamp: a.contentTimestamp!,
-        label: a.content.length > 60 ? a.content.slice(0, 57) + '\u2026' : a.content,
-        color: '#3b82f6',
-      })),
-    [annotations],
+    () =>
+      annotations
+        .filter(
+          (a) =>
+            a.layer === AnnotationLayer.PERSONAL &&
+            a.contentTimestamp !== undefined
+        )
+        .map((a) => ({
+          id: a.id,
+          timestamp: a.contentTimestamp!,
+          label:
+            a.content.length > 60
+              ? a.content.slice(0, 57) + '\u2026'
+              : a.content,
+          color: '#3b82f6',
+        })),
+    [annotations]
   );
 
   // ── Live session / scenario ──
@@ -131,14 +138,14 @@ export function ContentViewer() {
     (content: string, layer: AnnotationLayer, timestamp: number) => {
       void addAnnotation(content, layer, timestamp);
     },
-    [addAnnotation],
+    [addAnnotation]
   );
 
   const handleReply = useCallback(
     (parentId: string, replyContent: string, replyLayer: AnnotationLayer) => {
       void addReply(parentId, replyContent, replyLayer, currentTime);
     },
-    [addReply, currentTime],
+    [addReply, currentTime]
   );
 
   const handleSendChat = useCallback(() => {

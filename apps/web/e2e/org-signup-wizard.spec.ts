@@ -27,7 +27,9 @@ const WIZARD_ROUTE = '/signup/organization';
 
 // ─── Mock helpers ────────────────────────────────────────────────────────────
 
-async function mockSignupSuccess(page: import('@playwright/test').Page): Promise<void> {
+async function mockSignupSuccess(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'CreateOrganization' || op.toLowerCase().includes('createorg')) {
       return JSON.stringify({
@@ -49,7 +51,9 @@ async function mockSignupSuccess(page: import('@playwright/test').Page): Promise
   });
 }
 
-async function mockSignupError(page: import('@playwright/test').Page): Promise<void> {
+async function mockSignupError(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'CreateOrganization' || op.toLowerCase().includes('createorg')) {
       return JSON.stringify({
@@ -66,7 +70,9 @@ async function mockSignupError(page: import('@playwright/test').Page): Promise<v
   });
 }
 
-async function mockSlugTaken(page: import('@playwright/test').Page): Promise<void> {
+async function mockSlugTaken(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'CheckSlugAvailability' || op.toLowerCase().includes('slug')) {
       return JSON.stringify({
@@ -82,7 +88,9 @@ async function mockSlugTaken(page: import('@playwright/test').Page): Promise<voi
   });
 }
 
-async function assertNoRawErrors(page: import('@playwright/test').Page): Promise<void> {
+async function assertNoRawErrors(
+  page: import('@playwright/test').Page
+): Promise<void> {
   const body = (await page.textContent('body')) ?? '';
   expect(body).not.toContain('urql error');
   expect(body).not.toContain('GraphQL error');
@@ -96,12 +104,18 @@ async function assertNoRawErrors(page: import('@playwright/test').Page): Promise
 test.describe('Org Signup Wizard — Structure', () => {
   test.beforeEach(async ({ page }) => {
     await mockSignupSuccess(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('wizard loads at /signup/organization', async ({ page }) => {
-    await expect(page.locator('[data-testid="org-signup-wizard"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="org-signup-wizard"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   test('shows 3-step progress stepper', async ({ page }) => {
@@ -126,8 +140,12 @@ test.describe('Org Signup Wizard — Structure', () => {
 test.describe('Org Signup Wizard — Step 1 Account', () => {
   test.beforeEach(async ({ page }) => {
     await mockSignupSuccess(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('full name field is visible and required', async ({ page }) => {
@@ -143,12 +161,18 @@ test.describe('Org Signup Wizard — Step 1 Account', () => {
   });
 
   test('password field has toggle visibility button', async ({ page }) => {
-    await expect(page.locator('[data-testid="input-password"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('[data-testid="toggle-password-visibility"]')).toBeVisible();
+    await expect(page.locator('[data-testid="input-password"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(
+      page.locator('[data-testid="toggle-password-visibility"]')
+    ).toBeVisible();
   });
 
   test('ToS and GDPR checkboxes are present', async ({ page }) => {
-    await expect(page.locator('[data-testid="checkbox-tos"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="checkbox-tos"]')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.locator('[data-testid="checkbox-gdpr"]')).toBeVisible();
   });
 
@@ -170,11 +194,17 @@ test.describe('Org Signup Wizard — Step 1 Account', () => {
 test.describe('Org Signup Wizard — Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await mockSignupSuccess(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
   });
 
-  async function fillStep1(page: import('@playwright/test').Page): Promise<void> {
+  async function fillStep1(
+    page: import('@playwright/test').Page
+  ): Promise<void> {
     await page.locator('[data-testid="input-full-name"]').fill('John Admin');
     await page.locator('[data-testid="input-email"]').fill('admin@acme.edu');
     await page.locator('[data-testid="input-password"]').fill('SecureP@ss123');
@@ -185,23 +215,37 @@ test.describe('Org Signup Wizard — Navigation', () => {
   test('advances to step 2 when step 1 is valid', async ({ page }) => {
     await fillStep1(page);
     await page.locator('[data-testid="btn-next"]').click();
-    await expect(page.locator('[data-step="2"]')).toHaveAttribute('data-active', 'true', { timeout: 5_000 });
+    await expect(page.locator('[data-step="2"]')).toHaveAttribute(
+      'data-active',
+      'true',
+      { timeout: 5_000 }
+    );
   });
 
   test('back button returns to step 1 from step 2', async ({ page }) => {
     await fillStep1(page);
     await page.locator('[data-testid="btn-next"]').click();
-    await page.locator('[data-step="2"][data-active="true"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-step="2"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
     await page.locator('[data-testid="btn-back"]').click();
-    await expect(page.locator('[data-step="1"]')).toHaveAttribute('data-active', 'true', { timeout: 5_000 });
+    await expect(page.locator('[data-step="1"]')).toHaveAttribute(
+      'data-active',
+      'true',
+      { timeout: 5_000 }
+    );
   });
 
   test('step 1 data preserved after navigation', async ({ page }) => {
     await fillStep1(page);
     await page.locator('[data-testid="btn-next"]').click();
-    await page.locator('[data-step="2"][data-active="true"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-step="2"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
     await page.locator('[data-testid="btn-back"]').click();
-    await expect(page.locator('[data-testid="input-full-name"]')).toHaveValue('John Admin');
+    await expect(page.locator('[data-testid="input-full-name"]')).toHaveValue(
+      'John Admin'
+    );
   });
 });
 
@@ -210,8 +254,12 @@ test.describe('Org Signup Wizard — Navigation', () => {
 test.describe('Org Signup Wizard — Slug Validation', () => {
   test('shows "slug taken" with suggestions', async ({ page }) => {
     await mockSlugTaken(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
 
     // Navigate to step 2 (need to fill step 1 first)
     await page.locator('[data-testid="input-full-name"]').fill('John Admin');
@@ -220,14 +268,18 @@ test.describe('Org Signup Wizard — Slug Validation', () => {
     await page.locator('[data-testid="checkbox-tos"]').click();
     await page.locator('[data-testid="checkbox-gdpr"]').click();
     await page.locator('[data-testid="btn-next"]').click();
-    await page.locator('[data-step="2"][data-active="true"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-step="2"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
 
     // Fill slug field
     await page.locator('[data-testid="input-slug"]').fill('acme-university');
     await page.locator('[data-testid="input-slug"]').blur();
 
     // Wait for availability check response
-    await expect(page.locator('[data-testid="slug-taken-message"]')).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="slug-taken-message"]')
+    ).toBeVisible({ timeout: 10_000 });
   });
 });
 
@@ -237,8 +289,12 @@ test.describe('Org Signup Wizard — Submission', () => {
   test('successful signup shows success message', async ({ page }) => {
     test.skip(!RUN_WRITE_TESTS, 'Write tests disabled');
     await mockSignupSuccess(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
 
     // Fill all 3 steps and submit
     // Step 1
@@ -250,18 +306,26 @@ test.describe('Org Signup Wizard — Submission', () => {
     await page.locator('[data-testid="btn-next"]').click();
 
     // Step 2
-    await page.locator('[data-step="2"][data-active="true"]').waitFor({ timeout: 5_000 });
-    await page.locator('[data-testid="input-org-name"]').fill('Acme University');
+    await page
+      .locator('[data-step="2"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-testid="input-org-name"]')
+      .fill('Acme University');
     await page.locator('[data-testid="input-slug"]').fill('acme-university');
     await page.locator('[data-testid="select-industry"]').click();
     await page.getByRole('option', { name: /technology/i }).click();
     await page.locator('[data-testid="btn-next"]').click();
 
     // Step 3 (Branding — minimal)
-    await page.locator('[data-step="3"][data-active="true"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-step="3"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
     await page.locator('[data-testid="btn-create-org"]').click();
 
-    await expect(page.locator('[data-testid="signup-success"]')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('[data-testid="signup-success"]')).toBeVisible({
+      timeout: 15_000,
+    });
     await assertNoRawErrors(page);
   });
 });
@@ -272,8 +336,12 @@ test.describe('Org Signup Wizard — Error Handling', () => {
   test('mutation error shows user-friendly message', async ({ page }) => {
     test.skip(!RUN_WRITE_TESTS, 'Write tests disabled');
     await mockSignupError(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
 
     // Fill and submit (abbreviated)
     await page.locator('[data-testid="input-full-name"]').fill('Error Test');
@@ -284,17 +352,23 @@ test.describe('Org Signup Wizard — Error Handling', () => {
     await page.locator('[data-testid="btn-next"]').click();
 
     // Navigate through all steps and submit
-    await page.locator('[data-step="2"][data-active="true"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-step="2"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
     await page.locator('[data-testid="input-org-name"]').fill('Error Org');
     await page.locator('[data-testid="input-slug"]').fill('error-org');
     await page.locator('[data-testid="select-industry"]').click();
     await page.getByRole('option').first().click();
     await page.locator('[data-testid="btn-next"]').click();
 
-    await page.locator('[data-step="3"][data-active="true"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-step="3"][data-active="true"]')
+      .waitFor({ timeout: 5_000 });
     await page.locator('[data-testid="btn-create-org"]').click();
 
-    await expect(page.locator('[data-testid="signup-error"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="signup-error"]')).toBeVisible({
+      timeout: 10_000,
+    });
     await assertNoRawErrors(page);
   });
 });
@@ -304,16 +378,28 @@ test.describe('Org Signup Wizard — Error Handling', () => {
 test.describe('Org Signup Wizard — Visual Regression', () => {
   test('visual regression — step 1 empty state', async ({ page }) => {
     await mockSignupSuccess(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
-    await expect(page).toHaveScreenshot('org-signup-step1-empty.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page).toHaveScreenshot('org-signup-step1-empty.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 
   test('visual regression — mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await mockSignupSuccess(page);
-    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 15_000 });
-    await expect(page).toHaveScreenshot('org-signup-step1-mobile.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}${WIZARD_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="org-signup-wizard"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page).toHaveScreenshot('org-signup-step1-mobile.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });

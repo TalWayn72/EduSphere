@@ -130,8 +130,12 @@ test.describe('Stripe Invoices — Invoice List', () => {
   test('all three invoices appear in the table', async ({ page }) => {
     const table = page.locator('[data-testid="invoice-history-table"]');
     await expect(table.getByText('Acme Corp')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('Edu Holdings')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('Global Learning')).toBeVisible({ timeout: 10_000 });
+    await expect(table.getByText('Edu Holdings')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(table.getByText('Global Learning')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('table shows plan and amount data', async ({ page }) => {
@@ -149,7 +153,9 @@ test.describe('Stripe Invoices — Invoice List', () => {
     await expect(table.getByText('overdue')).toBeVisible({ timeout: 10_000 });
   });
 
-  test('PDF download link for inv-1 points to a real URL (not "#")', async ({ page }) => {
+  test('PDF download link for inv-1 points to a real URL (not "#")', async ({
+    page,
+  }) => {
     const link = page.locator('[data-testid="download-pdf-inv-1"]');
     await expect(link).toBeVisible({ timeout: 10_000 });
     const href = await link.getAttribute('href');
@@ -157,7 +163,9 @@ test.describe('Stripe Invoices — Invoice List', () => {
     expect(href).toContain('inv-1.pdf');
   });
 
-  test('inv-2 with pdfUrl="#" shows "Pending" instead of download link', async ({ page }) => {
+  test('inv-2 with pdfUrl="#" shows "Pending" instead of download link', async ({
+    page,
+  }) => {
     // inv-2 has pdfUrl="#" so InvoiceTable renders "Pending" text, not a link
     const link = page.locator('[data-testid="download-pdf-inv-2"]');
     await expect(link).not.toBeVisible();
@@ -208,7 +216,9 @@ test.describe('Stripe Invoices — Generate Invoice Dialog', () => {
     ).toBeVisible({ timeout: 5_000 });
   });
 
-  test('submit button is disabled when tenant ID is empty', async ({ page }) => {
+  test('submit button is disabled when tenant ID is empty', async ({
+    page,
+  }) => {
     const genBtn = page.locator('[data-testid="generate-invoice-btn"]');
     await genBtn.scrollIntoViewIfNeeded();
     await genBtn.click({ force: true });
@@ -216,7 +226,9 @@ test.describe('Stripe Invoices — Generate Invoice Dialog', () => {
     await expect(submitBtn).toBeDisabled();
   });
 
-  test('filling tenant ID and submitting calls the mutation', async ({ page }) => {
+  test('filling tenant ID and submitting calls the mutation', async ({
+    page,
+  }) => {
     const genBtn = page.locator('[data-testid="generate-invoice-btn"]');
     await genBtn.scrollIntoViewIfNeeded();
     await genBtn.click({ force: true });
@@ -258,7 +270,9 @@ test.describe('Stripe Invoices — Empty State', () => {
     ).not.toBeVisible();
   });
 
-  test('generate invoice button is still available in empty state', async ({ page }) => {
+  test('generate invoice button is still available in empty state', async ({
+    page,
+  }) => {
     await expect(
       page.locator('[data-testid="generate-invoice-btn"]')
     ).toBeVisible({ timeout: 10_000 });

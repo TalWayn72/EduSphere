@@ -10,7 +10,7 @@
 import { useRef, useEffect } from 'react';
 
 interface Cmi5PlayerProps {
-  auUrl: string;          // Full AU launch URL (including cmi5 query params)
+  auUrl: string; // Full AU launch URL (including cmi5 query params)
   sessionId: string;
   onLaunched?: () => void;
   onTerminated?: () => void;

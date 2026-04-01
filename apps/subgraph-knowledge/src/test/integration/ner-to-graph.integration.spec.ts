@@ -52,11 +52,18 @@ function createMockSubscription(): {
             return Promise.resolve({ value: messages.shift()!, done: false });
           }
           if (done) {
-            return Promise.resolve({ value: undefined as unknown as NatsMsg, done: true });
+            return Promise.resolve({
+              value: undefined as unknown as NatsMsg,
+              done: true,
+            });
           }
-          return new Promise((resolve) => { resolver = resolve; });
+          return new Promise((resolve) => {
+            resolver = resolve;
+          });
         },
-        [Symbol.asyncIterator]() { return this; },
+        [Symbol.asyncIterator]() {
+          return this;
+        },
       };
     },
   };
@@ -64,7 +71,11 @@ function createMockSubscription(): {
 }
 
 // Hoisted mocks for vi.mock factory access
-const { mockDLQPublish: _mockDLQPublish, mockJSM, mockNatsConnection } = vi.hoisted(() => {
+const {
+  mockDLQPublish: _mockDLQPublish,
+  mockJSM,
+  mockNatsConnection,
+} = vi.hoisted(() => {
   const mockDLQPublish = vi.fn();
   const mockJSM = {
     streams: {
@@ -110,15 +121,27 @@ function encodePayload(payload: Record<string, unknown>): Uint8Array {
   return new TextEncoder().encode(JSON.stringify(payload));
 }
 
-function makeNERPayload(overrides?: Record<string, unknown>): Record<string, unknown> {
+function makeNERPayload(
+  overrides?: Record<string, unknown>
+): Record<string, unknown> {
   return {
     type: 'lesson.ner.extracted',
     tenantId: 'tenant-1',
     lessonId: 'lesson-1',
     runId: 'run-1',
     entities: [
-      { name: 'Talmud', type: 'Source', confidence: 0.95, sourceText: 'Talmud Bavli' },
-      { name: 'Rashi', type: 'Person', confidence: 0.9, sourceText: 'Rashi commentary' },
+      {
+        name: 'Talmud',
+        type: 'Source',
+        confidence: 0.95,
+        sourceText: 'Talmud Bavli',
+      },
+      {
+        name: 'Rashi',
+        type: 'Person',
+        confidence: 0.9,
+        sourceText: 'Rashi commentary',
+      },
     ],
     timestamp: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -239,7 +262,9 @@ describe('NER-to-Graph Integration (LessonNERConsumer)', () => {
   // ── DLQ after failures ────────────────────────────────────────────────
 
   it('catches errors from upsert and continues processing', async () => {
-    mockUpsertConceptsFromNER.mockRejectedValue(new Error('DB connection lost'));
+    mockUpsertConceptsFromNER.mockRejectedValue(
+      new Error('DB connection lost')
+    );
 
     const payload = makeNERPayload();
     const msgData = encodePayload(payload);

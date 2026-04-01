@@ -16,10 +16,12 @@ vi.mock('urql', () => ({
         acc + str + String(values[i] ?? ''),
       ''
     ),
-  useMutation: vi.fn().mockReturnValue([
-    { fetching: false },
-    vi.fn().mockResolvedValue({ data: true, error: undefined }),
-  ]),
+  useMutation: vi
+    .fn()
+    .mockReturnValue([
+      { fetching: false },
+      vi.fn().mockResolvedValue({ data: true, error: undefined }),
+    ]),
 }));
 
 vi.mock('@/lib/graphql/content.queries', () => ({
@@ -29,43 +31,71 @@ vi.mock('@/lib/graphql/content.queries', () => ({
 vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div data-testid="mock-dialog">{children}</div> : null,
-  DialogContent: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <div {...props}>{children}</div>
+  DialogContent: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <h2 {...props}>{children}</h2>
+  DialogTitle: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <h2 {...props}>{children}</h2>,
+  DialogDescription: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <p {...props}>{children}</p>,
+  DialogFooter: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
-  DialogDescription: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <p {...props}>{children}</p>
-  ),
-  DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }) => (
-    <button {...props}>{children}</button>
-  ),
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    size?: string;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-    (props, ref) => <input ref={ref} {...props} />
-  ),
+  Input: React.forwardRef<
+    HTMLInputElement,
+    React.InputHTMLAttributes<HTMLInputElement>
+  >((props, ref) => <input ref={ref} {...props} />),
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) => (
+  Label: ({
+    children,
+    ...props
+  }: React.LabelHTMLAttributes<HTMLLabelElement>) => (
     <label {...props}>{children}</label>
   ),
 }));
 
 vi.mock('lucide-react', () => ({
   Trash2: ({ className }: { className: string }) => (
-    <span data-testid="icon-trash" className={className}>trash</span>
+    <span data-testid="icon-trash" className={className}>
+      trash
+    </span>
   ),
   Loader2: ({ className }: { className: string }) => (
-    <span data-testid="icon-loader" className={className}>loading</span>
+    <span data-testid="icon-loader" className={className}>
+      loading
+    </span>
   ),
 }));
 
@@ -99,7 +129,9 @@ describe('DeleteCourseButton', () => {
   it('dialog is closed by default', () => {
     render(<DeleteCourseButton {...defaultProps} />);
 
-    expect(screen.queryByTestId('delete-course-dialog')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('delete-course-dialog')
+    ).not.toBeInTheDocument();
   });
 
   it('clicking button opens dialog', () => {

@@ -41,7 +41,10 @@ vi.mock('@edusphere/db', () => ({
     vi.fn((str: TemplateStringsArray) => str),
     { placeholder: vi.fn() }
   ),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) => cb(mockTx)),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) =>
+      cb(mockTx)
+  ),
   closeAllPools: vi.fn(),
 }));
 
@@ -106,7 +109,9 @@ describe('Comment Threading — nested annotation replies', () => {
       returning: mockReturning,
       orderBy: mockOrderBy,
     });
-    mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+    mockOrderBy.mockReturnValue({
+      limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+    });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
@@ -173,12 +178,11 @@ describe('Comment Threading — nested annotation replies', () => {
     const allComments = [TOP_LEVEL, REPLY_1, REPLY_2];
     mockOffset.mockResolvedValue(allComments);
 
-    const results = await service.findAll(
-      { limit: 50, offset: 0 },
-      ownerAuth
-    );
+    const results = await service.findAll({ limit: 50, offset: 0 }, ownerAuth);
     expect(results).toHaveLength(3);
-    const parentIds = results.map((a: { parent_id: string | null }) => a.parent_id);
+    const parentIds = results.map(
+      (a: { parent_id: string | null }) => a.parent_id
+    );
     expect(parentIds).toContain(null); // top-level
     expect(parentIds).toContain('top-1'); // reply
     expect(parentIds).toContain('reply-1'); // nested reply

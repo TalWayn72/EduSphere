@@ -93,7 +93,9 @@ describe('useTokenExpiryWatcher', () => {
     unmount();
 
     // clearTimers should have been called, cleaning up warn/expire/poll timers
-    expect(clearTimeoutSpy.mock.calls.length + clearIntervalSpy.mock.calls.length).toBeGreaterThan(0);
+    expect(
+      clearTimeoutSpy.mock.calls.length + clearIntervalSpy.mock.calls.length
+    ).toBeGreaterThan(0);
 
     clearTimeoutSpy.mockRestore();
     clearIntervalSpy.mockRestore();

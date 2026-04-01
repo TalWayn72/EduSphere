@@ -35,7 +35,9 @@ describe('useAnnounce', () => {
       result.current('Test message');
       vi.advanceTimersByTime(50);
     });
-    expect(document.getElementById('aria-live-polite')?.textContent).toBe('Test message');
+    expect(document.getElementById('aria-live-polite')?.textContent).toBe(
+      'Test message'
+    );
   });
 
   it('creates an assertive live region when politeness is assertive', () => {

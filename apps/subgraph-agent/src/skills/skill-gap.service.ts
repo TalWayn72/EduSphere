@@ -48,10 +48,7 @@ export class SkillGapService implements OnModuleDestroy {
 
     const gapIds = pathSkillIds.filter((id) => !masteredIds.has(id));
     const gapSkills = gapIds.length
-      ? await this.db
-          .select()
-          .from(skills)
-          .where(inArray(skills.id, gapIds))
+      ? await this.db.select().from(skills).where(inArray(skills.id, gapIds))
       : [];
 
     const mastered = pathSkillIds.length - gapIds.length;

@@ -68,77 +68,132 @@ const VIDEO_ASSET = {
 const FULL_RESULTS = [
   {
     __typename: 'PipelineResult',
-    id: 'r-ingestion', moduleName: 'INGESTION', outputType: 'INGESTION',
-    outputData: { sourceUrl: 'https://www.youtube.com/watch?v=purim-lesson-2024', assetType: 'VIDEO' },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    id: 'r-ingestion',
+    moduleName: 'INGESTION',
+    outputType: 'INGESTION',
+    outputData: {
+      sourceUrl: 'https://www.youtube.com/watch?v=purim-lesson-2024',
+      assetType: 'VIDEO',
+    },
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
   {
     __typename: 'PipelineResult',
-    id: 'r-asr', moduleName: 'ASR', outputType: 'ASR',
+    id: 'r-asr',
+    moduleName: 'ASR',
+    outputType: 'ASR',
     outputData: {
-      transcript: 'ברוכים הבאים לשיעור על פורים. היום נלמד על מגילת אסתר ועל מצוות היום הגדול. ייחודו של פורים הוא ששמחתו גדולה מכל שאר המועדות. חז"ל אמרו: "מי שלא שמח בפורים לא קיים מצוות שמחה". הגמרא בתענית מספרת על רבא ועל שמחת פורים.',
+      transcript:
+        'ברוכים הבאים לשיעור על פורים. היום נלמד על מגילת אסתר ועל מצוות היום הגדול. ייחודו של פורים הוא ששמחתו גדולה מכל שאר המועדות. חז"ל אמרו: "מי שלא שמח בפורים לא קיים מצוות שמחה". הגמרא בתענית מספרת על רבא ועל שמחת פורים.',
       language: 'he',
       duration: 3600,
     },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
   {
     __typename: 'PipelineResult',
-    id: 'r-cleaning', moduleName: 'CONTENT_CLEANING', outputType: 'CONTENT_CLEANING',
-    outputData: { cleanedText: 'ברוכים הבאים לשיעור על פורים היום נלמד על מגילת אסתר ועל מצוות היום הגדול' },
-    fileUrl: null, createdAt: new Date().toISOString(),
-  },
-  {
-    __typename: 'PipelineResult',
-    id: 'r-ner', moduleName: 'NER_SOURCE_LINKING', outputType: 'NER_SOURCE_LINKING',
+    id: 'r-cleaning',
+    moduleName: 'CONTENT_CLEANING',
+    outputType: 'CONTENT_CLEANING',
     outputData: {
-      entities: [{ text: 'פורים', type: 'CONCEPT' }, { text: 'מגילת אסתר', type: 'SOURCE' }, { text: 'רבא', type: 'PERSON' }],
-      linkedSources: [{ title: 'מגילת אסתר', url: null }, { title: 'תלמוד בבלי, תענית', url: null }],
+      cleanedText:
+        'ברוכים הבאים לשיעור על פורים היום נלמד על מגילת אסתר ועל מצוות היום הגדול',
     },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
   {
     __typename: 'PipelineResult',
-    id: 'r-summarize', moduleName: 'SUMMARIZATION', outputType: 'SUMMARIZATION',
+    id: 'r-ner',
+    moduleName: 'NER_SOURCE_LINKING',
+    outputType: 'NER_SOURCE_LINKING',
+    outputData: {
+      entities: [
+        { text: 'פורים', type: 'CONCEPT' },
+        { text: 'מגילת אסתר', type: 'SOURCE' },
+        { text: 'רבא', type: 'PERSON' },
+      ],
+      linkedSources: [
+        { title: 'מגילת אסתר', url: null },
+        { title: 'תלמוד בבלי, תענית', url: null },
+      ],
+    },
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    __typename: 'PipelineResult',
+    id: 'r-summarize',
+    moduleName: 'SUMMARIZATION',
+    outputType: 'SUMMARIZATION',
     outputData: {
       shortSummary: 'שיעור מרתק על ייחודו של פורים ומצוות השמחה בו.',
       keyPoints: ['מגילת אסתר', 'מצוות שמחה', 'שיטת רבא'],
     },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
   {
     __typename: 'PipelineResult',
-    id: 'r-notes', moduleName: 'STRUCTURED_NOTES', outputType: 'STRUCTURED_NOTES',
-    outputData: { outputMarkdown: '## פורים\n### מצוות\n- שמחה\n- מגילה\n- משלוח מנות\n- מתנות לאביונים' },
-    fileUrl: null, createdAt: new Date().toISOString(),
-  },
-  {
-    __typename: 'PipelineResult',
-    id: 'r-diagram', moduleName: 'DIAGRAM_GENERATOR', outputType: 'DIAGRAM_GENERATOR',
-    outputData: { mermaidSrc: 'graph LR\n  A[פורים] --> B[מגילת אסתר]\n  A --> C[שמחה]' },
-    fileUrl: null, createdAt: new Date().toISOString(),
-  },
-  {
-    __typename: 'PipelineResult',
-    id: 'r-citations', moduleName: 'CITATION_VERIFIER', outputType: 'CITATION_VERIFIER',
+    id: 'r-notes',
+    moduleName: 'STRUCTURED_NOTES',
+    outputType: 'STRUCTURED_NOTES',
     outputData: {
-      verifiedCitations: [{ sourceText: 'מגילת אסתר' }, { sourceText: 'תלמוד בבלי, תענית' }],
+      outputMarkdown:
+        '## פורים\n### מצוות\n- שמחה\n- מגילה\n- משלוח מנות\n- מתנות לאביונים',
+    },
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    __typename: 'PipelineResult',
+    id: 'r-diagram',
+    moduleName: 'DIAGRAM_GENERATOR',
+    outputType: 'DIAGRAM_GENERATOR',
+    outputData: {
+      mermaidSrc: 'graph LR\n  A[פורים] --> B[מגילת אסתר]\n  A --> C[שמחה]',
+    },
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    __typename: 'PipelineResult',
+    id: 'r-citations',
+    moduleName: 'CITATION_VERIFIER',
+    outputType: 'CITATION_VERIFIER',
+    outputData: {
+      verifiedCitations: [
+        { sourceText: 'מגילת אסתר' },
+        { sourceText: 'תלמוד בבלי, תענית' },
+      ],
       failedCitations: [],
       matchReport: '2 ציטוטים אומתו בהצלחה. לא נמצאו ציטוטים שגויים.',
     },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
   {
     __typename: 'PipelineResult',
-    id: 'r-qa', moduleName: 'QA_GATE', outputType: 'QA_GATE',
+    id: 'r-qa',
+    moduleName: 'QA_GATE',
+    outputType: 'QA_GATE',
     outputData: { overallScore: 0.92, fixList: [] },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
   {
     __typename: 'PipelineResult',
-    id: 'r-publish', moduleName: 'PUBLISH_SHARE', outputType: 'PUBLISH_SHARE',
-    outputData: { publishReady: true, publishedUrl: 'https://cdn.example.com/purim-lesson' },
-    fileUrl: null, createdAt: new Date().toISOString(),
+    id: 'r-publish',
+    moduleName: 'PUBLISH_SHARE',
+    outputType: 'PUBLISH_SHARE',
+    outputData: {
+      publishReady: true,
+      publishedUrl: 'https://cdn.example.com/purim-lesson',
+    },
+    fileUrl: null,
+    createdAt: new Date().toISOString(),
   },
 ];
 
@@ -182,7 +237,10 @@ const CORS_HEADERS = {
   'access-control-allow-headers': 'content-type, authorization',
 };
 
-async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed') {
+async function setupResultsMocks(
+  page: Page,
+  scenario: ScenarioKey = 'completed'
+) {
   // Use explicit URL (not glob) to reliably intercept cross-origin urql requests
   await page.route(GRAPHQL_URL, async (route) => {
     // Handle CORS preflight — the app (port 5175) fetches from the GraphQL API
@@ -198,7 +256,10 @@ async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed'
     let op = '';
     let q = rawBody;
     try {
-      const parsed = JSON.parse(rawBody) as { query?: string; operationName?: string };
+      const parsed = JSON.parse(rawBody) as {
+        query?: string;
+        operationName?: string;
+      };
       op = parsed?.operationName ?? '';
       q = parsed?.query ?? rawBody;
     } catch {
@@ -211,7 +272,14 @@ async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed'
         status: 200,
         headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
         body: JSON.stringify({
-          data: { addLessonAsset: { id: 'asset-new', assetType: 'VIDEO', sourceUrl: 'https://youtube.com/test', fileUrl: null } },
+          data: {
+            addLessonAsset: {
+              id: 'asset-new',
+              assetType: 'VIDEO',
+              sourceUrl: 'https://youtube.com/test',
+              fileUrl: null,
+            },
+          },
         }),
       });
     }
@@ -223,14 +291,19 @@ async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed'
       q.includes('lesson(id:') ||
       // fallback: any GraphQL POST that isn't a named mutation
       (route.request().method() === 'POST' &&
-       !op.startsWith('Add') && !op.startsWith('Save') && !op.startsWith('Start') &&
-       !op.startsWith('Cancel') && !op.startsWith('Publish'));
+        !op.startsWith('Add') &&
+        !op.startsWith('Save') &&
+        !op.startsWith('Start') &&
+        !op.startsWith('Cancel') &&
+        !op.startsWith('Publish'));
 
     if (isLessonQuery) {
       const pipeline =
-        scenario === 'empty'     ? null :
-        scenario === 'running'   ? PIPELINE_RUNNING :
-                                   PIPELINE_COMPLETED;
+        scenario === 'empty'
+          ? null
+          : scenario === 'running'
+            ? PIPELINE_RUNNING
+            : PIPELINE_COMPLETED;
 
       return route.fulfill({
         status: 200,
@@ -264,8 +337,12 @@ test.describe('Results Page — empty state', () => {
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText('תוצאות Pipeline')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByTestId('empty-results')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('תוצאות Pipeline')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByTestId('empty-results')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible();
     await expect(page.getByTestId('open-pipeline-from-empty')).toBeVisible();
   });
@@ -275,7 +352,9 @@ test.describe('Results Page — empty state', () => {
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByTestId('add-video-panel')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('add-video-panel')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('video-url-input')).toBeVisible();
     await expect(page.getByTestId('add-video-btn')).toBeVisible();
   });
@@ -287,19 +366,30 @@ test.describe('Results Page — empty state', () => {
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await page.waitForSelector('[data-testid="add-video-btn"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="add-video-btn"]', {
+      timeout: 10_000,
+    });
     await page.click('[data-testid="add-video-btn"]');
-    await expect(page.getByTestId('add-video-error')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('add-video-error')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('add-video-error')).toContainText('קישור');
   });
 
-  test('video URL: fill and submit navigates to pipeline page', async ({ page }) => {
+  test('video URL: fill and submit navigates to pipeline page', async ({
+    page,
+  }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await page.waitForSelector('[data-testid="video-url-input"]', { timeout: 10_000 });
-    await page.fill('[data-testid="video-url-input"]', 'https://www.youtube.com/watch?v=purim-2024');
+    await page.waitForSelector('[data-testid="video-url-input"]', {
+      timeout: 10_000,
+    });
+    await page.fill(
+      '[data-testid="video-url-input"]',
+      'https://www.youtube.com/watch?v=purim-2024'
+    );
     await page.click('[data-testid="add-video-btn"]');
 
     await expect(page).toHaveURL(
@@ -315,7 +405,9 @@ test.describe('Results Page — RUNNING state', () => {
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByTestId('run-status-badge')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByTestId('run-status-badge')).toBeVisible({
+      timeout: 8_000,
+    });
     await expect(page.getByTestId('run-status-badge')).toContainText(/מריץ/);
   });
 });
@@ -325,7 +417,9 @@ test.describe('Results Page — COMPLETED state with all outputs', () => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText('תוצאות Pipeline')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('תוצאות Pipeline')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('shows COMPLETED run status badge', async ({ page }) => {
@@ -334,61 +428,87 @@ test.describe('Results Page — COMPLETED state with all outputs', () => {
   });
 
   test('INGESTION section shows processed video URL', async ({ page }) => {
-    await expect(page.getByTestId('result-ingestion')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-ingestion')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('ingestion-url')).toBeVisible();
-    const ingestionText = await page.getByTestId('result-ingestion').textContent();
+    const ingestionText = await page
+      .getByTestId('result-ingestion')
+      .textContent();
     expect(ingestionText).toContain('youtube.com');
   });
 
   test('ASR section shows transcription text', async ({ page }) => {
-    await expect(page.getByTestId('result-asr')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-asr')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('asr-transcript')).toBeVisible();
-    const transcriptText = await page.getByTestId('asr-transcript').textContent();
+    const transcriptText = await page
+      .getByTestId('asr-transcript')
+      .textContent();
     expect(transcriptText).toContain('ברוכים הבאים לשיעור על פורים');
   });
 
   test('ASR shows language label', async ({ page }) => {
-    await expect(page.getByTestId('asr-language')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('asr-language')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('asr-language')).toContainText('he');
   });
 
   test('ASR shows duration', async ({ page }) => {
-    await expect(page.getByTestId('asr-duration')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('asr-duration')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('asr-duration')).toContainText('60');
   });
 
   test('CONTENT_CLEANING section renders cleaned text', async ({ page }) => {
-    await expect(page.getByTestId('result-cleaning')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-cleaning')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('cleaned-text')).toBeVisible();
   });
 
   test('NER section shows entity chips', async ({ page }) => {
-    await expect(page.getByTestId('result-ner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-ner')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('entity-0')).toContainText('פורים');
     await expect(page.getByTestId('entity-1')).toContainText('מגילת אסתר');
   });
 
   test('NER section shows linked sources', async ({ page }) => {
-    await expect(page.getByTestId('result-ner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-ner')).toBeVisible({
+      timeout: 5_000,
+    });
     const nerText = await page.getByTestId('result-ner').textContent();
     expect(nerText).toContain('מגילת אסתר');
     expect(nerText).toContain('תלמוד בבלי');
   });
 
   test('SUMMARIZATION section shows short summary', async ({ page }) => {
-    await expect(page.getByTestId('result-summarization')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('summary-short')).toContainText('שיעור מרתק על ייחודו של פורים');
+    await expect(page.getByTestId('result-summarization')).toBeVisible({
+      timeout: 5_000,
+    });
+    await expect(page.getByTestId('summary-short')).toContainText(
+      'שיעור מרתק על ייחודו של פורים'
+    );
   });
 
   test('SUMMARIZATION shows key points', async ({ page }) => {
-    await expect(page.getByTestId('summary-keypoints')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('summary-keypoints')).toBeVisible({
+      timeout: 5_000,
+    });
     const kpText = await page.getByTestId('summary-keypoints').textContent();
     expect(kpText).toContain('מגילת אסתר');
     expect(kpText).toContain('מצוות שמחה');
   });
 
   test('STRUCTURED_NOTES section shows markdown content', async ({ page }) => {
-    await expect(page.getByTestId('result-structured-notes')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-structured-notes')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('notes-markdown')).toBeVisible();
     const notesText = await page.getByTestId('notes-markdown').textContent();
     expect(notesText).toContain('פורים');
@@ -396,15 +516,21 @@ test.describe('Results Page — COMPLETED state with all outputs', () => {
   });
 
   test('DIAGRAM section shows mermaid source', async ({ page }) => {
-    await expect(page.getByTestId('result-diagram')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-diagram')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('diagram-mermaid')).toBeVisible();
     const diagramText = await page.getByTestId('diagram-mermaid').textContent();
     expect(diagramText).toContain('graph LR');
     expect(diagramText).toContain('פורים');
   });
 
-  test('CITATION_VERIFIER shows verified and failed counts', async ({ page }) => {
-    await expect(page.getByTestId('result-citations')).toBeVisible({ timeout: 5_000 });
+  test('CITATION_VERIFIER shows verified and failed counts', async ({
+    page,
+  }) => {
+    await expect(page.getByTestId('result-citations')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('citations-verified')).toContainText('2');
     await expect(page.getByTestId('citations-failed')).toContainText('0');
   });
@@ -420,19 +546,28 @@ test.describe('Results Page — COMPLETED state with all outputs', () => {
   });
 
   test('PUBLISH section shows publishReady and URL', async ({ page }) => {
-    await expect(page.getByTestId('result-publish')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('result-publish')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('publish-ready')).toBeVisible();
     await expect(page.getByTestId('publish-url')).toBeVisible();
-    await expect(page.getByTestId('publish-url')).toHaveAttribute('href', 'https://cdn.example.com/purim-lesson');
+    await expect(page.getByTestId('publish-url')).toHaveAttribute(
+      'href',
+      'https://cdn.example.com/purim-lesson'
+    );
   });
 
   test('Run Pipeline Again button is visible', async ({ page }) => {
-    await expect(page.getByTestId('run-pipeline-again-btn')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('run-pipeline-again-btn')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test.skip(!RUN_WRITE_TESTS, 'Skipped in read-only mode');
 
-  test('Run Pipeline Again button navigates to pipeline page', async ({ page }) => {
+  test('Run Pipeline Again button navigates to pipeline page', async ({
+    page,
+  }) => {
     await page.click('[data-testid="run-pipeline-again-btn"]');
     await expect(page).toHaveURL(
       new RegExp(`/courses/${COURSE_ID}/lessons/${LESSON_ID}/pipeline`),
@@ -442,11 +577,15 @@ test.describe('Results Page — COMPLETED state with all outputs', () => {
 });
 
 test.describe('Results Page — regression guards', () => {
-  test('no raw technical strings shown to user in empty state', async ({ page }) => {
+  test('no raw technical strings shown to user in empty state', async ({
+    page,
+  }) => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="empty-results"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="empty-results"]', {
+      timeout: 10_000,
+    });
 
     const pageText = await page.textContent('body');
     expect(pageText).not.toContain('[GraphQL]');
@@ -455,11 +594,15 @@ test.describe('Results Page — regression guards', () => {
     expect(pageText).not.toContain('undefined');
   });
 
-  test('no raw technical strings shown in completed state', async ({ page }) => {
+  test('no raw technical strings shown in completed state', async ({
+    page,
+  }) => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="result-asr"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="result-asr"]', {
+      timeout: 10_000,
+    });
 
     const pageText = await page.textContent('body');
     expect(pageText).not.toContain('[GraphQL]');
@@ -468,10 +611,15 @@ test.describe('Results Page — regression guards', () => {
     expect(pageText).not.toContain('undefined');
   });
 
-  test('no Authentication required errors shown in console', async ({ page }) => {
+  test('no Authentication required errors shown in console', async ({
+    page,
+  }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
-      if (msg.type() === 'error' && msg.text().includes('Authentication required')) {
+      if (
+        msg.type() === 'error' &&
+        msg.text().includes('Authentication required')
+      ) {
         // Only collect non-subscription auth errors (subscriptions degrading gracefully is OK)
         if (!msg.text().includes('subscription')) {
           consoleErrors.push(msg.text());
@@ -482,7 +630,9 @@ test.describe('Results Page — regression guards', () => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="result-asr"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="result-asr"]', {
+      timeout: 10_000,
+    });
 
     // Main content errors (non-subscription) should not exist
     expect(consoleErrors.length).toBe(0);
@@ -494,17 +644,25 @@ test.describe('Results Page — screenshots', () => {
     await setupResultsMocks(page, 'empty');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="empty-results"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="empty-results"]', {
+      timeout: 10_000,
+    });
 
-    await expect(page).toHaveScreenshot('lesson-results-empty.png', { maxDiffPixels: 400 });
+    await expect(page).toHaveScreenshot('lesson-results-empty.png', {
+      maxDiffPixels: 400,
+    });
   });
 
   test('completed results page screenshot', async ({ page }) => {
     await setupResultsMocks(page, 'completed');
     await page.goto(RESULTS_URL);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="result-asr"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="result-asr"]', {
+      timeout: 10_000,
+    });
 
-    await expect(page).toHaveScreenshot('lesson-results-completed.png', { maxDiffPixels: 400 });
+    await expect(page).toHaveScreenshot('lesson-results-completed.png', {
+      maxDiffPixels: 400,
+    });
   });
 });

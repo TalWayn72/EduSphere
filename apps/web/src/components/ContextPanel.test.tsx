@@ -10,7 +10,8 @@ import userEvent from '@testing-library/user-event';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(() => [
@@ -37,7 +38,10 @@ const SEGMENT = {
   endTime: 90,
 };
 
-function mockUseQuery(data: Record<string, unknown> | undefined, fetching = false) {
+function mockUseQuery(
+  data: Record<string, unknown> | undefined,
+  fetching = false
+) {
   vi.mocked(useQuery).mockReturnValue([
     { data, fetching, error: undefined },
     vi.fn(),
@@ -60,9 +64,7 @@ describe('ContextPanel', () => {
 
   it('shows play-video prompt when activeSegment is null', () => {
     render(<ContextPanel activeSegment={null} />);
-    expect(
-      screen.getByText(/play the video/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/play the video/i)).toBeInTheDocument();
   });
 
   it('does not show "Related Concepts" section heading when no segment is active', () => {
@@ -222,10 +224,9 @@ describe('ContextPanel', () => {
     render(<ContextPanel activeSegment={SEGMENT} onSeek={onSeek} />);
 
     // With real timers, wait for debounce to fire via state update
-    await waitFor(
-      () => screen.getByRole('button', { name: /jump to/i }),
-      { timeout: 1500 }
-    );
+    await waitFor(() => screen.getByRole('button', { name: /jump to/i }), {
+      timeout: 1500,
+    });
 
     await userEvent.click(screen.getByRole('button', { name: /jump to/i }));
     expect(onSeek).toHaveBeenCalledWith(90);
@@ -251,7 +252,9 @@ describe('ContextPanel', () => {
       vi.advanceTimersByTime(700);
     });
 
-    expect(screen.queryByRole('button', { name: /jump to/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /jump to/i })
+    ).not.toBeInTheDocument();
   });
 
   // ── Debounce ───────────────────────────────────────────────────────────────
@@ -265,7 +268,9 @@ describe('ContextPanel', () => {
 
     // useQuery was called but with pause=true (queryText still empty)
     // The loading state should NOT be active yet
-    expect(screen.queryByText(/finding related concepts/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/finding related concepts/i)
+    ).not.toBeInTheDocument();
   });
 
   it('clears debounce timer on segment change', () => {
@@ -276,7 +281,11 @@ describe('ContextPanel', () => {
     });
 
     // Change segment before debounce fires — timer should reset
-    const SEGMENT2 = { ...SEGMENT, id: 'seg-2', text: 'Different segment text' };
+    const SEGMENT2 = {
+      ...SEGMENT,
+      id: 'seg-2',
+      text: 'Different segment text',
+    };
     rerender(<ContextPanel activeSegment={SEGMENT2} />);
 
     act(() => {
@@ -284,7 +293,9 @@ describe('ContextPanel', () => {
     });
 
     // Only 300ms after the 2nd segment — debounce not yet fired
-    expect(screen.queryByText(/finding related concepts/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/finding related concepts/i)
+    ).not.toBeInTheDocument();
   });
 
   // ── Mixed results ──────────────────────────────────────────────────────────

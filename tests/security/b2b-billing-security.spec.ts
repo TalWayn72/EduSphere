@@ -84,7 +84,9 @@ describe('B2B Pilot Request — XSS Sanitization (T-01, SC-02)', () => {
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
     // Must have Zod or GraphQL schema definition for pilot input
-    expect(combined).toMatch(/PilotSignup|pilotSignup|requestPilot|pilot.*schema/i);
+    expect(combined).toMatch(
+      /PilotSignup|pilotSignup|requestPilot|pilot.*schema/i
+    );
   });
 
   it('pilot input validation strips HTML tags from institutionName', () => {
@@ -128,8 +130,12 @@ describe('B2B Pilot Request — XSS Sanitization (T-01, SC-02)', () => {
     // Skip if file not yet created
     if (adminPage.length === 0) return;
     // dangerouslySetInnerHTML on user-controlled fields is an XSS vector
-    expect(adminPage).not.toMatch(/dangerouslySetInnerHTML.*orgName|dangerouslySetInnerHTML.*institutionName/);
-    expect(adminPage).not.toMatch(/dangerouslySetInnerHTML.*useCase|dangerouslySetInnerHTML.*contactName/);
+    expect(adminPage).not.toMatch(
+      /dangerouslySetInnerHTML.*orgName|dangerouslySetInnerHTML.*institutionName/
+    );
+    expect(adminPage).not.toMatch(
+      /dangerouslySetInnerHTML.*useCase|dangerouslySetInnerHTML.*contactName/
+    );
   });
 
   it('billing schema does NOT store raw HTML in pilot text columns (schema-level constraint)', () => {
@@ -146,10 +152,9 @@ describe('B2B Pilot Request — XSS Sanitization (T-01, SC-02)', () => {
   it('pilot request mutation is NOT decorated with @authenticated (public endpoint)', () => {
     // requestPilot is intentionally public — no auth required for pilot sign-up
     // This test verifies the mutation exists without requiring auth
-    const sdlFiles = globSync(
-      'apps/subgraph-core/src/**/*.graphql',
-      { cwd: ROOT }
-    );
+    const sdlFiles = globSync('apps/subgraph-core/src/**/*.graphql', {
+      cwd: ROOT,
+    });
     const combined = sdlFiles
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
@@ -258,7 +263,9 @@ describe('B2B YAU — Cross-Tenant RLS Integrity (T-06, SC-06)', () => {
       c.indexOf('pilot_requests')
     );
     // Negative lookahead: app.current_user NOT followed by _id is the bug
-    expect(yauBlock).not.toMatch(/current_setting\s*\(\s*'app\.current_user'\s*,/);
+    expect(yauBlock).not.toMatch(
+      /current_setting\s*\(\s*'app\.current_user'\s*,/
+    );
   });
 
   it('yau_events RLS policy does not use app.current_user_role as sole USING clause', () => {
@@ -326,9 +333,8 @@ describe('B2B Admin Billing — @requiresRole Guard (T-05, SC-05)', () => {
       'apps/subgraph-core/src/subscription/subscription.graphql',
       'apps/subgraph-core/src/billing/billing.graphql',
     ];
-    subscriptionSdl = sdlCandidates
-      .map((p) => read(p))
-      .find((c) => c.length > 0) ?? '';
+    subscriptionSdl =
+      sdlCandidates.map((p) => read(p)).find((c) => c.length > 0) ?? '';
   });
 
   it('subscription SDL file exists', () => {
@@ -336,7 +342,7 @@ describe('B2B Admin Billing — @requiresRole Guard (T-05, SC-05)', () => {
       // SDL not yet created — this is a reminder test
       console.warn(
         '[b2b-billing-security] WARNING: subscription SDL not yet created — ' +
-        'ensure it is added before production deployment'
+          'ensure it is added before production deployment'
       );
     }
     // This test becomes a hard assertion once the file exists
@@ -379,17 +385,19 @@ describe('B2B Admin Billing — @requiresRole Guard (T-05, SC-05)', () => {
     const start = subscriptionSdl.indexOf('approvePilot');
     // Slice narrowly to just this mutation block
     const nextMutation = subscriptionSdl.indexOf('\n  ', start + 20);
-    const block = subscriptionSdl.slice(start, nextMutation > start ? nextMutation : start + 300);
+    const block = subscriptionSdl.slice(
+      start,
+      nextMutation > start ? nextMutation : start + 300
+    );
     // ORG_ADMIN must NOT appear in the approvePilot roles list — self-approval risk
     expect(block).not.toContain('ORG_ADMIN');
   });
 
   it('platformUsageOverview query requires @requiresRole with SUPER_ADMIN', () => {
     // Check across all subgraph-core SDL files
-    const sdlFiles = globSync(
-      'apps/subgraph-core/src/**/*.graphql',
-      { cwd: ROOT }
-    );
+    const sdlFiles = globSync('apps/subgraph-core/src/**/*.graphql', {
+      cwd: ROOT,
+    });
     const combined = sdlFiles
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
@@ -401,10 +409,9 @@ describe('B2B Admin Billing — @requiresRole Guard (T-05, SC-05)', () => {
   });
 
   it('platformUsageOverview does NOT allow ORG_ADMIN (cross-tenant data)', () => {
-    const sdlFiles = globSync(
-      'apps/subgraph-core/src/**/*.graphql',
-      { cwd: ROOT }
-    );
+    const sdlFiles = globSync('apps/subgraph-core/src/**/*.graphql', {
+      cwd: ROOT,
+    });
     const combined = sdlFiles
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
@@ -424,7 +431,9 @@ describe('B2B Admin Billing — @requiresRole Guard (T-05, SC-05)', () => {
     if (!existsSync(servicePath)) return; // not yet created — skip
     const c = readFileSync(servicePath, 'utf-8');
     // Service must have a guard preventing self-approval
-    expect(c).toMatch(/self.approval|Self.Approval|approver.*tenantId.*===.*targetTenant|tenantId.*approvedBy/i);
+    expect(c).toMatch(
+      /self.approval|Self.Approval|approver.*tenantId.*===.*targetTenant|tenantId.*approvedBy/i
+    );
   });
 });
 
@@ -439,17 +448,19 @@ describe('B2B Billing Schema — SI-1 RLS Variable Correctness', () => {
   it('billing.ts does NOT use bare app.current_user (SI-1 violation guard)', () => {
     const c = read('packages/db/src/schema/billing.ts');
     // Negative pattern: must not have app.current_user WITHOUT _id suffix
-    expect(c).not.toMatch(/current_setting\s*\(\s*['"`]app\.current_user['"`]\s*,/);
+    expect(c).not.toMatch(
+      /current_setting\s*\(\s*['"`]app\.current_user['"`]\s*,/
+    );
   });
 
   it('billing.ts uses app.current_user_id for user-scoped policies (SI-1)', () => {
     const c = read('packages/db/src/schema/billing.ts');
-    expect(c).toContain("app.current_user_id");
+    expect(c).toContain('app.current_user_id');
   });
 
   it('billing.ts uses app.current_tenant for tenant-scoped policies (SI-1)', () => {
     const c = read('packages/db/src/schema/billing.ts');
-    expect(c).toContain("app.current_tenant");
+    expect(c).toContain('app.current_tenant');
   });
 
   it('all current_setting calls in billing.ts use TRUE as second argument (fail-safe NULL)', () => {
@@ -500,7 +511,9 @@ describe('B2B Pilot Request — Email Enumeration Prevention (T-12)', () => {
   });
 
   it('PilotSignupResult type does NOT contain a duplicate or exists field', () => {
-    const allSdl = globSync('apps/subgraph-core/src/**/*.graphql', { cwd: ROOT })
+    const allSdl = globSync('apps/subgraph-core/src/**/*.graphql', {
+      cwd: ROOT,
+    })
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
     if (!allSdl.includes('PilotSignupResult')) return;
@@ -520,25 +533,33 @@ describe('B2B Admin Frontend — Forced Browsing Prevention (T-10)', () => {
     if (page.length === 0) return; // not yet created — skip
     // Must gate on SUPER_ADMIN role
     expect(page).toContain('SUPER_ADMIN');
-    expect(page).toMatch(/role.*SUPER_ADMIN|SUPER_ADMIN.*role|requiresRole|ProtectedRoute/);
+    expect(page).toMatch(
+      /role.*SUPER_ADMIN|SUPER_ADMIN.*role|requiresRole|ProtectedRoute/
+    );
   });
 
   it('PilotRequestsAdminPage restricts access to SUPER_ADMIN role', () => {
     const page = read('apps/web/src/pages/PilotRequestsAdminPage.tsx');
     if (page.length === 0) return; // not yet created — skip
     expect(page).toContain('SUPER_ADMIN');
-    expect(page).toMatch(/role.*SUPER_ADMIN|SUPER_ADMIN.*role|requiresRole|ProtectedRoute/);
+    expect(page).toMatch(
+      /role.*SUPER_ADMIN|SUPER_ADMIN.*role|requiresRole|ProtectedRoute/
+    );
   });
 
   it('admin billing route renders access-denied for non-SUPER_ADMIN roles', () => {
     const page = read('apps/web/src/pages/PlatformUsageDashboardPage.tsx');
     if (page.length === 0) return; // not yet created — skip
     // Must have an access-denied / unauthorized fallback
-    expect(page).toMatch(/[Aa]ccess [Dd]enied|[Uu]nauthorized|[Ff]orbidden|not.*authorized/i);
+    expect(page).toMatch(
+      /[Aa]ccess [Dd]enied|[Uu]nauthorized|[Ff]orbidden|not.*authorized/i
+    );
   });
 
   it('myTenantUsage query uses @authenticated (self-service, any role)', () => {
-    const allSdl = globSync('apps/subgraph-core/src/**/*.graphql', { cwd: ROOT })
+    const allSdl = globSync('apps/subgraph-core/src/**/*.graphql', {
+      cwd: ROOT,
+    })
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
     if (!allSdl.includes('myTenantUsage')) return;
@@ -548,7 +569,9 @@ describe('B2B Admin Frontend — Forced Browsing Prevention (T-10)', () => {
   });
 
   it('myTenantUsage query does NOT require SUPER_ADMIN (self-service query)', () => {
-    const allSdl = globSync('apps/subgraph-core/src/**/*.graphql', { cwd: ROOT })
+    const allSdl = globSync('apps/subgraph-core/src/**/*.graphql', {
+      cwd: ROOT,
+    })
       .map((f) => readFileSync(resolve(ROOT, f), 'utf-8'))
       .join('\n');
     if (!allSdl.includes('myTenantUsage')) return;
@@ -614,7 +637,9 @@ describe('B2B Billing — Schema Completeness', () => {
   it('billing.ts is exported from packages/db schema index', () => {
     const indexFile = read('packages/db/src/schema/index.ts');
     if (indexFile.length === 0) return; // index may not exist yet
-    expect(indexFile).toMatch(/billing|subscriptionPlans|tenantSubscriptions|yauEvents/);
+    expect(indexFile).toMatch(
+      /billing|subscriptionPlans|tenantSubscriptions|yauEvents/
+    );
   });
 
   it('tenant_subscriptions has stripe fields for future payment integration', () => {
@@ -627,7 +652,7 @@ describe('B2B Billing — Schema Completeness', () => {
     const c = read('packages/db/src/schema/billing.ts');
     // Status enum: pending | approved | rejected | expired
     expect(c).toContain("'pending'");
-    expect(c).toContain("status");
+    expect(c).toContain('status');
   });
 
   it('yau_events has index on (tenant_id, year) for billing performance', () => {

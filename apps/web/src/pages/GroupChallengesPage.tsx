@@ -77,7 +77,9 @@ export function GroupChallengesPage() {
     <Layout>
       <PageShell size="md" className="py-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">{t('groupChallenges')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {t('groupChallenges')}
+          </h1>
           <Link
             to="/challenges/new"
             className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -120,11 +122,15 @@ export function GroupChallengesPage() {
         {activeTab === 'active' && (
           <div>
             {activeChallengesResult.fetching && (
-              <p className="text-sm text-muted-foreground">{t('loadingChallenges')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('loadingChallenges')}
+              </p>
             )}
             {!activeChallengesResult.fetching && challenges.length === 0 && (
               <div className="rounded-lg border border-border bg-card p-8 text-center">
-                <p className="text-sm text-muted-foreground">{t('noActiveChallenges')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('noActiveChallenges')}
+                </p>
               </div>
             )}
             {challenges.length > 0 && (
@@ -134,7 +140,9 @@ export function GroupChallengesPage() {
                     key={challenge.id}
                     challenge={challenge}
                     onJoin={handleJoin}
-                    isJoining={joiningId === challenge.id || joinResult.fetching}
+                    isJoining={
+                      joiningId === challenge.id || joinResult.fetching
+                    }
                   />
                 ))}
               </div>
@@ -146,13 +154,18 @@ export function GroupChallengesPage() {
         {activeTab === 'mine' && (
           <div>
             {myParticipationsResult.fetching && (
-              <p className="text-sm text-muted-foreground">{t('loadingParticipations')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('loadingParticipations')}
+              </p>
             )}
-            {!myParticipationsResult.fetching && participations.length === 0 && (
-              <div className="rounded-lg border border-border bg-card p-8 text-center">
-                <p className="text-sm text-muted-foreground">{t('noParticipations')}</p>
-              </div>
-            )}
+            {!myParticipationsResult.fetching &&
+              participations.length === 0 && (
+                <div className="rounded-lg border border-border bg-card p-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {t('noParticipations')}
+                  </p>
+                </div>
+              )}
             {participations.length > 0 && (
               <div className="flex flex-col gap-3">
                 {participations.map((p) => (
@@ -162,9 +175,12 @@ export function GroupChallengesPage() {
                     className="rounded-lg border border-border bg-card p-4 flex items-center justify-between hover:bg-muted/30 transition-colors"
                   >
                     <div>
-                      <p className="text-sm font-medium text-foreground">{t('challengeLabel', { id: p.challengeId.slice(0, 8) })}</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {t('challengeLabel', { id: p.challengeId.slice(0, 8) })}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        {t('score')}: {p.score} {p.rank != null ? `· ${t('rank')} #${p.rank}` : ''}
+                        {t('score')}: {p.score}{' '}
+                        {p.rank != null ? `· ${t('rank')} #${p.rank}` : ''}
                       </p>
                     </div>
                     <span className="text-xs text-muted-foreground">

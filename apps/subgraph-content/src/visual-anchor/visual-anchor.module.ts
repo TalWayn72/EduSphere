@@ -7,7 +7,11 @@ import { ImageOptimizerModule } from '../image-optimizer/image-optimizer.module'
 
 @Module({
   imports: [ClamavModule, ImageOptimizerModule],
-  providers: [VisualAnchorService, VisualAnchorQueryService, VisualAnchorResolver],
+  providers: [
+    VisualAnchorService,
+    VisualAnchorQueryService,
+    VisualAnchorResolver,
+  ],
   exports: [VisualAnchorService],
 })
 export class VisualAnchorModule {}

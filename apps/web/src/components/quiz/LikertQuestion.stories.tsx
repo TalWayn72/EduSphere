@@ -5,7 +5,8 @@ import type { Likert } from '@/types/quiz';
 
 const fivePoint: Likert = {
   type: 'LIKERT',
-  question: 'How confident are you in applying calculus to real-world problems?',
+  question:
+    'How confident are you in applying calculus to real-world problems?',
   scale: 5,
   labels: { min: 'Not Confident', max: 'Very Confident' },
 };
@@ -25,7 +26,14 @@ const defaultLabels: Likert = {
 
 function Wrapper({ item, disabled }: { item: Likert; disabled?: boolean }) {
   const [value, setValue] = useState<number | null>(null);
-  return <LikertQuestion item={item} value={value} onChange={setValue} disabled={disabled} />;
+  return (
+    <LikertQuestion
+      item={item}
+      value={value}
+      onChange={setValue}
+      disabled={disabled}
+    />
+  );
 }
 
 const meta: Meta<typeof LikertQuestion> = {
@@ -49,7 +57,9 @@ export const DefaultLabels: Story = {
 };
 
 export const Selected: Story = {
-  render: () => <LikertQuestion item={fivePoint} value={4} onChange={() => {}} />,
+  render: () => (
+    <LikertQuestion item={fivePoint} value={4} onChange={() => {}} />
+  ),
 };
 
 export const Disabled: Story = {

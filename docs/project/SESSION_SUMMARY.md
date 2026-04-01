@@ -58,14 +58,14 @@
 
 ## Statistics
 
-| Metric | Value |
-|--------|-------|
-| Total Commits | 6 |
-| Packages Created | 3 (auth, db, gateway) |
-| Subgraphs Functional | 2/6 (core, content) |
-| Database Tables | 16/16 |
-| GraphQL Types | User, Tenant, Course, Module |
-| Lines of Code | ~3,500+ |
+| Metric               | Value                        |
+| -------------------- | ---------------------------- |
+| Total Commits        | 6                            |
+| Packages Created     | 3 (auth, db, gateway)        |
+| Subgraphs Functional | 2/6 (core, content)          |
+| Database Tables      | 16/16                        |
+| GraphQL Types        | User, Tenant, Course, Module |
+| Lines of Code        | ~3,500+                      |
 
 ## Key Commits
 
@@ -241,7 +241,7 @@
 - NATS JetStream streams: max_age + max_bytes enforced
 - LangGraph checkpointer wrapped in NestJS lifecycle hooks
 - Unbounded Map/Array eviction guards (LRU, slice(-N))
-- Memory test files: *.memory.spec.ts for every new service
+- Memory test files: \*.memory.spec.ts for every new service
 
 ### Test Additions
 
@@ -542,7 +542,7 @@
 - CoursesScreen: search input + MasteryBadge integration + left-accent card layout
 - ProfileScreen + SettingsScreen: COLORS.primary replaces iOS #007AFF / Material #2563EB
 - Navigation: tabBarActiveTintColor -> COLORS.primary
-- vitest.config.ts: __DEV__: true define + CoursesScreen/MasteryBadge/HomeScreen tests included
+- vitest.config.ts: **DEV**: true define + CoursesScreen/MasteryBadge/HomeScreen tests included
 - Mobile test pattern: pure logic tests only (no @testing-library/react-native — not installed)
 - Mobile tests: 119 total
 
@@ -597,7 +597,7 @@
 - BUG-054: Progress bar indicatorClassName fix (container vs indicator div)
   - progress.tsx: added indicatorClassName prop
   - SettingsPage.tsx: className={barColor} -> indicatorClassName={barColor}
-- Security: live_sessions password columns renamed to *Enc (SI-3 compliance)
+- Security: live_sessions password columns renamed to \*Enc (SI-3 compliance)
 - Security: raw GraphQL error hidden in LiveSessionsPage (generic user message)
 - GDPR: PROCESSING_ACTIVITIES.md added to docs/isms/
 - E2E tests: live-sessions.spec.ts, offline-mode.spec.ts, course-discovery.spec.ts, knowledge-graph-course-context.spec.ts
@@ -615,15 +615,15 @@
 
 ## Cumulative Statistics
 
-| Session | Tests | TypeScript Errors | Notes |
-|---------|-------|-------------------|-------|
-| 1 (Session 1) | ~200 | 0 | Foundation + 2 subgraphs |
-| 6 | ~2,000 | 0 | All 6 subgraphs + admin |
-| 10 | ~3,500 | 0 | i18n + memory safety |
-| 15 | ~5,000 | 0 | First 5k milestone |
-| 18 | ~5,300 | 0 | PRD gaps closed |
-| 22 | ~5,650 | 0 | Mobile DS aligned |
-| 24 | 5,762+ | 0 | Phase 27 complete |
+| Session       | Tests  | TypeScript Errors | Notes                    |
+| ------------- | ------ | ----------------- | ------------------------ |
+| 1 (Session 1) | ~200   | 0                 | Foundation + 2 subgraphs |
+| 6             | ~2,000 | 0                 | All 6 subgraphs + admin  |
+| 10            | ~3,500 | 0                 | i18n + memory safety     |
+| 15            | ~5,000 | 0                 | First 5k milestone       |
+| 18            | ~5,300 | 0                 | PRD gaps closed          |
+| 22            | ~5,650 | 0                 | Mobile DS aligned        |
+| 24            | 5,762+ | 0                 | Phase 27 complete        |
 
 ---
 
@@ -636,6 +636,7 @@
 ### Key Deliverables
 
 **Phase 28 — Live Sessions Mutations + PWA + SI-3**
+
 - All 4 live session mutations implemented: end/join/cancel/start
 - SI-3 security critical fix: `encryptField()` in live-session.service.ts
 - ServiceWorker (`pwa.ts`) with hourly update poll
@@ -643,34 +644,42 @@
 - Husky v10 pre-commit hook fixed
 
 **Phase 29 — Stripe Checkout**
+
 - Full Stripe Elements checkout flow
 - Secure: clientSecret never in localStorage or DOM
 
 **Phase 30 — Personal KG Wiki + Annotation Merge Request**
+
 - SVG personal annotation graph across all courses
 - Instructor merge queue with diff view + approve/reject
 
 **Phase 31 — Video Sketch 6 Tools**
+
 - freehand, eraser, rect, arrow, ellipse, text
 - Color picker, shape preview on mousemove
 
 **Phase 32 — AI Subtitle Translation**
+
 - LibreTranslate integration for real-time VTT generation
 - VideoSubtitleSelector CC button + language dropdown
 
 **Phase 33 — Remote Proctoring**
+
 - WebRTC webcam overlay, tab-switch detection
 - ProctoringSession DB table with JSONB flags
 
 **Phase 34 — 3D Models & Simulations**
+
 - Three.js WebGL viewer with OrbitControls
 - uploadModel3D mutation (gltf/glb/obj/fbx)
 - Full memory cleanup on unmount
 
 ### Milestone: ALL PRD GAPS CLOSED
+
 G-1 (3D Models), G-2 (AI Subtitles), G-3 (Annotation Merge), G-4 (Proctoring), P-1 (Video Sketch), P-2 (Personal KG), P-3 (Stripe Checkout)
 
 ### Tests Added
+
 - ~352 new tests across Phases 28-34
 - Total: ~6,125+ (100% pass rate)
 - New E2E specs: offline-sync, live-sessions-mutations, course-discovery-filters, checkout-flow, annotation-merge-request, video-sketch, subtitle-translation, proctoring, model3d-viewer
@@ -679,14 +688,14 @@ G-1 (3D Models), G-2 (AI Subtitles), G-3 (Annotation Merge), G-4 (Proctoring), P
 
 ## Cumulative Statistics (All Sessions)
 
-| Session | Phases | Tests | Milestone |
-|---------|--------|-------|-----------|
-| 1 | 0-2 | ~200 | Foundation |
-| 2-17 | 3-17 | ~2,500 | Full stack |
-| 18-22 | 18-22 | ~3,500 | Admin + i18n |
-| 23 | 23 | ~3,550 | Mobile quality |
-| 24 | 24 | ~4,050 | PRD G1-G8 |
-| 25 | 25-26 | ~5,250 | UI/UX Revolution |
-| 26 | doc | ~5,300 | Doc infra |
-| 27 | 27 | ~5,762 | Live Sessions + Offline |
-| **28** | **28-34** | **~6,125+** | **ALL PRD GAPS CLOSED** |
+| Session | Phases    | Tests       | Milestone               |
+| ------- | --------- | ----------- | ----------------------- |
+| 1       | 0-2       | ~200        | Foundation              |
+| 2-17    | 3-17      | ~2,500      | Full stack              |
+| 18-22   | 18-22     | ~3,500      | Admin + i18n            |
+| 23      | 23        | ~3,550      | Mobile quality          |
+| 24      | 24        | ~4,050      | PRD G1-G8               |
+| 25      | 25-26     | ~5,250      | UI/UX Revolution        |
+| 26      | doc       | ~5,300      | Doc infra               |
+| 27      | 27        | ~5,762      | Live Sessions + Offline |
+| **28**  | **28-34** | **~6,125+** | **ALL PRD GAPS CLOSED** |

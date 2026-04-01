@@ -47,7 +47,8 @@ export class TracingInterceptor implements NestInterceptor {
 
     // Extract user context from GraphQL context
     const ctx = gqlCtx.getContext();
-    const tenantId = ctx?.tenantId || ctx?.req?.headers?.['x-tenant-id'] || 'unknown';
+    const tenantId =
+      ctx?.tenantId || ctx?.req?.headers?.['x-tenant-id'] || 'unknown';
     const userId = ctx?.userId || 'unknown';
 
     if (api) {
@@ -69,12 +70,15 @@ export class TracingInterceptor implements NestInterceptor {
             span.end();
           },
           error: (err: Error) => {
-            span.setStatus({ code: api!.SpanStatusCode.ERROR, message: err.message });
+            span.setStatus({
+              code: api!.SpanStatusCode.ERROR,
+              message: err.message,
+            });
             span.recordException(err);
             span.setAttribute('graphql.duration_ms', performance.now() - start);
             span.end();
           },
-        }),
+        })
       );
     }
 
@@ -84,16 +88,16 @@ export class TracingInterceptor implements NestInterceptor {
         next: () => {
           const durationMs = (performance.now() - start).toFixed(1);
           this.logger.debug(
-            `[Trace] ${spanName} OK ${durationMs}ms tenant=${tenantId} user=${userId}`,
+            `[Trace] ${spanName} OK ${durationMs}ms tenant=${tenantId} user=${userId}`
           );
         },
         error: (err: Error) => {
           const durationMs = (performance.now() - start).toFixed(1);
           this.logger.warn(
-            `[Trace] ${spanName} ERROR ${durationMs}ms tenant=${tenantId} user=${userId} err=${err.message}`,
+            `[Trace] ${spanName} ERROR ${durationMs}ms tenant=${tenantId} user=${userId} err=${err.message}`
           );
         },
-      }),
+      })
     );
   }
 }

@@ -85,7 +85,9 @@ describe('GapAnalysisService', () => {
     const after = new Date();
 
     expect(report.generatedAt).toBeInstanceOf(Date);
-    expect(report.generatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
+    expect(report.generatedAt.getTime()).toBeGreaterThanOrEqual(
+      before.getTime()
+    );
     expect(report.generatedAt.getTime()).toBeLessThanOrEqual(after.getTime());
   });
 

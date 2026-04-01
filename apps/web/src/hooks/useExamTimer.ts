@@ -19,7 +19,7 @@ export interface ExamTimerResult {
 
 export function useExamTimer(
   initialSeconds: number,
-  onExpire: () => void,
+  onExpire: () => void
 ): ExamTimerResult {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onExpireRef = useRef(onExpire);
@@ -48,7 +48,8 @@ export function useExamTimer(
 
   return {
     timeRemaining,
-    isWarning: timeRemaining <= WARNING_THRESHOLD && timeRemaining > CRITICAL_THRESHOLD,
+    isWarning:
+      timeRemaining <= WARNING_THRESHOLD && timeRemaining > CRITICAL_THRESHOLD,
     isCritical: timeRemaining <= CRITICAL_THRESHOLD,
     formattedTime: formatTime(timeRemaining),
   };

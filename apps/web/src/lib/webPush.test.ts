@@ -6,7 +6,11 @@
  * in subscribeWebPush / unsubscribeWebPush.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { urlBase64ToUint8Array, subscribeWebPush, unsubscribeWebPush } from './webPush';
+import {
+  urlBase64ToUint8Array,
+  subscribeWebPush,
+  unsubscribeWebPush,
+} from './webPush';
 
 // ─── urlBase64ToUint8Array ─────────────────────────────────────────────────
 
@@ -131,7 +135,9 @@ describe('unsubscribeWebPush', () => {
       value: {
         ready: Promise.resolve({
           pushManager: {
-            getSubscription: vi.fn().mockResolvedValue({ unsubscribe: mockUnsubscribe }),
+            getSubscription: vi
+              .fn()
+              .mockResolvedValue({ unsubscribe: mockUnsubscribe }),
           },
         }),
       },

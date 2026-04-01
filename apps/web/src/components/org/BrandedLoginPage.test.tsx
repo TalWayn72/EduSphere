@@ -20,10 +20,16 @@ const DEFAULT_LOGIN_CONFIG = {
   primaryColor: '#ff0000',
   secondaryColor: '#00ff00',
   welcomeMessage: 'Welcome to AcmeCorp Learning!',
-  ssoProviders: [] as { id: string; name: string; type: string; iconUrl: string | null }[],
+  ssoProviders: [] as {
+    id: string;
+    name: string;
+    type: string;
+    iconUrl: string | null;
+  }[],
   isLoading: false,
   isOrgFound: true,
-  keycloakAuthUrl: 'http://localhost:8080/realms/edusphere/protocol/openid-connect/auth?client_id=edusphere-web',
+  keycloakAuthUrl:
+    'http://localhost:8080/realms/edusphere/protocol/openid-connect/auth?client_id=edusphere-web',
   buildSsoUrl: (idp: string) => `http://localhost:8080/auth?kc_idp_hint=${idp}`,
 };
 
@@ -59,7 +65,7 @@ describe('BrandedLoginPage', () => {
     render(<BrandedLoginPage slug="acme" />);
     expect(screen.getByText('AcmeCorp')).toBeInTheDocument();
     expect(
-      screen.getByText('Welcome to AcmeCorp Learning!'),
+      screen.getByText('Welcome to AcmeCorp Learning!')
     ).toBeInTheDocument();
   });
 
@@ -95,7 +101,7 @@ describe('BrandedLoginPage', () => {
     });
     render(<BrandedLoginPage slug="acme" />);
     expect(
-      screen.queryByTestId('branded-welcome-message'),
+      screen.queryByTestId('branded-welcome-message')
     ).not.toBeInTheDocument();
   });
 
@@ -127,7 +133,7 @@ describe('BrandedLoginPage', () => {
     render(<BrandedLoginPage slug="acme" />);
     fireEvent.click(screen.getByTestId('branded-login-btn'));
     expect(window.location.href).toContain(
-      '/realms/edusphere/protocol/openid-connect/auth',
+      '/realms/edusphere/protocol/openid-connect/auth'
     );
     Object.defineProperty(window, 'location', {
       writable: true,

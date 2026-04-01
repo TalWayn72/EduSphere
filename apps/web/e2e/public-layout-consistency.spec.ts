@@ -49,7 +49,9 @@ const PUBLIC_ROUTES = [
 test.describe('Public Layout Consistency — Nav + Footer on all public pages', () => {
   for (const route of PUBLIC_ROUTES) {
     test(`${route.path} has PublicNav and LandingFooter`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${route.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${route.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
 
       // PublicNav should be visible
       const nav = page.getByTestId('public-nav');
@@ -64,9 +66,15 @@ test.describe('Public Layout Consistency — Nav + Footer on all public pages', 
 
       // If full variant, section anchor links must be visible (desktop)
       if (route.nav === 'full') {
-        await expect(nav.getByText('Features').first()).toBeVisible({ timeout: 5_000 });
-        await expect(nav.getByText('Pricing').first()).toBeVisible({ timeout: 5_000 });
-        await expect(nav.getByText('Compliance').first()).toBeVisible({ timeout: 5_000 });
+        await expect(nav.getByText('Features').first()).toBeVisible({
+          timeout: 5_000,
+        });
+        await expect(nav.getByText('Pricing').first()).toBeVisible({
+          timeout: 5_000,
+        });
+        await expect(nav.getByText('Compliance').first()).toBeVisible({
+          timeout: 5_000,
+        });
       }
 
       // LandingFooter should be visible
@@ -74,7 +82,9 @@ test.describe('Public Layout Consistency — Nav + Footer on all public pages', 
       await expect(footer).toBeVisible({ timeout: 10_000 });
 
       // Footer should have EduSphere branding
-      await expect(footer.getByText('EduSphere')).toBeVisible({ timeout: 5_000 });
+      await expect(footer.getByText('EduSphere')).toBeVisible({
+        timeout: 5_000,
+      });
     });
   }
 });
@@ -96,7 +106,9 @@ test.describe('Public Layout Consistency — Login page special case', () => {
     await expect(nav.getByText('Log In')).toBeVisible({ timeout: 5_000 });
 
     // Footer should NOT be visible (showFooter={false} on Login page)
-    await expect(page.getByTestId('landing-footer')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByTestId('landing-footer')).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 });
 
@@ -119,7 +131,9 @@ test.describe('Public Layout Consistency — Sticky navigation', () => {
 // ─── Suite 4: Mobile hamburger menu ─────────────────────────────────────────
 
 test.describe('Public Layout Consistency — Mobile hamburger menu', () => {
-  test('hamburger menu toggles nav links on mobile viewport', async ({ page }) => {
+  test('hamburger menu toggles nav links on mobile viewport', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -138,8 +152,12 @@ test.describe('Public Layout Consistency — Mobile hamburger menu', () => {
     await hamburger.click();
 
     // Section links should now be visible in the mobile drawer
-    await expect(nav.getByText('Features').first()).toBeVisible({ timeout: 3_000 });
-    await expect(nav.getByText('Pricing').first()).toBeVisible({ timeout: 3_000 });
+    await expect(nav.getByText('Features').first()).toBeVisible({
+      timeout: 3_000,
+    });
+    await expect(nav.getByText('Pricing').first()).toBeVisible({
+      timeout: 3_000,
+    });
 
     // Close menu button should now show "Close menu"
     const closeBtn = nav.getByRole('button', { name: /Close menu/i });
@@ -149,10 +167,14 @@ test.describe('Public Layout Consistency — Mobile hamburger menu', () => {
     await closeBtn.click();
 
     // Section links should be hidden again
-    await expect(nav.locator('.md\\:hidden').first()).not.toBeVisible({ timeout: 3_000 });
+    await expect(nav.locator('.md\\:hidden').first()).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
-  test('mobile Log In button is accessible via hamburger menu', async ({ page }) => {
+  test('mobile Log In button is accessible via hamburger menu', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -161,7 +183,9 @@ test.describe('Public Layout Consistency — Mobile hamburger menu', () => {
     await hamburger.click();
 
     // Log In should be visible in mobile menu
-    await expect(nav.getByText('Log In').first()).toBeVisible({ timeout: 3_000 });
+    await expect(nav.getByText('Log In').first()).toBeVisible({
+      timeout: 3_000,
+    });
   });
 });
 
@@ -196,7 +220,9 @@ test.describe('Public Layout Consistency — Footer content', () => {
     const footer = page.getByTestId('landing-footer');
     await expect(footer.getByText('Product')).toBeVisible({ timeout: 10_000 });
     await expect(footer.getByText('Solutions')).toBeVisible({ timeout: 5_000 });
-    await expect(footer.getByText('Compliance')).toBeVisible({ timeout: 5_000 });
+    await expect(footer.getByText('Compliance')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(footer.getByText('Company')).toBeVisible({ timeout: 5_000 });
   });
 
@@ -204,17 +230,25 @@ test.describe('Public Layout Consistency — Footer content', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const footer = page.getByTestId('landing-footer');
-    await expect(footer.getByText('2026 EduSphere')).toBeVisible({ timeout: 10_000 });
+    await expect(footer.getByText('2026 EduSphere')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('LandingFooter has Privacy, Terms, and Accessibility links', async ({ page }) => {
+  test('LandingFooter has Privacy, Terms, and Accessibility links', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const footer = page.getByTestId('landing-footer');
     // Bottom bar legal links
     const bottomBar = footer.locator('.border-t');
-    await expect(bottomBar.getByText('Privacy')).toBeVisible({ timeout: 5_000 });
+    await expect(bottomBar.getByText('Privacy')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(bottomBar.getByText('Terms')).toBeVisible({ timeout: 5_000 });
-    await expect(bottomBar.getByText('Accessibility')).toBeVisible({ timeout: 5_000 });
+    await expect(bottomBar.getByText('Accessibility')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 });

@@ -36,8 +36,12 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
 vi.mock('@aws-sdk/client-s3', () => {
   const destroy = vi.fn();
   return {
-    S3Client: class { destroy = destroy; },
-    GetObjectCommand: class { constructor(public input: unknown) {} },
+    S3Client: class {
+      destroy = destroy;
+    },
+    GetObjectCommand: class {
+      constructor(public input: unknown) {}
+    },
     __mockDestroy: destroy,
   };
 });
@@ -61,7 +65,9 @@ describe('CertificateDownloadService', () => {
     it('destroys S3 client', async () => {
       await service.onModuleDestroy();
       // S3 client destroy is called on module destroy
-      const { __mockDestroy } = await import('@aws-sdk/client-s3') as { __mockDestroy: ReturnType<typeof vi.fn> };
+      const { __mockDestroy } = (await import('@aws-sdk/client-s3')) as {
+        __mockDestroy: ReturnType<typeof vi.fn>;
+      };
       expect(__mockDestroy).toHaveBeenCalled();
     });
   });
@@ -80,7 +86,7 @@ describe('CertificateDownloadService', () => {
       expect(mockGetSignedUrl).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
-        expect.objectContaining({ expiresIn: 900 }),
+        expect.objectContaining({ expiresIn: 900 })
       );
     });
 
@@ -89,7 +95,7 @@ describe('CertificateDownloadService', () => {
       mockTx.select.mockReturnValueOnce({ from: chain.from });
 
       await expect(
-        service.getCertificateDownloadUrl('missing', 'u1', 't1'),
+        service.getCertificateDownloadUrl('missing', 'u1', 't1')
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -100,7 +106,7 @@ describe('CertificateDownloadService', () => {
       mockTx.select.mockReturnValueOnce({ from: chain.from });
 
       await expect(
-        service.getCertificateDownloadUrl('cert-1', 'u1', 't1'),
+        service.getCertificateDownloadUrl('cert-1', 'u1', 't1')
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -111,7 +117,7 @@ describe('CertificateDownloadService', () => {
       mockTx.select.mockReturnValueOnce({ from: chain.from });
 
       await expect(
-        service.getCertificateDownloadUrl('cert-1', 'u1', 't1'),
+        service.getCertificateDownloadUrl('cert-1', 'u1', 't1')
       ).rejects.toThrow(BadRequestException);
     });
   });

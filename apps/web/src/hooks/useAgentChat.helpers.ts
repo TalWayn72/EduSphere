@@ -41,5 +41,8 @@ export function withStreamingCursor(
   if (!isStreaming || messages.length === 0) return messages;
   const last = messages[messages.length - 1];
   if (!last || last.role !== 'agent') return messages;
-  return [...messages.slice(0, -1), { ...last, content: last.content + '\u258C' }];
+  return [
+    ...messages.slice(0, -1),
+    { ...last, content: last.content + '\u258C' },
+  ];
 }

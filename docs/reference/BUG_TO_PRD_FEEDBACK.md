@@ -16,18 +16,19 @@ have prevented the bug are never formalized.
 ### Trigger Condition
 
 A bug-to-PRD update is triggered when:
+
 - A bug fix's **Discovery Wave 2** finds the same pattern in **3 or more files**
 - The bug class represents a **missing non-functional requirement** (not just a coding error)
 
 ### Examples of Bug Classes → PRD Updates
 
-| Bug Class | PRD Section to Add/Update |
-|-----------|--------------------------|
-| Missing upload retry | NFR: "All uploads must implement retry with exponential backoff" |
-| Missing error boundary | NFR: "All route-level components must catch and display errors gracefully" |
-| Missing tenant_id on table | Security: "All new tables must include tenant_id with RLS policy" |
-| Missing cleanup on unmount | NFR: "All timers/subscriptions must be cleaned up on component unmount" |
-| Missing Zod validation | Security: "All mutation inputs must be validated with Zod schemas" |
+| Bug Class                  | PRD Section to Add/Update                                                  |
+| -------------------------- | -------------------------------------------------------------------------- |
+| Missing upload retry       | NFR: "All uploads must implement retry with exponential backoff"           |
+| Missing error boundary     | NFR: "All route-level components must catch and display errors gracefully" |
+| Missing tenant_id on table | Security: "All new tables must include tenant_id with RLS policy"          |
+| Missing cleanup on unmount | NFR: "All timers/subscriptions must be cleaned up on component unmount"    |
+| Missing Zod validation     | Security: "All mutation inputs must be validated with Zod schemas"         |
 
 ### Process
 
@@ -49,6 +50,7 @@ A bug-to-PRD update is triggered when:
 
 ```markdown
 ### NFR-XXX: [Requirement Title]
+
 > Auto-added from BUG-XXX (Discovery Wave 2: N files affected)
 
 **Requirement:** [One-line statement]
@@ -59,4 +61,4 @@ A bug-to-PRD update is triggered when:
 
 ---
 
-*Created: March 2026 — Enterprise Audit Wave 8*
+_Created: March 2026 — Enterprise Audit Wave 8_

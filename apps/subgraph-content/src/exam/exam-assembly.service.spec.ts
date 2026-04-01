@@ -13,7 +13,7 @@ function makeItem(
   bloom: string,
   status: string,
   irtB = 0,
-  difFlagged = false,
+  difFlagged = false
 ) {
   return {
     id,
@@ -61,7 +61,7 @@ describe('ExamAssemblyService', () => {
     mockBlueprintService = { getBlueprint: vi.fn() };
     service = new ExamAssemblyService(
       mockItemService as never,
-      mockBlueprintService as never,
+      mockBlueprintService as never
     );
   });
 
@@ -143,9 +143,9 @@ describe('ExamAssemblyService', () => {
       mockBlueprintService.getBlueprint.mockResolvedValue(bp);
       mockItemService.getAssemblableItems.mockResolvedValue(items);
 
-      await expect(
-        service.assembleExam('bp-1', 'u1', 't1'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.assembleExam('bp-1', 'u1', 't1')).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('generates unique option shuffle seeds per item', async () => {
@@ -174,7 +174,10 @@ describe('ExamAssemblyService', () => {
 
   describe('validateBlueprintCanAssemble', () => {
     it('returns valid when sufficient items exist', async () => {
-      const bp = makeBlueprint({ totalQuestions: 2, domainDistribution: { algebra: 100 } });
+      const bp = makeBlueprint({
+        totalQuestions: 2,
+        domainDistribution: { algebra: 100 },
+      });
       const items = [
         makeItem('i1', 'algebra', 'REMEMBER', 'CALIBRATED'),
         makeItem('i2', 'algebra', 'APPLY', 'CALIBRATED'),
@@ -183,7 +186,11 @@ describe('ExamAssemblyService', () => {
       mockBlueprintService.getBlueprint.mockResolvedValue(bp);
       mockItemService.getAssemblableItems.mockResolvedValue(items);
 
-      const result = await service.validateBlueprintCanAssemble('bp-1', 't1', 'u1');
+      const result = await service.validateBlueprintCanAssemble(
+        'bp-1',
+        't1',
+        'u1'
+      );
       expect(result.valid).toBe(true);
       expect(result.issues).toHaveLength(0);
     });
@@ -193,13 +200,15 @@ describe('ExamAssemblyService', () => {
         totalQuestions: 10,
         domainDistribution: { algebra: 50, geometry: 50 },
       });
-      const items = [
-        makeItem('i1', 'algebra', 'REMEMBER', 'CALIBRATED'),
-      ];
+      const items = [makeItem('i1', 'algebra', 'REMEMBER', 'CALIBRATED')];
       mockBlueprintService.getBlueprint.mockResolvedValue(bp);
       mockItemService.getAssemblableItems.mockResolvedValue(items);
 
-      const result = await service.validateBlueprintCanAssemble('bp-1', 't1', 'u1');
+      const result = await service.validateBlueprintCanAssemble(
+        'bp-1',
+        't1',
+        'u1'
+      );
       expect(result.valid).toBe(false);
       expect(result.issues.length).toBeGreaterThan(0);
     });

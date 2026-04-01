@@ -15,7 +15,7 @@ vi.mock('framer-motion', () => ({
           return { type: prop, props: rest, children };
         };
       },
-    },
+    }
   ),
   AnimatePresence: ({ children }: { children: unknown }) => children,
   useInView: vi.fn(() => true),

@@ -175,7 +175,9 @@ test.describe('Contrast Audit — Landing Page @a11y', () => {
 test.describe('Contrast Audit — Landing Page (Dark Mode) @a11y', () => {
   test.setTimeout(30_000);
 
-  test('landing page hero passes color-contrast in dark mode', async ({ page }) => {
+  test('landing page hero passes color-contrast in dark mode', async ({
+    page,
+  }) => {
     await page.goto('/landing');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
@@ -196,14 +198,17 @@ test.describe('Contrast Audit — Landing Page (Dark Mode) @a11y', () => {
     ).toHaveLength(0);
   });
 
-  test('landing page — full scroll audit passes color-contrast in dark mode', async ({ page }) => {
+  test('landing page — full scroll audit passes color-contrast in dark mode', async ({
+    page,
+  }) => {
     await page.goto('/landing');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
     await setDarkMode(page, true);
 
     await page.evaluate(async () => {
-      const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
       const scrollHeight = document.body.scrollHeight;
       const step = Math.ceil(scrollHeight / 5);
       for (let y = 0; y <= scrollHeight; y += step) {
@@ -261,7 +266,9 @@ test.describe('Contrast Audit — Form Pages (Dark Mode) @a11y', () => {
   ] as const;
 
   for (const { name, path } of FORM_PAGES) {
-    test(`${name} (${path}) passes color-contrast in dark mode`, async ({ page }) => {
+    test(`${name} (${path}) passes color-contrast in dark mode`, async ({
+      page,
+    }) => {
       const violations = await auditContrastDarkMode(page, path);
       expect(
         violations,
@@ -311,7 +318,9 @@ test.describe('Contrast Audit — Public Pages (Dark Mode) @a11y', () => {
   ] as const;
 
   for (const { name, path } of PUBLIC_PAGES) {
-    test(`${name} page (${path}) passes color-contrast in dark mode`, async ({ page }) => {
+    test(`${name} page (${path}) passes color-contrast in dark mode`, async ({
+      page,
+    }) => {
       const violations = await auditContrastDarkMode(page, path);
       expect(
         violations,
@@ -365,7 +374,9 @@ test.describe('Contrast Audit — Authenticated Pages (Dark Mode) @a11y', () => 
   ] as const;
 
   for (const { name, path } of AUTH_PAGES) {
-    test(`${name} page (${path}) passes color-contrast in dark mode`, async ({ page }) => {
+    test(`${name} page (${path}) passes color-contrast in dark mode`, async ({
+      page,
+    }) => {
       const violations = await auditContrastDarkMode(page, path);
       expect(
         violations,
@@ -415,7 +426,9 @@ test.describe('Contrast Visual Regression @a11y', () => {
     });
   });
 
-  test('landing page screenshot matches baseline (dark mode)', async ({ page }) => {
+  test('landing page screenshot matches baseline (dark mode)', async ({
+    page,
+  }) => {
     await page.goto('/landing');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
@@ -427,7 +440,9 @@ test.describe('Contrast Visual Regression @a11y', () => {
     });
   });
 
-  test('login page screenshot matches baseline (dark mode)', async ({ page }) => {
+  test('login page screenshot matches baseline (dark mode)', async ({
+    page,
+  }) => {
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
@@ -439,7 +454,9 @@ test.describe('Contrast Visual Regression @a11y', () => {
     });
   });
 
-  test('dashboard screenshot matches baseline (dark mode)', async ({ page }) => {
+  test('dashboard screenshot matches baseline (dark mode)', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);

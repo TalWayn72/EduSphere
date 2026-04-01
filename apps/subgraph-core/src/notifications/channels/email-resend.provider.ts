@@ -17,7 +17,10 @@ interface ResendClient {
       to: string;
       subject: string;
       html: string;
-    }) => Promise<{ data: ResendSendResponse | null; error: { message: string } | null }>;
+    }) => Promise<{
+      data: ResendSendResponse | null;
+      error: { message: string } | null;
+    }>;
   };
 }
 
@@ -32,7 +35,9 @@ export class EmailResendProvider implements EmailProvider {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Resend } = require('resend') as { Resend: new (key: string) => ResendClient };
+      const { Resend } = require('resend') as {
+        Resend: new (key: string) => ResendClient;
+      };
       this.client = new Resend(process.env['RESEND_API_KEY'] ?? '');
       return this.client;
     } catch {
@@ -40,8 +45,13 @@ export class EmailResendProvider implements EmailProvider {
     }
   }
 
-  async send(to: string, subject: string, html: string): Promise<string | null> {
-    const from = process.env['EMAIL_FROM'] ?? 'EduSphere <noreply@edusphere.dev>';
+  async send(
+    to: string,
+    subject: string,
+    html: string
+  ): Promise<string | null> {
+    const from =
+      process.env['EMAIL_FROM'] ?? 'EduSphere <noreply@edusphere.dev>';
     const client = this.getClient();
 
     const { data, error } = await client.emails.send({

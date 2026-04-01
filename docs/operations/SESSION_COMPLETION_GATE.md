@@ -9,31 +9,31 @@
 
 ## Completion Check Table
 
-| # | Check | Command | Required Result |
-|---|-------|---------|----------------|
-| -1 | Orchestrator Compliance | Self-audit: Did Orchestrator use Edit/Write/mutating Bash directly? | 0 violations — all work done via agents |
-| 0 | Docker Up | `docker ps \| grep -c healthy` | >=5 containers healthy |
-| 1 | Unit Tests | `pnpm turbo test` | 100% pass, 0 failures |
-| 2 | TypeScript | `pnpm turbo typecheck` | 0 errors |
-| 3 | Lint | `pnpm turbo lint` | 0 warnings/errors |
-| 4 | Security Tests | `pnpm test:security` | 0 failures |
-| 5 | E2E Playwright | `pnpm --filter @edusphere/web test:e2e` | all pass |
-| 6 | Health Check | `./scripts/health-check.sh` | all services UP |
-| 7 | 5-User Auth | Keycloak login x 5 roles | all login OK |
-| 8 | GitHub CI | `gh run list --limit 3` | all green |
-| 9 | Git Push | `git log --oneline -1` | commit pushed |
-| 10 | OPEN_ISSUES.md | updated with E2E files listed | status passed |
-| 11 | Memory Audit | `vm_get_recent({ n: 10 })` | >=1 decision stored this session |
+| #   | Check                   | Command                                                             | Required Result                         |
+| --- | ----------------------- | ------------------------------------------------------------------- | --------------------------------------- |
+| -1  | Orchestrator Compliance | Self-audit: Did Orchestrator use Edit/Write/mutating Bash directly? | 0 violations — all work done via agents |
+| 0   | Docker Up               | `docker ps \| grep -c healthy`                                      | >=5 containers healthy                  |
+| 1   | Unit Tests              | `pnpm turbo test`                                                   | 100% pass, 0 failures                   |
+| 2   | TypeScript              | `pnpm turbo typecheck`                                              | 0 errors                                |
+| 3   | Lint                    | `pnpm turbo lint`                                                   | 0 warnings/errors                       |
+| 4   | Security Tests          | `pnpm test:security`                                                | 0 failures                              |
+| 5   | E2E Playwright          | `pnpm --filter @edusphere/web test:e2e`                             | all pass                                |
+| 6   | Health Check            | `./scripts/health-check.sh`                                         | all services UP                         |
+| 7   | 5-User Auth             | Keycloak login x 5 roles                                            | all login OK                            |
+| 8   | GitHub CI               | `gh run list --limit 3`                                             | all green                               |
+| 9   | Git Push                | `git log --oneline -1`                                              | commit pushed                           |
+| 10  | OPEN_ISSUES.md          | updated with E2E files listed                                       | status passed                           |
+| 11  | Memory Audit            | `vm_get_recent({ n: 10 })`                                          | >=1 decision stored this session        |
 
 ## 5 Test Users (for Check #7)
 
-| User | Role | Password |
-|------|------|----------|
+| User                      | Role        | Password       |
+| ------------------------- | ----------- | -------------- |
 | super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
-| instructor@example.com | INSTRUCTOR | Instructor123! |
-| org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
-| researcher@example.com | RESEARCHER | Researcher123! |
-| student@example.com | STUDENT | Student123! |
+| instructor@example.com    | INSTRUCTOR  | Instructor123! |
+| org.admin@example.com     | ORG_ADMIN   | OrgAdmin123!   |
+| researcher@example.com    | RESEARCHER  | Researcher123! |
+| student@example.com       | STUDENT     | Student123!    |
 
 ## Iron Rules for Completion
 
@@ -48,6 +48,7 @@
 ## Parallel Agents — Completion Protocol
 
 When running parallel agents:
+
 1. Wait for ALL agents to complete before declaring session done
 2. Review each agent's output for errors, gaps, or missed tests
 3. Spawn fix agents for any gaps found

@@ -97,11 +97,18 @@ function createMockNatsSub(): {
             return Promise.resolve({ value: messages.shift()!, done: false });
           }
           if (done) {
-            return Promise.resolve({ value: undefined as unknown as NatsMsg, done: true });
+            return Promise.resolve({
+              value: undefined as unknown as NatsMsg,
+              done: true,
+            });
           }
-          return new Promise((resolve) => { resolver = resolve; });
+          return new Promise((resolve) => {
+            resolver = resolve;
+          });
         },
-        [Symbol.asyncIterator]() { return this; },
+        [Symbol.asyncIterator]() {
+          return this;
+        },
       };
     },
   };
@@ -109,13 +116,16 @@ function createMockNatsSub(): {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const publishedChannelMessages: Array<{ channel: string; payload: unknown }> = [];
+const publishedChannelMessages: Array<{ channel: string; payload: unknown }> =
+  [];
 
 function encodeEvent(payload: Record<string, unknown>): Uint8Array {
   return new TextEncoder().encode(JSON.stringify(payload));
 }
 
-function makeModuleEvent(overrides?: Record<string, unknown>): Record<string, unknown> {
+function makeModuleEvent(
+  overrides?: Record<string, unknown>
+): Record<string, unknown> {
   return {
     type: 'lesson.pipeline.module.completed',
     lessonId: 'lesson-1',
@@ -145,14 +155,21 @@ describe('Pipeline Subscription Integration', () => {
     mockNatsConnection.drain.mockResolvedValue(undefined);
 
     // Track published messages
-    mockPubSub.publish.mockImplementation(async (channel: string, payload: unknown) => {
-      publishedChannelMessages.push({ channel, payload });
-    });
+    mockPubSub.publish.mockImplementation(
+      async (channel: string, payload: unknown) => {
+        publishedChannelMessages.push({ channel, payload });
+      }
+    );
 
     // Return a simple async iterator
     mockPubSub.asyncIterableIterator.mockImplementation((_channel: string) => ({
-      next: () => new Promise<IteratorResult<unknown>>(() => { /* hangs until test ends */ }),
-      [Symbol.asyncIterator]() { return this; },
+      next: () =>
+        new Promise<IteratorResult<unknown>>(() => {
+          /* hangs until test ends */
+        }),
+      [Symbol.asyncIterator]() {
+        return this;
+      },
     }));
 
     mockPubSub.close.mockResolvedValue(undefined);
@@ -171,7 +188,9 @@ describe('Pipeline Subscription Integration', () => {
 
     currentNatsSub.push({
       subject: 'EDUSPHERE.lesson.pipeline.module.completed',
-      data: encodeEvent(makeModuleEvent({ runId: 'run-1', moduleType: 'INGESTION' })),
+      data: encodeEvent(
+        makeModuleEvent({ runId: 'run-1', moduleType: 'INGESTION' })
+      ),
     });
 
     await new Promise((r) => setTimeout(r, 50));
@@ -182,7 +201,10 @@ describe('Pipeline Subscription Integration', () => {
     expect(runChannel.length).toBe(1);
 
     const published = runChannel[0]!.payload as Record<string, unknown>;
-    const progress = published['lessonPipelineProgress'] as Record<string, unknown>;
+    const progress = published['lessonPipelineProgress'] as Record<
+      string,
+      unknown
+    >;
     expect(progress['id']).toBe('run-1');
     expect(progress['moduleType']).toBe('INGESTION');
   });
@@ -194,14 +216,18 @@ describe('Pipeline Subscription Integration', () => {
 
     currentNatsSub.push({
       subject: 'EDUSPHERE.lesson.pipeline.module.completed',
-      data: encodeEvent(makeModuleEvent({ runId: 'run-A', moduleType: 'INGESTION' })),
+      data: encodeEvent(
+        makeModuleEvent({ runId: 'run-A', moduleType: 'INGESTION' })
+      ),
     });
 
     await new Promise((r) => setTimeout(r, 30));
 
     currentNatsSub.push({
       subject: 'EDUSPHERE.lesson.pipeline.module.completed',
-      data: encodeEvent(makeModuleEvent({ runId: 'run-B', moduleType: 'NER_SOURCE_LINKING' })),
+      data: encodeEvent(
+        makeModuleEvent({ runId: 'run-B', moduleType: 'NER_SOURCE_LINKING' })
+      ),
     });
 
     await new Promise((r) => setTimeout(r, 50));
@@ -259,7 +285,10 @@ describe('Pipeline Subscription Integration', () => {
     currentNatsSub.push({
       subject: 'EDUSPHERE.lesson.pipeline.module.completed',
       data: encodeEvent(
-        makeModuleEvent({ runId: 'run-window', moduleType: 'NER_SOURCE_LINKING' })
+        makeModuleEvent({
+          runId: 'run-window',
+          moduleType: 'NER_SOURCE_LINKING',
+        })
       ),
     });
 

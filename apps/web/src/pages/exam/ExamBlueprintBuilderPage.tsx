@@ -12,7 +12,9 @@ import { PageShell } from '@/components/PageShell';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import {
-  useExamBlueprint, useCreateExamBlueprint, useUpdateExamBlueprint,
+  useExamBlueprint,
+  useCreateExamBlueprint,
+  useUpdateExamBlueprint,
 } from '@/hooks/useExamApi';
 import { BlueprintBasicFields } from './BlueprintBasicFields';
 import { BlueprintDistributions } from './BlueprintDistributions';
@@ -46,13 +48,18 @@ const DEFAULT_BLOOM: DistributionItem[] = [
 ];
 
 export function ExamBlueprintBuilderPage() {
-  const { courseId, blueprintId } = useParams<{ courseId: string; blueprintId: string }>();
+  const { courseId, blueprintId } = useParams<{
+    courseId: string;
+    blueprintId: string;
+  }>();
   const navigate = useNavigate();
   const role = useAuthRole();
   const isEdit = Boolean(blueprintId);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { blueprint, fetching } = useExamBlueprint(blueprintId);
   const createBlueprint = useCreateExamBlueprint();
@@ -65,10 +72,20 @@ export function ExamBlueprintBuilderPage() {
   const form = useForm<BlueprintFormData>({
     resolver: zodResolver(blueprintSchema),
     defaultValues: {
-      title: '', description: '', totalItems: 50, timeLimitMinutes: 90,
-      passingMethod: 'PERCENTAGE', passingThreshold: 700, status: 'DRAFT',
-      catMinItems: 20, catMaxItems: 60, catSeCutoff: 0.3, catStartTheta: 0,
-      catExposureControl: 0.8, minB: -3, maxB: 3,
+      title: '',
+      description: '',
+      totalItems: 50,
+      timeLimitMinutes: 90,
+      passingMethod: 'PERCENTAGE',
+      passingThreshold: 700,
+      status: 'DRAFT',
+      catMinItems: 20,
+      catMaxItems: 60,
+      catSeCutoff: 0.3,
+      catStartTheta: 0,
+      catExposureControl: 0.8,
+      minB: -3,
+      maxB: 3,
     },
   });
 
@@ -92,17 +109,29 @@ export function ExamBlueprintBuilderPage() {
       maxB: 3,
     });
     setEnableCat(blueprint.isAdaptive);
-    const domains = blueprint.domainDistribution as DomainDistEntry[] | undefined;
+    const domains = blueprint.domainDistribution as
+      | DomainDistEntry[]
+      | undefined;
     if (domains?.length) {
-      setDomainDist(domains.map((d) => ({
-        label: d.domain, weight: d.weight, minPercent: d.minPercent, maxPercent: d.maxPercent,
-      })));
+      setDomainDist(
+        domains.map((d) => ({
+          label: d.domain,
+          weight: d.weight,
+          minPercent: d.minPercent,
+          maxPercent: d.maxPercent,
+        }))
+      );
     }
     const blooms = blueprint.bloomDistribution as BloomDistEntry[] | undefined;
     if (blooms?.length) {
-      setBloomDist(blooms.map((b) => ({
-        label: b.level, weight: b.minPercent, minPercent: b.minPercent, maxPercent: b.maxPercent,
-      })));
+      setBloomDist(
+        blooms.map((b) => ({
+          label: b.level,
+          weight: b.minPercent,
+          minPercent: b.minPercent,
+          maxPercent: b.maxPercent,
+        }))
+      );
     }
   }, [blueprint, form]);
 
@@ -120,25 +149,41 @@ export function ExamBlueprintBuilderPage() {
       passingMethod: data.passingMethod,
       passingScore: data.passingThreshold,
       domainDistribution: domainDist.map((d) => ({
-        domain: d.label, weight: d.weight, minPercent: d.minPercent, maxPercent: d.maxPercent,
+        domain: d.label,
+        weight: d.weight,
+        minPercent: d.minPercent,
+        maxPercent: d.maxPercent,
       })),
       bloomDistribution: bloomDist.map((b) => ({
-        level: b.label as BloomLevel, minPercent: b.minPercent, maxPercent: b.maxPercent,
+        level: b.label as BloomLevel,
+        minPercent: b.minPercent,
+        maxPercent: b.maxPercent,
       })),
       isAdaptive: enableCat,
-      ...(enableCat ? {
-        catMinItems: data.catMinItems,
-        catMaxItems: data.catMaxItems,
-      } : {}),
+      ...(enableCat
+        ? {
+            catMinItems: data.catMinItems,
+            catMaxItems: data.catMaxItems,
+          }
+        : {}),
     };
 
     if (isEdit && blueprintId) {
-      const result = await updateBlueprint(blueprintId, { ...input, status: data.status });
-      if (result.error) { toast.error('Failed to update blueprint'); return; }
+      const result = await updateBlueprint(blueprintId, {
+        ...input,
+        status: data.status,
+      });
+      if (result.error) {
+        toast.error('Failed to update blueprint');
+        return;
+      }
       toast.success('Blueprint updated');
     } else {
       const result = await createBlueprint(input as never);
-      if (result.error) { toast.error('Failed to create blueprint'); return; }
+      if (result.error) {
+        toast.error('Failed to create blueprint');
+        return;
+      }
       toast.success('Blueprint created');
     }
     void navigate(`/courses/${courseId}/exams/blueprints`);
@@ -150,13 +195,21 @@ export function ExamBlueprintBuilderPage() {
         <PageHeader title={isEdit ? 'Edit Blueprint' : 'Create Blueprint'} />
         <div className="container mx-auto p-6 max-w-3xl space-y-6">
           {fetching && <p className="text-muted-foreground">Loading...</p>}
-          <BlueprintBasicFields form={form} isEdit={isEdit} onSubmit={onSubmit} />
+          <BlueprintBasicFields
+            form={form}
+            isEdit={isEdit}
+            onSubmit={onSubmit}
+          />
           <BlueprintDistributions
-            domainDist={domainDist} onDomainChange={setDomainDist}
-            bloomDist={bloomDist} onBloomChange={setBloomDist}
+            domainDist={domainDist}
+            onDomainChange={setDomainDist}
+            bloomDist={bloomDist}
+            onBloomChange={setBloomDist}
           />
           <BlueprintCatSettings
-            form={form} enableCat={enableCat} onEnableCatChange={setEnableCat}
+            form={form}
+            enableCat={enableCat}
+            onEnableCatChange={setEnableCat}
           />
         </div>
       </PageShell>

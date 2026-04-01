@@ -145,9 +145,9 @@ describe('AnnotationQueriesService', () => {
 
   describe('findByAsset', () => {
     it('throws UnauthorizedException without authContext', async () => {
-      await expect(service.findByAsset('a1', undefined, undefined)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        service.findByAsset('a1', undefined, undefined)
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws when tenantId is missing', async () => {
@@ -177,9 +177,9 @@ describe('AnnotationQueriesService', () => {
 
   describe('findByUser', () => {
     it('throws UnauthorizedException without authContext', async () => {
-      await expect(
-        service.findByUser('u1', 10, 0, undefined)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.findByUser('u1', 10, 0, undefined)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws when tenantId is missing', async () => {

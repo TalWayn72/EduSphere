@@ -3,8 +3,16 @@ import { fn } from '@storybook/test';
 import { PipelineStepper } from './PipelineStepper';
 
 const STEPS = [
-  { moduleType: 'TRANSCRIPTION' as const, status: 'done' as const, output: 'Transcribed 45 min video' },
-  { moduleType: 'SUMMARIZATION' as const, status: 'done' as const, output: 'Generated 3 summaries' },
+  {
+    moduleType: 'TRANSCRIPTION' as const,
+    status: 'done' as const,
+    output: 'Transcribed 45 min video',
+  },
+  {
+    moduleType: 'SUMMARIZATION' as const,
+    status: 'done' as const,
+    output: 'Generated 3 summaries',
+  },
   { moduleType: 'QUIZ_GENERATION' as const, status: 'running' as const },
   { moduleType: 'EMBEDDING' as const, status: 'pending' as const },
   { moduleType: 'KNOWLEDGE_GRAPH' as const, status: 'pending' as const },
@@ -40,7 +48,11 @@ export const WithError: Story = {
   args: {
     steps: [
       { moduleType: 'TRANSCRIPTION' as const, status: 'done' as const },
-      { moduleType: 'SUMMARIZATION' as const, status: 'failed' as const, errorMessage: 'Model timeout after 30s' },
+      {
+        moduleType: 'SUMMARIZATION' as const,
+        status: 'failed' as const,
+        errorMessage: 'Model timeout after 30s',
+      },
       { moduleType: 'QUIZ_GENERATION' as const, status: 'pending' as const },
     ],
   },

@@ -11,11 +11,20 @@ describe('FAQSchema', () => {
   ];
 
   it('renders without throwing', () => {
-    expect(() => render(<HelmetProvider><FAQSchema items={items} /></HelmetProvider>)).not.toThrow();
+    expect(() =>
+      render(
+        <HelmetProvider>
+          <FAQSchema items={items} />
+        </HelmetProvider>
+      )
+    ).not.toThrow();
   });
 
   it('builds FAQPage schema', () => {
-    const schema = { '@type': 'FAQPage', mainEntity: items.map(i => ({ name: i.question })) };
+    const schema = {
+      '@type': 'FAQPage',
+      mainEntity: items.map((i) => ({ name: i.question })),
+    };
     expect(schema['@type']).toBe('FAQPage');
     expect(schema.mainEntity).toHaveLength(2);
   });

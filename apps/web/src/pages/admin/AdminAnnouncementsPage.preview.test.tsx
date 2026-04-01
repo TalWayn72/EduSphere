@@ -29,12 +29,16 @@ describe('AnnouncementPreview', () => {
 
   it('shows announcement title', () => {
     render(<AnnouncementPreview data={baseData} />);
-    expect(screen.getByTestId('preview-title')).toHaveTextContent('System Maintenance');
+    expect(screen.getByTestId('preview-title')).toHaveTextContent(
+      'System Maintenance'
+    );
   });
 
   it('shows announcement body', () => {
     render(<AnnouncementPreview data={baseData} />);
-    expect(screen.getByTestId('preview-body')).toHaveTextContent('scheduled maintenance');
+    expect(screen.getByTestId('preview-body')).toHaveTextContent(
+      'scheduled maintenance'
+    );
   });
 
   it('shows schedule date', () => {
@@ -50,16 +54,22 @@ describe('AnnouncementPreview', () => {
 
   it('shows untitled when title is empty', () => {
     render(<AnnouncementPreview data={{ ...baseData, title: '' }} />);
-    expect(screen.getByTestId('preview-title')).toHaveTextContent('announcements.untitled');
+    expect(screen.getByTestId('preview-title')).toHaveTextContent(
+      'announcements.untitled'
+    );
   });
 
   it('shows no content when body is empty', () => {
     render(<AnnouncementPreview data={{ ...baseData, body: '' }} />);
-    expect(screen.getByTestId('preview-body')).toHaveTextContent('announcements.noContent');
+    expect(screen.getByTestId('preview-body')).toHaveTextContent(
+      'announcements.noContent'
+    );
   });
 
   it('does not show schedule section when date is empty', () => {
     render(<AnnouncementPreview data={{ ...baseData, scheduleDate: '' }} />);
-    expect(screen.queryByText(/announcements.scheduled/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/announcements.scheduled/)
+    ).not.toBeInTheDocument();
   });
 });

@@ -212,7 +212,8 @@ export function AdminActivityFeed({
           <ul className="space-y-3" data-testid="activity-feed-list">
             {items.slice(0, 10).map((item) => {
               const Icon = ACTIVITY_ICON[item.type] ?? Activity;
-              const colorClass = ACTIVITY_COLOR[item.type] ?? 'text-muted-foreground';
+              const colorClass =
+                ACTIVITY_COLOR[item.type] ?? 'text-muted-foreground';
               return (
                 <li
                   key={item.id}

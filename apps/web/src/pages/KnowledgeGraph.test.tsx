@@ -81,7 +81,9 @@ describe('KnowledgeGraph', () => {
   it('renders "Knowledge Graph" heading', () => {
     renderKG();
     // PageHeader + inline h1 both render "Knowledge Graph" in global view
-    const headings = screen.getAllByRole('heading', { name: 'Knowledge Graph' });
+    const headings = screen.getAllByRole('heading', {
+      name: 'Knowledge Graph',
+    });
     expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -391,7 +393,10 @@ describe('KnowledgeGraph — BUG-043 regression: clean error banner (no raw erro
       {
         data: undefined,
         fetching: false,
-        error: { message: '[Network] Failed to fetch', networkError: new Error('Failed to fetch') },
+        error: {
+          message: '[Network] Failed to fetch',
+          networkError: new Error('Failed to fetch'),
+        },
       },
     ]);
     renderKG();
@@ -439,7 +444,10 @@ describe('KnowledgeGraph — BUG-096 regression: context-specific error messages
         error: {
           message: 'Authentication required',
           graphQLErrors: [
-            { message: 'Authentication required', extensions: { code: 'UNAUTHENTICATED' } },
+            {
+              message: 'Authentication required',
+              extensions: { code: 'UNAUTHENTICATED' },
+            },
           ],
         },
       },
@@ -458,9 +466,7 @@ describe('KnowledgeGraph — BUG-096 regression: context-specific error messages
         fetching: false,
         error: {
           message: 'Some GraphQL error',
-          graphQLErrors: [
-            { message: 'Some GraphQL error', extensions: {} },
-          ],
+          graphQLErrors: [{ message: 'Some GraphQL error', extensions: {} }],
         },
       },
     ]);

@@ -13,27 +13,27 @@
 
 ### 1. Decisions Made
 
-| # | Decision | Rationale | Alternatives Considered |
-|---|----------|-----------|------------------------|
-| 1 | [Decision] | [Why] | [What else was considered] |
+| #   | Decision   | Rationale | Alternatives Considered    |
+| --- | ---------- | --------- | -------------------------- |
+| 1   | [Decision] | [Why]     | [What else was considered] |
 
 ### 2. Entity Boundaries
 
-| Entity | Owning Subgraph | Extended By | Key Fields |
-|--------|----------------|-------------|------------|
-| [Type] | [subgraph-*] | [subgraph-*] | [id, ...] |
+| Entity | Owning Subgraph | Extended By  | Key Fields |
+| ------ | --------------- | ------------ | ---------- |
+| [Type] | [subgraph-*]    | [subgraph-*] | [id, ...]  |
 
 ### 3. Schema Changes Required
 
-| Table/Type | Change | Migration Needed | Breaking |
-|-----------|--------|-----------------|----------|
-| [table] | [add column X] | Yes | No |
+| Table/Type | Change         | Migration Needed | Breaking |
+| ---------- | -------------- | ---------------- | -------- |
+| [table]    | [add column X] | Yes              | No       |
 
 ### 4. Threat Model Stub
 
-| Threat | STRIDE Category | Mitigation | Owner |
-|--------|----------------|-----------|-------|
-| [Threat] | [S/T/R/I/D/E] | [Mitigation] | [Division] |
+| Threat   | STRIDE Category | Mitigation   | Owner      |
+| -------- | --------------- | ------------ | ---------- |
+| [Threat] | [S/T/R/I/D/E]   | [Mitigation] | [Division] |
 
 ### 5. Testability Contract
 
@@ -50,14 +50,14 @@
 
 ### 7. Open Questions for Wave [N+1]
 
-| # | Question | Context | Suggested Answer |
-|---|----------|---------|-----------------|
-| 1 | [Question] | [Why it matters] | [Suggested answer] |
+| #   | Question   | Context          | Suggested Answer   |
+| --- | ---------- | ---------------- | ------------------ |
+| 1   | [Question] | [Why it matters] | [Suggested answer] |
 
 ### 8. Dependencies
 
-| Dependency | Status | Blocker? |
-|-----------|--------|----------|
+| Dependency        | Status              | Blocker? |
+| ----------------- | ------------------- | -------- |
 | [Package/service] | [Available/Pending] | [Yes/No] |
 
 ---
@@ -65,11 +65,11 @@
 ### Sign-off
 
 | Wave 1 Division | Approved | Date |
-|-----------------|----------|------|
-| Product | [ ] | |
-| Architecture | [ ] | |
-| UX/UI | [ ] | |
+| --------------- | -------- | ---- |
+| Product         | [ ]      |      |
+| Architecture    | [ ]      |      |
+| UX/UI           | [ ]      |      |
 
 ---
 
-*Template version: 1.0 — March 2026*
+_Template version: 1.0 — March 2026_

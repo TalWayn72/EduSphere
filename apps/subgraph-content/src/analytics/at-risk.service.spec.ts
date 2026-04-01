@@ -29,7 +29,8 @@ vi.mock('@edusphere/db', () => ({
   },
   sql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   and: (...args: unknown[]) => args,
@@ -62,7 +63,8 @@ function makeFlag(overrides: {
     courseId: overrides.courseId ?? '00000000-0000-0000-0000-000000000020',
     displayName: overrides.displayName ?? 'Alice Smith',
     courseTitle: overrides.courseTitle ?? 'Intro to AI',
-    flaggedAt: overrides.flaggedAt ?? new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+    flaggedAt:
+      overrides.flaggedAt ?? new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
     riskScore: overrides.riskScore ?? 0.8,
   };
 }
@@ -78,7 +80,11 @@ describe('AtRiskService', () => {
 
     // Default: delegate operation to the callback
     vi.mocked(db.withTenantContext).mockImplementation(
-      (_db: unknown, _ctx: unknown, operation: (db: unknown) => Promise<unknown>) => {
+      (
+        _db: unknown,
+        _ctx: unknown,
+        operation: (db: unknown) => Promise<unknown>
+      ) => {
         const chainMock = {
           select: mockSelect.mockReturnThis(),
           from: mockFrom.mockReturnThis(),

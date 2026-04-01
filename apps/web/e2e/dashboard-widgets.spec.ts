@@ -27,7 +27,9 @@ import { BASE_URL } from './env';
 async function gotoDashboard(page: import('@playwright/test').Page) {
   // Phase 27: /dashboard now serves the new DashboardPage.
   // Widget tests (DailyLearning, SkillGap, Leaderboard) remain at /dashboard/legacy.
-  await page.goto(`${BASE_URL}/dashboard/legacy`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE_URL}/dashboard/legacy`, {
+    waitUntil: 'domcontentloaded',
+  });
   // Wait for React to finish rendering and mock queries to settle
   await page.waitForLoadState('networkidle').catch(() => {});
 }
@@ -92,7 +94,11 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
     const errorMsg = page.getByText(/Could not load lesson/i);
 
     // Wait for any one of the expected states to become visible (polling)
-    const combined = startBtn.or(noLesson).or(allDone).or(loadingMsg).or(errorMsg);
+    const combined = startBtn
+      .or(noLesson)
+      .or(allDone)
+      .or(loadingMsg)
+      .or(errorMsg);
     await expect(combined.first()).toBeVisible({ timeout: 10_000 });
   });
 

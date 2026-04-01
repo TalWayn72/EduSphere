@@ -26,7 +26,9 @@ async function loginWithHebrewLocale(page: import('@playwright/test').Page) {
   await devBtn.waitFor({ timeout: 10_000 });
   await devBtn.click();
   await page
-    .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+    .waitForURL((url) => !url.toString().includes('/login'), {
+      timeout: 20_000,
+    })
     .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
 }
@@ -42,7 +44,9 @@ test.describe('BUG-096: Hebrew translation completeness', () => {
   });
 
   test.describe('Social Feed page — no English headings in Hebrew', () => {
-    test('Social Feed page does not show English-only headings', async ({ page }) => {
+    test('Social Feed page does not show English-only headings', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/social`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle').catch(() => {});
 
@@ -68,18 +72,30 @@ test.describe('BUG-096: Hebrew translation completeness', () => {
       }
 
       // Specific element checks
-      await expect(page.getByText('Social Feed', { exact: true })).not.toBeVisible().catch(() => {
-        // Element may not exist at all, which is fine
-      });
-      await expect(page.getByText('Following Activity', { exact: true })).not.toBeVisible().catch(() => {});
-      await expect(page.getByText('Recommended Content', { exact: true })).not.toBeVisible().catch(() => {});
-      await expect(page.getByText('Find People to Follow', { exact: true })).not.toBeVisible().catch(() => {});
+      await expect(page.getByText('Social Feed', { exact: true }))
+        .not.toBeVisible()
+        .catch(() => {
+          // Element may not exist at all, which is fine
+        });
+      await expect(page.getByText('Following Activity', { exact: true }))
+        .not.toBeVisible()
+        .catch(() => {});
+      await expect(page.getByText('Recommended Content', { exact: true }))
+        .not.toBeVisible()
+        .catch(() => {});
+      await expect(page.getByText('Find People to Follow', { exact: true }))
+        .not.toBeVisible()
+        .catch(() => {});
     });
   });
 
   test.describe('Gamification page — no English headings in Hebrew', () => {
-    test('Gamification page does not show English-only headings', async ({ page }) => {
-      await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+    test('Gamification page does not show English-only headings', async ({
+      page,
+    }) => {
+      await page.goto(`${BASE_URL}/gamification`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('networkidle').catch(() => {});
       await page.waitForTimeout(1000);
 
@@ -109,7 +125,9 @@ test.describe('BUG-096: Hebrew translation completeness', () => {
   });
 
   test.describe('Profile page — no English headings in Hebrew', () => {
-    test('Profile page does not show English-only headings', async ({ page }) => {
+    test('Profile page does not show English-only headings', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle').catch(() => {});
       await page.waitForTimeout(1000);
@@ -131,7 +149,9 @@ test.describe('BUG-096: Hebrew translation completeness', () => {
 
   test.describe('Dashboard page — document direction is RTL', () => {
     test('Dashboard in Hebrew has RTL direction', async ({ page }) => {
-      await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}/dashboard`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('networkidle').catch(() => {});
 
       const dir = await page.evaluate(() => document.documentElement.dir);
@@ -143,9 +163,9 @@ test.describe('BUG-096: Hebrew translation completeness', () => {
         // Raw i18n keys follow the pattern "namespace.key"
         const rawKeyPattern = /\b(dashboard|common|nav)\.[a-z][a-zA-Z.]+\b/;
         // Filter out URLs and file paths which may contain dots
-        const lines = bodyText.split('\n').filter(
-          (line) => !line.includes('http') && !line.includes('/')
-        );
+        const lines = bodyText
+          .split('\n')
+          .filter((line) => !line.includes('http') && !line.includes('/'));
         for (const line of lines) {
           if (line.trim().length > 0 && line.trim().length < 100) {
             expect(line).not.toMatch(rawKeyPattern);

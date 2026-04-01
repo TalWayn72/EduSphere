@@ -56,7 +56,8 @@ export function LeaderboardPage() {
     gamificationConfig: { showLeaderboard: boolean };
   }>({ query: GAMIFICATION_CONFIG_QUERY });
 
-  const showLeaderboard = configData?.gamificationConfig?.showLeaderboard ?? true;
+  const showLeaderboard =
+    configData?.gamificationConfig?.showLeaderboard ?? true;
 
   const [{ data, fetching }] = useQuery<LeaderboardResult>({
     query: LEADERBOARD_QUERY,
@@ -77,7 +78,9 @@ export function LeaderboardPage() {
       <Layout>
         <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
           <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-xl font-semibold mb-2">{t('leaderboardDisabled')}</h1>
+          <h1 className="text-xl font-semibold mb-2">
+            {t('leaderboardDisabled')}
+          </h1>
           <p className="text-muted-foreground">
             {t('leaderboardDisabledByOrg')}
           </p>

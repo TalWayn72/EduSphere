@@ -1,4 +1,11 @@
-import { pgTable, uuid, varchar, text, jsonb, timestamp } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  jsonb,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './core';
 
@@ -11,7 +18,9 @@ export const savedSearches = pgTable('saved_searches', {
   name: varchar('name', { length: 100 }).notNull(),
   query: text('query').notNull(),
   filters: jsonb('filters'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const savedSearchesRLS = sql`

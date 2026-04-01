@@ -26,11 +26,50 @@ interface Props {
 function sanitizeEmailHtml(html: string): string {
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'div', 'span',
-      'a', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
-      'ul', 'ol', 'li', 'b', 'i', 'em', 'strong', 'u', 'blockquote', 'pre', 'code',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'p',
+      'br',
+      'hr',
+      'div',
+      'span',
+      'a',
+      'img',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'td',
+      'th',
+      'ul',
+      'ol',
+      'li',
+      'b',
+      'i',
+      'em',
+      'strong',
+      'u',
+      'blockquote',
+      'pre',
+      'code',
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'width', 'height', 'align', 'valign', 'colspan', 'rowspan'],
+    ALLOWED_ATTR: [
+      'href',
+      'src',
+      'alt',
+      'style',
+      'class',
+      'width',
+      'height',
+      'align',
+      'valign',
+      'colspan',
+      'rowspan',
+    ],
     ALLOW_DATA_ATTR: false,
   });
 }
@@ -53,7 +92,10 @@ export function NotificationTemplateEditor({
   const [subject, setSubject] = useState(template.subject);
   const [bodyHtml, setBodyHtml] = useState(template.bodyHtml);
   const [tab, setTab] = useState<'edit' | 'preview'>('edit');
-  const sanitizedPreview = useMemo(() => sanitizeEmailHtml(bodyHtml), [bodyHtml]);
+  const sanitizedPreview = useMemo(
+    () => sanitizeEmailHtml(bodyHtml),
+    [bodyHtml]
+  );
 
   const insertVariable = (variable: string) => {
     setBodyHtml((prev) => prev + variable);

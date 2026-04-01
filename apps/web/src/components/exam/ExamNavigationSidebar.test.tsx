@@ -15,7 +15,9 @@ import { ExamNavigationSidebar } from './ExamNavigationSidebar';
 
 const IDS = ['q1', 'q2', 'q3', 'q4', 'q5'];
 
-function renderSidebar(overrides: Partial<Parameters<typeof ExamNavigationSidebar>[0]> = {}) {
+function renderSidebar(
+  overrides: Partial<Parameters<typeof ExamNavigationSidebar>[0]> = {}
+) {
   const defaults = {
     totalQuestions: 5,
     currentIndex: 0,
@@ -73,7 +75,9 @@ describe('ExamNavigationSidebar', () => {
 
   it('shows Submit Exam button', () => {
     renderSidebar();
-    expect(screen.getByRole('button', { name: /submit exam/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /submit exam/i })
+    ).toBeInTheDocument();
   });
 
   it('disables Submit Exam button while submitting', () => {

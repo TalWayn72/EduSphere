@@ -8,45 +8,47 @@
 
 ## Summary
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Infrastructure (Docker, Postgres, NATS, MinIO, Keycloak, Jaeger) | Complete | All containers healthy |
-| Data Layer (Drizzle ORM + Apache AGE + pgvector) | Complete | 16 tables, RLS, migrations, seed |
-| packages/auth | Complete | JWT + Keycloak JWKS, guards |
-| packages/db | Complete | Schema, migrations, RLS helpers, AGE helpers |
-| packages/graphql-shared | Complete | Scalars, enums, directives, pagination |
-| packages/graphql-types | Complete | Codegen output, 0 TS errors |
-| packages/nats-client | Complete | JetStream client wrapper |
-| packages/i18n | Complete | EN + HE locales, 247 tests |
-| packages/config | Complete | Shared constants |
-| packages/test-utils | Complete | Shared test helpers |
-| **Gateway** (Port 4000) | Complete | Hive Gateway v2.5.1, supergraph composition |
-| **subgraph-core** (Port 4001) | Complete | User, Tenant, RLS, JWT, 640 tests |
-| **subgraph-content** (Port 4002) | Complete | Course, Lesson, Media, Pipeline, Fork, 1041 tests |
-| **subgraph-annotation** (Port 4003) | Complete | 4-layer annotations + Word-Style, 144 tests |
-| **subgraph-collaboration** (Port 4004) | Complete | Yjs CRDT, WebSocket, 161 tests |
-| **subgraph-agent** (Port 4005) | Complete | LangGraph, LlamaIndex, RAG, Chavruta, 599 tests |
-| **subgraph-knowledge** (Port 4006) | Complete | Apache AGE, pgvector, HybridRAG, 507 tests |
-| **Frontend web** (Port 5173) | Complete | React 19, Vite 6, 3065 tests |
-| **Mobile** (Expo SDK 54) | Complete | React Native 0.81, offline-first, 31 unit + 34 static |
-| **Admin Panel** | Complete | Phases 1-7 (Notification Templates) |
-| Security Compliance | Complete | G-01 to G-22, SOC2 Type II ready |
-| CI/CD | Complete | GitHub Actions, Hive schema registry, Trivy |
-| Observability | Complete | OpenTelemetry + Jaeger, Pino logging |
-| Load Testing | Complete | k6 scenarios (lesson pipeline, concurrent users) |
-| Memory Safety | Complete | OnModuleDestroy on all 20+ services, frontend timers |
+| Component                                                        | Status   | Notes                                                 |
+| ---------------------------------------------------------------- | -------- | ----------------------------------------------------- |
+| Infrastructure (Docker, Postgres, NATS, MinIO, Keycloak, Jaeger) | Complete | All containers healthy                                |
+| Data Layer (Drizzle ORM + Apache AGE + pgvector)                 | Complete | 16 tables, RLS, migrations, seed                      |
+| packages/auth                                                    | Complete | JWT + Keycloak JWKS, guards                           |
+| packages/db                                                      | Complete | Schema, migrations, RLS helpers, AGE helpers          |
+| packages/graphql-shared                                          | Complete | Scalars, enums, directives, pagination                |
+| packages/graphql-types                                           | Complete | Codegen output, 0 TS errors                           |
+| packages/nats-client                                             | Complete | JetStream client wrapper                              |
+| packages/i18n                                                    | Complete | EN + HE locales, 247 tests                            |
+| packages/config                                                  | Complete | Shared constants                                      |
+| packages/test-utils                                              | Complete | Shared test helpers                                   |
+| **Gateway** (Port 4000)                                          | Complete | Hive Gateway v2.5.1, supergraph composition           |
+| **subgraph-core** (Port 4001)                                    | Complete | User, Tenant, RLS, JWT, 640 tests                     |
+| **subgraph-content** (Port 4002)                                 | Complete | Course, Lesson, Media, Pipeline, Fork, 1041 tests     |
+| **subgraph-annotation** (Port 4003)                              | Complete | 4-layer annotations + Word-Style, 144 tests           |
+| **subgraph-collaboration** (Port 4004)                           | Complete | Yjs CRDT, WebSocket, 161 tests                        |
+| **subgraph-agent** (Port 4005)                                   | Complete | LangGraph, LlamaIndex, RAG, Chavruta, 599 tests       |
+| **subgraph-knowledge** (Port 4006)                               | Complete | Apache AGE, pgvector, HybridRAG, 507 tests            |
+| **Frontend web** (Port 5173)                                     | Complete | React 19, Vite 6, 3065 tests                          |
+| **Mobile** (Expo SDK 54)                                         | Complete | React Native 0.81, offline-first, 31 unit + 34 static |
+| **Admin Panel**                                                  | Complete | Phases 1-7 (Notification Templates)                   |
+| Security Compliance                                              | Complete | G-01 to G-22, SOC2 Type II ready                      |
+| CI/CD                                                            | Complete | GitHub Actions, Hive schema registry, Trivy           |
+| Observability                                                    | Complete | OpenTelemetry + Jaeger, Pino logging                  |
+| Load Testing                                                     | Complete | k6 scenarios (lesson pipeline, concurrent users)      |
+| Memory Safety                                                    | Complete | OnModuleDestroy on all 20+ services, frontend timers  |
 
 ---
 
 ## Completed Phases
 
 ### Phase 0: Foundation (100%)
+
 - Docker Compose (PostgreSQL 16 + Apache AGE + pgvector, Keycloak, NATS JetStream, MinIO, Jaeger)
 - Monorepo (pnpm workspaces + Turborepo)
 - Health check + smoke test scripts
 - TypeScript strict configuration (0 errors across 26 packages)
 
 ### Phase 1: Data Layer (100%)
+
 - 16 tables with full RLS (Row-Level Security)
 - Apache AGE graph ontology (Concept, Person, Term, Source, TopicCluster)
 - pgvector HNSW indexes (768-dim nomic-embed-text)
@@ -54,11 +56,13 @@
 - Migrations + seed data (5 demo users, 3 tenants, sample courses + knowledge graph)
 
 ### Phase 2: Authentication (100%)
+
 - Keycloak realm with 5 roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, RESEARCHER, STUDENT)
 - JWT validation via JWKS, `@authenticated` / `@requiresScopes` / `@requiresRole` directives
 - All subgraphs enforce `x-tenant-id` header from gateway
 
 ### Phase 3: All 6 Subgraphs (100%)
+
 - Core (4001): User, Tenant CRUD + RLS + JWT
 - Content (4002): Courses, Lessons, Media, Transcription pipeline, Course Forking, Search
 - Annotation (4003): 4-layer system (PERSONAL/SHARED/INSTRUCTOR/AI_GENERATED) + Word-Style annotations
@@ -67,17 +71,20 @@
 - Knowledge (4006): Apache AGE Cypher queries + pgvector HybridRAG + K-means clustering
 
 ### Phase 4: Gateway + Frontend (100%)
+
 - Hive Gateway v2.5.1 (supergraph composition, JWT propagation, rate limiting, query depth/complexity)
 - React 19 + Vite 6 + urql + TanStack Query v5 + Zustand v5
 - shadcn/ui + Tailwind CSS v4 + React Router v6
 - All pages: Dashboard, Courses, Lessons, Pipeline Builder, Knowledge Graph, Annotations, Collaboration, SRS, Admin
 
 ### Phase 5: Mobile (100%)
+
 - Expo SDK 54 (React Native 0.81)
 - Offline-first with expo-sqlite + TanStack Query
 - Auth, courses, lessons, annotations, offline sync screens
 
 ### Phase 6: AI/ML (100%)
+
 - Layer 1: Vercel AI SDK v6 (Ollama dev / OpenAI+Anthropic prod)
 - Layer 2: LangGraph.js state machines with checkpointing
 - Layer 3: LlamaIndex.TS RAG pipeline
@@ -85,10 +92,12 @@
 - gVisor sandboxing for multi-tenant agent execution
 
 ### Phase 7: Admin + Competitive Gap Features (100%)
+
 - Admin Phases 1-7: User Management, Org Settings, Analytics, Enrollment, Sub-Admin, Notifications, Notification Templates
 - 39 competitive gap features (Tier 1+2+3): xAPI/LRS, OpenBadges, BI export, Portal builder, Social following, Marketplace, Saved searches, Persisted queries, etc.
 
 ### Phase 8: Security + Compliance (100%)
+
 - G-01 to G-22 security invariants enforced
 - 813 security tests (32 spec files)
 - GDPR erasure + portability, EU AI Act transparency, SOC2 Type II ready
@@ -98,23 +107,23 @@
 
 ## Test Coverage
 
-| Scope | Tests | Files |
-|-------|-------|-------|
-| Web frontend | 3,065 | 231 |
-| subgraph-core | 640 | - |
-| subgraph-content | 1,041 | - |
-| subgraph-annotation | 144 | - |
-| subgraph-collaboration | 161 | - |
-| subgraph-agent | 599 | - |
-| subgraph-knowledge | 507 | - |
-| Gateway | 138 | - |
-| Security | 813 | 32 |
-| i18n | ~247 | - |
-| Mobile | 65 | - |
-| AGE Graph | 52 | - |
-| NATS Schema | 56 | - |
-| LangGraph | 154 | - |
-| **Total** | **>5,500** | - |
+| Scope                  | Tests      | Files |
+| ---------------------- | ---------- | ----- |
+| Web frontend           | 3,065      | 231   |
+| subgraph-core          | 640        | -     |
+| subgraph-content       | 1,041      | -     |
+| subgraph-annotation    | 144        | -     |
+| subgraph-collaboration | 161        | -     |
+| subgraph-agent         | 599        | -     |
+| subgraph-knowledge     | 507        | -     |
+| Gateway                | 138        | -     |
+| Security               | 813        | 32    |
+| i18n                   | ~247       | -     |
+| Mobile                 | 65         | -     |
+| AGE Graph              | 52         | -     |
+| NATS Schema            | 56         | -     |
+| LangGraph              | 154        | -     |
+| **Total**              | **>5,500** | -     |
 
 TypeScript: **0 errors** across all 26 packages.
 
@@ -129,22 +138,22 @@ TypeScript: **0 errors** across all 26 packages.
 
 ## Infrastructure
 
-| Service | Port | Status |
-|---------|------|--------|
-| PostgreSQL 16 + AGE + pgvector | 5432 | Complete |
-| Keycloak | 8080 | Complete |
-| NATS JetStream | 4222 | Complete |
-| MinIO | 9000 | Complete |
-| Jaeger (OTLP) | 16686 | Complete |
-| Gateway (Hive v2.5.1) | 4000 | Complete |
-| subgraph-core | 4001 | Complete |
-| subgraph-content | 4002 | Complete |
-| subgraph-annotation | 4003 | Complete |
-| subgraph-collaboration | 4004 | Complete |
-| subgraph-agent | 4005 | Complete |
-| subgraph-knowledge | 4006 | Complete |
-| Frontend web | 5173 | Complete |
-| Mobile (Expo) | - | Complete |
+| Service                        | Port  | Status   |
+| ------------------------------ | ----- | -------- |
+| PostgreSQL 16 + AGE + pgvector | 5432  | Complete |
+| Keycloak                       | 8080  | Complete |
+| NATS JetStream                 | 4222  | Complete |
+| MinIO                          | 9000  | Complete |
+| Jaeger (OTLP)                  | 16686 | Complete |
+| Gateway (Hive v2.5.1)          | 4000  | Complete |
+| subgraph-core                  | 4001  | Complete |
+| subgraph-content               | 4002  | Complete |
+| subgraph-annotation            | 4003  | Complete |
+| subgraph-collaboration         | 4004  | Complete |
+| subgraph-agent                 | 4005  | Complete |
+| subgraph-knowledge             | 4006  | Complete |
+| Frontend web                   | 5173  | Complete |
+| Mobile (Expo)                  | -     | Complete |
 
 ---
 
@@ -155,6 +164,7 @@ TypeScript: **0 errors** across all 26 packages.
 **Focus:** Mobile TypeScript fixes, Code quality, LoggerModule extraction
 
 **Key Changes:**
+
 - Mobile app TypeScript strict-mode errors resolved (Expo SDK 54 compatibility)
 - LoggerModule extracted as reusable NestJS global module (shared across all subgraphs)
 - TIME constants package created (`packages/config`) for shared duration literals
@@ -172,6 +182,7 @@ TypeScript: **0 errors** across all 26 packages.
 **Focus:** PRD Gap Closure G1-G8 (canvas annotations, video sketch, AI Tutor, knowledge sources, adaptive quiz, study streaks)
 
 **Key Changes:**
+
 - Annotation subgraph: canvas/sketch annotation support added
 - VideoPlayerWithCurriculum: base implementation with sidebar
 - AITutorScreen: enhanced with EU AI Act compliance and consent management (SI-10)
@@ -192,6 +203,7 @@ TypeScript: **0 errors** across all 26 packages.
 **Focus:** UI/UX Revolution — Design System + Accessibility + Mobile alignment (5 phases)
 
 **Phase 1 — Design System:**
+
 - Indigo design tokens: `COLORS.primary = #6366F1`, `SPACING`, `RADIUS`, `FONT`, `SHADOW`
 - ThemeProvider (3-tier: globals.css `:root` → tenant CSS vars → user pref class toggles on `html`)
 - LandingPage rewrite with gradient hero and feature sections
@@ -199,25 +211,30 @@ TypeScript: **0 errors** across all 26 packages.
 - DB migration `0010_tenant_themes` (tenant_themes table + RLS + user_preferences columns)
 
 **Phase 2 — Navigation + Dashboard:**
+
 - AppSidebar: collapsible 240px/64px with 6 nav groups
 - DashboardPage: 5 sections (hero streak, stats grid, recent activity, upcoming, quick actions)
 - CoursesDiscoveryPage with search + MasteryBadge integration + CourseCard component
 
 **Phase 3 — Learning + Knowledge:**
+
 - VideoPlayerWithCurriculum: 320px curriculum sidebar with lesson list
 - KnowledgeSkillTree: BFS traversal + SVG bezier edge rendering
 
 **Phase 4 — WCAG 2.2 AAA Accessibility:**
+
 - SkipLinks, useFocusTrap, useAnnounce (dual live-region), useReducedMotion
 - ThemeSettingsPage (font size, contrast, motion preferences)
 
 **Phase 5 — Mobile Design System Alignment:**
+
 - `theme.ts` with Indigo tokens shared across all screens
 - HomeScreen, CoursesScreen, ProfileScreen, SettingsScreen: all migrated to `COLORS.primary`
 - Navigation `tabBarActiveTintColor` → `COLORS.primary`
 - MasteryBadge mobile component (`testID=mastery-badge-${level}`)
 
 **New Files:**
+
 - `apps/subgraph-knowledge/src/graph/skill-tree.resolver.ts`
 - `apps/subgraph-knowledge/src/graph/skill-tree.service.ts`
 - `apps/subgraph-knowledge/src/graph/skill-tree.resolver.spec.ts`
@@ -240,6 +257,7 @@ TypeScript: **0 errors** across all 26 packages.
 **Focus:** Documentation Infrastructure + Phase 27 Security Audit preparation
 
 **Key Changes:**
+
 - `docs/INDEX.md` created as documentation root index
 - `.github/workflows/ci.yml`: root-cleanliness job added (enforces no stray files at repo root)
 - `.husky/pre-commit` hook: doc lint check
@@ -259,6 +277,7 @@ TypeScript: **0 errors** across all 26 packages.
 **Focus:** Live Sessions, Offline Web, Course Discovery, Knowledge Graph course context, BUG-054
 
 **New Features:**
+
 - **Live Sessions** (`/sessions`): List + Detail pages backed by new agent subgraph module
 - **Offline Web**: OfflineBanner, useOfflineStatus, useOfflineQueue (100-item LRU cap), OfflineLessonCache (IndexedDB), SmartRoot
 - **Course Discovery**: `/explore`, `/discover`, `/courses/discover` routes; CourseCard + Highlight component (BUG-053 fix)
@@ -266,6 +285,7 @@ TypeScript: **0 errors** across all 26 packages.
 - **AdminActivityFeed** component for admin dashboard
 
 **New Files:**
+
 - `apps/subgraph-agent/src/live-sessions/` (live-sessions NestJS module)
 - `apps/web/src/pages/LiveSessionsPage.tsx` + `LiveSessionsPage.test.tsx`
 - `apps/web/src/pages/LiveSessionDetailPage.tsx` + `LiveSessionDetailPage.test.tsx`
@@ -282,6 +302,7 @@ TypeScript: **0 errors** across all 26 packages.
 - `packages/db/src/migrations/0011_user_skill_mastery.sql`
 
 **Database:**
+
 - `live_sessions` table with SI-3 compliant encrypted fields (`attendeePasswordEnc`, `moderatorPasswordEnc`)
 
 **Routes Added:** `/explore`, `/discover`, `/courses/discover`, `/sessions`, `/sessions/:id`, `/skill-tree`
@@ -305,9 +326,11 @@ TypeScript: **0 errors** across all 26 packages.
 ## Session 28 — Phases 28-34 (2026-03-06)
 
 ### Phase 28 — Live Sessions Mutations + Offline Sync + PWA + SI-3 Fix
+
 **Commit:** `fddb6c0` + `1cc2469`
 
 **Key changes:**
+
 - `useLiveSessionActions.ts`: 4 mutations (end/join/cancel/start) with toast error handling
 - SI-3 critical fix: `encryptField()`/`decryptField()` wired in `live-session.service.ts`
 - `useOfflineQueue`: TTL 48h + online-event auto-flush + LRU 100 + `onFlush` callback
@@ -318,6 +341,7 @@ TypeScript: **0 errors** across all 26 packages.
 - Husky v10: `#!/bin/sh` shebang fix
 
 **New files:**
+
 - `apps/web/src/hooks/useLiveSessionActions.ts`
 - `apps/web/src/pwa.ts`
 - `apps/web/e2e/offline-sync.spec.ts`, `live-sessions-mutations.spec.ts`, `course-discovery-filters.spec.ts`, `aria-phase28.spec.ts`
@@ -328,9 +352,11 @@ TypeScript: **0 errors** across all 26 packages.
 ---
 
 ### Phase 29 — Stripe Checkout Flow (PRD §8.4)
+
 **Commit:** `be3705a`
 
 **Key changes:**
+
 - `CheckoutPage.tsx`: Stripe Elements, clientSecret from URL, success redirect
 - `PurchaseCourseButton.tsx`: URL-based secret passing, fixed console.error removal
 - `/checkout` route added (lazy-loaded, auth-guarded)
@@ -338,6 +364,7 @@ TypeScript: **0 errors** across all 26 packages.
 - Security: clientSecret never in localStorage or DOM text
 
 **New files:**
+
 - `apps/web/src/pages/CheckoutPage.tsx` + `CheckoutPage.test.tsx`
 - `apps/web/e2e/checkout-flow.spec.ts`
 
@@ -346,9 +373,11 @@ TypeScript: **0 errors** across all 26 packages.
 ---
 
 ### Phase 30 — Personal Knowledge Graph Wiki + Annotation Merge Request (PRD §4.3+§4.4)
+
 **Commit:** `4ae6614`
 
 **Key changes:**
+
 - `PersonalGraphView.tsx`: SVG annotation wiki across all courses (6 nodes, 7 edges, colour legend, detail panel)
 - `KnowledgeGraph.tsx`: Global/My Wiki tab toggle
 - `AnnotationMergeRequestModal.tsx`: propose annotation dialog with 0/500 char counter
@@ -356,6 +385,7 @@ TypeScript: **0 errors** across all 26 packages.
 - `InstructorMergeQueuePage.tsx`: diff view, approve/reject, route `/instructor/merge-queue`
 
 **New files:**
+
 - `apps/web/src/components/PersonalGraphView.tsx` + `.test.tsx`
 - `apps/web/src/components/AnnotationMergeRequestModal.tsx` + `.test.tsx`
 - `apps/web/src/pages/InstructorMergeQueuePage.tsx` + `.test.tsx`
@@ -366,15 +396,18 @@ TypeScript: **0 errors** across all 26 packages.
 ---
 
 ### Phase 31 — Video Sketch Overlay Enhancement (PRD §4.2 P-1)
+
 **Commit:** `2c9d178`
 
 **Key changes:**
+
 - `useSketchCanvas.ts`: 6 tools — freehand, eraser (destination-out), rect, arrow, ellipse, text
 - `VideoSketchToolbar.tsx`: tool buttons (aria-pressed), color picker swatch, Save/Clear/Cancel
 - Text tool: positioned `<input>` on click, commits on Enter/blur
 - `VideoSketchOverlay.tsx`: refactored as coordinator; backward-compatible SketchPath re-export
 
 **New files:**
+
 - `apps/web/src/hooks/useSketchCanvas.ts`
 - `apps/web/src/components/VideoSketchToolbar.tsx`
 - `apps/web/src/components/VideoSketchOverlay.tools.test.tsx`
@@ -385,9 +418,11 @@ TypeScript: **0 errors** across all 26 packages.
 ---
 
 ### Phase 32 — Real-time AI Subtitle Translation (PRD §3.4 G-2)
+
 **Commit:** `720b7c9`
 
 **Key changes:**
+
 - `TranslationService`: LibreTranslate HTTP, VTT generation, MinIO upload, NATS event
 - `SubtitleTrack` GraphQL type; `subtitleTracks` field on `MediaAsset`
 - `VideoSubtitleSelector.tsx`: CC button, language dropdown, Off option, ARIA
@@ -396,6 +431,7 @@ TypeScript: **0 errors** across all 26 packages.
 - Env: `TRANSLATION_TARGETS` (BCP-47), `LIBRE_TRANSLATE_URL`
 
 **New files:**
+
 - `apps/subgraph-content/src/translation/translation.service.ts` + `.spec.ts`
 - `apps/web/src/components/VideoSubtitleSelector.tsx` + `.test.tsx`
 - `apps/web/e2e/subtitle-translation.spec.ts`
@@ -405,9 +441,11 @@ TypeScript: **0 errors** across all 26 packages.
 ---
 
 ### Phase 33 — Remote Proctoring (PRD §7.2 G-4)
+
 **Commit:** `0d51873`
 
 **Key changes:**
+
 - `ProctoringService`: full session lifecycle (start/flag/end) with `OnModuleDestroy` cleanup
 - `ProctoringOverlay.tsx`: WebRTC webcam, tab-switch via `visibilitychange`, flag count badge
 - `ProctoringReportCard.tsx`: status badge + flag timeline
@@ -415,6 +453,7 @@ TypeScript: **0 errors** across all 26 packages.
 - Memory safety: `visibilitychange` listener removed + `MediaStream.getTracks().stop()` on unmount
 
 **New files:**
+
 - `apps/subgraph-agent/src/proctoring/proctoring.service.ts` + `.spec.ts`
 - `apps/web/src/components/ProctoringOverlay.tsx` + `.test.tsx`
 - `apps/web/src/components/ProctoringReportCard.tsx`
@@ -426,11 +465,13 @@ TypeScript: **0 errors** across all 26 packages.
 ---
 
 ### Phase 34 — 3D Models & Simulations (PRD §3.3 G-1)
+
 **Commit:** `1e3314b`
 
 **ALL PRD GAPS CLOSED** — G-1 through G-4, P-1 through P-3 complete.
 
 **Key changes:**
+
 - `Model3DViewer.tsx`: Three.js WebGL via dynamic `import()`, OrbitControls, full memory cleanup
 - `Model3DInfo` + `ModelAnimation` types; `AssetType.MODEL_3D` enum value
 - `uploadModel3D` mutation: format validation (gltf/glb/obj/fbx), MinIO presigned URL
@@ -438,6 +479,7 @@ TypeScript: **0 errors** across all 26 packages.
 - Three.js vitest stubs for CI
 
 **New files:**
+
 - `apps/web/src/components/Model3DViewer.tsx` + `.test.tsx`
 - `apps/web/src/lib/graphql/model3d.queries.ts`
 - `apps/web/e2e/model3d-viewer.spec.ts`
@@ -450,12 +492,12 @@ TypeScript: **0 errors** across all 26 packages.
 
 ## Cumulative Test Count (All Sessions)
 
-| Session | Tests Added | Running Total |
-|---------|------------|---------------|
-| 1-22 | ~3,500 | ~3,500 |
-| 23 | ~50 | ~3,550 |
-| 24 | ~500 | ~4,050 |
-| 25 | ~1,200 | ~5,250 |
-| 26 | ~50 | ~5,300 |
-| 27 | ~462 | ~5,762 |
-| 28 (Phases 28-34) | ~352 | **~6,114+** |
+| Session           | Tests Added | Running Total |
+| ----------------- | ----------- | ------------- |
+| 1-22              | ~3,500      | ~3,500        |
+| 23                | ~50         | ~3,550        |
+| 24                | ~500        | ~4,050        |
+| 25                | ~1,200      | ~5,250        |
+| 26                | ~50         | ~5,300        |
+| 27                | ~462        | ~5,762        |
+| 28 (Phases 28-34) | ~352        | **~6,114+**   |

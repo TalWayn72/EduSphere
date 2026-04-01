@@ -44,7 +44,10 @@ export function useLearningPath() {
   // Log GraphQL errors
   useEffect(() => {
     if (learningPathResult.error) {
-      console.error('[KnowledgeGraph] Learning path query error:', learningPathResult.error.message);
+      console.error(
+        '[KnowledgeGraph] Learning path query error:',
+        learningPathResult.error.message
+      );
     }
   }, [learningPathResult.error]);
 
@@ -89,7 +92,9 @@ export function useLearningPath() {
     [learningPath]
   );
 
-  const isPathLoading = DEV_MODE ? mockPathLoading : learningPathResult.fetching;
+  const isPathLoading = DEV_MODE
+    ? mockPathLoading
+    : learningPathResult.fetching;
 
   return {
     pathFrom,

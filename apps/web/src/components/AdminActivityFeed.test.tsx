@@ -31,14 +31,26 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
-    <div {...props}>{children}</div>
+  Card: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  CardHeader: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <h3>{children}</h3>
   ),
-  CardHeader: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
-    <div {...props}>{children}</div>
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
-  CardTitle: ({ children }: { children: React.ReactNode }) => <h3>{children}</h3>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 // ─── Sample data ──────────────────────────────────────────────────────────────
@@ -62,7 +74,9 @@ const SAMPLE_ITEMS: ActivityItem[] = [
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
-function renderFeed(props: React.ComponentProps<typeof AdminActivityFeed> = {}) {
+function renderFeed(
+  props: React.ComponentProps<typeof AdminActivityFeed> = {}
+) {
   return render(
     <MemoryRouter>
       {/* Disable auto-refresh to avoid leaky timers in tests */}

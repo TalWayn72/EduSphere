@@ -71,7 +71,10 @@ function renderWithRoute(path: string) {
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/knowledge-graph" element={<KnowledgeGraphPage />} />
-        <Route path="/knowledge-graph/:courseId" element={<KnowledgeGraphPage />} />
+        <Route
+          path="/knowledge-graph/:courseId"
+          element={<KnowledgeGraphPage />}
+        />
       </Routes>
     </MemoryRouter>
   );
@@ -87,7 +90,9 @@ describe('KnowledgeGraphPage', () => {
   it('without courseId: renders global Knowledge Graph heading', () => {
     renderWithRoute('/knowledge-graph');
     // PageHeader + inline h1 both render "Knowledge Graph" — use getAllByRole
-    const headings = screen.getAllByRole('heading', { name: /knowledge graph/i });
+    const headings = screen.getAllByRole('heading', {
+      name: /knowledge graph/i,
+    });
     expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -130,7 +135,9 @@ describe('KnowledgeGraphPage', () => {
 
   // Regression: /knowledge-graph/:courseId must not crash
   it('regression: /knowledge-graph/:courseId route resolves without crash', () => {
-    expect(() => renderWithRoute('/knowledge-graph/some-course-id')).not.toThrow();
+    expect(() =>
+      renderWithRoute('/knowledge-graph/some-course-id')
+    ).not.toThrow();
   });
 
   // Regression: global route must still work

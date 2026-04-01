@@ -86,7 +86,8 @@ describe('StripeInvoiceService — Security Invariants', () => {
     const content = readService();
     // Structured Pino context { err, tenantId } is acceptable per project rules
     // (tenantId is a UUID, not PII). What's NOT allowed: template-string interpolation.
-    const interpolatedTenantId = /this\.logger\.error\(`[^`]*\$\{.*tenantId.*\}[^`]*`\)/;
+    const interpolatedTenantId =
+      /this\.logger\.error\(`[^`]*\$\{.*tenantId.*\}[^`]*`\)/;
     expect(content).not.toMatch(interpolatedTenantId);
   });
 });

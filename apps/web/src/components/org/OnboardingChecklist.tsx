@@ -12,7 +12,8 @@ export function OnboardingChecklist() {
 
   if (isDismissed) return null;
 
-  const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const percent =
+    totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   return (
     <div className="rounded-lg border p-4 space-y-3">
@@ -53,7 +54,11 @@ export function OnboardingChecklist() {
             data-completed={String(step.completed)}
             className="flex items-center gap-2 text-sm"
           >
-            <span className={step.completed ? 'text-green-600' : 'text-muted-foreground'}>
+            <span
+              className={
+                step.completed ? 'text-green-600' : 'text-muted-foreground'
+              }
+            >
               {step.completed ? '\u2713' : '\u25CB'}
             </span>
             <span>{t(step.label)}</span>

@@ -18,7 +18,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 const mockOnboardingData = {
   steps: [
-    { id: 's1', label: 'Create first course', completed: true, href: '/courses/new' },
+    {
+      id: 's1',
+      label: 'Create first course',
+      completed: true,
+      href: '/courses/new',
+    },
     { id: 's2', label: 'Add a lesson', completed: false, href: '/lessons/new' },
     { id: 's3', label: 'Invite students', completed: false, href: '/invite' },
   ],
@@ -26,7 +31,9 @@ const mockOnboardingData = {
   totalCount: 3,
 };
 
-let mockQueryResult: { data: { onboardingStatus: typeof mockOnboardingData } | null } = {
+let mockQueryResult: {
+  data: { onboardingStatus: typeof mockOnboardingData } | null;
+} = {
   data: { onboardingStatus: mockOnboardingData },
 };
 
@@ -55,7 +62,11 @@ describe('OnboardingChecklist', () => {
   it('returns null when all steps completed', () => {
     mockQueryResult = {
       data: {
-        onboardingStatus: { ...mockOnboardingData, completedCount: 3, totalCount: 3 },
+        onboardingStatus: {
+          ...mockOnboardingData,
+          completedCount: 3,
+          totalCount: 3,
+        },
       },
     };
     const { container } = render(<OnboardingChecklist />);
@@ -108,7 +119,9 @@ describe('OnboardingChecklist', () => {
     fireEvent.click(screen.getByText(/Setup Checklist/));
     fireEvent.click(screen.getByText('Dismiss checklist'));
 
-    expect(screen.queryByTestId('onboarding-checklist')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('onboarding-checklist')
+    ).not.toBeInTheDocument();
   });
 
   it('completed steps have checkmark', () => {

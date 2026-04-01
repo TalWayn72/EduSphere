@@ -13,7 +13,11 @@ function getTierCost(students: number): number {
 }
 
 function formatCurrency(n: number): string {
-  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  return n.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
 }
 
 export function ROICalculatorSection() {
@@ -26,7 +30,10 @@ export function ROICalculatorSection() {
   const hoursSaved = Math.round(instructors * hoursPerWeek * 52 * 0.6);
   const valueSaved = hoursSaved * hourlyRate;
   const annualCost = getTierCost(students);
-  const netROI = annualCost > 0 ? Math.round(((valueSaved - annualCost) / annualCost) * 100) : 0;
+  const netROI =
+    annualCost > 0
+      ? Math.round(((valueSaved - annualCost) / annualCost) * 100)
+      : 0;
 
   return (
     <section
@@ -49,22 +56,60 @@ export function ROICalculatorSection() {
           {/* Sliders */}
           <div className="space-y-8">
             {[
-              { label: t('landing.roi.instructors'), value: instructors, min: 1, max: 50, step: 1, set: setInstructors, format: (v: number) => `${v}` },
-              { label: t('landing.roi.hoursPerWeek'), value: hoursPerWeek, min: 1, max: 20, step: 1, set: setHoursPerWeek, format: (v: number) => `${v} hrs` },
-              { label: t('landing.roi.hourlyCost'), value: hourlyRate, min: 50, max: 200, step: 5, set: setHourlyRate, format: (v: number) => `$${v}/hr` },
-              { label: t('landing.roi.students'), value: students, min: 100, max: 50000, step: 100, set: setStudents, format: (v: number) => v.toLocaleString() },
+              {
+                label: t('landing.roi.instructors'),
+                value: instructors,
+                min: 1,
+                max: 50,
+                step: 1,
+                set: setInstructors,
+                format: (v: number) => `${v}`,
+              },
+              {
+                label: t('landing.roi.hoursPerWeek'),
+                value: hoursPerWeek,
+                min: 1,
+                max: 20,
+                step: 1,
+                set: setHoursPerWeek,
+                format: (v: number) => `${v} hrs`,
+              },
+              {
+                label: t('landing.roi.hourlyCost'),
+                value: hourlyRate,
+                min: 50,
+                max: 200,
+                step: 5,
+                set: setHourlyRate,
+                format: (v: number) => `$${v}/hr`,
+              },
+              {
+                label: t('landing.roi.students'),
+                value: students,
+                min: 100,
+                max: 50000,
+                step: 100,
+                set: setStudents,
+                format: (v: number) => v.toLocaleString(),
+              },
             ].map(({ label, value, min, max, step, set, format }) => (
               <div key={label}>
                 <div className="flex justify-between items-center mb-3">
-                  <Label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</Label>
-                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{format(value)}</span>
+                  <Label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    {label}
+                  </Label>
+                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                    {format(value)}
+                  </span>
                 </div>
                 <Slider
                   min={min}
                   max={max}
                   step={step}
                   value={[value]}
-                  onValueChange={(vals) => { if (vals[0] !== undefined) set(vals[0]); }}
+                  onValueChange={(vals) => {
+                    if (vals[0] !== undefined) set(vals[0]);
+                  }}
                   aria-label={label}
                   className="w-full"
                 />
@@ -75,21 +120,61 @@ export function ROICalculatorSection() {
           {/* Results */}
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 flex flex-col gap-6 dark:bg-slate-800 dark:border-slate-600">
             {[
-              { label: t('landing.roi.hoursSavedYear'), value: `${hoursSaved.toLocaleString()} hrs` },
-              { label: t('landing.roi.dollarValueSaved'), value: formatCurrency(valueSaved), highlight: true },
-              { label: t('landing.roi.annualCost'), value: formatCurrency(annualCost) },
+              {
+                label: t('landing.roi.hoursSavedYear'),
+                value: `${hoursSaved.toLocaleString()} hrs`,
+              },
+              {
+                label: t('landing.roi.dollarValueSaved'),
+                value: formatCurrency(valueSaved),
+                highlight: true,
+              },
+              {
+                label: t('landing.roi.annualCost'),
+                value: formatCurrency(annualCost),
+              },
             ].map(({ label, value, highlight }) => (
-              <div key={label} className={`rounded-xl px-5 py-4 ${highlight ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200'}`}>
-                <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${highlight ? 'text-indigo-100' : 'text-slate-500'}`}>{label}</p>
-                <p className={`text-2xl font-extrabold ${highlight ? 'text-white' : 'text-slate-900'}`}>{value}</p>
+              <div
+                key={label}
+                className={`rounded-xl px-5 py-4 ${highlight ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200'}`}
+              >
+                <p
+                  className={`text-xs font-medium uppercase tracking-wider mb-1 ${highlight ? 'text-indigo-100' : 'text-slate-500'}`}
+                >
+                  {label}
+                </p>
+                <p
+                  className={`text-2xl font-extrabold ${highlight ? 'text-white' : 'text-slate-900'}`}
+                >
+                  {value}
+                </p>
               </div>
             ))}
             <div className="rounded-xl bg-green-50 border border-green-200 px-5 py-4 dark:bg-green-950 dark:border-green-700">
-              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1 dark:text-green-300">{t('landing.roi.netRoi')}</p>
-              <p className="text-3xl font-extrabold text-green-700 dark:text-green-300">{netROI > 0 ? '+' : ''}{netROI}%</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-green-700 mb-1 dark:text-green-300">
+                {t('landing.roi.netRoi')}
+              </p>
+              <p className="text-3xl font-extrabold text-green-700 dark:text-green-300">
+                {netROI > 0 ? '+' : ''}
+                {netROI}%
+              </p>
             </div>
-            <Button className="bg-indigo-600 hover:bg-indigo-500 text-white w-full dark:bg-indigo-500 dark:text-white" asChild>
-              <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>{t('landing.roi.getReport')}</Link>
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-500 text-white w-full dark:bg-indigo-500 dark:text-white"
+              asChild
+            >
+              <Link
+                to="/#pilot-cta"
+                onClick={(e) => {
+                  const el = document.getElementById('pilot-cta');
+                  if (el) {
+                    e.preventDefault();
+                    el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                {t('landing.roi.getReport')}
+              </Link>
             </Button>
           </div>
         </div>

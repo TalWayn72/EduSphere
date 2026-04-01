@@ -2,7 +2,12 @@
  * ChavrutaPartnerMatchService — GAP-3: Chavruta debate partner matching.
  * Finds enrolled peers in the same course and creates partner sessions.
  */
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   db,
   withTenantContext,
@@ -57,7 +62,10 @@ export class ChavrutaPartnerMatchService implements OnModuleDestroy {
       this.ctx(tenantId, userId),
       async (tx) => {
         const rows = await tx
-          .select({ candidateId: userCourses.userId, courseId: userCourses.courseId })
+          .select({
+            candidateId: userCourses.userId,
+            courseId: userCourses.courseId,
+          })
           .from(userCourses)
           .where(
             and(
@@ -89,7 +97,8 @@ export class ChavrutaPartnerMatchService implements OnModuleDestroy {
       partnerName: `Learner ${idx + 1}`,
       courseId: c.courseId,
       topic,
-      matchReason: 'Both enrolled in the same course with complementary perspectives',
+      matchReason:
+        'Both enrolled in the same course with complementary perspectives',
       compatibilityScore: Math.min(1, 0.7 + idx * 0.05),
     }));
   }
@@ -100,7 +109,15 @@ export class ChavrutaPartnerMatchService implements OnModuleDestroy {
     partnerId: string,
     courseId: string,
     topic: string
-  ): Promise<{ id: string; initiatorId: string; partnerId: string; courseId: string; topic: string; status: string; initiatedAt: string }> {
+  ): Promise<{
+    id: string;
+    initiatorId: string;
+    partnerId: string;
+    courseId: string;
+    topic: string;
+    status: string;
+    initiatedAt: string;
+  }> {
     return withTenantContext(
       db,
       this.ctx(tenantId, initiatorId),
@@ -120,7 +137,9 @@ export class ChavrutaPartnerMatchService implements OnModuleDestroy {
           .returning();
         const session = rows[0];
         if (!session) {
-          throw new InternalServerErrorException('[ChavrutaPartnerMatchService] Insert returned no rows');
+          throw new InternalServerErrorException(
+            '[ChavrutaPartnerMatchService] Insert returned no rows'
+          );
         }
         this.logger.log(
           { sessionId: session.id, initiatorId, partnerId },
@@ -142,25 +161,31 @@ export class ChavrutaPartnerMatchService implements OnModuleDestroy {
   async getMyPartnerSessions(
     userId: string,
     tenantId: string
-  ): Promise<Array<{ id: string; initiatorId: string; partnerId: string; courseId: string; topic: string; status: string; initiatedAt: string }>> {
-    return withTenantContext(
-      db,
-      this.ctx(tenantId, userId),
-      async (tx) => {
-        const rows = await tx
-          .select()
-          .from(chavrutaPartnerSessions)
-          .where(eq(chavrutaPartnerSessions.tenantId, tenantId));
-        return rows.map((r) => ({
-          id: r.id,
-          initiatorId: r.initiatorId,
-          partnerId: r.partnerId,
-          courseId: r.courseId ?? '',
-          topic: r.topic,
-          status: r.status,
-          initiatedAt: r.initiatedAt.toISOString(),
-        }));
-      }
-    );
+  ): Promise<
+    Array<{
+      id: string;
+      initiatorId: string;
+      partnerId: string;
+      courseId: string;
+      topic: string;
+      status: string;
+      initiatedAt: string;
+    }>
+  > {
+    return withTenantContext(db, this.ctx(tenantId, userId), async (tx) => {
+      const rows = await tx
+        .select()
+        .from(chavrutaPartnerSessions)
+        .where(eq(chavrutaPartnerSessions.tenantId, tenantId));
+      return rows.map((r) => ({
+        id: r.id,
+        initiatorId: r.initiatorId,
+        partnerId: r.partnerId,
+        courseId: r.courseId ?? '',
+        topic: r.topic,
+        status: r.status,
+        initiatedAt: r.initiatedAt.toISOString(),
+      }));
+    });
   }
 }

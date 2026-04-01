@@ -83,64 +83,64 @@ describe('utils — getSourceErrorKey()', () => {
 
   it('maps "400 Bad Request" to sources.errorUnauthorized (BUG-098 core fix)', () => {
     expect(getSourceErrorKey(new Error('400 Bad Request'))).toBe(
-      'sources.errorUnauthorized',
+      'sources.errorUnauthorized'
     );
   });
 
   it('maps "UNAUTHENTICATED" to sources.errorUnauthorized', () => {
     expect(getSourceErrorKey(new Error('UNAUTHENTICATED'))).toBe(
-      'sources.errorUnauthorized',
+      'sources.errorUnauthorized'
     );
   });
 
   it('maps "Not authenticated" to sources.errorUnauthorized', () => {
     expect(
-      getSourceErrorKey(new Error('Not authenticated — please log in')),
+      getSourceErrorKey(new Error('Not authenticated — please log in'))
     ).toBe('sources.errorUnauthorized');
   });
 
   it('maps "Unauthorized" to sources.errorUnauthorized', () => {
     expect(getSourceErrorKey(new Error('Unauthorized'))).toBe(
-      'sources.errorUnauthorized',
+      'sources.errorUnauthorized'
     );
   });
 
   it('maps "Auth required" to sources.errorUnauthorized', () => {
     expect(getSourceErrorKey(new Error('Auth required'))).toBe(
-      'sources.errorUnauthorized',
+      'sources.errorUnauthorized'
     );
   });
 
   it('maps "DOWNSTREAM_SERVICE_ERROR" to sources.errorDownstream', () => {
     expect(
-      getSourceErrorKey(new Error('DOWNSTREAM_SERVICE_ERROR: timeout')),
+      getSourceErrorKey(new Error('DOWNSTREAM_SERVICE_ERROR: timeout'))
     ).toBe('sources.errorDownstream');
   });
 
   it('maps "Network" error to sources.errorNetwork', () => {
     expect(getSourceErrorKey(new Error('Network request failed'))).toBe(
-      'sources.errorNetwork',
+      'sources.errorNetwork'
     );
   });
 
   it('maps "fetch" error to sources.errorNetwork', () => {
     expect(getSourceErrorKey(new Error('fetch failed'))).toBe(
-      'sources.errorNetwork',
+      'sources.errorNetwork'
     );
   });
 
   it('returns sources.errorGeneric for unknown error strings', () => {
     expect(getSourceErrorKey(new Error('Something else went wrong'))).toBe(
-      'sources.errorGeneric',
+      'sources.errorGeneric'
     );
   });
 
   it('handles non-Error values (strings, objects) by calling String()', () => {
     expect(getSourceErrorKey('400 Bad Request')).toBe(
-      'sources.errorUnauthorized',
+      'sources.errorUnauthorized'
     );
     expect(getSourceErrorKey({ toString: () => 'Network failure' })).toBe(
-      'sources.errorNetwork',
+      'sources.errorNetwork'
     );
   });
 });
@@ -153,43 +153,43 @@ describe('utils — getFriendlySourceErrorKey()', () => {
 
   it('maps "interrupted" to sources.errorServiceRestarted', () => {
     expect(getFriendlySourceErrorKey('Processing interrupted')).toBe(
-      'sources.errorServiceRestarted',
+      'sources.errorServiceRestarted'
     );
   });
 
   it('maps "service restarted" to sources.errorServiceRestarted', () => {
     expect(
-      getFriendlySourceErrorKey('Pipeline failed: service restarted'),
+      getFriendlySourceErrorKey('Pipeline failed: service restarted')
     ).toBe('sources.errorServiceRestarted');
   });
 
   it('maps "timeout" to sources.errorTimeout', () => {
     expect(getFriendlySourceErrorKey('Request timeout after 30s')).toBe(
-      'sources.errorTimeout',
+      'sources.errorTimeout'
     );
   });
 
   it('maps "timed out" to sources.errorTimeout', () => {
     expect(getFriendlySourceErrorKey('Connection timed out')).toBe(
-      'sources.errorTimeout',
+      'sources.errorTimeout'
     );
   });
 
   it('maps "too large" to sources.errorFileTooLarge', () => {
     expect(getFriendlySourceErrorKey('File too large (limit: 25MB)')).toBe(
-      'sources.errorFileTooLarge',
+      'sources.errorFileTooLarge'
     );
   });
 
   it('maps "size limit" to sources.errorFileTooLarge', () => {
     expect(getFriendlySourceErrorKey('Exceeded size limit')).toBe(
-      'sources.errorFileTooLarge',
+      'sources.errorFileTooLarge'
     );
   });
 
   it('returns sources.errorGeneric for unmatched error messages', () => {
     expect(getFriendlySourceErrorKey('Unknown pipeline failure')).toBe(
-      'sources.errorGeneric',
+      'sources.errorGeneric'
     );
   });
 });
@@ -203,16 +203,22 @@ describe('utils — parseSourceError() (deprecated)', () => {
 
   it('returns Hebrew auth error for "Unauthorized"', () => {
     const result = parseSourceError(new Error('Unauthorized'));
-    expect(result).toContain('\u05E9\u05D2\u05D9\u05D0\u05EA \u05D4\u05E8\u05E9\u05D0\u05D4');
+    expect(result).toContain(
+      '\u05E9\u05D2\u05D9\u05D0\u05EA \u05D4\u05E8\u05E9\u05D0\u05D4'
+    );
   });
 
   it('returns Hebrew downstream error for "DOWNSTREAM_SERVICE_ERROR"', () => {
     const result = parseSourceError(new Error('DOWNSTREAM_SERVICE_ERROR'));
-    expect(result).toContain('\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05E9\u05D9\u05E8\u05D5\u05EA');
+    expect(result).toContain(
+      '\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05E9\u05D9\u05E8\u05D5\u05EA'
+    );
   });
 
   it('returns Hebrew network error for "Network" errors', () => {
     const result = parseSourceError(new Error('Network error'));
-    expect(result).toContain('\u05E9\u05D2\u05D9\u05D0\u05EA \u05E8\u05E9\u05EA');
+    expect(result).toContain(
+      '\u05E9\u05D2\u05D9\u05D0\u05EA \u05E8\u05E9\u05EA'
+    );
   });
 });

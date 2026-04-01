@@ -8,11 +8,7 @@
  * SECURITY: No user-supplied values are interpolated; all params pass via AGE third-argument JSON.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  db,
-  executeCypher,
-  createConcept,
-} from '@edusphere/db';
+import { db, executeCypher, createConcept } from '@edusphere/db';
 import type { ConceptProperties } from '@edusphere/db';
 import { graphConfig } from '@edusphere/config';
 import { MAX_CONCEPT_LIMIT } from '../constants';

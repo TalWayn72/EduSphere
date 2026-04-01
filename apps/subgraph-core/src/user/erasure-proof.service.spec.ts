@@ -74,7 +74,10 @@ describe('ErasureProofService', () => {
         { table: 'USER_RECORD', rowsDeleted: 1 },
       ];
       const manifest = service.buildManifest(
-        'user-1', 'tenant-1', 'admin-1', entries
+        'user-1',
+        'tenant-1',
+        'admin-1',
+        entries
       );
 
       expect(manifest.userId).toBe(service.hashUserId('user-1'));
@@ -89,22 +92,17 @@ describe('ErasureProofService', () => {
 
   describe('hashManifest', () => {
     it('returns a 64-char hex SHA-256 hash', () => {
-      const entries: ManifestEntry[] = [
-        { table: 'USERS', rowsDeleted: 1 },
-      ];
-      const manifest = service.buildManifest(
-        'u1', 't1', 'admin', entries
-      );
+      const entries: ManifestEntry[] = [{ table: 'USERS', rowsDeleted: 1 }];
+      const manifest = service.buildManifest('u1', 't1', 'admin', entries);
       const hash = service.hashManifest(manifest);
       expect(hash).toHaveLength(64);
       expect(hash).toMatch(/^[0-9a-f]{64}$/);
     });
 
     it('is deterministic for the same manifest', () => {
-      const manifest = service.buildManifest(
-        'u1', 't1', 'admin',
-        [{ table: 'X', rowsDeleted: 1 }]
-      );
+      const manifest = service.buildManifest('u1', 't1', 'admin', [
+        { table: 'X', rowsDeleted: 1 },
+      ]);
       expect(service.hashManifest(manifest)).toBe(
         service.hashManifest(manifest)
       );
@@ -119,10 +117,9 @@ describe('ErasureProofService', () => {
     });
 
     it('createVerificationToken produces a valid base64 token', () => {
-      const manifest = service.buildManifest(
-        'u1', 't1', 'admin',
-        [{ table: 'USERS', rowsDeleted: 1 }]
-      );
+      const manifest = service.buildManifest('u1', 't1', 'admin', [
+        { table: 'USERS', rowsDeleted: 1 },
+      ]);
       const hash = service.hashManifest(manifest);
       const token = service.createVerificationToken(manifest, hash);
 
@@ -131,10 +128,9 @@ describe('ErasureProofService', () => {
     });
 
     it('verifyToken returns true for a valid token', () => {
-      const manifest = service.buildManifest(
-        'u1', 't1', 'admin',
-        [{ table: 'USERS', rowsDeleted: 1 }]
-      );
+      const manifest = service.buildManifest('u1', 't1', 'admin', [
+        { table: 'USERS', rowsDeleted: 1 },
+      ]);
       const hash = service.hashManifest(manifest);
       const token = service.createVerificationToken(manifest, hash);
 
@@ -142,10 +138,9 @@ describe('ErasureProofService', () => {
     });
 
     it('verifyToken returns false for a tampered token', () => {
-      const manifest = service.buildManifest(
-        'u1', 't1', 'admin',
-        [{ table: 'USERS', rowsDeleted: 1 }]
-      );
+      const manifest = service.buildManifest('u1', 't1', 'admin', [
+        { table: 'USERS', rowsDeleted: 1 },
+      ]);
       const hash = service.hashManifest(manifest);
       const token = service.createVerificationToken(manifest, hash);
 
@@ -170,7 +165,10 @@ describe('ErasureProofService', () => {
       ];
 
       const proof = await service.generateAndStore(
-        'user-1', 'tenant-1', 'admin-1', entries
+        'user-1',
+        'tenant-1',
+        'admin-1',
+        entries
       );
 
       expect(mockInsert).toHaveBeenCalled();
@@ -183,7 +181,9 @@ describe('ErasureProofService', () => {
 
     it('proof verification token is valid', async () => {
       const proof = await service.generateAndStore(
-        'user-1', 'tenant-1', 'admin-1',
+        'user-1',
+        'tenant-1',
+        'admin-1',
         [{ table: 'USERS', rowsDeleted: 1 }]
       );
       expect(service.verifyToken(proof.verificationToken)).toBe(true);
@@ -198,10 +198,9 @@ describe('ErasureProofService', () => {
 
     it('returns verification data when log exists', async () => {
       // Build a valid token for the mock row
-      const manifest = service.buildManifest(
-        'user-1', 't1', 'admin',
-        [{ table: 'USERS', rowsDeleted: 1 }]
-      );
+      const manifest = service.buildManifest('user-1', 't1', 'admin', [
+        { table: 'USERS', rowsDeleted: 1 },
+      ]);
       const hash = service.hashManifest(manifest);
       const token = service.createVerificationToken(manifest, hash);
 

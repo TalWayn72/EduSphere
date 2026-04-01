@@ -7,11 +7,7 @@
  *   - Custom XP rules per organization
  *   - All queries scoped via withTenantContext (RLS enforced)
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,

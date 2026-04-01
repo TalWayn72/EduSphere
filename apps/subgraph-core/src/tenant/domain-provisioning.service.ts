@@ -60,19 +60,15 @@ export class DomainProvisioningService implements OnModuleDestroy {
     const result = await this.dnsProvider.createSubdomain(slug);
 
     // Store subdomain in tenant_domains table
-    await withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        await db.insert(schema.tenantDomains).values({
-          tenantId: tenantCtx.tenantId,
-          domain: `${slug}.edusphere.io`,
-          domainType: 'SUBDOMAIN',
-          verified: true,
-          sslProvisioned: true,
-        });
-      }
-    );
+    await withTenantContext(this.db, tenantCtx, async (db) => {
+      await db.insert(schema.tenantDomains).values({
+        tenantId: tenantCtx.tenantId,
+        domain: `${slug}.edusphere.io`,
+        domainType: 'SUBDOMAIN',
+        verified: true,
+        sslProvisioned: true,
+      });
+    });
 
     return result;
   }
@@ -104,19 +100,15 @@ export class DomainProvisioningService implements OnModuleDestroy {
       await this.dnsProvider.requestDomainVerification(normalized);
 
     // Store in custom_domains table
-    await withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        await db.insert(schema.customDomains).values({
-          tenantId: tenantCtx.tenantId,
-          domain: normalized,
-          verificationToken: verification.token,
-          verificationRecordType: verification.recordType,
-          sslStatus: 'pending',
-        });
-      }
-    );
+    await withTenantContext(this.db, tenantCtx, async (db) => {
+      await db.insert(schema.customDomains).values({
+        tenantId: tenantCtx.tenantId,
+        domain: normalized,
+        verificationToken: verification.token,
+        verificationRecordType: verification.recordType,
+        sslStatus: 'pending',
+      });
+    });
 
     return {
       token: verification.token,
@@ -143,22 +135,18 @@ export class DomainProvisioningService implements OnModuleDestroy {
   }> {
     const normalized = domain.toLowerCase().trim();
 
-    const rows = await withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        return db
-          .select()
-          .from(schema.customDomains)
-          .where(
-            and(
-              eq(schema.customDomains.domain, normalized),
-              eq(schema.customDomains.tenantId, tenantCtx.tenantId)
-            )
+    const rows = await withTenantContext(this.db, tenantCtx, async (db) => {
+      return db
+        .select()
+        .from(schema.customDomains)
+        .where(
+          and(
+            eq(schema.customDomains.domain, normalized),
+            eq(schema.customDomains.tenantId, tenantCtx.tenantId)
           )
-          .limit(1);
-      }
-    );
+        )
+        .limit(1);
+    });
 
     const record = rows[0];
     if (!record) {
@@ -177,16 +165,12 @@ export class DomainProvisioningService implements OnModuleDestroy {
 
     if (verified) {
       const now = new Date();
-      await withTenantContext(
-        this.db,
-        tenantCtx,
-        async (db) => {
-          await db
-            .update(schema.customDomains)
-            .set({ verifiedAt: now, sslStatus: 'provisioning' })
-            .where(eq(schema.customDomains.id, record.id));
-        }
-      );
+      await withTenantContext(this.db, tenantCtx, async (db) => {
+        await db
+          .update(schema.customDomains)
+          .set({ verifiedAt: now, sslStatus: 'provisioning' })
+          .where(eq(schema.customDomains.id, record.id));
+      });
 
       this.logger.log(
         { tenantId: tenantCtx.tenantId, domain: normalized },
@@ -206,22 +190,18 @@ export class DomainProvisioningService implements OnModuleDestroy {
     domainId: string,
     tenantCtx: TenantContext
   ): Promise<boolean> {
-    const deleted = await withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        const result = await db
-          .delete(schema.customDomains)
-          .where(
-            and(
-              eq(schema.customDomains.id, domainId),
-              eq(schema.customDomains.tenantId, tenantCtx.tenantId)
-            )
+    const deleted = await withTenantContext(this.db, tenantCtx, async (db) => {
+      const result = await db
+        .delete(schema.customDomains)
+        .where(
+          and(
+            eq(schema.customDomains.id, domainId),
+            eq(schema.customDomains.tenantId, tenantCtx.tenantId)
           )
-          .returning({ id: schema.customDomains.id });
-        return result.length > 0;
-      }
-    );
+        )
+        .returning({ id: schema.customDomains.id });
+      return result.length > 0;
+    });
 
     return deleted;
   }
@@ -229,26 +209,22 @@ export class DomainProvisioningService implements OnModuleDestroy {
   /**
    * List all custom domains for a tenant.
    */
-  async listCustomDomains(
-    tenantCtx: TenantContext
-  ): Promise<Array<{
-    id: string;
-    domain: string;
-    verificationToken: string | null;
-    verificationRecordType: string | null;
-    verifiedAt: Date | null;
-    sslStatus: string;
-    createdAt: Date;
-  }>> {
-    return withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        return db
-          .select()
-          .from(schema.customDomains)
-          .where(eq(schema.customDomains.tenantId, tenantCtx.tenantId));
-      }
-    );
+  async listCustomDomains(tenantCtx: TenantContext): Promise<
+    Array<{
+      id: string;
+      domain: string;
+      verificationToken: string | null;
+      verificationRecordType: string | null;
+      verifiedAt: Date | null;
+      sslStatus: string;
+      createdAt: Date;
+    }>
+  > {
+    return withTenantContext(this.db, tenantCtx, async (db) => {
+      return db
+        .select()
+        .from(schema.customDomains)
+        .where(eq(schema.customDomains.tenantId, tenantCtx.tenantId));
+    });
   }
 }

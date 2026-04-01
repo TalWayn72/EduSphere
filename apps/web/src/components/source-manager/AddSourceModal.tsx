@@ -24,7 +24,12 @@ import {
   useAddYoutubeMutation,
   useAddFileMutation,
 } from './useAddSourceMutations';
-import { UrlPanel, TextPanel, YoutubePanel, FilePanel } from './AddSourceTabPanels';
+import {
+  UrlPanel,
+  TextPanel,
+  YoutubePanel,
+  FilePanel,
+} from './AddSourceTabPanels';
 
 export function AddSourceModal({
   courseId,
@@ -51,7 +56,7 @@ export function AddSourceModal({
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
+    undefined
   );
 
   useEffect(() => {
@@ -124,19 +129,29 @@ export function AddSourceModal({
   };
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent
         className="w-[520px] max-w-[90vw] p-0 gap-0"
         dir={dir}
         data-testid="add-source-modal"
-        onInteractOutside={(e) => { if (success) e.preventDefault(); }}
+        onInteractOutside={(e) => {
+          if (success) e.preventDefault();
+        }}
       >
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-lg font-semibold">
             {t('sources.addSourceTitle')}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            {t('sources.addSourceDescription', 'Add a knowledge source to this course')}
+            {t(
+              'sources.addSourceDescription',
+              'Add a knowledge source to this course'
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -173,16 +188,38 @@ export function AddSourceModal({
           )}
 
           {!success && tab === 'url' && (
-            <UrlPanel url={url} urlTitle={urlTitle} onUrlChange={setUrl} onTitleChange={setUrlTitle} />
+            <UrlPanel
+              url={url}
+              urlTitle={urlTitle}
+              onUrlChange={setUrl}
+              onTitleChange={setUrlTitle}
+            />
           )}
           {!success && tab === 'text' && (
-            <TextPanel text={text} textTitle={textTitle} onTextChange={setText} onTitleChange={setTextTitle} />
+            <TextPanel
+              text={text}
+              textTitle={textTitle}
+              onTextChange={setText}
+              onTitleChange={setTextTitle}
+            />
           )}
           {!success && tab === 'youtube' && (
-            <YoutubePanel youtubeUrl={youtubeUrl} youtubeTitle={youtubeTitle} onUrlChange={setYoutubeUrl} onTitleChange={setYoutubeTitle} />
+            <YoutubePanel
+              youtubeUrl={youtubeUrl}
+              youtubeTitle={youtubeTitle}
+              onUrlChange={setYoutubeUrl}
+              onTitleChange={setYoutubeTitle}
+            />
           )}
           {!success && tab === 'file' && (
-            <FilePanel fileTitle={fileTitle} selectedFileName={selectedFileName} busy={busy} fileRef={fileRef} onTitleChange={setFileTitle} onFileSelect={handleFileSelect} />
+            <FilePanel
+              fileTitle={fileTitle}
+              selectedFileName={selectedFileName}
+              busy={busy}
+              fileRef={fileRef}
+              onTitleChange={setFileTitle}
+              onFileSelect={handleFileSelect}
+            />
           )}
 
           {!success && error && (

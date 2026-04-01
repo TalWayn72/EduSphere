@@ -35,7 +35,9 @@ import { routeGraphQL } from './graphql-mock.helpers';
 async function clickByTestId(page: Page, testId: string): Promise<void> {
   await page.locator(`[data-testid="${testId}"]`).scrollIntoViewIfNeeded();
   await page.evaluate((id: string) => {
-    const el = document.querySelector(`[data-testid="${id}"]`) as HTMLElement | null;
+    const el = document.querySelector(
+      `[data-testid="${id}"]`
+    ) as HTMLElement | null;
     el?.click();
   }, testId);
 }
@@ -52,12 +54,17 @@ async function clickByTestId(page: Page, testId: string): Promise<void> {
  * @param page       - Playwright Page object
  * @param buttonText - Partial text content to match against dialog buttons
  */
-async function clickDialogButton(page: Page, buttonText: string): Promise<void> {
+async function clickDialogButton(
+  page: Page,
+  buttonText: string
+): Promise<void> {
   await page.evaluate((text: string) => {
     const dialog = document.querySelector('[role="dialog"]');
     if (!dialog) return;
     const buttons = Array.from(dialog.querySelectorAll('button'));
-    const btn = buttons.find((b) => (b.textContent ?? '').trim().includes(text));
+    const btn = buttons.find((b) =>
+      (b.textContent ?? '').trim().includes(text)
+    );
     (btn as HTMLElement | undefined)?.click();
   }, buttonText);
 }
@@ -78,7 +85,7 @@ interface MockPilotRequest {
 }
 
 function makePilotRequest(
-  overrides: Partial<MockPilotRequest> = {},
+  overrides: Partial<MockPilotRequest> = {}
 ): MockPilotRequest {
   return {
     __typename: 'PilotRequest',
@@ -109,7 +116,7 @@ interface MockConfig {
  */
 async function mockAdminGraphQL(
   page: import('@playwright/test').Page,
-  config: MockConfig = {},
+  config: MockConfig = {}
 ): Promise<void> {
   const requests = config.requests ?? [makePilotRequest()];
   const approveSuccess = config.approveSuccess !== false;
@@ -176,7 +183,7 @@ async function mockAdminGraphQL(
 
 /** Assert no raw technical error strings are visible to the user. */
 async function assertNoRawErrors(
-  page: import('@playwright/test').Page,
+  page: import('@playwright/test').Page
 ): Promise<void> {
   const body = (await page.textContent('body')) ?? '';
   expect(body).not.toContain('urql error');
@@ -206,7 +213,7 @@ test.describe('Pilot Requests Admin Page — Structure', () => {
     page,
   }) => {
     await expect(
-      page.locator('[data-testid="pilot-requests-page"]'),
+      page.locator('[data-testid="pilot-requests-page"]')
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -263,20 +270,20 @@ test.describe('Pilot Requests Admin Page — Requests Table', () => {
 
   test('requests table is visible when data is loaded', async ({ page }) => {
     await expect(
-      page.locator('[data-testid="pilot-requests-table"]'),
+      page.locator('[data-testid="pilot-requests-table"]')
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('table shows org name of pending request', async ({ page }) => {
-    await expect(
-      page.getByText('State University of Testing'),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('State University of Testing')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('table shows org name of approved request', async ({ page }) => {
-    await expect(
-      page.getByText('Tech College of Approval'),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Tech College of Approval')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('PENDING status badge is visible for pending request', async ({
@@ -295,13 +302,13 @@ test.describe('Pilot Requests Admin Page — Requests Table', () => {
     page,
   }) => {
     await expect(
-      page.locator(`[data-testid="approve-btn-${pendingRequest.id}"]`),
+      page.locator(`[data-testid="approve-btn-${pendingRequest.id}"]`)
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('Reject button is present for pending request row', async ({ page }) => {
     await expect(
-      page.locator(`[data-testid="reject-btn-${pendingRequest.id}"]`),
+      page.locator(`[data-testid="reject-btn-${pendingRequest.id}"]`)
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -339,15 +346,15 @@ test.describe('Pilot Requests Admin Page — Empty State', () => {
   test('shows empty state message when no pilot requests exist', async ({
     page,
   }) => {
-    await expect(
-      page.getByText(/No pilot requests yet/i),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/No pilot requests yet/i)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('requests table is NOT rendered in empty state', async ({ page }) => {
     await page.waitForLoadState('domcontentloaded');
     await expect(
-      page.locator('[data-testid="pilot-requests-table"]'),
+      page.locator('[data-testid="pilot-requests-table"]')
     ).not.toBeVisible();
   });
 
@@ -375,7 +382,7 @@ test.describe('Pilot Requests Admin Page — Approve Modal', () => {
   test('clicking Approve button opens the approval modal', async ({ page }) => {
     await clickByTestId(page, `approve-btn-${pendingRequest.id}`);
     await expect(
-      page.getByRole('dialog', { name: /Approve Pilot Request/i }),
+      page.getByRole('dialog', { name: /Approve Pilot Request/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -480,7 +487,7 @@ test.describe('Pilot Requests Admin Page — Reject Modal', () => {
   test('clicking Reject button opens the rejection modal', async ({ page }) => {
     await clickByTestId(page, `reject-btn-${pendingRequest.id}`);
     await expect(
-      page.getByRole('dialog', { name: /Reject Pilot Request/i }),
+      page.getByRole('dialog', { name: /Reject Pilot Request/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -503,7 +510,7 @@ test.describe('Pilot Requests Admin Page — Reject Modal', () => {
     });
     await dialog.waitFor({ timeout: 10_000 });
     await expect(
-      dialog.getByRole('button', { name: /Confirm Rejection/i }),
+      dialog.getByRole('button', { name: /Confirm Rejection/i })
     ).toBeDisabled({ timeout: 5_000 });
   });
 
@@ -519,7 +526,7 @@ test.describe('Pilot Requests Admin Page — Reject Modal', () => {
       .locator('#rejectReason')
       .fill('Insufficient capacity in your region at this time.');
     await expect(
-      dialog.getByRole('button', { name: /Confirm Rejection/i }),
+      dialog.getByRole('button', { name: /Confirm Rejection/i })
     ).not.toBeDisabled({ timeout: 5_000 });
   });
 

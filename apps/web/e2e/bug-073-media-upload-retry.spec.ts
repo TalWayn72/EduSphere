@@ -47,7 +47,9 @@ test.describe('BUG-073: Media Upload Retry', () => {
       });
 
       // Verify no raw error strings are shown to user
-      await expect(page.locator('text=MinIO temporarily unavailable')).not.toBeVisible();
+      await expect(
+        page.locator('text=MinIO temporarily unavailable')
+      ).not.toBeVisible();
       await expect(page.locator('text=ECONNREFUSED')).not.toBeVisible();
       await expect(page.locator('text=500')).not.toBeVisible();
     }
@@ -87,10 +89,10 @@ test.describe('BUG-073: Media Upload Retry', () => {
 
       // These raw error strings must NEVER appear in the UI
       await expect(
-        page.locator('text=Cannot return null for non-nullable field'),
+        page.locator('text=Cannot return null for non-nullable field')
       ).not.toBeVisible();
       await expect(
-        page.locator('text=INTERNAL_SERVER_ERROR'),
+        page.locator('text=INTERNAL_SERVER_ERROR')
       ).not.toBeVisible();
     }
   });
@@ -108,7 +110,9 @@ test.describe('BUG-073: Media Upload Retry', () => {
           await route.fulfill({
             status: 503,
             contentType: 'application/json',
-            body: JSON.stringify({ errors: [{ message: 'Service Unavailable' }] }),
+            body: JSON.stringify({
+              errors: [{ message: 'Service Unavailable' }],
+            }),
           });
           return;
         }

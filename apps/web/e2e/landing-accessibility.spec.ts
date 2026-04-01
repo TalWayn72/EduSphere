@@ -41,7 +41,10 @@ async function runAxe(
     async ({ ctx }: { ctx: string }) => {
       // @ts-expect-error axe is injected globally
       const results = await window.axe.run(ctx, {
-        runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'] },
+        runOnly: {
+          type: 'tag',
+          values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'],
+        },
       });
       return { violations: results.violations };
     },
@@ -58,7 +61,9 @@ interface AxeViolation {
 
 /** Filter to only critical and serious violations (ignore moderate / minor). */
 function criticalViolations(violations: AxeViolation[]): AxeViolation[] {
-  return violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
+  return violations.filter(
+    (v) => v.impact === 'critical' || v.impact === 'serious'
+  );
 }
 
 // ─── Suite 1: axe-core Automated Audit ───────────────────────────────────────
@@ -68,55 +73,84 @@ test.describe('Landing Page — WCAG 2.2 AA axe-core Audit', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('hero section passes axe audit (0 critical/serious violations)', async ({ page }) => {
+  test('hero section passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
     const { violations } = await runAxe(page, '[data-testid="hero-section"]');
     const serious = criticalViolations(violations);
     if (serious.length > 0) {
       const details = serious
-        .map((v) => `[${v.impact}] ${v.id}: ${v.description}\n  Node: ${v.nodes[0]?.html ?? 'n/a'}`)
+        .map(
+          (v) =>
+            `[${v.impact}] ${v.id}: ${v.description}\n  Node: ${v.nodes[0]?.html ?? 'n/a'}`
+        )
         .join('\n');
       throw new Error(`Hero section axe violations:\n${details}`);
     }
     expect(serious).toHaveLength(0);
   });
 
-  test('trust bar passes axe audit (0 critical/serious violations)', async ({ page }) => {
+  test('trust bar passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
     const { violations } = await runAxe(page, '[data-testid="trust-bar"]');
     const serious = criticalViolations(violations);
     expect(serious).toHaveLength(0);
   });
 
-  test('compliance badges section passes axe audit (0 critical/serious violations)', async ({ page }) => {
-    const { violations } = await runAxe(page, '[data-testid="compliance-badges-section"]');
+  test('compliance badges section passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
+    const { violations } = await runAxe(
+      page,
+      '[data-testid="compliance-badges-section"]'
+    );
     const serious = criticalViolations(violations);
     expect(serious).toHaveLength(0);
   });
 
-  test('competitor comparison table passes axe audit (0 critical/serious violations)', async ({ page }) => {
+  test('competitor comparison table passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="vs-competitors-section"]');
     await section.scrollIntoViewIfNeeded();
-    const { violations } = await runAxe(page, '[data-testid="vs-competitors-section"]');
+    const { violations } = await runAxe(
+      page,
+      '[data-testid="vs-competitors-section"]'
+    );
     const serious = criticalViolations(violations);
     expect(serious).toHaveLength(0);
   });
 
-  test('pricing section passes axe audit (0 critical/serious violations)', async ({ page }) => {
+  test('pricing section passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     await section.scrollIntoViewIfNeeded();
-    const { violations } = await runAxe(page, '[data-testid="pricing-section"]');
+    const { violations } = await runAxe(
+      page,
+      '[data-testid="pricing-section"]'
+    );
     const serious = criticalViolations(violations);
     expect(serious).toHaveLength(0);
   });
 
-  test('pilot CTA form passes axe audit (0 critical/serious violations)', async ({ page }) => {
+  test('pilot CTA form passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
     await section.scrollIntoViewIfNeeded();
-    const { violations } = await runAxe(page, '[data-testid="pilot-cta-section"]');
+    const { violations } = await runAxe(
+      page,
+      '[data-testid="pilot-cta-section"]'
+    );
     const serious = criticalViolations(violations);
     expect(serious).toHaveLength(0);
   });
 
-  test('full landing page passes axe audit (0 critical/serious violations)', async ({ page }) => {
+  test('full landing page passes axe audit (0 critical/serious violations)', async ({
+    page,
+  }) => {
     // Scroll through the page to allow lazy sections to render
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForLoadState('domcontentloaded');
@@ -126,7 +160,10 @@ test.describe('Landing Page — WCAG 2.2 AA axe-core Audit', () => {
     const serious = criticalViolations(violations);
     if (serious.length > 0) {
       const details = serious
-        .map((v) => `[${v.impact}] ${v.id}: ${v.description}\n  Node: ${v.nodes[0]?.html ?? 'n/a'}`)
+        .map(
+          (v) =>
+            `[${v.impact}] ${v.id}: ${v.description}\n  Node: ${v.nodes[0]?.html ?? 'n/a'}`
+        )
         .join('\n');
       throw new Error(`Full page axe violations:\n${details}`);
     }
@@ -141,12 +178,15 @@ test.describe('Landing Page — Interactive Elements Accessibility', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('all buttons have accessible names (text or aria-label)', async ({ page }) => {
+  test('all buttons have accessible names (text or aria-label)', async ({
+    page,
+  }) => {
     const buttons = await page.getByRole('button').all();
     for (const button of buttons) {
-      const name = await button.getAttribute('aria-label')
-        ?? await button.textContent()
-        ?? '';
+      const name =
+        (await button.getAttribute('aria-label')) ??
+        (await button.textContent()) ??
+        '';
       expect(name.trim().length).toBeGreaterThan(0);
     }
   });
@@ -155,17 +195,20 @@ test.describe('Landing Page — Interactive Elements Accessibility', () => {
     const links = await page.getByRole('link').all();
     for (const link of links) {
       const ariaLabel = await link.getAttribute('aria-label');
-      const textContent = await link.textContent() ?? '';
+      const textContent = (await link.textContent()) ?? '';
       const ariaLabelledBy = await link.getAttribute('aria-labelledby');
       // Link must have either aria-label, visible text, or aria-labelledby
-      const hasName = (ariaLabel?.trim().length ?? 0) > 0
-        || textContent.trim().length > 0
-        || (ariaLabelledBy?.trim().length ?? 0) > 0;
+      const hasName =
+        (ariaLabel?.trim().length ?? 0) > 0 ||
+        textContent.trim().length > 0 ||
+        (ariaLabelledBy?.trim().length ?? 0) > 0;
       expect(hasName).toBe(true);
     }
   });
 
-  test('nav hamburger button has aria-label and aria-expanded', async ({ page }) => {
+  test('nav hamburger button has aria-label and aria-expanded', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -179,7 +222,9 @@ test.describe('Landing Page — Interactive Elements Accessibility', () => {
     expect(ariaExpandedAfter).toBe('true');
   });
 
-  test('FAQ accordion buttons have aria-expanded attribute', async ({ page }) => {
+  test('FAQ accordion buttons have aria-expanded attribute', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     await section.scrollIntoViewIfNeeded();
 
@@ -199,7 +244,9 @@ test.describe('Landing Page — Interactive Elements Accessibility', () => {
     await expect(table).toHaveAttribute('aria-label', 'LMS comparison table');
   });
 
-  test('compliance certifications list has role="list" with aria-label', async ({ page }) => {
+  test('compliance certifications list has role="list" with aria-label', async ({
+    page,
+  }) => {
     const list = page.locator(
       '[data-testid="trust-bar"] [role="list"][aria-label="Compliance certifications"]'
     );
@@ -225,7 +272,9 @@ test.describe('Landing Page — Images & Media Accessibility', () => {
     }
   });
 
-  test('aria-hidden decorative icons do not receive focus', async ({ page }) => {
+  test('aria-hidden decorative icons do not receive focus', async ({
+    page,
+  }) => {
     // All Lucide/SVG icons marked aria-hidden="true" must not be focusable
     const hiddenIcons = await page.locator('[aria-hidden="true"]').all();
     for (const icon of hiddenIcons) {
@@ -243,7 +292,9 @@ test.describe('Landing Page — Color Contrast', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('hero h1 text is white on dark background (meets 4.5:1 contrast)', async ({ page }) => {
+  test('hero h1 text is white on dark background (meets 4.5:1 contrast)', async ({
+    page,
+  }) => {
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible({ timeout: 10_000 });
 
@@ -259,7 +310,9 @@ test.describe('Landing Page — Color Contrast', () => {
     expect(styles.color).toMatch(/rgb\(255,\s*255,\s*255\)/);
   });
 
-  test('pricing section headings use dark text on light background', async ({ page }) => {
+  test('pricing section headings use dark text on light background', async ({
+    page,
+  }) => {
     const pricingHeading = page.locator('[data-testid="pricing-section"] h2');
     await pricingHeading.scrollIntoViewIfNeeded();
     await expect(pricingHeading).toBeVisible({ timeout: 10_000 });
@@ -281,7 +334,9 @@ test.describe('Landing Page — Keyboard Navigation', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('pilot form is keyboard navigable — all fields reachable via Tab', async ({ page }) => {
+  test('pilot form is keyboard navigable — all fields reachable via Tab', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
     await section.scrollIntoViewIfNeeded();
 
@@ -292,11 +347,22 @@ test.describe('Landing Page — Keyboard Navigation', () => {
     // Tab through fields: orgName → (orgType trigger) → contactName → email
     await page.keyboard.press('Tab');
     // After orgName, focus moves to orgType select trigger
-    const focusedAfterFirstTab = await page.evaluate(() => document.activeElement?.id ?? document.activeElement?.getAttribute('role') ?? '');
-    expect(['orgType', 'combobox', 'listbox'].some((id) => focusedAfterFirstTab.includes(id)) || focusedAfterFirstTab.length > 0).toBe(true);
+    const focusedAfterFirstTab = await page.evaluate(
+      () =>
+        document.activeElement?.id ??
+        document.activeElement?.getAttribute('role') ??
+        ''
+    );
+    expect(
+      ['orgType', 'combobox', 'listbox'].some((id) =>
+        focusedAfterFirstTab.includes(id)
+      ) || focusedAfterFirstTab.length > 0
+    ).toBe(true);
   });
 
-  test('submit button is reachable by keyboard from first form field', async ({ page }) => {
+  test('submit button is reachable by keyboard from first form field', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
     await section.scrollIntoViewIfNeeded();
 
@@ -312,7 +378,10 @@ test.describe('Landing Page — Keyboard Navigation', () => {
         if (!el) return null;
         return { type: el.getAttribute('type'), text: el.textContent?.trim() };
       });
-      if (focusedEl?.type === 'submit' || focusedEl?.text?.toLowerCase().includes('apply')) {
+      if (
+        focusedEl?.type === 'submit' ||
+        focusedEl?.text?.toLowerCase().includes('apply')
+      ) {
         submitFocused = true;
         break;
       }
@@ -339,7 +408,9 @@ test.describe('Landing Page — Keyboard Navigation', () => {
 
     await expect(firstFaq).toHaveAttribute('aria-expanded', 'true');
     // Answer text should now be visible
-    await expect(section.getByText(/logs in at least once/i)).toBeVisible({ timeout: 3_000 });
+    await expect(section.getByText(/logs in at least once/i)).toBeVisible({
+      timeout: 3_000,
+    });
   });
 });
 
@@ -350,7 +421,9 @@ test.describe('Landing Page — ARIA Landmarks & Roles', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('page has a main landmark containing all content sections', async ({ page }) => {
+  test('page has a main landmark containing all content sections', async ({
+    page,
+  }) => {
     const main = page.locator('#main-content');
     await expect(main).toBeVisible({ timeout: 10_000 });
   });
@@ -367,14 +440,24 @@ test.describe('Landing Page — ARIA Landmarks & Roles', () => {
     await expect(hero).toHaveAttribute('aria-label', 'Hero');
   });
 
-  test('compliance section has aria-label="Compliance certifications"', async ({ page }) => {
+  test('compliance section has aria-label="Compliance certifications"', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="compliance-badges-section"]');
-    await expect(section).toHaveAttribute('aria-label', 'Compliance certifications');
+    await expect(section).toHaveAttribute(
+      'aria-label',
+      'Compliance certifications'
+    );
   });
 
-  test('comparison section has aria-label="Comparison with competitors"', async ({ page }) => {
+  test('comparison section has aria-label="Comparison with competitors"', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="vs-competitors-section"]');
-    await expect(section).toHaveAttribute('aria-label', 'Comparison with competitors');
+    await expect(section).toHaveAttribute(
+      'aria-label',
+      'Comparison with competitors'
+    );
   });
 
   test('pricing section has aria-label="Pricing plans"', async ({ page }) => {
@@ -382,14 +465,21 @@ test.describe('Landing Page — ARIA Landmarks & Roles', () => {
     await expect(section).toHaveAttribute('aria-label', 'Pricing plans');
   });
 
-  test('ROI calculator section has aria-label="ROI Calculator"', async ({ page }) => {
+  test('ROI calculator section has aria-label="ROI Calculator"', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="roi-calculator-section"]');
     await expect(section).toHaveAttribute('aria-label', 'ROI Calculator');
   });
 
-  test('pilot CTA section has aria-label="Start your 90-day pilot"', async ({ page }) => {
+  test('pilot CTA section has aria-label="Start your 90-day pilot"', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
-    await expect(section).toHaveAttribute('aria-label', 'Start your 90-day pilot');
+    await expect(section).toHaveAttribute(
+      'aria-label',
+      'Start your 90-day pilot'
+    );
   });
 
   test('trust bar has aria-label="Trust indicators"', async ({ page }) => {
@@ -411,11 +501,15 @@ test.describe('Landing Page — Screen Reader Pricing Accessibility', () => {
 
     const planNames = ['Starter', 'Growth', 'University', 'Enterprise'];
     for (const name of planNames) {
-      await expect(section.getByRole('heading', { name, level: 3 })).toBeVisible({ timeout: 10_000 });
+      await expect(
+        section.getByRole('heading', { name, level: 3 })
+      ).toBeVisible({ timeout: 10_000 });
     }
   });
 
-  test('price amounts are present and readable (not hidden from AT)', async ({ page }) => {
+  test('price amounts are present and readable (not hidden from AT)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     await section.scrollIntoViewIfNeeded();
 
@@ -430,17 +524,23 @@ test.describe('Landing Page — Screen Reader Pricing Accessibility', () => {
     const section = page.locator('[data-testid="pricing-section"]');
     await section.scrollIntoViewIfNeeded();
 
-    const ctaLinks = section.getByRole('link', { name: /Start Pilot|Request Demo|Contact Sales/i });
+    const ctaLinks = section.getByRole('link', {
+      name: /Start Pilot|Request Demo|Contact Sales/i,
+    });
     const count = await ctaLinks.count();
     expect(count).toBeGreaterThanOrEqual(3);
   });
 
-  test('Most Popular visual indicator has visible text (not icon-only)', async ({ page }) => {
+  test('Most Popular visual indicator has visible text (not icon-only)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     await section.scrollIntoViewIfNeeded();
 
     // "Most Popular" is rendered as visible text, not just a CSS decoration
-    await expect(section.getByText('Most Popular')).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('Most Popular')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('YAU tooltip button has aria-label="What is YAU?"', async ({ page }) => {
@@ -459,18 +559,28 @@ test.describe('Landing Page — Pilot Form Accessibility', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('all required form fields have aria-required="true"', async ({ page }) => {
+  test('all required form fields have aria-required="true"', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
     await section.scrollIntoViewIfNeeded();
 
-    const requiredFields = ['orgName', 'contactName', 'email', 'estimatedUsers', 'useCase'];
+    const requiredFields = [
+      'orgName',
+      'contactName',
+      'email',
+      'estimatedUsers',
+      'useCase',
+    ];
     for (const fieldId of requiredFields) {
       const field = section.locator(`#${fieldId}`);
       await expect(field).toHaveAttribute('aria-required', 'true');
     }
   });
 
-  test('form field labels are associated with inputs via htmlFor', async ({ page }) => {
+  test('form field labels are associated with inputs via htmlFor', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
     await section.scrollIntoViewIfNeeded();
 
@@ -484,22 +594,29 @@ test.describe('Landing Page — Pilot Form Accessibility', () => {
       const input = section.locator(`#${inputId}`);
       await expect(input).toBeVisible({ timeout: 10_000 });
       // Field must be labelled — either by label[for] or aria-labelledby
-      const labelText2 = await input.getAttribute('aria-labelledby')
-        ?? await section.locator(`label[for="${inputId}"]`).textContent()
-        ?? '';
+      const labelText2 =
+        (await input.getAttribute('aria-labelledby')) ??
+        (await section.locator(`label[for="${inputId}"]`).textContent()) ??
+        '';
       expect(labelText2.length).toBeGreaterThan(0);
     }
   });
 
-  test('validation errors use role="alert" for screen reader announcement', async ({ page }) => {
+  test('validation errors use role="alert" for screen reader announcement', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pilot-cta-section"]');
     await section.scrollIntoViewIfNeeded();
 
     // Trigger validation
-    await section.getByRole('button', { name: /Apply for Free Pilot/i }).click();
+    await section
+      .getByRole('button', { name: /Apply for Free Pilot/i })
+      .click();
 
     // Error paragraphs must have role="alert"
-    await expect(section.locator('[role="alert"]').first()).toBeVisible({ timeout: 3_000 });
+    await expect(section.locator('[role="alert"]').first()).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('form has accessible name via aria-label', async ({ page }) => {
@@ -520,17 +637,21 @@ test.describe('Landing Page — Reduced Motion Support', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('h1 heading is immediately visible with reduced-motion (no animation delay)', async ({ page }) => {
+  test('h1 heading is immediately visible with reduced-motion (no animation delay)', async ({
+    page,
+  }) => {
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible({ timeout: 3_000 });
   });
 
-  test('pulse animations on decorative elements use motion-safe CSS', async ({ page }) => {
+  test('pulse animations on decorative elements use motion-safe CSS', async ({
+    page,
+  }) => {
     // Elements with animate-pulse should respect prefers-reduced-motion
     const pulseEl = page.locator('.animate-pulse').first();
-    if (await pulseEl.count() > 0) {
-      const animationName = await pulseEl.evaluate((el) =>
-        window.getComputedStyle(el).animationName
+    if ((await pulseEl.count()) > 0) {
+      const animationName = await pulseEl.evaluate(
+        (el) => window.getComputedStyle(el).animationName
       );
       // Under prefers-reduced-motion: reduce, animation must be "none"
       expect(animationName).toBe('none');

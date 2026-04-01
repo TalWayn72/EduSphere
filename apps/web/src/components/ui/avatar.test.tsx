@@ -32,7 +32,9 @@ describe('AvatarFallback', () => {
   it('forwards className', () => {
     render(
       <Avatar>
-        <AvatarFallback className="bg-blue-500" data-testid="fb">J</AvatarFallback>
+        <AvatarFallback className="bg-blue-500" data-testid="fb">
+          J
+        </AvatarFallback>
       </Avatar>
     );
     expect(screen.getByTestId('fb')).toHaveClass('bg-blue-500');

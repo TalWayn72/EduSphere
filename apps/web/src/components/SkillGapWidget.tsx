@@ -62,7 +62,9 @@ export function SkillGapWidget() {
   const [newRole, setNewRole] = useState('');
   const [newConcepts, setNewConcepts] = useState('');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data: profilesData, fetching: profilesFetching }] = useQuery<{
     skillProfiles: SkillProfile[];
@@ -212,7 +214,9 @@ export function SkillGapWidget() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Skill Profile</DialogTitle>
-            <DialogDescription>Define a role and its required concepts for gap analysis.</DialogDescription>
+            <DialogDescription>
+              Define a role and its required concepts for gap analysis.
+            </DialogDescription>
           </DialogHeader>
           <div className="py-2 space-y-3">
             <Input

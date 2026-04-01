@@ -62,7 +62,9 @@ export function DomainConfigPage() {
   const onAddDomain = async (d: DomainForm) => {
     const result = await requestVerification({ domain: d.domain });
     if (result.data?.requestDomainVerification) {
-      setVerificationInfo(result.data.requestDomainVerification as VerificationInfo);
+      setVerificationInfo(
+        result.data.requestDomainVerification as VerificationInfo
+      );
       reset();
       reexecute({ requestPolicy: 'network-only' });
     }
@@ -81,7 +83,10 @@ export function DomainConfigPage() {
   return (
     <AdminLayout
       title={t('domains.title', 'Domain Configuration')}
-      description={t('domains.description', 'Manage your subdomain and custom domains')}
+      description={t(
+        'domains.description',
+        'Manage your subdomain and custom domains'
+      )}
     >
       <h1 className="sr-only">Domain Configuration</h1>
       <div data-testid="domain-config-page" className="space-y-6">
@@ -102,7 +107,9 @@ export function DomainConfigPage() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {fetching ? t('common.loading', 'Loading...') : t('domains.noSubdomain', 'No subdomain configured')}
+                {fetching
+                  ? t('common.loading', 'Loading...')
+                  : t('domains.noSubdomain', 'No subdomain configured')}
               </p>
             )}
           </CardContent>

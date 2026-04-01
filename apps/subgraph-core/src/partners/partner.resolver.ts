@@ -18,9 +18,7 @@ interface GraphQLContext {
 
 @Resolver('Query')
 export class PartnerQueryResolver {
-  constructor(
-    private readonly dashboard: PartnerDashboardService
-  ) {}
+  constructor(private readonly dashboard: PartnerDashboardService) {}
 
   @Query('myPartnerDashboard')
   async myPartnerDashboard(
@@ -35,9 +33,7 @@ export class PartnerQueryResolver {
 
 @Resolver('Mutation')
 export class PartnerMutationResolver {
-  constructor(
-    private readonly dashboard: PartnerDashboardService
-  ) {}
+  constructor(private readonly dashboard: PartnerDashboardService) {}
 
   @Mutation('regeneratePartnerApiKey')
   async regeneratePartnerApiKey(

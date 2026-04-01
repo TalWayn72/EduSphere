@@ -95,7 +95,8 @@ export function PrivacyConsentCard({ highlight }: PrivacyConsentCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {TOGGLES.map((toggle) => {
-          const isTarget = highlight.highlightId === toggle.id.replace('setting-', '');
+          const isTarget =
+            highlight.highlightId === toggle.id.replace('setting-', '');
           const row = (
             <div
               key={toggle.id}

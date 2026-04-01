@@ -60,13 +60,15 @@ export function ScimTokenList({
                     Created {new Date(token.createdAt).toLocaleDateString()}
                     {token.lastUsedAt !== null && (
                       <span>
-                        {' '}&middot; Last used{' '}
+                        {' '}
+                        &middot; Last used{' '}
                         {new Date(token.lastUsedAt).toLocaleDateString()}
                       </span>
                     )}
                     {token.expiresAt !== null && (
                       <span>
-                        {' '}&middot; Expires{' '}
+                        {' '}
+                        &middot; Expires{' '}
                         {new Date(token.expiresAt).toLocaleDateString()}
                       </span>
                     )}

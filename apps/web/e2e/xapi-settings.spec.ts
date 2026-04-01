@@ -75,13 +75,15 @@ test.describe('XapiSettingsPage — DEV_MODE guard', () => {
   });
 
   test('page heading is visible', async ({ page }) => {
-    await expect(
-      page.getByRole('heading', { name: /xapi/i })
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /xapi/i })).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('shows existing token description', async ({ page }) => {
-    await expect(page.getByText('My LRS Token')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('My LRS Token')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('generate token button is present', async ({ page }) => {
@@ -90,7 +92,9 @@ test.describe('XapiSettingsPage — DEV_MODE guard', () => {
     ).toBeVisible({ timeout: 5_000 });
   });
 
-  test('STUDENT role cannot access xapi-settings (redirected)', async ({ page }) => {
+  test('STUDENT role cannot access xapi-settings (redirected)', async ({
+    page,
+  }) => {
     // In DEV_MODE the app auto-auths; in production a STUDENT would be redirected.
     // We verify the page either renders (ORG_ADMIN mock) or redirects to /login or /dashboard.
     await page.goto(XAPI_URL, { waitUntil: 'domcontentloaded' });

@@ -8,7 +8,7 @@ function renderSection() {
   return render(
     <MemoryRouter initialEntries={['/']}>
       <ROICalculatorSection />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -41,6 +41,8 @@ describe('ROICalculatorSection', () => {
 
   it('renders the CTA button', () => {
     renderSection();
-    expect(screen.getByRole('link', { name: /Get Your Custom ROI Report/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Get Your Custom ROI Report/i })
+    ).toBeInTheDocument();
   });
 });

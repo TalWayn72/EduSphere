@@ -40,14 +40,19 @@ export function useMediaUpload(
   const [richDocTitle, setRichDocTitle] = useState('');
   const [richDocContent, setRichDocContent] = useState('');
   const [richDocSaved, setRichDocSaved] = useState(false);
-  const richDocSavedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const richDocSavedTimerRef = useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
 
   useEffect(() => {
     return () => {
       if (richDocSavedTimerRef.current) {
         clearTimeout(richDocSavedTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[CourseWizardMediaStep] cleanup: richDocSaved timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[CourseWizardMediaStep] cleanup: richDocSaved timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -87,9 +92,13 @@ export function useMediaUpload(
       .toPromise();
 
     if (presignResult.error || !presignResult.data?.getPresignedUploadUrl) {
-      const reason = presignResult.error?.message ?? 'No presigned URL returned';
+      const reason =
+        presignResult.error?.message ?? 'No presigned URL returned';
       console.error('[CourseWizardMediaStep] presign failed:', reason);
-      updateEntry(index, { state: 'error', error: t('wizard.failedUploadUrl') });
+      updateEntry(index, {
+        state: 'error',
+        error: t('wizard.failedUploadUrl'),
+      });
       return;
     }
 
@@ -108,7 +117,10 @@ export function useMediaUpload(
         headers: { 'Content-Type': contentType },
       });
       if (!uploadResp.ok) {
-        updateEntry(index, { state: 'error', error: `Upload failed: ${uploadResp.statusText}` });
+        updateEntry(index, {
+          state: 'error',
+          error: `Upload failed: ${uploadResp.statusText}`,
+        });
         return;
       }
     } catch {
@@ -119,7 +131,11 @@ export function useMediaUpload(
     updateEntry(index, { state: 'confirming', progress: 80 });
 
     const confirmResult = await urqlClient
-      .mutation(CONFIRM_MEDIA_UPLOAD_MUTATION, { fileKey, courseId, title: entry.title })
+      .mutation(CONFIRM_MEDIA_UPLOAD_MUTATION, {
+        fileKey,
+        courseId,
+        title: entry.title,
+      })
       .toPromise();
 
     if (confirmResult.error || !confirmResult.data?.confirmMediaUpload) {
@@ -135,7 +151,9 @@ export function useMediaUpload(
   const removeEntry = (index: number) => {
     const entry = entries[index];
     if (entry?.result) {
-      onChange({ mediaList: mediaList.filter((m) => m.id !== entry.result?.id) });
+      onChange({
+        mediaList: mediaList.filter((m) => m.id !== entry.result?.id),
+      });
     }
     setEntries((prev) => prev.filter((_, i) => i !== index));
   };
@@ -156,8 +174,12 @@ export function useMediaUpload(
     setRichDocSaved(true);
     setRichDocTitle('');
     setRichDocContent('');
-    if (richDocSavedTimerRef.current) clearTimeout(richDocSavedTimerRef.current);
-    richDocSavedTimerRef.current = setTimeout(() => setRichDocSaved(false), SAVED_CONFIRMATION_MS);
+    if (richDocSavedTimerRef.current)
+      clearTimeout(richDocSavedTimerRef.current);
+    richDocSavedTimerRef.current = setTimeout(
+      () => setRichDocSaved(false),
+      SAVED_CONFIRMATION_MS
+    );
   };
 
   return {

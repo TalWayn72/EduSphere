@@ -12,10 +12,14 @@ vi.mock('../../mcp-coordination-bridge/src/db.js', () => ({
   closeDb: () => {},
 }));
 
-const { publish, subscribe } = await import('../../mcp-coordination-bridge/src/pubsub.js');
-const { acquireLock, releaseLock, checkLock } = await import('../../mcp-coordination-bridge/src/locks.js');
-const { registerAgent, updateStatus } = await import('../../mcp-coordination-bridge/src/status.js');
-const { requestHelp, respondHelp, getPendingHelp } = await import('../../mcp-coordination-bridge/src/help.js');
+const { publish, subscribe } =
+  await import('../../mcp-coordination-bridge/src/pubsub.js');
+const { acquireLock, releaseLock, checkLock } =
+  await import('../../mcp-coordination-bridge/src/locks.js');
+const { registerAgent, updateStatus } =
+  await import('../../mcp-coordination-bridge/src/status.js');
+const { requestHelp, respondHelp, getPendingHelp } =
+  await import('../../mcp-coordination-bridge/src/help.js');
 
 beforeEach(() => {
   db = createTestDb();
@@ -33,7 +37,11 @@ describe('full coordination flow', () => {
     expect(acquireLock('src/App.tsx', 'agent-a').locked).toBe(true);
 
     // Agent A publishes progress
-    publish('fe:progress', 'agent-a', JSON.stringify({ file: 'src/App.tsx', action: 'editing' }));
+    publish(
+      'fe:progress',
+      'agent-a',
+      JSON.stringify({ file: 'src/App.tsx', action: 'editing' })
+    );
 
     // Agent B checks lock — sees it's taken
     registerAgent('agent-b', 'Frontend', 'State Specialist');
@@ -46,7 +54,11 @@ describe('full coordination flow', () => {
 
     // Agent A finishes, unlocks, publishes completion
     releaseLock('src/App.tsx', 'agent-a');
-    publish('fe:progress', 'agent-a', JSON.stringify({ file: 'src/App.tsx', action: 'complete' }));
+    publish(
+      'fe:progress',
+      'agent-a',
+      JSON.stringify({ file: 'src/App.tsx', action: 'complete' })
+    );
     updateStatus('agent-a', 'complete');
 
     // Agent B finds completion event and acquires released file
@@ -64,7 +76,11 @@ describe('full coordination flow', () => {
     registerAgent('be-lead', 'Backend', 'Lead');
 
     // FE requests help
-    const helpReq = requestHelp('fe-lead', 'Backend', 'Need API schema for user profile');
+    const helpReq = requestHelp(
+      'fe-lead',
+      'Backend',
+      'Need API schema for user profile'
+    );
     expect(helpReq.status).toBe('pending');
 
     // BE sees pending request
@@ -73,7 +89,10 @@ describe('full coordination flow', () => {
     expect(pending[0].query).toContain('user profile');
 
     // BE responds
-    const responded = respondHelp(helpReq.id, 'Schema: { id, name, email, avatar }');
+    const responded = respondHelp(
+      helpReq.id,
+      'Schema: { id, name, email, avatar }'
+    );
     expect(responded!.status).toBe('responded');
     expect(responded!.response).toContain('Schema:');
   });

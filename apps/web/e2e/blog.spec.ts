@@ -28,8 +28,12 @@ import { BASE_URL } from './env';
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 /** Extract all JSON-LD schemas from the current page */
-async function getAllSchemas(page: import('@playwright/test').Page): Promise<unknown[]> {
-  const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+async function getAllSchemas(
+  page: import('@playwright/test').Page
+): Promise<unknown[]> {
+  const ldScripts = await page
+    .locator('script[type="application/ld+json"]')
+    .all();
   const schemas: unknown[] = [];
   for (const script of ldScripts) {
     const text = await script.textContent();
@@ -59,7 +63,7 @@ test.describe('Blog — List Page (/blog)', () => {
     // Wait for React to render the blog cards (links to /blog/:slug appear after hydration)
     await page.waitForFunction(
       () => document.querySelectorAll('a[href^="/blog/"]').length >= 4,
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     );
   });
 
@@ -74,37 +78,44 @@ test.describe('Blog — List Page (/blog)', () => {
     expect(blogLinks.length).toBeGreaterThanOrEqual(4);
   });
 
-  test('/blog list page has correct page title containing "Blog"', async ({ page }) => {
+  test('/blog list page has correct page title containing "Blog"', async ({
+    page,
+  }) => {
     // Wait for react-helmet-async to override the default index.html title
-    await page.waitForFunction(
-      () => /blog/i.test(document.title),
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => /blog/i.test(document.title), {
+      timeout: 10_000,
+    });
     const title = await page.title();
     expect(title).toMatch(/blog/i);
   });
 
-  test('/blog list page has canonical URL containing /blog', async ({ page }) => {
+  test('/blog list page has canonical URL containing /blog', async ({
+    page,
+  }) => {
     // Wait for react-helmet-async to inject the canonical link
     await page.waitForFunction(
       () => {
         const el = document.querySelector('link[rel="canonical"]');
         return el ? (el.getAttribute('href') ?? '').includes('/blog') : false;
       },
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     );
-    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+    const canonical = await page
+      .locator('link[rel="canonical"]')
+      .getAttribute('href');
     expect(canonical).toBeTruthy();
     expect(canonical).toContain('/blog');
   });
 
   test('/blog list page has h1 heading "EduSphere Blog"', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { level: 1, name: /EduSphere Blog/i }),
+      page.getByRole('heading', { level: 1, name: /EduSphere Blog/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('/blog list page h1/h2 headings contain no raw error strings', async ({ page }) => {
+  test('/blog list page h1/h2 headings contain no raw error strings', async ({
+    page,
+  }) => {
     const headings = await page.locator('h1, h2').allTextContents();
     for (const heading of headings) {
       expect(heading).not.toMatch(/GraphQL error/i);
@@ -115,7 +126,9 @@ test.describe('Blog — List Page (/blog)', () => {
     }
   });
 
-  test('/blog list page does not expose DB connection strings in HTML', async ({ page }) => {
+  test('/blog list page does not expose DB connection strings in HTML', async ({
+    page,
+  }) => {
     const bodyHtml = await page.locator('html').innerHTML();
     expect(bodyHtml).not.toMatch(/DATABASE_URL|postgres:\/\/|postgresql:\/\//i);
     expect(bodyHtml).not.toMatch(/api[_-]?key\s*[:=]\s*['"][^'"]{8,}['"]/i);
@@ -123,7 +136,9 @@ test.describe('Blog — List Page (/blog)', () => {
   });
 
   test('no </script> XSS vectors in /blog JSON-LD', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     for (const script of ldScripts) {
       const text = await script.textContent();
       expect(text).not.toContain('</script>');
@@ -145,33 +160,45 @@ test.describe('Blog — List Page (/blog)', () => {
 
 test.describe('Blog — Detail Page (/blog/:slug)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${BASE_URL}/blog/${FIRST_POST_SLUG}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/blog/${FIRST_POST_SLUG}`, {
+      waitUntil: 'domcontentloaded',
+    });
     // Wait for react-helmet-async to inject the BlogPosting JSON-LD schema
     await page.waitForFunction(
       () => {
-        const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+        const scripts = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
         for (const s of scripts) {
           try {
             const d = JSON.parse(s.textContent ?? '');
             if (d['@type'] === 'BlogPosting') return true;
-          } catch { /* */ }
+          } catch {
+            /* */
+          }
         }
         return false;
       },
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     );
   });
 
-  test('clicking first blog card navigates to /blog/:slug', async ({ page }) => {
+  test('clicking first blog card navigates to /blog/:slug', async ({
+    page,
+  }) => {
     // Navigate from list page → click first card link → land on detail page
     await page.goto(`${BASE_URL}/blog`, { waitUntil: 'domcontentloaded' });
-    const firstLink = page.locator(`a[href="/blog/${FIRST_POST_SLUG}"]`).first();
+    const firstLink = page
+      .locator(`a[href="/blog/${FIRST_POST_SLUG}"]`)
+      .first();
     await firstLink.click();
     await page.waitForURL(`**/blog/${FIRST_POST_SLUG}`, { timeout: 10_000 });
     expect(page.url()).toContain(`/blog/${FIRST_POST_SLUG}`);
   });
 
-  test('blog detail page <title> contains post title fragment', async ({ page }) => {
+  test('blog detail page <title> contains post title fragment', async ({
+    page,
+  }) => {
     const title = await page.title();
     expect(title).toMatch(new RegExp(FIRST_POST_TITLE_FRAGMENT, 'i'));
   });
@@ -180,24 +207,32 @@ test.describe('Blog — Detail Page (/blog/:slug)', () => {
     // react-helmet-async may render multiple og:type tags — the last one wins for crawlers
     const ogTypeElements = await page.locator('meta[property="og:type"]').all();
     expect(ogTypeElements.length).toBeGreaterThan(0);
-    const ogTypes = await Promise.all(ogTypeElements.map((el) => el.getAttribute('content')));
+    const ogTypes = await Promise.all(
+      ogTypeElements.map((el) => el.getAttribute('content'))
+    );
     expect(ogTypes).toContain('article');
   });
 
   test('blog detail page has og:image containing /aeo/og', async ({ page }) => {
-    const ogImageElements = await page.locator('meta[property="og:image"]').all();
+    const ogImageElements = await page
+      .locator('meta[property="og:image"]')
+      .all();
     expect(ogImageElements.length).toBeGreaterThan(0);
-    const ogImages = await Promise.all(ogImageElements.map((el) => el.getAttribute('content')));
-    const hasAeoOgImage = ogImages.some((src) => src && src.includes('/aeo/og'));
+    const ogImages = await Promise.all(
+      ogImageElements.map((el) => el.getAttribute('content'))
+    );
+    const hasAeoOgImage = ogImages.some(
+      (src) => src && src.includes('/aeo/og')
+    );
     expect(hasAeoOgImage).toBe(true);
   });
 
   test('blog detail page has BlogPosting JSON-LD', async ({ page }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const blogPosting = schemas.find((s: any) => s['@type'] === 'BlogPosting') as
-      | Record<string, unknown>
-      | undefined;
+    const blogPosting = schemas.find(
+      (s: any) => s['@type'] === 'BlogPosting'
+    ) as Record<string, unknown> | undefined;
     expect(blogPosting).toBeTruthy();
     if (blogPosting) {
       expect(blogPosting['@context']).toBe('https://schema.org');
@@ -210,7 +245,9 @@ test.describe('Blog — Detail Page (/blog/:slug)', () => {
   test('blog detail BlogPosting JSON-LD has author field', async ({ page }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const blogPosting = schemas.find((s: any) => s['@type'] === 'BlogPosting') as any;
+    const blogPosting = schemas.find(
+      (s: any) => s['@type'] === 'BlogPosting'
+    ) as any;
     expect(blogPosting).toBeTruthy();
     expect(blogPosting.author).toBeTruthy();
   });
@@ -218,19 +255,23 @@ test.describe('Blog — Detail Page (/blog/:slug)', () => {
   test('blog detail page has BreadcrumbList JSON-LD', async ({ page }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const breadcrumb = schemas.find((s: any) => s['@type'] === 'BreadcrumbList') as any;
+    const breadcrumb = schemas.find(
+      (s: any) => s['@type'] === 'BreadcrumbList'
+    ) as any;
     expect(breadcrumb).toBeTruthy();
     expect(breadcrumb.itemListElement).toBeInstanceOf(Array);
     // /blog detail breadcrumb: Home → Blog → Post Title (≥ 3 items)
     expect(breadcrumb.itemListElement.length).toBeGreaterThanOrEqual(3);
   });
 
-  test('blog detail page does not expose internal data in JSON-LD', async ({ page }) => {
+  test('blog detail page does not expose internal data in JSON-LD', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const blogPosting = schemas.find((s: any) => s['@type'] === 'BlogPosting') as
-      | Record<string, unknown>
-      | undefined;
+    const blogPosting = schemas.find(
+      (s: any) => s['@type'] === 'BlogPosting'
+    ) as Record<string, unknown> | undefined;
     if (blogPosting) {
       expect(Object.keys(blogPosting)).not.toContain('tenantId');
       expect(Object.keys(blogPosting)).not.toContain('internalId');
@@ -239,7 +280,9 @@ test.describe('Blog — Detail Page (/blog/:slug)', () => {
   });
 
   test('no </script> XSS vectors in blog detail JSON-LD', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     for (const script of ldScripts) {
       const text = await script.textContent();
       expect(text).not.toContain('</script>');
@@ -260,7 +303,9 @@ test.describe('Blog — Detail Page (/blog/:slug)', () => {
 // ── SPA Redirect for Unknown Slug ─────────────────────────────────────────────
 
 test.describe('Blog — Unknown Slug Redirect', () => {
-  test('/blog/nonexistent-slug-12345 redirects back to /blog', async ({ page }) => {
+  test('/blog/nonexistent-slug-12345 redirects back to /blog', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/blog/nonexistent-slug-12345`, {
       waitUntil: 'domcontentloaded',
     });
@@ -268,7 +313,7 @@ test.describe('Blog — Unknown Slug Redirect', () => {
     // Wait until the URL no longer contains the nonexistent slug.
     await page.waitForFunction(
       () => !window.location.pathname.includes('nonexistent-slug-12345'),
-      { timeout: 10_000 },
+      { timeout: 10_000 }
     );
     expect(page.url()).toMatch(/\/blog\/?$/);
   });

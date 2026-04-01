@@ -53,7 +53,10 @@ function mockGraphQLResponses(page: import('@playwright/test').Page) {
 
     const opName = body?.operationName ?? '';
 
-    if (opName.includes('KnowledgeSources') || body?.query?.includes('knowledgeSources')) {
+    if (
+      opName.includes('KnowledgeSources') ||
+      body?.query?.includes('knowledgeSources')
+    ) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -64,7 +67,10 @@ function mockGraphQLResponses(page: import('@playwright/test').Page) {
       return;
     }
 
-    if (opName.includes('KnowledgeSourceDetail') || body?.query?.includes('knowledgeSource')) {
+    if (
+      opName.includes('KnowledgeSourceDetail') ||
+      body?.query?.includes('knowledgeSource')
+    ) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -91,7 +97,9 @@ test.describe('PDF Viewer', () => {
     await page.goto(`${BASE_URL}/learn`);
 
     // Look for source manager or knowledge sources section
-    const sourceList = page.locator('[data-testid="source-manager"], [data-testid="sources-list"]');
+    const sourceList = page.locator(
+      '[data-testid="source-manager"], [data-testid="sources-list"]'
+    );
     if (await sourceList.isVisible({ timeout: 5000 }).catch(() => false)) {
       await expect(sourceList).toBeVisible();
     }
@@ -108,7 +116,9 @@ test.describe('PDF Viewer', () => {
       await page.waitForTimeout(1000);
 
       // Check for PDF viewer or document viewer
-      const pdfViewer = page.locator('[data-testid="pdf-document-viewer"], [data-testid="pdf-viewer"]');
+      const pdfViewer = page.locator(
+        '[data-testid="pdf-document-viewer"], [data-testid="pdf-viewer"]'
+      );
       if (await pdfViewer.isVisible({ timeout: 5000 }).catch(() => false)) {
         await expect(pdfViewer).toBeVisible();
       }
@@ -164,7 +174,9 @@ test.describe('PDF Viewer', () => {
       const sketchBtn = page.locator('[data-testid="mode-sketch"]');
       if (await sketchBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await sketchBtn.click();
-        const sketchOverlay = page.locator('[data-testid="pdf-sketch-overlay"]');
+        const sketchOverlay = page.locator(
+          '[data-testid="pdf-sketch-overlay"]'
+        );
         await expect(sketchOverlay).toBeVisible({ timeout: 3000 });
       }
     }
@@ -179,7 +191,9 @@ test.describe('PDF Viewer', () => {
       await pdfLink.click();
       await page.waitForTimeout(1000);
 
-      const toolbar = page.locator('[role="toolbar"][aria-label="PDF controls"]');
+      const toolbar = page.locator(
+        '[role="toolbar"][aria-label="PDF controls"]'
+      );
       if (await toolbar.isVisible({ timeout: 3000 }).catch(() => false)) {
         await expect(toolbar).toBeVisible();
       }
@@ -209,36 +223,57 @@ test.describe('PDF Viewer', () => {
 // ── Enhanced PDF Viewer Tests ────────────────────────────────────────────────
 
 test.describe('PDF Viewer — Source Manager Integration', () => {
-  test('click PDF source in source manager → drawer opens with PdfDocumentViewer', async ({ page }) => {
+  test('click PDF source in source manager → drawer opens with PdfDocumentViewer', async ({
+    page,
+  }) => {
     await login(page);
 
     // Mock GraphQL to return a PDF source with fileUrl
     await page.route(`${GRAPHQL_URL}`, async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+          body: '',
+        });
         return;
       }
-      const body = req.postDataJSON() as { operationName?: string; query?: string } | null;
+      const body = req.postDataJSON() as {
+        operationName?: string;
+        query?: string;
+      } | null;
       const op = body?.operationName ?? '';
 
-      if (op.includes('KnowledgeSources') || body?.query?.includes('knowledgeSources')) {
+      if (
+        op.includes('KnowledgeSources') ||
+        body?.query?.includes('knowledgeSources')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
             data: {
-              knowledgeSources: [{
-                ...MOCK_PDF_SOURCE,
-                fileUrl: 'https://cdn.edusphere.io/docs/test.pdf',
-              }],
+              knowledgeSources: [
+                {
+                  ...MOCK_PDF_SOURCE,
+                  fileUrl: 'https://cdn.edusphere.io/docs/test.pdf',
+                },
+              ],
             },
           }),
         });
         return;
       }
 
-      if (op.includes('KnowledgeSourceDetail') || body?.query?.includes('knowledgeSource')) {
+      if (
+        op.includes('KnowledgeSourceDetail') ||
+        body?.query?.includes('knowledgeSource')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -254,7 +289,11 @@ test.describe('PDF Viewer — Source Manager Integration', () => {
         return;
       }
 
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await page.goto(`${BASE_URL}/learn`);
@@ -302,7 +341,10 @@ test.describe('PDF Viewer — Page Navigation', () => {
           await page.waitForTimeout(500);
 
           // Page counter should update
-          const updatedText = await page.locator('[aria-live="polite"]').first().textContent();
+          const updatedText = await page
+            .locator('[aria-live="polite"]')
+            .first()
+            .textContent();
           expect(updatedText).toBeTruthy();
         }
       }
@@ -311,7 +353,9 @@ test.describe('PDF Viewer — Page Navigation', () => {
 });
 
 test.describe('PDF Viewer — Zoom Controls', () => {
-  test('zoom in and zoom out buttons change scale display', async ({ page }) => {
+  test('zoom in and zoom out buttons change scale display', async ({
+    page,
+  }) => {
     await login(page);
     await mockGraphQLResponses(page);
     await page.goto(`${BASE_URL}/learn`);
@@ -331,7 +375,9 @@ test.describe('PDF Viewer — Zoom Controls', () => {
 
         // The scale percentage should be visible in the toolbar
         const scaleDisplay = page.locator('.font-mono.tabular-nums').first();
-        if (await scaleDisplay.isVisible({ timeout: 2000 }).catch(() => false)) {
+        if (
+          await scaleDisplay.isVisible({ timeout: 2000 }).catch(() => false)
+        ) {
           const text = await scaleDisplay.textContent();
           expect(text).toMatch(/\d+%/);
         }
@@ -341,7 +387,9 @@ test.describe('PDF Viewer — Zoom Controls', () => {
 });
 
 test.describe('PDF Viewer — Annotate Mode', () => {
-  test('switching to Annotate mode shows text selection area', async ({ page }) => {
+  test('switching to Annotate mode shows text selection area', async ({
+    page,
+  }) => {
     await login(page);
     await mockGraphQLResponses(page);
     await page.goto(`${BASE_URL}/learn`);
@@ -357,8 +405,12 @@ test.describe('PDF Viewer — Annotate Mode', () => {
         await page.waitForTimeout(500);
 
         // text-selection-area should appear
-        const selectionArea = page.locator('[data-testid="text-selection-area"]');
-        if (await selectionArea.isVisible({ timeout: 3000 }).catch(() => false)) {
+        const selectionArea = page.locator(
+          '[data-testid="text-selection-area"]'
+        );
+        if (
+          await selectionArea.isVisible({ timeout: 3000 }).catch(() => false)
+        ) {
           await expect(selectionArea).toBeVisible();
         }
 
@@ -370,7 +422,9 @@ test.describe('PDF Viewer — Annotate Mode', () => {
 });
 
 test.describe('PDF Viewer — Sketch Mode', () => {
-  test('switching to Sketch mode shows drawing tools and canvas', async ({ page }) => {
+  test('switching to Sketch mode shows drawing tools and canvas', async ({
+    page,
+  }) => {
     await login(page);
     await mockGraphQLResponses(page);
     await page.goto(`${BASE_URL}/learn`);
@@ -387,12 +441,18 @@ test.describe('PDF Viewer — Sketch Mode', () => {
 
         // Sketch toolbar with drawing tools should appear
         const sketchToolbar = page.locator('[data-testid="sketch-tool-bar"]');
-        if (await sketchToolbar.isVisible({ timeout: 3000 }).catch(() => false)) {
+        if (
+          await sketchToolbar.isVisible({ timeout: 3000 }).catch(() => false)
+        ) {
           await expect(sketchToolbar).toBeVisible();
 
           // Individual drawing tools should be visible
-          const freehandTool = page.locator('[data-testid="viewer-sketch-tool-freehand"]');
-          const eraserTool = page.locator('[data-testid="viewer-sketch-tool-eraser"]');
+          const freehandTool = page.locator(
+            '[data-testid="viewer-sketch-tool-freehand"]'
+          );
+          const eraserTool = page.locator(
+            '[data-testid="viewer-sketch-tool-eraser"]'
+          );
           await expect(freehandTool).toBeVisible();
           await expect(eraserTool).toBeVisible();
         }
@@ -426,7 +486,9 @@ test.describe('PDF Viewer — Keyboard Navigation', () => {
         await page.waitForTimeout(200);
 
         // The focused element should be within the toolbar
-        const focusedTag = await page.evaluate(() => document.activeElement?.tagName);
+        const focusedTag = await page.evaluate(
+          () => document.activeElement?.tagName
+        );
         expect(focusedTag).toBeTruthy();
       }
     }
@@ -434,45 +496,67 @@ test.describe('PDF Viewer — Keyboard Navigation', () => {
 });
 
 test.describe('PDF Viewer — Plaintext Fallback', () => {
-  test('PDF source without fileUrl shows plaintext content', async ({ page }) => {
+  test('PDF source without fileUrl shows plaintext content', async ({
+    page,
+  }) => {
     await login(page);
 
     // Mock source without fileUrl — should fall back to rawContent text
     await page.route(`${GRAPHQL_URL}`, async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+          body: '',
+        });
         return;
       }
-      const body = req.postDataJSON() as { operationName?: string; query?: string } | null;
+      const body = req.postDataJSON() as {
+        operationName?: string;
+        query?: string;
+      } | null;
       const op = body?.operationName ?? '';
 
-      if (op.includes('KnowledgeSources') || body?.query?.includes('knowledgeSources')) {
+      if (
+        op.includes('KnowledgeSources') ||
+        body?.query?.includes('knowledgeSources')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
             data: {
-              knowledgeSources: [{
-                id: 'src-nopdf-1',
-                title: 'No PDF Source',
-                sourceType: 'FILE_PDF',
-                origin: null,
-                rawContent: 'Fallback plain text content for a PDF without binary.',
-                preview: 'Fallback plain...',
-                status: 'READY',
-                chunkCount: 3,
-                errorMessage: null,
-                createdAt: '2026-03-01T10:00:00Z',
-                // No fileUrl — should trigger plaintext fallback
-              }],
+              knowledgeSources: [
+                {
+                  id: 'src-nopdf-1',
+                  title: 'No PDF Source',
+                  sourceType: 'FILE_PDF',
+                  origin: null,
+                  rawContent:
+                    'Fallback plain text content for a PDF without binary.',
+                  preview: 'Fallback plain...',
+                  status: 'READY',
+                  chunkCount: 3,
+                  errorMessage: null,
+                  createdAt: '2026-03-01T10:00:00Z',
+                  // No fileUrl — should trigger plaintext fallback
+                },
+              ],
             },
           }),
         });
         return;
       }
 
-      if (op.includes('KnowledgeSourceDetail') || body?.query?.includes('knowledgeSource')) {
+      if (
+        op.includes('KnowledgeSourceDetail') ||
+        body?.query?.includes('knowledgeSource')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -483,7 +567,8 @@ test.describe('PDF Viewer — Plaintext Fallback', () => {
                 title: 'No PDF Source',
                 sourceType: 'FILE_PDF',
                 origin: null,
-                rawContent: 'Fallback plain text content for a PDF without binary.',
+                rawContent:
+                  'Fallback plain text content for a PDF without binary.',
                 status: 'READY',
                 chunkCount: 3,
                 errorMessage: null,
@@ -495,7 +580,11 @@ test.describe('PDF Viewer — Plaintext Fallback', () => {
         return;
       }
 
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await page.goto(`${BASE_URL}/learn`);
@@ -507,7 +596,9 @@ test.describe('PDF Viewer — Plaintext Fallback', () => {
 
       // PdfDocumentViewer should NOT be visible (no fileUrl)
       const pdfViewer = page.locator('[data-testid="pdf-document-viewer"]');
-      const isPdfVisible = await pdfViewer.isVisible({ timeout: 2000 }).catch(() => false);
+      const isPdfVisible = await pdfViewer
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
 
       // Instead, the rawContent plain text should be visible
       const bodyText = await page.textContent('body');

@@ -15,12 +15,17 @@ import { ResultsGrid } from './ResultsGrid';
 // ── Main Page (orchestrator) ─────────────────────────────────────────────────
 
 export function LessonResultsPage() {
-  const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
+  const { courseId, lessonId } = useParams<{
+    courseId: string;
+    lessonId: string;
+  }>();
   const navigate = useNavigate();
 
   // Defer query until after mount to prevent React concurrent-mode setState-during-render
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching, error }] = useQuery<LessonQueryData>({
     query: LESSON_QUERY,
@@ -64,7 +69,10 @@ export function LessonResultsPage() {
           items={[
             { label: 'Courses', href: '/courses' },
             { label: 'Course', href: `/courses/${courseId}` },
-            { label: lesson.title, href: `/courses/${courseId}/lessons/${lessonId}` },
+            {
+              label: lesson.title,
+              href: `/courses/${courseId}/lessons/${lessonId}`,
+            },
             { label: 'Results' },
           ]}
         />
@@ -82,11 +90,28 @@ export function LessonResultsPage() {
 
         {/* Run status badge */}
         {runStatus && (
-          <div className="flex items-center gap-2 mb-4 text-sm" data-testid="run-status-badge">
-            {runStatus === 'COMPLETED' && <span className="text-green-600 font-medium dark:text-green-400">✅ הושלם</span>}
-            {runStatus === 'RUNNING'   && <span className="text-blue-600 font-medium dark:text-blue-400">⏳ מריץ...</span>}
-            {runStatus === 'FAILED'    && <span className="text-red-600 font-medium dark:text-red-400">❌ נכשל</span>}
-            {runStatus === 'CANCELLED' && <span className="text-muted-foreground font-medium">⛔ בוטל</span>}
+          <div
+            className="flex items-center gap-2 mb-4 text-sm"
+            data-testid="run-status-badge"
+          >
+            {runStatus === 'COMPLETED' && (
+              <span className="text-green-600 font-medium dark:text-green-400">
+                ✅ הושלם
+              </span>
+            )}
+            {runStatus === 'RUNNING' && (
+              <span className="text-blue-600 font-medium dark:text-blue-400">
+                ⏳ מריץ...
+              </span>
+            )}
+            {runStatus === 'FAILED' && (
+              <span className="text-red-600 font-medium dark:text-red-400">
+                ❌ נכשל
+              </span>
+            )}
+            {runStatus === 'CANCELLED' && (
+              <span className="text-muted-foreground font-medium">⛔ בוטל</span>
+            )}
             {completedAt && (
               <span className="text-muted-foreground text-xs">
                 {new Date(completedAt).toLocaleString('he-IL')}
@@ -94,7 +119,9 @@ export function LessonResultsPage() {
             )}
             <button
               className="ml-auto text-xs text-blue-600 hover:underline dark:text-blue-400"
-              onClick={() => navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)}
+              onClick={() =>
+                navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)
+              }
               data-testid="open-pipeline-btn"
             >
               פתח Pipeline Builder
@@ -105,12 +132,19 @@ export function LessonResultsPage() {
         {/* Empty state */}
         {!hasResults && (
           <div>
-            <div className="text-center py-10 text-muted-foreground" data-testid="empty-results">
+            <div
+              className="text-center py-10 text-muted-foreground"
+              data-testid="empty-results"
+            >
               <p className="text-4xl mb-3">⏳</p>
-              <p className="text-base">אין תוצאות עדיין. הפעל את ה-Pipeline תחילה.</p>
+              <p className="text-base">
+                אין תוצאות עדיין. הפעל את ה-Pipeline תחילה.
+              </p>
               <Button
                 className="mt-4"
-                onClick={() => navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)}
+                onClick={() =>
+                  navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)
+                }
                 data-testid="open-pipeline-from-empty"
               >
                 פתח Pipeline Builder

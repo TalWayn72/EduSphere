@@ -9,8 +9,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 /* ── hoisted mocks ────────────────────────────────────────────────────────── */
 
 const {
-  mockNatsDrain, mockNatsPublish, mockSubUnsubscribe,
-  mockJsmStreamsInfo, mockJsmStreamsAdd,
+  mockNatsDrain,
+  mockNatsPublish,
+  mockSubUnsubscribe,
+  mockJsmStreamsInfo,
+  mockJsmStreamsAdd,
 } = vi.hoisted(() => ({
   mockNatsDrain: vi.fn().mockResolvedValue(undefined),
   mockNatsPublish: vi.fn(),
@@ -123,11 +126,16 @@ describe('LessonNERConsumer', () => {
   describe('message processing — consumeLoop (via private access)', () => {
     it('processes valid NER event and calls upsertConceptsFromNER', async () => {
       const payload = createValidPayload();
-      const _msg = createNatsMessage('EDUSPHERE.content.tenant-1.ner.extracted', payload);
+      const _msg = createNatsMessage(
+        'EDUSPHERE.content.tenant-1.ner.extracted',
+        payload
+      );
 
       // Access the private consumeLoop indirectly by simulating a message
       // We test the core logic via extractTenantFromSubject + direct cypherService call
-      const extractTenant = (consumer as any).extractTenantFromSubject.bind(consumer);
+      const extractTenant = (consumer as any).extractTenantFromSubject.bind(
+        consumer
+      );
       const tenant = extractTenant('EDUSPHERE.content.tenant-1.ner.extracted');
       expect(tenant).toBe('tenant-1');
 
@@ -136,22 +144,34 @@ describe('LessonNERConsumer', () => {
     });
 
     it('extracts tenantId from subject correctly', () => {
-      const extractTenant = (consumer as any).extractTenantFromSubject.bind(consumer);
+      const extractTenant = (consumer as any).extractTenantFromSubject.bind(
+        consumer
+      );
 
-      expect(extractTenant('EDUSPHERE.content.tenant-abc.ner.extracted')).toBe('tenant-abc');
-      expect(extractTenant('EDUSPHERE.content.uuid-123.ner.extracted')).toBe('uuid-123');
+      expect(extractTenant('EDUSPHERE.content.tenant-abc.ner.extracted')).toBe(
+        'tenant-abc'
+      );
+      expect(extractTenant('EDUSPHERE.content.uuid-123.ner.extracted')).toBe(
+        'uuid-123'
+      );
     });
 
     it('returns null for malformed subjects', () => {
-      const extractTenant = (consumer as any).extractTenantFromSubject.bind(consumer);
+      const extractTenant = (consumer as any).extractTenantFromSubject.bind(
+        consumer
+      );
 
       expect(extractTenant('short.subject')).toBeNull();
       expect(extractTenant('a.b.c')).toBeNull();
     });
 
     it('rejects mismatched tenantId (subject vs payload)', () => {
-      const extractTenant = (consumer as any).extractTenantFromSubject.bind(consumer);
-      const subjectTenant = extractTenant('EDUSPHERE.content.tenant-1.ner.extracted');
+      const extractTenant = (consumer as any).extractTenantFromSubject.bind(
+        consumer
+      );
+      const subjectTenant = extractTenant(
+        'EDUSPHERE.content.tenant-1.ner.extracted'
+      );
       const payloadTenant = 'tenant-DIFFERENT';
 
       // The consumer should reject when these don't match

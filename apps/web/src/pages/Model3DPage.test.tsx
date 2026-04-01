@@ -6,7 +6,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
@@ -15,12 +17,15 @@ vi.mock('@/components/PageShell', () => ({
   ),
 }));
 
-const Model3DViewerMock = vi.fn(({ src, className }: { src: string; className: string }) => (
-  <div data-testid="model3d-viewer" data-src={src} className={className} />
-));
+const Model3DViewerMock = vi.fn(
+  ({ src, className }: { src: string; className: string }) => (
+    <div data-testid="model3d-viewer" data-src={src} className={className} />
+  )
+);
 
 vi.mock('@/components/Model3DViewer', () => ({
-  Model3DViewer: (props: Record<string, unknown>) => Model3DViewerMock(props as never),
+  Model3DViewer: (props: Record<string, unknown>) =>
+    Model3DViewerMock(props as never),
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
@@ -35,7 +40,7 @@ function renderPage(assetId = 'abc123') {
       <Routes>
         <Route path="/model3d/:assetId" element={<Model3DPage />} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -44,7 +49,9 @@ function renderPage(assetId = 'abc123') {
 describe('Model3DPage', () => {
   it('renders heading "3D Model Viewer"', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /3d model viewer/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /3d model viewer/i })
+    ).toBeInTheDocument();
   });
 
   it('passes correct src derived from assetId to Model3DViewer', () => {
@@ -70,7 +77,7 @@ describe('Model3DPage', () => {
         <Routes>
           <Route path="/model3d/" element={<Model3DPage />} />
         </Routes>
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     const viewer = screen.getByTestId('model3d-viewer');
     expect(viewer).toHaveAttribute('data-src', '/api/assets//model');

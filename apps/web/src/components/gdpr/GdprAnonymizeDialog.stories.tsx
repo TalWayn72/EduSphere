@@ -21,16 +21,22 @@ function GdprAnonymizePreview({ confirmed }: { confirmed: boolean }) {
         <DialogHeader>
           <DialogTitle>Anonymize User Data</DialogTitle>
           <DialogDescription>
-            This action is irreversible. All personal data for this user will be permanently anonymized.
+            This action is irreversible. All personal data for this user will be
+            permanently anonymized.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-4">
           <Label>Type ANONYMIZE to confirm</Label>
-          <Input defaultValue={confirmed ? 'ANONYMIZE' : ''} placeholder="ANONYMIZE" />
+          <Input
+            defaultValue={confirmed ? 'ANONYMIZE' : ''}
+            placeholder="ANONYMIZE"
+          />
         </div>
         <DialogFooter>
           <Button variant="outline">Cancel</Button>
-          <Button variant="destructive" disabled={!confirmed}>Anonymize</Button>
+          <Button variant="destructive" disabled={!confirmed}>
+            Anonymize
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -41,7 +41,15 @@ export const PEER_REVIEW_RUBRIC_QUERY = gql`
 `;
 
 export const SUBMIT_PEER_REVIEW_MUTATION = gql`
-  mutation SubmitPeerReview($assignmentId: ID!, $criteriaScores: String!, $feedback: String) {
-    submitPeerReview(assignmentId: $assignmentId, criteriaScores: $criteriaScores, feedback: $feedback)
+  mutation SubmitPeerReview(
+    $assignmentId: ID!
+    $criteriaScores: String!
+    $feedback: String
+  ) {
+    submitPeerReview(
+      assignmentId: $assignmentId
+      criteriaScores: $criteriaScores
+      feedback: $feedback
+    )
   }
 `;

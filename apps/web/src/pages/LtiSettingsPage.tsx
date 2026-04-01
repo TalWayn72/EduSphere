@@ -10,13 +10,7 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { useAuthRole } from '@/hooks/useAuthRole';
-import {
-  Plus,
-  AlertCircle,
-  Loader2,
-  Copy,
-  CheckCircle2,
-} from 'lucide-react';
+import { Plus, AlertCircle, Loader2, Copy, CheckCircle2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
 import { LtiPlatformForm } from './LtiPlatformForm';
@@ -57,7 +51,9 @@ export function LtiSettingsPage() {
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data, fetching, error }, refetch] = useQuery<{
     ltiPlatforms: LtiPlatform[];
   }>({
@@ -86,7 +82,10 @@ export function LtiSettingsPage() {
     void navigator.clipboard.writeText(callbackUrl);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
+    copyTimerRef.current = setTimeout(
+      () => setCopied(false),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
   const handleToggle = async (id: string, current: boolean) => {
@@ -121,10 +120,7 @@ export function LtiSettingsPage() {
     <Layout>
       <PageShell size="md">
         <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'LTI' },
-          ]}
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'LTI' }]}
         />
         <div className="flex items-center justify-between">
           <div>
@@ -135,7 +131,11 @@ export function LtiSettingsPage() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleCopyUrl}>
-              {copied ? <CheckCircle2 className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+              {copied ? (
+                <CheckCircle2 className="h-4 w-4 mr-1" />
+              ) : (
+                <Copy className="h-4 w-4 mr-1" />
+              )}
               {copied ? 'Copied!' : 'Copy Launch URL'}
             </Button>
             <Button size="sm" onClick={() => setShowForm((p) => !p)}>
@@ -185,8 +185,12 @@ export function LtiSettingsPage() {
           <LtiPlatformCard
             key={platform.id}
             platform={platform}
-            onToggle={(id, current) => { void handleToggle(id, current); }}
-            onTestConnection={(url) => { void handleTestConnection(url); }}
+            onToggle={(id, current) => {
+              void handleToggle(id, current);
+            }}
+            onTestConnection={(url) => {
+              void handleTestConnection(url);
+            }}
           />
         ))}
 

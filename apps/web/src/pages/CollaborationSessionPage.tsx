@@ -45,19 +45,26 @@ export function CollaborationSessionPage() {
     topic ? `${t('chavruta')}: ${topic}` : t('sharedStudyNotes')
   );
   const [saved, setSaved] = useState(false);
-  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Mounted guard: prevent urql cache dispatch during sibling route render
   // (/collaboration and /collaboration/session share the same parent path prefix).
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     return () => {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[CollaborationSessionPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[CollaborationSessionPage] cleanup: saved timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -105,7 +112,10 @@ export function CollaborationSessionPage() {
   const handleSave = () => {
     setSaved(true);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = setTimeout(() => setSaved(false), TOAST_AUTO_DISMISS_MS);
+    savedTimerRef.current = setTimeout(
+      () => setSaved(false),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
   const SAMPLE_CONTENT = `<h1>${docTitle}</h1>

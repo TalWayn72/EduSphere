@@ -38,22 +38,16 @@ export class KeycloakAdminService {
     const location = res.headers.get('location') ?? '';
     const groupId = location.split('/').pop() ?? '';
 
-    this.logger.log(
-      { slug, groupId },
-      '[KeycloakAdminService] Group created'
-    );
+    this.logger.log({ slug, groupId }, '[KeycloakAdminService] Group created');
     return { id: groupId, name: groupName };
   }
 
   async deleteGroup(groupId: string): Promise<void> {
     const token = await this.http.getToken();
-    await this.http.fetchWithRetry(
-      `${this.http.adminBase}/groups/${groupId}`,
-      {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    await this.http.fetchWithRetry(`${this.http.adminBase}/groups/${groupId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
     this.logger.log({ groupId }, '[KeycloakAdminService] Group deleted');
   }
 
@@ -67,36 +61,32 @@ export class KeycloakAdminService {
     if (existing) return existing;
 
     const token = await this.http.getToken();
-    const res = await this.http.fetchWithRetry(
-      `${this.http.adminBase}/users`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          firstName,
-          lastName,
-          enabled: true,
-          emailVerified: false,
-          groups: groupIds.map((gid) => `/org:${gid}`),
-        }),
-      }
-    );
+    const res = await this.http.fetchWithRetry(`${this.http.adminBase}/users`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        firstName,
+        lastName,
+        enabled: true,
+        emailVerified: false,
+        groups: groupIds.map((gid) => `/org:${gid}`),
+      }),
+    });
 
     const location = res.headers.get('location') ?? '';
     const userId = location.split('/').pop() ?? '';
 
-    await this.http.sendPasswordResetEmail(userId).catch((err) =>
-      this.logger.warn({ userId, err }, 'Failed to send password reset email')
-    );
+    await this.http
+      .sendPasswordResetEmail(userId)
+      .catch((err) =>
+        this.logger.warn({ userId, err }, 'Failed to send password reset email')
+      );
 
-    this.logger.log(
-      { email, userId },
-      '[KeycloakAdminService] User created'
-    );
+    this.logger.log({ email, userId }, '[KeycloakAdminService] User created');
     return { id: userId, email, firstName, lastName, enabled: true };
   }
 
@@ -140,10 +130,7 @@ export class KeycloakAdminService {
     return (await res.json()) as KeycloakUser[];
   }
 
-  async removeUserFromGroup(
-    userId: string,
-    groupId: string
-  ): Promise<void> {
+  async removeUserFromGroup(userId: string, groupId: string): Promise<void> {
     const token = await this.http.getToken();
     await this.http.fetchWithRetry(
       `${this.http.adminBase}/users/${userId}/groups/${groupId}`,

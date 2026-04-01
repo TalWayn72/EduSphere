@@ -3,11 +3,7 @@
  * and PeerReviewAssignmentService. Preserves the original public API
  * so that all existing imports continue to work unchanged.
  */
-import {
-  Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import type { TenantContext } from '@edusphere/db';
 import { schema } from '@edusphere/db';
 import { PeerReviewCoreService } from './peer-review-core.service';
@@ -30,7 +26,7 @@ export interface AuthContext {
 export class PeerReviewService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly core: PeerReviewCoreService,
-    private readonly assignments: PeerReviewAssignmentService,
+    private readonly assignments: PeerReviewAssignmentService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -43,14 +39,14 @@ export class PeerReviewService implements OnModuleInit, OnModuleDestroy {
 
   async createRubric(
     input: CreateRubricInput,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<typeof schema.peerReviewRubrics.$inferSelect> {
     return this.core.createRubric(input, ctx);
   }
 
   async getRubric(
     contentItemId: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<typeof schema.peerReviewRubrics.$inferSelect | null> {
     return this.core.getRubric(contentItemId, ctx);
   }
@@ -59,9 +55,14 @@ export class PeerReviewService implements OnModuleInit, OnModuleDestroy {
     contentItemId: string,
     submitterId: string,
     submissionText: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<(typeof schema.peerReviewAssignments.$inferSelect)[]> {
-    return this.assignments.createAssignment(contentItemId, submitterId, submissionText, ctx);
+    return this.assignments.createAssignment(
+      contentItemId,
+      submitterId,
+      submissionText,
+      ctx
+    );
   }
 
   async submitReview(
@@ -69,21 +70,27 @@ export class PeerReviewService implements OnModuleInit, OnModuleDestroy {
     reviewerId: string,
     criteriaScores: string,
     feedback: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<boolean> {
-    return this.assignments.submitReview(assignmentId, reviewerId, criteriaScores, feedback, ctx);
+    return this.assignments.submitReview(
+      assignmentId,
+      reviewerId,
+      criteriaScores,
+      feedback,
+      ctx
+    );
   }
 
   async getMyAssignmentsToReview(
     reviewerId: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<(typeof schema.peerReviewAssignments.$inferSelect)[]> {
     return this.core.getMyAssignmentsToReview(reviewerId, ctx);
   }
 
   async getMySubmissions(
     submitterId: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<(typeof schema.peerReviewAssignments.$inferSelect)[]> {
     return this.core.getMySubmissions(submitterId, ctx);
   }

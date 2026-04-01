@@ -37,7 +37,8 @@ const MOCK_PROPOSALS = [
     id: 'prop-1',
     annotationId: 'ann-1',
     content: 'GraphQL Federation resolves entities via @key directive.',
-    description: 'This clarifies the entity resolution mechanism for federation.',
+    description:
+      'This clarifies the entity resolution mechanism for federation.',
     authorName: 'Alice Student',
     courseId: 'course-1',
     courseName: 'GraphQL Mastery',
@@ -68,23 +69,44 @@ function mockMergeQueueWithData(page: Page): Promise<void> {
   rejectedIds = [];
   return routeGraphQL(page, (op, body) => {
     const q = (body.query as string | undefined) ?? '';
-    if (q.includes('pendingAnnotationProposals') || op === 'PendingAnnotationProposals') {
+    if (
+      q.includes('pendingAnnotationProposals') ||
+      op === 'PendingAnnotationProposals'
+    ) {
       return JSON.stringify({
         data: { pendingAnnotationProposals: MOCK_PROPOSALS },
       });
     }
-    if (q.includes('approveAnnotationProposal') || op === 'ApproveAnnotationProposal') {
+    if (
+      q.includes('approveAnnotationProposal') ||
+      op === 'ApproveAnnotationProposal'
+    ) {
       const vars = body.variables as Record<string, string> | undefined;
       approvedIds.push(vars?.proposalId ?? '');
       return JSON.stringify({
-        data: { approveAnnotationProposal: { __typename: 'AnnotationProposal', id: vars?.proposalId, status: 'approved' } },
+        data: {
+          approveAnnotationProposal: {
+            __typename: 'AnnotationProposal',
+            id: vars?.proposalId,
+            status: 'approved',
+          },
+        },
       });
     }
-    if (q.includes('rejectAnnotationProposal') || op === 'RejectAnnotationProposal') {
+    if (
+      q.includes('rejectAnnotationProposal') ||
+      op === 'RejectAnnotationProposal'
+    ) {
       const vars = body.variables as Record<string, string> | undefined;
       rejectedIds.push(vars?.proposalId ?? '');
       return JSON.stringify({
-        data: { rejectAnnotationProposal: { __typename: 'AnnotationProposal', id: vars?.proposalId, status: 'rejected' } },
+        data: {
+          rejectAnnotationProposal: {
+            __typename: 'AnnotationProposal',
+            id: vars?.proposalId,
+            status: 'rejected',
+          },
+        },
       });
     }
     return null;
@@ -94,7 +116,10 @@ function mockMergeQueueWithData(page: Page): Promise<void> {
 function mockMergeQueueEmpty(page: Page): Promise<void> {
   return routeGraphQL(page, (op, body) => {
     const q = (body.query as string | undefined) ?? '';
-    if (q.includes('pendingAnnotationProposals') || op === 'PendingAnnotationProposals') {
+    if (
+      q.includes('pendingAnnotationProposals') ||
+      op === 'PendingAnnotationProposals'
+    ) {
       return JSON.stringify({
         data: { pendingAnnotationProposals: [] },
       });
@@ -122,9 +147,9 @@ test.describe('Instructor Merge Queue — Pending Proposals', () => {
   });
 
   test('merge queue list is visible with proposal cards', async ({ page }) => {
-    await expect(
-      page.locator('[data-testid="merge-queue-list"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="merge-queue-list"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('first proposal card shows author name', async ({ page }) => {
@@ -158,9 +183,9 @@ test.describe('Instructor Merge Queue — Pending Proposals', () => {
   });
 
   test('reject button is visible on each card', async ({ page }) => {
-    await expect(
-      page.locator('[data-testid="reject-btn-prop-1"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="reject-btn-prop-1"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   test('approve button calls the approve mutation', async ({ page }) => {
@@ -171,7 +196,9 @@ test.describe('Instructor Merge Queue — Pending Proposals', () => {
     expect(approvedIds).toContain('prop-1');
   });
 
-  test('reject button opens the reject dialog with reason field', async ({ page }) => {
+  test('reject button opens the reject dialog with reason field', async ({
+    page,
+  }) => {
     const btn = page.locator('[data-testid="reject-btn-prop-1"]');
     await btn.click();
 
@@ -186,7 +213,9 @@ test.describe('Instructor Merge Queue — Pending Proposals', () => {
     ).toBeVisible({ timeout: 5_000 });
   });
 
-  test('reject dialog description warns about notification', async ({ page }) => {
+  test('reject dialog description warns about notification', async ({
+    page,
+  }) => {
     await page.locator('[data-testid="reject-btn-prop-1"]').click();
     const body = (await page.textContent('[role="dialog"]')) ?? '';
     expect(body).toMatch(/student will be notified/i);
@@ -207,7 +236,9 @@ test.describe('Instructor Merge Queue — Empty State', () => {
     await page.waitForLoadState('domcontentloaded');
   });
 
-  test('empty state message "No pending proposals" is visible', async ({ page }) => {
+  test('empty state message "No pending proposals" is visible', async ({
+    page,
+  }) => {
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
       timeout: 10_000,
     });

@@ -30,7 +30,7 @@ export function StorageSection() {
           setClearing(null);
           Alert.alert(
             t('storage.cleared'),
-            t('storage.freedBytes', { bytes: formatBytes(freed) }),
+            t('storage.freedBytes', { bytes: formatBytes(freed) })
           );
         },
       },
@@ -52,11 +52,11 @@ export function StorageSection() {
             setClearing(null);
             Alert.alert(
               t('storage.cleared'),
-              t('storage.freedBytes', { bytes: formatBytes(freed) }),
+              t('storage.freedBytes', { bytes: formatBytes(freed) })
             );
           },
         },
-      ],
+      ]
     );
   };
 
@@ -80,36 +80,60 @@ export function StorageSection() {
       {stats.isOverLimit && (
         <View style={styles.warningBanner}>
           <Text style={styles.warningIcon}>&#x26A0;&#xFE0F;</Text>
-          <Text style={styles.warningText}>{t('storage.overLimitWarning')}</Text>
+          <Text style={styles.warningText}>
+            {t('storage.overLimitWarning')}
+          </Text>
         </View>
       )}
       {!stats.isOverLimit && stats.isApproachingLimit && (
         <View style={styles.warningBannerYellow}>
           <Text style={styles.warningIcon}>&#x26A0;&#xFE0F;</Text>
-          <Text style={styles.warningTextYellow}>{t('storage.approachingLimitWarning')}</Text>
+          <Text style={styles.warningTextYellow}>
+            {t('storage.approachingLimitWarning')}
+          </Text>
         </View>
       )}
 
       <View style={styles.barBackground}>
-        <View style={[styles.barFill, { width: `${barFill * 100}%`, backgroundColor: barColor }]} />
+        <View
+          style={[
+            styles.barFill,
+            { width: `${barFill * 100}%`, backgroundColor: barColor },
+          ]}
+        />
       </View>
 
       <Text style={styles.usageLabel}>
-        {formatBytes(stats.eduSphereUsedBytes)} / {formatBytes(stats.eduSphereQuotaBytes)}
+        {formatBytes(stats.eduSphereUsedBytes)} /{' '}
+        {formatBytes(stats.eduSphereQuotaBytes)}
         {'  '}({Math.round(stats.usageRatio * 100)}%)
       </Text>
       <Text style={styles.usageSubLabel}>
         {t('storage.deviceFree', { free: formatBytes(stats.freeDiskBytes) })}
       </Text>
 
-      <TouchableOpacity style={styles.actionButton} onPress={handleClearCache} disabled={clearing !== null}>
-        {clearing === 'cache' ? <ActivityIndicator size="small" color={COLORS.primary} /> : null}
+      <TouchableOpacity
+        style={styles.actionButton}
+        onPress={handleClearCache}
+        disabled={clearing !== null}
+      >
+        {clearing === 'cache' ? (
+          <ActivityIndicator size="small" color={COLORS.primary} />
+        ) : null}
         <Text style={styles.actionButtonText}>{t('storage.clearCache')}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDanger]} onPress={handleClearDownloads} disabled={clearing !== null}>
-        {clearing === 'downloads' ? <ActivityIndicator size="small" color={COLORS.error} /> : null}
-        <Text style={[styles.actionButtonText, styles.actionButtonTextDanger]}>{t('storage.clearDownloads')}</Text>
+      <TouchableOpacity
+        style={[styles.actionButton, styles.actionButtonDanger]}
+        onPress={handleClearDownloads}
+        disabled={clearing !== null}
+      >
+        {clearing === 'downloads' ? (
+          <ActivityIndicator size="small" color={COLORS.error} />
+        ) : null}
+        <Text style={[styles.actionButtonText, styles.actionButtonTextDanger]}>
+          {t('storage.clearDownloads')}
+        </Text>
       </TouchableOpacity>
     </View>
   );

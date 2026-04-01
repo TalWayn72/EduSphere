@@ -62,8 +62,9 @@ describe('PartnerDashboardService', () => {
     it('throws NotFoundException when partner does not exist', async () => {
       mockLimit.mockResolvedValueOnce([]);
 
-      await expect(service.getDashboard(PARTNER_ID))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.getDashboard(PARTNER_ID)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('returns dashboard with masked API key and revenue', async () => {
@@ -86,7 +87,10 @@ describe('PartnerDashboardService', () => {
       expect(result.apiKeyMasked).toBe('abcdef12****');
       expect(result.totalRevenue).toBe(800);
       expect(result.revenueByMonth).toHaveLength(2);
-      expect(result.revenueByMonth[0]).toEqual({ month: '2026-03', amount: 500 });
+      expect(result.revenueByMonth[0]).toEqual({
+        month: '2026-03',
+        amount: 500,
+      });
     });
 
     it('returns zero totalRevenue when no revenue rows', async () => {
@@ -105,8 +109,9 @@ describe('PartnerDashboardService', () => {
     it('throws NotFoundException when partner does not exist', async () => {
       mockReturning.mockResolvedValueOnce([]);
 
-      await expect(service.regenerateApiKey(PARTNER_ID))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.regenerateApiKey(PARTNER_ID)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('returns a 64-char hex raw key', async () => {

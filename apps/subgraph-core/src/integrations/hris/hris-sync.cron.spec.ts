@@ -24,14 +24,18 @@ describe('HrisSyncCron', () => {
     delete process.env['HRIS_SYNC_ENABLED'];
     cron.onModuleInit();
     // No interval should be registered
-    expect((cron as unknown as { intervalHandle: unknown }).intervalHandle).toBeNull();
+    expect(
+      (cron as unknown as { intervalHandle: unknown }).intervalHandle
+    ).toBeNull();
   });
 
   it('schedules nightly sync when HRIS_SYNC_ENABLED=true', () => {
     process.env['HRIS_SYNC_ENABLED'] = 'true';
     cron.onModuleInit();
     // initTimeout should be set
-    expect((cron as unknown as { initTimeout: unknown }).initTimeout).not.toBeNull();
+    expect(
+      (cron as unknown as { initTimeout: unknown }).initTimeout
+    ).not.toBeNull();
     delete process.env['HRIS_SYNC_ENABLED'];
   });
 
@@ -39,8 +43,12 @@ describe('HrisSyncCron', () => {
     process.env['HRIS_SYNC_ENABLED'] = 'true';
     cron.onModuleInit();
     cron.onModuleDestroy();
-    expect((cron as unknown as { intervalHandle: unknown }).intervalHandle).toBeNull();
-    expect((cron as unknown as { initTimeout: unknown }).initTimeout).toBeNull();
+    expect(
+      (cron as unknown as { intervalHandle: unknown }).intervalHandle
+    ).toBeNull();
+    expect(
+      (cron as unknown as { initTimeout: unknown }).initTimeout
+    ).toBeNull();
     delete process.env['HRIS_SYNC_ENABLED'];
   });
 

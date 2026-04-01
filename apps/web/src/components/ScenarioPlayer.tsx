@@ -35,7 +35,9 @@ interface ScenarioPlayerProps {
 }
 
 const ENDING_ICONS: Record<string, React.ReactNode> = {
-  SUCCESS: <CheckCircle className="h-8 w-8 text-green-500 dark:text-green-400" />,
+  SUCCESS: (
+    <CheckCircle className="h-8 w-8 text-green-500 dark:text-green-400" />
+  ),
   FAILURE: <XCircle className="h-8 w-8 text-red-500 dark:text-red-400" />,
   NEUTRAL: <MinusCircle className="h-8 w-8 text-gray-400 dark:text-gray-500" />,
 };

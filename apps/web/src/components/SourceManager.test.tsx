@@ -46,32 +46,57 @@ vi.mock('@/lib/auth', () => ({
 
 // ── Mock Radix Dialog (BUG-098: AddSourceModal now uses Radix Dialog) ─────────
 // Use a module-level ref so DialogContent close button can call Dialog's onOpenChange
-const dialogOnOpenChangeRef: { current: ((v: boolean) => void) | undefined } = { current: undefined };
+const dialogOnOpenChangeRef: { current: ((v: boolean) => void) | undefined } = {
+  current: undefined,
+};
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ open, children, onOpenChange }: {
-    open: boolean; children: React.ReactNode;
+  Dialog: ({
+    open,
+    children,
+    onOpenChange,
+  }: {
+    open: boolean;
+    children: React.ReactNode;
     onOpenChange?: (v: boolean) => void;
   }) => {
     dialogOnOpenChangeRef.current = onOpenChange;
-    return open ? <div data-testid="dialog-root" role="dialog">{children}</div> : null;
+    return open ? (
+      <div data-testid="dialog-root" role="dialog">
+        {children}
+      </div>
+    ) : null;
   },
-  DialogContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="add-source-modal" {...props}>{children}
-      <button aria-label="Close" onClick={() => {
-        dialogOnOpenChangeRef.current?.(false);
-      }}>
+  DialogContent: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="add-source-modal" {...props}>
+      {children}
+      <button
+        aria-label="Close"
+        onClick={() => {
+          dialogOnOpenChangeRef.current?.(false);
+        }}
+      >
         <span className="sr-only">Close</span>
       </button>
     </div>
   ),
-  DialogHeader: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div {...props}>{children}</div>
-  ),
-  DialogTitle: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  DialogHeader: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+  DialogTitle: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2 {...props}>{children}</h2>
   ),
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
 }));
@@ -87,7 +112,12 @@ vi.mock('@/lib/graphql/sources.queries', () => ({
   DELETE_KNOWLEDGE_SOURCE: 'DELETE_KNOWLEDGE_SOURCE',
 }));
 
-import { SourceManager, parseSourceError, getSourceErrorKey, getFriendlySourceErrorKey } from './SourceManager';
+import {
+  SourceManager,
+  parseSourceError,
+  getSourceErrorKey,
+  getFriendlySourceErrorKey,
+} from './SourceManager';
 import { hasValidAuth } from './source-manager/utils';
 
 // ── QueryClient wrapper ───────────────────────────────────────────────────────
@@ -164,7 +194,9 @@ describe('parseSourceError()', () => {
 describe('getFriendlySourceErrorKey() — BUG-055 regression', () => {
   it('maps "Processing was interrupted (service restarted)" to sources.errorServiceRestarted', () => {
     expect(
-      getFriendlySourceErrorKey('Processing was interrupted (service restarted)')
+      getFriendlySourceErrorKey(
+        'Processing was interrupted (service restarted)'
+      )
     ).toBe('sources.errorServiceRestarted');
   });
 
@@ -181,15 +213,15 @@ describe('getFriendlySourceErrorKey() — BUG-055 regression', () => {
   });
 
   it('maps file size error to sources.errorFileTooLarge', () => {
-    expect(
-      getFriendlySourceErrorKey('File exceeds size limit of 25 MB')
-    ).toBe('sources.errorFileTooLarge');
+    expect(getFriendlySourceErrorKey('File exceeds size limit of 25 MB')).toBe(
+      'sources.errorFileTooLarge'
+    );
   });
 
   it('returns sources.errorGeneric for unknown error strings', () => {
-    expect(
-      getFriendlySourceErrorKey('Unexpected internal error XYZ')
-    ).toBe('sources.errorGeneric');
+    expect(getFriendlySourceErrorKey('Unexpected internal error XYZ')).toBe(
+      'sources.errorGeneric'
+    );
   });
 
   it('returns sources.errorGeneric for undefined (no error message)', () => {
@@ -232,21 +264,33 @@ describe('SourceManager FAILED source — BUG-055 visual regression', () => {
 
 describe('getSourceErrorKey() — BUG-045 regression', () => {
   it('returns sources.errorUnauthorized for Unauthorized errors', () => {
-    expect(getSourceErrorKey(new Error('Unauthorized'))).toBe('sources.errorUnauthorized');
-    expect(getSourceErrorKey(new Error('Auth required'))).toBe('sources.errorUnauthorized');
+    expect(getSourceErrorKey(new Error('Unauthorized'))).toBe(
+      'sources.errorUnauthorized'
+    );
+    expect(getSourceErrorKey(new Error('Auth required'))).toBe(
+      'sources.errorUnauthorized'
+    );
   });
 
   it('returns sources.errorDownstream for DOWNSTREAM_SERVICE_ERROR', () => {
-    expect(getSourceErrorKey(new Error('DOWNSTREAM_SERVICE_ERROR'))).toBe('sources.errorDownstream');
+    expect(getSourceErrorKey(new Error('DOWNSTREAM_SERVICE_ERROR'))).toBe(
+      'sources.errorDownstream'
+    );
   });
 
   it('returns sources.errorNetwork for Network/fetch errors', () => {
-    expect(getSourceErrorKey(new Error('Network error'))).toBe('sources.errorNetwork');
-    expect(getSourceErrorKey(new Error('Failed to fetch'))).toBe('sources.errorNetwork');
+    expect(getSourceErrorKey(new Error('Network error'))).toBe(
+      'sources.errorNetwork'
+    );
+    expect(getSourceErrorKey(new Error('Failed to fetch'))).toBe(
+      'sources.errorNetwork'
+    );
   });
 
   it('returns sources.errorGeneric for unknown errors', () => {
-    expect(getSourceErrorKey(new Error('Something unexpected'))).toBe('sources.errorGeneric');
+    expect(getSourceErrorKey(new Error('Something unexpected'))).toBe(
+      'sources.errorGeneric'
+    );
   });
 
   it('returns sources.errorUnknown for falsy input', () => {
@@ -293,7 +337,9 @@ describe('SourceManager', () => {
   });
 
   it('BUG-045: main panel dir attribute is from i18n.dir(), not hardcoded rtl', () => {
-    const { container } = render(<SourceManager courseId="course-1" />, { wrapper });
+    const { container } = render(<SourceManager courseId="course-1" />, {
+      wrapper,
+    });
     // The outer panel div must have dir="ltr" (from mock i18n.dir() → 'ltr')
     const panel = container.querySelector('[dir]');
     expect(panel).not.toBeNull();
@@ -387,7 +433,9 @@ describe('SourceManager', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('📄 File'));
     });
-    expect(screen.getByText('DOCX, PDF or TXT, up to 25 MB')).toBeInTheDocument();
+    expect(
+      screen.getByText('DOCX, PDF or TXT, up to 25 MB')
+    ).toBeInTheDocument();
   });
 
   it('shows error state with retry button when query fails', async () => {
@@ -500,17 +548,21 @@ describe('SourceManager', () => {
 
 describe('getSourceErrorKey() — BUG-098 regression', () => {
   it('returns sources.errorUnauthorized for "400 Bad Request" (gateway auth rejection)', () => {
-    expect(getSourceErrorKey(new Error('400 Bad Request'))).toBe('sources.errorUnauthorized');
-  });
-
-  it('returns sources.errorUnauthorized for "Not authenticated" errors', () => {
-    expect(getSourceErrorKey(new Error('Not authenticated — please log in'))).toBe(
+    expect(getSourceErrorKey(new Error('400 Bad Request'))).toBe(
       'sources.errorUnauthorized'
     );
   });
 
+  it('returns sources.errorUnauthorized for "Not authenticated" errors', () => {
+    expect(
+      getSourceErrorKey(new Error('Not authenticated — please log in'))
+    ).toBe('sources.errorUnauthorized');
+  });
+
   it('returns sources.errorUnauthorized for "UNAUTHENTICATED" GraphQL error code', () => {
-    expect(getSourceErrorKey(new Error('UNAUTHENTICATED'))).toBe('sources.errorUnauthorized');
+    expect(getSourceErrorKey(new Error('UNAUTHENTICATED'))).toBe(
+      'sources.errorUnauthorized'
+    );
   });
 });
 

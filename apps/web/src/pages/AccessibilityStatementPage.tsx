@@ -103,155 +103,157 @@ export function AccessibilityStatementPage() {
       <PageShell size="sm" spacing="relaxed" className="max-w-3xl py-10">
         {/* Header */}
         <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">{t('accessibilityPage.heading')}</h1>
-          <Badge variant="secondary" className="text-sm">
-            {t('accessibilityPage.badge')}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold">
+              {t('accessibilityPage.heading')}
+            </h1>
+            <Badge variant="secondary" className="text-sm">
+              {t('accessibilityPage.badge')}
+            </Badge>
+          </div>
+          <p className="text-muted-foreground">
+            {t('accessibilityPage.intro')}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t('accessibilityPage.lastUpdated')}
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          {t('accessibilityPage.intro')}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {t('accessibilityPage.lastUpdated')}
-        </p>
-      </div>
 
-      {/* Conformance status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('accessibilityPage.conformanceTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p>
-            EduSphere <strong>partially conforms</strong> to{' '}
-            <a
-              href="https://www.w3.org/TR/WCAG22/"
-              target="_blank"
-              rel="noreferrer"
-              className="underline text-primary"
-            >
-              Web Content Accessibility Guidelines (WCAG) 2.2
-            </a>{' '}
-            Level AA. Partial conformance means that some parts of the content
-            do not fully conform to the standard; known exceptions are listed
-            below.
-          </p>
-          <p>
-            Our platform also targets compliance with{' '}
-            <strong>Section 508</strong>,{' '}
-            <strong>EN 301 549</strong>, and the{' '}
-            <strong>European Accessibility Act (EAA)</strong> — enforced June
-            2025 for digital products and services in EU member states. A full
-            machine-readable conformance report is available in our{' '}
-            <a href="/docs/VPAT_v2.5.pdf" className="underline text-primary">
-              VPAT 2.5 (PDF)
-            </a>
-            .
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Implemented features */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('accessibilityPage.featuresTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul
-            className="space-y-3"
-            aria-label="Implemented accessibility features"
-          >
-            {FEATURES.map((f) => (
-              <li key={f.criterion} className="flex items-start gap-3 text-sm">
-                <CheckCircle
-                  className="h-4 w-4 text-green-600 mt-0.5 shrink-0 dark:text-green-400"
-                  aria-hidden="true"
-                />
-                <span>
-                  <span className="font-mono text-xs text-muted-foreground mr-2">
-                    {f.criterion}
-                  </span>
-                  {f.description}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Known limitations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('accessibilityPage.limitationsTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul
-            className="space-y-4"
-            aria-label="Known accessibility limitations"
-          >
-            {KNOWN_LIMITATIONS.map((l) => (
-              <li key={l.area} className="text-sm space-y-1">
-                <p className="font-semibold">{l.area}</p>
-                <p className="text-muted-foreground">{l.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Contact */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('accessibilityPage.feedbackTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p>
-            {t('accessibilityPage.feedbackIntro')}
-          </p>
-          <ul className="space-y-1 list-none">
-            <li>
-              <span className="font-medium">Email:</span>{' '}
+        {/* Conformance status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('accessibilityPage.conformanceTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p>
+              EduSphere <strong>partially conforms</strong> to{' '}
               <a
-                href="mailto:accessibility@edusphere.io"
+                href="https://www.w3.org/TR/WCAG22/"
+                target="_blank"
+                rel="noreferrer"
                 className="underline text-primary"
               >
-                accessibility@edusphere.io
+                Web Content Accessibility Guidelines (WCAG) 2.2
+              </a>{' '}
+              Level AA. Partial conformance means that some parts of the content
+              do not fully conform to the standard; known exceptions are listed
+              below.
+            </p>
+            <p>
+              Our platform also targets compliance with{' '}
+              <strong>Section 508</strong>, <strong>EN 301 549</strong>, and the{' '}
+              <strong>European Accessibility Act (EAA)</strong> — enforced June
+              2025 for digital products and services in EU member states. A full
+              machine-readable conformance report is available in our{' '}
+              <a href="/docs/VPAT_v2.5.pdf" className="underline text-primary">
+                VPAT 2.5 (PDF)
               </a>
-            </li>
-            <li>
-              <span className="font-medium">Response time:</span>{' '}
-              {t('accessibilityPage.responseTime')}
-            </li>
-          </ul>
-          <p className="text-muted-foreground">
-            You may also escalate unresolved accessibility concerns to your
-            country&apos;s supervisory authority or enforcement body if we do not
-            respond adequately.
-          </p>
-        </CardContent>
-      </Card>
+              .
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Technical info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('accessibilityPage.technicalTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>
-            EduSphere relies on the following technologies for conformance with
-            WCAG 2.2: HTML5, CSS (Tailwind CSS), JavaScript / TypeScript (React
-            19), ARIA, and WebVTT. Radix UI primitives provide keyboard
-            management and ARIA patterns for custom widgets. Automated
-            accessibility testing is performed with axe-core on every CI run.
-          </p>
-          <p>
-            This statement was prepared in March 2026 based on
-            self-evaluation and automated testing. We commit to reviewing and
-            updating this statement at least annually.
-          </p>
-        </CardContent>
-      </Card>
+        {/* Implemented features */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('accessibilityPage.featuresTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul
+              className="space-y-3"
+              aria-label="Implemented accessibility features"
+            >
+              {FEATURES.map((f) => (
+                <li
+                  key={f.criterion}
+                  className="flex items-start gap-3 text-sm"
+                >
+                  <CheckCircle
+                    className="h-4 w-4 text-green-600 mt-0.5 shrink-0 dark:text-green-400"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <span className="font-mono text-xs text-muted-foreground mr-2">
+                      {f.criterion}
+                    </span>
+                    {f.description}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Known limitations */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('accessibilityPage.limitationsTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul
+              className="space-y-4"
+              aria-label="Known accessibility limitations"
+            >
+              {KNOWN_LIMITATIONS.map((l) => (
+                <li key={l.area} className="text-sm space-y-1">
+                  <p className="font-semibold">{l.area}</p>
+                  <p className="text-muted-foreground">{l.detail}</p>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Contact */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('accessibilityPage.feedbackTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p>{t('accessibilityPage.feedbackIntro')}</p>
+            <ul className="space-y-1 list-none">
+              <li>
+                <span className="font-medium">Email:</span>{' '}
+                <a
+                  href="mailto:accessibility@edusphere.io"
+                  className="underline text-primary"
+                >
+                  accessibility@edusphere.io
+                </a>
+              </li>
+              <li>
+                <span className="font-medium">Response time:</span>{' '}
+                {t('accessibilityPage.responseTime')}
+              </li>
+            </ul>
+            <p className="text-muted-foreground">
+              You may also escalate unresolved accessibility concerns to your
+              country&apos;s supervisory authority or enforcement body if we do
+              not respond adequately.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Technical info */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('accessibilityPage.technicalTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>
+              EduSphere relies on the following technologies for conformance
+              with WCAG 2.2: HTML5, CSS (Tailwind CSS), JavaScript / TypeScript
+              (React 19), ARIA, and WebVTT. Radix UI primitives provide keyboard
+              management and ARIA patterns for custom widgets. Automated
+              accessibility testing is performed with axe-core on every CI run.
+            </p>
+            <p>
+              This statement was prepared in March 2026 based on self-evaluation
+              and automated testing. We commit to reviewing and updating this
+              statement at least annually.
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Back link */}
         <p className="text-sm">

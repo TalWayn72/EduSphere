@@ -14,9 +14,20 @@ describe('SearchResultCard', () => {
     render(
       <MemoryRouter>
         <SearchResultCard
-          result={{ id: 'r-1', type: 'course', title: 'Test Course', snippet: 'A course', href: '/courses' }}
+          result={{
+            id: 'r-1',
+            type: 'course',
+            title: 'Test Course',
+            snippet: 'A course',
+            href: '/courses',
+          }}
           query="test"
-          typeConfig={{ icon: () => <span />, label: 'Course', color: 'text-blue-700', bg: 'bg-blue-50' }}
+          typeConfig={{
+            icon: () => <span />,
+            label: 'Course',
+            color: 'text-blue-700',
+            bg: 'bg-blue-50',
+          }}
         />
       </MemoryRouter>
     );
@@ -27,9 +38,20 @@ describe('SearchResultCard', () => {
     render(
       <MemoryRouter>
         <SearchResultCard
-          result={{ id: 'r-1', type: 'course', title: 'TC', snippet: 'A snippet here', href: '/courses' }}
+          result={{
+            id: 'r-1',
+            type: 'course',
+            title: 'TC',
+            snippet: 'A snippet here',
+            href: '/courses',
+          }}
           query="test"
-          typeConfig={{ icon: () => <span />, label: 'Course', color: 'text-blue-700', bg: 'bg-blue-50' }}
+          typeConfig={{
+            icon: () => <span />,
+            label: 'Course',
+            color: 'text-blue-700',
+            bg: 'bg-blue-50',
+          }}
         />
       </MemoryRouter>
     );

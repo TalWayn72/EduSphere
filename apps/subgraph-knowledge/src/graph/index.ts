@@ -25,14 +25,14 @@ export {
   type LearningPathResult,
 } from './cypher-learning-path.service';
 export { KMeansAlgorithmService } from './kmeans-algorithm.service';
-export type { ConceptWithEmbedding, KMeansCluster } from './kmeans-algorithm.service';
+export type {
+  ConceptWithEmbedding,
+  KMeansCluster,
+} from './kmeans-algorithm.service';
 export { KMeansDataService } from './kmeans-data.service';
 export { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 export { SocialRecommendationsService } from './social-recommendations.service';
 export { SocialRecommendationsDataService } from './social-recommendations-data.service';
 export { GraphModule } from './graph.module';
 export { GapAnalysisService } from './gap-analysis.service';
-export type {
-  KnowledgeGap,
-  GapReport,
-} from './gap-analysis.service';
+export type { KnowledgeGap, GapReport } from './gap-analysis.service';

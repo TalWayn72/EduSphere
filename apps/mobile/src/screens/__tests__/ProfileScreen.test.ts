@@ -28,7 +28,11 @@ interface UserProfile {
   role: string;
 }
 
-function formatDisplayName(firstName: string | null, lastName: string | null, email: string): string {
+function formatDisplayName(
+  firstName: string | null,
+  lastName: string | null,
+  email: string
+): string {
   if (firstName && lastName) return `${firstName} ${lastName}`;
   if (firstName) return firstName;
   return email.split('@')[0] ?? email;
@@ -40,7 +44,10 @@ function maskEmail(email: string): string {
   return `${local[0]}${'*'.repeat(Math.max(0, local.length - 2))}${local[local.length - 1]}@${domain}`;
 }
 
-function getAvatarInitials(firstName: string | null, lastName: string | null): string {
+function getAvatarInitials(
+  firstName: string | null,
+  lastName: string | null
+): string {
   return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`;
 }
 
@@ -65,7 +72,9 @@ const MOCK_PROFILE: UserProfile = {
 
 describe('ProfileScreen — user info rendering', () => {
   it('formats full name when both parts present', () => {
-    expect(formatDisplayName('Alice', 'Cohen', 'alice@example.com')).toBe('Alice Cohen');
+    expect(formatDisplayName('Alice', 'Cohen', 'alice@example.com')).toBe(
+      'Alice Cohen'
+    );
   });
 
   it('uses first name only when last name absent', () => {
@@ -137,7 +146,10 @@ describe('ProfileScreen — Apollo query states', () => {
   });
 
   it('success state: me data present', () => {
-    mockUseQuery.mockReturnValue({ data: { me: MOCK_PROFILE }, loading: false });
+    mockUseQuery.mockReturnValue({
+      data: { me: MOCK_PROFILE },
+      loading: false,
+    });
     const result = mockUseQuery();
     expect(result.data.me.firstName).toBe('Alice');
     expect(result.data.me.role).toBe('STUDENT');

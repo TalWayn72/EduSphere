@@ -51,7 +51,11 @@ export class OnboardingService implements OnModuleDestroy {
   private readonly logger = new Logger(OnboardingService.name);
   private readonly db = createDatabaseConnection();
 
-  async getState(userId: string, tenantId: string, role: string): Promise<OnboardingStateData> {
+  async getState(
+    userId: string,
+    tenantId: string,
+    role: string
+  ): Promise<OnboardingStateData> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
       const rows = (await tx.execute(sql`
@@ -72,7 +76,7 @@ export class OnboardingService implements OnModuleDestroy {
     userId: string,
     tenantId: string,
     role: string,
-    tx: ReturnType<typeof createDatabaseConnection>,
+    tx: ReturnType<typeof createDatabaseConnection>
   ): Promise<OnboardingStateData> {
     const totalSteps = getTotalSteps(role);
     await tx.execute(sql`
@@ -80,7 +84,16 @@ export class OnboardingService implements OnModuleDestroy {
       VALUES (${userId}::uuid, ${tenantId}::uuid, ${role}, 1, ${totalSteps}, false, false, '{}', NOW())
       ON CONFLICT (user_id) DO NOTHING
     `);
-    return { userId, tenantId, role, currentStep: 1, totalSteps, completed: false, skipped: false, data: {} };
+    return {
+      userId,
+      tenantId,
+      role,
+      currentStep: 1,
+      totalSteps,
+      completed: false,
+      skipped: false,
+      data: {},
+    };
   }
 
   async updateStep(
@@ -88,7 +101,7 @@ export class OnboardingService implements OnModuleDestroy {
     tenantId: string,
     role: string,
     step: number,
-    stepData: Record<string, unknown>,
+    stepData: Record<string, unknown>
   ): Promise<OnboardingStateData> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
@@ -106,7 +119,11 @@ export class OnboardingService implements OnModuleDestroy {
     });
   }
 
-  async completeOnboarding(userId: string, tenantId: string, role: string): Promise<OnboardingStateData> {
+  async completeOnboarding(
+    userId: string,
+    tenantId: string,
+    role: string
+  ): Promise<OnboardingStateData> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
       const totalSteps = getTotalSteps(role);
@@ -117,12 +134,19 @@ export class OnboardingService implements OnModuleDestroy {
         DO UPDATE SET completed = true, current_step = ${totalSteps}, updated_at = NOW()
         RETURNING user_id, tenant_id, role, current_step, total_steps, completed, skipped, data
       `)) as unknown as OnboardingRow[];
-      this.logger.log({ userId, tenantId }, '[OnboardingService] User completed onboarding');
+      this.logger.log(
+        { userId, tenantId },
+        '[OnboardingService] User completed onboarding'
+      );
       return rowToState(rows[0]!);
     });
   }
 
-  async skipOnboarding(userId: string, tenantId: string, role: string): Promise<OnboardingStateData> {
+  async skipOnboarding(
+    userId: string,
+    tenantId: string,
+    role: string
+  ): Promise<OnboardingStateData> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
       const rows = (await tx.execute(sql`

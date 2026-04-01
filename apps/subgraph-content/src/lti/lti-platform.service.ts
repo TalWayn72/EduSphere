@@ -33,7 +33,7 @@ const registerPlatformSchema = z.object({
 });
 
 function rowToDto(
-  row: typeof schema.ltiPlatforms.$inferSelect,
+  row: typeof schema.ltiPlatforms.$inferSelect
 ): LtiPlatformDto {
   return {
     id: row.id,
@@ -65,7 +65,7 @@ export class LtiPlatformService implements OnModuleDestroy {
       tx
         .select()
         .from(schema.ltiPlatforms)
-        .where(eq(schema.ltiPlatforms.tenant_id, tenantId)),
+        .where(eq(schema.ltiPlatforms.tenant_id, tenantId))
     );
 
     if (rows.length > 0) return rows.map(rowToDto);
@@ -77,11 +77,13 @@ export class LtiPlatformService implements OnModuleDestroy {
   /** Register a new LTI platform in the database. */
   async registerPlatform(
     tenantId: string,
-    input: RegisterLtiPlatformInput,
+    input: RegisterLtiPlatformInput
   ): Promise<LtiPlatformDto> {
     const parsed = registerPlatformSchema.safeParse(input);
     if (!parsed.success) {
-      throw new BadRequestException(parsed.error.issues[0]?.message ?? 'Invalid input');
+      throw new BadRequestException(
+        parsed.error.issues[0]?.message ?? 'Invalid input'
+      );
     }
 
     const ctx = this.buildCtx(tenantId);
@@ -99,11 +101,14 @@ export class LtiPlatformService implements OnModuleDestroy {
           deployment_id: input.deploymentId,
           is_active: true,
         })
-        .returning(),
+        .returning()
     );
 
     if (!row) throw new BadRequestException('Failed to register platform');
-    this.logger.log({ tenantId, platformId: row.id }, 'LTI platform registered');
+    this.logger.log(
+      { tenantId, platformId: row.id },
+      'LTI platform registered'
+    );
     return rowToDto(row);
   }
 
@@ -111,7 +116,7 @@ export class LtiPlatformService implements OnModuleDestroy {
   async togglePlatform(
     id: string,
     tenantId: string,
-    isActive: boolean,
+    isActive: boolean
   ): Promise<LtiPlatformDto> {
     const ctx = this.buildCtx(tenantId);
     const [updated] = await withTenantContext(this.db, ctx, (tx) =>
@@ -121,16 +126,19 @@ export class LtiPlatformService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.ltiPlatforms.id, id),
-            eq(schema.ltiPlatforms.tenant_id, tenantId),
-          ),
+            eq(schema.ltiPlatforms.tenant_id, tenantId)
+          )
         )
-        .returning(),
+        .returning()
     );
 
     if (!updated) {
       throw new NotFoundException(`LTI platform ${id} not found for tenant`);
     }
-    this.logger.log({ tenantId, platformId: id, isActive }, 'LTI platform toggled');
+    this.logger.log(
+      { tenantId, platformId: id, isActive },
+      'LTI platform toggled'
+    );
     return rowToDto(updated);
   }
 

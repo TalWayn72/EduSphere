@@ -15,17 +15,32 @@ vi.mock('@edusphere/nats-client', () => ({
 }));
 
 function makeItem(
-  id: string, domain: string, bloom: string,
-  a = 1, b = 0, c = 0.2,
+  id: string,
+  domain: string,
+  bloom: string,
+  a = 1,
+  b = 0,
+  c = 0.2
 ) {
   return {
-    id, domainTag: domain, bloomLevel: bloom,
-    irtA: a, irtB: b, irtC: c,
+    id,
+    domainTag: domain,
+    bloomLevel: bloom,
+    irtA: a,
+    irtB: b,
+    irtC: c,
     calibrationStatus: 'CALIBRATED',
     questionData: { type: 'MULTIPLE_CHOICE', correctOptionIds: ['opt-a'] },
-    tenantId: 't1', courseId: 'c1', source: 'MANUAL',
-    difFlagged: false, exposureCount: 0, createdBy: 'u1',
-    moduleId: null, createdAt: new Date(), updatedAt: new Date(), deletedAt: null,
+    tenantId: 't1',
+    courseId: 'c1',
+    source: 'MANUAL',
+    difFlagged: false,
+    exposureCount: 0,
+    createdBy: 'u1',
+    moduleId: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
   };
 }
 
@@ -47,26 +62,37 @@ describe('ExamGradingService — internal scoring logic', () => {
       markResponseCorrectness: vi.fn(),
     };
     // Inject mock persistence
-    (service as unknown as { persistence: unknown }).persistence = mockPersistence;
+    (service as unknown as { persistence: unknown }).persistence =
+      mockPersistence;
   });
 
   const setupMocks = (
     items: ReturnType<typeof makeItem>[],
-    responses: Array<{ itemId: string; answerData: unknown; timeSpentMs: number }>,
-    passingScore = 600,
+    responses: Array<{
+      itemId: string;
+      answerData: unknown;
+      timeSpentMs: number;
+    }>,
+    passingScore = 600
   ) => {
     const questionOrder = items.map((i) => i.id);
     mockPersistence.loadSession.mockResolvedValue({
-      id: 'sess-1', blueprintId: 'bp-1', userId: 'u1',
-      questionOrder, status: 'SUBMITTED',
+      id: 'sess-1',
+      blueprintId: 'bp-1',
+      userId: 'u1',
+      questionOrder,
+      status: 'SUBMITTED',
     });
     mockPersistence.loadResponses.mockResolvedValue(responses);
     mockPersistence.loadItems.mockResolvedValue(items);
     mockPersistence.loadBlueprint.mockResolvedValue({
-      id: 'bp-1', passingScore, courseId: 'c1',
+      id: 'bp-1',
+      passingScore,
+      courseId: 'c1',
     });
     mockPersistence.insertResult.mockImplementation((_ctx, data) => ({
-      id: 'result-1', ...data,
+      id: 'result-1',
+      ...data,
     }));
     mockPersistence.writeResponseLog.mockResolvedValue(undefined);
     mockPersistence.updateExposureCounts.mockResolvedValue(undefined);
@@ -125,9 +151,11 @@ describe('ExamGradingService — internal scoring logic', () => {
   it('determines pass/fail based on threshold', async () => {
     const items = [makeItem('i1', 'math', 'REMEMBER')];
     // 1 correct = 100% = scaled 1000, passing=600 => pass
-    setupMocks(items, [
-      { itemId: 'i1', answerData: ['opt-a'], timeSpentMs: 5000 },
-    ], 600);
+    setupMocks(
+      items,
+      [{ itemId: 'i1', answerData: ['opt-a'], timeSpentMs: 5000 }],
+      600
+    );
 
     const result = await service.gradeExam('sess-1', 't1');
     expect(result.passed).toBe(true);
@@ -135,9 +163,11 @@ describe('ExamGradingService — internal scoring logic', () => {
 
   it('determines fail when below threshold', async () => {
     const items = [makeItem('i1', 'math', 'REMEMBER')];
-    setupMocks(items, [
-      { itemId: 'i1', answerData: ['opt-wrong'], timeSpentMs: 5000 },
-    ], 600);
+    setupMocks(
+      items,
+      [{ itemId: 'i1', answerData: ['opt-wrong'], timeSpentMs: 5000 }],
+      600
+    );
 
     const result = await service.gradeExam('sess-1', 't1');
     expect(result.passed).toBe(false);
@@ -157,10 +187,10 @@ describe('ExamGradingService — internal scoring logic', () => {
 
     const result = await service.gradeExam('sess-1', 't1');
     const algebraDomain = result.domainScores.find(
-      (d: { domain: string }) => d.domain === 'algebra',
+      (d: { domain: string }) => d.domain === 'algebra'
     );
     const geomDomain = result.domainScores.find(
-      (d: { domain: string }) => d.domain === 'geometry',
+      (d: { domain: string }) => d.domain === 'geometry'
     );
     expect(algebraDomain?.correct).toBe(1);
     expect(algebraDomain?.total).toBe(2);
@@ -182,10 +212,10 @@ describe('ExamGradingService — internal scoring logic', () => {
 
     const result = await service.gradeExam('sess-1', 't1');
     const remember = result.bloomScores.find(
-      (b: { level: string }) => b.level === 'REMEMBER',
+      (b: { level: string }) => b.level === 'REMEMBER'
     );
     const apply = result.bloomScores.find(
-      (b: { level: string }) => b.level === 'APPLY',
+      (b: { level: string }) => b.level === 'APPLY'
     );
     expect(remember?.correct).toBe(1);
     expect(remember?.total).toBe(1);

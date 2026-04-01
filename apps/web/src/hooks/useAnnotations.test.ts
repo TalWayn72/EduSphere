@@ -26,9 +26,10 @@ const mockCreateAnnotation = vi
 const mockReplyToAnnotation = vi
   .fn()
   .mockResolvedValue({ data: null, error: null });
-const mockCreateReviewCard = vi
-  .fn()
-  .mockResolvedValue({ data: { createReviewCard: { id: 'card-1', conceptName: 'test' } }, error: null });
+const mockCreateReviewCard = vi.fn().mockResolvedValue({
+  data: { createReviewCard: { id: 'card-1', conceptName: 'test' } },
+  error: null,
+});
 const mockExecuteQuery = vi.fn();
 
 vi.mock('urql', () => ({
@@ -411,7 +412,10 @@ describe('useAnnotations', () => {
 
     let ok = false;
     await act(async () => {
-      ok = await result.current.createFlashcard('ann-1', 'Some annotation text');
+      ok = await result.current.createFlashcard(
+        'ann-1',
+        'Some annotation text'
+      );
     });
 
     expect(ok).toBe(true);

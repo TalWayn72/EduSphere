@@ -18,7 +18,9 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 const mockUseAuthRole = vi.fn(() => 'SUPER_ADMIN' as string | null);
-vi.mock('@/hooks/useAuthRole', () => ({ useAuthRole: () => mockUseAuthRole() }));
+vi.mock('@/hooks/useAuthRole', () => ({
+  useAuthRole: () => mockUseAuthRole(),
+}));
 
 function renderPage() {
   return render(

@@ -14,7 +14,10 @@ describe('RateLimitMiddleware', () => {
     delete process.env['REDIS_URL'];
     middleware = new RateLimitMiddleware();
     mockReq = { headers: { 'x-tenant-id': 'tenant-abc' }, ip: '127.0.0.1' };
-    mockRes = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() } as Partial<Response>;
+    mockRes = {
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn().mockReturnThis(),
+    } as Partial<Response>;
     mockNext = vi.fn();
   });
 
@@ -36,7 +39,10 @@ describe('RateLimitMiddleware', () => {
   });
 
   it('allows requests from different tenants independently', async () => {
-    const req2 = { headers: { 'x-tenant-id': 'tenant-xyz' }, ip: '127.0.0.1' } as Partial<Request>;
+    const req2 = {
+      headers: { 'x-tenant-id': 'tenant-xyz' },
+      ip: '127.0.0.1',
+    } as Partial<Request>;
     for (let i = 0; i < 200; i++) {
       await middleware.use(mockReq as Request, mockRes as Response, mockNext);
     }

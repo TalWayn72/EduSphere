@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  HybridSearchEngine,
-  type RagConfig,
-} from './hybridSearch';
+import { HybridSearchEngine, type RagConfig } from './hybridSearch';
 import type { CachedEmbeddings } from './embeddings';
 import type { Pool } from 'pg';
 

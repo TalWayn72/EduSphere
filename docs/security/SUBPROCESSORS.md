@@ -10,13 +10,13 @@ All Tier 1 subprocessors have a signed Data Processing Agreement (DPA Signed).
 
 ## Tier 1 — Core Infrastructure
 
-| Subprocessor | Purpose | Region | DPA Status | Data Transferred |
-|-------------|---------|--------|-----------|-----------------|
-| **Amazon Web Services (AWS)** | Cloud infrastructure, compute, S3 storage | eu-central-1, eu-west-1 | DPA Signed ✅ | Tenant data (encrypted at rest) |
-| **PostgreSQL (self-hosted on AWS)** | Primary database (RLS enforced) | EU | DPA Signed ✅ | All application data |
-| **NATS.io (self-hosted on AWS)** | Event streaming | EU | DPA Signed ✅ | Event metadata only |
-| **MinIO (self-hosted on AWS)** | Object storage (media files) | eu-central-1 | DPA Signed ✅ | Course media, recordings |
-| **Keycloak (self-hosted on AWS)** | Identity and access management | EU | DPA Signed ✅ | User credentials (hashed) |
+| Subprocessor                        | Purpose                                   | Region                  | DPA Status    | Data Transferred                |
+| ----------------------------------- | ----------------------------------------- | ----------------------- | ------------- | ------------------------------- |
+| **Amazon Web Services (AWS)**       | Cloud infrastructure, compute, S3 storage | eu-central-1, eu-west-1 | DPA Signed ✅ | Tenant data (encrypted at rest) |
+| **PostgreSQL (self-hosted on AWS)** | Primary database (RLS enforced)           | EU                      | DPA Signed ✅ | All application data            |
+| **NATS.io (self-hosted on AWS)**    | Event streaming                           | EU                      | DPA Signed ✅ | Event metadata only             |
+| **MinIO (self-hosted on AWS)**      | Object storage (media files)              | eu-central-1            | DPA Signed ✅ | Course media, recordings        |
+| **Keycloak (self-hosted on AWS)**   | Identity and access management            | EU                      | DPA Signed ✅ | User credentials (hashed)       |
 
 ---
 
@@ -26,9 +26,9 @@ All AI subprocessors are activated only after explicit THIRD_PARTY_LLM consent f
 PII is scrubbed from all data before transmission to AI providers.
 Users may opt out at any time. On-premises air-gap deployment is available for institutions requiring full data sovereignty.
 
-| Subprocessor | Purpose | Region | DPA Status | Consent Required |
-|-------------|---------|--------|-----------|-----------------|
-| **OpenAI** | LLM inference (gpt-4o) | US (EU SCCs applied) | DPA Signed ✅ | THIRD_PARTY_LLM consent |
+| Subprocessor  | Purpose                           | Region               | DPA Status    | Consent Required        |
+| ------------- | --------------------------------- | -------------------- | ------------- | ----------------------- |
+| **OpenAI**    | LLM inference (gpt-4o)            | US (EU SCCs applied) | DPA Signed ✅ | THIRD_PARTY_LLM consent |
 | **Anthropic** | LLM inference (claude-3-5-sonnet) | US (EU SCCs applied) | DPA Signed ✅ | THIRD_PARTY_LLM consent |
 
 PII scrubbing: All user PII (names, email, annotation text) is scrubbed before transmission to OpenAI and Anthropic.
@@ -38,10 +38,10 @@ Standard Contractual Clauses (SCC): EU-US data transfers to OpenAI and Anthropic
 
 ## Tier 3 — Development and Operations
 
-| Subprocessor | Purpose | Region | DPA Status | Data Transferred |
-|-------------|---------|--------|-----------|-----------------|
-| **GitHub** | CI/CD, source control (GitHub Actions) | US (SCCs applied) | DPA Signed ✅ | Source code, CI logs (no PII) |
-| **Jaeger (self-hosted)** | Distributed tracing | EU | DPA Signed ✅ | Trace metadata (anonymized) |
+| Subprocessor             | Purpose                                | Region            | DPA Status    | Data Transferred              |
+| ------------------------ | -------------------------------------- | ----------------- | ------------- | ----------------------------- |
+| **GitHub**               | CI/CD, source control (GitHub Actions) | US (SCCs applied) | DPA Signed ✅ | Source code, CI logs (no PII) |
+| **Jaeger (self-hosted)** | Distributed tracing                    | EU                | DPA Signed ✅ | Trace metadata (anonymized)   |
 
 ---
 
@@ -56,6 +56,7 @@ Standard Contractual Clauses (SCC): EU-US data transfers to OpenAI and Anthropic
 ## Subprocessor Change Notice Policy
 
 EduSphere will notify customers of any intended changes to this subprocessor list with **30-day** advance notice via:
+
 1. Email notification to the registered DPA contact
 2. In-app notification to ORG_ADMIN users
 3. Update to this document with changelog entry
@@ -69,4 +70,4 @@ Customers may object to a new subprocessor within the 30-day notice period.
 For DPA inquiries: dpa@edusphere.dev
 For subprocessor objections: privacy@edusphere.dev
 
-*Last Updated: March 2026 | Version: 1.0*
+_Last Updated: March 2026 | Version: 1.0_

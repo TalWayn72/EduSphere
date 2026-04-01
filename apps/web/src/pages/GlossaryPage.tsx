@@ -2,7 +2,11 @@
 import React, { useState, useMemo } from 'react';
 import { Search, BookOpen } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { PageMeta, BreadcrumbSchema, OrganizationSchema } from '@/components/seo';
+import {
+  PageMeta,
+  BreadcrumbSchema,
+  OrganizationSchema,
+} from '@/components/seo';
 import { safeJsonLd } from '@/lib/safe-json-ld';
 import { GLOSSARY_TERMS } from '@/lib/aeo-data';
 import type { GlossaryTerm } from '@/lib/aeo-data';
@@ -106,7 +110,9 @@ export function GlossaryPage() {
         canonical="https://app.edusphere.dev/glossary"
       />
       <Helmet>
-        <script type="application/ld+json">{safeJsonLd(definedTermSetSchema)}</script>
+        <script type="application/ld+json">
+          {safeJsonLd(definedTermSetSchema)}
+        </script>
       </Helmet>
       <BreadcrumbSchema
         items={[
@@ -117,90 +123,100 @@ export function GlossaryPage() {
       <OrganizationSchema />
 
       <PublicLayout navVariant="minimal">
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-16 dark:text-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="flex justify-center mb-4">
-              <BookOpen className="h-10 w-10 text-indigo-300 dark:text-indigo-400" aria-hidden="true" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">EdTech Glossary</h1>
-            <p className="text-indigo-100 text-lg mb-8 max-w-xl mx-auto dark:text-indigo-300">
-              Definitions of key terms in AI learning, educational technology, and e-learning
-              standards.
-            </p>
-            <div className="relative max-w-xl mx-auto">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-slate-400"
-                aria-hidden="true"
-              />
-              <Input
-                type="search"
-                placeholder="Search terms..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border-0"
-                aria-label="Search glossary terms"
-              />
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+          {/* Header */}
+          <div className="bg-gradient-to-br from-indigo-900 to-purple-900 text-white py-16 dark:text-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <div className="flex justify-center mb-4">
+                <BookOpen
+                  className="h-10 w-10 text-indigo-300 dark:text-indigo-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
+                EdTech Glossary
+              </h1>
+              <p className="text-indigo-100 text-lg mb-8 max-w-xl mx-auto dark:text-indigo-300">
+                Definitions of key terms in AI learning, educational technology,
+                and e-learning standards.
+              </p>
+              <div className="relative max-w-xl mx-auto">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-slate-400"
+                  aria-hidden="true"
+                />
+                <Input
+                  type="search"
+                  placeholder="Search terms..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border-0"
+                  aria-label="Search glossary terms"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          {/* Alphabet Navigation */}
-          <nav aria-label="Alphabetical navigation" className="flex flex-wrap gap-1 mb-8">
-            <button
-              onClick={() => setActiveLetter(null)}
-              className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
-                activeLetter === null
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
-              }`}
-              aria-pressed={activeLetter === null}
+          <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            {/* Alphabet Navigation */}
+            <nav
+              aria-label="Alphabetical navigation"
+              className="flex flex-wrap gap-1 mb-8"
             >
-              All
-            </button>
-            {LETTERS.map((letter) => {
-              const hasTerms = GLOSSARY_TERMS.some((t) =>
-                t.term.toUpperCase().startsWith(letter)
-              );
-              return (
-                <button
-                  key={letter}
-                  onClick={() => setActiveLetter(activeLetter === letter ? null : letter)}
-                  disabled={!hasTerms}
-                  className={`w-8 h-8 rounded text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                    activeLetter === letter
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
-                  }`}
-                  aria-pressed={activeLetter === letter}
-                >
-                  {letter}
-                </button>
-              );
-            })}
-          </nav>
+              <button
+                onClick={() => setActiveLetter(null)}
+                className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                  activeLetter === null
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
+                }`}
+                aria-pressed={activeLetter === null}
+              >
+                All
+              </button>
+              {LETTERS.map((letter) => {
+                const hasTerms = GLOSSARY_TERMS.some((t) =>
+                  t.term.toUpperCase().startsWith(letter)
+                );
+                return (
+                  <button
+                    key={letter}
+                    onClick={() =>
+                      setActiveLetter(activeLetter === letter ? null : letter)
+                    }
+                    disabled={!hasTerms}
+                    className={`w-8 h-8 rounded text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                      activeLetter === letter
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
+                    }`}
+                    aria-pressed={activeLetter === letter}
+                  >
+                    {letter}
+                  </button>
+                );
+              })}
+            </nav>
 
-          {/* Term count */}
-          <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-            Showing {filtered.length} of {GLOSSARY_TERMS.length} terms
-          </p>
+            {/* Term count */}
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+              Showing {filtered.length} of {GLOSSARY_TERMS.length} terms
+            </p>
 
-          {/* Terms Grid */}
-          {filtered.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-slate-400">
-              <p>No terms found matching &ldquo;{search}&rdquo;.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filtered.map((term) => (
-                <GlossaryTermCard key={term.term} term={term} />
-              ))}
-            </div>
-          )}
-        </main>
-      </div>
+            {/* Terms Grid */}
+            {filtered.length === 0 ? (
+              <div className="text-center py-12 text-gray-500 dark:text-slate-400">
+                <p>No terms found matching &ldquo;{search}&rdquo;.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filtered.map((term) => (
+                  <GlossaryTermCard key={term.term} term={term} />
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
       </PublicLayout>
     </>
   );

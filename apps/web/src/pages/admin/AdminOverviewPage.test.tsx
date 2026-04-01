@@ -19,7 +19,11 @@ const MOCK_METRICS = {
 
 vi.mock('urql', () => ({
   useQuery: vi.fn(() => [
-    { fetching: false, data: { tenantMetrics: MOCK_METRICS }, error: undefined },
+    {
+      fetching: false,
+      data: { tenantMetrics: MOCK_METRICS },
+      error: undefined,
+    },
     vi.fn(),
   ]),
 }));
@@ -37,7 +41,11 @@ function renderPage() {
 describe('AdminOverviewPage', () => {
   beforeEach(() => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { fetching: false, data: { tenantMetrics: MOCK_METRICS }, error: undefined },
+      {
+        fetching: false,
+        data: { tenantMetrics: MOCK_METRICS },
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
   });
@@ -61,7 +69,9 @@ describe('AdminOverviewPage', () => {
     expect(screen.getByTestId('metric-total-users')).toBeInTheDocument();
     expect(screen.getByTestId('metric-active-courses')).toBeInTheDocument();
     expect(screen.getByTestId('metric-storage-used')).toBeInTheDocument();
-    expect(screen.getByTestId('metric-monthly-active-users')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('metric-monthly-active-users')
+    ).toBeInTheDocument();
   });
 
   it('displays BETA badge', () => {

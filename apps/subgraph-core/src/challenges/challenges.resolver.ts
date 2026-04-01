@@ -16,7 +16,9 @@ function toISOString(value: unknown): string {
 }
 
 /** Serialize Drizzle challenge row (Date→String) for GroupChallenge GraphQL type. */
-function serializeChallenge(row: Record<string, unknown>): Record<string, unknown> {
+function serializeChallenge(
+  row: Record<string, unknown>
+): Record<string, unknown> {
   return {
     ...row,
     startDate: toISOString(row.startDate),
@@ -26,7 +28,9 @@ function serializeChallenge(row: Record<string, unknown>): Record<string, unknow
 }
 
 /** Serialize Drizzle participant row (Date→String) for ChallengeParticipant GraphQL type. */
-function serializeParticipant(row: Record<string, unknown>): Record<string, unknown> {
+function serializeParticipant(
+  row: Record<string, unknown>
+): Record<string, unknown> {
   return {
     ...row,
     joinedAt: toISOString(row.joinedAt),
@@ -38,7 +42,7 @@ function serializeParticipant(row: Record<string, unknown>): Record<string, unkn
 export class ChallengesResolver {
   constructor(
     private readonly challengeService: GroupChallengeService,
-    private readonly leaderboardService: GroupChallengeLeaderboardService,
+    private readonly leaderboardService: GroupChallengeLeaderboardService
   ) {}
 
   private requireAuth(ctx: GqlContext) {
@@ -48,7 +52,12 @@ export class ChallengesResolver {
     return {
       userId: ctx.authContext.userId,
       tenantId: ctx.authContext.tenantId || '',
-      role: (ctx.authContext.roles?.[0] ?? 'STUDENT') as 'INSTRUCTOR' | 'ORG_ADMIN' | 'SUPER_ADMIN' | 'STUDENT' | 'RESEARCHER',
+      role: (ctx.authContext.roles?.[0] ?? 'STUDENT') as
+        | 'INSTRUCTOR'
+        | 'ORG_ADMIN'
+        | 'SUPER_ADMIN'
+        | 'STUDENT'
+        | 'RESEARCHER',
     };
   }
 
@@ -57,13 +66,21 @@ export class ChallengesResolver {
     @Args('courseId') courseId: string | undefined,
     @Args('first') first: number | undefined,
     @Args('after') after: string | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    const challenges = await this.challengeService.getActiveChallenges(tenantId, userId, courseId, first, after);
+    const challenges = await this.challengeService.getActiveChallenges(
+      tenantId,
+      userId,
+      courseId,
+      first,
+      after
+    );
 
     // Wrap flat array into Relay-style GroupChallengeConnection
-    const nodes = challenges.map((c: Record<string, unknown>) => serializeChallenge(c));
+    const nodes = challenges.map((c: Record<string, unknown>) =>
+      serializeChallenge(c)
+    );
 
     const edges = nodes.map((node: Record<string, unknown>) => ({
       node,
@@ -85,23 +102,31 @@ export class ChallengesResolver {
   @Query('challengeLeaderboard')
   async challengeLeaderboard(
     @Args('challengeId') challengeId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    const rows = await this.leaderboardService.getChallengeLeaderboard(tenantId, userId, challengeId);
+    const rows = await this.leaderboardService.getChallengeLeaderboard(
+      tenantId,
+      userId,
+      challengeId
+    );
     return (rows as Record<string, unknown>[]).map(serializeParticipant);
   }
 
   @Query('myChallengePariticipations')
   async myChallengePariticipations(@Context() ctx: GqlContext) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    const rows = await this.challengeService.getMyParticipations(tenantId, userId);
+    const rows = await this.challengeService.getMyParticipations(
+      tenantId,
+      userId
+    );
     return (rows as Record<string, unknown>[]).map(serializeParticipant);
   }
 
   @Mutation('createChallenge')
   async createChallenge(
-    @Args('input') input: {
+    @Args('input')
+    input: {
       title: string;
       description?: string;
       courseId?: string;
@@ -111,20 +136,29 @@ export class ChallengesResolver {
       endDate: string;
       maxParticipants?: number;
     },
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const { tenantId, userId, role } = this.requireAuth(ctx);
-    const row = await this.challengeService.createChallenge(tenantId, userId, role, input);
+    const row = await this.challengeService.createChallenge(
+      tenantId,
+      userId,
+      role,
+      input
+    );
     return serializeChallenge(row as unknown as Record<string, unknown>);
   }
 
   @Mutation('joinChallenge')
   async joinChallenge(
     @Args('challengeId') challengeId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    const row = await this.challengeService.joinChallenge(tenantId, userId, challengeId);
+    const row = await this.challengeService.joinChallenge(
+      tenantId,
+      userId,
+      challengeId
+    );
     return serializeParticipant(row as unknown as Record<string, unknown>);
   }
 
@@ -132,10 +166,15 @@ export class ChallengesResolver {
   async submitChallengeScore(
     @Args('challengeId') challengeId: string,
     @Args('score') score: number,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const { tenantId, userId } = this.requireAuth(ctx);
-    const row = await this.leaderboardService.submitChallengeScore(tenantId, userId, challengeId, score);
+    const row = await this.leaderboardService.submitChallengeScore(
+      tenantId,
+      userId,
+      challengeId,
+      score
+    );
     return serializeParticipant(row as unknown as Record<string, unknown>);
   }
 }

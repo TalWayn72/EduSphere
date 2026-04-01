@@ -194,7 +194,8 @@ export class MarketplaceOrgService implements OnModuleDestroy {
       categories: string[];
       preview_url: string | null;
       publisher_name: string;
-    }>(sql.raw(`
+    }>(
+      sql.raw(`
       SELECT ml.id, ml.course_id, ml.title, ml.description,
              ml.pricing_model, ml.price_per_seat::text, ml.flat_rate_price::text,
              ml.currency, ml.is_published, ml.categories, ml.preview_url,
@@ -204,7 +205,8 @@ export class MarketplaceOrgService implements OnModuleDestroy {
       WHERE ${whereClause}
       ORDER BY ml.created_at DESC
       LIMIT ${safeLimit} OFFSET ${safeOffset}
-    `));
+    `)
+    );
 
     return result.rows.map((r) => ({
       id: r.id,

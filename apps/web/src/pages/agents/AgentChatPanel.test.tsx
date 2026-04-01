@@ -11,8 +11,12 @@ vi.mock('@/components/ui/card', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -22,7 +26,16 @@ vi.mock('lucide-react', () => ({
 
 vi.mock('./agent-modes-data', () => ({
   AGENT_MODES: [
-    { id: 'chavruta', label: 'Chavruta', icon: 'icon', color: 'text-blue', bg: 'bg-blue', description: 'desc', prompts: ['p1'], responses: ['r1'] },
+    {
+      id: 'chavruta',
+      label: 'Chavruta',
+      icon: 'icon',
+      color: 'text-blue',
+      bg: 'bg-blue',
+      description: 'desc',
+      prompts: ['p1'],
+      responses: ['r1'],
+    },
   ],
 }));
 
@@ -32,9 +45,14 @@ describe('AgentChatPanel', () => {
   it('renders without crash', () => {
     const chatEndRef = { current: null };
     const translatedMode = {
-      id: 'chavruta', label: 'Chavruta', icon: <span>icon</span>,
-      color: 'text-blue-600', bg: 'bg-blue-50', description: 'desc',
-      prompts: ['p1'] as readonly string[], responses: ['r1'] as readonly string[],
+      id: 'chavruta',
+      label: 'Chavruta',
+      icon: <span>icon</span>,
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      description: 'desc',
+      prompts: ['p1'] as readonly string[],
+      responses: ['r1'] as readonly string[],
     };
     const { container } = render(
       <AgentChatPanel

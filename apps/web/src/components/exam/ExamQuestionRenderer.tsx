@@ -22,7 +22,7 @@ interface Props {
 function renderByType(
   data: QuizItem,
   answer: unknown,
-  onAnswer: (v: unknown) => void,
+  onAnswer: (v: unknown) => void
 ) {
   switch (data.type) {
     case 'MULTIPLE_CHOICE':

@@ -17,7 +17,11 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@/hooks/useUnsavedChangesGuard', () => ({
-  useUnsavedChangesGuard: () => ({ state: 'idle', proceed: vi.fn(), reset: vi.fn() }),
+  useUnsavedChangesGuard: () => ({
+    state: 'idle',
+    proceed: vi.fn(),
+    reset: vi.fn(),
+  }),
 }));
 
 vi.mock('@/components/UnsavedChangesDialog', () => ({
@@ -25,11 +29,15 @@ vi.mock('@/components/UnsavedChangesDialog', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -51,7 +59,9 @@ const mockQueries = {
     instructorId: 'u-1',
     modules: [],
   },
-  lessons: [{ id: 'l-1', title: 'Lesson 1', type: 'VIDEO', status: 'PUBLISHED' }],
+  lessons: [
+    { id: 'l-1', title: 'Lesson 1', type: 'VIDEO', status: 'PUBLISHED' },
+  ],
   fetching: false,
   isEnrolled: false,
   optimisticEnrolled: false,
@@ -94,45 +104,78 @@ describe('CourseDetailPage', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('renders inside Layout', () => {
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders course title via PageHeader', () => {
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('Test Course')).toBeInTheDocument();
   });
 
   it('renders CourseHeaderCard sub-component', () => {
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('course-header-card')).toBeInTheDocument();
   });
 
   it('renders CourseLessonsSection sub-component', () => {
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('course-lessons-section')).toBeInTheDocument();
   });
 
   it('renders CourseSourcesPanel sub-component', () => {
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('course-sources-panel')).toBeInTheDocument();
   });
 
   it('renders CourseModuleList sub-component', () => {
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('course-module-list')).toBeInTheDocument();
   });
 
   it('shows loading state when fetching', () => {
     mockQueries.fetching = true;
     mockQueries.course = null as never;
-    render(<MemoryRouter><CourseDetailPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseDetailPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('loadingCourse')).toBeInTheDocument();
     mockQueries.fetching = false;
     mockQueries.course = {
-      id: 'c-1', title: 'Test Course', description: 'A course',
-      thumbnailUrl: null, estimatedHours: 3, isPublished: true,
-      instructorId: 'u-1', modules: [],
+      id: 'c-1',
+      title: 'Test Course',
+      description: 'A course',
+      thumbnailUrl: null,
+      estimatedHours: 3,
+      isPublished: true,
+      instructorId: 'u-1',
+      modules: [],
     };
   });
 });

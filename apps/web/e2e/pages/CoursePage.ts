@@ -60,9 +60,7 @@ export class CoursePage {
       .locator('text=Transcript')
       .locator('..')
       .locator('..');
-    this.transcriptSegments = page.locator(
-      '.p-3.rounded-lg.cursor-pointer'
-    );
+    this.transcriptSegments = page.locator('.p-3.rounded-lg.cursor-pointer');
     this.annotationsPanel = page
       .locator('text=Annotations')
       .first()

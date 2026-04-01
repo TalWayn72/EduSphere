@@ -66,9 +66,7 @@ function hasPolicy(content: string): boolean {
 }
 
 function hasTenantIdColumn(content: string): boolean {
-  return (
-    content.includes("'tenant_id'") || content.includes('"tenant_id"')
-  );
+  return content.includes("'tenant_id'") || content.includes('"tenant_id"');
 }
 
 function hasTenantPolicyRef(content: string): boolean {
@@ -284,18 +282,18 @@ describe('F-10: Schema Index Completeness', () => {
   // duplicate table names from content.ts/core.ts legacy structure.
   // These are not directly exported from index.ts but are accessible.
   const EXPORTED_VIA_OTHER = new Set([
-    'users',           // via core.ts
-    'tags',            // via collaboration.ts or core.ts
-    'exam',            // may not exist yet
+    'users', // via core.ts
+    'tags', // via collaboration.ts or core.ts
+    'exam', // may not exist yet
     'scenario-progress', // via scenarios.ts
-    'courses',         // via content.ts
-    'annotations',     // via annotation.ts
-    'discussions',     // via discussion.ts
-    'files',           // via content.ts or contentItems.ts
-    'modules',         // via content.ts
-    'organizations',   // via core.ts or tenants.ts
-    'agentMessages',   // via agent.ts
-    'agentSessions',   // via agent.ts
+    'courses', // via content.ts
+    'annotations', // via annotation.ts
+    'discussions', // via discussion.ts
+    'files', // via content.ts or contentItems.ts
+    'modules', // via content.ts
+    'organizations', // via core.ts or tenants.ts
+    'agentMessages', // via agent.ts
+    'agentSessions', // via agent.ts
   ]);
 
   for (const file of tableFiles) {

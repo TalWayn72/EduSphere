@@ -6,7 +6,8 @@ import { MemoryRouter } from 'react-router-dom';
 const SAMPLE_PATH = {
   id: 'sp-1',
   title: 'Full-Stack Developer Path',
-  description: 'Master frontend, backend, and database technologies for modern web development.',
+  description:
+    'Master frontend, backend, and database technologies for modern web development.',
   targetRole: 'Senior Full-Stack Developer',
   skillIds: ['s1', 's2', 's3', 's4', 's5'],
   estimatedHours: 120,
@@ -45,20 +46,32 @@ export const Default: Story = {
 export const NoProgress: Story = {
   args: {
     path: SAMPLE_PATH,
-    progress: SAMPLE_PATH.skillIds.map((id) => ({ skillId: id, masteryLevel: 'none', evidenceCount: 0 })),
+    progress: SAMPLE_PATH.skillIds.map((id) => ({
+      skillId: id,
+      masteryLevel: 'none',
+      evidenceCount: 0,
+    })),
   },
 };
 
 export const Complete: Story = {
   args: {
     path: SAMPLE_PATH,
-    progress: SAMPLE_PATH.skillIds.map((id) => ({ skillId: id, masteryLevel: 'mastered', evidenceCount: 5 })),
+    progress: SAMPLE_PATH.skillIds.map((id) => ({
+      skillId: id,
+      masteryLevel: 'mastered',
+      evidenceCount: 5,
+    })),
   },
 };
 
 export const Draft: Story = {
   args: {
-    path: { ...SAMPLE_PATH, isPublished: false, title: 'Data Science Path (Draft)' },
+    path: {
+      ...SAMPLE_PATH,
+      isPublished: false,
+      title: 'Data Science Path (Draft)',
+    },
     progress: SAMPLE_PROGRESS,
   },
 };

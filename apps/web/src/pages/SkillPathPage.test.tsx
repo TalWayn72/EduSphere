@@ -9,7 +9,10 @@ import { SkillPathPage } from './SkillPathPage';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...vals: unknown[]) =>
-    strings.reduce((acc: string, s: string, i: number) => acc + s + String(vals[i] ?? ''), ''),
+    strings.reduce(
+      (acc: string, s: string, i: number) => acc + s + String(vals[i] ?? ''),
+      ''
+    ),
   useQuery: vi.fn(),
 }));
 
@@ -19,7 +22,9 @@ vi.mock('@/lib/graphql/skills.queries', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/skills/SkillPathCard', () => ({
@@ -30,13 +35,15 @@ vi.mock('@/components/skills/SkillPathCard', () => ({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const NOOP_QUERY = [{ data: undefined, fetching: false, error: undefined }] as never;
+const NOOP_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+] as never;
 
 function renderPage() {
   return render(
     <MemoryRouter>
       <SkillPathPage />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -50,7 +57,9 @@ describe('SkillPathPage', () => {
   it('renders heading "Skill Paths"', () => {
     vi.mocked(urql.useQuery).mockReturnValue(NOOP_QUERY);
     renderPage();
-    expect(screen.getByRole('heading', { name: /skill paths/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /skill paths/i })
+    ).toBeInTheDocument();
   });
 
   it('renders loading skeleton when fetching', () => {
@@ -66,14 +75,24 @@ describe('SkillPathPage', () => {
     vi.mocked(urql.useQuery).mockImplementation((args) => {
       const query = String((args as { query: unknown }).query);
       if (query.includes('SKILL_PATHS')) {
-        return [{ data: { skillPaths: [] }, fetching: false, error: undefined }] as never;
+        return [
+          { data: { skillPaths: [] }, fetching: false, error: undefined },
+        ] as never;
       }
-      return [{ data: { mySkillProgress: [] }, fetching: false, error: undefined }] as never;
+      return [
+        { data: { mySkillProgress: [] }, fetching: false, error: undefined },
+      ] as never;
     });
-    await act(async () => { renderPage(); });
+    await act(async () => {
+      renderPage();
+    });
     await waitFor(
-      () => { expect(screen.getByText(/no skill paths available yet/i)).toBeInTheDocument(); },
-      { timeout: 5000 },
+      () => {
+        expect(
+          screen.getByText(/no skill paths available yet/i)
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 }
     );
   });
 
@@ -90,14 +109,26 @@ describe('SkillPathPage', () => {
     vi.mocked(urql.useQuery).mockImplementation((args) => {
       const query = String((args as { query: unknown }).query);
       if (query.includes('SKILL_PATHS')) {
-        return [{ data: { skillPaths: [mockPath] }, fetching: false, error: undefined }] as never;
+        return [
+          {
+            data: { skillPaths: [mockPath] },
+            fetching: false,
+            error: undefined,
+          },
+        ] as never;
       }
-      return [{ data: { mySkillProgress: [] }, fetching: false, error: undefined }] as never;
+      return [
+        { data: { mySkillProgress: [] }, fetching: false, error: undefined },
+      ] as never;
     });
-    await act(async () => { renderPage(); });
+    await act(async () => {
+      renderPage();
+    });
     await waitFor(
-      () => { expect(screen.getByText('Frontend Developer Path')).toBeInTheDocument(); },
-      { timeout: 5000 },
+      () => {
+        expect(screen.getByText('Frontend Developer Path')).toBeInTheDocument();
+      },
+      { timeout: 5000 }
     );
   });
 });

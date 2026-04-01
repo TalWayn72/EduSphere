@@ -1,7 +1,12 @@
 import { cn } from '@/lib/utils';
 import { MasteryBadge } from '@/components/ui/MasteryBadge';
 import type { LayoutNode } from './KnowledgeSkillTree.types';
-import { MASTERY_ICON, MASTERY_LABEL, NODE_W, NODE_H } from './KnowledgeSkillTree.types';
+import {
+  MASTERY_ICON,
+  MASTERY_LABEL,
+  NODE_W,
+  NODE_H,
+} from './KnowledgeSkillTree.types';
 
 interface SkillTreeNodeProps {
   node: LayoutNode;
@@ -60,14 +65,19 @@ export function SkillTreeNode({
       }}
       className={cn(
         'flex flex-col justify-between p-3 rounded-lg border bg-card shadow-sm text-left transition-all',
-        isClickable ? 'hover:shadow-md cursor-pointer' : 'opacity-40 cursor-not-allowed',
+        isClickable
+          ? 'hover:shadow-md cursor-pointer'
+          : 'opacity-40 cursor-not-allowed',
         isSelected && 'ring-2 ring-indigo-500 ring-offset-1',
         isFocused && 'outline-2 outline-indigo-400 outline-offset-1'
       )}
     >
       {/* Node header */}
       <div className="flex items-center gap-1.5 min-w-0">
-        <span className="text-base leading-none flex-shrink-0" aria-hidden="true">
+        <span
+          className="text-base leading-none flex-shrink-0"
+          aria-hidden="true"
+        >
           {MASTERY_ICON[node.mastery]}
         </span>
         <span
@@ -81,7 +91,9 @@ export function SkillTreeNode({
       {/* Progress bar */}
       <div className="w-full" data-testid={`skill-node-progress-${node.id}`}>
         <div className="flex justify-between items-center mb-0.5">
-          <span className="text-[10px] text-muted-foreground">{node.progress}%</span>
+          <span className="text-[10px] text-muted-foreground">
+            {node.progress}%
+          </span>
         </div>
         <div
           className="h-1.5 w-full bg-muted rounded-full overflow-hidden"

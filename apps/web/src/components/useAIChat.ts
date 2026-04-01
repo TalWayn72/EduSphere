@@ -29,8 +29,12 @@ export function useAIChat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const mockTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const mockStreamRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mockTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const mockStreamRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
   const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
@@ -57,7 +61,11 @@ export function useAIChat() {
       if (exists) {
         return prev.map((m) =>
           m.id === (msg as { id: string }).id
-            ? { ...m, content: (msg as { content: string }).content, isStreaming: false }
+            ? {
+                ...m,
+                content: (msg as { content: string }).content,
+                isStreaming: false,
+              }
             : m
         );
       }
@@ -96,14 +104,30 @@ export function useAIChat() {
     if (localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true') {
       setMessages((prev) => [
         ...prev,
-        { id: `msg-${Date.now()}`, role: 'user' as const, content: inputValue.trim(), timestamp: new Date() },
-        { id: `consent-${Date.now()}`, role: 'agent' as const, content: '', timestamp: new Date(), type: 'consent-required' as const },
+        {
+          id: `msg-${Date.now()}`,
+          role: 'user' as const,
+          content: inputValue.trim(),
+          timestamp: new Date(),
+        },
+        {
+          id: `consent-${Date.now()}`,
+          role: 'agent' as const,
+          content: '',
+          timestamp: new Date(),
+          type: 'consent-required' as const,
+        },
       ]);
       setInputValue('');
       return;
     }
 
-    const userMsg: Message = { id: `msg-${Date.now()}`, role: 'user', content: inputValue.trim(), timestamp: new Date() };
+    const userMsg: Message = {
+      id: `msg-${Date.now()}`,
+      role: 'user',
+      content: inputValue.trim(),
+      timestamp: new Date(),
+    };
     setMessages((prev) => [...prev, userMsg]);
     const text = inputValue.trim();
     setInputValue('');
@@ -120,7 +144,11 @@ export function useAIChat() {
         };
         setMessages((prev) => [...prev, agentMsg]);
         mockStreamRef.current = setTimeout(() => {
-          setMessages((prev) => prev.map((m) => (m.id === agentMsg.id ? { ...m, isStreaming: false } : m)));
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === agentMsg.id ? { ...m, isStreaming: false } : m
+            )
+          );
           setIsStreaming(false);
         }, 1000);
       }, 800);
@@ -130,24 +158,51 @@ export function useAIChat() {
     try {
       let sid = sessionId;
       if (!sid) {
-        const res = await startSession({ templateType: AGENT_TO_TEMPLATE[selectedAgent], context: {} });
+        const res = await startSession({
+          templateType: AGENT_TO_TEMPLATE[selectedAgent],
+          context: {},
+        });
         if (res.error) {
-          const consentErr = res.error.graphQLErrors?.find((e) => e.extensions?.code === 'CONSENT_REQUIRED');
+          const consentErr = res.error.graphQLErrors?.find(
+            (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+          );
           if (consentErr) {
-            setMessages((prev) => [...prev, { id: `err-${Date.now()}`, role: 'agent' as const, content: '', timestamp: new Date(), type: 'consent-required' as const }]);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `err-${Date.now()}`,
+                role: 'agent' as const,
+                content: '',
+                timestamp: new Date(),
+                type: 'consent-required' as const,
+              },
+            ]);
             setIsStreaming(false);
             return;
           }
         }
-        sid = (res.data?.startAgentSession as { id?: string } | undefined)?.id ?? null;
+        sid =
+          (res.data?.startAgentSession as { id?: string } | undefined)?.id ??
+          null;
         if (sid) setSessionId(sid);
       }
       if (sid) {
         const res = await sendMessage({ sessionId: sid, content: text });
         if (res.error) {
-          const consentErr = res.error.graphQLErrors?.find((e) => e.extensions?.code === 'CONSENT_REQUIRED');
+          const consentErr = res.error.graphQLErrors?.find(
+            (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+          );
           if (consentErr) {
-            setMessages((prev) => [...prev, { id: `err-${Date.now()}`, role: 'agent' as const, content: '', timestamp: new Date(), type: 'consent-required' as const }]);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `err-${Date.now()}`,
+                role: 'agent' as const,
+                content: '',
+                timestamp: new Date(),
+                type: 'consent-required' as const,
+              },
+            ]);
             setIsStreaming(false);
             return;
           }

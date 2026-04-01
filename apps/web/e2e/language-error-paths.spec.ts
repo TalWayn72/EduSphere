@@ -40,7 +40,9 @@ async function triggerLanguageChange(page: import('@playwright/test').Page) {
 
 // ─── 502 Gateway error ────────────────────────────────────────────────────────
 
-test('502 gateway response shows error toast or fallback UI', async ({ page }) => {
+test('502 gateway response shows error toast or fallback UI', async ({
+  page,
+}) => {
   // Intercept GraphQL with 502
   await page.route('**/graphql', async (route) => {
     if (route.request().method() === 'OPTIONS') {
@@ -97,7 +99,9 @@ test('GraphQL error in response body shows error toast', async ({ page }) => {
 
     let parsed: { operationName?: string } = {};
     try {
-      parsed = JSON.parse(route.request().postData() ?? '{}') as { operationName?: string };
+      parsed = JSON.parse(route.request().postData() ?? '{}') as {
+        operationName?: string;
+      };
     } catch {
       // ignore parse errors
     }
@@ -137,15 +141,17 @@ test('GraphQL error in response body shows error toast', async ({ page }) => {
     await expect(errorToast).toBeVisible({ timeout: 10_000 });
 
     // Success toast MUST NOT appear
-    await expect(
-      page.getByText(/נשמרה|saved/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/נשמרה|saved/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   }
 });
 
 // ─── Network timeout ──────────────────────────────────────────────────────────
 
-test('network timeout shows error toast (request never completes)', async ({ page }) => {
+test('network timeout shows error toast (request never completes)', async ({
+  page,
+}) => {
   // Never fulfill the request — simulates network timeout
   await page.route('**/graphql', async (route) => {
     if (route.request().method() === 'OPTIONS') {
@@ -163,7 +169,9 @@ test('network timeout shows error toast (request never completes)', async ({ pag
 
     let parsed: { operationName?: string } = {};
     try {
-      parsed = JSON.parse(route.request().postData() ?? '{}') as { operationName?: string };
+      parsed = JSON.parse(route.request().postData() ?? '{}') as {
+        operationName?: string;
+      };
     } catch {
       // ignore
     }
@@ -199,7 +207,9 @@ test('network timeout shows error toast (request never completes)', async ({ pag
 
 // ─── Invalid JWT → redirect to login ─────────────────────────────────────────
 
-test('401 Unauthorized response triggers redirect to login page', async ({ page }) => {
+test('401 Unauthorized response triggers redirect to login page', async ({
+  page,
+}) => {
   await page.route('**/graphql', async (route) => {
     if (route.request().method() === 'OPTIONS') {
       await route.fulfill({
@@ -216,7 +226,9 @@ test('401 Unauthorized response triggers redirect to login page', async ({ page 
 
     let parsed: { operationName?: string } = {};
     try {
-      parsed = JSON.parse(route.request().postData() ?? '{}') as { operationName?: string };
+      parsed = JSON.parse(route.request().postData() ?? '{}') as {
+        operationName?: string;
+      };
     } catch {
       // ignore
     }
@@ -254,7 +266,8 @@ test('401 Unauthorized response triggers redirect to login page', async ({ page 
     // UNAUTHENTICATED error should redirect to login or show auth error
     await Promise.race([
       page.waitForURL(/\/login/, { timeout: 10_000 }).catch(() => null),
-      page.getByText(/unauthorized|unauthenticated|session.*expired/i)
+      page
+        .getByText(/unauthorized|unauthenticated|session.*expired/i)
         .waitFor({ timeout: 10_000 })
         .catch(() => null),
       // If neither, verify no crash

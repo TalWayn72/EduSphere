@@ -24,9 +24,7 @@ export class PipelineNatsService implements OnModuleDestroy {
     return this.nc;
   }
 
-  publishModuleEvent(
-    payload: LessonPipelineModuleCompletedPayload
-  ): void {
+  publishModuleEvent(payload: LessonPipelineModuleCompletedPayload): void {
     this.getNats()
       .then((nc) =>
         nc.publish(
@@ -65,10 +63,7 @@ export class PipelineNatsService implements OnModuleDestroy {
       );
   }
 
-  publishPipelineCompleted(
-    lessonId: string,
-    tenantId: string
-  ): void {
+  publishPipelineCompleted(lessonId: string, tenantId: string): void {
     this.getNats()
       .then((nc) =>
         nc.publish(

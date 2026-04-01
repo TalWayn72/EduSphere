@@ -5,15 +5,21 @@ import { render, screen } from '@testing-library/react';
 // ── Mock recharts ─────────────────────────────────────────────────────────────
 
 vi.mock('recharts', () => ({
-  AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="area-chart">{children}</div>
+  ),
   Area: () => <div data-testid="area" />,
-  LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
+  LineChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="line-chart">{children}</div>
+  ),
   Line: () => <div data-testid="line" />,
   XAxis: () => <div />,
   YAxis: () => <div />,
   CartesianGrid: () => <div />,
   Tooltip: () => <div />,
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
@@ -96,18 +102,15 @@ describe('TenantAnalyticsCharts', () => {
   });
 
   it('shows empty state when no courses', () => {
-    render(
-      <TenantAnalyticsCharts
-        {...defaultProps}
-        topCourses={[]}
-      />,
-    );
+    render(<TenantAnalyticsCharts {...defaultProps} topCourses={[]} />);
     expect(screen.getByText('No course data available.')).toBeInTheDocument();
   });
 
   it('renders accessible table with aria-label', () => {
     render(<TenantAnalyticsCharts {...defaultProps} />);
-    expect(screen.getByRole('table', { name: /top courses table/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: /top courses table/i })
+    ).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

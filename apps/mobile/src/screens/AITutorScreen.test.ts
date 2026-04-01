@@ -25,12 +25,19 @@ vi.mock('@react-native-async-storage/async-storage', () => ({
   },
 }));
 
-import { checkAiConsent, grantAiConsent, AI_CONSENT_KEY } from '../lib/ai-consent';
+import {
+  checkAiConsent,
+  grantAiConsent,
+  AI_CONSENT_KEY,
+} from '../lib/ai-consent';
 
 // ---------------------------------------------------------------------------
 // Pure resolveSessionId logic (mirrors AITutorScreen implementation)
 // ---------------------------------------------------------------------------
-function resolveSessionId(mutationResult: string | null, fallback: string): string {
+function resolveSessionId(
+  mutationResult: string | null,
+  fallback: string
+): string {
   if (mutationResult && mutationResult.trim().length > 0) {
     return mutationResult;
   }
@@ -70,7 +77,8 @@ describe('checkAiConsent', () => {
   });
 
   it('returns false when AsyncStorage throws (fail-closed)', async () => {
-    const AsyncStorage = await import('@react-native-async-storage/async-storage');
+    const AsyncStorage =
+      await import('@react-native-async-storage/async-storage');
     vi.mocked(AsyncStorage.default.getItem).mockRejectedValueOnce(
       new Error('storage error')
     );
@@ -105,7 +113,9 @@ describe('grantAiConsent', () => {
 // ---------------------------------------------------------------------------
 describe('resolveSessionId', () => {
   it('returns the mutation result when non-empty', () => {
-    expect(resolveSessionId('session-abc-123', 'demo-session')).toBe('session-abc-123');
+    expect(resolveSessionId('session-abc-123', 'demo-session')).toBe(
+      'session-abc-123'
+    );
   });
 
   it('returns fallback when mutation result is null', () => {

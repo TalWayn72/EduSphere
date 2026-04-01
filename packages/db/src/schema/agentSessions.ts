@@ -28,7 +28,9 @@ export const agentSessions = pgTable('agent_sessions', {
   agentType: varchar('agent_type', { length: 100 }).notNull(),
   status: sessionStatusEnum('status').notNull().default('ACTIVE'),
   metadata: jsonb('metadata'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   completedAt: timestamp('completed_at', { withTimezone: true }),
 });
 

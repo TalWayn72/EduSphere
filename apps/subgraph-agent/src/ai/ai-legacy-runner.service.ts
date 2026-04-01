@@ -68,7 +68,10 @@ export class AiLegacyRunnerService {
 
   constructor() {
     this.logger.log(
-      JSON.stringify({ hardware: gpuConfig.summary, msg: 'AI runner initialized' })
+      JSON.stringify({
+        hardware: gpuConfig.summary,
+        msg: 'AI runner initialized',
+      })
     );
   }
 

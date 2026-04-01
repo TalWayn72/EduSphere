@@ -44,7 +44,12 @@ describe('ChallengeCard', () => {
   });
 
   it('join button disabled when not ACTIVE', () => {
-    render(<ChallengeCard challenge={{ ...CHALLENGE, status: 'ENDED' }} onJoin={vi.fn()} />);
+    render(
+      <ChallengeCard
+        challenge={{ ...CHALLENGE, status: 'ENDED' }}
+        onJoin={vi.fn()}
+      />
+    );
     expect(screen.getByText('Join')).toBeDisabled();
   });
 

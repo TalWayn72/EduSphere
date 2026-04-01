@@ -19,8 +19,13 @@ interface ExamItem {
 const ABSOLUTE_TERMS = ['always', 'never', 'all', 'none', 'every', 'only'];
 const AOTA_NOTA = ['all of the above', 'none of the above'];
 
-function avgOptionLength(options: ExamOption[], excludeCorrect: boolean): number {
-  const filtered = excludeCorrect ? options.filter((o) => !o.isCorrect) : options;
+function avgOptionLength(
+  options: ExamOption[],
+  excludeCorrect: boolean
+): number {
+  const filtered = excludeCorrect
+    ? options.filter((o) => !o.isCorrect)
+    : options;
   if (filtered.length === 0) return 0;
   return filtered.reduce((sum, o) => sum + o.text.length, 0) / filtered.length;
 }

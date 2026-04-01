@@ -12,12 +12,16 @@ vi.mock('urql', async () => {
 });
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const NOOP_QUERY = [{ data: undefined, fetching: false, error: undefined }] as never;
+const NOOP_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+] as never;
 
 function renderDashboard(pathId = 'test-path-id') {
   return render(
@@ -25,7 +29,7 @@ function renderDashboard(pathId = 'test-path-id') {
       <Routes>
         <Route path="/skills/gap/:pathId" element={<SkillGapDashboard />} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -39,7 +43,9 @@ describe('SkillGapDashboard', () => {
   it('renders gap analysis heading', () => {
     vi.mocked(urql.useQuery).mockReturnValue(NOOP_QUERY);
     renderDashboard();
-    expect(screen.getByRole('heading', { name: /skill gap analysis/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /skill gap analysis/i })
+    ).toBeInTheDocument();
   });
 
   it('renders completionPct when data is present', () => {
@@ -49,13 +55,27 @@ describe('SkillGapDashboard', () => {
       masteredSkills: 7,
       completionPct: 70,
       gapSkills: [
-        { id: 'g1', name: 'TypeScript Advanced', category: 'Programming', level: 'INTERMEDIATE' },
-        { id: 'g2', name: 'GraphQL Federation', category: 'Backend', level: 'ADVANCED' },
+        {
+          id: 'g1',
+          name: 'TypeScript Advanced',
+          category: 'Programming',
+          level: 'INTERMEDIATE',
+        },
+        {
+          id: 'g2',
+          name: 'GraphQL Federation',
+          category: 'Backend',
+          level: 'ADVANCED',
+        },
         { id: 'g3', name: 'Testing', category: 'QA', level: 'BEGINNER' },
       ],
     };
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { skillGapAnalysis: mockAnalysis }, fetching: false, error: undefined },
+      {
+        data: { skillGapAnalysis: mockAnalysis },
+        fetching: false,
+        error: undefined,
+      },
     ] as never);
 
     renderDashboard();
@@ -79,7 +99,9 @@ describe('SkillGapDashboard', () => {
       { data: undefined, fetching: false, error: { message: 'Network error' } },
     ] as never);
     renderDashboard();
-    expect(screen.getByText(/failed to load gap analysis/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/failed to load gap analysis/i)
+    ).toBeInTheDocument();
   });
 
   it('renders "All skills mastered!" when no gap skills', () => {
@@ -91,7 +113,11 @@ describe('SkillGapDashboard', () => {
       gapSkills: [],
     };
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { skillGapAnalysis: mockAnalysis }, fetching: false, error: undefined },
+      {
+        data: { skillGapAnalysis: mockAnalysis },
+        fetching: false,
+        error: undefined,
+      },
     ] as never);
     renderDashboard();
     expect(screen.getByText(/all skills mastered/i)).toBeInTheDocument();

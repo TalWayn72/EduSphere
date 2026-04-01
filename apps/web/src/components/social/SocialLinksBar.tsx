@@ -1,5 +1,13 @@
 import React from 'react';
-import { Linkedin, Facebook, Twitter, Youtube, Instagram, MessageCircle, Github } from 'lucide-react';
+import {
+  Linkedin,
+  Facebook,
+  Twitter,
+  Youtube,
+  Instagram,
+  MessageCircle,
+  Github,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SocialLinks {
@@ -24,7 +32,10 @@ export const DEFAULT_SOCIAL_LINKS: SocialLinks = {
   github: 'https://github.com/edusphere',
 };
 
-const ICON_MAP: Record<keyof SocialLinks, { icon: React.ElementType; label: string }> = {
+const ICON_MAP: Record<
+  keyof SocialLinks,
+  { icon: React.ElementType; label: string }
+> = {
   linkedin: { icon: Linkedin, label: 'LinkedIn' },
   facebook: { icon: Facebook, label: 'Facebook' },
   twitter: { icon: Twitter, label: 'Twitter' },
@@ -36,15 +47,23 @@ const ICON_MAP: Record<keyof SocialLinks, { icon: React.ElementType; label: stri
 
 const SIZE_CLASSES = { sm: 'h-4 w-4', md: 'h-5 w-5' } as const;
 
-export function SocialLinksBar({ links, size = 'sm', className }: SocialLinksBarProps) {
+export function SocialLinksBar({
+  links,
+  size = 'sm',
+  className,
+}: SocialLinksBarProps) {
   const entries = (Object.keys(ICON_MAP) as Array<keyof SocialLinks>).filter(
-    (key) => links[key],
+    (key) => links[key]
   );
 
   if (entries.length === 0) return null;
 
   return (
-    <div className={cn('flex items-center gap-3', className)} role="list" aria-label="Social links">
+    <div
+      className={cn('flex items-center gap-3', className)}
+      role="list"
+      aria-label="Social links"
+    >
       {entries.map((key) => {
         const { icon: Icon, label } = ICON_MAP[key];
         return (

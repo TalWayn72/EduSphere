@@ -3,7 +3,13 @@
  * Target coverage: lines 56-67 (queue count / loading), 71-72 (handleAddDemo), 111 (Add Review Card button)
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { UseQueryResponse, UseMutationResponse } from 'urql';
 
@@ -296,7 +302,13 @@ describe('SRSWidget', () => {
     vi.mocked(useQuery).mockImplementation((opts) => {
       pauseValues.push((opts as { pause?: boolean }).pause ?? false);
       return [
-        { data: undefined, fetching: false, error: undefined, stale: false, operation: undefined },
+        {
+          data: undefined,
+          fetching: false,
+          error: undefined,
+          stale: false,
+          operation: undefined,
+        },
         vi.fn(),
         vi.fn(),
       ] as unknown as UseQueryResponse;
@@ -315,7 +327,13 @@ describe('SRSWidget', () => {
     vi.mocked(useQuery).mockImplementation((opts) => {
       pauseValues.push((opts as { pause?: boolean }).pause ?? false);
       return [
-        { data: undefined, fetching: false, error: undefined, stale: false, operation: undefined },
+        {
+          data: undefined,
+          fetching: false,
+          error: undefined,
+          stale: false,
+          operation: undefined,
+        },
         vi.fn(),
         vi.fn(),
       ] as unknown as UseQueryResponse;
@@ -335,7 +353,9 @@ describe('SRSWidget', () => {
         {
           data: undefined,
           fetching: false,
-          error: { message: '[GraphQL] Internal server error — connection refused' },
+          error: {
+            message: '[GraphQL] Internal server error — connection refused',
+          },
           stale: false,
           operation: undefined,
         },
@@ -374,7 +394,13 @@ describe('SRSWidget', () => {
         ] as unknown as UseQueryResponse;
       }
       return [
-        { data: { dueReviews: [] }, fetching: false, error: undefined, stale: false, operation: undefined },
+        {
+          data: { dueReviews: [] },
+          fetching: false,
+          error: undefined,
+          stale: false,
+          operation: undefined,
+        },
         vi.fn(),
         vi.fn(),
       ] as unknown as UseQueryResponse;

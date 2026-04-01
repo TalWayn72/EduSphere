@@ -14,13 +14,14 @@ const mockRevokeToken = vi.fn().mockResolvedValue({ data: null });
 
 vi.mock('urql', () => ({
   useQuery: vi.fn().mockImplementation(({ query }: { query: string }) => {
-    if (query.includes && typeof query === 'string' && query.includes('scimSyncLog')) {
+    if (
+      query.includes &&
+      typeof query === 'string' &&
+      query.includes('scimSyncLog')
+    ) {
       return [{ data: { scimSyncLog: [] }, fetching: false }, vi.fn()];
     }
-    return [
-      { data: { scimTokens: [] }, fetching: false },
-      mockRefetch,
-    ];
+    return [{ data: { scimTokens: [] }, fetching: false }, mockRefetch];
   }),
   useMutation: vi.fn().mockImplementation((query: string) => {
     if (typeof query === 'string' && query.includes('revoke')) {
@@ -64,10 +65,18 @@ vi.mock('@/components/ui/button', () => ({
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardTitle: ({ children }: { children: React.ReactNode }) => <h3>{children}</h3>,
-  CardDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <h3>{children}</h3>
+  ),
+  CardDescription: ({ children }: { children: React.ReactNode }) => (
+    <p>{children}</p>
+  ),
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('lucide-react', () => ({

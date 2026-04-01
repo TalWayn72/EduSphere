@@ -147,7 +147,9 @@ describe('BrandedLoginPage', () => {
     });
     renderBrandedLogin();
     fireEvent.click(screen.getByTestId('branded-login-btn'));
-    expect(window.location.href).toContain('/realms/edusphere/protocol/openid-connect/auth');
+    expect(window.location.href).toContain(
+      '/realms/edusphere/protocol/openid-connect/auth'
+    );
     expect(window.location.href).toContain('client_id=edusphere');
     // Restore
     Object.defineProperty(window, 'location', {

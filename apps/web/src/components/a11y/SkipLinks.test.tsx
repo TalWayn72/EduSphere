@@ -15,12 +15,18 @@ describe('SkipLinks', () => {
 
   it('skip-to-main href points to #main-content', () => {
     render(<SkipLinks />);
-    expect(screen.getByTestId('skip-to-main')).toHaveAttribute('href', '#main-content');
+    expect(screen.getByTestId('skip-to-main')).toHaveAttribute(
+      'href',
+      '#main-content'
+    );
   });
 
   it('skip-to-nav href points to #main-nav', () => {
     render(<SkipLinks />);
-    expect(screen.getByTestId('skip-to-nav')).toHaveAttribute('href', '#main-nav');
+    expect(screen.getByTestId('skip-to-nav')).toHaveAttribute(
+      'href',
+      '#main-nav'
+    );
   });
 
   it('links have meaningful accessible text', () => {

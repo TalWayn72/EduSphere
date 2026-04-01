@@ -1,6 +1,10 @@
 import * as Linking from 'expo-linking';
 import { useEffect } from 'react';
-import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
+import {
+  useNavigation,
+  type NavigationProp,
+  type ParamListBase,
+} from '@react-navigation/native';
 
 export interface DeepLinkRoute {
   screen: string;

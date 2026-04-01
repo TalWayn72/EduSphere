@@ -9,12 +9,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {
-  schema,
-  eq,
-  and,
-  withTenantContext,
-} from '@edusphere/db';
+import { schema, eq, and, withTenantContext } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import type { AuthContext } from './peer-review.service';
 import { PeerReviewCoreService } from './peer-review-core.service';
@@ -31,7 +26,7 @@ export class PeerReviewAssignmentService {
     contentItemId: string,
     submitterId: string,
     submissionText: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<(typeof schema.peerReviewAssignments.$inferSelect)[]> {
     const tenantCtx: TenantContext = {
       tenantId: ctx.tenantId,
@@ -42,11 +37,14 @@ export class PeerReviewAssignmentService {
     const rubric = await this.core.getRubric(contentItemId, ctx);
     const minReviewers = rubric?.minReviewers ?? DEFAULT_MIN_REVIEWERS;
 
-    const enrollments = await withTenantContext(this.core.getDb(), tenantCtx, async (tx) =>
-      tx
-        .select({ userId: schema.userCourses.userId })
-        .from(schema.userCourses)
-        .where(eq(schema.userCourses.status, 'ACTIVE')),
+    const enrollments = await withTenantContext(
+      this.core.getDb(),
+      tenantCtx,
+      async (tx) =>
+        tx
+          .select({ userId: schema.userCourses.userId })
+          .from(schema.userCourses)
+          .where(eq(schema.userCourses.status, 'ACTIVE'))
     );
 
     const candidates = enrollments
@@ -59,7 +57,7 @@ export class PeerReviewAssignmentService {
     if (reviewers.length === 0) {
       this.logger.warn(
         { contentItemId, submitterId, tenantId: ctx.tenantId },
-        'No eligible peer reviewers found — creating assignment with empty reviewer list',
+        'No eligible peer reviewers found — creating assignment with empty reviewer list'
       );
       return [];
     }
@@ -73,11 +71,11 @@ export class PeerReviewAssignmentService {
       submissionText,
     }));
 
-    const created = await withTenantContext(this.core.getDb(), tenantCtx, async (tx) =>
-      tx
-        .insert(schema.peerReviewAssignments)
-        .values(insertRows)
-        .returning(),
+    const created = await withTenantContext(
+      this.core.getDb(),
+      tenantCtx,
+      async (tx) =>
+        tx.insert(schema.peerReviewAssignments).values(insertRows).returning()
     );
 
     for (const assignment of created) {
@@ -91,8 +89,13 @@ export class PeerReviewAssignmentService {
     }
 
     this.logger.log(
-      { contentItemId, submitterId, reviewerCount: created.length, tenantId: ctx.tenantId },
-      'Peer review assignments created',
+      {
+        contentItemId,
+        submitterId,
+        reviewerCount: created.length,
+        tenantId: ctx.tenantId,
+      },
+      'Peer review assignments created'
     );
     return created;
   }
@@ -102,7 +105,7 @@ export class PeerReviewAssignmentService {
     reviewerId: string,
     criteriaScores: string,
     feedback: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<boolean> {
     const tenantCtx: TenantContext = {
       tenantId: ctx.tenantId,
@@ -110,36 +113,49 @@ export class PeerReviewAssignmentService {
       userRole: ctx.userRole,
     };
 
-    const rows = await withTenantContext(this.core.getDb(), tenantCtx, async (tx) =>
-      tx
-        .select()
-        .from(schema.peerReviewAssignments)
-        .where(
-          and(
-            eq(schema.peerReviewAssignments.id, assignmentId),
-            eq(schema.peerReviewAssignments.tenantId, ctx.tenantId),
-          ),
-        ),
+    const rows = await withTenantContext(
+      this.core.getDb(),
+      tenantCtx,
+      async (tx) =>
+        tx
+          .select()
+          .from(schema.peerReviewAssignments)
+          .where(
+            and(
+              eq(schema.peerReviewAssignments.id, assignmentId),
+              eq(schema.peerReviewAssignments.tenantId, ctx.tenantId)
+            )
+          )
     );
 
     const assignment = rows[0];
     if (!assignment) {
-      throw new NotFoundException(`Peer review assignment ${assignmentId} not found`);
+      throw new NotFoundException(
+        `Peer review assignment ${assignmentId} not found`
+      );
     }
 
     if (assignment.reviewerId !== reviewerId) {
       this.logger.warn(
-        { assignmentId, reviewerId, expectedReviewerId: assignment.reviewerId, tenantId: ctx.tenantId },
-        'IDOR attempt — reviewerId does not match assignment.reviewerId',
+        {
+          assignmentId,
+          reviewerId,
+          expectedReviewerId: assignment.reviewerId,
+          tenantId: ctx.tenantId,
+        },
+        'IDOR attempt — reviewerId does not match assignment.reviewerId'
       );
-      throw new UnauthorizedException('You are not the assigned reviewer for this assignment');
+      throw new UnauthorizedException(
+        'You are not the assigned reviewer for this assignment'
+      );
     }
 
     const parsed = JSON.parse(criteriaScores) as Record<string, number>;
     const scores = Object.values(parsed);
-    const score = scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : null;
+    const score =
+      scores.length > 0
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+        : null;
 
     await withTenantContext(this.core.getDb(), tenantCtx, async (tx) =>
       tx
@@ -153,21 +169,21 @@ export class PeerReviewAssignmentService {
         .where(
           and(
             eq(schema.peerReviewAssignments.id, assignmentId),
-            eq(schema.peerReviewAssignments.tenantId, ctx.tenantId),
-          ),
-        ),
+            eq(schema.peerReviewAssignments.tenantId, ctx.tenantId)
+          )
+        )
     );
 
     this.logger.log(
       { assignmentId, reviewerId, tenantId: ctx.tenantId },
-      'Peer review submitted',
+      'Peer review submitted'
     );
 
     await this.core.checkAndPublishCompletion(
       assignment.submitterId,
       assignment.contentItemId,
       ctx,
-      tenantCtx,
+      tenantCtx
     );
 
     return true;

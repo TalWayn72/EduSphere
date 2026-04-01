@@ -13,7 +13,7 @@ export function prob3PL(
   a: number,
   b: number,
   c: number,
-  theta: number,
+  theta: number
 ): number {
   const exp = Math.exp(-D * a * (theta - b));
   return c + (1 - c) / (1 + exp);
@@ -27,7 +27,7 @@ export function clamp(val: number, min: number, max: number): number {
 /** Fisher information for a set of items at a given theta. */
 export function computeTestInformation(
   items: Array<{ a: number; b: number; c: number }>,
-  theta: number,
+  theta: number
 ): number {
   let info = 0;
   for (const item of items) {
@@ -36,8 +36,8 @@ export function computeTestInformation(
     const oneMinusC = 1 - item.c;
     if (p <= 0 || p >= 1 || oneMinusC === 0) continue;
     info +=
-      D * D * item.a * item.a * pMinusC * pMinusC * (1 - p)
-      / (oneMinusC * oneMinusC * p);
+      (D * D * item.a * item.a * pMinusC * pMinusC * (1 - p)) /
+      (oneMinusC * oneMinusC * p);
   }
   return info;
 }
@@ -50,7 +50,7 @@ export function runEM(
   responses: Array<{ userId: string; isCorrect: boolean }>,
   userThetas: Map<string, number>,
   maxIter = 100,
-  tol = 0.01,
+  tol = 0.01
 ): { a: number; b: number; c: number; converged: boolean; iterations: number } {
   let a = 1.0;
   let b = 0.0;
@@ -59,7 +59,9 @@ export function runEM(
   let iter = 0;
 
   for (iter = 0; iter < maxIter; iter++) {
-    let gradA = 0, gradB = 0, gradC = 0;
+    let gradA = 0,
+      gradB = 0,
+      gradC = 0;
 
     for (const r of responses) {
       const theta = userThetas.get(r.userId) ?? 0;
@@ -70,8 +72,8 @@ export function runEM(
       if (p <= 0.001 || p >= 0.999 || oneMinusC === 0) continue;
 
       const residual = (x - p) / (p * (1 - p));
-      const dPdA = D * (theta - b) * pMinusC * (1 - p) / oneMinusC;
-      const dPdB = -D * a * pMinusC * (1 - p) / oneMinusC;
+      const dPdA = (D * (theta - b) * pMinusC * (1 - p)) / oneMinusC;
+      const dPdB = (-D * a * pMinusC * (1 - p)) / oneMinusC;
       const dPdC = (1 - p) / oneMinusC;
 
       gradA += residual * dPdA;
@@ -89,11 +91,15 @@ export function runEM(
       Math.abs(newB - b) < tol &&
       Math.abs(newC - c) < tol
     ) {
-      a = newA; b = newB; c = newC;
+      a = newA;
+      b = newB;
+      c = newC;
       converged = true;
       break;
     }
-    a = newA; b = newB; c = newC;
+    a = newA;
+    b = newB;
+    c = newC;
   }
 
   return { a, b, c, converged, iterations: iter + 1 };
@@ -105,7 +111,7 @@ export function runEM(
 export function estimateAbilityMLE(
   responses: ItemResponse[],
   maxIter = 50,
-  tolerance = 0.001,
+  tolerance = 0.001
 ): { theta: number; se: number } {
   let theta = 0;
 
@@ -120,10 +126,10 @@ export function estimateAbilityMLE(
       const oneMinusC = 1 - r.irtC;
       if (p <= 0 || p >= 1 || oneMinusC === 0) continue;
 
-      lPrime += D * r.irtA * (x - p) * pMinusC / (p * oneMinusC);
+      lPrime += (D * r.irtA * (x - p) * pMinusC) / (p * oneMinusC);
       lDoublePrime -=
-        D * D * r.irtA * r.irtA * pMinusC * pMinusC * (1 - p)
-        / (oneMinusC * oneMinusC * p);
+        (D * D * r.irtA * r.irtA * pMinusC * pMinusC * (1 - p)) /
+        (oneMinusC * oneMinusC * p);
     }
 
     if (lDoublePrime === 0) break;
@@ -134,7 +140,7 @@ export function estimateAbilityMLE(
 
   const info = computeTestInformation(
     responses.map((r) => ({ a: r.irtA, b: r.irtB, c: r.irtC })),
-    theta,
+    theta
   );
   const se = info > 0 ? 1 / Math.sqrt(info) : 9.99;
 

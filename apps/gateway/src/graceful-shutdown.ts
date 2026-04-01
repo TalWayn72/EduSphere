@@ -83,9 +83,13 @@ export async function performShutdown(
   signal: string,
   deps: ShutdownDeps
 ): Promise<void> {
-  const { server, wsServer, stopRateLimitCleanup, shutdownNatsPubSub, logger } = deps;
+  const { server, wsServer, stopRateLimitCleanup, shutdownNatsPubSub, logger } =
+    deps;
 
-  logger.info({ signal }, '[shutdown] received signal — starting graceful shutdown');
+  logger.info(
+    { signal },
+    '[shutdown] received signal — starting graceful shutdown'
+  );
 
   // 1. Stop accepting new connections
   await new Promise<void>((resolve, reject) => {
@@ -129,12 +133,14 @@ export async function performShutdown(
  */
 export function registerShutdownHandlers(deps: ShutdownDeps): void {
   const handler = (signal: string) => {
-    void performShutdown(signal, deps).then(() => {
-      process.exit(0);
-    }).catch((err) => {
-      deps.logger.error({ err }, '[shutdown] error during shutdown');
-      process.exit(1);
-    });
+    void performShutdown(signal, deps)
+      .then(() => {
+        process.exit(0);
+      })
+      .catch((err) => {
+        deps.logger.error({ err }, '[shutdown] error during shutdown');
+        process.exit(1);
+      });
   };
 
   process.on('SIGTERM', () => handler('SIGTERM'));

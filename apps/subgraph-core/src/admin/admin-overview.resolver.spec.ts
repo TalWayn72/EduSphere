@@ -120,7 +120,11 @@ describe('AdminOverviewResolver', () => {
   });
 
   it('adminDashboardStats calls service.getDashboardStats with tenantId', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-abc', userId: 'u1', roles: [] });
+    const ctx = makeContext({
+      tenantId: 'tenant-abc',
+      userId: 'u1',
+      roles: [],
+    });
     await resolver.adminDashboardStats(ctx);
     expect(mockService.getDashboardStats).toHaveBeenCalledWith('tenant-abc');
   });

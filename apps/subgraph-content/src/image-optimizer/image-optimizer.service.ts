@@ -1,10 +1,15 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
 // sharp and file-type are optional peer deps — guard for environments without them.
- 
-type SharpFn = (input: Buffer) => { webp(opts: unknown): { toBuffer(): Promise<Buffer> }; metadata(): Promise<{ width?: number; height?: number }> };
- 
-type FileTypeFromBufferFn = (buf: Buffer) => Promise<{ mime: string } | undefined>;
+
+type SharpFn = (input: Buffer) => {
+  webp(opts: unknown): { toBuffer(): Promise<Buffer> };
+  metadata(): Promise<{ width?: number; height?: number }>;
+};
+
+type FileTypeFromBufferFn = (
+  buf: Buffer
+) => Promise<{ mime: string } | undefined>;
 
 let sharpFn: SharpFn | null = null;
 let fileTypeFromBuffer: FileTypeFromBufferFn | null = null;
@@ -18,7 +23,9 @@ try {
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ft = require('file-type') as { fileTypeFromBuffer: FileTypeFromBufferFn };
+  const ft = require('file-type') as {
+    fileTypeFromBuffer: FileTypeFromBufferFn;
+  };
   fileTypeFromBuffer = ft.fileTypeFromBuffer;
 } catch {
   // file-type is ESM-only in v19+; graceful fallback
@@ -68,7 +75,9 @@ export class ImageOptimizerService {
 
     if (!fileTypeFromBuffer) {
       // file-type unavailable — accept on declared MIME (validated by caller)
-      this.logger.warn('[ImageOptimizerService] file-type package unavailable; skipping magic-byte check');
+      this.logger.warn(
+        '[ImageOptimizerService] file-type package unavailable; skipping magic-byte check'
+      );
       return 'application/octet-stream';
     }
 
@@ -96,7 +105,9 @@ export class ImageOptimizerService {
    * Extract width/height from image buffer using sharp.
    * Returns {0,0} if sharp is unavailable or extraction fails.
    */
-  async extractDimensions(buffer: Buffer): Promise<{ width: number; height: number }> {
+  async extractDimensions(
+    buffer: Buffer
+  ): Promise<{ width: number; height: number }> {
     if (!sharpFn) {
       return { width: 0, height: 0 };
     }
@@ -118,19 +129,25 @@ export class ImageOptimizerService {
       return buffer;
     }
     if (!sharpFn) {
-      this.logger.warn('[ImageOptimizerService] sharp unavailable — returning original buffer');
+      this.logger.warn(
+        '[ImageOptimizerService] sharp unavailable — returning original buffer'
+      );
       return buffer;
     }
     try {
       const webp = await sharpFn(buffer)
-        .webp({ quality: 85, effort: 4 } as unknown as Parameters<ReturnType<SharpFn>['webp']>[0])
+        .webp({ quality: 85, effort: 4 } as unknown as Parameters<
+          ReturnType<SharpFn>['webp']
+        >[0])
         .toBuffer();
       this.logger.debug(
         `[ImageOptimizerService] Converted ${mimeType} → WebP (${buffer.length} → ${webp.length} bytes)`
       );
       return webp;
     } catch (err) {
-      this.logger.warn(`[ImageOptimizerService] WebP conversion failed: ${String(err)}. Returning original.`);
+      this.logger.warn(
+        `[ImageOptimizerService] WebP conversion failed: ${String(err)}. Returning original.`
+      );
       return buffer;
     }
   }

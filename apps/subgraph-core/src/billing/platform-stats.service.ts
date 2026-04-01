@@ -42,15 +42,14 @@ export class PlatformStatsService implements OnModuleDestroy {
    */
   async getPlatformStats(): Promise<PlatformStatsResult> {
     try {
-      const [tenantsResult, learnersResult, coursesResult] =
-        await Promise.all([
-          this.db.select({ value: count() }).from(schema.tenants),
-          this.db
-            .select({ value: count() })
-            .from(schema.users)
-            .where(eq(schema.users.role, 'STUDENT')),
-          this.db.select({ value: count() }).from(schema.courses),
-        ]);
+      const [tenantsResult, learnersResult, coursesResult] = await Promise.all([
+        this.db.select({ value: count() }).from(schema.tenants),
+        this.db
+          .select({ value: count() })
+          .from(schema.users)
+          .where(eq(schema.users.role, 'STUDENT')),
+        this.db.select({ value: count() }).from(schema.courses),
+      ]);
 
       return {
         totalTenants: tenantsResult[0]?.value ?? 0,

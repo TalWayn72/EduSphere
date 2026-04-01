@@ -17,17 +17,35 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: { children: React.ReactNode } & Record<string, unknown>) =>
-    <div data-testid="card" onClick={props.onClick as () => void}>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardTitle: ({ children }: { children: React.ReactNode }) => <h3>{children}</h3>,
-  CardDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
+  Card: ({
+    children,
+    ...props
+  }: { children: React.ReactNode } & Record<string, unknown>) => (
+    <div data-testid="card" onClick={props.onClick as () => void}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <h3>{children}</h3>
+  ),
+  CardDescription: ({ children }: { children: React.ReactNode }) => (
+    <p>{children}</p>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 import { CourseCard } from './CourseCard';
@@ -56,18 +74,30 @@ describe('CourseCard', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('renders course title', () => {
-    render(<MemoryRouter><CourseCard {...baseProps} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseCard {...baseProps} />
+      </MemoryRouter>
+    );
     expect(screen.getByText('React Fundamentals')).toBeInTheDocument();
   });
 
   it('navigates to course detail on card click', () => {
-    render(<MemoryRouter><CourseCard {...baseProps} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseCard {...baseProps} />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('card'));
     expect(mockNavigate).toHaveBeenCalledWith('/courses/c-1');
   });
 
   it('renders without crash when isEnrolled', () => {
-    const { container } = render(<MemoryRouter><CourseCard {...baseProps} isEnrolled={true} /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <CourseCard {...baseProps} isEnrolled={true} />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 
@@ -81,7 +111,11 @@ describe('CourseCard', () => {
   });
 
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><CourseCard {...baseProps} /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <CourseCard {...baseProps} />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

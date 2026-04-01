@@ -103,7 +103,9 @@ test.describe('Landing Navigation — Public routes accessible without auth', ()
 
   for (const route of publicRoutes) {
     test(`${route.path} does NOT redirect to /login`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${route.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${route.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       // Wait for any redirects to settle
       await page.waitForLoadState('domcontentloaded');
       expect(page.url()).not.toContain('/login');
@@ -123,7 +125,9 @@ test.describe('Landing Navigation — Placeholder public routes', () => {
   ];
 
   for (const route of placeholderRoutes) {
-    test(`${route} is accessible without auth (no /login redirect)`, async ({ page }) => {
+    test(`${route} is accessible without auth (no /login redirect)`, async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}${route}`, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('domcontentloaded');
       expect(page.url()).not.toContain('/login');
@@ -148,8 +152,12 @@ test.describe('Landing Navigation — Redirect routes', () => {
     expect(page.url()).not.toContain('/login');
   });
 
-  test('/features/ai-course-builder redirects to /features', async ({ page }) => {
-    await page.goto(`${BASE_URL}/features/ai-course-builder`, { waitUntil: 'domcontentloaded' });
+  test('/features/ai-course-builder redirects to /features', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/features/ai-course-builder`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForURL(/\/features$/, { timeout: 10_000 });
     expect(page.url()).toContain('/features');
     expect(page.url()).not.toContain('/login');
@@ -159,23 +167,31 @@ test.describe('Landing Navigation — Redirect routes', () => {
 // ─── Suite 6: Catch-all route behaviour ──────────────────────────────────────
 
 test.describe('Landing Navigation — Catch-all route', () => {
-  test('unknown route /xyz-nonexistent does NOT redirect to /login', async ({ page }) => {
-    await page.goto(`${BASE_URL}/xyz-nonexistent`, { waitUntil: 'domcontentloaded' });
+  test('unknown route /xyz-nonexistent does NOT redirect to /login', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/xyz-nonexistent`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     // SmartRoot: unauthenticated → landing page; authenticated → dashboard
     // Either way, should NOT be /login
     expect(page.url()).not.toContain('/login');
   });
 
-  test('unknown route shows landing page content for unauthenticated user', async ({ page }) => {
+  test('unknown route shows landing page content for unauthenticated user', async ({
+    page,
+  }) => {
     test.skip(
       process.env.VITE_DEV_MODE !== 'false',
       'SmartRoot shows LandingPage only in non-DEV_MODE'
     );
-    await page.goto(`${BASE_URL}/xyz-nonexistent`, { waitUntil: 'domcontentloaded' });
-    await expect(
-      page.locator('[data-testid="hero-section"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await page.goto(`${BASE_URL}/xyz-nonexistent`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await expect(page.locator('[data-testid="hero-section"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
@@ -195,7 +211,9 @@ test.describe('Landing Navigation — Footer links', () => {
     expect(page.url()).not.toContain('/login');
   });
 
-  test('footer "Privacy Policy" link does not lead to /login', async ({ page }) => {
+  test('footer "Privacy Policy" link does not lead to /login', async ({
+    page,
+  }) => {
     const footer = page.locator('[data-testid="landing-footer"]');
     const link = footer.locator('a[href="/privacy"]').first();
     await expect(link).toBeVisible({ timeout: 10_000 });
@@ -231,7 +249,9 @@ test.describe('Landing Navigation — Footer links', () => {
     expect(page.url()).not.toContain('/login');
   });
 
-  test('footer "Contact" link redirects to /pilot, not /login', async ({ page }) => {
+  test('footer "Contact" link redirects to /pilot, not /login', async ({
+    page,
+  }) => {
     const footer = page.locator('[data-testid="landing-footer"]');
     const link = footer.locator('a[href="/contact"]').first();
     await expect(link).toBeVisible({ timeout: 10_000 });
@@ -241,7 +261,9 @@ test.describe('Landing Navigation — Footer links', () => {
     expect(page.url()).not.toContain('/login');
   });
 
-  test('footer "Accessibility Statement" link does not lead to /login', async ({ page }) => {
+  test('footer "Accessibility Statement" link does not lead to /login', async ({
+    page,
+  }) => {
     const footer = page.locator('[data-testid="landing-footer"]');
     const link = footer.locator('a[href="/accessibility"]').first();
     await expect(link).toBeVisible({ timeout: 10_000 });
@@ -250,9 +272,13 @@ test.describe('Landing Navigation — Footer links', () => {
     expect(page.url()).not.toContain('/login');
   });
 
-  test('footer feature sub-page links redirect to /features, not /login', async ({ page }) => {
+  test('footer feature sub-page links redirect to /features, not /login', async ({
+    page,
+  }) => {
     const footer = page.locator('[data-testid="landing-footer"]');
-    const featureLink = footer.locator('a[href="/features/ai-course-builder"]').first();
+    const featureLink = footer
+      .locator('a[href="/features/ai-course-builder"]')
+      .first();
     await expect(featureLink).toBeVisible({ timeout: 10_000 });
     await featureLink.click();
     await page.waitForURL(/\/features/, { timeout: 10_000 });
@@ -261,7 +287,9 @@ test.describe('Landing Navigation — Footer links', () => {
 
   test('footer solution links do not lead to /login', async ({ page }) => {
     const footer = page.locator('[data-testid="landing-footer"]');
-    const solutionLink = footer.locator('a[href="/solutions/universities"]').first();
+    const solutionLink = footer
+      .locator('a[href="/solutions/universities"]')
+      .first();
     await expect(solutionLink).toBeVisible({ timeout: 10_000 });
     await solutionLink.click();
     await page.waitForLoadState('domcontentloaded');
@@ -270,7 +298,9 @@ test.describe('Landing Navigation — Footer links', () => {
 
   test('footer compliance links do not lead to /login', async ({ page }) => {
     const footer = page.locator('[data-testid="landing-footer"]');
-    const complianceLink = footer.locator('a[href="/compliance#ferpa"]').first();
+    const complianceLink = footer
+      .locator('a[href="/compliance#ferpa"]')
+      .first();
     await expect(complianceLink).toBeVisible({ timeout: 10_000 });
     await complianceLink.click();
     await page.waitForLoadState('domcontentloaded');
@@ -281,7 +311,16 @@ test.describe('Landing Navigation — Footer links', () => {
 // ─── Suite 8: No technical errors visible on any public route ────────────────
 
 test.describe('Landing Navigation — No technical errors on public pages', () => {
-  const publicPages = ['/landing', '/pilot', '/features', '/pricing', '/faq', '/blog', '/privacy', '/terms'];
+  const publicPages = [
+    '/landing',
+    '/pilot',
+    '/features',
+    '/pricing',
+    '/faq',
+    '/blog',
+    '/privacy',
+    '/terms',
+  ];
 
   for (const route of publicPages) {
     test(`${route} has no raw technical error strings`, async ({ page }) => {

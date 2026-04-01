@@ -52,7 +52,12 @@ export class LiveSessionResolver {
     this.logger.debug(
       `[LiveSessionResolver] liveSessions tenantId=${tenantId} status=${status ?? 'all'}`
     );
-    return this.liveSessionService.listSessions(tenantId, status, limit ?? 20, offset ?? 0);
+    return this.liveSessionService.listSessions(
+      tenantId,
+      status,
+      limit ?? 20,
+      offset ?? 0
+    );
   }
 
   @Query('liveSessionById')

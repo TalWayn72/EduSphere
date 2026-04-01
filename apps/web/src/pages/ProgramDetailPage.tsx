@@ -46,7 +46,9 @@ export function ProgramDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [programResult] = useQuery<{ program: CredentialProgram | null }>({
     query: PROGRAM_QUERY,
@@ -104,117 +106,119 @@ export function ProgramDetailPage(): React.ReactElement {
 
   return (
     <Layout>
-    <PageShell size="md">
-      <PageHeader
-        title={program.title}
-        breadcrumbs={[
-          { label: 'Programs', href: '/programs' },
-          { label: program.title },
-        ]}
-      />
+      <PageShell size="md">
+        <PageHeader
+          title={program.title}
+          breadcrumbs={[
+            { label: 'Programs', href: '/programs' },
+            { label: program.title },
+          ]}
+        />
 
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-start gap-4">
-            <span className="text-6xl">{program.badgeEmoji}</span>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <CardTitle className="text-2xl">{program.title}</CardTitle>
-                {isCompleted && (
-                  <Badge className="bg-green-500 dark:bg-green-600">Completed</Badge>
-                )}
-                {isEnrolled && !isCompleted && (
-                  <Badge variant="secondary">In Progress</Badge>
-                )}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-start gap-4">
+              <span className="text-6xl">{program.badgeEmoji}</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <CardTitle className="text-2xl">{program.title}</CardTitle>
+                  {isCompleted && (
+                    <Badge className="bg-green-500 dark:bg-green-600">
+                      Completed
+                    </Badge>
+                  )}
+                  {isEnrolled && !isCompleted && (
+                    <Badge variant="secondary">In Progress</Badge>
+                  )}
+                </div>
+                <p className="text-muted-foreground mt-2">
+                  {program.description}
+                </p>
+                <div className="flex gap-4 text-sm text-muted-foreground mt-3">
+                  <span>{totalCourses} courses required</span>
+                  <span>{program.totalHours}h total</span>
+                  <span>{program.enrollmentCount} learners enrolled</span>
+                </div>
               </div>
-              <p className="text-muted-foreground mt-2">
-                {program.description}
+            </div>
+          </CardHeader>
+
+          {isEnrolled && (
+            <CardContent>
+              <div className="mb-1 flex justify-between text-sm text-muted-foreground">
+                <span>Progress</span>
+                <span>
+                  {completedCourses}/{totalCourses} courses
+                </span>
+              </div>
+              <Progress
+                value={pct}
+                className="h-3"
+                aria-label={`${pct}% complete`}
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                {pct}% complete
               </p>
-              <div className="flex gap-4 text-sm text-muted-foreground mt-3">
-                <span>{totalCourses} courses required</span>
-                <span>{program.totalHours}h total</span>
-                <span>{program.enrollmentCount} learners enrolled</span>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-
-        {isEnrolled && (
-          <CardContent>
-            <div className="mb-1 flex justify-between text-sm text-muted-foreground">
-              <span>Progress</span>
-              <span>
-                {completedCourses}/{totalCourses} courses
-              </span>
-            </div>
-            <Progress
-              value={pct}
-              className="h-3"
-              aria-label={`${pct}% complete`}
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              {pct}% complete
-            </p>
-          </CardContent>
-        )}
-      </Card>
-
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Required Courses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {program.requiredCourseIds.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No courses defined yet.
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {program.requiredCourseIds.map((courseId, idx) => {
-                const done = completedSet.has(courseId);
-                return (
-                  <li key={courseId} className="flex items-center gap-3">
-                    <span
-                      className={`text-lg ${done ? 'text-green-500' : 'text-muted-foreground'}`}
-                    >
-                      {done ? '✓' : '○'}
-                    </span>
-                    <span
-                      className={`text-sm cursor-pointer hover:underline ${done ? 'text-green-700' : ''}`}
-                      onClick={() => navigate(`/courses/${courseId}`)}
-                    >
-                      Course {idx + 1}: {courseId.slice(0, 8)}…
-                    </span>
-                    {done && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs text-green-600 border-green-600 dark:text-green-400 dark:border-green-400"
-                      >
-                        Done
-                      </Badge>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            </CardContent>
           )}
-        </CardContent>
-      </Card>
+        </Card>
 
-      <div className="flex gap-3">
-        {isCompleted && enrollment?.certificateId ? (
-          <Button className="bg-green-500 hover:bg-green-600 dark:bg-green-600">
-            View Nanodegree Certificate
-          </Button>
-        ) : isEnrolled ? (
-          <Button onClick={() => navigate('/courses')}>
-            Continue Learning
-          </Button>
-        ) : (
-          <Button onClick={handleEnroll}>Enroll in Program</Button>
-        )}
-      </div>
-    </PageShell>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Required Courses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {program.requiredCourseIds.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No courses defined yet.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {program.requiredCourseIds.map((courseId, idx) => {
+                  const done = completedSet.has(courseId);
+                  return (
+                    <li key={courseId} className="flex items-center gap-3">
+                      <span
+                        className={`text-lg ${done ? 'text-green-500' : 'text-muted-foreground'}`}
+                      >
+                        {done ? '✓' : '○'}
+                      </span>
+                      <span
+                        className={`text-sm cursor-pointer hover:underline ${done ? 'text-green-700' : ''}`}
+                        onClick={() => navigate(`/courses/${courseId}`)}
+                      >
+                        Course {idx + 1}: {courseId.slice(0, 8)}…
+                      </span>
+                      {done && (
+                        <Badge
+                          variant="outline"
+                          className="text-xs text-green-600 border-green-600 dark:text-green-400 dark:border-green-400"
+                        >
+                          Done
+                        </Badge>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="flex gap-3">
+          {isCompleted && enrollment?.certificateId ? (
+            <Button className="bg-green-500 hover:bg-green-600 dark:bg-green-600">
+              View Nanodegree Certificate
+            </Button>
+          ) : isEnrolled ? (
+            <Button onClick={() => navigate('/courses')}>
+              Continue Learning
+            </Button>
+          ) : (
+            <Button onClick={handleEnroll}>Enroll in Program</Button>
+          )}
+        </div>
+      </PageShell>
     </Layout>
   );
 }

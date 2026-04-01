@@ -70,7 +70,7 @@ export function ProgressStatus({
     <Loader2
       className={cn(
         'motion-safe:animate-spin shrink-0',
-        variant === 'block' ? 'h-8 w-8' : 'h-4 w-4',
+        variant === 'block' ? 'h-8 w-8' : 'h-4 w-4'
       )}
       aria-hidden="true"
     />
@@ -82,7 +82,7 @@ export function ProgressStatus({
       aria-live="polite"
       className={cn(
         'motion-safe:transition-opacity motion-safe:duration-300',
-        visible ? 'opacity-100' : 'opacity-0',
+        visible ? 'opacity-100' : 'opacity-0'
       )}
     >
       {currentMessage}
@@ -94,7 +94,7 @@ export function ProgressStatus({
       <div
         className={cn(
           'flex flex-col items-center gap-3 text-muted-foreground',
-          className,
+          className
         )}
       >
         {spinnerElement}
@@ -113,12 +113,7 @@ export function ProgressStatus({
 
   // Default: inline — use <span> (not <div>) so it works inside <button>
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-2 text-sm',
-        className,
-      )}
-    >
+    <span className={cn('inline-flex items-center gap-2 text-sm', className)}>
       {spinnerElement}
       {textElement}
     </span>

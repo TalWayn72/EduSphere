@@ -121,8 +121,7 @@ const wsClient = createWsClient({
 // When APQ IS enabled, generateHash is used on the first request; if the
 // gateway responds with PersistedQueryNotFound the exchange automatically
 // retries with the full query document (standard APQ protocol).
-const apqEnabled =
-  import.meta.env.VITE_APQ_ENABLED === 'true';
+const apqEnabled = import.meta.env.VITE_APQ_ENABLED === 'true';
 
 const maybePersistedExchange = apqEnabled
   ? [

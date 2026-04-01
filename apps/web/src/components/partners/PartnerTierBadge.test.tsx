@@ -5,7 +5,11 @@ import { PartnerTierBadge } from './PartnerTierBadge';
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
-  return { ...actual, useNavigate: vi.fn(() => vi.fn()), useParams: vi.fn(() => ({})) };
+  return {
+    ...actual,
+    useNavigate: vi.fn(() => vi.fn()),
+    useParams: vi.fn(() => ({})),
+  };
 });
 
 describe('PartnerTierBadge', () => {
@@ -36,7 +40,9 @@ describe('PartnerTierBadge', () => {
 
   it('shows tier name text', () => {
     render(<PartnerTierBadge tier="GOLD" />);
-    expect(screen.getByTestId('partner-tier-badge').textContent).toMatch(/Gold/);
+    expect(screen.getByTestId('partner-tier-badge').textContent).toMatch(
+      /Gold/
+    );
   });
 
   it('has data-testid=partner-tier-badge and tier-specific testid', () => {

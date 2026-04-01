@@ -143,7 +143,10 @@ describe('GraphQueryFacadeService', () => {
     mockFindTopicClustersByCourse.mockResolvedValue([]);
     await facade.findTopicClustersByCourse('course-1', T, U, R);
     expect(mockFindTopicClustersByCourse).toHaveBeenCalledWith(
-      'course-1', T, U, R
+      'course-1',
+      T,
+      U,
+      R
     );
   });
 

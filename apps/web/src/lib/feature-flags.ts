@@ -12,10 +12,14 @@ const envFlag = (key: string, fallback = true): boolean => {
 };
 
 /** Guards WebSocket subscription path; fallback = polling when disabled. */
-export const ENABLE_PIPELINE_SUBSCRIPTIONS = envFlag('VITE_ENABLE_PIPELINE_SUBSCRIPTIONS');
+export const ENABLE_PIPELINE_SUBSCRIPTIONS = envFlag(
+  'VITE_ENABLE_PIPELINE_SUBSCRIPTIONS'
+);
 
 /** Guards NER-to-AGE knowledge-graph bridge. */
 export const ENABLE_NER_BRIDGE = envFlag('VITE_ENABLE_NER_BRIDGE');
 
 /** Guards course publish-readiness validation panel. */
-export const ENABLE_PUBLISH_READINESS = envFlag('VITE_ENABLE_PUBLISH_READINESS');
+export const ENABLE_PUBLISH_READINESS = envFlag(
+  'VITE_ENABLE_PUBLISH_READINESS'
+);

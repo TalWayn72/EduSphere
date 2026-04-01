@@ -50,7 +50,12 @@ interface OverviewResult {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const ALLOWED_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
-const TABS = ['Overview', 'Learner Engagement', 'At-Risk Learners', 'AI Usage'] as const;
+const TABS = [
+  'Overview',
+  'Learner Engagement',
+  'At-Risk Learners',
+  'AI Usage',
+] as const;
 type Tab = (typeof TABS)[number];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -92,7 +97,9 @@ export function InstructorAnalyticsDashboard() {
   const role = useAuthRole();
   const [activeTab, setActiveTab] = useState<Tab>('Overview');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }] = useQuery<OverviewResult>({
     query: INSTRUCTOR_ANALYTICS_OVERVIEW_QUERY,
@@ -115,10 +122,15 @@ export function InstructorAnalyticsDashboard() {
     .map((c) => c.courseAnalytics)
     .filter((a): a is CourseAnalyticsSummary => a != null);
 
-  const totalEnrollments = analyticsRows.reduce((s, a) => s + a.enrollmentCount, 0);
+  const totalEnrollments = analyticsRows.reduce(
+    (s, a) => s + a.enrollmentCount,
+    0
+  );
   const avgCompletion = avg(analyticsRows.map((a) => a.completionRate));
   const avgQuiz = avg(
-    analyticsRows.flatMap((a) => (a.avgQuizScore != null ? [a.avgQuizScore] : []))
+    analyticsRows.flatMap((a) =>
+      a.avgQuizScore != null ? [a.avgQuizScore] : []
+    )
   );
   const atRiskCount = analyticsRows.filter((a) => a.completionRate < 20).length;
 
@@ -208,7 +220,9 @@ export function InstructorAnalyticsDashboard() {
         {activeTab === 'Learner Engagement' && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Module Drop-off Funnel</CardTitle>
+              <CardTitle className="text-base">
+                Module Drop-off Funnel
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <DropOffFunnelChart data={allFunnelSteps} />

@@ -3,14 +3,21 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { TrustBar } from './TrustBar';
 
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_, name) => {
-    if (name === '__esModule') return true;
-    return function MockIcon(props: Record<string, unknown>) {
-      return <span data-testid={`icon-${String(name)}`} {...props} />;
-    };
-  },
-}));
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
+);
 
 describe('TrustBar', () => {
   it('renders without crashing', () => {
@@ -27,7 +34,9 @@ describe('TrustBar', () => {
 
   it('renders all 7 compliance badge labels', () => {
     render(<TrustBar />);
-    const badgeList = screen.getByRole('list', { name: /Compliance certifications/i });
+    const badgeList = screen.getByRole('list', {
+      name: /Compliance certifications/i,
+    });
     expect(badgeList).toBeInTheDocument();
 
     expect(screen.getByText('FERPA')).toBeInTheDocument();
@@ -41,7 +50,9 @@ describe('TrustBar', () => {
 
   it('renders the 5 partner placeholder logos', () => {
     render(<TrustBar />);
-    const partnerList = screen.getByRole('list', { name: /Partner organizations/i });
+    const partnerList = screen.getByRole('list', {
+      name: /Partner organizations/i,
+    });
     const items = partnerList.querySelectorAll('[role="listitem"]');
     expect(items).toHaveLength(5);
   });
@@ -49,7 +60,7 @@ describe('TrustBar', () => {
   it('renders the trusted-by tagline', () => {
     render(<TrustBar />);
     expect(
-      screen.getByText(/Trusted by universities, enterprises/i),
+      screen.getByText(/Trusted by universities, enterprises/i)
     ).toBeInTheDocument();
   });
 });

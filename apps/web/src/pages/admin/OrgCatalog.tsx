@@ -11,7 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 
 const ORG_CATALOG_QUERY = `
@@ -36,7 +41,9 @@ export function OrgCatalog() {
   const { t } = useTranslation('orgMarketplace');
   const [search, setSearch] = useState('');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }] = useQuery<{ orgCatalog: CatalogItem[] }>({
     query: ORG_CATALOG_QUERY,
@@ -47,7 +54,10 @@ export function OrgCatalog() {
   const items = data?.orgCatalog ?? [];
 
   return (
-    <AdminLayout title={t('catalog.title')} description={t('catalog.description')}>
+    <AdminLayout
+      title={t('catalog.title')}
+      description={t('catalog.description')}
+    >
       <div data-testid="org-catalog-page" className="space-y-6">
         <Input
           placeholder={t('catalog.searchPlaceholder')}
@@ -81,7 +91,9 @@ export function OrgCatalog() {
                 <TableBody>
                   {items.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.title}</TableCell>
+                      <TableCell className="font-medium">
+                        {item.title}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{item.category}</Badge>
                       </TableCell>
@@ -92,7 +104,9 @@ export function OrgCatalog() {
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className={item.status === 'active' ? 'text-green-700' : ''}
+                          className={
+                            item.status === 'active' ? 'text-green-700' : ''
+                          }
                         >
                           {item.status}
                         </Badge>

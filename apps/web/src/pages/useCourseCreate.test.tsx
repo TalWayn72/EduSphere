@@ -44,9 +44,14 @@ vi.mock('@/lib/graphql/content.queries', () => ({
 
 vi.mock('./course-create.types', () => ({
   DEFAULT_FORM: {
-    title: '', description: '', difficulty: 'BEGINNER',
-    duration: '', thumbnail: '\u{1F4DA}', modules: [],
-    mediaList: [], published: false,
+    title: '',
+    description: '',
+    difficulty: 'BEGINNER',
+    duration: '',
+    thumbnail: '\u{1F4DA}',
+    modules: [],
+    mediaList: [],
+    published: false,
   },
 }));
 
@@ -61,8 +66,11 @@ vi.mock('./CourseCreatePage.types', () => ({
 // Mock react-hook-form since zodResolver requires real zod schema
 vi.mock('react-hook-form', () => {
   const formValues: Record<string, string> = {
-    title: '', description: '', difficulty: 'BEGINNER',
-    duration: '', thumbnail: '\u{1F4DA}',
+    title: '',
+    description: '',
+    difficulty: 'BEGINNER',
+    duration: '',
+    thumbnail: '\u{1F4DA}',
   };
   return {
     useForm: () => ({
@@ -96,9 +104,13 @@ import { toast } from 'sonner';
 function setupUrqlMocks() {
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'EXPORT_SCORM') {
-      return [{ fetching: false }, mockExecuteExportScorm] as ReturnType<typeof urql.useMutation>;
+      return [{ fetching: false }, mockExecuteExportScorm] as ReturnType<
+        typeof urql.useMutation
+      >;
     }
-    return [{ fetching: false }, mockExecuteMutation] as ReturnType<typeof urql.useMutation>;
+    return [{ fetching: false }, mockExecuteMutation] as ReturnType<
+      typeof urql.useMutation
+    >;
   });
 }
 
@@ -154,7 +166,7 @@ describe('useCourseCreate', () => {
           isPublished: true,
           instructorId: 'user-123',
         }),
-      }),
+      })
     );
     expect(mockNavigate).toHaveBeenCalledWith('/courses/c-1');
   });
@@ -168,7 +180,7 @@ describe('useCourseCreate', () => {
       await result.current.handlePublish(false);
     });
     expect(toast.error).toHaveBeenCalledWith(
-      'Failed to create course. Please try again.',
+      'Failed to create course. Please try again.'
     );
     expect(mockNavigate).not.toHaveBeenCalled();
   });
@@ -182,7 +194,7 @@ describe('useCourseCreate', () => {
       await result.current.handleExportScorm();
     });
     expect(toast.error).toHaveBeenCalledWith(
-      'Failed to export SCORM package. Please try again.',
+      'Failed to export SCORM package. Please try again.'
     );
   });
 
@@ -201,7 +213,7 @@ describe('useCourseCreate', () => {
     });
     expect(toast.success).toHaveBeenCalledWith(
       expect.stringContaining('SCORM 2004 package ready'),
-      expect.objectContaining({ duration: 15000 }),
+      expect.objectContaining({ duration: 15000 })
     );
   });
 

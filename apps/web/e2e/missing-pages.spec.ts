@@ -33,7 +33,9 @@ const NO_RAW_ERRORS = [
 
 async function assertNoRawErrors(page: Page) {
   for (const err of NO_RAW_ERRORS) {
-    await expect(page.getByText(err, { exact: false })).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(err, { exact: false })).not.toBeVisible({
+      timeout: 2_000,
+    });
   }
 }
 
@@ -44,16 +46,35 @@ test.describe('missing-pages — T-11: Knowledge Graph', () => {
 
   test('/graph page loads without raw GraphQL errors', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
-      if (opName === 'KnowledgeGraph' || opName === 'GetKnowledgeGraph' || opName === 'ConceptGraph') {
+      if (
+        opName === 'KnowledgeGraph' ||
+        opName === 'GetKnowledgeGraph' ||
+        opName === 'ConceptGraph'
+      ) {
         return JSON.stringify({
           data: {
             knowledgeGraph: {
               nodes: [
-                { id: 'concept-001', label: 'Machine Learning', type: 'CONCEPT', properties: {} },
-                { id: 'concept-002', label: 'Neural Networks', type: 'CONCEPT', properties: {} },
+                {
+                  id: 'concept-001',
+                  label: 'Machine Learning',
+                  type: 'CONCEPT',
+                  properties: {},
+                },
+                {
+                  id: 'concept-002',
+                  label: 'Neural Networks',
+                  type: 'CONCEPT',
+                  properties: {},
+                },
               ],
               edges: [
-                { id: 'edge-001', source: 'concept-001', target: 'concept-002', label: 'RELATED_TO' },
+                {
+                  id: 'edge-001',
+                  source: 'concept-001',
+                  target: 'concept-002',
+                  label: 'RELATED_TO',
+                },
               ],
             },
           },
@@ -84,12 +105,19 @@ test.describe('missing-pages — T-11: Knowledge Graph', () => {
     });
   });
 
-  test('knowledge graph error state shows friendly message', async ({ page }) => {
+  test('knowledge graph error state shows friendly message', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'KnowledgeGraph' || opName === 'GetKnowledgeGraph') {
         return JSON.stringify({
           data: { knowledgeGraph: null },
-          errors: [{ message: 'Apache AGE extension not loaded: LOAD "age" failed', extensions: { code: 'GRAPH_ENGINE_ERROR' } }],
+          errors: [
+            {
+              message: 'Apache AGE extension not loaded: LOAD "age" failed',
+              extensions: { code: 'GRAPH_ENGINE_ERROR' },
+            },
+          ],
         });
       }
       return null;
@@ -99,7 +127,9 @@ test.describe('missing-pages — T-11: Knowledge Graph', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Raw AGE error must NOT be shown
-    await expect(page.getByText('Apache AGE extension not loaded')).not.toBeVisible({ timeout: 3_000 });
+    await expect(
+      page.getByText('Apache AGE extension not loaded')
+    ).not.toBeVisible({ timeout: 3_000 });
 
     await expect(page).toHaveScreenshot('knowledge-graph-error.png', {
       maxDiffPixelRatio: 0.05,
@@ -115,8 +145,22 @@ test.describe('missing-pages — T-12: Search Page', () => {
   const MOCK_SEARCH_RESULTS = {
     semanticSearch: {
       items: [
-        { id: 'content-001', title: 'Introduction to Neural Networks', type: 'ARTICLE', score: 0.95, courseId: 'course-001', moduleId: 'mod-001' },
-        { id: 'content-002', title: 'Backpropagation Explained', type: 'VIDEO', score: 0.88, courseId: 'course-001', moduleId: 'mod-002' },
+        {
+          id: 'content-001',
+          title: 'Introduction to Neural Networks',
+          type: 'ARTICLE',
+          score: 0.95,
+          courseId: 'course-001',
+          moduleId: 'mod-001',
+        },
+        {
+          id: 'content-002',
+          title: 'Backpropagation Explained',
+          type: 'VIDEO',
+          score: 0.88,
+          courseId: 'course-001',
+          moduleId: 'mod-002',
+        },
       ],
       totalCount: 2,
     },
@@ -126,7 +170,10 @@ test.describe('missing-pages — T-12: Search Page', () => {
     await loginAndNavigate(page, '/search');
 
     // Search input should be visible
-    const searchInput = page.getByRole('searchbox').or(page.getByRole('textbox')).first();
+    const searchInput = page
+      .getByRole('searchbox')
+      .or(page.getByRole('textbox'))
+      .first();
     await expect(searchInput).toBeVisible({ timeout: 10_000 });
     await assertNoRawErrors(page);
 
@@ -145,7 +192,10 @@ test.describe('missing-pages — T-12: Search Page', () => {
 
     await loginAndNavigate(page, '/search');
 
-    const searchInput = page.getByRole('searchbox').or(page.getByRole('textbox')).first();
+    const searchInput = page
+      .getByRole('searchbox')
+      .or(page.getByRole('textbox'))
+      .first();
     await searchInput.waitFor({ timeout: 10_000 });
     await searchInput.fill('neural networks');
 
@@ -160,12 +210,20 @@ test.describe('missing-pages — T-12: Search Page', () => {
     });
   });
 
-  test('search shows friendly message on error (not raw GraphQL)', async ({ page }) => {
+  test('search shows friendly message on error (not raw GraphQL)', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'SemanticSearch' || opName === 'SearchContent') {
         return JSON.stringify({
           data: { semanticSearch: null },
-          errors: [{ message: 'pgvector HNSW index not built for embedding_vector column', extensions: { code: 'INDEX_NOT_FOUND' } }],
+          errors: [
+            {
+              message:
+                'pgvector HNSW index not built for embedding_vector column',
+              extensions: { code: 'INDEX_NOT_FOUND' },
+            },
+          ],
         });
       }
       return null;
@@ -173,7 +231,10 @@ test.describe('missing-pages — T-12: Search Page', () => {
 
     await loginAndNavigate(page, '/search');
 
-    const searchInput = page.getByRole('searchbox').or(page.getByRole('textbox')).first();
+    const searchInput = page
+      .getByRole('searchbox')
+      .or(page.getByRole('textbox'))
+      .first();
     await searchInput.waitFor({ timeout: 10_000 });
     await searchInput.fill('machine learning');
     await page.keyboard.press('Enter');
@@ -227,7 +288,9 @@ test.describe('missing-pages — T-13: My Open Badges', () => {
     });
   });
 
-  test('my badges page shows empty state when no badges earned', async ({ page }) => {
+  test('my badges page shows empty state when no badges earned', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'MyOpenBadges' || opName === 'GetMyBadges') {
         return JSON.stringify({ data: { myOpenBadges: [] } });
@@ -244,12 +307,20 @@ test.describe('missing-pages — T-13: My Open Badges', () => {
     });
   });
 
-  test('badge error state shows friendly message (not raw JSON)', async ({ page }) => {
+  test('badge error state shows friendly message (not raw JSON)', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'MyOpenBadges' || opName === 'GetMyBadges') {
         return JSON.stringify({
           data: { myOpenBadges: null },
-          errors: [{ message: 'JSON validation failed: verificationHash mismatch for cred-uuid-001', extensions: { code: 'BADGE_VERIFICATION_ERROR' } }],
+          errors: [
+            {
+              message:
+                'JSON validation failed: verificationHash mismatch for cred-uuid-001',
+              extensions: { code: 'BADGE_VERIFICATION_ERROR' },
+            },
+          ],
         });
       }
       return null;
@@ -259,9 +330,9 @@ test.describe('missing-pages — T-13: My Open Badges', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Raw verification hash error must NOT be visible
-    await expect(
-      page.getByText('verificationHash mismatch')
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('verificationHash mismatch')).not.toBeVisible({
+      timeout: 3_000,
+    });
 
     await expect(page).toHaveScreenshot('my-badges-error.png', {
       maxDiffPixelRatio: 0.05,
@@ -313,7 +384,13 @@ test.describe('missing-pages — T-14: Agents', () => {
       if (opName === 'ListAgentWorkflows' || opName === 'GetAgents') {
         return JSON.stringify({
           data: { agentWorkflows: null },
-          errors: [{ message: 'gVisor sandbox not available: ptrace syscall interceptor failed to initialize', extensions: { code: 'SANDBOX_ERROR' } }],
+          errors: [
+            {
+              message:
+                'gVisor sandbox not available: ptrace syscall interceptor failed to initialize',
+              extensions: { code: 'SANDBOX_ERROR' },
+            },
+          ],
         });
       }
       return null;
@@ -360,7 +437,9 @@ test.describe('missing-pages — T-15: Compliance Library', () => {
   test('compliance library loads course list', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'ComplianceCourses' || opName === 'GetComplianceCourses') {
-        return JSON.stringify({ data: { complianceCourses: MOCK_COMPLIANCE_COURSES } });
+        return JSON.stringify({
+          data: { complianceCourses: MOCK_COMPLIANCE_COURSES },
+        });
       }
       return null;
     });
@@ -377,7 +456,9 @@ test.describe('missing-pages — T-15: Compliance Library', () => {
   test('compliance library shows GDPR course', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'ComplianceCourses' || opName === 'GetComplianceCourses') {
-        return JSON.stringify({ data: { complianceCourses: MOCK_COMPLIANCE_COURSES } });
+        return JSON.stringify({
+          data: { complianceCourses: MOCK_COMPLIANCE_COURSES },
+        });
       }
       return null;
     });
@@ -385,19 +466,26 @@ test.describe('missing-pages — T-15: Compliance Library', () => {
     await loginAndNavigate(page, '/admin/compliance');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.getByText(/GDPR|Data Protection|compliance/i).first()
-    ).toBeVisible({ timeout: 10_000 }).catch(() => {
-      // Page may still be loading or have different structure — just verify no crash
-    });
+    await expect(page.getByText(/GDPR|Data Protection|compliance/i).first())
+      .toBeVisible({ timeout: 10_000 })
+      .catch(() => {
+        // Page may still be loading or have different structure — just verify no crash
+      });
   });
 
-  test('compliance library error state shows friendly message', async ({ page }) => {
+  test('compliance library error state shows friendly message', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'ComplianceCourses' || opName === 'GetComplianceCourses') {
         return JSON.stringify({
           data: { complianceCourses: null },
-          errors: [{ message: 'Compliance module not licensed for this tenant', extensions: { code: 'LICENSE_REQUIRED' } }],
+          errors: [
+            {
+              message: 'Compliance module not licensed for this tenant',
+              extensions: { code: 'LICENSE_REQUIRED' },
+            },
+          ],
         });
       }
       return null;

@@ -11,14 +11,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
-import { ReducedMotionProvider, useReducedMotion } from './ReducedMotionProvider';
+import {
+  ReducedMotionProvider,
+  useReducedMotion,
+} from './ReducedMotionProvider';
 
 let changeHandler: ((e: { matches: boolean }) => void) | null = null;
 
 function setupMatchMedia(matches: boolean) {
-  const addEventListener = vi.fn((_event: string, handler: (e: { matches: boolean }) => void) => {
-    changeHandler = handler;
-  });
+  const addEventListener = vi.fn(
+    (_event: string, handler: (e: { matches: boolean }) => void) => {
+      changeHandler = handler;
+    }
+  );
   const removeEventListener = vi.fn();
 
   Object.defineProperty(window, 'matchMedia', {
@@ -76,7 +81,10 @@ describe('ReducedMotionProvider', () => {
 
     unmount();
 
-    expect(removeEventListener).toHaveBeenCalledWith('change', expect.any(Function));
+    expect(removeEventListener).toHaveBeenCalledWith(
+      'change',
+      expect.any(Function)
+    );
   });
 
   it('returns false when used outside provider (default context)', () => {

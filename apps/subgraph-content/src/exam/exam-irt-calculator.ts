@@ -36,7 +36,7 @@ export class ExamIrtCalculator {
    */
   static calculateTheta(
     responses: GradedResponse[],
-    itemMap: Map<string, ExamItem>,
+    itemMap: Map<string, ExamItem>
   ): IrtResult | null {
     const calibrated = responses.filter((r) => {
       const item = itemMap.get(r.itemId);
@@ -65,7 +65,8 @@ export class ExamIrtCalculator {
         // L'(θ) = Σ D * a * (P* / P) * (x - P)
         firstDerivative += D * a * (pStar / p) * (x - p);
         // L''(θ) = -Σ (D * a)² * (P*)² * Q / (P * (1-c)²)
-        secondDerivative -= (D * a) ** 2 * pStar ** 2 * q / (p * (1 - c) ** 2);
+        secondDerivative -=
+          ((D * a) ** 2 * pStar ** 2 * q) / (p * (1 - c) ** 2);
       }
 
       if (Math.abs(secondDerivative) < 1e-10) break;
@@ -88,17 +89,23 @@ export class ExamIrtCalculator {
       const pMinusC = p - item.irtC;
       const denominator = (1 - item.irtC) ** 2 * p;
       if (denominator > 1e-10) {
-        totalInfo += item.irtA ** 2 * pMinusC ** 2 * q / denominator;
+        totalInfo += (item.irtA ** 2 * pMinusC ** 2 * q) / denominator;
       }
     }
 
     const sem = totalInfo > 1e-10 ? 1 / Math.sqrt(totalInfo) : 1;
 
-    return { theta: Math.round(theta * 1000) / 1000, sem: Math.round(sem * 1000) / 1000 };
+    return {
+      theta: Math.round(theta * 1000) / 1000,
+      sem: Math.round(sem * 1000) / 1000,
+    };
   }
 
   /** Map SEM to 0-1000 scale and compute 95% CI. */
-  static confidenceInterval(scaledScore: number, sem: number): ConfidenceInterval {
+  static confidenceInterval(
+    scaledScore: number,
+    sem: number
+  ): ConfidenceInterval {
     // SEM is on theta scale (-4 to 4), map to 0-1000 via the same linear transform
     const scaledSem = sem * 100; // approximate scaling
     return {

@@ -8,7 +8,11 @@ import { toast } from 'sonner';
 import { TOAST_AUTO_DISMISS_MS, SIMULATED_SAVE_MS } from '@/lib/constants';
 import { CREATE_AGENT_WORKFLOW_MUTATION } from '@/lib/graphql/agent.queries';
 import { DEV_MODE } from '@/lib/auth';
-import type { NodeType, WorkflowNode, WorkflowEdge } from './agent-studio.types';
+import type {
+  NodeType,
+  WorkflowNode,
+  WorkflowEdge,
+} from './agent-studio.types';
 import { NODE_META } from './agent-studio.types';
 
 export function useAgentStudio() {
@@ -18,7 +22,9 @@ export function useAgentStudio() {
   const [edges, setEdges] = useState<WorkflowEdge[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [connecting, setConnecting] = useState<string | null>(null);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveStatus, setSaveStatus] = useState<
+    'idle' | 'saving' | 'saved' | 'error'
+  >('idle');
   const canvasRef = useRef<HTMLDivElement>(null);
   const [, execCreate] = useMutation(CREATE_AGENT_WORKFLOW_MUTATION);
 
@@ -32,18 +38,27 @@ export function useAgentStudio() {
     const id = `node-${Date.now()}`;
     setNodes((prev) => [
       ...prev,
-      { id, type, label: NODE_META[type].label, x: Math.max(0, x), y: Math.max(0, y) },
+      {
+        id,
+        type,
+        label: NODE_META[type].label,
+        x: Math.max(0, x),
+        y: Math.max(0, y),
+      },
     ]);
   }, []);
 
-  const handlePaletteAdd = useCallback((type: NodeType) => {
-    const id = `node-${Date.now()}`;
-    const yOffset = nodes.length * 60;
-    setNodes((prev) => [
-      ...prev,
-      { id, type, label: NODE_META[type].label, x: 40, y: 40 + yOffset },
-    ]);
-  }, [nodes.length]);
+  const handlePaletteAdd = useCallback(
+    (type: NodeType) => {
+      const id = `node-${Date.now()}`;
+      const yOffset = nodes.length * 60;
+      setNodes((prev) => [
+        ...prev,
+        { id, type, label: NODE_META[type].label, x: 40, y: 40 + yOffset },
+      ]);
+    },
+    [nodes.length]
+  );
 
   const handleNodeClick = useCallback(
     (nodeId: string) => {
@@ -62,7 +77,11 @@ export function useAgentStudio() {
       if (!exists) {
         setEdges((prev) => [
           ...prev,
-          { id: `edge-${connecting}-${nodeId}`, source: connecting, target: nodeId },
+          {
+            id: `edge-${connecting}-${nodeId}`,
+            source: connecting,
+            target: nodeId,
+          },
         ]);
       }
       setConnecting(null);
@@ -87,7 +106,10 @@ export function useAgentStudio() {
       toast.error('AI features require your consent.', {
         action: {
           label: 'Enable in Settings',
-          onClick: () => agentNavigate('/settings?highlight=ai-consent&returnTo=/agents/studio'),
+          onClick: () =>
+            agentNavigate(
+              '/settings?highlight=ai-consent&returnTo=/agents/studio'
+            ),
         },
       });
       setTimeout(() => setSaveStatus('idle'), TOAST_AUTO_DISMISS_MS);
@@ -103,12 +125,17 @@ export function useAgentStudio() {
           (e) => e.extensions?.code === 'CONSENT_REQUIRED'
         );
         if (consentErr) {
-          console.error('[AgentStudioPage] Consent required for AI workflow save');
+          console.error(
+            '[AgentStudioPage] Consent required for AI workflow save'
+          );
           setSaveStatus('error');
           toast.error('AI features require your consent.', {
             action: {
               label: 'Enable in Settings',
-              onClick: () => agentNavigate('/settings?highlight=ai-consent&returnTo=/agents/studio'),
+              onClick: () =>
+                agentNavigate(
+                  '/settings?highlight=ai-consent&returnTo=/agents/studio'
+                ),
             },
           });
         } else {

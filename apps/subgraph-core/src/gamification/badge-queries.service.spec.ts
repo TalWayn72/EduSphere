@@ -13,7 +13,8 @@ const mockDelete = vi.fn();
 const mockExecute = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -34,15 +35,21 @@ vi.mock('@edusphere/db', () => ({
     delete: mockDelete,
     execute: mockExecute,
   })),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-    fn({
-      select: mockSelect,
-      insert: mockInsert,
-      execute: mockExecute,
-    })
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({
+        select: mockSelect,
+        insert: mockInsert,
+        execute: mockExecute,
+      })
   ),
   schema: {
-    userBadges: { id: 'id', badgeId: 'badgeId', userId: 'userId', earnedAt: 'earnedAt' },
+    userBadges: {
+      id: 'id',
+      badgeId: 'badgeId',
+      userId: 'userId',
+      earnedAt: 'earnedAt',
+    },
     badges: { id: 'id', tenantId: 'tenantId' },
     userPoints: { userId: 'userId', totalPoints: 'totalPoints' },
     annotations: { user_id: 'user_id', tenant_id: 'tenant_id' },
@@ -54,7 +61,15 @@ vi.mock('@edusphere/db', () => ({
 
 vi.mock('./badge-definitions.js', () => ({
   PLATFORM_BADGES: [
-    { name: 'First Step', description: 'd', icon: '🎓', category: 'COMPLETION', pointsReward: 100, conditionType: 'courses_completed', conditionValue: 1 },
+    {
+      name: 'First Step',
+      description: 'd',
+      icon: '🎓',
+      category: 'COMPLETION',
+      pointsReward: 100,
+      conditionType: 'courses_completed',
+      conditionValue: 1,
+    },
   ],
 }));
 
@@ -71,9 +86,9 @@ describe('BadgeQueriesService', () => {
   describe('myBadges', () => {
     it('should return user badges with join', async () => {
       const badge = { id: 'b1', name: 'Test' };
-      mockSelect.mockReturnValue(makeChain([
-        { id: 'ub1', earnedAt: new Date('2025-01-01'), badge },
-      ]));
+      mockSelect.mockReturnValue(
+        makeChain([{ id: 'ub1', earnedAt: new Date('2025-01-01'), badge }])
+      );
       const result = await service.myBadges('u1', 't1');
       expect(result).toHaveLength(1);
       expect(result[0].badge).toEqual(badge);
@@ -84,8 +99,20 @@ describe('BadgeQueriesService', () => {
     it('should return ranked entries', async () => {
       mockExecute.mockResolvedValue({
         rows: [
-          { user_id: 'u1', first_name: 'A', last_name: 'B', total_points: 500, badge_count: '3' },
-          { user_id: 'u2', first_name: 'C', last_name: 'D', total_points: 300, badge_count: '1' },
+          {
+            user_id: 'u1',
+            first_name: 'A',
+            last_name: 'B',
+            total_points: 500,
+            badge_count: '3',
+          },
+          {
+            user_id: 'u2',
+            first_name: 'C',
+            last_name: 'D',
+            total_points: 300,
+            badge_count: '1',
+          },
         ],
       });
       const result = await service.leaderboard('t1', 10);
@@ -156,40 +183,82 @@ describe('BadgeQueriesService', () => {
   describe('createBadge', () => {
     it('should insert and return badge', async () => {
       const badge = { id: 'b1', name: 'New' };
-      mockInsert.mockReturnValue({ values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([badge]) }) });
+      mockInsert.mockReturnValue({
+        values: vi
+          .fn()
+          .mockReturnValue({ returning: vi.fn().mockResolvedValue([badge]) }),
+      });
       const result = await service.createBadge(
-        { name: 'New', description: 'd', iconEmoji: '⭐', category: 'STREAK', pointsReward: 50, conditionType: 'streak', conditionValue: 7 },
+        {
+          name: 'New',
+          description: 'd',
+          iconEmoji: '⭐',
+          category: 'STREAK',
+          pointsReward: 50,
+          conditionType: 'streak',
+          conditionValue: 7,
+        },
         't1'
       );
       expect(result).toEqual(badge);
     });
 
     it('should throw when insert returns empty', async () => {
-      mockInsert.mockReturnValue({ values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }) });
-      await expect(service.createBadge(
-        { name: 'X', description: '', iconEmoji: '', category: '', pointsReward: 0, conditionType: '', conditionValue: 0 },
-        't1'
-      )).rejects.toThrow('Badge insert failed');
+      mockInsert.mockReturnValue({
+        values: vi
+          .fn()
+          .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+      });
+      await expect(
+        service.createBadge(
+          {
+            name: 'X',
+            description: '',
+            iconEmoji: '',
+            category: '',
+            pointsReward: 0,
+            conditionType: '',
+            conditionValue: 0,
+          },
+          't1'
+        )
+      ).rejects.toThrow('Badge insert failed');
     });
   });
 
   describe('updateBadge', () => {
     it('should update and return badge', async () => {
       const badge = { id: 'b1', name: 'Updated' };
-      mockUpdate.mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([badge]) }) }) });
+      mockUpdate.mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([badge]),
+          }),
+        }),
+      });
       const result = await service.updateBadge('b1', { name: 'Updated' });
       expect(result.name).toBe('Updated');
     });
 
     it('should throw NotFoundException when badge missing', async () => {
-      mockUpdate.mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }) }) });
-      await expect(service.updateBadge('missing', { name: 'X' })).rejects.toThrow('Badge not found');
+      mockUpdate.mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi
+            .fn()
+            .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+        }),
+      });
+      await expect(
+        service.updateBadge('missing', { name: 'X' })
+      ).rejects.toThrow('Badge not found');
     });
   });
 
   describe('deleteBadge', () => {
     it('should delete and return true', async () => {
-      mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+      mockDelete.mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      });
       const result = await service.deleteBadge('b1');
       expect(result).toBe(true);
     });

@@ -28,7 +28,10 @@ import type { PipelineNode } from '@/lib/lesson-pipeline.store';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeNode(moduleType: string, config: Record<string, unknown> = {}): PipelineNode {
+function makeNode(
+  moduleType: string,
+  config: Record<string, unknown> = {}
+): PipelineNode {
   return {
     id: 'node-1',
     label: 'Test Node',
@@ -50,9 +53,7 @@ describe('PipelineConfigPanel — BUG-045 regression', () => {
   it('BUG-045: ASR node default language is DEFAULT_LOCALE, not hardcoded "he"', () => {
     // When no language is configured, it must default to DEFAULT_LOCALE ('en')
     const node = makeNode('ASR', {}); // no 'language' in config
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     const select = screen.getByRole('combobox') as HTMLSelectElement;
     expect(select.value).toBe(DEFAULT_LOCALE);
     expect(select.value).not.toBe('he');
@@ -60,9 +61,7 @@ describe('PipelineConfigPanel — BUG-045 regression', () => {
 
   it('BUG-045: INGESTION content language default is DEFAULT_LOCALE, not "he"', () => {
     const node = makeNode('INGESTION', {}); // no 'locale' in config
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     const selects = screen.getAllByRole('combobox') as HTMLSelectElement[];
     // The locale select is the last select in the ingestion config
     const localeSelect = selects.at(-1) as HTMLSelectElement;
@@ -72,9 +71,7 @@ describe('PipelineConfigPanel — BUG-045 regression', () => {
 
   it('renders English i18n labels for Enable toggle', () => {
     const node = makeNode('ASR');
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     // English from content.json pipeline.enableModule
     expect(screen.getByText('Enable this module')).toBeInTheDocument();
     // Must NOT contain hardcoded Hebrew
@@ -83,18 +80,14 @@ describe('PipelineConfigPanel — BUG-045 regression', () => {
 
   it('renders English i18n label for ASR language field', () => {
     const node = makeNode('ASR');
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     expect(screen.getByText('Transcription language')).toBeInTheDocument();
     expect(screen.queryByText('שפת תמלול')).not.toBeInTheDocument();
   });
 
   it('renders English i18n labels for SUMMARIZATION style options', () => {
     const node = makeNode('SUMMARIZATION');
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     expect(screen.getByText('Summary style')).toBeInTheDocument();
     expect(screen.getByText('Academic')).toBeInTheDocument();
     expect(screen.getByText('Accessible')).toBeInTheDocument();
@@ -103,11 +96,11 @@ describe('PipelineConfigPanel — BUG-045 regression', () => {
 
   it('renders English i18n labels for auto-module nodes', () => {
     const node = makeNode('CONTENT_CLEANING');
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     expect(
-      screen.getByText('This module runs automatically — no additional settings.')
+      screen.getByText(
+        'This module runs automatically — no additional settings.'
+      )
     ).toBeInTheDocument();
     expect(
       screen.queryByText('מודול זה פועל אוטומטית — אין הגדרות נוספות.')
@@ -116,9 +109,7 @@ describe('PipelineConfigPanel — BUG-045 regression', () => {
 
   it('close button has English aria-label', () => {
     const node = makeNode('ASR');
-    render(
-      <PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />
-    );
+    render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     const closeBtn = screen.getByRole('button', { name: 'Close settings' });
     expect(closeBtn).toBeInTheDocument();
   });
@@ -160,7 +151,9 @@ describe('PipelineConfigPanel — Feature A: QA_GATE tooltip', () => {
     const node = makeNode('QA_GATE', { threshold: 50 });
     render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
     const tooltip = screen.getByTestId('field-tooltip');
-    expect(tooltip.getAttribute('aria-label')).toBe(tooltip.getAttribute('title'));
+    expect(tooltip.getAttribute('aria-label')).toBe(
+      tooltip.getAttribute('title')
+    );
   });
 });
 
@@ -255,7 +248,9 @@ describe('PipelineConfigPanel — Feature C: file upload from device', () => {
   it('non-INGESTION modules do NOT show file upload input', () => {
     const node = makeNode('ASR', {});
     render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
-    expect(screen.queryByTestId('ingestion-file-upload')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('ingestion-file-upload')
+    ).not.toBeInTheDocument();
   });
 
   it('uploading state hides after successful mock upload', async () => {
@@ -267,7 +262,9 @@ describe('PipelineConfigPanel — Feature C: file upload from device', () => {
     render(<PipelineConfigPanel node={node} assets={[]} onClose={vi.fn()} />);
 
     const fileInput = screen.getByTestId('ingestion-file-upload');
-    const mockFile = new File(['content'], 'lecture.mp4', { type: 'video/mp4' });
+    const mockFile = new File(['content'], 'lecture.mp4', {
+      type: 'video/mp4',
+    });
 
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [mockFile] } });

@@ -24,11 +24,9 @@ function createMockServer(connectionCount = 0): Server {
       // Simulate async close completing immediately
       process.nextTick(() => closeCb?.());
     }),
-    getConnections: vi.fn(
-      (cb: (err: Error | null, count: number) => void) => {
-        cb(null, connectionCount);
-      }
-    ),
+    getConnections: vi.fn((cb: (err: Error | null, count: number) => void) => {
+      cb(null, connectionCount);
+    }),
   };
   return mock as unknown as Server;
 }

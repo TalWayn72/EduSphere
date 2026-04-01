@@ -22,7 +22,7 @@ describe('reportWebVitals', () => {
     reportWebVitals();
     expect(sendBeaconMock).toHaveBeenCalledWith(
       'http://localhost:4001/vitals',
-      expect.stringContaining('CLS'),
+      expect.stringContaining('CLS')
     );
   });
 

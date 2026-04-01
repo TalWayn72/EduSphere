@@ -40,7 +40,8 @@ export class EmbeddingDataLoader {
     const vectorEntries = await Promise.all(
       conceptNames.map(async (name) => {
         try {
-          const vector = await this.embeddingService.callEmbeddingProvider(name);
+          const vector =
+            await this.embeddingService.callEmbeddingProvider(name);
           return { name, vector };
         } catch (err) {
           this.logger.warn(

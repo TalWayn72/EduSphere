@@ -18,16 +18,23 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
   desc: vi.fn((col) => col),
-  withTenantContext: vi.fn(async (_db, _ctx, fn: (tx: unknown) => Promise<unknown>) =>
-    fn({
-      select: () => ({
-        from: () => ({ where: () => ({ orderBy: () => ({ limit: () => [] }) }) }),
-      }),
-    })
+  withTenantContext: vi.fn(
+    async (_db, _ctx, fn: (tx: unknown) => Promise<unknown>) =>
+      fn({
+        select: () => ({
+          from: () => ({
+            where: () => ({ orderBy: () => ({ limit: () => [] }) }),
+          }),
+        }),
+      })
   ),
 }));
 
-const tenantCtx = { tenantId: 't-1', userId: 'u-1', userRole: 'INSTRUCTOR' as const };
+const tenantCtx = {
+  tenantId: 't-1',
+  userId: 'u-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 describe('InstructorPayoutService', () => {
   let service: InstructorPayoutService;
@@ -44,14 +51,18 @@ describe('InstructorPayoutService', () => {
 
   it('does NOT start cron when PAYOUT_CRON_ENABLED is falsy', () => {
     service.onModuleInit();
-    expect((service as unknown as Record<string, unknown>).initTimeout).toBeNull();
+    expect(
+      (service as unknown as Record<string, unknown>).initTimeout
+    ).toBeNull();
   });
 
   it('starts cron when PAYOUT_CRON_ENABLED=true', () => {
     vi.useFakeTimers();
     vi.stubEnv('PAYOUT_CRON_ENABLED', 'true');
     service.onModuleInit();
-    expect((service as unknown as Record<string, unknown>).initTimeout).not.toBeNull();
+    expect(
+      (service as unknown as Record<string, unknown>).initTimeout
+    ).not.toBeNull();
     vi.useRealTimers();
   });
 
@@ -60,8 +71,12 @@ describe('InstructorPayoutService', () => {
     vi.stubEnv('PAYOUT_CRON_ENABLED', 'true');
     service.onModuleInit();
     service.onModuleDestroy();
-    expect((service as unknown as Record<string, unknown>).initTimeout).toBeNull();
-    expect((service as unknown as Record<string, unknown>).intervalHandle).toBeNull();
+    expect(
+      (service as unknown as Record<string, unknown>).initTimeout
+    ).toBeNull();
+    expect(
+      (service as unknown as Record<string, unknown>).intervalHandle
+    ).toBeNull();
     vi.useRealTimers();
   });
 

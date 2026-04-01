@@ -101,11 +101,15 @@ export class TenantSocialLinksService implements OnModuleDestroy {
         .returning();
     });
 
-    this.logger.log(`[TenantSocialLinksService] Upserted social links — tenantId=${tenantId}`);
+    this.logger.log(
+      `[TenantSocialLinksService] Upserted social links — tenantId=${tenantId}`
+    );
     return this.mapRow(row);
   }
 
-  private mapRow(r: typeof schema.tenantSocialLinks.$inferSelect): SocialLinksDto {
+  private mapRow(
+    r: typeof schema.tenantSocialLinks.$inferSelect
+  ): SocialLinksDto {
     return {
       id: r.id,
       linkedinUrl: r.linkedinUrl,

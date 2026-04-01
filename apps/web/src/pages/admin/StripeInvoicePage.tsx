@@ -59,7 +59,9 @@ export function StripeInvoicePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result, reexecute] = useQuery<{ invoices: Invoice[] }>({
     query: INVOICES_QUERY,
@@ -71,7 +73,10 @@ export function StripeInvoicePage() {
   if (!role || role !== 'SUPER_ADMIN') {
     navigate('/dashboard');
     return (
-      <div data-testid="access-denied" className="p-8 text-center text-destructive">
+      <div
+        data-testid="access-denied"
+        className="p-8 text-center text-destructive"
+      >
         Access Denied — SUPER_ADMIN role required.
       </div>
     );
@@ -80,18 +85,28 @@ export function StripeInvoicePage() {
   const { data, fetching, error } = result;
   const invoices = data?.invoices ?? [];
 
-  const handleGenerate = async (tenantId: string, year: number, plan: string) => {
+  const handleGenerate = async (
+    tenantId: string,
+    year: number,
+    plan: string
+  ) => {
     await generateInvoice({ tenantId, year, plan });
     setModalOpen(false);
     reexecute({ requestPolicy: 'network-only' });
   };
 
   return (
-    <AdminLayout title="Stripe Invoices" description="Manage tenant invoices and billing">
+    <AdminLayout
+      title="Stripe Invoices"
+      description="Manage tenant invoices and billing"
+    >
       <div data-testid="stripe-invoice-page" className="space-y-6">
         <Card className="border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-950">
           <CardContent className="py-4">
-            <p data-testid="stripe-setup-notice" className="text-sm text-yellow-800 dark:text-yellow-200">
+            <p
+              data-testid="stripe-setup-notice"
+              className="text-sm text-yellow-800 dark:text-yellow-200"
+            >
               Stripe integration requires STRIPE_SECRET_KEY in environment
             </p>
           </CardContent>
@@ -115,13 +130,19 @@ export function StripeInvoicePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Invoice History</CardTitle>
-              <Button data-testid="generate-invoice-btn" onClick={() => setModalOpen(true)}>
+              <Button
+                data-testid="generate-invoice-btn"
+                onClick={() => setModalOpen(true)}
+              >
                 Generate Invoice
               </Button>
             </CardHeader>
             <CardContent>
               {invoices.length === 0 ? (
-                <p className="py-8 text-center text-muted-foreground text-sm" data-testid="empty-state">
+                <p
+                  className="py-8 text-center text-muted-foreground text-sm"
+                  data-testid="empty-state"
+                >
                   No invoices found.
                 </p>
               ) : (

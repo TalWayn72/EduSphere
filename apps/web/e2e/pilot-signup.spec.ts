@@ -30,7 +30,7 @@ const PILOT_ROUTE = '/pilot';
  * requestPilot mutation returns a success payload.
  */
 async function mockRequestPilotSuccess(
-  page: import('@playwright/test').Page,
+  page: import('@playwright/test').Page
 ): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'RequestPilot' || op.toLowerCase().includes('requestpilot')) {
@@ -52,7 +52,7 @@ async function mockRequestPilotSuccess(
  * Intercept GraphQL and return a network error for requestPilot.
  */
 async function mockRequestPilotError(
-  page: import('@playwright/test').Page,
+  page: import('@playwright/test').Page
 ): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'RequestPilot' || op.toLowerCase().includes('requestpilot')) {
@@ -69,7 +69,7 @@ async function mockRequestPilotError(
 
 /** Assert no raw technical error strings are visible to the user. */
 async function assertNoRawErrors(
-  page: import('@playwright/test').Page,
+  page: import('@playwright/test').Page
 ): Promise<void> {
   const body = (await page.textContent('body')) ?? '';
   expect(body).not.toContain('urql error');
@@ -98,14 +98,14 @@ test.describe('Pilot Signup Page — Structure', () => {
   });
 
   test('pilot signup page loads at /pilot', async ({ page }) => {
-    await expect(
-      page.locator('[data-testid="pilot-signup-page"]'),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="pilot-signup-page"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   test('page heading "Start Your Free Pilot" is visible', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: /Start Your Free Pilot/i }),
+      page.getByRole('heading', { name: /Start Your Free Pilot/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -133,7 +133,9 @@ test.describe('Pilot Signup Page — Form Fields', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
+    await page
+      .locator('[data-testid="pilot-form"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('Organization Name field is present and required', async ({ page }) => {
@@ -207,7 +209,9 @@ test.describe('Pilot Signup Page — Validation', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
+    await page
+      .locator('[data-testid="pilot-form"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('submitting empty form shows validation errors', async ({ page }) => {
@@ -224,9 +228,9 @@ test.describe('Pilot Signup Page — Validation', () => {
   }) => {
     await page.locator('#orgName').fill('X');
     await page.locator('[data-testid="pilot-submit-btn"]').click();
-    await expect(
-      page.locator('[role="alert"]').first(),
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('[role="alert"]').first()).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('invalid email shows validation error', async ({ page }) => {
@@ -258,12 +262,14 @@ test.describe('Pilot Signup Page — Successful Submission', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
+    await page
+      .locator('[data-testid="pilot-form"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   /** Fill all required fields with valid data. */
   async function fillValidForm(
-    page: import('@playwright/test').Page,
+    page: import('@playwright/test').Page
   ): Promise<void> {
     await page.locator('#orgName').fill('Test University of E2E');
     // Select organization type
@@ -275,9 +281,11 @@ test.describe('Pilot Signup Page — Successful Submission', () => {
     await page.locator('#contactName').fill('Dr. E2E Tester');
     await page.locator('#contactEmail').fill('e2e.tester@university.edu');
     await page.locator('#estimatedUsers').fill('250');
-    await page.locator('#useCase').fill(
-      'We want to use EduSphere for undergraduate computer science courses.',
-    );
+    await page
+      .locator('#useCase')
+      .fill(
+        'We want to use EduSphere for undergraduate computer science courses.'
+      );
   }
 
   test('filling valid form and submitting shows success message', async ({
@@ -287,7 +295,7 @@ test.describe('Pilot Signup Page — Successful Submission', () => {
     await fillValidForm(page);
     await page.locator('[data-testid="pilot-submit-btn"]').click();
     await expect(
-      page.locator('[data-testid="pilot-success-message"]'),
+      page.locator('[data-testid="pilot-success-message"]')
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -301,7 +309,7 @@ test.describe('Pilot Signup Page — Successful Submission', () => {
       .locator('[data-testid="pilot-success-message"]')
       .waitFor({ timeout: 10_000 });
     await expect(
-      page.getByRole('heading', { name: /Request Received/i }),
+      page.getByRole('heading', { name: /Request Received/i })
     ).toBeVisible({ timeout: 5_000 });
   });
 
@@ -360,12 +368,14 @@ test.describe('Pilot Signup Page — Error Handling', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 15_000 });
+    await page
+      .locator('[data-testid="pilot-form"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   /** Fill minimum valid data so the form passes client validation. */
   async function fillMinimalValidForm(
-    page: import('@playwright/test').Page,
+    page: import('@playwright/test').Page
   ): Promise<void> {
     await page.locator('#orgName').fill('Test University Error Case');
     await page.locator('#orgType').click();
@@ -375,9 +385,9 @@ test.describe('Pilot Signup Page — Error Handling', () => {
     await page.locator('#contactName').fill('Error Tester');
     await page.locator('#contactEmail').fill('error@university.edu');
     await page.locator('#estimatedUsers').fill('100');
-    await page.locator('#useCase').fill(
-      'Testing the error handling path for this form.',
-    );
+    await page
+      .locator('#useCase')
+      .fill('Testing the error handling path for this form.');
   }
 
   test('mutation error shows error message element', async ({ page }) => {
@@ -385,7 +395,7 @@ test.describe('Pilot Signup Page — Error Handling', () => {
     await fillMinimalValidForm(page);
     await page.locator('[data-testid="pilot-submit-btn"]').click();
     await expect(
-      page.locator('[data-testid="pilot-error-message"]'),
+      page.locator('[data-testid="pilot-error-message"]')
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -429,7 +439,7 @@ test.describe('Pilot Signup Page — Error Handling', () => {
       .locator('[data-testid="pilot-error-message"]')
       .waitFor({ timeout: 10_000 });
     await expect(
-      page.locator('[data-testid="pilot-success-message"]'),
+      page.locator('[data-testid="pilot-success-message"]')
     ).not.toBeVisible();
   });
 });
@@ -441,7 +451,9 @@ test.describe('Pilot Signup Page — Visual Regression', () => {
     await page.goto(`${BASE_URL}${PILOT_ROUTE}`, {
       waitUntil: 'domcontentloaded',
     });
-    await page.locator('[data-testid="pilot-form"]').waitFor({ timeout: 10_000 });
+    await page
+      .locator('[data-testid="pilot-form"]')
+      .waitFor({ timeout: 10_000 });
     await expect(page).toHaveScreenshot('pilot-signup-empty-form.png', {
       maxDiffPixelRatio: 0.05,
     });

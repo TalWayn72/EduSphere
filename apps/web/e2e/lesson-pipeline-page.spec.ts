@@ -49,10 +49,42 @@ const MOCK_LESSON = {
     lessonId: LESSON_ID,
     templateName: 'THEMATIC',
     nodes: [
-      { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
-      { id: 'n2', moduleType: 'ASR', label: 'Transcription', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
-      { id: 'n3', moduleType: 'SUMMARIZATION', label: 'Summarization', labelHe: 'סיכום', enabled: true, order: 2, config: {} },
-      { id: 'n4', moduleType: 'QA_GATE', label: 'QA Gate', labelHe: 'בקרת איכות', enabled: true, order: 3, config: {} },
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+      {
+        id: 'n2',
+        moduleType: 'ASR',
+        label: 'Transcription',
+        labelHe: 'תמלול',
+        enabled: true,
+        order: 1,
+        config: {},
+      },
+      {
+        id: 'n3',
+        moduleType: 'SUMMARIZATION',
+        label: 'Summarization',
+        labelHe: 'סיכום',
+        enabled: true,
+        order: 2,
+        config: {},
+      },
+      {
+        id: 'n4',
+        moduleType: 'QA_GATE',
+        label: 'QA Gate',
+        labelHe: 'בקרת איכות',
+        enabled: true,
+        order: 3,
+        config: {},
+      },
     ],
     config: {},
     status: 'DRAFT',
@@ -173,10 +205,15 @@ async function setupMocks(page: Page, lessonData: LessonData = MOCK_LESSON) {
     let op = '';
     let q = rawBody;
     try {
-      const parsed = JSON.parse(rawBody) as { query?: string; operationName?: string };
+      const parsed = JSON.parse(rawBody) as {
+        query?: string;
+        operationName?: string;
+      };
       op = parsed?.operationName ?? '';
       q = parsed?.query ?? rawBody;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     // Course query (for breadcrumb)
     if (op === 'Course' || q.includes('course(id:')) {
@@ -197,7 +234,11 @@ async function setupMocks(page: Page, lessonData: LessonData = MOCK_LESSON) {
     }
 
     // Lesson query
-    if (op === 'Lesson' || q.includes('lesson(id:') || q.includes('query Lesson')) {
+    if (
+      op === 'Lesson' ||
+      q.includes('lesson(id:') ||
+      q.includes('query Lesson')
+    ) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -235,36 +276,46 @@ test.describe('Lesson Pipeline Page — breadcrumb navigation', () => {
     await setupMocks(page);
   });
 
-  test('breadcrumb shows at least 3 segments including course and lesson links', async ({ page }) => {
+  test('breadcrumb shows at least 3 segments including course and lesson links', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
     // Wait for pipeline content to render
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Breadcrumb should contain navigation segments
-    const breadcrumb = page.locator('nav[aria-label*="breadcrumb"], [data-testid="breadcrumb"]');
+    const breadcrumb = page.locator(
+      'nav[aria-label*="breadcrumb"], [data-testid="breadcrumb"]'
+    );
     await expect(breadcrumb).toBeVisible({ timeout: 5_000 });
 
-    const breadcrumbText = await breadcrumb.textContent() ?? '';
+    const breadcrumbText = (await breadcrumb.textContent()) ?? '';
 
     // Should contain "Courses" or course-related segment
     expect(
       breadcrumbText.includes('Courses') ||
-      breadcrumbText.includes('קורסים') ||
-      breadcrumbText.includes(COURSE_TITLE),
+        breadcrumbText.includes('קורסים') ||
+        breadcrumbText.includes(COURSE_TITLE)
     ).toBeTruthy();
   });
 
-  test('breadcrumb lesson link navigates to lesson detail', async ({ page }) => {
+  test('breadcrumb lesson link navigates to lesson detail', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Find a breadcrumb link containing the lesson title or "lesson" text
     const lessonLink = page.locator(
-      `nav a[href*="/lessons/${LESSON_ID}"], [data-testid="breadcrumb"] a[href*="/lessons/${LESSON_ID}"]`,
+      `nav a[href*="/lessons/${LESSON_ID}"], [data-testid="breadcrumb"] a[href*="/lessons/${LESSON_ID}"]`
     );
 
     const lessonLinkCount = await lessonLink.count();
@@ -272,7 +323,7 @@ test.describe('Lesson Pipeline Page — breadcrumb navigation', () => {
       await lessonLink.first().click();
       await expect(page).toHaveURL(
         new RegExp(`/courses/${COURSE_ID}/lessons/${LESSON_ID}$`),
-        { timeout: 8_000 },
+        { timeout: 8_000 }
       );
     }
   });
@@ -336,9 +387,10 @@ test.describe('Lesson Pipeline Page — output preview modal', () => {
       await expect(modal).toBeVisible({ timeout: 5_000 });
 
       // Modal should contain the summary text
-      const modalText = await modal.textContent() ?? '';
+      const modalText = (await modal.textContent()) ?? '';
       expect(
-        modalText.includes('שיעור על הלכות ברכות') || modalText.includes('SUMMARIZATION'),
+        modalText.includes('שיעור על הלכות ברכות') ||
+          modalText.includes('SUMMARIZATION')
       ).toBeTruthy();
     }
   });
@@ -358,7 +410,9 @@ test.describe('Lesson Pipeline Page — output preview modal', () => {
 
       // Close the modal via Escape
       await page.keyboard.press('Escape');
-      await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 3_000 });
+      await expect(page.getByRole('dialog')).not.toBeVisible({
+        timeout: 3_000,
+      });
     }
   });
 });
@@ -373,7 +427,9 @@ test.describe('Lesson Pipeline Page — undo/redo', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Toggle a node to create an undoable action
     await page.getByTestId('pipeline-node-INGESTION').click();
@@ -383,7 +439,9 @@ test.describe('Lesson Pipeline Page — undo/redo', () => {
       await page.getByTestId('config-panel-close').click();
 
       // Node should show disabled state (opacity-50)
-      await expect(page.getByTestId('pipeline-node-INGESTION')).toHaveClass(/opacity-50/);
+      await expect(page.getByTestId('pipeline-node-INGESTION')).toHaveClass(
+        /opacity-50/
+      );
 
       // Undo with Ctrl+Z
       await page.keyboard.press('Control+z');
@@ -398,7 +456,9 @@ test.describe('Lesson Pipeline Page — undo/redo', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Toggle a node off, then undo, then redo
     await page.getByTestId('pipeline-node-INGESTION').click();
@@ -432,7 +492,9 @@ test.describe('Lesson Pipeline Page — regression guards', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     const bodyText = await page.textContent('body');
     expect(bodyText).not.toContain('[GraphQL]');
@@ -445,7 +507,9 @@ test.describe('Lesson Pipeline Page — regression guards', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('lesson-pipeline-page.png', {
       maxDiffPixels: 300,

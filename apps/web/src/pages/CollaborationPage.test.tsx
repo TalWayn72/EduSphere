@@ -119,13 +119,17 @@ describe('CollaborationPage', () => {
       {
         data: undefined,
         fetching: false,
-        error: { message: 'Cannot query field "myDiscussions" on type "Query"' },
+        error: {
+          message: 'Cannot query field "myDiscussions" on type "Query"',
+        },
       },
       vi.fn(),
     ]);
     renderPage();
     // Should NOT show the network error banner
-    expect(screen.queryByTestId('collab-offline-banner')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('collab-offline-banner')
+    ).not.toBeInTheDocument();
     // Should show the schema upgrade banner
     expect(screen.getByTestId('collab-schema-banner')).toBeInTheDocument();
     expect(

@@ -40,11 +40,17 @@ export const InToolbar: Story = {
   render: () => (
     <div className="flex items-center gap-2">
       <button className="text-sm px-2 py-1 rounded hover:bg-muted">Bold</button>
-      <button className="text-sm px-2 py-1 rounded hover:bg-muted">Italic</button>
+      <button className="text-sm px-2 py-1 rounded hover:bg-muted">
+        Italic
+      </button>
       <Separator orientation="vertical" className="h-5" />
       <button className="text-sm px-2 py-1 rounded hover:bg-muted">Left</button>
-      <button className="text-sm px-2 py-1 rounded hover:bg-muted">Center</button>
-      <button className="text-sm px-2 py-1 rounded hover:bg-muted">Right</button>
+      <button className="text-sm px-2 py-1 rounded hover:bg-muted">
+        Center
+      </button>
+      <button className="text-sm px-2 py-1 rounded hover:bg-muted">
+        Right
+      </button>
     </div>
   ),
 };

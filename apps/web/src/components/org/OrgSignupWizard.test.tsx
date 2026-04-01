@@ -27,7 +27,9 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/hooks/useGraphQL', () => ({
   useGraphQL: vi.fn(() => ({
-    mutate: vi.fn().mockResolvedValue({ data: { createOrganization: { tenantId: 't-001' } } }),
+    mutate: vi.fn().mockResolvedValue({
+      data: { createOrganization: { tenantId: 't-001' } },
+    }),
     loading: false,
     error: null,
   })),
@@ -57,14 +59,22 @@ describe('OrgSignupWizard', () => {
   describe('step rendering', () => {
     it('renders step 1 (Account) by default', () => {
       render(<OrgSignupWizard />);
-      expect(screen.getByText(/orgOnboarding\.createAccount/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/orgOnboarding\.createAccount/i)
+      ).toBeInTheDocument();
     });
 
     it('shows progress stepper with 3 steps', () => {
       render(<OrgSignupWizard />);
-      expect(screen.getByText(/orgOnboarding\.stepAccount/i)).toBeInTheDocument();
-      expect(screen.getByText(/orgOnboarding\.stepOrganization/i)).toBeInTheDocument();
-      expect(screen.getByText(/orgOnboarding\.stepBranding/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/orgOnboarding\.stepAccount/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/orgOnboarding\.stepOrganization/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/orgOnboarding\.stepBranding/i)
+      ).toBeInTheDocument();
     });
 
     it('marks step 1 as active and steps 2-3 as pending', () => {
@@ -79,7 +89,9 @@ describe('OrgSignupWizard', () => {
   describe('Step 1 — Account', () => {
     it('renders full name input', () => {
       render(<OrgSignupWizard />);
-      expect(screen.getByLabelText(/orgOnboarding\.fullName/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/orgOnboarding\.fullName/i)
+      ).toBeInTheDocument();
     });
 
     it('renders email input with type="email"', () => {
@@ -91,13 +103,19 @@ describe('OrgSignupWizard', () => {
 
     it('renders password input with toggle visibility', () => {
       render(<OrgSignupWizard />);
-      expect(screen.getByLabelText(/orgOnboarding\.password/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/orgOnboarding\.password/i)
+      ).toBeInTheDocument();
     });
 
     it('renders ToS and GDPR checkboxes', () => {
       render(<OrgSignupWizard />);
-      expect(screen.getByLabelText(/orgOnboarding\.tosAgree/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/orgOnboarding\.gdprConsent/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/orgOnboarding\.tosAgree/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/orgOnboarding\.gdprConsent/i)
+      ).toBeInTheDocument();
     });
 
     it('disables Next button when form is invalid', () => {
@@ -128,9 +146,18 @@ describe('OrgSignupWizard', () => {
 
   describe('step navigation', () => {
     async function fillStep1(user: ReturnType<typeof userEvent.setup>) {
-      await user.type(screen.getByLabelText(/orgOnboarding\.fullName/i), 'John Admin');
-      await user.type(screen.getByLabelText(/orgOnboarding\.workEmail/i), 'admin@acme.edu');
-      await user.type(screen.getByLabelText(/orgOnboarding\.password/i), 'SecureP@ss123');
+      await user.type(
+        screen.getByLabelText(/orgOnboarding\.fullName/i),
+        'John Admin'
+      );
+      await user.type(
+        screen.getByLabelText(/orgOnboarding\.workEmail/i),
+        'admin@acme.edu'
+      );
+      await user.type(
+        screen.getByLabelText(/orgOnboarding\.password/i),
+        'SecureP@ss123'
+      );
       await user.click(screen.getByLabelText(/orgOnboarding\.tosAgree/i));
       await user.click(screen.getByLabelText(/orgOnboarding\.gdprConsent/i));
     }
@@ -144,7 +171,9 @@ describe('OrgSignupWizard', () => {
       await user.click(nextBtn);
 
       await waitFor(() => {
-        expect(screen.getByText(/orgOnboarding\.tellUsAboutOrg/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/orgOnboarding\.tellUsAboutOrg/i)
+        ).toBeInTheDocument();
       });
     });
 
@@ -155,12 +184,16 @@ describe('OrgSignupWizard', () => {
       await user.click(screen.getByRole('button', { name: /next/i }));
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /back/i })
+        ).toBeInTheDocument();
       });
       await user.click(screen.getByRole('button', { name: /back/i }));
 
       await waitFor(() => {
-        expect(screen.getByText(/orgOnboarding\.createAccount/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/orgOnboarding\.createAccount/i)
+        ).toBeInTheDocument();
       });
     });
 
@@ -171,12 +204,16 @@ describe('OrgSignupWizard', () => {
       await user.click(screen.getByRole('button', { name: /next/i }));
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /back/i })
+        ).toBeInTheDocument();
       });
       await user.click(screen.getByRole('button', { name: /back/i }));
 
       await waitFor(() => {
-        expect(screen.getByLabelText(/orgOnboarding\.fullName/i)).toHaveValue('John Admin');
+        expect(screen.getByLabelText(/orgOnboarding\.fullName/i)).toHaveValue(
+          'John Admin'
+        );
       });
     });
   });
@@ -197,9 +234,17 @@ describe('OrgSignupWizard', () => {
   describe('accessibility', () => {
     it('has aria-required on required fields', () => {
       render(<OrgSignupWizard />);
-      expect(screen.getByLabelText(/orgOnboarding\.fullName/i)).toHaveAttribute('aria-required', 'true');
-      expect(screen.getByLabelText(/orgOnboarding\.workEmail/i)).toHaveAttribute('aria-required', 'true');
-      expect(screen.getByLabelText(/orgOnboarding\.password/i)).toHaveAttribute('aria-required', 'true');
+      expect(screen.getByLabelText(/orgOnboarding\.fullName/i)).toHaveAttribute(
+        'aria-required',
+        'true'
+      );
+      expect(
+        screen.getByLabelText(/orgOnboarding\.workEmail/i)
+      ).toHaveAttribute('aria-required', 'true');
+      expect(screen.getByLabelText(/orgOnboarding\.password/i)).toHaveAttribute(
+        'aria-required',
+        'true'
+      );
     });
 
     it('uses role="alert" for validation errors', async () => {

@@ -5,7 +5,12 @@ import { MediaQueriesService } from './media-queries.service';
 import { AltTextGeneratorService } from './alt-text-generator.service';
 
 @Module({
-  providers: [MediaResolver, MediaService, MediaQueriesService, AltTextGeneratorService],
+  providers: [
+    MediaResolver,
+    MediaService,
+    MediaQueriesService,
+    AltTextGeneratorService,
+  ],
   exports: [MediaService],
 })
 export class MediaModule {}

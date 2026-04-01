@@ -13,12 +13,23 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('./agent-modes-data', () => ({
   AGENT_MODES: [
-    { id: 'chavruta', label: 'Chavruta', icon: 'icon', color: 'text-blue', bg: 'bg-blue', description: 'desc', prompts: ['p1'], responses: ['r1'] },
+    {
+      id: 'chavruta',
+      label: 'Chavruta',
+      icon: 'icon',
+      color: 'text-blue',
+      bg: 'bg-blue',
+      description: 'desc',
+      prompts: ['p1'],
+      responses: ['r1'],
+    },
   ],
 }));
 
@@ -50,12 +61,20 @@ import { AgentsPage } from './AgentsPage';
 
 describe('AgentsPage (subdirectory)', () => {
   it('renders inside Layout', () => {
-    render(<MemoryRouter><AgentsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <AgentsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><AgentsPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <AgentsPage />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

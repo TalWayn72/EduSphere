@@ -44,9 +44,7 @@ export const CourseGrid = React.memo(function CourseGrid({
       <Card>
         <CardContent className="pt-6 text-center">
           <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            {t('noCoursesYet')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('noCoursesYet')}</p>
         </CardContent>
       </Card>
     );

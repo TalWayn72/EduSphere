@@ -28,26 +28,40 @@ function read(relativePath: string): string {
 
 describe('Rate Limiting: Org Creation (10/hr per IP)', () => {
   it('rate-limit middleware handles unauthenticated public endpoints (including org creation)', () => {
-    const c = read('apps/gateway/src/middleware/rate-limit.ts') || read('apps/gateway/src/middleware/rate-limit.middleware.ts');
+    const c =
+      read('apps/gateway/src/middleware/rate-limit.ts') ||
+      read('apps/gateway/src/middleware/rate-limit.middleware.ts');
     // The general rate-limiter has a pilot/unauthenticated tier for public endpoints
-    expect(c).toMatch(/createOrganization|org.*creation|SIGNUP|signup|pilot|unauthenticated/i);
+    expect(c).toMatch(
+      /createOrganization|org.*creation|SIGNUP|signup|pilot|unauthenticated/i
+    );
   });
 
   it('org creation rate limit is scoped to IP (not tenant — unauthenticated)', () => {
-    const c = read('apps/gateway/src/middleware/rate-limit.ts') || read('apps/gateway/src/middleware/rate-limit.middleware.ts');
+    const c =
+      read('apps/gateway/src/middleware/rate-limit.ts') ||
+      read('apps/gateway/src/middleware/rate-limit.middleware.ts');
     // Org creation is public — must use IP-based rate limiting
     expect(c).toMatch(/ip|IP|remoteAddress|x-forwarded-for/i);
   });
 
   it('org creation rate limit maximum is ≤10 per hour', () => {
-    const c = read('apps/gateway/src/middleware/rate-limit.ts') || read('apps/gateway/src/middleware/rate-limit.middleware.ts');
+    const c =
+      read('apps/gateway/src/middleware/rate-limit.ts') ||
+      read('apps/gateway/src/middleware/rate-limit.middleware.ts');
     // Must enforce a limit — either hardcoded or via env var
-    expect(c).toMatch(/ORG_CREATION_RATE_LIMIT|createOrg.*limit|10|SIGNUP_RATE/i);
+    expect(c).toMatch(
+      /ORG_CREATION_RATE_LIMIT|createOrg.*limit|10|SIGNUP_RATE/i
+    );
   });
 
   it('rate limiter returns standardized error code on limit exceeded', () => {
-    const c = read('apps/gateway/src/middleware/rate-limit.ts') || read('apps/gateway/src/middleware/rate-limit.middleware.ts');
-    expect(c).toMatch(/RATE_LIMIT_EXCEEDED|429|Too Many Requests|allowed.*false|remaining/i);
+    const c =
+      read('apps/gateway/src/middleware/rate-limit.ts') ||
+      read('apps/gateway/src/middleware/rate-limit.middleware.ts');
+    expect(c).toMatch(
+      /RATE_LIMIT_EXCEEDED|429|Too Many Requests|allowed.*false|remaining/i
+    );
   });
 });
 
@@ -58,9 +72,13 @@ describe('Rate Limiting: API Key Creation (20/day per org)', () => {
     const service =
       read('apps/subgraph-core/src/api-keys/api-key.service.ts') ||
       read('apps/subgraph-core/src/org/api-key.service.ts');
-    const middleware = read('apps/gateway/src/middleware/rate-limit.ts') || read('apps/gateway/src/middleware/rate-limit.middleware.ts');
+    const middleware =
+      read('apps/gateway/src/middleware/rate-limit.ts') ||
+      read('apps/gateway/src/middleware/rate-limit.middleware.ts');
     const combined = service + middleware;
-    expect(combined).toMatch(/rate.*limit|limit.*key|max.*key|API_KEY_RATE|createApiKey/i);
+    expect(combined).toMatch(
+      /rate.*limit|limit.*key|max.*key|API_KEY_RATE|createApiKey/i
+    );
   });
 
   it('API key creation limit is enforced per tenant (not per user)', () => {
@@ -88,9 +106,13 @@ describe('Rate Limiting: Invitation (100/day per org)', () => {
     const service =
       read('apps/subgraph-core/src/tenant/org-invitation.service.ts') ||
       read('apps/subgraph-core/src/org/org-invitation.service.ts');
-    const middleware = read('apps/gateway/src/middleware/rate-limit.ts') || read('apps/gateway/src/middleware/rate-limit.middleware.ts');
+    const middleware =
+      read('apps/gateway/src/middleware/rate-limit.ts') ||
+      read('apps/gateway/src/middleware/rate-limit.middleware.ts');
     const combined = service + middleware;
-    expect(combined).toMatch(/rate.*limit|limit.*invit|max.*invit|batch|INVITATION_RATE/i);
+    expect(combined).toMatch(
+      /rate.*limit|limit.*invit|max.*invit|batch|INVITATION_RATE/i
+    );
   });
 
   it('invitation batch size is limited (max 100 emails per request)', () => {
@@ -99,7 +121,9 @@ describe('Rate Limiting: Invitation (100/day per org)', () => {
       read('apps/subgraph-core/src/org/org.schemas.ts') ||
       read('apps/subgraph-core/src/org/validation.ts');
     // Zod schema validates message max or role enum — service enforces batch limit
-    expect(schemas).toMatch(/max\(100\)|max\(\d+\)|MAX_BATCH|batch.*limit|\.max\(/);
+    expect(schemas).toMatch(
+      /max\(100\)|max\(\d+\)|MAX_BATCH|batch.*limit|\.max\(/
+    );
   });
 });
 
@@ -112,7 +136,9 @@ describe('Rate Limiting: Webhook Dispatch (1000/hr per endpoint)', () => {
       read('apps/subgraph-core/src/webhooks/webhook-validation.ts') +
       read('apps/subgraph-core/src/webhooks/webhook-delivery.service.ts') +
       read('apps/subgraph-core/src/org/webhook-dispatcher.service.ts');
-    expect(content).toMatch(/rate.*limit|throttle|limit.*dispatch|MAX_DISPATCH|MAX_RETRIES|AUTO_DISABLE/i);
+    expect(content).toMatch(
+      /rate.*limit|throttle|limit.*dispatch|MAX_DISPATCH|MAX_RETRIES|AUTO_DISABLE/i
+    );
   });
 
   it('webhook dispatcher tracks dispatch count per endpoint', () => {
@@ -174,7 +200,9 @@ describe('GDPR: Org Signup Consent (Art.6, Art.7)', () => {
       read('apps/web/src/pages/OrgSignupPage.tsx') ||
       read('apps/web/src/pages/SignupPage.tsx');
     // Consent value must be passed in the mutation input
-    expect(signupPage).toMatch(/consent|acceptTerms|agreeToTerms|dataProcessingConsent/i);
+    expect(signupPage).toMatch(
+      /consent|acceptTerms|agreeToTerms|dataProcessingConsent/i
+    );
   });
 
   it('createOrganization mutation records provisioning status for audit trail', () => {
@@ -182,7 +210,9 @@ describe('GDPR: Org Signup Consent (Art.6, Art.7)', () => {
       read('apps/subgraph-core/src/tenant/org-provisioning.service.ts') ||
       read('apps/subgraph-core/src/org/org-provisioning.service.ts');
     // Provisioning pipeline logs status transitions (audit trail)
-    expect(service).toMatch(/provisioningStatus|PROVISIONING|ACTIVE|FAILED|logger/i);
+    expect(service).toMatch(
+      /provisioningStatus|PROVISIONING|ACTIVE|FAILED|logger/i
+    );
   });
 
   it('createOrganization validates input before creating org', () => {
@@ -190,7 +220,9 @@ describe('GDPR: Org Signup Consent (Art.6, Art.7)', () => {
       read('apps/subgraph-core/src/tenant/org-provisioning.service.ts') ||
       read('apps/subgraph-core/src/org/org-provisioning.service.ts');
     // Validates slug uniqueness and throws on conflict
-    expect(service).toMatch(/ConflictException|BadRequestException|SLUG_TAKEN|validate/i);
+    expect(service).toMatch(
+      /ConflictException|BadRequestException|SLUG_TAKEN|validate/i
+    );
   });
 });
 
@@ -284,8 +316,6 @@ describe('Email Verification: Org Admin Account', () => {
       read('apps/subgraph-core/src/tenant/org-provisioning.service.ts') ||
       read('apps/subgraph-core/src/org/org-provisioning.service.ts');
     // Provisioning status gates activation
-    expect(service).toMatch(
-      /PROVISIONING|provisioningStatus|ACTIVE|FAILED/i
-    );
+    expect(service).toMatch(/PROVISIONING|provisioningStatus|ACTIVE|FAILED/i);
   });
 });

@@ -36,7 +36,9 @@ export function WorkflowCanvas({
       onDrop={onDrop}
       onDragOver={(e) => e.preventDefault()}
       data-testid="workflow-canvas"
-      onClick={() => { if (!connecting) onCanvasClick(); }}
+      onClick={() => {
+        if (!connecting) onCanvasClick();
+      }}
     >
       {nodes.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground pointer-events-none gap-2">
@@ -68,7 +70,14 @@ export function WorkflowCanvas({
           );
         })}
         <defs>
-          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <marker
+            id="arrow"
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="3"
+            orient="auto"
+          >
             <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8" />
           </marker>
         </defs>
@@ -90,7 +99,10 @@ export function WorkflowCanvas({
               isConnectSource && 'ring-2 ring-orange-400 animate-pulse'
             )}
             style={{ left: node.x, top: node.y }}
-            onClick={(e) => { e.stopPropagation(); onNodeClick(node.id); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onNodeClick(node.id);
+            }}
             data-testid={`workflow-node-${node.id}`}
             aria-pressed={isSelected}
           >

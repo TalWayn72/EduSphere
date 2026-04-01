@@ -15,15 +15,23 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/skeleton', () => ({
-  Skeleton: ({ className }: { className: string }) => <div data-testid="skeleton" className={className} />,
+  Skeleton: ({ className }: { className: string }) => (
+    <div data-testid="skeleton" className={className} />
+  ),
 }));
 
 vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div data-testid="dialog">{children}</div> : null,
-  DialogContent: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-content">{children}</div>,
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogContent: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dialog-content">{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2>{children}</h2>
+  ),
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
@@ -34,7 +42,11 @@ import { LearnerDetailPanel } from './LearnerDetailPanel';
 
 function setupMocks(learner?: Record<string, unknown>, fetching = false) {
   vi.mocked(urql.useQuery).mockReturnValue([
-    { data: learner ? { learnerDetail: learner } : undefined, fetching, error: undefined },
+    {
+      data: learner ? { learnerDetail: learner } : undefined,
+      fetching,
+      error: undefined,
+    },
   ] as never);
 }
 
@@ -122,7 +134,11 @@ describe('LearnerDetailPanel', () => {
       avgQuizScore: 90,
       totalLearningHours: 10,
       activityTimeline: [
-        { date: '2026-03-01T00:00:00Z', type: 'QUIZ', description: 'Passed quiz on React' },
+        {
+          date: '2026-03-01T00:00:00Z',
+          type: 'QUIZ',
+          description: 'Passed quiz on React',
+        },
       ],
     });
     render(<LearnerDetailPanel userId="u1" open={true} onClose={vi.fn()} />);

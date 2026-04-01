@@ -2,13 +2,13 @@
 
 **GDPR Article 33 & 34 | Israeli Privacy Protection Regulations 2023**
 
-| Field | Value |
-|---|---|
-| **Organisation** | EduSphere Ltd |
-| **Document Owner** | CISO / DPO (on appointment) |
-| **Version** | 1.0 |
-| **Last Updated** | March 2026 |
-| **Review Cycle** | Annual, or following any notifiable breach |
+| Field              | Value                                      |
+| ------------------ | ------------------------------------------ |
+| **Organisation**   | EduSphere Ltd                              |
+| **Document Owner** | CISO / DPO (on appointment)                |
+| **Version**        | 1.0                                        |
+| **Last Updated**   | March 2026                                 |
+| **Review Cycle**   | Annual, or following any notifiable breach |
 
 > This procedure implements the obligations of GDPR Art. 33 (72-hour DPA notification), Art. 34 (data subject notification), and the Israeli Privacy Protection Regulations 2023 (PPR 2023) notification requirements. Both regimes require notification to the supervisory authority **no later than 72 hours after becoming aware** of a breach where feasible.
 
@@ -56,18 +56,18 @@ A **personal data breach** is any security incident leading to the accidental or
 
 ### 1.1 Notifiable vs. Non-Notifiable Breaches
 
-| Breach Type | Notification Required? | Rationale |
-|---|---|---|
-| Unauthorised access to encrypted data (key not compromised) | No | Unlikely to result in risk to individuals |
-| Accidental internal access by wrong employee, immediately corrected, no further disclosure | No (document internally) | Unlikely to result in risk |
-| Lost laptop with encrypted disk — full-disk encryption confirmed | No | Encrypted — risk mitigated |
-| Unauthorised access to plaintext personal data | YES — Art. 33 | Risk to individuals |
-| SQL injection exposing user records | YES — Art. 33 | Risk to individuals |
-| Ransomware encrypting DB with data unavailable > 72h | YES — Art. 33 | Availability breach |
-| Mass email sent to wrong recipients revealing other users' emails | YES — Art. 33 | Confidentiality breach |
-| Conversation data forwarded to LLM without consent | YES — Art. 33 + Art. 34 | High risk to individuals |
-| Cross-tenant data leak (one tenant sees another's data) | YES — Art. 33 + Art. 34 | High risk; contractual breach |
-| Credential stuffing attack with confirmed account takeovers | YES — Art. 33 | Access breach |
+| Breach Type                                                                                | Notification Required?   | Rationale                                 |
+| ------------------------------------------------------------------------------------------ | ------------------------ | ----------------------------------------- |
+| Unauthorised access to encrypted data (key not compromised)                                | No                       | Unlikely to result in risk to individuals |
+| Accidental internal access by wrong employee, immediately corrected, no further disclosure | No (document internally) | Unlikely to result in risk                |
+| Lost laptop with encrypted disk — full-disk encryption confirmed                           | No                       | Encrypted — risk mitigated                |
+| Unauthorised access to plaintext personal data                                             | YES — Art. 33            | Risk to individuals                       |
+| SQL injection exposing user records                                                        | YES — Art. 33            | Risk to individuals                       |
+| Ransomware encrypting DB with data unavailable > 72h                                       | YES — Art. 33            | Availability breach                       |
+| Mass email sent to wrong recipients revealing other users' emails                          | YES — Art. 33            | Confidentiality breach                    |
+| Conversation data forwarded to LLM without consent                                         | YES — Art. 33 + Art. 34  | High risk to individuals                  |
+| Cross-tenant data leak (one tenant sees another's data)                                    | YES — Art. 33 + Art. 34  | High risk; contractual breach             |
+| Credential stuffing attack with confirmed account takeovers                                | YES — Art. 33            | Access breach                             |
 
 ### 1.2 What Does NOT Trigger This Procedure
 
@@ -127,6 +127,7 @@ A **personal data breach** is any security incident leading to the accidental or
 **Trigger:** Alert fired (SIEM, monitoring, user report, third-party notification, internal discovery).
 
 **Actions:**
+
 - [ ] Incident ticket created in incident tracking system with unique reference number (format: `INC-YYYY-MM-DD-NNN`)
 - [ ] Detection source documented
 - [ ] Initial responder identified (on-call engineer / security team)
@@ -139,6 +140,7 @@ A **personal data breach** is any security incident leading to the accidental or
 ### Hour 0–4 — Initial Assessment
 
 **Actions:**
+
 - [ ] Determine: Is this a personal data breach? (Use Section 1 criteria)
 - [ ] If NOT a personal data breach: close with documentation, exit this procedure
 - [ ] If YES: assign Severity Tier (Section 2)
@@ -153,6 +155,7 @@ A **personal data breach** is any security incident leading to the accidental or
 ### Hour 4–24 — Containment and Evidence Preservation
 
 **Actions:**
+
 - [ ] Full containment achieved (attacker access removed, vulnerability patched or mitigated)
 - [ ] Evidence preservation complete:
   - PostgreSQL: `pg_dump` of affected tables with timestamp
@@ -171,6 +174,7 @@ A **personal data breach** is any security incident leading to the accidental or
 ### Hour 24–48 — Impact Analysis
 
 **Actions:**
+
 - [ ] Determine exact number of affected data subjects (query affected tables with tenant context)
 - [ ] Categorise personal data involved (use RoPA categories from `ROPA.md`)
 - [ ] Identify whether special category data (Art. 9) was involved
@@ -188,6 +192,7 @@ A **personal data breach** is any security incident leading to the accidental or
 **HARD DEADLINE — 72 HOURS FROM DETECTION**
 
 **Actions:**
+
 - [ ] **GDPR Art. 33: Submit notification to Lead Supervisory Authority**
   - If EduSphere is established in an EU Member State: notify that Member State's DPA
   - If EduSphere serves EU data subjects without EU establishment: notify relevant DPA of data subjects
@@ -207,6 +212,7 @@ A **personal data breach** is any security incident leading to the accidental or
 **Triggered when:** The breach is **likely to result in a high risk** to the rights and freedoms of natural persons (Art. 34).
 
 **Actions:**
+
 - [ ] Identify all affected data subjects by email address
 - [ ] Send notification via primary email channel within 96 hours of breach detection
 - [ ] Content must include (Art. 34(2)):
@@ -222,6 +228,7 @@ A **personal data breach** is any security incident leading to the accidental or
 ### Hour 96 onwards — Recovery and Post-Incident
 
 **Actions:**
+
 - [ ] Full system restoration from clean backup (if systems were compromised)
 - [ ] Vulnerability remediated and verified
 - [ ] Penetration test of remediation (if Tier 3/4)
@@ -321,17 +328,18 @@ EduSphere Ltd
 
 ## Section 5 — Contacts
 
-| Role | Name | Contact | Escalation Order |
-|---|---|---|---|
-| DPO | [TO BE APPOINTED] | dpo@edusphere.dev | 1st |
-| CISO | [TO BE APPOINTED] | ciso@edusphere.dev | 2nd |
-| Head of Engineering | [TO BE APPOINTED] | engineering@edusphere.dev | 3rd |
-| Legal Counsel | [TO BE APPOINTED] | legal@edusphere.dev | 4th |
-| CEO / Management | [TO BE APPOINTED] | — | Tier 3/4 only |
-| PR / Communications | [TO BE APPOINTED] | — | Tier 4 only |
-| External Forensics | [TO BE CONTRACTED] | — | Tier 3/4 only |
+| Role                | Name               | Contact                   | Escalation Order |
+| ------------------- | ------------------ | ------------------------- | ---------------- |
+| DPO                 | [TO BE APPOINTED]  | dpo@edusphere.dev         | 1st              |
+| CISO                | [TO BE APPOINTED]  | ciso@edusphere.dev        | 2nd              |
+| Head of Engineering | [TO BE APPOINTED]  | engineering@edusphere.dev | 3rd              |
+| Legal Counsel       | [TO BE APPOINTED]  | legal@edusphere.dev       | 4th              |
+| CEO / Management    | [TO BE APPOINTED]  | —                         | Tier 3/4 only    |
+| PR / Communications | [TO BE APPOINTED]  | —                         | Tier 4 only      |
+| External Forensics  | [TO BE CONTRACTED] | —                         | Tier 3/4 only    |
 
 **Supervisory Authorities:**
+
 - GDPR Lead DPA: [Determined by EduSphere establishment / main establishment — to be confirmed on DPA appointment]
 - Israeli Privacy Protection Authority: [https://www.gov.il/en/departments/the_privacy_protection_authority](https://www.gov.il/en/departments/the_privacy_protection_authority) — submissions via online portal
 
@@ -344,6 +352,7 @@ EduSphere Ltd
 All breaches must be documented in the internal breach register regardless of whether DPA notification is required (GDPR Art. 33(5)).
 
 **Register fields per entry:**
+
 - Date and time of detection
 - Date and time of notification to DPA (or reason no notification required)
 - Severity tier
@@ -359,6 +368,7 @@ All breaches must be documented in the internal breach register regardless of wh
 A formal post-mortem is mandatory for all Tier 2, 3, and 4 incidents. Post-mortem must be completed within 14 days of incident closure.
 
 **Post-mortem sections:**
+
 1. Timeline of events (UTC timestamps)
 2. Root cause analysis (5 Whys or fishbone)
 3. Contributing factors
@@ -377,18 +387,18 @@ A formal post-mortem is mandatory for all Tier 2, 3, and 4 incidents. Post-morte
 
 ## Appendix A — Breach Detection Sources
 
-| Source | Monitoring System | Alert Type |
-|---|---|---|
+| Source                         | Monitoring System             | Alert Type                                  |
+| ------------------------------ | ----------------------------- | ------------------------------------------- |
 | PostgreSQL audit log anomalies | Jaeger + Pino log aggregation | Unusual query volumes, cross-tenant queries |
-| Failed authentication spikes | Keycloak events + SIEM | Brute force, credential stuffing |
-| Container resource anomalies | Docker stats + health checks | Possible exfiltration (high network egress) |
-| GraphQL error rate spike | Gateway monitoring | Possible injection attempts |
-| MinIO access anomalies | MinIO access logs | Bulk object download |
-| User-reported anomalies | Support ticket system | User sees another user's data |
-| NATS stream anomalies | NATS JetStream monitoring | Unexpected message routing |
+| Failed authentication spikes   | Keycloak events + SIEM        | Brute force, credential stuffing            |
+| Container resource anomalies   | Docker stats + health checks  | Possible exfiltration (high network egress) |
+| GraphQL error rate spike       | Gateway monitoring            | Possible injection attempts                 |
+| MinIO access anomalies         | MinIO access logs             | Bulk object download                        |
+| User-reported anomalies        | Support ticket system         | User sees another user's data               |
+| NATS stream anomalies          | NATS JetStream monitoring     | Unexpected message routing                  |
 
 ---
 
-*Document owner: CISO / DPO (to be appointed)*
-*Stored at: `docs/compliance/BREACH-NOTIFICATION-PROCEDURE.md`*
-*Related: `ROPA.md`, `DPIA.md`, `docs/security/`*
+_Document owner: CISO / DPO (to be appointed)_
+_Stored at: `docs/compliance/BREACH-NOTIFICATION-PROCEDURE.md`_
+_Related: `ROPA.md`, `DPIA.md`, `docs/security/`_

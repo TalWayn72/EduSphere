@@ -17,7 +17,9 @@ vi.mock('./knowledge-source.service.js', () => ({
 }));
 
 // ─── MinioUrlService mock ─────────────────────────────────────────────────────
-const mockGetPresignedUrl = vi.fn().mockResolvedValue('https://minio.local/presigned');
+const mockGetPresignedUrl = vi
+  .fn()
+  .mockResolvedValue('https://minio.local/presigned');
 
 vi.mock('./minio-url.service.js', () => ({
   MinioUrlService: class {
@@ -204,9 +206,13 @@ describe('KnowledgeSourceResolver', () => {
 
   describe('fileUrl (ResolveField)', () => {
     it('returns presigned URL when fileKey is present', async () => {
-      const result = await resolver.fileUrl({ fileKey: 'tenant-1/course-1/abc/file.pdf' });
+      const result = await resolver.fileUrl({
+        fileKey: 'tenant-1/course-1/abc/file.pdf',
+      });
       expect(result).toBe('https://minio.local/presigned');
-      expect(mockGetPresignedUrl).toHaveBeenCalledWith('tenant-1/course-1/abc/file.pdf');
+      expect(mockGetPresignedUrl).toHaveBeenCalledWith(
+        'tenant-1/course-1/abc/file.pdf'
+      );
     });
 
     it('returns null when fileKey is null', async () => {

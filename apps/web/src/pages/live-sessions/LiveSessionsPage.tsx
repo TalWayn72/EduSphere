@@ -37,8 +37,7 @@ export function LiveSessionsPage() {
   }, []);
 
   // GraphQL — list sessions
-  const statusFilter =
-    activeTab === 'upcoming' ? undefined : 'ENDED';
+  const statusFilter = activeTab === 'upcoming' ? undefined : 'ENDED';
   const [sessionsResult] = useQuery({
     query: LIST_LIVE_SESSIONS_QUERY,
     variables: { status: statusFilter, limit: 20, offset: 0 },
@@ -46,7 +45,9 @@ export function LiveSessionsPage() {
   });
 
   // Mutations — create (inline) + session actions via hook
-  const [createResult, executeCreate] = useMutation(CREATE_LIVE_SESSION_MUTATION);
+  const [createResult, executeCreate] = useMutation(
+    CREATE_LIVE_SESSION_MUTATION
+  );
   const {
     startSession,
     endSession,
@@ -66,7 +67,11 @@ export function LiveSessionsPage() {
       ? sessions.filter((s) => s.status !== 'ENDED')
       : sessions.filter((s) => s.status === 'ENDED');
 
-  const handleCreate = async (name: string, contentId: string, scheduledAt: string) => {
+  const handleCreate = async (
+    name: string,
+    contentId: string,
+    scheduledAt: string
+  ) => {
     const isoAt = new Date(scheduledAt).toISOString();
     await executeCreate({
       contentItemId: contentId,
@@ -126,7 +131,11 @@ export function LiveSessionsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b" role="tablist" aria-label="Session filter tabs">
+        <div
+          className="flex gap-1 border-b"
+          role="tablist"
+          aria-label="Session filter tabs"
+        >
           {(['upcoming', 'past'] as Tab[]).map((tab) => (
             <button
               key={tab}

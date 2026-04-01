@@ -97,7 +97,8 @@ export class PushDispatchService implements OnModuleDestroy {
   ): Promise<void> {
     const vapidPublicKey = process.env['VAPID_PUBLIC_KEY'];
     const vapidPrivateKey = process.env['VAPID_PRIVATE_KEY'];
-    const vapidSubject = process.env['VAPID_SUBJECT'] ?? 'mailto:admin@edusphere.dev';
+    const vapidSubject =
+      process.env['VAPID_SUBJECT'] ?? 'mailto:admin@edusphere.dev';
 
     if (!vapidPublicKey || !vapidPrivateKey) {
       // Graceful fallback: log and skip when VAPID keys are not configured.
@@ -114,7 +115,10 @@ export class PushDispatchService implements OnModuleDestroy {
     // If not installed, log a warning and skip.
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const webpush = require('web-push') as { setVapidDetails: (s: string, pub: string, priv: string) => void; sendNotification: (sub: unknown, payload: string) => Promise<unknown> };
+      const webpush = require('web-push') as {
+        setVapidDetails: (s: string, pub: string, priv: string) => void;
+        sendNotification: (sub: unknown, payload: string) => Promise<unknown>;
+      };
       webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
       const subscription = JSON.parse(subscriptionJson) as {
@@ -127,9 +131,7 @@ export class PushDispatchService implements OnModuleDestroy {
         JSON.stringify({ title, body })
       );
 
-      this.logger.log(
-        '[PushDispatchService] Web push sent successfully'
-      );
+      this.logger.log('[PushDispatchService] Web push sent successfully');
     } catch (err) {
       this.logger.warn(
         { err },
@@ -141,7 +143,8 @@ export class PushDispatchService implements OnModuleDestroy {
   private timeout(ms: number): Promise<never> {
     return new Promise((_, reject) =>
       setTimeout(
-        () => reject(new Error(`Push dispatch timed out after ${ms.toString()}ms`)),
+        () =>
+          reject(new Error(`Push dispatch timed out after ${ms.toString()}ms`)),
         ms
       )
     );

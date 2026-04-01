@@ -83,7 +83,10 @@ export function useCourseListData() {
 
   // Show success message from navigation state (CourseCreatePage, DeleteCourse, etc.)
   useEffect(() => {
-    const state = location.state as { message?: string; deleted?: boolean } | null;
+    const state = location.state as {
+      message?: string;
+      deleted?: boolean;
+    } | null;
     if (state?.message) {
       showToast(state.message);
     }

@@ -47,6 +47,8 @@ describe('VsCompetitorsSection', () => {
 
   it('renders the legend note', () => {
     render(<VsCompetitorsSection />);
-    expect(screen.getByText(/Based on publicly available documentation/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Based on publicly available documentation/i)
+    ).toBeInTheDocument();
   });
 });

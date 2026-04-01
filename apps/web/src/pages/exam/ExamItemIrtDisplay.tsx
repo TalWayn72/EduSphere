@@ -17,7 +17,11 @@ export function ExamItemIrtDisplay({ item }: ExamItemIrtDisplayProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <CardTitle className="text-sm">IRT Parameters</CardTitle>
-          {isCalibrated && <Badge className="bg-green-100 text-green-800 text-xs dark:bg-green-900 dark:text-green-200">Calibrated</Badge>}
+          {isCalibrated && (
+            <Badge className="bg-green-100 text-green-800 text-xs dark:bg-green-900 dark:text-green-200">
+              Calibrated
+            </Badge>
+          )}
           {!isCalibrated && (
             <Badge variant="outline" className="text-xs">
               {item.calibrationStatus} — values may change after calibration
@@ -45,7 +49,9 @@ function IrtParam({ label, value }: { label: string; value?: number }) {
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-lg font-mono font-semibold">{value != null ? value.toFixed(3) : '—'}</p>
+      <p className="text-lg font-mono font-semibold">
+        {value != null ? value.toFixed(3) : '—'}
+      </p>
     </div>
   );
 }

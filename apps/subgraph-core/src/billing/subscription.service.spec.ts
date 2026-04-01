@@ -14,7 +14,8 @@ const mockUpdate = vi.fn();
 const mockReturning = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -32,7 +33,9 @@ vi.mock('@edusphere/db', () => ({
     transaction: vi.fn(),
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db, _ctx, fn) => fn({ insert: mockInsert, select: mockSelect })),
+  withTenantContext: vi.fn(async (_db, _ctx, fn) =>
+    fn({ insert: mockInsert, select: mockSelect })
+  ),
   schema: {
     tenantSubscriptions: {
       tenantId: 'tenantId',
@@ -49,7 +52,11 @@ vi.mock('@edusphere/db', () => ({
 
 import { SubscriptionService } from './subscription.service.js';
 
-const CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'ORG_ADMIN' as const };
+const CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'ORG_ADMIN' as const,
+};
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
@@ -75,9 +82,9 @@ describe('SubscriptionService', () => {
     vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) =>
       fn({ select: () => makeChain([]) } as Parameters<typeof fn>[0])
     );
-    await expect(service.getTenantSubscription('tenant-1', CTX)).rejects.toBeInstanceOf(
-      NotFoundException
-    );
+    await expect(
+      service.getTenantSubscription('tenant-1', CTX)
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('isPilotActive returns false when no subscription', async () => {
@@ -121,14 +128,26 @@ describe('SubscriptionService', () => {
   it('createPilotSubscription calls withTenantContext', async () => {
     const { withTenantContext } = await import('@edusphere/db');
     const pilotEndsAt = new Date(Date.now() + 90 * 86400_000);
-    vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) => {
-      const row = { id: 'sub-1', status: 'pilot', tenantId: 'tenant-1', planId: 'plan-1' };
-      const tx = {
-        insert: () => ({ values: () => ({ returning: async () => [row] }) }),
-      };
-      return fn(tx as Parameters<typeof fn>[0]);
-    });
-    const result = await service.createPilotSubscription('tenant-1', 'plan-1', pilotEndsAt, CTX);
+    vi.mocked(withTenantContext).mockImplementationOnce(
+      async (_db, _ctx, fn) => {
+        const row = {
+          id: 'sub-1',
+          status: 'pilot',
+          tenantId: 'tenant-1',
+          planId: 'plan-1',
+        };
+        const tx = {
+          insert: () => ({ values: () => ({ returning: async () => [row] }) }),
+        };
+        return fn(tx as Parameters<typeof fn>[0]);
+      }
+    );
+    const result = await service.createPilotSubscription(
+      'tenant-1',
+      'plan-1',
+      pilotEndsAt,
+      CTX
+    );
     expect(result).toHaveProperty('status', 'pilot');
     expect(withTenantContext).toHaveBeenCalledWith(
       expect.anything(),

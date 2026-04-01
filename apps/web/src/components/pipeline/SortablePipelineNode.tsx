@@ -10,7 +10,7 @@ import type { PipelineNode } from '@/lib/lesson-pipeline.store';
 
 /** Replicate @dnd-kit/utilities CSS.Transform.toString inline. */
 function transformToString(
-  t: { x: number; y: number; scaleX: number; scaleY: number } | null,
+  t: { x: number; y: number; scaleX: number; scaleY: number } | null
 ): string | undefined {
   if (!t) return undefined;
   return `translate3d(${t.x}px, ${t.y}px, 0) scaleX(${t.scaleX}) scaleY(${t.scaleY})`;
@@ -25,7 +25,14 @@ interface Props {
   onRemove: () => void;
 }
 
-export function SortablePipelineNode({ node, idx, total, isSelected, onSelect, onRemove }: Props) {
+export function SortablePipelineNode({
+  node,
+  idx,
+  total,
+  isSelected,
+  onSelect,
+  onRemove,
+}: Props) {
   const {
     attributes,
     listeners,
@@ -82,7 +89,10 @@ export function SortablePipelineNode({ node, idx, total, isSelected, onSelect, o
           </button>
         </div>
         <button
-          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
           className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-red-500 text-xs"
           aria-label={`הסר ${node.labelHe}`}
         >

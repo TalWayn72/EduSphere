@@ -19,8 +19,10 @@ import { BASE_URL } from './env';
 // ─── Anti-regression helpers ──────────────────────────────────────────────────
 
 /** Assert no raw technical error strings are visible to the user. */
-async function assertNoRawErrors(page: import('@playwright/test').Page): Promise<void> {
-  const body = await page.textContent('body') ?? '';
+async function assertNoRawErrors(
+  page: import('@playwright/test').Page
+): Promise<void> {
+  const body = (await page.textContent('body')) ?? '';
   expect(body).not.toContain('urql error');
   expect(body).not.toContain('GraphQL error');
   expect(body).not.toContain('Cannot read properties');
@@ -38,7 +40,9 @@ test.describe('Pricing Page — Page Load', () => {
   });
 
   test('pricing page root element is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="pricing-page"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="pricing-page"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('page title is "Pricing & Plans"', async ({ page }) => {
@@ -46,11 +50,15 @@ test.describe('Pricing Page — Page Load', () => {
   });
 
   test('hero heading "Pricing & Plans" is visible', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /Pricing & Plans/i, level: 1 })).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole('heading', { name: /Pricing & Plans/i, level: 1 })
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('hero subtitle mentions YAU-based pricing', async ({ page }) => {
-    await expect(page.getByText(/Transparent YAU-based pricing/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Transparent YAU-based pricing/i)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('no raw error strings anywhere on page', async ({ page }) => {
@@ -66,13 +74,19 @@ test.describe('Pricing Page — Pricing Tiers', () => {
   });
 
   test('pricing section is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="pricing-section"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="pricing-section"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('all 4 tier names are visible: Starter, Growth, University, Enterprise', async ({ page }) => {
+  test('all 4 tier names are visible: Starter, Growth, University, Enterprise', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     for (const tier of ['Starter', 'Growth', 'University', 'Enterprise']) {
-      await expect(section.getByText(tier).first()).toBeVisible({ timeout: 10_000 });
+      await expect(section.getByText(tier).first()).toBeVisible({
+        timeout: 10_000,
+      });
     }
   });
 
@@ -93,28 +107,40 @@ test.describe('Pricing Page — Pricing Tiers', () => {
 
   test('Enterprise plan shows "Custom" price', async ({ page }) => {
     const section = page.locator('[data-testid="pricing-section"]');
-    await expect(section.getByText('Custom', { exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('Custom', { exact: true })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('each plan card has a CTA button or link', async ({ page }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     // Starter + Growth → "Start Pilot", University → "Request Demo", Enterprise → "Contact Sales"
     for (const ctaText of ['Start Pilot', 'Request Demo', 'Contact Sales']) {
-      await expect(section.getByRole('link', { name: new RegExp(ctaText, 'i') }).first()).toBeVisible({ timeout: 10_000 });
+      await expect(
+        section.getByRole('link', { name: new RegExp(ctaText, 'i') }).first()
+      ).toBeVisible({ timeout: 10_000 });
     }
   });
 
-  test('"Contact Sales" CTA is visible for Enterprise tier', async ({ page }) => {
+  test('"Contact Sales" CTA is visible for Enterprise tier', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
-    await expect(section.getByRole('link', { name: /Contact Sales/i })).toBeVisible({ timeout: 10_000 });
+    await expect(
+      section.getByRole('link', { name: /Contact Sales/i })
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('white-label branding is mentioned in FAQ', async ({ page }) => {
     const faq = page.locator('[data-testid="pricing-faq"]');
-    await expect(faq.getByText(/white-label/i).first()).toBeVisible({ timeout: 10_000 });
+    await expect(faq.getByText(/white-label/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('YAU capacity labels are visible (500 YAU, 2,000 YAU, 10,000 YAU, Unlimited)', async ({ page }) => {
+  test('YAU capacity labels are visible (500 YAU, 2,000 YAU, 10,000 YAU, Unlimited)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="pricing-section"]');
     for (const yau of ['500 YAU', '2,000 YAU', '10,000 YAU', 'Unlimited']) {
       await expect(section.getByText(yau)).toBeVisible({ timeout: 10_000 });
@@ -123,7 +149,9 @@ test.describe('Pricing Page — Pricing Tiers', () => {
 
   test('University tier has "Most Popular" badge', async ({ page }) => {
     const section = page.locator('[data-testid="pricing-section"]');
-    await expect(section.getByText('Most Popular')).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('Most Popular')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
@@ -136,18 +164,24 @@ test.describe('Pricing Page — Hero CTA Navigation', () => {
 
   test('"Start Free Pilot →" CTA link is visible in hero', async ({ page }) => {
     // Hero area above the PricingSection
-    const heroCta = page.getByRole('link', { name: /Start Free Pilot/i }).first();
+    const heroCta = page
+      .getByRole('link', { name: /Start Free Pilot/i })
+      .first();
     await expect(heroCta).toBeVisible({ timeout: 10_000 });
   });
 
   test('"Start Free Pilot →" CTA href points to /pilot', async ({ page }) => {
-    const heroCta = page.getByRole('link', { name: /Start Free Pilot/i }).first();
+    const heroCta = page
+      .getByRole('link', { name: /Start Free Pilot/i })
+      .first();
     const href = await heroCta.getAttribute('href');
     expect(href).toContain('/pilot');
   });
 
   test('nav "Log In" link is visible', async ({ page }) => {
-    await expect(page.getByRole('link', { name: /Log In/i })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('link', { name: /Log In/i })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('nav logo links back to /landing', async ({ page }) => {
@@ -165,7 +199,9 @@ test.describe('Pricing Page — Compliance Badges', () => {
   });
 
   test('compliance section is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="compliance-badges-section"]')).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="compliance-badges-section"]')
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('FERPA compliance card is visible', async ({ page }) => {
@@ -175,12 +211,16 @@ test.describe('Pricing Page — Compliance Badges', () => {
 
   test('WCAG 2.2 AA compliance card is visible', async ({ page }) => {
     const section = page.locator('[data-testid="compliance-badges-section"]');
-    await expect(section.getByText('WCAG 2.2 AA')).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('WCAG 2.2 AA')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('SCORM 2004 compliance card is visible', async ({ page }) => {
     const section = page.locator('[data-testid="compliance-badges-section"]');
-    await expect(section.getByText('SCORM 2004')).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('SCORM 2004')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('LTI 1.3 compliance card is visible', async ({ page }) => {
@@ -207,10 +247,14 @@ test.describe('Pricing Page — Compliance Badges', () => {
 
   test('SOC 2 Type II roadmap notice is visible', async ({ page }) => {
     const section = page.locator('[data-testid="compliance-badges-section"]');
-    await expect(section.getByText(/SOC 2 Type II/i)).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText(/SOC 2 Type II/i)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('VPAT / HECVAT download link is present and has an href', async ({ page }) => {
+  test('VPAT / HECVAT download link is present and has an href', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="compliance-badges-section"]');
     const link = section.getByRole('link', { name: /Download VPAT/i });
     await expect(link).toBeVisible({ timeout: 10_000 });
@@ -231,12 +275,16 @@ test.describe('Pricing Page — Competitor Comparison', () => {
   });
 
   test('comparison section is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="vs-competitors-section"]')).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="vs-competitors-section"]')
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('EduSphere column header is visible', async ({ page }) => {
     const section = page.locator('[data-testid="vs-competitors-section"]');
-    await expect(section.getByText('EduSphere').first()).toBeVisible({ timeout: 10_000 });
+    await expect(section.getByText('EduSphere').first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('Canvas competitor column is visible', async ({ page }) => {
@@ -256,7 +304,9 @@ test.describe('Pricing Page — Competitor Comparison', () => {
     expect(count).toBeGreaterThanOrEqual(10);
   });
 
-  test('Knowledge Graph AI row shows EduSphere winning (✅)', async ({ page }) => {
+  test('Knowledge Graph AI row shows EduSphere winning (✅)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="vs-competitors-section"]');
     const table = section.locator('table');
     const kgRow = table.getByRole('row', { name: /Knowledge Graph AI/i });
@@ -265,7 +315,9 @@ test.describe('Pricing Page — Competitor Comparison', () => {
     await expect(eduCell.getByText('✅')).toBeVisible({ timeout: 5_000 });
   });
 
-  test('White-label Included row shows EduSphere winning (✅)', async ({ page }) => {
+  test('White-label Included row shows EduSphere winning (✅)', async ({
+    page,
+  }) => {
     const section = page.locator('[data-testid="vs-competitors-section"]');
     const table = section.locator('table');
     const wlRow = table.getByRole('row', { name: /White-label Included/i });
@@ -287,12 +339,16 @@ test.describe('Pricing Page — FAQ Accordion', () => {
   });
 
   test('FAQ section is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="pricing-faq"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="pricing-faq"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('"Frequently Asked Questions" heading is visible', async ({ page }) => {
     const faq = page.locator('[data-testid="pricing-faq"]');
-    await expect(faq.getByRole('heading', { name: /Frequently Asked Questions/i })).toBeVisible({ timeout: 10_000 });
+    await expect(
+      faq.getByRole('heading', { name: /Frequently Asked Questions/i })
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('FAQ item expands on click and reveals answer', async ({ page }) => {
@@ -305,7 +361,9 @@ test.describe('Pricing Page — FAQ Accordion', () => {
     await firstBtn.click();
     await expect(firstBtn).toHaveAttribute('aria-expanded', 'true');
     // Answer text is now visible
-    await expect(faq.getByText(/Yearly Active User/i)).toBeVisible({ timeout: 5_000 });
+    await expect(faq.getByText(/Yearly Active User/i)).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('FAQ item collapses on second click', async ({ page }) => {
@@ -330,7 +388,9 @@ test.describe('Pricing Page — Footer', () => {
 
   test('footer "Start Pilot" link is present', async ({ page }) => {
     const footer = page.locator('footer');
-    await expect(footer.getByRole('link', { name: /Start Pilot/i })).toBeVisible({ timeout: 10_000 });
+    await expect(
+      footer.getByRole('link', { name: /Start Pilot/i })
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('footer "Home" link navigates to /landing', async ({ page }) => {
@@ -343,7 +403,9 @@ test.describe('Pricing Page — Footer', () => {
   test('footer copyright year is correct', async ({ page }) => {
     const footer = page.locator('footer');
     const year = new Date().getFullYear().toString();
-    await expect(footer.getByText(new RegExp(year))).toBeVisible({ timeout: 10_000 });
+    await expect(footer.getByText(new RegExp(year))).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
@@ -353,9 +415,15 @@ test.describe('Pricing Page — Visual Regression', () => {
   test('full pricing page matches visual snapshot', async ({ page }) => {
     await page.goto(`${BASE_URL}/pricing`, { waitUntil: 'domcontentloaded' });
     // Ensure all sections loaded before screenshot
-    await expect(page.locator('[data-testid="pricing-section"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('[data-testid="compliance-badges-section"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('[data-testid="vs-competitors-section"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="pricing-section"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(
+      page.locator('[data-testid="compliance-badges-section"]')
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="vs-competitors-section"]')
+    ).toBeVisible({ timeout: 10_000 });
     await page.evaluate(() => window.scrollTo(0, 0));
     await expect(page).toHaveScreenshot('pricing-page-full.png', {
       fullPage: true,
@@ -373,7 +441,9 @@ test.describe('Pricing Page — Visual Regression', () => {
     });
   });
 
-  test('compliance badges section matches visual snapshot', async ({ page }) => {
+  test('compliance badges section matches visual snapshot', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/pricing`, { waitUntil: 'domcontentloaded' });
     const section = page.locator('[data-testid="compliance-badges-section"]');
     await section.scrollIntoViewIfNeeded();

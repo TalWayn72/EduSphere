@@ -31,11 +31,17 @@ test.describe('Visual A11y -- Reduced Motion (Part 1) @visual @a11y', () => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside'))
+      .first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sidebar).toHaveScreenshot('a11y-motion-dashboard-sidebar.png', {
-        animations: 'disabled',
-      });
+      await expect(sidebar).toHaveScreenshot(
+        'a11y-motion-dashboard-sidebar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('a11y-motion-dashboard-sidebar.png', {
         animations: 'disabled',
@@ -65,11 +71,17 @@ test.describe('Visual A11y -- Reduced Motion (Part 1) @visual @a11y', () => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const topbar = page.getByTestId('topbar').or(page.locator('header')).first();
+    const topbar = page
+      .getByTestId('topbar')
+      .or(page.locator('header'))
+      .first();
     if (await topbar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(topbar).toHaveScreenshot('a11y-motion-dashboard-topbar.png', {
-        animations: 'disabled',
-      });
+      await expect(topbar).toHaveScreenshot(
+        'a11y-motion-dashboard-topbar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('a11y-motion-dashboard-topbar.png', {
         animations: 'disabled',
@@ -81,45 +93,69 @@ test.describe('Visual A11y -- Reduced Motion (Part 1) @visual @a11y', () => {
 
   test('knowledge graph -- full page no animations', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('a11y-motion-knowledge-graph-full.png', {
-      ...LOOSE_OPTS,
-      mask: dynamicMasks(page),
+    await page.goto(`${BASE_URL}/knowledge-graph`, {
+      waitUntil: 'domcontentloaded',
     });
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot(
+      'a11y-motion-knowledge-graph-full.png',
+      {
+        ...LOOSE_OPTS,
+        mask: dynamicMasks(page),
+      }
+    );
   });
 
   test('knowledge graph -- graph area static state', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/knowledge-graph`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     const main = page.locator('main').first();
     if (await main.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(main).toHaveScreenshot('a11y-motion-knowledge-graph-content.png', {
-        animations: 'disabled',
-        mask: dynamicMasks(page),
-      });
+      await expect(main).toHaveScreenshot(
+        'a11y-motion-knowledge-graph-content.png',
+        {
+          animations: 'disabled',
+          mask: dynamicMasks(page),
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('a11y-motion-knowledge-graph-content.png', {
-        animations: 'disabled',
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'a11y-motion-knowledge-graph-content.png',
+        {
+          animations: 'disabled',
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 
   test('knowledge graph -- controls no animation', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/knowledge-graph`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
-    const controls = page.locator('[data-testid="graph-controls"]').or(page.locator('main section')).first();
+    const controls = page
+      .locator('[data-testid="graph-controls"]')
+      .or(page.locator('main section'))
+      .first();
     if (await controls.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(controls).toHaveScreenshot('a11y-motion-knowledge-graph-controls.png', {
-        animations: 'disabled',
-      });
+      await expect(controls).toHaveScreenshot(
+        'a11y-motion-knowledge-graph-controls.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('a11y-motion-knowledge-graph-controls.png', {
-        animations: 'disabled',
-      });
+      await expect(page).toHaveScreenshot(
+        'a11y-motion-knowledge-graph-controls.png',
+        {
+          animations: 'disabled',
+        }
+      );
     }
   });
 
@@ -187,11 +223,17 @@ test.describe('Visual A11y -- Reduced Motion (Part 1) @visual @a11y', () => {
     await login(page);
     await page.goto(`${BASE_URL}/analytics`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside'))
+      .first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sidebar).toHaveScreenshot('a11y-motion-analytics-sidebar.png', {
-        animations: 'disabled',
-      });
+      await expect(sidebar).toHaveScreenshot(
+        'a11y-motion-analytics-sidebar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('a11y-motion-analytics-sidebar.png', {
         animations: 'disabled',

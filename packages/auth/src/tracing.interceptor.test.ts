@@ -53,7 +53,7 @@ describe('TracingInterceptor', () => {
     mockHandler.handle.mockReturnValue(of({ data: 'test' }));
     const result$ = interceptor.intercept(
       mockContext as never,
-      mockHandler as never,
+      mockHandler as never
     );
     const result = await lastValueFrom(result$);
     expect(result).toEqual({ data: 'test' });
@@ -64,7 +64,7 @@ describe('TracingInterceptor', () => {
     mockHandler.handle.mockReturnValue(throwError(() => error));
     const result$ = interceptor.intercept(
       mockContext as never,
-      mockHandler as never,
+      mockHandler as never
     );
     await expect(lastValueFrom(result$)).rejects.toThrow('resolver failed');
   });
@@ -79,7 +79,7 @@ describe('TracingInterceptor', () => {
     mockHandler.handle.mockReturnValue(of('passthrough'));
     const result$ = interceptor.intercept(
       mockContext as never,
-      mockHandler as never,
+      mockHandler as never
     );
     const result = await lastValueFrom(result$);
     expect(result).toBe('passthrough');
@@ -90,7 +90,7 @@ describe('TracingInterceptor', () => {
     mockHandler.handle.mockReturnValue(of({ id: '1' }));
     const result$ = interceptor.intercept(
       mockContext as never,
-      mockHandler as never,
+      mockHandler as never
     );
     const result = await lastValueFrom(result$);
     expect(result).toEqual({ id: '1' });

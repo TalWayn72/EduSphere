@@ -24,9 +24,8 @@ vi.mock('@edusphere/db', () => ({
         ''
       ),
     {
-      join: vi.fn(
-        (parts: unknown[], _sep: unknown) =>
-          Array.isArray(parts) ? parts.join(',') : ''
+      join: vi.fn((parts: unknown[], _sep: unknown) =>
+        Array.isArray(parts) ? parts.join(',') : ''
       ),
     }
   ),
@@ -77,7 +76,11 @@ describe('AiUsageService', () => {
   describe('getAiUsageStats', () => {
     it('returns valid shape with all required fields', async () => {
       vi.mocked(db.withTenantContext).mockImplementation(
-        (_db: unknown, _ctx: unknown, op: (tx: unknown) => Promise<unknown>) => {
+        (
+          _db: unknown,
+          _ctx: unknown,
+          op: (tx: unknown) => Promise<unknown>
+        ) => {
           let callCount = 0;
           const tx = {
             select: () => ({
@@ -86,7 +89,11 @@ describe('AiUsageService', () => {
                   callCount++;
                   if (callCount === 1) return Promise.resolve([{ total: 10 }]);
                   if (callCount === 2) return Promise.resolve([{ unique: 4 }]);
-                  return { groupBy: () => ({ orderBy: () => ({ limit: () => Promise.resolve([]) }) }) };
+                  return {
+                    groupBy: () => ({
+                      orderBy: () => ({ limit: () => Promise.resolve([]) }),
+                    }),
+                  };
                 },
               }),
             }),
@@ -102,12 +109,18 @@ describe('AiUsageService', () => {
       expect(typeof result.estimatedTokensUsed).toBe('number');
       expect(typeof result.topCourseRequests).toBe('number');
       // topCourseId can be null
-      expect(result.topCourseId === null || typeof result.topCourseId === 'string').toBe(true);
+      expect(
+        result.topCourseId === null || typeof result.topCourseId === 'string'
+      ).toBe(true);
     });
 
     it('returns zero stats when no AI tutor statements found', async () => {
       vi.mocked(db.withTenantContext).mockImplementation(
-        (_db: unknown, _ctx: unknown, op: (tx: unknown) => Promise<unknown>) => {
+        (
+          _db: unknown,
+          _ctx: unknown,
+          op: (tx: unknown) => Promise<unknown>
+        ) => {
           const tx = {
             select: () => ({
               from: () => ({
@@ -130,7 +143,11 @@ describe('AiUsageService', () => {
 
     it('estimatedTokensUsed is totalRequests * 500', async () => {
       vi.mocked(db.withTenantContext).mockImplementation(
-        (_db: unknown, _ctx: unknown, op: (tx: unknown) => Promise<unknown>) => {
+        (
+          _db: unknown,
+          _ctx: unknown,
+          op: (tx: unknown) => Promise<unknown>
+        ) => {
           let callCount = 0;
           const tx = {
             select: () => ({
@@ -139,7 +156,11 @@ describe('AiUsageService', () => {
                   callCount++;
                   if (callCount === 1) return Promise.resolve([{ total: 8 }]);
                   if (callCount === 2) return Promise.resolve([{ unique: 3 }]);
-                  return { groupBy: () => ({ orderBy: () => ({ limit: () => Promise.resolve([]) }) }) };
+                  return {
+                    groupBy: () => ({
+                      orderBy: () => ({ limit: () => Promise.resolve([]) }),
+                    }),
+                  };
                 },
               }),
             }),
@@ -186,7 +207,11 @@ describe('AiUsageService', () => {
         topCourseRequests: 0,
       });
 
-      const ctx = { tenantId: TENANT_ID, userId: 'u1', userRole: 'ORG_ADMIN' as const };
+      const ctx = {
+        tenantId: TENANT_ID,
+        userId: 'u1',
+        userRole: 'ORG_ADMIN' as const,
+      };
       const result = await service.getAiUsageStatsByTenantCtx(ctx);
 
       expect(typeof result.totalRequests).toBe('number');

@@ -17,7 +17,12 @@ import {
 import type { BloomLevel } from '@/types/exam';
 
 const BLOOM_LEVELS: BloomLevel[] = [
-  'REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'EVALUATE', 'CREATE',
+  'REMEMBER',
+  'UNDERSTAND',
+  'APPLY',
+  'ANALYZE',
+  'EVALUATE',
+  'CREATE',
 ];
 
 const DIFFICULTY_MAP: Record<string, number> = {
@@ -44,7 +49,11 @@ interface GeneratorFormProps {
   }) => Promise<void>;
 }
 
-export function GeneratorForm({ modules, loading, onGenerate }: GeneratorFormProps) {
+export function GeneratorForm({
+  modules,
+  loading,
+  onGenerate,
+}: GeneratorFormProps) {
   const [moduleId, setModuleId] = useState<string>('');
   const [domain, setDomain] = useState('');
   const [bloomLevel, setBloomLevel] = useState<BloomLevel>('APPLY');
@@ -78,7 +87,9 @@ export function GeneratorForm({ modules, loading, onGenerate }: GeneratorFormPro
               <SelectContent>
                 <SelectItem value="">Any Module</SelectItem>
                 {modules.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>{m.title}</SelectItem>
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.title}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -97,11 +108,18 @@ export function GeneratorForm({ modules, loading, onGenerate }: GeneratorFormPro
 
           <div className="space-y-2">
             <Label>Bloom Level</Label>
-            <Select value={bloomLevel} onValueChange={(v) => setBloomLevel(v as BloomLevel)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={bloomLevel}
+              onValueChange={(v) => setBloomLevel(v as BloomLevel)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {BLOOM_LEVELS.map((b) => (
-                  <SelectItem key={b} value={b}>{b}</SelectItem>
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -122,7 +140,9 @@ export function GeneratorForm({ modules, loading, onGenerate }: GeneratorFormPro
           <div className="space-y-2">
             <Label>Difficulty</Label>
             <Select value={difficulty} onValueChange={setDifficulty}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="easy">Easy</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
@@ -131,7 +151,11 @@ export function GeneratorForm({ modules, loading, onGenerate }: GeneratorFormPro
             </Select>
           </div>
 
-          <Button type="submit" disabled={loading || !domain.trim()} className="w-full">
+          <Button
+            type="submit"
+            disabled={loading || !domain.trim()}
+            className="w-full"
+          >
             {loading ? 'Generating...' : 'Generate Items'}
           </Button>
         </form>

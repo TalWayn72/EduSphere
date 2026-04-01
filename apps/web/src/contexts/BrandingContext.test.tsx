@@ -27,12 +27,24 @@ function TestConsumer() {
 
 describe('BrandingContext', () => {
   it('provides branding from hook to children', () => {
-    render(React.createElement(BrandingProvider, {}, React.createElement(TestConsumer)));
+    render(
+      React.createElement(
+        BrandingProvider,
+        {},
+        React.createElement(TestConsumer)
+      )
+    );
     expect(screen.getByTestId('org').textContent).toBe('TestOrg');
   });
 
   it('propagates fetching state', () => {
-    render(React.createElement(BrandingProvider, {}, React.createElement(TestConsumer)));
+    render(
+      React.createElement(
+        BrandingProvider,
+        {},
+        React.createElement(TestConsumer)
+      )
+    );
     expect(screen.getByTestId('fetching').textContent).toBe('false');
   });
 

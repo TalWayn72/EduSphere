@@ -21,14 +21,15 @@ describe('knowledge-events type guards', () => {
 
     it('returns true for knowledge.concepts.persisted', () => {
       expect(
-        isKnowledgeConceptEvent({ ...valid, type: 'knowledge.concepts.persisted' })
+        isKnowledgeConceptEvent({
+          ...valid,
+          type: 'knowledge.concepts.persisted',
+        })
       ).toBe(true);
     });
 
     it('returns true with empty concepts array', () => {
-      expect(
-        isKnowledgeConceptEvent({ ...valid, concepts: [] })
-      ).toBe(true);
+      expect(isKnowledgeConceptEvent({ ...valid, concepts: [] })).toBe(true);
     });
 
     it('returns false for knowledge.concept.deleted type', () => {
@@ -55,15 +56,13 @@ describe('knowledge-events type guards', () => {
     });
 
     it('returns false when concepts is not an array', () => {
-      expect(
-        isKnowledgeConceptEvent({ ...valid, concepts: 'not-array' })
-      ).toBe(false);
+      expect(isKnowledgeConceptEvent({ ...valid, concepts: 'not-array' })).toBe(
+        false
+      );
     });
 
     it('returns false when assetId is not a string', () => {
-      expect(
-        isKnowledgeConceptEvent({ ...valid, assetId: 42 })
-      ).toBe(false);
+      expect(isKnowledgeConceptEvent({ ...valid, assetId: 42 })).toBe(false);
     });
 
     it('returns false for empty object', () => {
@@ -111,9 +110,9 @@ describe('knowledge-events type guards', () => {
     });
 
     it('returns false when conceptId is not a string', () => {
-      expect(
-        isKnowledgeConceptDeletedEvent({ ...valid, conceptId: 42 })
-      ).toBe(false);
+      expect(isKnowledgeConceptDeletedEvent({ ...valid, conceptId: 42 })).toBe(
+        false
+      );
     });
 
     it('returns false for empty object', () => {

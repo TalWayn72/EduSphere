@@ -51,15 +51,16 @@ export function SessionCard({
       <CardContent className="p-4 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm truncate" data-testid="session-title">
+            <p
+              className="font-semibold text-sm truncate"
+              data-testid="session-title"
+            >
               {session.meetingName}
             </p>
             {session.scheduledAt && (
               <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {isLive
-                  ? 'Live Now!'
-                  : formatRelativeTime(session.scheduledAt)}
+                {isLive ? 'Live Now!' : formatRelativeTime(session.scheduledAt)}
               </p>
             )}
           </div>
@@ -70,7 +71,9 @@ export function SessionCard({
           <span className="flex items-center gap-1">
             <Users className="h-3 w-3" />
             {session.participantCount ?? 0}
-            {session.maxParticipants ? ` / ${session.maxParticipants}` : ''}{' '}
+            {session.maxParticipants
+              ? ` / ${session.maxParticipants}`
+              : ''}{' '}
             participants
           </span>
           {session.courseId && (
@@ -87,11 +90,19 @@ export function SessionCard({
               className="flex-1"
               data-testid="start-session-btn"
               disabled={startFetching}
-              onClick={(e) => { e.stopPropagation(); onStart(session.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onStart(session.id);
+              }}
             >
-              {startFetching
-                ? <Loader2 className="h-3 w-3 animate-spin" />
-                : <><PlayCircle className="h-3 w-3 mr-1" />Start</>}
+              {startFetching ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <>
+                  <PlayCircle className="h-3 w-3 mr-1" />
+                  Start
+                </>
+              )}
             </Button>
             <Button
               size="sm"
@@ -99,11 +110,19 @@ export function SessionCard({
               className="flex-1"
               data-testid="cancel-session-btn"
               disabled={cancelFetching}
-              onClick={(e) => { e.stopPropagation(); onCancel(session.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCancel(session.id);
+              }}
             >
-              {cancelFetching
-                ? <Loader2 className="h-3 w-3 animate-spin" />
-                : <><XCircle className="h-3 w-3 mr-1" />Cancel</>}
+              {cancelFetching ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <>
+                  <XCircle className="h-3 w-3 mr-1" />
+                  Cancel
+                </>
+              )}
             </Button>
           </div>
         )}
@@ -114,7 +133,10 @@ export function SessionCard({
               variant="outline"
               className="flex-1"
               data-testid="manage-session-btn"
-              onClick={(e) => { e.stopPropagation(); onOpen(session.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(session.id);
+              }}
             >
               Manage
             </Button>
@@ -124,11 +146,19 @@ export function SessionCard({
               className="flex-1"
               data-testid="end-session-btn"
               disabled={endFetching}
-              onClick={(e) => { e.stopPropagation(); onEnd(session.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEnd(session.id);
+              }}
             >
-              {endFetching
-                ? <Loader2 className="h-3 w-3 animate-spin" />
-                : <><StopCircle className="h-3 w-3 mr-1" />End</>}
+              {endFetching ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <>
+                  <StopCircle className="h-3 w-3 mr-1" />
+                  End
+                </>
+              )}
             </Button>
           </div>
         )}
@@ -141,11 +171,16 @@ export function SessionCard({
             className="w-full mt-1"
             data-testid="join-session-btn"
             disabled={joinFetching}
-            onClick={(e) => { e.stopPropagation(); onJoin(session.id); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onJoin(session.id);
+            }}
           >
-            {joinFetching
-              ? <Loader2 className="h-3 w-3 animate-spin" />
-              : 'Join'}
+            {joinFetching ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              'Join'
+            )}
           </Button>
         )}
       </CardContent>

@@ -33,7 +33,8 @@ vi.mock('@edusphere/db', () => ({
 
 const mockRunCertExamGenerator = vi.fn();
 vi.mock('./cert-exam-gen.adapter.js', () => ({
-  runCertExamGenerator: (...args: unknown[]) => mockRunCertExamGenerator(...args),
+  runCertExamGenerator: (...args: unknown[]) =>
+    mockRunCertExamGenerator(...args),
 }));
 
 // ── Mock ollama-ai-provider ─────────────────────────────────────────────────
@@ -59,7 +60,7 @@ import { CertExamGenService } from './cert-exam-gen.service';
 function buildService(): CertExamGenService {
   return new CertExamGenService(
     { assertConsent: mockAssertConsent } as never,
-    { publish: mockPubSubPublish } as never,
+    { publish: mockPubSubPublish } as never
   );
 }
 
@@ -90,7 +91,9 @@ describe('CertExamGenService', () => {
   describe('generateItems', () => {
     it('asserts LLM consent before proceeding', async () => {
       mockSelectLimit.mockResolvedValueOnce([{ id: 'agent-def-1' }]);
-      mockReturning.mockResolvedValueOnce([{ id: 'exec-1', status: 'RUNNING' }]);
+      mockReturning.mockResolvedValueOnce([
+        { id: 'exec-1', status: 'RUNNING' },
+      ]);
       mockRunCertExamGenerator.mockResolvedValue({ items: [], errors: [] });
 
       await service.generateItems(defaultOptions, 'user-1', 'tenant-1');
@@ -104,7 +107,9 @@ describe('CertExamGenService', () => {
 
     it('returns executionId with RUNNING status immediately', async () => {
       mockSelectLimit.mockResolvedValueOnce([{ id: 'agent-def-1' }]);
-      mockReturning.mockResolvedValueOnce([{ id: 'exec-42', status: 'RUNNING' }]);
+      mockReturning.mockResolvedValueOnce([
+        { id: 'exec-42', status: 'RUNNING' },
+      ]);
       mockRunCertExamGenerator.mockResolvedValue({ items: [], errors: [] });
 
       const result = await service.generateItems(
@@ -125,7 +130,7 @@ describe('CertExamGenService', () => {
       mockSelectLimit.mockResolvedValueOnce([]);
       // Insert returns new def
       mockReturning
-        .mockResolvedValueOnce([{ id: 'new-def-1' }])  // agent_definitions insert
+        .mockResolvedValueOnce([{ id: 'new-def-1' }]) // agent_definitions insert
         .mockResolvedValueOnce([{ id: 'exec-1', status: 'RUNNING' }]); // execution insert
       mockRunCertExamGenerator.mockResolvedValue({ items: [], errors: [] });
 

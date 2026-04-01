@@ -69,7 +69,13 @@ describe('AeoContentService', () => {
 
   it('getFeatures entries have valid categories', () => {
     const features = svc.getFeatures();
-    const validCategories = ['core', 'engagement', 'enterprise', 'collaboration', 'accessibility'];
+    const validCategories = [
+      'core',
+      'engagement',
+      'enterprise',
+      'collaboration',
+      'accessibility',
+    ];
     for (const feat of features) {
       expect(validCategories).toContain(feat.category);
     }
@@ -100,7 +106,9 @@ describe('AeoContentService', () => {
 
   it('getFaq includes pricing question', () => {
     const faq = svc.getFaq();
-    const pricing = faq.find((f) => f.question.toLowerCase().includes('pricing'));
+    const pricing = faq.find((f) =>
+      f.question.toLowerCase().includes('pricing')
+    );
     expect(pricing).toBeDefined();
     expect(pricing!.answer).toContain('Free');
   });

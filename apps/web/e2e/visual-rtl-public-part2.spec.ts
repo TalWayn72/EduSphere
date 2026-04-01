@@ -29,7 +29,10 @@ test.describe('Visual RTL -- Public Pages Part 2 @visual @rtl', () => {
   test('pricing -- full page RTL layout', async ({ page }) => {
     await page.goto(`${BASE_URL}/pricing`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('rtl-public-pricing-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'rtl-public-pricing-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('pricing -- header RTL alignment', async ({ page }) => {
@@ -99,7 +102,10 @@ test.describe('Visual RTL -- Public Pages Part 2 @visual @rtl', () => {
   test('help -- full page RTL layout', async ({ page }) => {
     await page.goto(`${BASE_URL}/help`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('rtl-public-help-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'rtl-public-help-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('help -- header RTL alignment', async ({ page }) => {
@@ -157,13 +163,19 @@ test.describe('Visual RTL -- Public Pages Part 2 @visual @rtl', () => {
       const header = page.locator('header').first();
       const slug = path === '/' ? 'landing' : path.replace('/', '');
       if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await expect(header).toHaveScreenshot(`rtl-public-consistency-header-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(header).toHaveScreenshot(
+          `rtl-public-consistency-header-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       } else {
-        await expect(page).toHaveScreenshot(`rtl-public-consistency-header-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(page).toHaveScreenshot(
+          `rtl-public-consistency-header-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       }
     }
   });
@@ -176,15 +188,20 @@ test.describe('Visual RTL -- Public Pages Part 2 @visual @rtl', () => {
       const footer = page.locator('footer').first();
       const slug = path === '/' ? 'landing' : path.replace('/', '');
       if (await footer.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await expect(footer).toHaveScreenshot(`rtl-public-consistency-footer-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(footer).toHaveScreenshot(
+          `rtl-public-consistency-footer-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       } else {
-        await expect(page).toHaveScreenshot(`rtl-public-consistency-footer-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(page).toHaveScreenshot(
+          `rtl-public-consistency-footer-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       }
     }
   });
-
 });

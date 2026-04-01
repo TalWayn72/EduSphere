@@ -54,7 +54,9 @@ Each distractor must be similar in length to the correct answer (${correct.text.
 }
 
 export function enhanceDistractorsNode(model: LanguageModel) {
-  return async (state: CertExamGenState): Promise<Partial<CertExamGenState>> => {
+  return async (
+    state: CertExamGenState
+  ): Promise<Partial<CertExamGenState>> => {
     const results: GeneratedItem[] = [];
 
     for (const item of state.iwfChecked) {

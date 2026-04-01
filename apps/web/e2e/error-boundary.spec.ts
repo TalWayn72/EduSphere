@@ -68,7 +68,9 @@ const CORS_HEADERS = {
 // ─── T-01: GraphQL network error → friendly UI (no raw CombinedError) ────────
 
 test.describe('error-boundary — T-01: GraphQL network error', () => {
-  test('blocking GraphQL endpoint shows friendly error, not raw CombinedError', async ({ page }) => {
+  test('blocking GraphQL endpoint shows friendly error, not raw CombinedError', async ({
+    page,
+  }) => {
     // Abort all GraphQL requests to simulate total network failure
     await page.route('**/graphql', async (route) => {
       if (route.request().method() === 'OPTIONS') {
@@ -83,9 +85,12 @@ test.describe('error-boundary — T-01: GraphQL network error', () => {
     // Page should show some form of error or empty state — not raw CombinedError
     await assertNoTechnicalStrings(page);
 
-    await expect(page).toHaveScreenshot('error-boundary-network-blocked-dashboard.png', {
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page).toHaveScreenshot(
+      'error-boundary-network-blocked-dashboard.png',
+      {
+        maxDiffPixelRatio: 0.05,
+      }
+    );
   });
 
   test('network error on /courses shows friendly message', async ({ page }) => {
@@ -116,7 +121,9 @@ test.describe('error-boundary — T-02: GraphQL 500 error', () => {
         contentType: 'application/json',
         headers: CORS_HEADERS,
         body: JSON.stringify({
-          errors: [{ message: 'Internal Server Error: connection pool exhausted' }],
+          errors: [
+            { message: 'Internal Server Error: connection pool exhausted' },
+          ],
         }),
       });
     });
@@ -125,7 +132,7 @@ test.describe('error-boundary — T-02: GraphQL 500 error', () => {
 
     // Raw server error must not leak to UI
     await expect(
-      page.getByText('connection pool exhausted', { exact: false }),
+      page.getByText('connection pool exhausted', { exact: false })
     ).not.toBeVisible({ timeout: 3_000 });
     await assertNoTechnicalStrings(page);
 
@@ -153,7 +160,7 @@ test.describe('error-boundary — T-02: GraphQL 500 error', () => {
     await loginAndNavigate(page, '/profile');
 
     await expect(
-      page.getByText('relation "users" does not exist', { exact: false }),
+      page.getByText('relation "users" does not exist', { exact: false })
     ).not.toBeVisible({ timeout: 3_000 });
     await assertNoTechnicalStrings(page);
   });
@@ -162,13 +169,16 @@ test.describe('error-boundary — T-02: GraphQL 500 error', () => {
 // ─── T-03: GraphQL error with extensions.code → friendly message ─────────────
 
 test.describe('error-boundary — T-03: GraphQL structured error', () => {
-  test('INTERNAL_SERVER_ERROR on /settings shows friendly error', async ({ page }) => {
+  test('INTERNAL_SERVER_ERROR on /settings shows friendly error', async ({
+    page,
+  }) => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
         errors: [
           {
-            message: 'Cannot read properties of undefined (reading "tenant_id")',
+            message:
+              'Cannot read properties of undefined (reading "tenant_id")',
             extensions: { code: 'INTERNAL_SERVER_ERROR' },
           },
         ],
@@ -178,18 +188,21 @@ test.describe('error-boundary — T-03: GraphQL structured error', () => {
     await loginAndNavigate(page, '/settings');
 
     await expect(
-      page.getByText('Cannot read properties of undefined'),
+      page.getByText('Cannot read properties of undefined')
     ).not.toBeVisible({ timeout: 3_000 });
     await assertNoTechnicalStrings(page);
   });
 
-  test('UNAUTHENTICATED error does not show raw GraphQL error text', async ({ page }) => {
+  test('UNAUTHENTICATED error does not show raw GraphQL error text', async ({
+    page,
+  }) => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
         errors: [
           {
-            message: 'Access denied! You need to be authenticated to perform this action.',
+            message:
+              'Access denied! You need to be authenticated to perform this action.',
             extensions: { code: 'UNAUTHENTICATED' },
           },
         ],
@@ -206,13 +219,24 @@ test.describe('error-boundary — T-03: GraphQL structured error', () => {
 // ─── T-04: Multiple sections failing — one error doesn't break entire page ──
 
 test.describe('error-boundary — T-04: Partial failure isolation', () => {
-  test('courses page with partial GraphQL error still renders navigation', async ({ page }) => {
+  test('courses page with partial GraphQL error still renders navigation', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       // Let some operations succeed, others fail
-      if (opName === 'GetCourses' || opName === 'MyCourses' || opName === 'ListCourses') {
+      if (
+        opName === 'GetCourses' ||
+        opName === 'MyCourses' ||
+        opName === 'ListCourses'
+      ) {
         return JSON.stringify({
           data: null,
-          errors: [{ message: 'Service unavailable', extensions: { code: 'SERVICE_UNAVAILABLE' } }],
+          errors: [
+            {
+              message: 'Service unavailable',
+              extensions: { code: 'SERVICE_UNAVAILABLE' },
+            },
+          ],
         });
       }
       // Other operations (auth, user info, etc.) succeed with empty data
@@ -226,11 +250,15 @@ test.describe('error-boundary — T-04: Partial failure isolation', () => {
     await expect(nav.first()).toBeVisible({ timeout: 10_000 });
 
     // Raw error should not leak
-    await expect(page.getByText('Service unavailable')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Service unavailable')).not.toBeVisible({
+      timeout: 3_000,
+    });
     await assertNoTechnicalStrings(page);
   });
 
-  test('dashboard with partial failure still shows page structure', async ({ page }) => {
+  test('dashboard with partial failure still shows page structure', async ({
+    page,
+  }) => {
     let callCount = 0;
     await page.route('**/graphql', async (route) => {
       if (route.request().method() === 'OPTIONS') {
@@ -244,7 +272,9 @@ test.describe('error-boundary — T-04: Partial failure isolation', () => {
           status: 500,
           contentType: 'application/json',
           headers: CORS_HEADERS,
-          body: JSON.stringify({ errors: [{ message: 'Intermittent failure' }] }),
+          body: JSON.stringify({
+            errors: [{ message: 'Intermittent failure' }],
+          }),
         });
         return;
       }
@@ -267,7 +297,9 @@ test.describe('error-boundary — T-04: Partial failure isolation', () => {
 // ─── T-05: Console error capture ─────────────────────────────────────────────
 
 test.describe('error-boundary — T-05: Console error capture', () => {
-  test('GraphQL failure logs error to console but does not show stack to user', async ({ page }) => {
+  test('GraphQL failure logs error to console but does not show stack to user', async ({
+    page,
+  }) => {
     const consoleErrors: ConsoleMessage[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -305,7 +337,9 @@ test.describe('error-boundary — T-06: No raw strings on various pages', () => 
   ];
 
   for (const { path, name } of PAGES_TO_TEST) {
-    test(`${name} page with GraphQL error shows no raw technical strings`, async ({ page }) => {
+    test(`${name} page with GraphQL error shows no raw technical strings`, async ({
+      page,
+    }) => {
       await routeGraphQL(page, () => {
         return JSON.stringify({
           data: null,
@@ -368,7 +402,9 @@ test.describe('error-boundary — T-07: Visual regression screenshots', () => {
 // ─── T-08: Recovery after error — navigate away and back ─────────────────────
 
 test.describe('error-boundary — T-08: Recovery after error', () => {
-  test('page recovers after navigating away from error state', async ({ page }) => {
+  test('page recovers after navigating away from error state', async ({
+    page,
+  }) => {
     let shouldFail = true;
 
     await page.route('**/graphql', async (route) => {
@@ -405,7 +441,9 @@ test.describe('error-boundary — T-08: Recovery after error', () => {
     await assertNoTechnicalStrings(page);
   });
 
-  test('dashboard recovers when GraphQL comes back online', async ({ page }) => {
+  test('dashboard recovers when GraphQL comes back online', async ({
+    page,
+  }) => {
     let requestCount = 0;
 
     await page.route('**/graphql', async (route) => {
@@ -441,7 +479,9 @@ test.describe('error-boundary — T-08: Recovery after error', () => {
 // ─── T-09: Malformed JSON response ──────────────────────────────────────────
 
 test.describe('error-boundary — T-09: Malformed response handling', () => {
-  test('malformed JSON GraphQL response does not show SyntaxError to user', async ({ page }) => {
+  test('malformed JSON GraphQL response does not show SyntaxError to user', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       if (route.request().method() === 'OPTIONS') {
         await route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });
@@ -463,7 +503,9 @@ test.describe('error-boundary — T-09: Malformed response handling', () => {
 // ─── T-10: Timeout simulation ────────────────────────────────────────────────
 
 test.describe('error-boundary — T-10: Request timeout handling', () => {
-  test('extremely slow GraphQL response (aborted) shows no raw error', async ({ page }) => {
+  test('extremely slow GraphQL response (aborted) shows no raw error', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       if (route.request().method() === 'OPTIONS') {
         await route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });

@@ -32,8 +32,12 @@ export function useAgentChat() {
   const [streamingContent, setStreamingContent] = useState('');
 
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const streamRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
-  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const streamRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  );
+  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
   const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
@@ -158,10 +162,9 @@ export function useAgentChat() {
       // GraphQL failed — fall back to mock response
       if (!gotResponse) {
         const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
-        const fullText = (
-          modeData.responses[
-            Math.floor(Math.random() * modeData.responses.length)
-          ] ?? modeData.responses[0]) as string;
+        const fullText = (modeData.responses[
+          Math.floor(Math.random() * modeData.responses.length)
+        ] ?? modeData.responses[0]) as string;
         const reply: ChatMsg = {
           id: (Date.now() + 1).toString(),
           role: 'agent',
@@ -179,10 +182,9 @@ export function useAgentChat() {
     setIsTyping(true);
     streamTimeoutRef.current = setTimeout(() => {
       const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
-      const fullText = (
-        modeData.responses[
-          Math.floor(Math.random() * modeData.responses.length)
-        ] ?? modeData.responses[0]) as string;
+      const fullText = (modeData.responses[
+        Math.floor(Math.random() * modeData.responses.length)
+      ] ?? modeData.responses[0]) as string;
       setIsTyping(false);
       let charIdx = 0;
       setStreamingContent('');

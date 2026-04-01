@@ -50,7 +50,9 @@ export function ScormImportDialog({
   const [errorMsg, setErrorMsg] = useState('');
   const [progress, setProgress] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
-  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
   const [, importPackage] = useMutation<
     { importScormPackage: { courseId: string; itemCount: number } },
     { fileKey: string }
@@ -61,7 +63,10 @@ export function ScormImportDialog({
       if (redirectTimerRef.current) {
         clearTimeout(redirectTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[ScormImportDialog] cleanup: redirect timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[ScormImportDialog] cleanup: redirect timer cleared on unmount'
+          );
       }
     };
   }, []);

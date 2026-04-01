@@ -7,16 +7,8 @@
  *  - MarketplaceSearchService   (search/filter listings)
  *  - MarketplaceEarningsService (revenue calculations)
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  closeAllPools,
-  schema,
-} from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, closeAllPools, schema } from '@edusphere/db';
 import { connect, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import Stripe from 'stripe';
@@ -72,7 +64,12 @@ export class MarketplaceService implements OnModuleDestroy {
     tenantId: string
   ): Promise<typeof schema.courseListings.$inferSelect> {
     return this.listingService.createListing(
-      this.db, courseId, priceCents, currency, revenueSplitPercent, tenantId
+      this.db,
+      courseId,
+      priceCents,
+      currency,
+      revenueSplitPercent,
+      tenantId
     );
   }
 
@@ -88,13 +85,18 @@ export class MarketplaceService implements OnModuleDestroy {
     userName: string
   ): Promise<PurchaseResult> {
     return this.purchaseService.purchaseCourse(
-      this.db, courseId, userId, tenantId, userEmail, userName
+      this.db,
+      courseId,
+      userId,
+      tenantId,
+      userEmail,
+      userName
     );
   }
 
   async processWebhook(event: Stripe.Event, tenantId: string): Promise<void> {
-    return this.purchaseService.processWebhook(
-      this.db, event, tenantId, () => this.getNatsConnection()
+    return this.purchaseService.processWebhook(this.db, event, tenantId, () =>
+      this.getNatsConnection()
     );
   }
 
@@ -107,7 +109,13 @@ export class MarketplaceService implements OnModuleDestroy {
     filters?: CourseListingFiltersInput
   ): Promise<CourseListingResult[]> {
     return this.searchService.getListings(
-      this.db, tenantId, userId, userRole, limit, offset, filters
+      this.db,
+      tenantId,
+      userId,
+      userRole,
+      limit,
+      offset,
+      filters
     );
   }
 

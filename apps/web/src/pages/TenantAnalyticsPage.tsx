@@ -72,78 +72,90 @@ export function TenantAnalyticsPage() {
             { label: 'Analytics' },
           ]}
         />
-      {/* Period selector */}
-      <div className="flex items-center justify-between mb-6">
-        <nav role="tablist" aria-label="Analytics period" className="flex gap-1">
-          {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
-            <button
-              key={p}
-              role="tab"
-              aria-selected={period === p}
-              onClick={() => setPeriod(p)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                period === p
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-accent'
-              }`}
-            >
-              {PERIOD_LABELS[p]}
-            </button>
-          ))}
-        </nav>
-        <ExportAnalyticsButton period={period} />
-      </div>
+        {/* Period selector */}
+        <div className="flex items-center justify-between mb-6">
+          <nav
+            role="tablist"
+            aria-label="Analytics period"
+            className="flex gap-1"
+          >
+            {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+              <button
+                key={p}
+                role="tab"
+                aria-selected={period === p}
+                onClick={() => setPeriod(p)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  period === p
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-accent'
+                }`}
+              >
+                {PERIOD_LABELS[p]}
+              </button>
+            ))}
+          </nav>
+          <ExportAnalyticsButton period={period} />
+        </div>
 
-      {/* KPI summary cards */}
-      {analytics && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {/* KPI summary cards */}
+        {analytics && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <Card>
+              <CardContent className="pt-4">
+                <p className="text-xs text-muted-foreground">
+                  Total Enrollments
+                </p>
+                <p className="text-2xl font-bold">
+                  {analytics.totalEnrollments}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4">
+                <p className="text-xs text-muted-foreground">
+                  Avg Learning Velocity
+                </p>
+                <p className="text-2xl font-bold">
+                  {(analytics.avgLearningVelocity ?? 0).toFixed(1)}
+                  <span className="text-sm font-normal text-muted-foreground ml-1">
+                    les/wk
+                  </span>
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Loading */}
+        {fetching && (
+          <LoadingSpinner containerHeight="py-16" label="Loading analytics" />
+        )}
+
+        {/* Error */}
+        {error && !fetching && (
           <Card>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Total Enrollments</p>
-              <p className="text-2xl font-bold">{analytics.totalEnrollments}</p>
+            <CardContent className="py-8 text-center text-destructive text-sm">
+              Failed to load analytics. Please try again.
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Avg Learning Velocity</p>
-              <p className="text-2xl font-bold">
-                {(analytics.avgLearningVelocity ?? 0).toFixed(1)}
-                <span className="text-sm font-normal text-muted-foreground ml-1">les/wk</span>
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        )}
 
-      {/* Loading */}
-      {fetching && (
-        <LoadingSpinner containerHeight="py-16" label="Loading analytics" />
-      )}
+        {/* Charts */}
+        {analytics && !fetching && (
+          <TenantAnalyticsCharts
+            activeLearnersTrend={analytics.activeLearnersTrend ?? []}
+            completionRateTrend={analytics.completionRateTrend ?? []}
+            topCourses={analytics.topCourses ?? []}
+          />
+        )}
 
-      {/* Error */}
-      {error && !fetching && (
-        <Card>
-          <CardContent className="py-8 text-center text-destructive text-sm">
-            Failed to load analytics. Please try again.
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Charts */}
-      {analytics && !fetching && (
-        <TenantAnalyticsCharts
-          activeLearnersTrend={analytics.activeLearnersTrend ?? []}
-          completionRateTrend={analytics.completionRateTrend ?? []}
-          topCourses={analytics.topCourses ?? []}
-        />
-      )}
-
-      {/* Cohort retention */}
-      {!fetching && (
-        <div className="mt-6">
-          <CohortRetentionTable rows={cohort} />
-        </div>
-      )}
+        {/* Cohort retention */}
+        {!fetching && (
+          <div className="mt-6">
+            <CohortRetentionTable rows={cohort} />
+          </div>
+        )}
       </PageShell>
     </AdminLayout>
   );

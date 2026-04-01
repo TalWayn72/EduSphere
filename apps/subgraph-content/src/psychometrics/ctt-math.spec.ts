@@ -36,8 +36,14 @@ describe('ctt-math', () => {
         { userId: 'u8', isCorrect: false },
       ];
       const scores = new Map([
-        ['u1', 90], ['u2', 85], ['u3', 80], ['u4', 75],
-        ['u5', 40], ['u6', 35], ['u7', 30], ['u8', 25],
+        ['u1', 90],
+        ['u2', 85],
+        ['u3', 80],
+        ['u4', 75],
+        ['u5', 40],
+        ['u6', 35],
+        ['u7', 30],
+        ['u8', 25],
       ]);
       expect(computeDIndex(responses, scores)).toBeGreaterThan(0);
     });
@@ -50,7 +56,10 @@ describe('ctt-math', () => {
         { userId: 'u4', isCorrect: true },
       ];
       const scores = new Map([
-        ['u1', 90], ['u2', 70], ['u3', 50], ['u4', 30],
+        ['u1', 90],
+        ['u2', 70],
+        ['u3', 50],
+        ['u4', 30],
       ]);
       expect(computeDIndex(responses, scores)).toBe(0);
     });
@@ -64,7 +73,10 @@ describe('ctt-math', () => {
         { userId: 'u4', isCorrect: true },
       ];
       const scores = new Map([
-        ['u1', 90], ['u2', 80], ['u3', 30], ['u4', 20],
+        ['u1', 90],
+        ['u2', 80],
+        ['u3', 30],
+        ['u4', 20],
       ]);
       expect(computeDIndex(responses, scores)).toBeLessThan(0);
     });
@@ -79,7 +91,10 @@ describe('ctt-math', () => {
         { userId: 'u4', isCorrect: false },
       ];
       const scores = new Map([
-        ['u1', 90], ['u2', 85], ['u3', 40], ['u4', 30],
+        ['u1', 90],
+        ['u2', 85],
+        ['u3', 40],
+        ['u4', 30],
       ]);
       const pValue = 0.5; // 2 of 4 correct
       expect(computeRpbis(responses, scores, pValue)).toBeGreaterThan(0);
@@ -94,7 +109,10 @@ describe('ctt-math', () => {
         { userId: 'u4', isCorrect: true },
       ];
       const scores = new Map([
-        ['u1', 90], ['u2', 85], ['u3', 40], ['u4', 30],
+        ['u1', 90],
+        ['u2', 85],
+        ['u3', 40],
+        ['u4', 30],
       ]);
       expect(computeRpbis(responses, scores, 0.5)).toBeLessThan(0);
     });
@@ -104,7 +122,10 @@ describe('ctt-math', () => {
         { userId: 'u1', isCorrect: true },
         { userId: 'u2', isCorrect: true },
       ];
-      const scores = new Map([['u1', 90], ['u2', 50]]);
+      const scores = new Map([
+        ['u1', 90],
+        ['u2', 50],
+      ]);
       expect(computeRpbis(responses, scores, 1.0)).toBe(0);
     });
 
@@ -113,7 +134,10 @@ describe('ctt-math', () => {
         { userId: 'u1', isCorrect: true },
         { userId: 'u2', isCorrect: false },
       ];
-      const scores = new Map([['u1', 50], ['u2', 50]]);
+      const scores = new Map([
+        ['u1', 50],
+        ['u2', 50],
+      ]);
       expect(computeRpbis(responses, scores, 0.5)).toBe(0);
     });
   });

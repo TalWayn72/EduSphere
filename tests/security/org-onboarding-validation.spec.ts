@@ -26,7 +26,9 @@ function read(relativePath: string): string {
 describe('Zod: createOrganization input validation', () => {
   it('org validation schemas file exists', () => {
     const exists =
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/tenant/org-onboarding.schemas.ts')) ||
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/tenant/org-onboarding.schemas.ts')
+      ) ||
       existsSync(resolve(ROOT, 'apps/subgraph-core/src/org/org.schemas.ts')) ||
       existsSync(resolve(ROOT, 'apps/subgraph-core/src/org/validation.ts'));
     expect(exists).toBe(true);
@@ -158,7 +160,9 @@ describe('Zod: createApiKey input validation', () => {
       read('apps/subgraph-core/src/tenant/org-onboarding.schemas.ts');
     expect(content).toMatch(/scopes|scope/);
     // Must validate against allowed scope values
-    expect(content).toMatch(/enum|includes|courses:read|users:read|analytics:read/);
+    expect(content).toMatch(
+      /enum|includes|courses:read|users:read|analytics:read/
+    );
   });
 
   it('API key validation schema validates rate_limit_per_minute (positive integer)', () => {
@@ -200,7 +204,9 @@ describe('Zod: registerWebhook input validation', () => {
       read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
       read('apps/subgraph-core/src/tenant/org-onboarding.schemas.ts');
     // Must block private IP ranges to prevent SSRF
-    expect(content).toMatch(/10\.|172\.16|192\.168|localhost|127\.0\.0\.1|0\.0\.0\.0|private|SSRF/i);
+    expect(content).toMatch(
+      /10\.|172\.16|192\.168|localhost|127\.0\.0\.1|0\.0\.0\.0|private|SSRF/i
+    );
   });
 
   it('webhook events validated against allowed event types', () => {
@@ -209,7 +215,9 @@ describe('Zod: registerWebhook input validation', () => {
       read('apps/subgraph-core/src/org/webhook.schemas.ts') ||
       read('apps/subgraph-core/src/tenant/org-onboarding.schemas.ts');
     // Must validate against known event types
-    expect(content).toMatch(/course\.completed|user\.enrolled|badge\.issued|enum/);
+    expect(content).toMatch(
+      /course\.completed|user\.enrolled|badge\.issued|enum/
+    );
   });
 });
 
@@ -239,8 +247,9 @@ describe('Zod: marketplace mutations input validation', () => {
 describe('GraphQL Authorization: Org onboarding mutations', () => {
   it('org.graphql SDL file exists in subgraph-core', () => {
     const exists =
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/tenant/org-onboarding.graphql')) ||
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/org/org.graphql'));
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/tenant/org-onboarding.graphql')
+      ) || existsSync(resolve(ROOT, 'apps/subgraph-core/src/org/org.graphql'));
     expect(exists).toBe(true);
   });
 
@@ -268,9 +277,7 @@ describe('GraphQL Authorization: Org onboarding mutations', () => {
     const lines = sdl.split('\n');
     const inviteLine = lines.findIndex((l) => l.includes('inviteUser'));
     if (inviteLine === -1) return;
-    const surroundingText = lines
-      .slice(inviteLine, inviteLine + 3)
-      .join('\n');
+    const surroundingText = lines.slice(inviteLine, inviteLine + 3).join('\n');
     // Must have at least @authenticated — resolver enforces ORG_ADMIN role
     expect(surroundingText).toContain('@authenticated');
   });
@@ -283,9 +290,7 @@ describe('GraphQL Authorization: Org onboarding mutations', () => {
     const lines = sdl.split('\n');
     const apiKeyLine = lines.findIndex((l) => l.includes('createApiKey'));
     if (apiKeyLine === -1) return;
-    const surroundingText = lines
-      .slice(apiKeyLine, apiKeyLine + 3)
-      .join('\n');
+    const surroundingText = lines.slice(apiKeyLine, apiKeyLine + 3).join('\n');
     expect(surroundingText).toContain('@authenticated');
   });
 
@@ -311,9 +316,7 @@ describe('GraphQL Authorization: Org onboarding mutations', () => {
     const lines = sdl.split('\n');
     const revokeLine = lines.findIndex((l) => l.includes('revokeApiKey'));
     if (revokeLine === -1) return;
-    const surroundingText = lines
-      .slice(revokeLine, revokeLine + 3)
-      .join('\n');
+    const surroundingText = lines.slice(revokeLine, revokeLine + 3).join('\n');
     expect(surroundingText).toContain('@authenticated');
   });
 
@@ -337,9 +340,7 @@ describe('GraphQL Authorization: Org onboarding mutations', () => {
       read('apps/subgraph-core/src/org/org.graphql');
     if (!sdl) return;
     const lines = sdl.split('\n');
-    const acceptLine = lines.findIndex((l) =>
-      l.includes('acceptInvitation')
-    );
+    const acceptLine = lines.findIndex((l) => l.includes('acceptInvitation'));
     if (acceptLine === -1) return;
     const lineText = lines[acceptLine];
     // acceptInvitation uses token-based auth, not JWT
@@ -356,7 +357,9 @@ describe('Input Sanitization: Slug injection prevention', () => {
       read('apps/subgraph-core/src/org/org.schemas.ts') ||
       read('apps/subgraph-core/src/org/validation.ts');
     // Must have a regex that only allows safe slug characters
-    expect(content).toMatch(/\[a-z0-9-\]|\[a-z\]\[a-z0-9\]|slug.*regex|regex.*slug/i);
+    expect(content).toMatch(
+      /\[a-z0-9-\]|\[a-z\]\[a-z0-9\]|slug.*regex|regex.*slug/i
+    );
   });
 
   it('slug length is constrained (min 3, max 63 — DNS label limit)', () => {

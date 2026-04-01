@@ -121,7 +121,10 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
 
   it('resolver passes authContext.userId to service (not input)', async () => {
     const { withTenantContext } = await import('@edusphere/db');
-    await resolver.updateUserPreferences({ locale: 'fr' }, makeContext(AUTH_CTX));
+    await resolver.updateUserPreferences(
+      { locale: 'fr' },
+      makeContext(AUTH_CTX)
+    );
     expect(vi.mocked(withTenantContext)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ userId: 'user-1', tenantId: 'tenant-1' }),

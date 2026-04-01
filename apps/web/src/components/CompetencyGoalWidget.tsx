@@ -129,7 +129,9 @@ export function CompetencyGoalWidget() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Learning Goal</DialogTitle>
-            <DialogDescription>Enter a concept name to track your learning progress.</DialogDescription>
+            <DialogDescription>
+              Enter a concept name to track your learning progress.
+            </DialogDescription>
           </DialogHeader>
           <div className="py-2">
             <Input

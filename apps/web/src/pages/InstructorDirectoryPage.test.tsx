@@ -6,7 +6,9 @@ import React from 'react';
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/seo', () => ({
@@ -38,12 +40,18 @@ describe('InstructorDirectoryPage', () => {
 
   it('renders header description', () => {
     renderPage();
-    expect(screen.getByText(/World-class educators from leading research institutions/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /World-class educators from leading research institutions/i
+      )
+    ).toBeInTheDocument();
   });
 
   it('renders instructors list with aria-label', () => {
     renderPage();
-    expect(screen.getByRole('list', { name: /EduSphere instructors/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('list', { name: /EduSphere instructors/i })
+    ).toBeInTheDocument();
   });
 
   it('renders all 4 instructor cards', () => {
@@ -57,7 +65,9 @@ describe('InstructorDirectoryPage', () => {
   it('renders Dr. Sarah Chen', () => {
     renderPage();
     expect(screen.getByText('Dr. Sarah Chen')).toBeInTheDocument();
-    expect(screen.getByText('AI & Machine Learning Researcher')).toBeInTheDocument();
+    expect(
+      screen.getByText('AI & Machine Learning Researcher')
+    ).toBeInTheDocument();
   });
 
   it('renders Prof. David Levi', () => {
@@ -81,15 +91,21 @@ describe('InstructorDirectoryPage', () => {
   // --- Card details ---
   it('renders credentials', () => {
     renderPage();
-    expect(screen.getByText('Stanford PhD, Computer Science')).toBeInTheDocument();
+    expect(
+      screen.getByText('Stanford PhD, Computer Science')
+    ).toBeInTheDocument();
     expect(screen.getByText('MIT CSAIL, Semantic Web')).toBeInTheDocument();
-    expect(screen.getByText('Harvard EdD, Learning Sciences')).toBeInTheDocument();
+    expect(
+      screen.getByText('Harvard EdD, Learning Sciences')
+    ).toBeInTheDocument();
   });
 
   it('renders bio for each instructor', () => {
     renderPage();
     expect(screen.getByText(/Leading AI researcher/)).toBeInTheDocument();
-    expect(screen.getByText(/Pioneer in enterprise knowledge graph/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Pioneer in enterprise knowledge graph/)
+    ).toBeInTheDocument();
   });
 
   it('renders expertise tags', () => {
@@ -110,10 +126,18 @@ describe('InstructorDirectoryPage', () => {
 
   it('each instructor card has aria-label', () => {
     renderPage();
-    expect(screen.getByLabelText(/Instructor: Dr. Sarah Chen/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Instructor: Prof. David Levi/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Instructor: Dr. Maria Santos/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Instructor: James Thompson/)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Instructor: Dr. Sarah Chen/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Instructor: Prof. David Levi/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Instructor: Dr. Maria Santos/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Instructor: James Thompson/)
+    ).toBeInTheDocument();
   });
 
   it('renders "Learn with them" links', () => {
@@ -124,21 +148,29 @@ describe('InstructorDirectoryPage', () => {
 
   it('"Learn with them" links have aria-labels with instructor names', () => {
     renderPage();
-    expect(screen.getByLabelText(/Learn from Dr. Sarah Chen/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Learn from James Thompson/)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Learn from Dr. Sarah Chen/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Learn from James Thompson/)
+    ).toBeInTheDocument();
   });
 
   // --- Expertise lists ---
   it('renders expertise list for each instructor', () => {
     renderPage();
-    const expertiseLists = screen.getAllByRole('list', { name: /areas of expertise/i });
+    const expertiseLists = screen.getAllByRole('list', {
+      name: /areas of expertise/i,
+    });
     expect(expertiseLists).toHaveLength(4);
   });
 
   // --- CTA section ---
   it('renders become-an-instructor CTA', () => {
     renderPage();
-    expect(screen.getByText(/Want to become an EduSphere instructor/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Want to become an EduSphere instructor/i)
+    ).toBeInTheDocument();
   });
 
   it('renders Get Started CTA button', () => {
@@ -148,7 +180,9 @@ describe('InstructorDirectoryPage', () => {
 
   it('CTA button has aria-label', () => {
     renderPage();
-    expect(screen.getByLabelText(/Apply to become an EduSphere instructor/)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Apply to become an EduSphere instructor/)
+    ).toBeInTheDocument();
   });
 
   // --- SEO ---
@@ -191,9 +225,9 @@ describe('InstructorDirectoryPage', () => {
 
   it('all pilot links point to /pilot', () => {
     renderPage();
-    const pilotLinks = screen.getAllByRole('link').filter(
-      (link) => link.getAttribute('href') === '/pilot'
-    );
+    const pilotLinks = screen
+      .getAllByRole('link')
+      .filter((link) => link.getAttribute('href') === '/pilot');
     // 4 "Learn with them" + 1 CTA = 5
     expect(pilotLinks.length).toBeGreaterThanOrEqual(5);
   });

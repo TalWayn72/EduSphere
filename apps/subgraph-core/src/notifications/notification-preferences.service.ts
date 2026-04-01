@@ -36,7 +36,10 @@ export class NotificationPreferencesService implements OnModuleDestroy {
   }
 
   /** Get all preferences for user, filling tenant defaults for missing entries. */
-  async getPreferences(userId: string, tenantId: string): Promise<PreferenceDto[]> {
+  async getPreferences(
+    userId: string,
+    tenantId: string
+  ): Promise<PreferenceDto[]> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const userPrefs = await withTenantContext(this.db, ctx, async (tx) => {
@@ -63,7 +66,8 @@ export class NotificationPreferencesService implements OnModuleDestroy {
     enabled: boolean
   ): Promise<PreferenceDto> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
-    const channelVal = channel.toLowerCase() as typeof schema.notificationPreferences.$inferInsert['channel'];
+    const channelVal =
+      channel.toLowerCase() as (typeof schema.notificationPreferences.$inferInsert)['channel'];
 
     const [row] = await withTenantContext(this.db, ctx, async (tx) => {
       return tx
@@ -107,7 +111,8 @@ export class NotificationPreferencesService implements OnModuleDestroy {
     channel: string
   ): Promise<boolean> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
-    const channelVal = channel.toLowerCase() as typeof schema.notificationPreferences.$inferInsert['channel'];
+    const channelVal =
+      channel.toLowerCase() as (typeof schema.notificationPreferences.$inferInsert)['channel'];
 
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
       return tx
@@ -116,7 +121,10 @@ export class NotificationPreferencesService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.notificationPreferences.userId, userId),
-            eq(schema.notificationPreferences.notificationType, notificationType),
+            eq(
+              schema.notificationPreferences.notificationType,
+              notificationType
+            ),
             eq(schema.notificationPreferences.channel, channelVal)
           )
         );
@@ -134,8 +142,13 @@ export class NotificationPreferencesService implements OnModuleDestroy {
     notificationType: string,
     channel: string
   ): Promise<boolean> {
-    const channelVal = channel.toLowerCase() as typeof schema.tenantNotificationDefaults.$inferInsert['channel'];
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const channelVal =
+      channel.toLowerCase() as (typeof schema.tenantNotificationDefaults.$inferInsert)['channel'];
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
 
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
       return tx
@@ -144,7 +157,10 @@ export class NotificationPreferencesService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.tenantNotificationDefaults.tenantId, tenantId),
-            eq(schema.tenantNotificationDefaults.notificationType, notificationType),
+            eq(
+              schema.tenantNotificationDefaults.notificationType,
+              notificationType
+            ),
             eq(schema.tenantNotificationDefaults.channel, channelVal)
           )
         );

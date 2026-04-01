@@ -326,14 +326,18 @@ describe('SettingsPage', () => {
     fireEvent.click(toggle);
     await waitFor(() => expect(mockMutate).toHaveBeenCalled());
     const callArgs = mockMutate.mock.calls[0][0];
-    expect(callArgs).toEqual({ input: { consentType: 'AI_PROCESSING', given: true } });
+    expect(callArgs).toEqual({
+      input: { consentType: 'AI_PROCESSING', given: true },
+    });
   });
 
   it('REGRESSION BUG-088: consent toggle saves to localStorage', () => {
     renderPage();
     const toggle = screen.getAllByRole('switch')[0];
     fireEvent.click(toggle);
-    expect(localStorage.getItem('edusphere_consent_AI_PROCESSING')).toBe('true');
+    expect(localStorage.getItem('edusphere_consent_AI_PROCESSING')).toBe(
+      'true'
+    );
   });
 
   it('REGRESSION BUG-088: back button shown when returnTo param present', () => {
@@ -344,7 +348,9 @@ describe('SettingsPage', () => {
 
   it('REGRESSION BUG-088: no back button without returnTo param', () => {
     renderPage(['/settings']);
-    expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /back/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls clearLocalStorage and shows success toast on clear cache click', () => {

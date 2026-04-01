@@ -88,14 +88,16 @@ async function loginThenGoto(page: Page, path: string) {
  */
 function loadingIndicator(page: Page) {
   // Use CSS-only selectors in a compound locator; add text pseudo-selector via .or()
-  const cssIndicators = page.locator([
-    '[data-testid*="skeleton"]',
-    '[class*="skeleton"]',
-    '[class*="animate-pulse"]',
-    '[class*="animate-spin"]',
-    '[class*="spinner"]',
-    '[role="progressbar"]',
-  ].join(', '));
+  const cssIndicators = page.locator(
+    [
+      '[data-testid*="skeleton"]',
+      '[class*="skeleton"]',
+      '[class*="animate-pulse"]',
+      '[class*="animate-spin"]',
+      '[class*="spinner"]',
+      '[role="progressbar"]',
+    ].join(', ')
+  );
   return cssIndicators.or(page.getByText('Loading'));
 }
 
@@ -115,10 +117,12 @@ async function assertLoadingGone(page: Page) {
   const indicator = loadingIndicator(page);
   // Wait for all loading indicators to disappear
   // Use a longer timeout to account for the GraphQL delay + render
-  await expect(indicator.first()).not.toBeVisible({ timeout: 15_000 }).catch(() => {
-    // If no loading indicator was ever present, that's also acceptable
-    // (some pages may render empty state directly)
-  });
+  await expect(indicator.first())
+    .not.toBeVisible({ timeout: 15_000 })
+    .catch(() => {
+      // If no loading indicator was ever present, that's also acceptable
+      // (some pages may render empty state directly)
+    });
 }
 
 // ─── T-01: Dashboard loading state ───────────────────────────────────────────
@@ -131,7 +135,7 @@ test.describe('loading-states — T-01: Dashboard', () => {
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-dashboard-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -152,14 +156,16 @@ test.describe('loading-states — T-01: Dashboard', () => {
 // ─── T-02: Courses list loading state ────────────────────────────────────────
 
 test.describe('loading-states — T-02: Courses', () => {
-  test('shows loading indicator while courses are fetching', async ({ page }) => {
+  test('shows loading indicator while courses are fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/courses');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-courses-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -177,14 +183,16 @@ test.describe('loading-states — T-02: Courses', () => {
 // ─── T-03: Settings loading state ────────────────────────────────────────────
 
 test.describe('loading-states — T-03: Settings', () => {
-  test('shows loading indicator while settings are fetching', async ({ page }) => {
+  test('shows loading indicator while settings are fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/settings');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-settings-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -202,16 +210,21 @@ test.describe('loading-states — T-03: Settings', () => {
 // ─── T-04: Knowledge Graph loading state ─────────────────────────────────────
 
 test.describe('loading-states — T-04: Knowledge Graph', () => {
-  test('shows loading indicator while graph data is fetching', async ({ page }) => {
+  test('shows loading indicator while graph data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/knowledge-graph');
 
     await assertLoadingVisible(page);
 
-    await expect(page).toHaveScreenshot('loading-knowledge-graph-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
-      timeout: 15_000,
-    });
+    await expect(page).toHaveScreenshot(
+      'loading-knowledge-graph-skeleton.png',
+      {
+        maxDiffPixelRatio: 0.1,
+        timeout: 15_000,
+      }
+    );
   });
 
   test('knowledge graph content appears after data loads', async ({ page }) => {
@@ -227,14 +240,16 @@ test.describe('loading-states — T-04: Knowledge Graph', () => {
 // ─── T-05: Agents page loading state ─────────────────────────────────────────
 
 test.describe('loading-states — T-05: Agents', () => {
-  test('shows loading indicator while agent data is fetching', async ({ page }) => {
+  test('shows loading indicator while agent data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/agents');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-agents-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -252,14 +267,16 @@ test.describe('loading-states — T-05: Agents', () => {
 // ─── T-06: Profile page loading state ────────────────────────────────────────
 
 test.describe('loading-states — T-06: Profile', () => {
-  test('shows loading indicator while profile data is fetching', async ({ page }) => {
+  test('shows loading indicator while profile data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/profile');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-profile-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -277,14 +294,16 @@ test.describe('loading-states — T-06: Profile', () => {
 // ─── T-07: Assessments page loading state ────────────────────────────────────
 
 test.describe('loading-states — T-07: Assessments', () => {
-  test('shows loading indicator while assessment data is fetching', async ({ page }) => {
+  test('shows loading indicator while assessment data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/assessments');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-assessments-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -302,14 +321,16 @@ test.describe('loading-states — T-07: Assessments', () => {
 // ─── T-08: Discussions page loading state ────────────────────────────────────
 
 test.describe('loading-states — T-08: Discussions', () => {
-  test('shows loading indicator while discussion data is fetching', async ({ page }) => {
+  test('shows loading indicator while discussion data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/discussions');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-discussions-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -327,14 +348,16 @@ test.describe('loading-states — T-08: Discussions', () => {
 // ─── T-09: Admin dashboard loading state ─────────────────────────────────────
 
 test.describe('loading-states — T-09: Admin Dashboard', () => {
-  test('shows loading indicator while admin data is fetching', async ({ page }) => {
+  test('shows loading indicator while admin data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/admin');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-admin-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });
@@ -352,14 +375,16 @@ test.describe('loading-states — T-09: Admin Dashboard', () => {
 // ─── T-10: Discover/Explore page loading state ──────────────────────────────
 
 test.describe('loading-states — T-10: Discover', () => {
-  test('shows loading indicator while discovery data is fetching', async ({ page }) => {
+  test('shows loading indicator while discovery data is fetching', async ({
+    page,
+  }) => {
     await setupDelayedGraphQL(page);
     await loginThenGoto(page, '/discover');
 
     await assertLoadingVisible(page);
 
     await expect(page).toHaveScreenshot('loading-discover-skeleton.png', {
-      maxDiffPixelRatio: 0.10,
+      maxDiffPixelRatio: 0.1,
       timeout: 15_000,
     });
   });

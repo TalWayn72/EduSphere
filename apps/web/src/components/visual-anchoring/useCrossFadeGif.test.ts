@@ -12,13 +12,15 @@ describe('useCrossFadeGif', () => {
   });
 
   it('returns scheduleGifPause function', () => {
-    const { result } = renderHook(() => useCrossFadeGif('img.gif', 'image/gif'));
+    const { result } = renderHook(() =>
+      useCrossFadeGif('img.gif', 'image/gif')
+    );
     expect(typeof result.current.scheduleGifPause).toBe('function');
   });
 
   it('scheduleGifPause replaces gif src with transparent gif after delay', () => {
     const { result } = renderHook(() =>
-      useCrossFadeGif('animation.gif', 'image/gif'),
+      useCrossFadeGif('animation.gif', 'image/gif')
     );
 
     const imgEl = document.createElement('img');
@@ -37,13 +39,13 @@ describe('useCrossFadeGif', () => {
     });
 
     expect(imgEl.src).toBe(
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7',
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7'
     );
   });
 
   it('does not replace src for non-gif images', () => {
     const { result } = renderHook(() =>
-      useCrossFadeGif('photo.png', 'image/png'),
+      useCrossFadeGif('photo.png', 'image/png')
     );
 
     const imgEl = document.createElement('img');
@@ -62,9 +64,7 @@ describe('useCrossFadeGif', () => {
   });
 
   it('does not replace src when outgoingSrc is null', () => {
-    const { result } = renderHook(() =>
-      useCrossFadeGif(null, 'image/gif'),
-    );
+    const { result } = renderHook(() => useCrossFadeGif(null, 'image/gif'));
 
     const imgEl = document.createElement('img');
     imgEl.src = 'some.gif';
@@ -82,7 +82,7 @@ describe('useCrossFadeGif', () => {
 
   it('does nothing when imgEl is null', () => {
     const { result } = renderHook(() =>
-      useCrossFadeGif('animation.gif', 'image/gif'),
+      useCrossFadeGif('animation.gif', 'image/gif')
     );
 
     // Should not throw
@@ -97,7 +97,7 @@ describe('useCrossFadeGif', () => {
 
   it('clears previous timer when scheduleGifPause is called again', () => {
     const { result } = renderHook(() =>
-      useCrossFadeGif('animation.gif', 'image/gif'),
+      useCrossFadeGif('animation.gif', 'image/gif')
     );
 
     const imgEl1 = document.createElement('img');
@@ -122,14 +122,14 @@ describe('useCrossFadeGif', () => {
 
     // Second image should be updated, first should NOT
     expect(imgEl2.src).toBe(
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7',
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7'
     );
   });
 
   it('clears timeout on unmount (memory safety)', () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
     const { result, unmount } = renderHook(() =>
-      useCrossFadeGif('animation.gif', 'image/gif'),
+      useCrossFadeGif('animation.gif', 'image/gif')
     );
 
     const imgEl = document.createElement('img');
@@ -145,7 +145,7 @@ describe('useCrossFadeGif', () => {
 
   it('detects gif by mime type containing "gif"', () => {
     const { result } = renderHook(() =>
-      useCrossFadeGif('file.unknown', 'image/gif'),
+      useCrossFadeGif('file.unknown', 'image/gif')
     );
 
     const imgEl = document.createElement('img');
@@ -160,13 +160,13 @@ describe('useCrossFadeGif', () => {
     });
 
     expect(imgEl.src).toBe(
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7',
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7'
     );
   });
 
   it('detects gif by .gif file extension', () => {
     const { result } = renderHook(() =>
-      useCrossFadeGif('file.gif', 'application/octet-stream'),
+      useCrossFadeGif('file.gif', 'application/octet-stream')
     );
 
     const imgEl = document.createElement('img');
@@ -181,7 +181,7 @@ describe('useCrossFadeGif', () => {
     });
 
     expect(imgEl.src).toBe(
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7',
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAIBRAA7'
     );
   });
 });

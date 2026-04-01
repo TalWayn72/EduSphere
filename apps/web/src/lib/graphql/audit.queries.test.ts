@@ -7,5 +7,4 @@ describe('audit.queries', () => {
     expect(typeof ADMIN_AUDIT_LOG_QUERY).toBe('string');
     expect(ADMIN_AUDIT_LOG_QUERY).toContain('query AdminAuditLog');
   });
-
 });

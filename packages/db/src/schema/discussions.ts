@@ -22,8 +22,12 @@ export const discussions = pgTable('discussions', {
   title: varchar('title', { length: 255 }),
   content: text('content').notNull(),
   upvotes: integer('upvotes').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const discussionsRLS = sql`

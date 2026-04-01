@@ -1,7 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { storeDecision, storeBugPattern, storeCodePattern, storeAgentPerf } from './handlers.js';
+import {
+  storeDecision,
+  storeBugPattern,
+  storeCodePattern,
+  storeAgentPerf,
+} from './handlers.js';
 import {
   searchAll,
   searchCollection,
@@ -28,7 +33,7 @@ server.tool(
     chosen: z.string().describe('Chosen approach'),
     tags: z.array(z.string()).describe('Categorization tags'),
   },
-  async (args) => storeDecision(args),
+  async (args) => storeDecision(args)
 );
 
 server.tool(
@@ -40,7 +45,7 @@ server.tool(
     solution: z.string().describe('How it was fixed'),
     files: z.array(z.string()).describe('Affected files'),
   },
-  async (args) => storeBugPattern(args),
+  async (args) => storeBugPattern(args)
 );
 
 server.tool(
@@ -52,7 +57,7 @@ server.tool(
     usage: z.string().describe('When and how to use'),
     tags: z.array(z.string()).describe('Tags'),
   },
-  async (args) => storeCodePattern(args),
+  async (args) => storeCodePattern(args)
 );
 
 server.tool(
@@ -65,7 +70,7 @@ server.tool(
     success: z.boolean().describe('Whether the task succeeded'),
     notes: z.string().describe('Additional notes'),
   },
-  async (args) => storeAgentPerf(args),
+  async (args) => storeAgentPerf(args)
 );
 
 // ─── Search tools ────────────────────────────────────────────────
@@ -77,7 +82,7 @@ server.tool(
     query: z.string().describe('Search query'),
     n_results: z.number().optional().describe('Number of results (default 5)'),
   },
-  async (args) => searchAll(args),
+  async (args) => searchAll(args)
 );
 
 server.tool(
@@ -87,7 +92,7 @@ server.tool(
     query: z.string().describe('Search query'),
     n_results: z.number().optional().describe('Number of results (default 5)'),
   },
-  async (args) => searchCollection('edusphere_decisions', args),
+  async (args) => searchCollection('edusphere_decisions', args)
 );
 
 server.tool(
@@ -97,7 +102,7 @@ server.tool(
     query: z.string().describe('Search query'),
     n_results: z.number().optional().describe('Number of results (default 5)'),
   },
-  async (args) => searchCollection('edusphere_bug_patterns', args),
+  async (args) => searchCollection('edusphere_bug_patterns', args)
 );
 
 server.tool(
@@ -107,7 +112,7 @@ server.tool(
     query: z.string().describe('Search query'),
     n_results: z.number().optional().describe('Number of results (default 5)'),
   },
-  async (args) => searchCollection('edusphere_code_patterns', args),
+  async (args) => searchCollection('edusphere_code_patterns', args)
 );
 
 // ─── Utility tools ───────────────────────────────────────────────
@@ -117,16 +122,19 @@ server.tool(
   'Get N most recent entries from a collection or all collections.',
   {
     n: z.number().optional().describe('Number of entries (default 10)'),
-    collection: z.string().optional().describe('Collection name (optional, searches all if omitted)'),
+    collection: z
+      .string()
+      .optional()
+      .describe('Collection name (optional, searches all if omitted)'),
   },
-  async (args) => getRecent(args),
+  async (args) => getRecent(args)
 );
 
 server.tool(
   'vm_list_collections',
   'List all collections with document counts.',
   {},
-  async () => listCollections(),
+  async () => listCollections()
 );
 
 server.tool(
@@ -135,14 +143,14 @@ server.tool(
   {
     file_path: z.string().describe('Absolute path to the markdown file'),
   },
-  async (args) => migrateMarkdown(args),
+  async (args) => migrateMarkdown(args)
 );
 
 server.tool(
   'vm_health',
   'Check ChromaDB connection health and collection status.',
   {},
-  async () => healthCheck(),
+  async () => healthCheck()
 );
 
 // ─── Start server ────────────────────────────────────────────────
@@ -153,6 +161,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((e) => {
-  process.stderr.write(`[vector-memory] Fatal: ${e instanceof Error ? e.message : String(e)}\n`);
+  process.stderr.write(
+    `[vector-memory] Fatal: ${e instanceof Error ? e.message : String(e)}\n`
+  );
   process.exit(1);
 });

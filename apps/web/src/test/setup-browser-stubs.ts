@@ -33,20 +33,31 @@ if (!globalThis.ResizeObserver) {
 if (!globalThis.IntersectionObserver) {
   globalThis.IntersectionObserver = class IntersectionObserver {
     private _cb: IntersectionObserverCallback;
-    constructor(cb: IntersectionObserverCallback, _opts?: IntersectionObserverInit) {
+    constructor(
+      cb: IntersectionObserverCallback,
+      _opts?: IntersectionObserverInit
+    ) {
       this._cb = cb;
     }
     observe(target: Element) {
       // Immediately invoke callback with isIntersecting:true so animated
       // components (AnimatedCounter, VideoSection) behave synchronously in tests.
       this._cb(
-        [{ isIntersecting: true, target, intersectionRatio: 1 } as IntersectionObserverEntry],
-        this as unknown as IntersectionObserver,
+        [
+          {
+            isIntersecting: true,
+            target,
+            intersectionRatio: 1,
+          } as IntersectionObserverEntry,
+        ],
+        this as unknown as IntersectionObserver
       );
     }
     unobserve() {}
     disconnect() {}
-    takeRecords(): IntersectionObserverEntry[] { return []; }
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
     readonly root: Element | null = null;
     readonly rootMargin: string = '';
     readonly thresholds: ReadonlyArray<number> = [];

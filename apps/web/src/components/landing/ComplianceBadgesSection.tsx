@@ -1,7 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Shield, Globe, FileCheck, Link2, BookOpen, KeyRound, Lock, Server } from 'lucide-react';
+import {
+  Shield,
+  Globe,
+  FileCheck,
+  Link2,
+  BookOpen,
+  KeyRound,
+  Lock,
+  Server,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const BADGE_ITEMS = [
@@ -28,7 +37,9 @@ export function ComplianceBadgesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight dark:text-slate-100">
-            {t('landing.complianceBadges.title')}<br className="hidden sm:block" /> {t('landing.complianceBadges.titleBreak')}
+            {t('landing.complianceBadges.title')}
+            <br className="hidden sm:block" />{' '}
+            {t('landing.complianceBadges.titleBreak')}
           </h2>
           <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto dark:text-slate-400">
             {t('landing.complianceBadges.subtitle')}
@@ -42,29 +53,50 @@ export function ComplianceBadgesSection() {
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 rounded-lg bg-indigo-50 flex-shrink-0 dark:bg-indigo-950">
-                  <Icon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Icon
+                    className="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-slate-900 text-sm dark:text-slate-100">{title}</span>
-                  <span className="text-green-600 text-sm font-bold dark:text-green-400" aria-label="Certified">✓</span>
+                  <span className="font-semibold text-slate-900 text-sm dark:text-slate-100">
+                    {title}
+                  </span>
+                  <span
+                    className="text-green-600 text-sm font-bold dark:text-green-400"
+                    aria-label="Certified"
+                  >
+                    ✓
+                  </span>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed dark:text-slate-400">{t(`landing.complianceBadges.${descKey}`)}</p>
+              <p className="text-xs text-slate-500 leading-relaxed dark:text-slate-400">
+                {t(`landing.complianceBadges.${descKey}`)}
+              </p>
             </div>
           ))}
         </div>
         {/* SOC2 note */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center gap-3 dark:border-slate-600 dark:bg-slate-800">
-            <Shield className="h-5 w-5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+            <Shield
+              className="h-5 w-5 text-slate-500 dark:text-slate-400"
+              aria-hidden="true"
+            />
             <span className="text-sm text-slate-500 dark:text-slate-400">
-              <strong className="text-slate-700 dark:text-slate-200">{t('landing.complianceBadges.soc2')}</strong> — {t('landing.complianceBadges.soc2Status')}
+              <strong className="text-slate-700 dark:text-slate-200">
+                {t('landing.complianceBadges.soc2')}
+              </strong>{' '}
+              — {t('landing.complianceBadges.soc2Status')}
             </span>
           </div>
         </div>
         <div className="text-center">
           <Button variant="outline" asChild>
-            <Link to="/compliance#downloads" aria-label="Download VPAT and HECVAT compliance documents">
+            <Link
+              to="/compliance#downloads"
+              aria-label="Download VPAT and HECVAT compliance documents"
+            >
               {t('landing.complianceBadges.downloadVpat')}
             </Link>
           </Button>

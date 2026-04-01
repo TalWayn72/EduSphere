@@ -5,16 +5,21 @@ import * as urql from 'urql';
 import { SocialFeedPage } from './SocialFeedPage';
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('urql', async () => ({
-  ...await vi.importActual('urql'),
+  ...(await vi.importActual('urql')),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
 
-const NOOP_QUERY = [{ data: undefined, fetching: false, error: undefined }, vi.fn()] as never;
+const NOOP_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+  vi.fn(),
+] as never;
 
 describe('SocialFeedPage', () => {
   beforeEach(() => {
@@ -22,45 +27,72 @@ describe('SocialFeedPage', () => {
   });
 
   it('renders Social Feed heading', () => {
-    render(<MemoryRouter><SocialFeedPage /></MemoryRouter>);
-    expect(screen.getByRole('heading', { name: /Social Feed/i })).toBeInTheDocument();
+    render(
+      <MemoryRouter>
+        <SocialFeedPage />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getByRole('heading', { name: /Social Feed/i })
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no feed items', () => {
-    render(<MemoryRouter><SocialFeedPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SocialFeedPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/Follow learners/i)).toBeInTheDocument();
   });
 
   it('renders feed items when data available', async () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{
-      data: {
-        socialFeed: [{
-          id: '1',
-          actorId: 'u1',
-          actorDisplayName: 'Alice',
-          verb: 'COMPLETED',
-          objectType: 'course',
-          objectId: 'c1',
-          objectTitle: 'React Fundamentals',
-          createdAt: new Date().toISOString(),
-        }],
-        socialRecommendations: [],
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        data: {
+          socialFeed: [
+            {
+              id: '1',
+              actorId: 'u1',
+              actorDisplayName: 'Alice',
+              verb: 'COMPLETED',
+              objectType: 'course',
+              objectId: 'c1',
+              objectTitle: 'React Fundamentals',
+              createdAt: new Date().toISOString(),
+            },
+          ],
+          socialRecommendations: [],
+        },
+        fetching: false,
+        error: undefined,
       },
-      fetching: false,
-      error: undefined,
-    }, vi.fn()] as never);
-    render(<MemoryRouter><SocialFeedPage /></MemoryRouter>);
+      vi.fn(),
+    ] as never);
+    render(
+      <MemoryRouter>
+        <SocialFeedPage />
+      </MemoryRouter>
+    );
     // mounted guard: feed items render after useEffect fires (setMounted(true))
     expect(await screen.findByText('Alice')).toBeInTheDocument();
   });
 
   it('shows recommendations section heading', () => {
-    render(<MemoryRouter><SocialFeedPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SocialFeedPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/Recommended Content/i)).toBeInTheDocument();
   });
 
   it('shows Find People CTA', () => {
-    render(<MemoryRouter><SocialFeedPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SocialFeedPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/Find People/i)).toBeInTheDocument();
   });
 });

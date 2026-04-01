@@ -162,7 +162,7 @@ test.describe('BUG-098: AddSourceModal — Radix Dialog accessibility', () => {
     // Visual regression screenshot — modal open state
     await expect(page.getByTestId('add-source-modal')).toHaveScreenshot(
       'bug098-add-source-modal-open.png',
-      { maxDiffPixelRatio: 0.05 },
+      { maxDiffPixelRatio: 0.05 }
     );
   });
 
@@ -176,7 +176,7 @@ test.describe('BUG-098: AddSourceModal — Radix Dialog accessibility', () => {
     // Visual regression screenshot — error state
     await expect(page.getByTestId('add-source-modal')).toHaveScreenshot(
       'bug098-add-source-modal-error.png',
-      { maxDiffPixelRatio: 0.05 },
+      { maxDiffPixelRatio: 0.05 }
     );
   });
 });
@@ -208,13 +208,13 @@ test.describe('BUG-098: Source auth error — friendly message display', () => {
     await toggle.click({ force: true });
 
     // Should show source list header (data-testid) without errors
-    await expect(
-      page.getByTestId('sources-title'),
-    ).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-title')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
 
     // No error boundary crash
-    await expect(
-      page.getByText(/something went wrong/i),
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 2_000,
+    });
   });
 });

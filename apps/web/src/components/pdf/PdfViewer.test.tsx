@@ -13,7 +13,13 @@
  *  9. Keyboard navigation (ArrowLeft/ArrowRight)
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 
 // ── Hoist mock data so vi.mock factory can reference it ──────────────────────
 
@@ -43,11 +49,19 @@ const {
     destroy: vi.fn(),
   };
   const mockLoadingTask = {
-    promise: Promise.resolve(mockPdfDocument) as Promise<typeof mockPdfDocument>,
+    promise: Promise.resolve(mockPdfDocument) as Promise<
+      typeof mockPdfDocument
+    >,
     destroy: vi.fn(),
   };
   const mockGetDocument = vi.fn().mockReturnValue(mockLoadingTask);
-  return { mockRenderTask, mockPage, mockPdfDocument, mockLoadingTask, mockGetDocument };
+  return {
+    mockRenderTask,
+    mockPage,
+    mockPdfDocument,
+    mockLoadingTask,
+    mockGetDocument,
+  };
 });
 
 vi.mock('pdfjs-dist', () => ({
@@ -77,7 +91,9 @@ function createMockCanvasCtx(): CanvasRenderingContext2D {
 const mockCtx = createMockCanvasCtx();
 const origGetContext = HTMLCanvasElement.prototype.getContext;
 beforeEach(() => {
-  HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockCtx) as unknown as typeof origGetContext;
+  HTMLCanvasElement.prototype.getContext = vi
+    .fn()
+    .mockReturnValue(mockCtx) as unknown as typeof origGetContext;
 });
 afterEach(() => {
   HTMLCanvasElement.prototype.getContext = origGetContext;
@@ -151,7 +167,9 @@ describe('PdfViewer', () => {
     render(<PdfViewer fileUrl="https://example.com/test.pdf" />);
     await screen.findByLabelText(/PDF page/);
     fireEvent.click(screen.getByLabelText('Zoom in'));
-    await act(async () => { await Promise.resolve(); });
+    await act(async () => {
+      await Promise.resolve();
+    });
     expect(mockPdfDocument.getPage).toHaveBeenCalled();
   });
 
@@ -159,20 +177,29 @@ describe('PdfViewer', () => {
     render(<PdfViewer fileUrl="https://example.com/test.pdf" />);
     await screen.findByLabelText(/PDF page/);
     fireEvent.click(screen.getByLabelText('Zoom out'));
-    await act(async () => { await Promise.resolve(); });
+    await act(async () => {
+      await Promise.resolve();
+    });
     expect(mockPdfDocument.getPage).toHaveBeenCalled();
   });
 
   it('fires onTextSelect callback on text selection', async () => {
     const onTextSelect = vi.fn();
-    render(<PdfViewer fileUrl="https://example.com/test.pdf" onTextSelect={onTextSelect} />);
+    render(
+      <PdfViewer
+        fileUrl="https://example.com/test.pdf"
+        onTextSelect={onTextSelect}
+      />
+    );
     await screen.findByLabelText(/PDF page/);
 
     const mockSelection = {
       toString: () => '  selected text  ',
       isCollapsed: false,
     };
-    vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as globalThis.Selection);
+    vi.spyOn(window, 'getSelection').mockReturnValue(
+      mockSelection as unknown as globalThis.Selection
+    );
 
     const container = screen.getByTestId('pdf-viewer');
     const scrollContainer = container.querySelector('.overflow-auto');
@@ -185,7 +212,12 @@ describe('PdfViewer', () => {
 
   it('does not fire onTextSelect for empty selection', async () => {
     const onTextSelect = vi.fn();
-    render(<PdfViewer fileUrl="https://example.com/test.pdf" onTextSelect={onTextSelect} />);
+    render(
+      <PdfViewer
+        fileUrl="https://example.com/test.pdf"
+        onTextSelect={onTextSelect}
+      />
+    );
     await screen.findByLabelText(/PDF page/);
 
     vi.spyOn(window, 'getSelection').mockReturnValue({
@@ -223,7 +255,9 @@ describe('PdfViewer', () => {
   });
 
   it('cleans up PDF document on unmount (memory safety)', async () => {
-    const { unmount } = render(<PdfViewer fileUrl="https://example.com/test.pdf" />);
+    const { unmount } = render(
+      <PdfViewer fileUrl="https://example.com/test.pdf" />
+    );
     await screen.findByLabelText(/PDF page/);
     unmount();
     expect(mockLoadingTask.destroy).toHaveBeenCalled();
@@ -232,7 +266,9 @@ describe('PdfViewer', () => {
   it('has correct ARIA labels', async () => {
     render(<PdfViewer fileUrl="https://example.com/test.pdf" />);
     await screen.findByLabelText(/PDF page/);
-    expect(screen.getByRole('toolbar', { name: 'PDF controls' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('toolbar', { name: 'PDF controls' })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/PDF page 1 of 5/)).toBeInTheDocument();
   });
 
@@ -252,7 +288,12 @@ describe('PdfViewer', () => {
 
   it('fires onPageChange callback when page changes', async () => {
     const onPageChange = vi.fn();
-    render(<PdfViewer fileUrl="https://example.com/test.pdf" onPageChange={onPageChange} />);
+    render(
+      <PdfViewer
+        fileUrl="https://example.com/test.pdf"
+        onPageChange={onPageChange}
+      />
+    );
     await screen.findByLabelText(/PDF page/);
     expect(onPageChange).toHaveBeenCalledWith(1);
 
@@ -295,7 +336,9 @@ describe('PdfViewer', () => {
   });
 
   it('applies className prop', async () => {
-    render(<PdfViewer fileUrl="https://example.com/test.pdf" className="my-class" />);
+    render(
+      <PdfViewer fileUrl="https://example.com/test.pdf" className="my-class" />
+    );
     await screen.findByLabelText(/PDF page/);
     expect(screen.getByTestId('pdf-viewer')).toHaveClass('my-class');
   });
@@ -361,6 +404,8 @@ describe('PdfViewer — Accessibility', () => {
   it('toolbar has role="toolbar" with accessible name', async () => {
     render(<PdfViewer fileUrl="https://example.com/test.pdf" />);
     await screen.findByLabelText(/PDF page/);
-    expect(screen.getByRole('toolbar', { name: 'PDF controls' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('toolbar', { name: 'PDF controls' })
+    ).toBeInTheDocument();
   });
 });

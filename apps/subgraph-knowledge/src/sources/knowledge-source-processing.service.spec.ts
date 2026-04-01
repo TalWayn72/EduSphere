@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 
 // ─── DB mock ───────────────────────────────────────────────────────────────
 const mockInsertReturning = vi.fn();
 const mockUpdateReturning = vi.fn();
-const mockUpdateSet = vi.fn(() => ({ where: vi.fn(() => ({
-  returning: mockUpdateReturning,
-})) }));
+const mockUpdateSet = vi.fn(() => ({
+  where: vi.fn(() => ({
+    returning: mockUpdateReturning,
+  })),
+}));
 const mockSelectFrom = vi.fn();
 
 const mockDb = {
@@ -22,7 +22,12 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   schema: {
-    knowledgeSources: { id: 'id', tenant_id: 'tenant_id', course_id: 'course_id', status: 'status' },
+    knowledgeSources: {
+      id: 'id',
+      tenant_id: 'tenant_id',
+      course_id: 'course_id',
+      status: 'status',
+    },
   },
   eq: vi.fn((_col, val) => ({ eq: val })),
   and: vi.fn((...args: unknown[]) => ({ and: args })),
@@ -106,9 +111,7 @@ describe('KnowledgeSourceProcessingService', () => {
         wordCount: 2,
         metadata: {},
       });
-      mockChunkText.mockReturnValue([
-        { text: 'Hello world', index: 0 },
-      ]);
+      mockChunkText.mockReturnValue([{ text: 'Hello world', index: 0 }]);
       mockGenerateEmbedding.mockResolvedValue(undefined);
       mockUpdateReturning.mockResolvedValue([
         { ...fakeSource, status: 'READY', chunk_count: 1 },
@@ -117,7 +120,8 @@ describe('KnowledgeSourceProcessingService', () => {
       const result = await service.processSource('src-1', baseInput);
       expect(result.status).toBe('READY');
       expect(mockGenerateEmbedding).toHaveBeenCalledWith(
-        'Hello world', 'ks:src-1:0'
+        'Hello world',
+        'ks:src-1:0'
       );
     });
 
@@ -155,14 +159,16 @@ describe('KnowledgeSourceProcessingService', () => {
 
     it('throws when update returns no rows', async () => {
       mockParseText.mockResolvedValue({
-        text: 'Hi', wordCount: 1, metadata: {},
+        text: 'Hi',
+        wordCount: 1,
+        metadata: {},
       });
       mockChunkText.mockReturnValue([]);
       mockUpdateReturning.mockResolvedValue([]);
 
-      await expect(
-        service.processSource('src-1', baseInput)
-      ).rejects.toThrow(InternalServerErrorException);
+      await expect(service.processSource('src-1', baseInput)).rejects.toThrow(
+        InternalServerErrorException
+      );
     });
   });
 
@@ -179,7 +185,10 @@ describe('KnowledgeSourceProcessingService', () => {
         where: vi.fn().mockResolvedValue(undefined),
       });
 
-      const result = await service.reindexCourseEmbeddings('tenant-1', 'course-1');
+      const result = await service.reindexCourseEmbeddings(
+        'tenant-1',
+        'course-1'
+      );
       expect(result.sourcesProcessed).toBe(1);
       expect(result.embeddingsGenerated).toBe(1);
       expect(result.errors).toEqual([]);
@@ -191,7 +200,10 @@ describe('KnowledgeSourceProcessingService', () => {
         where: vi.fn().mockResolvedValue([source]),
       });
 
-      const result = await service.reindexCourseEmbeddings('tenant-1', 'course-1');
+      const result = await service.reindexCourseEmbeddings(
+        'tenant-1',
+        'course-1'
+      );
       expect(result.sourcesProcessed).toBe(0);
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0]).toContain('no raw_content');
@@ -202,7 +214,10 @@ describe('KnowledgeSourceProcessingService', () => {
         where: vi.fn().mockResolvedValue([]),
       });
 
-      const result = await service.reindexCourseEmbeddings('tenant-1', 'course-1');
+      const result = await service.reindexCourseEmbeddings(
+        'tenant-1',
+        'course-1'
+      );
       expect(result).toEqual({
         sourcesProcessed: 0,
         embeddingsGenerated: 0,
@@ -217,7 +232,9 @@ describe('KnowledgeSourceProcessingService', () => {
       mockInsertReturning.mockResolvedValue([fakeSource]);
       // processSource runs in background — mock extractText to resolve
       mockParseText.mockResolvedValue({
-        text: '', wordCount: 0, metadata: {},
+        text: '',
+        wordCount: 0,
+        metadata: {},
       });
       mockChunkText.mockReturnValue([]);
       mockUpdateReturning.mockResolvedValue([

@@ -20,7 +20,9 @@ const OAUTH_CALLBACK_URL = `${BASE_URL}/oauth/google/callback`;
 
 // ── Helper: mock GraphQL responses for Drive import ───────────────────────────
 
-function mockImportGraphQL(page: import('@playwright/test').Page): Promise<void> {
+function mockImportGraphQL(
+  page: import('@playwright/test').Page
+): Promise<void> {
   return page.route('**/graphql', async (route) => {
     const body = route.request().postDataJSON() as { query?: string };
     const query = body?.query ?? '';
@@ -109,10 +111,14 @@ test.describe('Drive Import — OAuthCallbackPage', () => {
     await expect(page.locator('body')).not.toContainText('[object Object]');
   });
 
-  test('OAuth callback page without code param renders gracefully', async ({ page }) => {
+  test('OAuth callback page without code param renders gracefully', async ({
+    page,
+  }) => {
     await page.goto(OAUTH_CALLBACK_URL, { waitUntil: 'domcontentloaded' });
     // Should render without crashing
-    await expect(page.locator('body')).not.toContainText('Something went wrong');
+    await expect(page.locator('body')).not.toContainText(
+      'Something went wrong'
+    );
     const bodyText = await page.textContent('body');
     expect(bodyText).toBeTruthy();
   });
@@ -168,7 +174,9 @@ test.describe('Drive Import — error handling', () => {
     expect(body).not.toContain('INTERNAL_SERVER_ERROR');
   });
 
-  test('import page handles network failure without crash', async ({ page }) => {
+  test('import page handles network failure without crash', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('importFromDrive') || body.includes('importFrom')) {

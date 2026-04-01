@@ -32,9 +32,16 @@ vi.mock('@edusphere/db', () => ({
     tenants: { id: 'id' },
   },
   withTenantContext: vi.fn(),
-  sql: Object.assign(vi.fn((parts: TemplateStringsArray, ...vals: unknown[]) => ({ sql: true, parts, vals })), {
-    raw: vi.fn((s: string) => ({ sqlRaw: s })),
-  }),
+  sql: Object.assign(
+    vi.fn((parts: TemplateStringsArray, ...vals: unknown[]) => ({
+      sql: true,
+      parts,
+      vals,
+    })),
+    {
+      raw: vi.fn((s: string) => ({ sqlRaw: s })),
+    }
+  ),
   count: vi.fn(() => 'count(*)'),
   avg: vi.fn(() => 'avg()'),
   and: vi.fn((...args: unknown[]) => ({ and: args })),
@@ -49,7 +56,15 @@ const USER_ID = 'bbbbbbbb-0000-0000-0000-000000000001';
 /** Builds a minimal tx stub that resolves with the given rows. */
 function makeTx(rows: unknown[] = []) {
   const chainable: Record<string, unknown> = {};
-  const methods = ['select', 'from', 'where', 'innerJoin', 'leftJoin', 'groupBy', 'orderBy'];
+  const methods = [
+    'select',
+    'from',
+    'where',
+    'innerJoin',
+    'leftJoin',
+    'groupBy',
+    'orderBy',
+  ];
   for (const m of methods) {
     chainable[m] = vi.fn(() => chainable);
   }
@@ -80,8 +95,8 @@ describe('TenantAnalyticsService', () => {
 
   describe('getTenantAnalytics', () => {
     it('returns correct shape with all 5 required top-level fields', async () => {
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) => fn(makeTx([]) as never)
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn(makeTx([]) as never)
       );
 
       const result = await service.getTenantAnalytics(
@@ -102,8 +117,8 @@ describe('TenantAnalyticsService', () => {
     });
 
     it('returns zeroed metrics when no data exists', async () => {
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) => fn(makeTx([]) as never)
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn(makeTx([]) as never)
       );
 
       const result = await service.getTenantAnalytics(
@@ -119,8 +134,8 @@ describe('TenantAnalyticsService', () => {
     });
 
     it('SEVEN_DAYS period is accepted and returns data', async () => {
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) => fn(makeTx([{ total: 5 }]) as never)
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn(makeTx([{ total: 5 }]) as never)
       );
 
       const result = await service.getTenantAnalytics(
@@ -133,8 +148,8 @@ describe('TenantAnalyticsService', () => {
     });
 
     it('NINETY_DAYS tries snapshot cache (empty snapshots falls back to live)', async () => {
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) => fn(makeTx([]) as never)
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn(makeTx([]) as never)
       );
 
       const result = await service.getTenantAnalytics(
@@ -152,13 +167,11 @@ describe('TenantAnalyticsService', () => {
 
   describe('getLearnerVelocity', () => {
     it('returns empty array gracefully when table not available', async () => {
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) => {
-          // Simulate table not existing
-          fn(makeTx([]) as never);
-          throw new Error('relation "user_learning_velocity" does not exist');
-        }
-      );
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) => {
+        // Simulate table not existing
+        fn(makeTx([]) as never);
+        throw new Error('relation "user_learning_velocity" does not exist');
+      });
 
       const result = await service.getLearnerVelocity(
         TENANT_ID,
@@ -170,18 +183,15 @@ describe('TenantAnalyticsService', () => {
     });
 
     it('returns velocity data with correct shape', async () => {
-      const mockRows = [
-        { userId: USER_ID, avgLessons: 5.5, totalWeeks: 4 },
-      ];
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) =>
-          fn({
-            ...makeTx(mockRows),
-            select: vi.fn().mockReturnThis(),
-            from: vi.fn().mockReturnThis(),
-            where: vi.fn().mockReturnThis(),
-            groupBy: vi.fn().mockResolvedValue(mockRows),
-          } as never)
+      const mockRows = [{ userId: USER_ID, avgLessons: 5.5, totalWeeks: 4 }];
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn({
+          ...makeTx(mockRows),
+          select: vi.fn().mockReturnThis(),
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockResolvedValue(mockRows),
+        } as never)
       );
 
       const result = await service.getLearnerVelocity(
@@ -207,15 +217,14 @@ describe('TenantAnalyticsService', () => {
           activeAt30Days: 50,
         },
       ];
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) =>
-          fn({
-            ...makeTx(mockRows),
-            select: vi.fn().mockReturnThis(),
-            from: vi.fn().mockReturnThis(),
-            where: vi.fn().mockReturnThis(),
-            groupBy: vi.fn().mockResolvedValue(mockRows),
-          } as never)
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn({
+          ...makeTx(mockRows),
+          select: vi.fn().mockReturnThis(),
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockResolvedValue(mockRows),
+        } as never)
       );
 
       const result = await service.getCohortRetention(TENANT_ID, USER_ID, 4);
@@ -224,15 +233,14 @@ describe('TenantAnalyticsService', () => {
     });
 
     it('returns empty array when no enrollments in window', async () => {
-      vi.mocked(db.withTenantContext).mockImplementation(
-        async (_d, _c, fn) =>
-          fn({
-            ...makeTx([]),
-            select: vi.fn().mockReturnThis(),
-            from: vi.fn().mockReturnThis(),
-            where: vi.fn().mockReturnThis(),
-            groupBy: vi.fn().mockResolvedValue([]),
-          } as never)
+      vi.mocked(db.withTenantContext).mockImplementation(async (_d, _c, fn) =>
+        fn({
+          ...makeTx([]),
+          select: vi.fn().mockReturnThis(),
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockResolvedValue([]),
+        } as never)
       );
 
       const result = await service.getCohortRetention(TENANT_ID, USER_ID, 12);

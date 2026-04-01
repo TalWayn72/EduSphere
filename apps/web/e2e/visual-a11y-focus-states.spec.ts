@@ -22,11 +22,16 @@ test.use({ reducedMotion: 'reduce' });
 test.describe('Visual A11y -- Focus States @visual @a11y', () => {
   // --- Login page focus rings ---
 
-  test('login -- first focusable element has visible focus ring', async ({ page }) => {
+  test('login -- first focusable element has visible focus ring', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-login-first-tab.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-login-first-tab.png',
+      STABLE_OPTS
+    );
   });
 
   test('login -- second tab stop has visible focus ring', async ({ page }) => {
@@ -34,7 +39,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-login-second-tab.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-login-second-tab.png',
+      STABLE_OPTS
+    );
   });
 
   test('login -- third tab stop has visible focus ring', async ({ page }) => {
@@ -43,7 +51,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-login-third-tab.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-login-third-tab.png',
+      STABLE_OPTS
+    );
   });
 
   test('login -- button focus ring visibility', async ({ page }) => {
@@ -53,7 +64,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     for (let i = 0; i < 4; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-login-button.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-login-button.png',
+      STABLE_OPTS
+    );
   });
 
   test('login -- link focus ring visibility', async ({ page }) => {
@@ -63,7 +77,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     for (let i = 0; i < 5; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-login-link.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-login-link.png',
+      STABLE_OPTS
+    );
   });
 
   // --- Dashboard focus rings (authenticated) ---
@@ -91,7 +108,9 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     });
   });
 
-  test('dashboard -- third interactive element focus ring', async ({ page }) => {
+  test('dashboard -- third interactive element focus ring', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
@@ -121,39 +140,59 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
 
   test('course create -- first form field focus ring', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/create`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-course-create-first-field.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-course-create-first-field.png',
+      STABLE_OPTS
+    );
   });
 
   test('course create -- second form field focus ring', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/create`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-course-create-second-field.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-course-create-second-field.png',
+      STABLE_OPTS
+    );
   });
 
   test('course create -- third form field focus ring', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/create`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-course-create-third-field.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-course-create-third-field.png',
+      STABLE_OPTS
+    );
   });
 
   test('course create -- submit button focus ring', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/create`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-course-create-submit.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-course-create-submit.png',
+      STABLE_OPTS
+    );
   });
 
   // --- Search page focus rings ---
@@ -163,7 +202,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     await page.goto(`${BASE_URL}/search`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-search-input.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-search-input.png',
+      STABLE_OPTS
+    );
   });
 
   test('search -- filter button focus ring', async ({ page }) => {
@@ -172,7 +214,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     await page.waitForTimeout(500);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
-    await expect(page).toHaveScreenshot('a11y-focus-search-filter.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-search-filter.png',
+      STABLE_OPTS
+    );
   });
 
   test('search -- third interactive element focus ring', async ({ page }) => {
@@ -182,7 +227,10 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-search-third-element.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-search-third-element.png',
+      STABLE_OPTS
+    );
   });
 
   test('search -- fourth interactive element focus ring', async ({ page }) => {
@@ -192,12 +240,17 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
     for (let i = 0; i < 4; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-search-fourth-element.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-search-fourth-element.png',
+      STABLE_OPTS
+    );
   });
 
   // --- Additional focus ring checks ---
 
-  test('dashboard -- fifth interactive element focus ring', async ({ page }) => {
+  test('dashboard -- fifth interactive element focus ring', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
@@ -212,20 +265,30 @@ test.describe('Visual A11y -- Focus States @visual @a11y', () => {
 
   test('course create -- fourth form field focus ring', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/courses/create`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/create`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     for (let i = 0; i < 4; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-course-create-fourth-field.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-course-create-fourth-field.png',
+      STABLE_OPTS
+    );
   });
 
-  test('login -- full page after tabbing to show focus state', async ({ page }) => {
+  test('login -- full page after tabbing to show focus state', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
     }
-    await expect(page).toHaveScreenshot('a11y-focus-login-full-tabbed.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-focus-login-full-tabbed.png',
+      STABLE_OPTS
+    );
   });
 });

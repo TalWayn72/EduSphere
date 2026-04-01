@@ -22,27 +22,39 @@ import { BASE_URL } from './env';
 // ─── Suite 1: Hero video — LCP invariants ─────────────────────────────────────
 
 test.describe('Motion Design — Hero video (LCP invariants)', () => {
-  test('hero background video has preload="none" and must not block LCP', async ({ page }) => {
+  test('hero background video has preload="none" and must not block LCP', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     // HeroSection: <video aria-hidden="true" preload="none" autoPlay muted loop playsInline>
-    const heroVideo = page.locator('[data-testid="hero-section"] video[aria-hidden="true"]').first();
-    await expect(heroVideo).toHaveAttribute('preload', 'none', { timeout: 10_000 });
+    const heroVideo = page
+      .locator('[data-testid="hero-section"] video[aria-hidden="true"]')
+      .first();
+    await expect(heroVideo).toHaveAttribute('preload', 'none', {
+      timeout: 10_000,
+    });
     // aria-hidden so screen-readers skip it
     await expect(heroVideo).toHaveAttribute('aria-hidden', 'true');
   });
 
-  test('hero background video has poster= attribute (avoids blank-frame flash)', async ({ page }) => {
+  test('hero background video has poster= attribute (avoids blank-frame flash)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const heroVideo = page.locator('[data-testid="hero-section"] video[aria-hidden="true"]').first();
+    const heroVideo = page
+      .locator('[data-testid="hero-section"] video[aria-hidden="true"]')
+      .first();
     const poster = await heroVideo.getAttribute('poster');
     // poster="/hero-bg-poster.webp" — browser renders this while video loads
     expect(poster).toBeTruthy();
     expect(poster).toContain('.webp');
   });
 
-  test('ALL video elements on landing page use preload="none"', async ({ page }) => {
+  test('ALL video elements on landing page use preload="none"', async ({
+    page,
+  }) => {
     // Iron rule: no video element on this page may use preload="auto" or preload="metadata"
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -62,7 +74,9 @@ test.describe('Motion Design — Hero video (LCP invariants)', () => {
 test.describe('Motion Design — prefers-reduced-motion (GSAP hero)', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  test('h1 is visible without animation delay when reduced-motion is set', async ({ page }) => {
+  test('h1 is visible without animation delay when reduced-motion is set', async ({
+    page,
+  }) => {
     // GSAP useGSAP callback: if (prefersReducedMotion || !heroRef.current) return;
     // So .hero-animate elements are NEVER set to opacity:0 → h1 is immediately visible
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
@@ -72,7 +86,9 @@ test.describe('Motion Design — prefers-reduced-motion (GSAP hero)', () => {
     await expect(h1).toBeVisible({ timeout: 3_000 });
   });
 
-  test('all .hero-animate elements have natural opacity (GSAP fromTo skipped)', async ({ page }) => {
+  test('all .hero-animate elements have natural opacity (GSAP fromTo skipped)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const heroSection = page.locator('[data-testid="hero-section"]');
@@ -90,33 +106,42 @@ test.describe('Motion Design — prefers-reduced-motion (GSAP hero)', () => {
       const opacity = await el.evaluate((node) =>
         parseFloat(window.getComputedStyle(node).opacity)
       );
-      expect(opacity, `.hero-animate[${i}] must not have opacity:0`).toBeGreaterThan(0);
+      expect(
+        opacity,
+        `.hero-animate[${i}] must not have opacity:0`
+      ).toBeGreaterThan(0);
     }
   });
 
-  test('no infinite CSS animations are running (motion-safe: prefix respected)', async ({ page }) => {
+  test('no infinite CSS animations are running (motion-safe: prefix respected)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     // Background orbs use Tailwind motion-safe:animate-pulse / motion-safe:animate-bounce
     // Under prefers-reduced-motion: reduce, these CSS classes have NO effect
-    const orbEls = page.locator('[data-testid="hero-section"] .motion-safe\\:animate-pulse').first();
-    if (await orbEls.count() > 0) {
-      const animationName = await orbEls.evaluate((el) =>
-        window.getComputedStyle(el).animationName
+    const orbEls = page
+      .locator('[data-testid="hero-section"] .motion-safe\\:animate-pulse')
+      .first();
+    if ((await orbEls.count()) > 0) {
+      const animationName = await orbEls.evaluate(
+        (el) => window.getComputedStyle(el).animationName
       );
       // With reduced-motion, Tailwind's motion-safe: prefix sets animation-name: none
       expect(animationName).toBe('none');
     }
   });
 
-  test('cta-shimmer animation is disabled for reduced-motion users', async ({ page }) => {
+  test('cta-shimmer animation is disabled for reduced-motion users', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     // CTABanner: <div class="cta-shimmer"> — CSS animation via Tailwind motion-safe:
     const shimmerEl = page.locator('.cta-shimmer').first();
-    if (await shimmerEl.count() > 0) {
-      const animationName = await shimmerEl.evaluate((el) =>
-        window.getComputedStyle(el).animationName
+    if ((await shimmerEl.count()) > 0) {
+      const animationName = await shimmerEl.evaluate(
+        (el) => window.getComputedStyle(el).animationName
       );
       expect(animationName).toBe('none');
     }
@@ -155,7 +180,9 @@ test.describe('Motion Design — prefers-reduced-motion (framer-motion MotionCar
     }
   });
 
-  test('MotionCard cards are NOT wrapped in motion.div elements', async ({ page }) => {
+  test('MotionCard cards are NOT wrapped in motion.div elements', async ({
+    page,
+  }) => {
     // When prefersReducedMotion: MotionCard returns <div> NOT <motion.div>
     // framer-motion motion.div renders with data-framer-motion attribute or style="..."
     // With reducedMotion, the wrapper must be a plain div with no framer transforms
@@ -167,13 +194,15 @@ test.describe('Motion Design — prefers-reduced-motion (framer-motion MotionCar
     // framer-motion motion.div injects style with transform when animating
     // Under reduced-motion, cards are plain divs — verify no translateY transform stuck at initial
     const firstCard = featuresSection.locator('.hover\\:shadow-md').first();
-    if (await firstCard.count() > 0) {
+    if ((await firstCard.count()) > 0) {
       const transform = await firstCard.evaluate((el) => {
         const parent = el.parentElement;
         return parent ? window.getComputedStyle(parent).transform : 'none';
       });
       // Should be 'none' or identity matrix — NOT a translateY(30px) initial state
-      expect(transform === 'none' || transform === 'matrix(1, 0, 0, 1, 0, 0)').toBe(true);
+      expect(
+        transform === 'none' || transform === 'matrix(1, 0, 0, 1, 0, 0)'
+      ).toBe(true);
     }
   });
 });
@@ -183,7 +212,9 @@ test.describe('Motion Design — prefers-reduced-motion (framer-motion MotionCar
 test.describe('Motion Design — prefers-reduced-motion (AnimatedCounter)', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  test('stats bar counters show final formatted values immediately', async ({ page }) => {
+  test('stats bar counters show final formatted values immediately', async ({
+    page,
+  }) => {
     // AnimatedCounter: if prefersReducedMotion → setValue(target) immediately (no rAF loop)
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -192,7 +223,9 @@ test.describe('Motion Design — prefers-reduced-motion (AnimatedCounter)', () =
 
     // STATS targets: 10000 → "10,000+", 500000 → "500,000+", 98 → "98%", 50 → "50+"
     await expect(statsBar.getByText('10,000+')).toBeVisible({ timeout: 3_000 });
-    await expect(statsBar.getByText('500,000+')).toBeVisible({ timeout: 3_000 });
+    await expect(statsBar.getByText('500,000+')).toBeVisible({
+      timeout: 3_000,
+    });
     await expect(statsBar.getByText('98%')).toBeVisible({ timeout: 3_000 });
     await expect(statsBar.getByText('50+')).toBeVisible({ timeout: 3_000 });
   });
@@ -205,8 +238,14 @@ test.describe('Motion Design — prefers-reduced-motion (AnimatedCounter)', () =
     await expect(statsBar).toBeVisible({ timeout: 10_000 });
     const statsText = await statsBar.textContent();
 
-    expect(statsText, 'raw "500000" must not appear — Intl.NumberFormat must be applied').not.toContain('500000');
-    expect(statsText, 'raw "10000" must not appear — Intl.NumberFormat must be applied').not.toContain('10000');
+    expect(
+      statsText,
+      'raw "500000" must not appear — Intl.NumberFormat must be applied'
+    ).not.toContain('500000');
+    expect(
+      statsText,
+      'raw "10000" must not appear — Intl.NumberFormat must be applied'
+    ).not.toContain('10000');
   });
 
   test('stats counters start at 0 in normal motion mode (animation begins at 0)', async ({
@@ -230,28 +269,43 @@ test.describe('Motion Design — prefers-reduced-motion (AnimatedCounter)', () =
 test.describe('Motion Design — prefers-reduced-motion (TestimonialsCarousel)', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  test('carousel does not auto-advance under reduced-motion', async ({ page }) => {
+  test('carousel does not auto-advance under reduced-motion', async ({
+    page,
+  }) => {
     // TestimonialsCarousel: if paused || prefersReducedMotion → setInterval never starts
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 
-    const initialQuote = await carousel.locator('blockquote').first().textContent();
+    const initialQuote = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
 
     // 5s wait — carousel would normally advance at 4s intervals
     await page.waitForLoadState('networkidle').catch(() => {});
 
-    const quoteAfterWait = await carousel.locator('blockquote').first().textContent();
-    expect(quoteAfterWait, 'Carousel must NOT auto-advance under prefers-reduced-motion').toBe(
-      initialQuote
-    );
+    const quoteAfterWait = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
+    expect(
+      quoteAfterWait,
+      'Carousel must NOT auto-advance under prefers-reduced-motion'
+    ).toBe(initialQuote);
   });
 
-  test('carousel first testimonial quote is visible immediately', async ({ page }) => {
+  test('carousel first testimonial quote is visible immediately', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 
     // First testimonial from CAROUSEL_TESTIMONIALS
@@ -273,12 +327,19 @@ test.describe('Motion Design — VideoSection', () => {
     await expect(videoSection).toHaveAttribute('aria-label', 'Product demo');
   });
 
-  test('VideoSection demo video has aria-label and preload="none"', async ({ page }) => {
+  test('VideoSection demo video has aria-label and preload="none"', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const demoVideo = page.locator('[data-testid="video-section"] video');
-    await expect(demoVideo).toHaveAttribute('preload', 'none', { timeout: 10_000 });
-    await expect(demoVideo).toHaveAttribute('aria-label', 'EduSphere product demonstration video');
+    await expect(demoVideo).toHaveAttribute('preload', 'none', {
+      timeout: 10_000,
+    });
+    await expect(demoVideo).toHaveAttribute(
+      'aria-label',
+      'EduSphere product demonstration video'
+    );
   });
 
   test('VideoSection does not autoplay under reduced-motion (IntersectionObserver skipped)', async ({
@@ -294,8 +355,13 @@ test.describe('Motion Design — VideoSection', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Video must NOT be playing (paused=true) under reduced-motion
-    const isPaused = await demoVideo.evaluate((v) => (v as HTMLVideoElement).paused);
-    expect(isPaused, 'Video must remain paused under prefers-reduced-motion').toBe(true);
+    const isPaused = await demoVideo.evaluate(
+      (v) => (v as HTMLVideoElement).paused
+    );
+    expect(
+      isPaused,
+      'Video must remain paused under prefers-reduced-motion'
+    ).toBe(true);
   });
 });
 
@@ -306,12 +372,17 @@ test.describe('Motion Design — WCAG 2.2.2 (Pause, Stop, Hide)', () => {
     // This test requires animations to be running — do NOT use reducedMotion here
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await carousel.scrollIntoViewIfNeeded();
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 
     // Record current testimonial
-    const initialQuote = await carousel.locator('blockquote').first().textContent();
+    const initialQuote = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
 
     // Hover — triggers onMouseEnter → setPaused(true)
     await carousel.hover();
@@ -319,7 +390,10 @@ test.describe('Motion Design — WCAG 2.2.2 (Pause, Stop, Hide)', () => {
     // Wait longer than the 4s auto-advance interval
     await page.waitForLoadState('networkidle').catch(() => {});
 
-    const quoteDuringHover = await carousel.locator('blockquote').first().textContent();
+    const quoteDuringHover = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
     expect(
       quoteDuringHover,
       'Carousel must not advance while mouse is hovering (WCAG 2.2.2)'
@@ -329,7 +403,9 @@ test.describe('Motion Design — WCAG 2.2.2 (Pause, Stop, Hide)', () => {
   test('testimonials carousel resumes after mouse leaves', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await carousel.scrollIntoViewIfNeeded();
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 
@@ -352,7 +428,9 @@ test.describe('Motion Design — WCAG 2.2.2 (Pause, Stop, Hide)', () => {
   test('carousel dot navigation is keyboard accessible', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await carousel.scrollIntoViewIfNeeded();
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 

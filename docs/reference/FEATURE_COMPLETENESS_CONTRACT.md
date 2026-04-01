@@ -64,13 +64,13 @@
 ### Sign-off
 
 | Division | Approved | Date |
-|----------|----------|------|
-| Product | [ ] | |
-| Frontend | [ ] | |
-| Backend | [ ] | |
-| QA | [ ] | |
-| Security | [ ] | |
+| -------- | -------- | ---- |
+| Product  | [ ]      |      |
+| Frontend | [ ]      |      |
+| Backend  | [ ]      |      |
+| QA       | [ ]      |      |
+| Security | [ ]      |      |
 
 ---
 
-*Template version: 1.0 — March 2026*
+_Template version: 1.0 — March 2026_

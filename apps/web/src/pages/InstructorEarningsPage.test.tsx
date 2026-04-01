@@ -31,7 +31,9 @@ vi.mock('@/components/AppSidebar', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/Breadcrumbs', () => ({

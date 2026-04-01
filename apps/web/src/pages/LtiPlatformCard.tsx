@@ -65,9 +65,7 @@ export function LtiPlatformCard({
               variant="ghost"
               size="sm"
               aria-label={
-                platform.isActive
-                  ? 'Deactivate platform'
-                  : 'Activate platform'
+                platform.isActive ? 'Deactivate platform' : 'Activate platform'
               }
               onClick={() => onToggle(platform.id, platform.isActive)}
             >

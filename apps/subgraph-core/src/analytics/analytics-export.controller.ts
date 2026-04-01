@@ -72,7 +72,9 @@ export class AnalyticsExportController implements OnModuleDestroy {
       throw new BadRequestException('format must be csv or json');
     }
 
-    const from = dateFrom ? new Date(dateFrom) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const from = dateFrom
+      ? new Date(dateFrom)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const to = dateTo ? new Date(dateTo) : new Date();
 
     const ctx: TenantContext = {
@@ -88,7 +90,10 @@ export class AnalyticsExportController implements OnModuleDestroy {
     if (exportFormat === 'csv') {
       const csv = this.toCsv(data);
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=analytics-export.csv');
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=analytics-export.csv'
+      );
       res.send(csv);
     } else {
       res.setHeader('Content-Type', 'application/json');
@@ -102,7 +107,9 @@ export class AnalyticsExportController implements OnModuleDestroy {
     }
     const parts = authHeader.split(' ');
     if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      throw new UnauthorizedException('Authorization header must be: Bearer <api_key>');
+      throw new UnauthorizedException(
+        'Authorization header must be: Bearer <api_key>'
+      );
     }
     return parts[1] as string;
   }
@@ -172,8 +179,10 @@ export class AnalyticsExportController implements OnModuleDestroy {
 
   private evictRateLimitMap(): void {
     if (this.rateLimitMap.size > MAX_RATE_LIMIT_MAP_SIZE) {
-      const keysToDelete = Array.from(this.rateLimitMap.keys())
-        .slice(0, this.rateLimitMap.size - MAX_RATE_LIMIT_MAP_SIZE);
+      const keysToDelete = Array.from(this.rateLimitMap.keys()).slice(
+        0,
+        this.rateLimitMap.size - MAX_RATE_LIMIT_MAP_SIZE
+      );
       for (const key of keysToDelete) {
         this.rateLimitMap.delete(key);
       }

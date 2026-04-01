@@ -40,9 +40,11 @@ test.describe('Offline Sync — Online Flush', () => {
   }) => {
     // Confirm banner is absent while online
     const banner = page.getByTestId('offline-banner');
-    await expect(banner).not.toBeVisible({ timeout: 3_000 }).catch(() => {
-      // Banner may not be in DOM at all while online — that is acceptable
-    });
+    await expect(banner)
+      .not.toBeVisible({ timeout: 3_000 })
+      .catch(() => {
+        // Banner may not be in DOM at all while online — that is acceptable
+      });
 
     // Go offline
     await context.setOffline(true);
@@ -334,9 +336,9 @@ test.describe('Offline Sync — Online Flush', () => {
 
     // Layout shell should still be visible
     const layoutEl = page.locator('[data-testid="layout-main"]');
-    const layoutVisible = await layoutEl.isVisible({ timeout: 3_000 }).catch(
-      () => false
-    );
+    const layoutVisible = await layoutEl
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
     if (layoutVisible) {
       await expect(layoutEl).toBeVisible();
     } else {

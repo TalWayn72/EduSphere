@@ -3,7 +3,12 @@
  * Admin logic lives in UserAdminService; this file delegates to it.
  * File-size compliance: <300 lines.
  */
-import { Injectable, OnModuleDestroy, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleDestroy,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -195,7 +200,10 @@ export class UserService implements OnModuleDestroy {
 
   // --- Delegated admin methods (preserve API for resolver) ---
 
-  async resetUserPassword(userId: string, authContext: AuthContext): Promise<boolean> {
+  async resetUserPassword(
+    userId: string,
+    authContext: AuthContext
+  ): Promise<boolean> {
     return this.adminService.resetUserPassword(userId, authContext);
   }
 
@@ -204,13 +212,23 @@ export class UserService implements OnModuleDestroy {
   }
 
   async listUsers(
-    opts: { page?: number; limit?: number; search?: string; role?: string; after?: string | null },
+    opts: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      role?: string;
+      after?: string | null;
+    },
     authContext: AuthContext
   ): Promise<RelayConnection<NonNullable<MappedUser>>> {
     return this.adminService.listUsers(opts, authContext);
   }
 
-  async suspendUser(userId: string, suspended: boolean, authContext: AuthContext) {
+  async suspendUser(
+    userId: string,
+    suspended: boolean,
+    authContext: AuthContext
+  ) {
     return this.adminService.suspendUser(userId, suspended, authContext);
   }
 

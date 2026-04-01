@@ -41,9 +41,7 @@ test.describe('Unauthenticated access — route protection', () => {
   ];
 
   for (const route of protectedRoutes) {
-    test(`unauthenticated — ${route} redirects to /login`, async ({
-      page,
-    }) => {
+    test(`unauthenticated — ${route} redirects to /login`, async ({ page }) => {
       await page.goto(`${BASE_URL}${route}`, NAV_TIMEOUT);
 
       // ProtectedRoute should redirect unauthenticated users to /login
@@ -96,16 +94,56 @@ test.describe('Admin routes — authenticated access', () => {
   });
 
   const adminRoutes = [
-    { path: '/admin', name: 'admin-dashboard', expect: /admin|dashboard|management|overview/i },
-    { path: '/admin/users', name: 'admin-users', expect: /user|management|member/i },
-    { path: '/admin/roles', name: 'admin-roles', expect: /role|permission|management/i },
-    { path: '/admin/compliance', name: 'admin-compliance', expect: /compliance|report|gdpr|audit/i },
-    { path: '/admin/security', name: 'admin-security', expect: /security|setting|policy/i },
-    { path: '/admin/audit', name: 'admin-audit', expect: /audit|log|event|activity/i },
-    { path: '/admin/branding', name: 'admin-branding', expect: /branding|theme|logo|color/i },
-    { path: '/admin/announcements', name: 'admin-announcements', expect: /announcement|message|notification/i },
-    { path: '/admin/enrollment', name: 'admin-enrollment', expect: /enrollment|manage|student/i },
-    { path: '/admin/analytics', name: 'admin-analytics', expect: /analytics|tenant|organization|overview/i },
+    {
+      path: '/admin',
+      name: 'admin-dashboard',
+      expect: /admin|dashboard|management|overview/i,
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      expect: /user|management|member/i,
+    },
+    {
+      path: '/admin/roles',
+      name: 'admin-roles',
+      expect: /role|permission|management/i,
+    },
+    {
+      path: '/admin/compliance',
+      name: 'admin-compliance',
+      expect: /compliance|report|gdpr|audit/i,
+    },
+    {
+      path: '/admin/security',
+      name: 'admin-security',
+      expect: /security|setting|policy/i,
+    },
+    {
+      path: '/admin/audit',
+      name: 'admin-audit',
+      expect: /audit|log|event|activity/i,
+    },
+    {
+      path: '/admin/branding',
+      name: 'admin-branding',
+      expect: /branding|theme|logo|color/i,
+    },
+    {
+      path: '/admin/announcements',
+      name: 'admin-announcements',
+      expect: /announcement|message|notification/i,
+    },
+    {
+      path: '/admin/enrollment',
+      name: 'admin-enrollment',
+      expect: /enrollment|manage|student/i,
+    },
+    {
+      path: '/admin/analytics',
+      name: 'admin-analytics',
+      expect: /analytics|tenant|organization|overview/i,
+    },
   ];
 
   for (const { path, name, expect: textPattern } of adminRoutes) {
@@ -148,10 +186,22 @@ test.describe('Instructor routes — authenticated access', () => {
 
   const instructorRoutes = [
     { path: '/courses', name: 'instructor-courses', expect: /course/i },
-    { path: '/courses/new', name: 'instructor-course-create', expect: /create|new|course/i },
+    {
+      path: '/courses/new',
+      name: 'instructor-course-create',
+      expect: /create|new|course/i,
+    },
     { path: '/agents', name: 'instructor-agents', expect: /agent|ai|tutor/i },
-    { path: '/instructor/earnings', name: 'instructor-earnings', expect: /earning|payout|revenue|instructor/i },
-    { path: '/instructor/analytics', name: 'instructor-analytics', expect: /analytics|instructor|overview/i },
+    {
+      path: '/instructor/earnings',
+      name: 'instructor-earnings',
+      expect: /earning|payout|revenue|instructor/i,
+    },
+    {
+      path: '/instructor/analytics',
+      name: 'instructor-analytics',
+      expect: /analytics|instructor|overview/i,
+    },
   ];
 
   for (const { path, name, expect: textPattern } of instructorRoutes) {
@@ -191,13 +241,41 @@ test.describe('Student routes — authenticated access', () => {
   });
 
   const studentRoutes = [
-    { path: '/dashboard', name: 'student-dashboard', expect: /dashboard|welcome|overview/i },
-    { path: '/srs-review', name: 'student-srs-review', expect: /review|spaced|srs|card|no card/i },
-    { path: '/my-progress', name: 'student-progress', expect: /progress|streak|challenge|xp/i },
-    { path: '/my-badges', name: 'student-badges', expect: /badge|credential|no badge/i },
-    { path: '/gamification', name: 'student-gamification', expect: /gamification|xp|level|point/i },
-    { path: '/leaderboard', name: 'student-leaderboard', expect: /leaderboard|rank|top/i },
-    { path: '/skills', name: 'student-skills', expect: /skill|path|learning|no skill/i },
+    {
+      path: '/dashboard',
+      name: 'student-dashboard',
+      expect: /dashboard|welcome|overview/i,
+    },
+    {
+      path: '/srs-review',
+      name: 'student-srs-review',
+      expect: /review|spaced|srs|card|no card/i,
+    },
+    {
+      path: '/my-progress',
+      name: 'student-progress',
+      expect: /progress|streak|challenge|xp/i,
+    },
+    {
+      path: '/my-badges',
+      name: 'student-badges',
+      expect: /badge|credential|no badge/i,
+    },
+    {
+      path: '/gamification',
+      name: 'student-gamification',
+      expect: /gamification|xp|level|point/i,
+    },
+    {
+      path: '/leaderboard',
+      name: 'student-leaderboard',
+      expect: /leaderboard|rank|top/i,
+    },
+    {
+      path: '/skills',
+      name: 'student-skills',
+      expect: /skill|path|learning|no skill/i,
+    },
   ];
 
   for (const { path, name, expect: textPattern } of studentRoutes) {
@@ -335,7 +413,12 @@ test.describe('API authorization context', () => {
         status: 401,
         contentType: 'application/json',
         body: JSON.stringify({
-          errors: [{ message: 'Unauthorized', extensions: { code: 'UNAUTHENTICATED' } }],
+          errors: [
+            {
+              message: 'Unauthorized',
+              extensions: { code: 'UNAUTHENTICATED' },
+            },
+          ],
         }),
       })
     );
@@ -375,9 +458,7 @@ test.describe('Direct URL access after login', () => {
     await expect(body).toBeVisible(VIS_TIMEOUT);
   });
 
-  test('direct navigation to /settings works after login', async ({
-    page,
-  }) => {
+  test('direct navigation to /settings works after login', async ({ page }) => {
     await page.goto(`${BASE_URL}/settings`, NAV_TIMEOUT);
     await page.waitForLoadState('domcontentloaded');
 
@@ -397,9 +478,7 @@ test.describe('Direct URL access after login', () => {
     await expect(body).toBeVisible(VIS_TIMEOUT);
   });
 
-  test('navigation between sections preserves auth state', async ({
-    page,
-  }) => {
+  test('navigation between sections preserves auth state', async ({ page }) => {
     // Navigate through multiple protected routes sequentially
     const routes = ['/dashboard', '/courses', '/settings', '/profile'];
 
@@ -420,15 +499,11 @@ test.describe('UI element isolation', () => {
     await login(page);
   });
 
-  test('no raw "undefined" or "null" text on admin pages', async ({
-    page,
-  }) => {
+  test('no raw "undefined" or "null" text on admin pages', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin`, NAV_TIMEOUT);
     await page.waitForLoadState('domcontentloaded');
 
-    const undefinedCount = await page
-      .locator('text=/^undefined$/i')
-      .count();
+    const undefinedCount = await page.locator('text=/^undefined$/i').count();
     const nullCount = await page.locator('text=/^null$/i').count();
 
     expect(undefinedCount).toBe(0);

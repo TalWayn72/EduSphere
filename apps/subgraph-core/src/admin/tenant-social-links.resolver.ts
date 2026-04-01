@@ -28,7 +28,9 @@ export class TenantSocialLinksResolver {
   constructor(private readonly svc: TenantSocialLinksService) {}
 
   @Query('tenantSocialLinks')
-  async tenantSocialLinks(@Context() ctx: GraphQLContext): Promise<SocialLinksDto | null> {
+  async tenantSocialLinks(
+    @Context() ctx: GraphQLContext
+  ): Promise<SocialLinksDto | null> {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth.tenantId) {
       throw new UnauthorizedException('Authentication required');

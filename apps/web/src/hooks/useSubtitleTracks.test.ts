@@ -31,7 +31,12 @@ describe('useSubtitleTracks', () => {
 
   it('returns empty array when no data', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: undefined, stale: false } as never,
+      {
+        data: undefined,
+        fetching: false,
+        error: undefined,
+        stale: false,
+      } as never,
       vi.fn(),
     ]);
     const { result } = renderHook(() => useSubtitleTracks('content-1'));
@@ -91,11 +96,18 @@ describe('useSubtitleTracks', () => {
 
   it('passes pause:true when contentId is empty', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: undefined, stale: false } as never,
+      {
+        data: undefined,
+        fetching: false,
+        error: undefined,
+        stale: false,
+      } as never,
       vi.fn(),
     ]);
     renderHook(() => useSubtitleTracks(''));
-    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]![0] as { pause?: boolean };
+    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]![0] as {
+      pause?: boolean;
+    };
     expect(callArgs.pause).toBe(true);
   });
 });

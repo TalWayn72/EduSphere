@@ -30,13 +30,19 @@ describe('SapAdapter', () => {
   });
 
   it('testConnection returns true on 200 response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({ ok: true, status: 200 } as Response);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+    } as Response);
     const result = await adapter.testConnection(config);
     expect(result).toBe(true);
   });
 
   it('testConnection returns false on non-200 response', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({ ok: false, status: 401 } as Response);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+    } as Response);
     const result = await adapter.testConnection(config);
     expect(result).toBe(false);
   });

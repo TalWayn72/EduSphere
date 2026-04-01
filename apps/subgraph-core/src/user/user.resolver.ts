@@ -91,7 +91,10 @@ export class UserResolver {
 
   @Query('listUsers')
   async listUsers(
-    @Args('input') input: { page?: number; limit?: number; search?: string; role?: string } | undefined,
+    @Args('input')
+    input:
+      | { page?: number; limit?: number; search?: string; role?: string }
+      | undefined,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext)
@@ -201,7 +204,8 @@ export class UserResolver {
     @Args('limit') limit: number,
     @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     return this.inProgressCoursesService.getInProgressCourses(
       context.authContext.userId,
       context.authContext.tenantId || '',
@@ -214,7 +218,8 @@ export class UserResolver {
     @Args('limit') limit: number,
     @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     return this.recommendedCoursesService.getRecommendedCourses(
       context.authContext.userId,
       context.authContext.tenantId || '',
@@ -227,7 +232,8 @@ export class UserResolver {
     @Args('limit') limit: number,
     @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     return this.activityFeedService.getActivityFeed(
       context.authContext.userId,
       context.authContext.tenantId || '',

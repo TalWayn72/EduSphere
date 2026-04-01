@@ -29,7 +29,11 @@ vi.mock('@edusphere/db', () => ({
 
 import { DocumentVersionService } from './document-version.service';
 
-const TENANT_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'INSTRUCTOR' as const };
+const TENANT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 const MOCK_ANCHOR = {
   id: 'anchor-1',
@@ -39,8 +43,13 @@ const MOCK_ANCHOR = {
   anchor_text: 'Test anchor',
   anchor_hash: 'abc',
   page_number: 1,
-  pos_x: '0.1', pos_y: '0.2', pos_w: '0.3', pos_h: '0.05',
-  page_end: null, pos_x_end: null, pos_y_end: null,
+  pos_x: '0.1',
+  pos_y: '0.2',
+  pos_w: '0.3',
+  pos_h: '0.05',
+  page_end: null,
+  pos_x_end: null,
+  pos_y_end: null,
   visual_asset_id: null,
   document_order: 0,
   is_broken: false,
@@ -89,11 +98,15 @@ describe('DocumentVersionService', () => {
   it('creates first version with version_number=1', async () => {
     // summary provided → no prevRow query; no existing versions
     (await getWTC())
-      .mockResolvedValueOnce([MOCK_ANCHOR] as never)   // anchors
-      .mockResolvedValueOnce([] as never)              // existing versions
+      .mockResolvedValueOnce([MOCK_ANCHOR] as never) // anchors
+      .mockResolvedValueOnce([] as never) // existing versions
       .mockResolvedValueOnce([MOCK_VERSION] as never); // insert returning
 
-    const result = await service.createVersion('media-1', 'Initial version', TENANT_CTX);
+    const result = await service.createVersion(
+      'media-1',
+      'Initial version',
+      TENANT_CTX
+    );
 
     expect(result.versionNumber).toBe(1);
     expect(result.anchorCount).toBe(1);
@@ -104,10 +117,10 @@ describe('DocumentVersionService', () => {
     // summary=null + existing v1 → triggers prevRow query (4 calls total)
     const v2 = { ...MOCK_VERSION, id: 'version-2', version_number: 2 };
     (await getWTC())
-      .mockResolvedValueOnce([MOCK_ANCHOR] as never)              // anchors
-      .mockResolvedValueOnce([{ versionNumber: 1 }] as never)    // existing versions
-      .mockResolvedValueOnce([MOCK_VERSION] as never)             // prevRow diff query
-      .mockResolvedValueOnce([v2] as never);                      // insert returning
+      .mockResolvedValueOnce([MOCK_ANCHOR] as never) // anchors
+      .mockResolvedValueOnce([{ versionNumber: 1 }] as never) // existing versions
+      .mockResolvedValueOnce([MOCK_VERSION] as never) // prevRow diff query
+      .mockResolvedValueOnce([v2] as never); // insert returning
 
     const result = await service.createVersion('media-1', null, TENANT_CTX);
     expect(result.versionNumber).toBe(2);
@@ -117,9 +130,9 @@ describe('DocumentVersionService', () => {
     const brokenAnchor = { ...MOCK_ANCHOR, is_broken: true };
     const rowWithBroken = { ...MOCK_VERSION, broken_anchors: ['anchor-1'] };
     (await getWTC())
-      .mockResolvedValueOnce([brokenAnchor] as never)  // anchors
-      .mockResolvedValueOnce([] as never)              // existing versions (none)
-      .mockResolvedValueOnce([rowWithBroken] as never);// insert returning
+      .mockResolvedValueOnce([brokenAnchor] as never) // anchors
+      .mockResolvedValueOnce([] as never) // existing versions (none)
+      .mockResolvedValueOnce([rowWithBroken] as never); // insert returning
 
     const result = await service.createVersion('media-1', null, TENANT_CTX);
     expect(result.brokenAnchorCount).toBe(1);
@@ -130,15 +143,17 @@ describe('DocumentVersionService', () => {
   it('throws NotFoundException when version not found', async () => {
     (await getWTC()).mockResolvedValueOnce([] as never); // select returns empty
 
-    await expect(service.rollbackToVersion('missing-id', TENANT_CTX)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.rollbackToVersion('missing-id', TENANT_CTX)
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('soft-deletes current anchors and re-inserts snapshot', async () => {
     // MOCK_VERSION has anchors_snapshot=[MOCK_ANCHOR] so snapshot.length > 0 → 3 calls
     (await getWTC())
-      .mockResolvedValueOnce([MOCK_VERSION] as never)  // load version
-      .mockResolvedValueOnce(undefined as never)        // soft-delete update
-      .mockResolvedValueOnce(undefined as never);       // re-insert
+      .mockResolvedValueOnce([MOCK_VERSION] as never) // load version
+      .mockResolvedValueOnce(undefined as never) // soft-delete update
+      .mockResolvedValueOnce(undefined as never); // re-insert
 
     const result = await service.rollbackToVersion('version-1', TENANT_CTX);
     expect(result).toBe(true);

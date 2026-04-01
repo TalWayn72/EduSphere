@@ -4,14 +4,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as urql from 'urql';
 import { AdminNotificationAnalyticsPage } from './AdminNotificationAnalyticsPage';
 
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_, name) => {
-    if (name === '__esModule') return true;
-    return function MockIcon(props: Record<string, unknown>) {
-      return <span data-testid={`icon-${String(name)}`} {...props} />;
-    };
-  },
-}));
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
+);
 
 vi.mock('urql', async () => {
   const actual = await vi.importActual('urql');
@@ -27,20 +34,32 @@ const MOCK_ANALYTICS = {
     { channel: 'push', sent: 1000, delivered: 720, failed: 30 },
   ],
   byType: [
-    { notificationType: 'COURSE_ENROLLED', sent: 300, delivered: 290, failed: 10 },
+    {
+      notificationType: 'COURSE_ENROLLED',
+      sent: 300,
+      delivered: 290,
+      failed: 10,
+    },
     { notificationType: 'BADGE_ISSUED', sent: 200, delivered: 195, failed: 5 },
   ],
 };
 
 function setup(data = MOCK_ANALYTICS, fetching = false) {
-  vi.mocked(urql.useQuery).mockReturnValue([{
-    data: data ? { notificationDeliveryAnalytics: data } : undefined,
-    fetching, stale: false, error: undefined,
-  }, vi.fn()] as never);
+  vi.mocked(urql.useQuery).mockReturnValue([
+    {
+      data: data ? { notificationDeliveryAnalytics: data } : undefined,
+      fetching,
+      stale: false,
+      error: undefined,
+    },
+    vi.fn(),
+  ] as never);
 }
 
 describe('AdminNotificationAnalyticsPage', () => {
-  beforeEach(() => { vi.restoreAllMocks(); });
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it('renders page title', () => {
     setup();
@@ -65,7 +84,9 @@ describe('AdminNotificationAnalyticsPage', () => {
     setup();
     render(<AdminNotificationAnalyticsPage />);
     expect(screen.getByTestId('stat-total-sent')).toHaveTextContent('1,500');
-    expect(screen.getByTestId('stat-total-delivered')).toHaveTextContent('1,200');
+    expect(screen.getByTestId('stat-total-delivered')).toHaveTextContent(
+      '1,200'
+    );
     expect(screen.getByTestId('stat-total-failed')).toHaveTextContent('50');
   });
 
@@ -86,9 +107,15 @@ describe('AdminNotificationAnalyticsPage', () => {
   });
 
   it('shows no data message when analytics is null', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{
-      data: undefined, fetching: false, stale: false, error: undefined,
-    }, vi.fn()] as never);
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        stale: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as never);
     render(<AdminNotificationAnalyticsPage />);
     expect(screen.getByText('No data available')).toBeInTheDocument();
   });

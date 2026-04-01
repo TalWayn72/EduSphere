@@ -4,22 +4,19 @@
  * Item selection via Maximum Fisher Information (MFI) with
  * randomesque exposure control. Ability estimation via EAP/MLE.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  closeAllPools,
-} from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, closeAllPools } from '@edusphere/db';
 import type { TenantContext, ExamItem } from '@edusphere/db';
 import { fisherInformation3PL, passingProbability } from './cat-math.js';
 import { estimateAbilityEAP } from './cat-eap-estimator.js';
 import { estimateAbilityMLE } from '../psychometrics/irt-math.js';
 import { ExamSessionHelpers } from './exam-session-helpers.js';
 import { CatItemLoader } from './cat-item-loader.js';
-import type { CatState, TerminationResult, CatNextResult } from './cat-engine.types.js';
+import type {
+  CatState,
+  TerminationResult,
+  CatNextResult,
+} from './cat-engine.types.js';
 
 const MFI_TOP_K = 5;
 const EAP_THRESHOLD = 5;
@@ -42,7 +39,8 @@ export class CatEngineService implements OnModuleDestroy {
   }
 
   async selectNextItem(
-    sessionId: string, tenantId: string,
+    sessionId: string,
+    tenantId: string
   ): Promise<ExamItem | null> {
     const ctx = this.buildCtx(tenantId);
     const session = await this.helpers.loadSession(sessionId, ctx);
@@ -50,15 +48,19 @@ export class CatEngineService implements OnModuleDestroy {
     const bp = await this.helpers.loadBlueprint(session.blueprintId, ctx);
 
     const eligible = await this.loader.loadEligibleItems(
-      bp.courseId, catState.administeredItemIds, ctx,
+      bp.courseId,
+      catState.administeredItemIds,
+      ctx
     );
     if (eligible.length === 0) return null;
     return this.mfiSelect(eligible, catState.currentTheta);
   }
 
   async updateAbility(
-    sessionId: string, itemId: string,
-    isCorrect: boolean, tenantId: string,
+    sessionId: string,
+    itemId: string,
+    isCorrect: boolean,
+    tenantId: string
   ): Promise<{ theta: number; se: number }> {
     const ctx = this.buildCtx(tenantId);
     const session = await this.helpers.loadSession(sessionId, ctx);
@@ -73,18 +75,25 @@ export class CatEngineService implements OnModuleDestroy {
     catState.administeredItemIds.push(itemId);
     catState.responsePattern.push(isCorrect);
 
-    const items = await this.loader.loadAdministeredItems(catState.administeredItemIds, ctx);
+    const items = await this.loader.loadAdministeredItems(
+      catState.administeredItemIds,
+      ctx
+    );
     const estimate = this.estimateTheta(items, catState.responsePattern);
     catState.currentTheta = estimate.theta;
     catState.currentSE = estimate.se;
 
     await this.loader.saveCatState(sessionId, catState, ctx);
-    this.logger.log({ sessionId, theta: estimate.theta, se: estimate.se }, 'CAT ability updated');
+    this.logger.log(
+      { sessionId, theta: estimate.theta, se: estimate.se },
+      'CAT ability updated'
+    );
     return estimate;
   }
 
   async checkTermination(
-    sessionId: string, tenantId: string,
+    sessionId: string,
+    tenantId: string
   ): Promise<TerminationResult> {
     const ctx = this.buildCtx(tenantId);
     const session = await this.helpers.loadSession(sessionId, ctx);
@@ -99,25 +108,34 @@ export class CatEngineService implements OnModuleDestroy {
 
     if (count < min) return this.result(catState, false, 'CONTINUE');
     if (count >= max) return this.result(catState, true, 'MAX_ITEMS');
-    if (catState.currentSE < seT) return this.result(catState, true, 'PRECISION');
+    if (catState.currentSE < seT)
+      return this.result(catState, true, 'PRECISION');
 
     const thetaCut = (bp.passingScore - 500) / 100;
-    const pPass = passingProbability(catState.currentTheta, thetaCut, catState.currentSE);
-    if (pPass > confT || (1 - pPass) > confT) {
+    const pPass = passingProbability(
+      catState.currentTheta,
+      thetaCut,
+      catState.currentSE
+    );
+    if (pPass > confT || 1 - pPass > confT) {
       return this.result(catState, true, 'PASS_FAIL_CONFIDENCE');
     }
     return this.result(catState, false, 'CONTINUE');
   }
 
   async getNextOrTerminate(
-    sessionId: string, tenantId: string,
+    sessionId: string,
+    tenantId: string
   ): Promise<CatNextResult> {
     const term = await this.checkTermination(sessionId, tenantId);
     if (term.shouldTerminate) return { terminated: true, result: term };
 
     const item = await this.selectNextItem(sessionId, tenantId);
     if (!item) {
-      return { terminated: true, result: { ...term, shouldTerminate: true, reason: 'NO_ITEMS' } };
+      return {
+        terminated: true,
+        result: { ...term, shouldTerminate: true, reason: 'NO_ITEMS' },
+      };
     }
     return { terminated: false, item };
   }
@@ -133,19 +151,34 @@ export class CatEngineService implements OnModuleDestroy {
   }
 
   private estimateTheta(
-    items: ExamItem[], responses: boolean[],
+    items: ExamItem[],
+    responses: boolean[]
   ): { theta: number; se: number } {
     const paired = items.map((item, i) => ({
-      isCorrect: responses[i]!, a: item.irtA, b: item.irtB, c: item.irtC,
-      irtA: item.irtA, irtB: item.irtB, irtC: item.irtC,
+      isCorrect: responses[i]!,
+      a: item.irtA,
+      b: item.irtB,
+      c: item.irtC,
+      irtA: item.irtA,
+      irtB: item.irtB,
+      irtC: item.irtC,
     }));
     return paired.length < EAP_THRESHOLD
       ? estimateAbilityEAP(paired)
       : estimateAbilityMLE(paired);
   }
 
-  private result(s: CatState, stop: boolean, reason: string): TerminationResult {
-    return { shouldTerminate: stop, reason, theta: s.currentTheta, se: s.currentSE };
+  private result(
+    s: CatState,
+    stop: boolean,
+    reason: string
+  ): TerminationResult {
+    return {
+      shouldTerminate: stop,
+      reason,
+      theta: s.currentTheta,
+      se: s.currentSE,
+    };
   }
 
   private buildCtx(tenantId: string): TenantContext {

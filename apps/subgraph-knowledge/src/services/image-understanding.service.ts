@@ -15,7 +15,8 @@ interface OllamaGenerateResponse {
 @Injectable()
 export class ImageUnderstandingService {
   private readonly logger = new Logger(ImageUnderstandingService.name);
-  private readonly ollamaUrl = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+  private readonly ollamaUrl =
+    process.env.OLLAMA_URL ?? 'http://localhost:11434';
 
   /**
    * Generate a natural language description of an image.
@@ -28,7 +29,8 @@ export class ImageUnderstandingService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'moondream',
-          prompt: 'Describe this image in 1-2 sentences for accessibility purposes.',
+          prompt:
+            'Describe this image in 1-2 sentences for accessibility purposes.',
           images: [imageBase64],
           stream: false,
         }),
@@ -59,7 +61,8 @@ export class ImageUnderstandingService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'moondream',
-          prompt: 'Does this image contain handwritten text? Answer with only "yes" or "no".',
+          prompt:
+            'Does this image contain handwritten text? Answer with only "yes" or "no".',
           images: [imageBase64],
           stream: false,
         }),

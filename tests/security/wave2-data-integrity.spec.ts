@@ -63,7 +63,10 @@ describe('DB-4: withTimezone on all timestamp columns', () => {
   const SCHEMA_DIR = 'packages/db/src/schema';
   const schemaFiles = existsSync(resolve(ROOT, SCHEMA_DIR))
     ? readdirSync(resolve(ROOT, SCHEMA_DIR))
-        .filter((f) => f.endsWith('.ts') && !f.endsWith('.spec.ts') && !f.startsWith('_'))
+        .filter(
+          (f) =>
+            f.endsWith('.ts') && !f.endsWith('.spec.ts') && !f.startsWith('_')
+        )
         .map((f) => ({
           name: f,
           content: readFileSync(join(resolve(ROOT, SCHEMA_DIR), f), 'utf-8'),
@@ -85,7 +88,10 @@ describe('DB-4: withTimezone on all timestamp columns', () => {
       const timestampCalls = file.content.match(/timestamp\([^)]+\)/g) || [];
       for (const call of timestampCalls) {
         // Skip if it contains withTimezone: true
-        if (call.includes('withTimezone: true') || call.includes('withTimezone:true')) {
+        if (
+          call.includes('withTimezone: true') ||
+          call.includes('withTimezone:true')
+        ) {
           continue;
         }
         // Skip if it's a helper function definition (not a column definition)
@@ -141,9 +147,14 @@ describe('BE-3: adminUsers uses COUNT(*)', () => {
     // This should no longer exist in the adminUsers function
     const adminFn = src.slice(
       src.indexOf('async adminUsers'),
-      src.indexOf('}', src.indexOf('return {', src.indexOf('adminUsers')) + 10) + 1
+      src.indexOf(
+        '}',
+        src.indexOf('return {', src.indexOf('adminUsers')) + 10
+      ) + 1
     );
-    expect(adminFn).not.toMatch(/select\(\{\s*id:\s*schema\.users\.id\s*\}\).*\.length/s);
+    expect(adminFn).not.toMatch(
+      /select\(\{\s*id:\s*schema\.users\.id\s*\}\).*\.length/s
+    );
   });
 });
 

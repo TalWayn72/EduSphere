@@ -22,7 +22,9 @@ function calculateTimeLeft(endDate: string): TimeLeft {
 }
 
 export function CountdownTimer({ endDate }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft(endDate));
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
+    calculateTimeLeft(endDate)
+  );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -40,7 +42,9 @@ export function CountdownTimer({ endDate }: CountdownTimerProps) {
   }, [endDate]);
 
   if (timeLeft.ended) {
-    return <span className="text-xs text-muted-foreground font-medium">Ended</span>;
+    return (
+      <span className="text-xs text-muted-foreground font-medium">Ended</span>
+    );
   }
 
   const parts: string[] = [];

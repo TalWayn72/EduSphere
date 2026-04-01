@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Flame, BookOpen, CheckCircle, Zap, Clock, ChevronRight } from 'lucide-react';
+import {
+  Flame,
+  BookOpen,
+  CheckCircle,
+  Zap,
+  Clock,
+  ChevronRight,
+} from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { MasteryBadge } from '@/components/ui/MasteryBadge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CourseCard } from './CourseCard';
 import { ActivityIcon } from './ActivityIcon';
 import { useDashboardData } from './useDashboardData';
@@ -38,7 +40,6 @@ export function DashboardPage() {
   return (
     <Layout>
       <PageShell size="2xl" spacing="relaxed">
-
         {/* Onboarding banner */}
         {showOnboardingBanner && (
           <div
@@ -47,14 +48,18 @@ export function DashboardPage() {
             className="flex items-center justify-between rounded-lg border border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-950/30 px-4 py-3"
           >
             <div className="flex items-center gap-3">
-              <span className="text-lg" aria-hidden>📚</span>
+              <span className="text-lg" aria-hidden>
+                📚
+              </span>
               <p className="text-sm text-indigo-700 dark:text-indigo-300">
                 Complete your profile setup to get personalized recommendations
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Link to="/onboarding">
-                <Button size="sm" variant="default" className="text-xs">Continue Setup</Button>
+                <Button size="sm" variant="default" className="text-xs">
+                  Continue Setup
+                </Button>
               </Link>
               <Button
                 size="sm"
@@ -130,7 +135,6 @@ export function DashboardPage() {
 
         {/* Sections 2 + 3 — Continue Learning + Mastery Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
           {/* Section 2 — Continue Learning (8 cols) */}
           <section
             aria-labelledby="continue-learning-heading"
@@ -153,7 +157,11 @@ export function DashboardPage() {
               <CardContent>
                 <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
                   {inProgressCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} progressLabel={t('progress')} />
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      progressLabel={t('progress')}
+                    />
                   ))}
                 </div>
               </CardContent>
@@ -174,8 +182,14 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {masteryTopics.map(({ topic, level: masteryLevel }) => (
-                  <div key={topic} className="flex items-center justify-between gap-2" dir="ltr">
-                    <span className="text-sm text-foreground truncate">{topic}</span>
+                  <div
+                    key={topic}
+                    className="flex items-center justify-between gap-2"
+                    dir="ltr"
+                  >
+                    <span className="text-sm text-foreground truncate">
+                      {topic}
+                    </span>
                     <MasteryBadge level={masteryLevel} size="sm" />
                   </div>
                 ))}
@@ -186,7 +200,6 @@ export function DashboardPage() {
 
         {/* Sections 4 + 5 — Recent Activity + Recommended */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
           {/* Section 4 — Recent Activity (6 cols) */}
           <section
             aria-labelledby="recent-activity-heading"
@@ -200,12 +213,21 @@ export function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ol className="space-y-3" aria-label="Recent learning activities">
+                <ol
+                  className="space-y-3"
+                  aria-label="Recent learning activities"
+                >
                   {activity.map((item) => (
-                    <li key={item.id} className="flex items-start gap-3" dir="ltr">
+                    <li
+                      key={item.id}
+                      className="flex items-start gap-3"
+                      dir="ltr"
+                    >
                       <ActivityIcon type={item.icon} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-foreground leading-tight">{item.action}</p>
+                        <p className="text-sm text-foreground leading-tight">
+                          {item.action}
+                        </p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                           <Clock className="h-3 w-3" aria-hidden />
                           {item.timeAgo}
@@ -239,12 +261,22 @@ export function DashboardPage() {
                     aria-label={`Explore ${course.title}`}
                     dir="ltr"
                   >
-                    <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden />
+                    <BookOpen
+                      className="h-5 w-5 text-primary shrink-0 mt-0.5"
+                      aria-hidden
+                    />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground">{course.title}</p>
-                      <p className="text-xs text-muted-foreground">{course.instructor}</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {course.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {course.instructor}
+                      </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto shrink-0 mt-0.5" aria-hidden />
+                    <ChevronRight
+                      className="h-4 w-4 text-muted-foreground ml-auto shrink-0 mt-0.5"
+                      aria-hidden
+                    />
                   </Link>
                 ))}
               </CardContent>

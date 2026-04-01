@@ -75,57 +75,74 @@ export class GroupChallengeService implements OnModuleDestroy {
     input: CreateChallengeInput
   ) {
     const values: NewGroupChallenge = {
-      tenantId, createdBy: userId, title: input.title,
-      description: input.description ?? null, courseId: input.courseId ?? null,
-      challengeType: input.challengeType, targetScore: input.targetScore,
-      startDate: new Date(input.startDate), endDate: new Date(input.endDate),
-      maxParticipants: input.maxParticipants ?? DEFAULT_MAX_PARTICIPANTS, status: 'ACTIVE',
+      tenantId,
+      createdBy: userId,
+      title: input.title,
+      description: input.description ?? null,
+      courseId: input.courseId ?? null,
+      challengeType: input.challengeType,
+      targetScore: input.targetScore,
+      startDate: new Date(input.startDate),
+      endDate: new Date(input.endDate),
+      maxParticipants: input.maxParticipants ?? DEFAULT_MAX_PARTICIPANTS,
+      status: 'ACTIVE',
     };
-    return withTenantContext(this.db, this.ctx(tenantId, userId, role), async (tx) => {
-      const [row] = await tx.insert(groupChallenges).values(values).returning();
-      return row;
-    });
+    return withTenantContext(
+      this.db,
+      this.ctx(tenantId, userId, role),
+      async (tx) => {
+        const [row] = await tx
+          .insert(groupChallenges)
+          .values(values)
+          .returning();
+        return row;
+      }
+    );
   }
 
   async joinChallenge(tenantId: string, userId: string, challengeId: string) {
-    return withTenantContext(this.db, this.ctx(tenantId, userId), async (tx) => {
-      const [challenge] = await tx
-        .select({ maxParticipants: groupChallenges.maxParticipants })
-        .from(groupChallenges)
-        .where(eq(groupChallenges.id, challengeId))
-        .limit(1);
-      if (!challenge) throw new NotFoundException('Challenge not found');
+    return withTenantContext(
+      this.db,
+      this.ctx(tenantId, userId),
+      async (tx) => {
+        const [challenge] = await tx
+          .select({ maxParticipants: groupChallenges.maxParticipants })
+          .from(groupChallenges)
+          .where(eq(groupChallenges.id, challengeId))
+          .limit(1);
+        if (!challenge) throw new NotFoundException('Challenge not found');
 
-      const [{ total }] = await tx
-        .select({ total: count() })
-        .from(challengeParticipants)
-        .where(eq(challengeParticipants.challengeId, challengeId));
+        const [{ total }] = await tx
+          .select({ total: count() })
+          .from(challengeParticipants)
+          .where(eq(challengeParticipants.challengeId, challengeId));
 
-      if (Number(total) >= challenge.maxParticipants) {
-        throw new BadRequestException('Challenge is full');
-      }
+        if (Number(total) >= challenge.maxParticipants) {
+          throw new BadRequestException('Challenge is full');
+        }
 
-      const existing = await tx
-        .select({ id: challengeParticipants.id })
-        .from(challengeParticipants)
-        .where(
-          and(
-            eq(challengeParticipants.challengeId, challengeId),
-            eq(challengeParticipants.userId, userId)
+        const existing = await tx
+          .select({ id: challengeParticipants.id })
+          .from(challengeParticipants)
+          .where(
+            and(
+              eq(challengeParticipants.challengeId, challengeId),
+              eq(challengeParticipants.userId, userId)
+            )
           )
-        )
-        .limit(1);
+          .limit(1);
 
-      if (existing.length > 0) {
-        throw new BadRequestException('Already joined this challenge');
+        if (existing.length > 0) {
+          throw new BadRequestException('Already joined this challenge');
+        }
+
+        const [participant] = await tx
+          .insert(challengeParticipants)
+          .values({ challengeId, userId, score: 0 })
+          .returning();
+        return participant;
       }
-
-      const [participant] = await tx
-        .insert(challengeParticipants)
-        .values({ challengeId, userId, score: 0 })
-        .returning();
-      return participant;
-    });
+    );
   }
 
   async getActiveChallenges(
@@ -135,26 +152,30 @@ export class GroupChallengeService implements OnModuleDestroy {
     first = 20,
     _after?: string
   ) {
-    return withTenantContext(this.db, this.ctx(tenantId, userId), async (tx) => {
-      const conditions = [eq(groupChallenges.status, 'ACTIVE')];
-      if (courseId) conditions.push(eq(groupChallenges.courseId, courseId));
+    return withTenantContext(
+      this.db,
+      this.ctx(tenantId, userId),
+      async (tx) => {
+        const conditions = [eq(groupChallenges.status, 'ACTIVE')];
+        if (courseId) conditions.push(eq(groupChallenges.courseId, courseId));
 
-      const rows = await tx
-        .select({
-          challenge: groupChallenges,
-          participantCount: sql<number>`(
+        const rows = await tx
+          .select({
+            challenge: groupChallenges,
+            participantCount: sql<number>`(
             SELECT COUNT(*) FROM challenge_participants cp WHERE cp.challenge_id = ${groupChallenges.id}
           )`.as('participant_count'),
-        })
-        .from(groupChallenges)
-        .where(and(...conditions))
-        .limit(first);
+          })
+          .from(groupChallenges)
+          .where(and(...conditions))
+          .limit(first);
 
-      return rows.map(({ challenge, participantCount }) => ({
-        ...challenge,
-        participantCount: Number(participantCount),
-      }));
-    });
+        return rows.map(({ challenge, participantCount }) => ({
+          ...challenge,
+          participantCount: Number(participantCount),
+        }));
+      }
+    );
   }
 
   async getMyParticipations(tenantId: string, userId: string) {
@@ -174,10 +195,22 @@ export class GroupChallengeService implements OnModuleDestroy {
   ): Promise<void> {
     if (!this.nats) return;
     try {
-      const payload = { tenantId, userId, challengeId, score, timestamp: new Date().toISOString() };
-      this.nats.publish(SUBJECT_SCORE_SUBMITTED, new TextEncoder().encode(JSON.stringify(payload)));
+      const payload = {
+        tenantId,
+        userId,
+        challengeId,
+        score,
+        timestamp: new Date().toISOString(),
+      };
+      this.nats.publish(
+        SUBJECT_SCORE_SUBMITTED,
+        new TextEncoder().encode(JSON.stringify(payload))
+      );
     } catch (err) {
-      this.logger.warn({ err }, 'GroupChallengeService: failed to publish score event');
+      this.logger.warn(
+        { err },
+        'GroupChallengeService: failed to publish score event'
+      );
     }
   }
 }

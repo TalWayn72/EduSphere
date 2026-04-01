@@ -51,7 +51,9 @@ const PricingPage = lazy(() =>
   import('@/pages/PricingPage').then((m) => ({ default: m.PricingPage }))
 );
 const CourseCatalogPage = lazy(() =>
-  import('@/pages/CourseCatalogPage').then((m) => ({ default: m.CourseCatalogPage }))
+  import('@/pages/CourseCatalogPage').then((m) => ({
+    default: m.CourseCatalogPage,
+  }))
 );
 const InstructorDirectoryPage = lazy(() =>
   import('@/pages/InstructorDirectoryPage').then((m) => ({
@@ -83,19 +85,27 @@ const OAuthCallbackPage = lazy(() =>
   }))
 );
 const PilotSignupPage = lazy(() =>
-  import('@/pages/PilotSignupPage').then((m) => ({ default: m.PilotSignupPage }))
+  import('@/pages/PilotSignupPage').then((m) => ({
+    default: m.PilotSignupPage,
+  }))
 );
 const PartnerSignupPage = lazy(() =>
-  import('@/pages/PartnerSignupPage').then((m) => ({ default: m.PartnerSignupPage }))
+  import('@/pages/PartnerSignupPage').then((m) => ({
+    default: m.PartnerSignupPage,
+  }))
 );
 const PortalPage = lazy(() =>
   import('@/pages/PortalPage').then((m) => ({ default: m.PortalPage }))
 );
 const OrgSignupWizard = lazy(() =>
-  import('@/pages/signup/OrgSignupWizard').then((m) => ({ default: m.OrgSignupWizard }))
+  import('@/pages/signup/OrgSignupWizard').then((m) => ({
+    default: m.OrgSignupWizard,
+  }))
 );
 const BrandedLoginPage = lazy(() =>
-  import('@/pages/auth/BrandedLoginPage').then((m) => ({ default: m.BrandedLoginPage }))
+  import('@/pages/auth/BrandedLoginPage').then((m) => ({
+    default: m.BrandedLoginPage,
+  }))
 );
 
 /**
@@ -114,14 +124,20 @@ export const publicRoutes: RouteObject[] = [
   // Public compliance overview — static page with section anchors
   { path: '/compliance', element: publicPage(<CompliancePage />) },
   // Feature sub-pages → redirect to main features page
-  { path: '/features/:featureSlug', element: <Navigate to="/features" replace /> },
+  {
+    path: '/features/:featureSlug',
+    element: <Navigate to="/features" replace />,
+  },
   { path: '/solutions/:solutionSlug', element: publicPage(<SolutionsPage />) },
   { path: '/solutions', element: publicPage(<SolutionsPage />) },
   { path: '/privacy', element: publicPage(<PrivacyPage />) },
   { path: '/terms', element: publicPage(<TermsPage />) },
   { path: '/about', element: publicPage(<AboutPage />) },
   { path: '/careers', element: publicPage(<CareersPage />) },
-  { path: '/accessibility', element: publicPage(<AccessibilityStatementPage />) },
+  {
+    path: '/accessibility',
+    element: publicPage(<AccessibilityStatementPage />),
+  },
   // Public AEO pages
   { path: '/faq', element: publicPage(<FaqPage />) },
   { path: '/features', element: publicPage(<FeaturesPage />) },
@@ -135,9 +151,15 @@ export const publicRoutes: RouteObject[] = [
   { path: '/blog', element: publicPage(<BlogListPage />) },
   { path: '/blog/:slug', element: publicPage(<BlogPostPage />) },
   // Public OpenBadge 3.0 verifier (shareable link)
-  { path: '/verify/badge/:assertionId', element: publicPage(<BadgeVerifierPage />) },
+  {
+    path: '/verify/badge/:assertionId',
+    element: publicPage(<BadgeVerifierPage />),
+  },
   // Google OAuth 2.0 callback — public route
-  { path: '/oauth/google/callback', element: publicPage(<OAuthCallbackPage />) },
+  {
+    path: '/oauth/google/callback',
+    element: publicPage(<OAuthCallbackPage />),
+  },
   // Public partner program signup
   { path: '/partners', element: publicPage(<PartnerSignupPage />) },
   // Public B2B pilot signup

@@ -48,9 +48,7 @@ export const examSessions = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    status: examSessionStatusEnum('status')
-      .notNull()
-      .default('SCHEDULED'),
+    status: examSessionStatusEnum('status').notNull().default('SCHEDULED'),
     attemptNumber: integer('attempt_number').notNull().default(1),
     startedAt: timestamp('started_at', { withTimezone: true }),
     submittedAt: timestamp('submitted_at', { withTimezone: true }),

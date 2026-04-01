@@ -32,7 +32,9 @@ export async function subscribeWebPush(): Promise<string | null> {
   const registration = await navigator.serviceWorker.ready;
   const subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as Uint8Array<ArrayBuffer>,
+    applicationServerKey: urlBase64ToUint8Array(
+      VAPID_PUBLIC_KEY
+    ) as unknown as Uint8Array<ArrayBuffer>,
   });
 
   return JSON.stringify(subscription);

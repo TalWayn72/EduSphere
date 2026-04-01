@@ -167,7 +167,12 @@ describe('StripeClient', () => {
     const client = await getClient();
     const result = await client.createCheckoutSession({
       lineItems: [
-        { name: 'Test Course', amountCents: 4999, currency: 'usd', quantity: 1 },
+        {
+          name: 'Test Course',
+          amountCents: 4999,
+          currency: 'usd',
+          quantity: 1,
+        },
       ],
       metadata: { listingId: 'listing-1', tenantId: 'tenant-1' },
       successUrl: 'http://localhost:5173/success',

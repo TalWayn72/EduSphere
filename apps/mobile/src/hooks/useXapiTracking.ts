@@ -1,12 +1,25 @@
 import { useCallback } from 'react';
 import { enqueueStatement } from '../services/XapiOfflineQueue';
 
-const XAPI_VERBS: Record<string, { id: string; display: { 'en-US': string } }> = {
-  progressed: { id: 'http://adlnet.gov/expapi/verbs/progressed', display: { 'en-US': 'progressed' } },
-  completed:  { id: 'http://adlnet.gov/expapi/verbs/completed',  display: { 'en-US': 'completed' } },
-  launched:   { id: 'http://adlnet.gov/expapi/verbs/launched',   display: { 'en-US': 'launched' } },
-  attempted:  { id: 'http://adlnet.gov/expapi/verbs/attempted',  display: { 'en-US': 'attempted' } },
-};
+const XAPI_VERBS: Record<string, { id: string; display: { 'en-US': string } }> =
+  {
+    progressed: {
+      id: 'http://adlnet.gov/expapi/verbs/progressed',
+      display: { 'en-US': 'progressed' },
+    },
+    completed: {
+      id: 'http://adlnet.gov/expapi/verbs/completed',
+      display: { 'en-US': 'completed' },
+    },
+    launched: {
+      id: 'http://adlnet.gov/expapi/verbs/launched',
+      display: { 'en-US': 'launched' },
+    },
+    attempted: {
+      id: 'http://adlnet.gov/expapi/verbs/attempted',
+      display: { 'en-US': 'attempted' },
+    },
+  };
 
 interface XapiTrackingOptions {
   tenantId: string | null;
@@ -14,16 +27,24 @@ interface XapiTrackingOptions {
   bearerToken?: string;
 }
 
-export function useXapiTracking({ tenantId, lrsEndpoint, bearerToken }: XapiTrackingOptions) {
+export function useXapiTracking({
+  tenantId,
+  lrsEndpoint,
+  bearerToken,
+}: XapiTrackingOptions) {
   const flush = useCallback(async () => {
     if (!lrsEndpoint || !bearerToken || !tenantId) return;
-    const { getPendingStatements, deleteStatements } = await import('../services/XapiOfflineQueue');
+    const { getPendingStatements, deleteStatements } =
+      await import('../services/XapiOfflineQueue');
     const batch = getPendingStatements(50);
     if (batch.length === 0) return;
     try {
       const res = await fetch(`${lrsEndpoint}/xapi/statements`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${bearerToken}`, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(batch.map((s) => JSON.parse(s.payload))),
       });
       if (res.ok) {
@@ -52,7 +73,7 @@ export function useXapiTracking({ tenantId, lrsEndpoint, bearerToken }: XapiTrac
         timestamp: new Date().toISOString(),
       });
     },
-    [tenantId],
+    [tenantId]
   );
 
   return { track, flush };

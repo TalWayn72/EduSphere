@@ -12,7 +12,13 @@ import { WhatsAppChannelService } from './channels/whatsapp-channel.service';
 import { PushDispatchService } from './push-dispatch.service';
 
 /** Channels that can be dispatched to. */
-const DISPATCHABLE_CHANNELS = ['push_web', 'push_mobile', 'email', 'whatsapp', 'in_app'] as const;
+const DISPATCHABLE_CHANNELS = [
+  'push_web',
+  'push_mobile',
+  'email',
+  'whatsapp',
+  'in_app',
+] as const;
 type DispatchChannel = (typeof DISPATCHABLE_CHANNELS)[number];
 
 interface DispatchRequest {
@@ -57,7 +63,9 @@ export class NotificationDispatcherService implements OnModuleDestroy {
   /** Dispatch a notification — fire-and-forget, never blocks caller. */
   dispatch(request: DispatchRequest): void {
     // Memory safety: evict oldest if at capacity.
-    if (this.pendingPromises.length >= NotificationDispatcherService.MAX_PENDING) {
+    if (
+      this.pendingPromises.length >= NotificationDispatcherService.MAX_PENDING
+    ) {
       this.pendingPromises.splice(0, 50);
     }
 
@@ -112,12 +120,22 @@ export class NotificationDispatcherService implements OnModuleDestroy {
           break;
         case 'whatsapp':
           if (req.phone) {
-            await this.whatsAppChannel.sendTemplate(req.phone, 'notification_generic', [req.title, req.body]);
+            await this.whatsAppChannel.sendTemplate(
+              req.phone,
+              'notification_generic',
+              [req.title, req.body]
+            );
           }
           break;
         case 'push_web':
         case 'push_mobile':
-          await this.pushDispatch.dispatchToUser(req.userId, req.tenantId, req.title, req.body, req.payload);
+          await this.pushDispatch.dispatchToUser(
+            req.userId,
+            req.tenantId,
+            req.title,
+            req.body,
+            req.payload
+          );
           break;
         case 'in_app':
           // In-app is handled by the existing PubSub pipeline (NatsNotificationBridge).

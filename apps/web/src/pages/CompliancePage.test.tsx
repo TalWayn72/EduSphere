@@ -3,22 +3,26 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('lucide-react', () =>
-  new Proxy(
-    {},
-    {
-      get: (_, name) => {
-        if (name === '__esModule') return true;
-        return function MockIcon(props: Record<string, unknown>) {
-          return <span data-testid={`icon-${String(name)}`} {...props} />;
-        };
-      },
-    },
-  ),
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
 );
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 import { CompliancePage } from './CompliancePage';
@@ -27,25 +31,32 @@ function renderPage() {
   return render(
     <MemoryRouter>
       <CompliancePage />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
 describe('CompliancePage', () => {
   it('renders without crashing', () => {
     renderPage();
-    expect(
-      screen.getByRole('heading', { level: 1 }),
-    ).toHaveTextContent(/compliance/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /compliance/i
+    );
   });
 
   it('has all 6 compliance section anchors', () => {
     const { container } = renderPage();
-    const expectedIds = ['ferpa', 'wcag', 'scorm', 'gdpr', 'air-gapped', 'security'];
+    const expectedIds = [
+      'ferpa',
+      'wcag',
+      'scorm',
+      'gdpr',
+      'air-gapped',
+      'security',
+    ];
     for (const id of expectedIds) {
       expect(
         container.querySelector(`#${id}`),
-        `Missing section anchor: #${id}`,
+        `Missing section anchor: #${id}`
       ).toBeInTheDocument();
     }
   });
@@ -54,7 +65,7 @@ describe('CompliancePage', () => {
     renderPage();
     expect(document.body.textContent).toContain('FERPA');
     expect(document.body.textContent).toContain(
-      'Family Educational Rights and Privacy Act',
+      'Family Educational Rights and Privacy Act'
     );
   });
 
@@ -74,7 +85,9 @@ describe('CompliancePage', () => {
 
   it('has section navigation pills', () => {
     renderPage();
-    const nav = screen.getByRole('navigation', { name: /compliance sections/i });
+    const nav = screen.getByRole('navigation', {
+      name: /compliance sections/i,
+    });
     expect(nav).toBeInTheDocument();
   });
 
@@ -85,10 +98,16 @@ describe('CompliancePage', () => {
     expect(screen.getByText('HECVAT Lite')).toBeInTheDocument();
     const vpatLink = screen.getByText('VPAT 2.5 (Section 508)').closest('a');
     expect(vpatLink).toHaveAttribute('download');
-    expect(vpatLink).toHaveAttribute('href', '/compliance/EduSphere-VPAT-2.5.html');
+    expect(vpatLink).toHaveAttribute(
+      'href',
+      '/compliance/EduSphere-VPAT-2.5.html'
+    );
     const hecvatLink = screen.getByText('HECVAT Lite').closest('a');
     expect(hecvatLink).toHaveAttribute('download');
-    expect(hecvatLink).toHaveAttribute('href', '/compliance/EduSphere-HECVAT-Lite-2026.html');
+    expect(hecvatLink).toHaveAttribute(
+      'href',
+      '/compliance/EduSphere-HECVAT-Lite-2026.html'
+    );
   });
 
   it('has Downloads pill in navigation', () => {

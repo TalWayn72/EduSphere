@@ -46,9 +46,8 @@ async function executeAgent(config: SandboxConfig): Promise<void> {
     // Dynamic import of AI service internals.
     // In the child process we import the legacy runner directly to
     // avoid bootstrapping the full NestJS DI container.
-    const { AiLegacyRunnerService } = await import(
-      '../ai/ai-legacy-runner.service.js'
-    );
+    const { AiLegacyRunnerService } =
+      await import('../ai/ai-legacy-runner.service.js');
     const runner = new AiLegacyRunnerService();
     const model = runner.getModel();
 
@@ -62,10 +61,11 @@ async function executeAgent(config: SandboxConfig): Promise<void> {
         unknown
       >;
     } else {
-      result = (await runner.runGeneric(model, agent, input)) as unknown as Record<
-        string,
-        unknown
-      >;
+      result = (await runner.runGeneric(
+        model,
+        agent,
+        input
+      )) as unknown as Record<string, unknown>;
     }
 
     sendResult({ type: 'result', response: { success: true, data: result } });

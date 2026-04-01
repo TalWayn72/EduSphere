@@ -161,7 +161,9 @@ describe('useSubmitAssignment', () => {
     });
 
     expect(returned).toBeNull();
-    expect(result.current.error).toBe('Failed to submit assignment. Please try again.');
+    expect(result.current.error).toBe(
+      'Failed to submit assignment. Please try again.'
+    );
     expect(result.current.loading).toBe(false);
   });
 
@@ -187,7 +189,9 @@ describe('useSubmitAssignment', () => {
     });
 
     expect(returned).toBeNull();
-    expect(result.current.error).toBe('Failed to submit assignment. Please try again.');
+    expect(result.current.error).toBe(
+      'Failed to submit assignment. Please try again.'
+    );
     expect(result.current.loading).toBe(false);
   });
 
@@ -254,7 +258,9 @@ describe('useSubmitAssignment', () => {
     await act(async () => {
       await result.current.submit('bad text');
     });
-    expect(result.current.error).toBe('Failed to submit assignment. Please try again.');
+    expect(result.current.error).toBe(
+      'Failed to submit assignment. Please try again.'
+    );
 
     // Second call — error should clear and succeed
     await act(async () => {

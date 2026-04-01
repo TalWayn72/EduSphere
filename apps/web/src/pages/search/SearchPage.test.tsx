@@ -40,22 +40,31 @@ let savedState = {
 };
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string, fallback?: string) => fallback ?? k }),
+  useTranslation: () => ({
+    t: (k: string, fallback?: string) => fallback ?? k,
+  }),
 }));
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
 vi.mock('@/lib/auth', () => ({ DEV_MODE: true }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -63,8 +72,12 @@ vi.mock('@/components/PageHeader', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('./useSearchQuery', () => ({
@@ -96,8 +109,19 @@ vi.mock('./useSavedSearches', () => ({
 }));
 
 vi.mock('./SearchResultsGroup', () => ({
-  SearchResultsGroup: ({ results, query }: { results: unknown[]; query: string }) =>
-    <div data-testid="search-results" data-count={results.length} data-query={query} />,
+  SearchResultsGroup: ({
+    results,
+    query,
+  }: {
+    results: unknown[];
+    query: string;
+  }) => (
+    <div
+      data-testid="search-results"
+      data-count={results.length}
+      data-query={query}
+    />
+  ),
 }));
 
 vi.mock('./SaveSearchModal', () => ({
@@ -115,22 +139,46 @@ import { SearchPage } from './SearchPage';
 describe('SearchPage — basic rendering', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: '', query: '', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: '',
+      query: '',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('renders inside Layout', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders search input with placeholder', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
-    expect(screen.getByPlaceholderText('searchFullPlaceholder')).toBeInTheDocument();
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getByPlaceholderText('searchFullPlaceholder')
+    ).toBeInTheDocument();
   });
 
   it('renders search results container', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('search-results')).toBeInTheDocument();
   });
 });
@@ -138,17 +186,35 @@ describe('SearchPage — basic rendering', () => {
 describe('SearchPage — empty state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: '', query: '', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: '',
+      query: '',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('shows search hint when query is empty', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('searchHint')).toBeInTheDocument();
   });
 
   it('shows suggested query buttons', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     // SUGGESTED_QUERIES from search.constants
     const buttons = screen.getAllByRole('button');
     // At least the suggested query buttons should be present
@@ -156,11 +222,15 @@ describe('SearchPage — empty state', () => {
   });
 
   it('clicking suggested query calls setInputValue', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
-    // Find any suggested query button (they're rendered as plain buttons)
-    const suggestedButtons = screen.getAllByRole('button').filter(
-      (btn) => btn.className.includes('rounded-full')
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
     );
+    // Find any suggested query button (they're rendered as plain buttons)
+    const suggestedButtons = screen
+      .getAllByRole('button')
+      .filter((btn) => btn.className.includes('rounded-full'));
     if (suggestedButtons.length > 0) {
       fireEvent.click(suggestedButtons[0]!);
       expect(mockSetInputValue).toHaveBeenCalled();
@@ -168,12 +238,20 @@ describe('SearchPage — empty state', () => {
   });
 
   it('does not show no-results text when query is empty', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.queryByText('noResults')).not.toBeInTheDocument();
   });
 
   it('does not show loading skeleton when not searching', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.queryByLabelText('Loading results')).not.toBeInTheDocument();
   });
 });
@@ -181,12 +259,26 @@ describe('SearchPage — empty state', () => {
 describe('SearchPage — loading state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: 'test', query: 'test', results: [], loading: true, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: 'test',
+      query: 'test',
+      results: [],
+      loading: true,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('shows loading skeleton when searching', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByLabelText('Loading results')).toBeInTheDocument();
   });
 });
@@ -204,21 +296,37 @@ describe('SearchPage — results state', () => {
       loading: false,
       isOfflineFallback: false,
     };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('shows result count', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/2 result/)).toBeInTheDocument();
   });
 
   it('shows save search button when query >= 2 chars', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('save-search-btn')).toBeInTheDocument();
   });
 
   it('does not show search hint when query is present', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.queryByText('searchHint')).not.toBeInTheDocument();
   });
 });
@@ -226,22 +334,44 @@ describe('SearchPage — results state', () => {
 describe('SearchPage — no results state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: 'xyz', query: 'xyz', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: 'xyz',
+      query: 'xyz',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('shows noResults text', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('noResults')).toBeInTheDocument();
   });
 
   it('shows empty state container', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('search-empty-state')).toBeInTheDocument();
   });
 
   it('shows dev mode hint in DEV_MODE', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/Dev Mode/)).toBeInTheDocument();
   });
 });
@@ -249,12 +379,26 @@ describe('SearchPage — no results state', () => {
 describe('SearchPage — offline fallback', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: 'test', query: 'te', results: [], loading: false, isOfflineFallback: true };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: 'test',
+      query: 'te',
+      results: [],
+      loading: false,
+      isOfflineFallback: true,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('shows offline banner when isOfflineFallback is true', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/Offline mode/)).toBeInTheDocument();
   });
 });
@@ -262,12 +406,26 @@ describe('SearchPage — offline fallback', () => {
 describe('SearchPage — keyboard interactions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: '', query: '', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: '',
+      query: '',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('Escape key navigates back', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const input = screen.getByPlaceholderText('searchFullPlaceholder');
     fireEvent.keyDown(input, { key: 'Escape' });
     expect(mockNavigate).toHaveBeenCalledWith(-1);
@@ -277,19 +435,37 @@ describe('SearchPage — keyboard interactions', () => {
 describe('SearchPage — input interaction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: '', query: '', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: '',
+      query: '',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('typing in input calls setInputValue', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const input = screen.getByPlaceholderText('searchFullPlaceholder');
     fireEvent.change(input, { target: { value: 'new search' } });
     expect(mockSetInputValue).toHaveBeenCalledWith('new search');
   });
 
   it('saved searches toggle button is present', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('saved-searches-toggle')).toBeInTheDocument();
   });
 });
@@ -297,12 +473,26 @@ describe('SearchPage — input interaction', () => {
 describe('SearchPage — no offline when online', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: '', query: '', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: '',
+      query: '',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('does not show offline banner when online', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     expect(screen.queryByText(/offline mode/i)).not.toBeInTheDocument();
   });
 });
@@ -310,31 +500,60 @@ describe('SearchPage — no offline when online', () => {
 describe('SearchPage — Accessibility', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchState = { inputValue: '', query: '', results: [], loading: false, isOfflineFallback: false };
-    savedState = { showSaveModal: false, showSavedPanel: false, savingSearch: false };
+    searchState = {
+      inputValue: '',
+      query: '',
+      results: [],
+      loading: false,
+      isOfflineFallback: false,
+    };
+    savedState = {
+      showSaveModal: false,
+      showSavedPanel: false,
+      savingSearch: false,
+    };
   });
 
   it('search container has role="search" with aria-label', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const searchRegion = screen.getByRole('search');
     expect(searchRegion).toHaveAttribute('aria-label', 'Content search');
   });
 
   it('search input has role="searchbox" with aria-label', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const input = screen.getByRole('searchbox');
-    expect(input).toHaveAttribute('aria-label', 'Search courses, lessons, and knowledge sources');
+    expect(input).toHaveAttribute(
+      'aria-label',
+      'Search courses, lessons, and knowledge sources'
+    );
   });
 
   it('decorative search icon is hidden from assistive technology', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     // SearchIcon is mocked but the search region should exist with hidden icons
     const search = screen.getByRole('search');
     expect(search).toBeInTheDocument();
   });
 
   it('saved searches toggle has aria-expanded attribute', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const toggle = screen.getByTestId('saved-searches-toggle');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
@@ -347,25 +566,43 @@ describe('SearchPage — Accessibility', () => {
       loading: false,
       isOfflineFallback: false,
     };
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const status = screen.getByRole('status');
     expect(status).toHaveAttribute('aria-live', 'polite');
     expect(status).toHaveTextContent(/1 result/);
   });
 
   it('loading skeleton has aria-busy="true"', () => {
-    searchState = { inputValue: 'test', query: 'test', results: [], loading: true, isOfflineFallback: false };
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    searchState = {
+      inputValue: 'test',
+      query: 'test',
+      results: [],
+      loading: true,
+      isOfflineFallback: false,
+    };
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const loading = screen.getByLabelText('Loading results');
     expect(loading).toHaveAttribute('aria-busy', 'true');
   });
 
   it('suggested query buttons have aria-label attribute', () => {
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
-    // Suggested query buttons are rounded-full styled buttons
-    const suggestedButtons = screen.getAllByRole('button').filter(
-      (btn) => btn.className.includes('rounded-full')
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
     );
+    // Suggested query buttons are rounded-full styled buttons
+    const suggestedButtons = screen
+      .getAllByRole('button')
+      .filter((btn) => btn.className.includes('rounded-full'));
     // Each suggested query button must have an aria-label
     for (const btn of suggestedButtons) {
       expect(btn).toHaveAttribute('aria-label');
@@ -381,15 +618,31 @@ describe('SearchPage — Accessibility', () => {
       loading: false,
       isOfflineFallback: false,
     };
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
     const saveBtn = screen.getByTestId('save-search-btn');
     expect(saveBtn).toHaveAttribute('aria-label', 'Save Search');
   });
 
   it('offline banner has role="status" with aria-live', () => {
-    searchState = { inputValue: 'test', query: 'te', results: [], loading: false, isOfflineFallback: true };
-    render(<MemoryRouter><SearchPage /></MemoryRouter>);
-    const status = screen.getAllByRole('status').find(el => el.textContent?.includes('Offline'));
+    searchState = {
+      inputValue: 'test',
+      query: 'te',
+      results: [],
+      loading: false,
+      isOfflineFallback: true,
+    };
+    render(
+      <MemoryRouter>
+        <SearchPage />
+      </MemoryRouter>
+    );
+    const status = screen
+      .getAllByRole('status')
+      .find((el) => el.textContent?.includes('Offline'));
     expect(status).toHaveAttribute('aria-live', 'polite');
   });
 });

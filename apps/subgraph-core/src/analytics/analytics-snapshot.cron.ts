@@ -6,11 +6,7 @@
  *
  * Implements OnModuleDestroy for memory safety.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import {
   createDatabaseConnection,
@@ -36,7 +32,9 @@ export class AnalyticsSnapshotCron implements OnModuleDestroy {
 
   @Cron('0 2 * * *')
   async runDailySnapshot(): Promise<void> {
-    this.logger.log('[AnalyticsSnapshotCron] Starting daily analytics snapshot');
+    this.logger.log(
+      '[AnalyticsSnapshotCron] Starting daily analytics snapshot'
+    );
     try {
       const tenants = await this.db
         .select({ id: schema.tenants.id })
@@ -57,21 +55,20 @@ export class AnalyticsSnapshotCron implements OnModuleDestroy {
     }
   }
 
-  private async snapshotTenant(
-    tenantId: string,
-    today: string
-  ): Promise<void> {
+  private async snapshotTenant(tenantId: string, today: string): Promise<void> {
     try {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const todayStart = new Date(today + 'T00:00:00Z');
 
-      const [kpiResult] = await this.db.execute<{
-        active_learners: string;
-        completions: string;
-        new_enrollments: string;
-        total_minutes: string;
-        avg_completion_rate: string;
-      }>(sql`
+      const [kpiResult] = await this.db
+        .execute<{
+          active_learners: string;
+          completions: string;
+          new_enrollments: string;
+          total_minutes: string;
+          avg_completion_rate: string;
+        }>(
+          sql`
         SELECT
           (SELECT COUNT(DISTINCT up.user_id)
            FROM user_progress up
@@ -108,13 +105,18 @@ export class AnalyticsSnapshotCron implements OnModuleDestroy {
             INNER JOIN courses c ON c.id = uc.course_id
             WHERE c.tenant_id = ${tenantId}::uuid
           ), 0)::text AS avg_completion_rate
-      `).then((r) => r.rows);
+      `
+        )
+        .then((r) => r.rows);
 
       const activeLearners = Number(kpiResult?.active_learners ?? 0);
       const completions = Number(kpiResult?.completions ?? 0);
       const newEnrollments = Number(kpiResult?.new_enrollments ?? 0);
-      const totalMinutes = Math.round(Number(kpiResult?.total_minutes ?? 0) / 60);
-      const avgCompletionRate = Math.round(Number(kpiResult?.avg_completion_rate ?? 0) * 100) / 100;
+      const totalMinutes = Math.round(
+        Number(kpiResult?.total_minutes ?? 0) / 60
+      );
+      const avgCompletionRate =
+        Math.round(Number(kpiResult?.avg_completion_rate ?? 0) * 100) / 100;
 
       await this.db
         .insert(schema.tenantAnalyticsSnapshots)

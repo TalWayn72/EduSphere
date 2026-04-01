@@ -6,11 +6,7 @@
  *
  * Memory safety: implements OnModuleDestroy.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -71,7 +67,11 @@ export class ExamItemGeneratorService implements OnModuleDestroy {
 
       if (iwfFlags.length >= 2) {
         this.logger.warn(
-          { question: item.question.slice(0, 50), iwfFlags, tenantId: input.tenantId },
+          {
+            question: item.question.slice(0, 50),
+            iwfFlags,
+            tenantId: input.tenantId,
+          },
           '[ExamItemGeneratorService] item rejected — too many IWF flags'
         );
         continue;
@@ -87,18 +87,17 @@ export class ExamItemGeneratorService implements OnModuleDestroy {
 
       try {
         await withTenantContext(this.db, ctx, async (tx) =>
-          tx
-            .insert(schema.examItems)
-            .values({
-              tenantId: input.tenantId,
-              courseId: input.courseId,
-              moduleId: input.moduleId ?? null,
-              domainTag: item.domainTag,
-              bloomLevel: item.bloomLevel as (typeof bloomLevelEnum.enumValues)[number],
-              questionData,
-              source: 'AI_GENERATED',
-              createdBy: input.userId,
-            })
+          tx.insert(schema.examItems).values({
+            tenantId: input.tenantId,
+            courseId: input.courseId,
+            moduleId: input.moduleId ?? null,
+            domainTag: item.domainTag,
+            bloomLevel:
+              item.bloomLevel as (typeof bloomLevelEnum.enumValues)[number],
+            questionData,
+            source: 'AI_GENERATED',
+            createdBy: input.userId,
+          })
         );
         storedCount++;
       } catch (err) {

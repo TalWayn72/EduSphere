@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -123,7 +129,9 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
       const batch = state.citations.slice(i, i + batchSize);
 
       const { object } = await generateObject({
-        model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+        model: openai(this.model) as unknown as Parameters<
+          typeof generateObject
+        >[0]['model'],
         system: systemPrompt,
         prompt: `Verify these Hebrew citations:\n${JSON.stringify(batch, null, 2)}`,
         schema: z.object({ results: z.array(CitationResultSchema) }),

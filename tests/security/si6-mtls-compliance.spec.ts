@@ -25,7 +25,9 @@ function readFile(relativePath: string): string {
 
 describe('SI-6: mTLS infrastructure files exist', () => {
   it('generate-certs.sh script exists', () => {
-    expect(existsSync(join(ROOT, 'infrastructure/mtls/generate-certs.sh'))).toBe(true);
+    expect(
+      existsSync(join(ROOT, 'infrastructure/mtls/generate-certs.sh'))
+    ).toBe(true);
   });
 
   it('mTLS README.md exists', () => {
@@ -37,13 +39,23 @@ describe('SI-6: mTLS infrastructure files exist', () => {
   });
 
   it('certs directory has .gitignore (never commit keys)', () => {
-    expect(existsSync(join(ROOT, 'infrastructure/mtls/certs/.gitignore'))).toBe(true);
+    expect(existsSync(join(ROOT, 'infrastructure/mtls/certs/.gitignore'))).toBe(
+      true
+    );
   });
 
   it('Linkerd manifests exist for production mTLS', () => {
-    expect(existsSync(join(ROOT, 'infrastructure/k8s/linkerd/server-policies.yaml'))).toBe(true);
-    expect(existsSync(join(ROOT, 'infrastructure/k8s/linkerd/mtls-test.yaml'))).toBe(true);
-    expect(existsSync(join(ROOT, 'infrastructure/k8s/linkerd/namespace-annotations.yaml'))).toBe(true);
+    expect(
+      existsSync(join(ROOT, 'infrastructure/k8s/linkerd/server-policies.yaml'))
+    ).toBe(true);
+    expect(
+      existsSync(join(ROOT, 'infrastructure/k8s/linkerd/mtls-test.yaml'))
+    ).toBe(true);
+    expect(
+      existsSync(
+        join(ROOT, 'infrastructure/k8s/linkerd/namespace-annotations.yaml')
+      )
+    ).toBe(true);
   });
 });
 
@@ -143,7 +155,10 @@ describe('SI-6: docker-compose.mtls.yml configures HTTPS', () => {
     // The overlay should only have https:// for subgraph URL assignments
     const subgraphUrlLines = content
       .split('\n')
-      .filter((line) => line.match(/SUBGRAPH_.*_URL/) && !line.trimStart().startsWith('#'));
+      .filter(
+        (line) =>
+          line.match(/SUBGRAPH_.*_URL/) && !line.trimStart().startsWith('#')
+      );
     for (const line of subgraphUrlLines) {
       expect(line).not.toMatch(/http:\/\//);
     }
@@ -154,12 +169,16 @@ describe('SI-6: docker-compose.mtls.yml configures HTTPS', () => {
 
 describe('SI-6: Helm values enforce mTLS in non-dev environments', () => {
   it('values.staging.yaml has mtls.enabled: true', () => {
-    const staging = readFile('infrastructure/k8s/helm/edusphere/values.staging.yaml');
+    const staging = readFile(
+      'infrastructure/k8s/helm/edusphere/values.staging.yaml'
+    );
     expect(staging).toMatch(/mtls:\s*\n\s*enabled:\s*true/);
   });
 
   it('values.production.yaml has mtls.enabled: true', () => {
-    const production = readFile('infrastructure/k8s/helm/edusphere/values.production.yaml');
+    const production = readFile(
+      'infrastructure/k8s/helm/edusphere/values.production.yaml'
+    );
     expect(production).toMatch(/mtls:\s*\n\s*enabled:\s*true/);
   });
 
@@ -174,7 +193,7 @@ describe('SI-6: Helm values enforce mTLS in non-dev environments', () => {
 describe('SI-6: Helm templates support https:// when mtls.enabled', () => {
   it('subgraph-urls configmap template uses protocol variable', () => {
     const template = readFile(
-      'infrastructure/k8s/helm/edusphere/templates/configmaps/subgraph-urls.yaml',
+      'infrastructure/k8s/helm/edusphere/templates/configmaps/subgraph-urls.yaml'
     );
     expect(template).toContain('$protocol');
     expect(template).toContain('.Values.mtls');
@@ -182,7 +201,7 @@ describe('SI-6: Helm templates support https:// when mtls.enabled', () => {
 
   it('gateway deployment template uses protocol variable', () => {
     const template = readFile(
-      'infrastructure/k8s/helm/edusphere/templates/gateway/deployment.yaml',
+      'infrastructure/k8s/helm/edusphere/templates/gateway/deployment.yaml'
     );
     expect(template).toContain('$protocol');
     expect(template).toContain('.Values.mtls');
@@ -221,7 +240,9 @@ describe('SI-6: Development docker-compose.dev.yml uses plain HTTP', () => {
   });
 
   it('gateway connects to subgraphs via http:// in dev', () => {
-    expect(devCompose).toContain('SUBGRAPH_CORE_URL=http://subgraph-core:4001/graphql');
+    expect(devCompose).toContain(
+      'SUBGRAPH_CORE_URL=http://subgraph-core:4001/graphql'
+    );
   });
 
   it('does NOT use https:// in dev compose (no accidental mTLS)', () => {

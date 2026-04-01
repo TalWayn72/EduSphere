@@ -26,7 +26,7 @@ interface EAPResult {
  */
 export function estimateAbilityEAP(
   responses: EAPResponse[],
-  quadPoints = 41,
+  quadPoints = 41
 ): EAPResult {
   const lower = -4;
   const upper = 4;
@@ -43,9 +43,7 @@ export function estimateAbilityEAP(
     for (const r of responses) {
       const p = prob3PL(r.a, r.b, r.c, theta);
       const pClamped = Math.max(1e-10, Math.min(1 - 1e-10, p));
-      logL += r.isCorrect
-        ? Math.log(pClamped)
-        : Math.log(1 - pClamped);
+      logL += r.isCorrect ? Math.log(pClamped) : Math.log(1 - pClamped);
     }
     // N(0,1) log-prior
     const logPrior = -0.5 * theta * theta;

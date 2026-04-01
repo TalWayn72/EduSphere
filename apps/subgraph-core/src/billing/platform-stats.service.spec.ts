@@ -8,7 +8,8 @@ const mockSelect = vi.fn();
 const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -42,7 +43,7 @@ describe('PlatformStatsService', () => {
   describe('getPlatformStats', () => {
     it('should aggregate cross-tenant stats', async () => {
       mockSelect
-        .mockReturnValueOnce(makeChain([{ value: 15 }]))  // tenants
+        .mockReturnValueOnce(makeChain([{ value: 15 }])) // tenants
         .mockReturnValueOnce(makeChain([{ value: 200 }])) // learners
         .mockReturnValueOnce(makeChain([{ value: 50 }])); // courses
 

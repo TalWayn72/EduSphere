@@ -23,7 +23,12 @@ interface QuizQuestionProps {
 
 const CHOICE_LABELS = ['A', 'B', 'C', 'D'] as const;
 
-export function QuizQuestion({ index, question, onChange, onRemove }: QuizQuestionProps) {
+export function QuizQuestion({
+  index,
+  question,
+  onChange,
+  onRemove,
+}: QuizQuestionProps) {
   const handleQuestionText = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...question, question: e.target.value });
   };
@@ -73,7 +78,9 @@ export function QuizQuestion({ index, question, onChange, onRemove }: QuizQuesti
               aria-label={`Mark choice ${CHOICE_LABELS[ci]} as correct`}
               className="h-4 w-4 accent-primary"
             />
-            <Label className="w-5 text-muted-foreground">{CHOICE_LABELS[ci]}</Label>
+            <Label className="w-5 text-muted-foreground">
+              {CHOICE_LABELS[ci]}
+            </Label>
             <Input
               placeholder={`Choice ${CHOICE_LABELS[ci]}`}
               value={choice}

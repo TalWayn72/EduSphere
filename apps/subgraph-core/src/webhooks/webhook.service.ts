@@ -247,10 +247,7 @@ export class WebhookService implements OnModuleDestroy {
     });
   }
 
-  async testWebhook(
-    id: string,
-    ctx: TenantContext
-  ): Promise<WebhookDelivery> {
+  async testWebhook(id: string, ctx: TenantContext): Promise<WebhookDelivery> {
     const webhooks = await this.listWebhooks(ctx);
     const webhook = webhooks.find((w) => w.id === id);
     if (!webhook) throw new BadRequestException('Webhook not found');
@@ -263,7 +260,11 @@ export class WebhookService implements OnModuleDestroy {
     };
 
     return this.deliveryService.dispatchToWebhook(
-      this.db, webhook, 'test', testPayload, ctx
+      this.db,
+      webhook,
+      'test',
+      testPayload,
+      ctx
     );
   }
 
@@ -275,7 +276,12 @@ export class WebhookService implements OnModuleDestroy {
     attempt = 1
   ): Promise<WebhookDelivery> {
     return this.deliveryService.dispatchToWebhook(
-      this.db, webhook, eventType, payload, ctx, attempt
+      this.db,
+      webhook,
+      eventType,
+      payload,
+      ctx,
+      attempt
     );
   }
 }

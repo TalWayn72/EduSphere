@@ -10,7 +10,9 @@ describe('Slider', () => {
   });
 
   it('forwards className to root', () => {
-    render(<Slider className="mt-4" defaultValue={[50]} data-testid="slider" />);
+    render(
+      <Slider className="mt-4" defaultValue={[50]} data-testid="slider" />
+    );
     // className goes on the root span, check ancestors of the slider thumb
     const slider = screen.getByRole('slider');
     const root = slider.closest('[class*="mt-4"]');

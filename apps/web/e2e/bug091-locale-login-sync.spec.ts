@@ -51,7 +51,9 @@ test.describe('BUG-091: locale persists after login', () => {
     });
   });
 
-  test('language change in Settings persists across page navigation', async ({ page }) => {
+  test('language change in Settings persists across page navigation', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'en');
       localStorage.setItem('edusphere-sidebar-collapsed', 'true');
@@ -82,7 +84,9 @@ test.describe('BUG-091: locale persists after login', () => {
     await expect(page.getByRole('combobox').first()).toContainText('עברית');
   });
 
-  test('BUG-091: LOCALE_SYNCED_KEY is cleared on login, enabling DB re-sync', async ({ page }) => {
+  test('BUG-091: LOCALE_SYNCED_KEY is cleared on login, enabling DB re-sync', async ({
+    page,
+  }) => {
     // Pre-set stale English localStorage + sync flag from "previous session"
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'en');

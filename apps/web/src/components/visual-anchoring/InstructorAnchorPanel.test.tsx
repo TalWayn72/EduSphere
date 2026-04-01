@@ -10,14 +10,25 @@
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import type { VisualAnchor } from './visual-anchor.types';
 
 // ── urql mock ──────────────────────────────────────────────────────────────────
-const mockDeleteAnchor = vi.fn().mockResolvedValue({ data: { deleteVisualAnchor: true }, error: undefined });
+const mockDeleteAnchor = vi
+  .fn()
+  .mockResolvedValue({ data: { deleteVisualAnchor: true }, error: undefined });
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, mockDeleteAnchor]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    mockDeleteAnchor,
+  ]),
   gql: vi.fn((s: TemplateStringsArray) => String(s)),
 }));
 
@@ -40,7 +51,10 @@ vi.mock('@/components/ui/button', () => ({
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, 'data-testid': testId }: React.HTMLAttributes<HTMLSpanElement> & { 'data-testid'?: string }) => (
+  Badge: ({
+    children,
+    'data-testid': testId,
+  }: React.HTMLAttributes<HTMLSpanElement> & { 'data-testid'?: string }) => (
     <span data-testid={testId}>{children}</span>
   ),
 }));
@@ -51,7 +65,9 @@ vi.mock('lucide-react', () => ({
   AlertTriangle: () => <span data-testid="icon-alert" />,
 }));
 
-vi.mock('@/lib/utils', () => ({ cn: (...args: string[]) => args.filter(Boolean).join(' ') }));
+vi.mock('@/lib/utils', () => ({
+  cn: (...args: string[]) => args.filter(Boolean).join(' '),
+}));
 
 vi.mock('./visual-anchor.graphql', () => ({
   DELETE_VISUAL_ANCHOR: 'DELETE_VISUAL_ANCHOR',
@@ -106,7 +122,7 @@ function renderPanel(anchors = ANCHORS) {
       courseId="course-1"
       onAnchorDeleted={onAnchorDeleted}
       onPreviewAsStudent={onPreviewAsStudent}
-    />,
+    />
   );
   return { ...utils, onAnchorDeleted, onPreviewAsStudent };
 }
@@ -160,7 +176,10 @@ describe('InstructorAnchorPanel', () => {
   });
 
   it('does NOT call onAnchorDeleted when mutation returns an error', async () => {
-    mockDeleteAnchor.mockResolvedValueOnce({ data: undefined, error: new Error('Network error') });
+    mockDeleteAnchor.mockResolvedValueOnce({
+      data: undefined,
+      error: new Error('Network error'),
+    });
     const { onAnchorDeleted } = renderPanel();
 
     await act(async () => {

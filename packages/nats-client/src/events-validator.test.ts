@@ -47,9 +47,7 @@ describe('validateAgentSessionEvent', () => {
   });
 
   it('throws for null payload', () => {
-    expect(() => validateAgentSessionEvent(null)).toThrow(
-      EventValidationError
-    );
+    expect(() => validateAgentSessionEvent(null)).toThrow(EventValidationError);
   });
 
   it('throws for non-object payload', () => {

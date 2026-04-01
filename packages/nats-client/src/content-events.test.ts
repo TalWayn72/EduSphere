@@ -16,9 +16,9 @@ describe('content-events type guards', () => {
     });
 
     it('returns true for content.updated', () => {
-      expect(
-        isContentEvent({ ...validContent, type: 'content.updated' })
-      ).toBe(true);
+      expect(isContentEvent({ ...validContent, type: 'content.updated' })).toBe(
+        true
+      );
     });
 
     it('returns true for content.published', () => {
@@ -50,7 +50,9 @@ describe('content-events type guards', () => {
     });
 
     it('returns false when contentItemId is not a string', () => {
-      expect(isContentEvent({ ...validContent, contentItemId: 42 })).toBe(false);
+      expect(isContentEvent({ ...validContent, contentItemId: 42 })).toBe(
+        false
+      );
     });
 
     it('returns false for empty object', () => {

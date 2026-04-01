@@ -69,7 +69,11 @@ export function buildGatewayPlugins() {
 
     // Cache-Control: stale-while-revalidate header
     {
-      onResponse({ request, response, serverContext: _ctx }: {
+      onResponse({
+        request,
+        response,
+        serverContext: _ctx,
+      }: {
         request: { method: string };
         response: { headers: { set: (k: string, v: string) => void } };
         serverContext: unknown;
@@ -86,7 +90,10 @@ export function buildGatewayPlugins() {
 
     // Authorization Header Propagation — Phase 1: onContextBuilding
     {
-      async onContextBuilding({ context, extendContext }: {
+      async onContextBuilding({
+        context,
+        extendContext,
+      }: {
         context: Record<string, unknown>;
         extendContext: (ctx: Record<string, unknown>) => void;
       }) {
@@ -111,8 +118,18 @@ export function buildGatewayPlugins() {
 
         if (auth?.startsWith('Bearer ')) {
           const token = auth.slice(7);
-          if (token === DEV_TOKEN && !isProduction && process.env['ALLOW_DEV_TOKEN'] === 'true') {
-            const APP_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER']);
+          if (
+            token === DEV_TOKEN &&
+            !isProduction &&
+            process.env['ALLOW_DEV_TOKEN'] === 'true'
+          ) {
+            const APP_ROLES = new Set([
+              'SUPER_ADMIN',
+              'ORG_ADMIN',
+              'INSTRUCTOR',
+              'STUDENT',
+              'RESEARCHER',
+            ]);
             const devRole = process.env['DEV_TOKEN_ROLE'] ?? 'STUDENT';
             userId = '00000000-0000-0000-0000-000000000001';
             resolvedTenantId = '00000000-0000-0000-0000-000000000000';
@@ -124,8 +141,7 @@ export function buildGatewayPlugins() {
                 audience: KEYCLOAK_AUDIENCE,
               });
               userId = (payload.sub as string) ?? null;
-              resolvedTenantId =
-                (payload.tenant_id as string) ?? tenantId;
+              resolvedTenantId = (payload.tenant_id as string) ?? tenantId;
               const roles =
                 (payload.realm_access as { roles?: string[] })?.roles ?? [];
               const knownRoles = [
@@ -153,7 +169,11 @@ export function buildGatewayPlugins() {
 
     // Phase 2: onFetch — forward auth headers to subgraphs
     {
-      onFetch({ options, setOptions, context }: {
+      onFetch({
+        options,
+        setOptions,
+        context,
+      }: {
         options: { headers?: Record<string, string> };
         setOptions: (opts: Record<string, unknown>) => void;
         context: Record<string, unknown> | null | undefined;

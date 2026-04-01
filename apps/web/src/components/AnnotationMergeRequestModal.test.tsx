@@ -15,26 +15,45 @@ vi.mock('@/components/ui/button', () => ({
 }));
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
-    open !== false ? <>{children}</> : null,
-  DialogContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div role="dialog" aria-modal="true" {...props}>{children}</div>
+  Dialog: ({
+    children,
+    open,
+  }: {
+    children: React.ReactNode;
+    open?: boolean;
+  }) => (open !== false ? <>{children}</> : null),
+  DialogContent: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div role="dialog" aria-modal="true" {...props}>
+      {children}
+    </div>
   ),
-  DialogHeader: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div {...props}>{children}</div>
-  ),
-  DialogTitle: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  DialogHeader: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+  DialogTitle: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2 {...props}>{children}</h2>
   ),
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
-  DialogFooter: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div {...props}>{children}</div>
-  ),
+  DialogFooter: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
 }));
 
-const CONTENT = 'Maimonides uses the term "overflow" to bridge Neoplatonism and Aristotle.';
+const CONTENT =
+  'Maimonides uses the term "overflow" to bridge Neoplatonism and Aristotle.';
 
 describe('AnnotationMergeRequestModal', () => {
   it('renders the dialog with the annotation content', () => {
@@ -70,7 +89,9 @@ describe('AnnotationMergeRequestModal', () => {
       />
     );
     const textarea = screen.getByTestId('merge-description-input');
-    fireEvent.change(textarea, { target: { value: 'Important cross-course insight.' } });
+    fireEvent.change(textarea, {
+      target: { value: 'Important cross-course insight.' },
+    });
     const submitBtn = screen.getByTestId('merge-submit-btn');
     expect(submitBtn).not.toBeDisabled();
   });

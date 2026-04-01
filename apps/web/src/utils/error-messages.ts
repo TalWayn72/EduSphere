@@ -7,13 +7,28 @@
 
 /** Common error patterns and their user-friendly replacements */
 const ERROR_MAP: Array<[test: RegExp, friendly: string]> = [
-  [/network\s*error|ECONNREFUSED|fetch\s*failed/i, 'Unable to reach the server. Please check your connection and try again.'],
-  [/unauthorized|401|jwt\s*expired/i, 'Your session has expired. Please sign in again.'],
-  [/forbidden|403|access\s*denied/i, 'You do not have permission to perform this action.'],
+  [
+    /network\s*error|ECONNREFUSED|fetch\s*failed/i,
+    'Unable to reach the server. Please check your connection and try again.',
+  ],
+  [
+    /unauthorized|401|jwt\s*expired/i,
+    'Your session has expired. Please sign in again.',
+  ],
+  [
+    /forbidden|403|access\s*denied/i,
+    'You do not have permission to perform this action.',
+  ],
   [/not\s*found|404/i, 'The requested resource could not be found.'],
   [/timeout|ETIMEDOUT|504/i, 'The request timed out. Please try again.'],
-  [/rate\s*limit|429|too\s*many/i, 'Too many requests. Please wait a moment and try again.'],
-  [/internal\s*server|500/i, 'A server error occurred. Please try again later.'],
+  [
+    /rate\s*limit|429|too\s*many/i,
+    'Too many requests. Please wait a moment and try again.',
+  ],
+  [
+    /internal\s*server|500/i,
+    'A server error occurred. Please try again later.',
+  ],
   [/validation|invalid\s*input/i, 'Please check your input and try again.'],
   [/CombinedError/i, 'A data loading error occurred. Please refresh the page.'],
   [/GraphQL/i, 'A data loading error occurred. Please try again.'],
@@ -29,13 +44,14 @@ const ERROR_MAP: Array<[test: RegExp, friendly: string]> = [
  */
 export function getUserFriendlyMessage(
   error: unknown,
-  fallback = 'Something went wrong. Please try again.',
+  fallback = 'Something went wrong. Please try again.'
 ): string {
-  const raw = error instanceof Error
-    ? error.message
-    : typeof error === 'string'
-      ? error
-      : String(error);
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : String(error);
 
   for (const [pattern, friendly] of ERROR_MAP) {
     if (pattern.test(raw)) return friendly;
@@ -51,7 +67,7 @@ export function getUserFriendlyMessage(
  */
 export function getGraphQLErrorMessage(
   error: { message: string; graphQLErrors?: Array<{ message: string }> },
-  fallback = 'Failed to load data. Please try again.',
+  fallback = 'Failed to load data. Please try again.'
 ): string {
   // If there's a GraphQL-level error that looks user-friendly (not a stack trace), use it
   const gqlMsg = error.graphQLErrors?.[0]?.message;

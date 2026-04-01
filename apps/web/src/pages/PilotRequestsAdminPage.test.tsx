@@ -12,7 +12,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -52,7 +54,13 @@ const MOCK_REQUESTS = [
 ];
 
 vi.mock('urql', () => ({
-  useQuery: vi.fn(() => [{ data: { allPilotRequests: MOCK_REQUESTS }, fetching: false, error: undefined }]),
+  useQuery: vi.fn(() => [
+    {
+      data: { allPilotRequests: MOCK_REQUESTS },
+      fetching: false,
+      error: undefined,
+    },
+  ]),
   useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
 }));
 
@@ -70,7 +78,11 @@ function renderPage() {
 describe('PilotRequestsAdminPage', () => {
   beforeEach(() => {
     vi.mocked(useQuery).mockReturnValue([
-      { data: { allPilotRequests: MOCK_REQUESTS }, fetching: false, error: undefined },
+      {
+        data: { allPilotRequests: MOCK_REQUESTS },
+        fetching: false,
+        error: undefined,
+      },
     ] as unknown as ReturnType<typeof useQuery>);
     vi.mocked(useAuthRole).mockReturnValue('SUPER_ADMIN');
     mockNavigate.mockClear();

@@ -31,6 +31,10 @@ export class AtRiskResolver {
     @Context() ctx: GqlContext
   ) {
     const { tenantId, userId } = requireAdmin(ctx);
-    return this.atRiskService.getAtRiskLearners(tenantId, userId, threshold ?? 30);
+    return this.atRiskService.getAtRiskLearners(
+      tenantId,
+      userId,
+      threshold ?? 30
+    );
   }
 }

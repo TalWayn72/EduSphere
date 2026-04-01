@@ -1,8 +1,5 @@
 import { useState, useMemo } from 'react';
-import {
-  Annotation,
-  AnnotationLayer,
-} from '@/types/annotations';
+import { Annotation, AnnotationLayer } from '@/types/annotations';
 import {
   getThreadedAnnotations,
   filterAnnotationsByLayers,
@@ -53,9 +50,14 @@ export function AnnotationPanel({
   const sortedAnnotations = useMemo(() => {
     const sorted = [...filteredAnnotations];
     if (sortBy === 'timestamp') {
-      sorted.sort((a, b) => (a.contentTimestamp || 0) - (b.contentTimestamp || 0));
+      sorted.sort(
+        (a, b) => (a.contentTimestamp || 0) - (b.contentTimestamp || 0)
+      );
     } else {
-      sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      sorted.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     }
     return sorted;
   }, [filteredAnnotations, sortBy]);
@@ -70,17 +72,39 @@ export function AnnotationPanel({
     );
   };
 
-  const handleAddAnnotation = (content: string, layer: AnnotationLayer, timestamp?: number) => {
+  const handleAddAnnotation = (
+    content: string,
+    layer: AnnotationLayer,
+    timestamp?: number
+  ) => {
     const newAnnotation = createAnnotation(
-      content, layer, currentUserId, currentUserRole, contentId,
-      timestamp ? formatTimestamp(timestamp) : '', timestamp
+      content,
+      layer,
+      currentUserId,
+      currentUserRole,
+      contentId,
+      timestamp ? formatTimestamp(timestamp) : '',
+      timestamp
     );
     setAnnotations((prev) => [...prev, newAnnotation]);
     setIsAddingNew(false);
   };
 
-  const handleReply = (parentId: string, content: string, layer: AnnotationLayer) => {
-    const reply = createAnnotation(content, layer, currentUserId, currentUserRole, contentId, '', undefined, parentId);
+  const handleReply = (
+    parentId: string,
+    content: string,
+    layer: AnnotationLayer
+  ) => {
+    const reply = createAnnotation(
+      content,
+      layer,
+      currentUserId,
+      currentUserRole,
+      contentId,
+      '',
+      undefined,
+      parentId
+    );
     setAnnotations((prev) => buildAnnotationTree([...prev, reply]));
   };
 
@@ -96,14 +120,16 @@ export function AnnotationPanel({
 
   const handleDelete = (annotationId: string) => {
     setAnnotations((prev) =>
-      prev.filter((ann) => ann.id !== annotationId && ann.parentId !== annotationId)
+      prev.filter(
+        (ann) => ann.id !== annotationId && ann.parentId !== annotationId
+      )
     );
   };
 
   const handleMergeRequestSubmit = (description: string) => {
     if (!proposingId) return;
     if (import.meta.env.DEV) {
-// eslint-disable-next-line no-console -- DEV-only debug trace for merge-request lifecycle
+      // eslint-disable-next-line no-console -- DEV-only debug trace for merge-request lifecycle
       console.debug('[AnnotationPanel] Merge request submitted:', {
         annotationId: proposingId,
         description,
@@ -145,7 +171,9 @@ export function AnnotationPanel({
 
       {proposingId && (
         <AnnotationMergeRequestModal
-          annotationContent={annotations.find((a) => a.id === proposingId)?.content ?? ''}
+          annotationContent={
+            annotations.find((a) => a.id === proposingId)?.content ?? ''
+          }
           onSubmit={handleMergeRequestSubmit}
           onCancel={() => setProposingId(null)}
         />
@@ -162,7 +190,10 @@ export function AnnotationPanel({
           sortedAnnotations.map((annotation) => (
             <div key={annotation.id}>
               {submittedIds.has(annotation.id) && (
-                <p className="text-xs text-indigo-600 mb-1 ml-1 dark:text-indigo-400" data-testid={`merge-submitted-${annotation.id}`}>
+                <p
+                  className="text-xs text-indigo-600 mb-1 ml-1 dark:text-indigo-400"
+                  data-testid={`merge-submitted-${annotation.id}`}
+                >
                   Proposal submitted — pending instructor review.
                 </p>
               )}
@@ -173,7 +204,11 @@ export function AnnotationPanel({
                 onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onPropose={submittedIds.has(annotation.id) ? undefined : (id) => setProposingId(id)}
+                onPropose={
+                  submittedIds.has(annotation.id)
+                    ? undefined
+                    : (id) => setProposingId(id)
+                }
               />
             </div>
           ))
@@ -181,8 +216,13 @@ export function AnnotationPanel({
       </div>
 
       <div className="p-3 bg-white dark:bg-slate-800 border-t text-xs text-gray-500 dark:text-slate-400 flex justify-between">
-        <span>{sortedAnnotations.length} of {annotations.length} annotations visible</span>
-        <span>{enabledLayers.length} of {Object.keys(AnnotationLayer).length} layers enabled</span>
+        <span>
+          {sortedAnnotations.length} of {annotations.length} annotations visible
+        </span>
+        <span>
+          {enabledLayers.length} of {Object.keys(AnnotationLayer).length} layers
+          enabled
+        </span>
       </div>
     </div>
   );

@@ -42,7 +42,10 @@ export class AiUsageService implements OnModuleDestroy {
     return withTenantContext(this.db, ctx, async (tx) => {
       // verb is jsonb: match on verb->>'id' for known AI tutor verb IDs
       const verbFilter = sql`(
-        verb->>'id' = ANY(ARRAY[${sql.join(AI_VERB_IDS.map((v) => sql`${v}`), sql`, `)}])
+        verb->>'id' = ANY(ARRAY[${sql.join(
+          AI_VERB_IDS.map((v) => sql`${v}`),
+          sql`, `
+        )}])
       )`;
 
       // Total AI requests

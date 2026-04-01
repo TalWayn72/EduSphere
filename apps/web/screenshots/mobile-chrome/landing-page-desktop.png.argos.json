@@ -1,1 +1,28 @@
-{"url":"http://localhost:5176/landing","colorScheme":"light","mediaType":"screen","test":{"id":"e0f2b3f5c1ecc224a2ed-27657b23d5a1774ac54e","title":"visual regression — landing page desktop","titlePath":["landing-page.spec.ts","Landing Page — @visual","visual regression — landing page desktop"],"retry":0,"retries":0,"repeat":0,"location":{"file":"apps\\web\\e2e\\landing-page.spec.ts","line":554,"column":3},"annotations":[]},"browser":{"name":"chromium","version":"145.0.7632.6"},"automationLibrary":{"version":"1.58.2","name":"@playwright/test"},"sdk":{"name":"@argos-ci/playwright","version":"6.4.2"},"viewport":{"width":393,"height":727},"transient":{}}
+{
+  "url": "http://localhost:5176/landing",
+  "colorScheme": "light",
+  "mediaType": "screen",
+  "test": {
+    "id": "e0f2b3f5c1ecc224a2ed-27657b23d5a1774ac54e",
+    "title": "visual regression — landing page desktop",
+    "titlePath": [
+      "landing-page.spec.ts",
+      "Landing Page — @visual",
+      "visual regression — landing page desktop"
+    ],
+    "retry": 0,
+    "retries": 0,
+    "repeat": 0,
+    "location": {
+      "file": "apps\\web\\e2e\\landing-page.spec.ts",
+      "line": 554,
+      "column": 3
+    },
+    "annotations": []
+  },
+  "browser": { "name": "chromium", "version": "145.0.7632.6" },
+  "automationLibrary": { "version": "1.58.2", "name": "@playwright/test" },
+  "sdk": { "name": "@argos-ci/playwright", "version": "6.4.2" },
+  "viewport": { "width": 393, "height": 727 },
+  "transient": {}
+}

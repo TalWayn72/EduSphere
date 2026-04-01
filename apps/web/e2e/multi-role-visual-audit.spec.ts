@@ -82,14 +82,10 @@ async function visitAndAudit(
 
   // 4. No "undefined" or "null" rendered as visible text
   // Check for standalone occurrences (not inside URLs, IDs, or code blocks)
-  const undefinedVisible = await page
-    .locator('text=/^undefined$/i')
-    .count();
+  const undefinedVisible = await page.locator('text=/^undefined$/i').count();
   expect(undefinedVisible, `"undefined" text visible on ${route}`).toBe(0);
 
-  const nullVisible = await page
-    .locator('text=/^null$/i')
-    .count();
+  const nullVisible = await page.locator('text=/^null$/i').count();
   expect(nullVisible, `"null" text visible on ${route}`).toBe(0);
 
   // 5. Visual regression screenshot
@@ -291,11 +287,7 @@ test.describe('Student view', () => {
   });
 
   test('Leaderboard — ranking list', async ({ page }) => {
-    await visitAndAudit(
-      page,
-      '/leaderboard',
-      'multi-role-student-leaderboard'
-    );
+    await visitAndAudit(page, '/leaderboard', 'multi-role-student-leaderboard');
     await expectVisibleText(page, /leaderboard|rank|top/i);
   });
 });
@@ -366,11 +358,7 @@ test.describe('Admin view', () => {
   });
 
   test('Security Settings — security panel', async ({ page }) => {
-    await visitAndAudit(
-      page,
-      '/admin/security',
-      'multi-role-admin-security'
-    );
+    await visitAndAudit(page, '/admin/security', 'multi-role-admin-security');
     await expectVisibleText(page, /security|setting|policy/i);
   });
 
@@ -398,11 +386,7 @@ test.describe('Admin view', () => {
   });
 
   test('Branding Settings — branding config', async ({ page }) => {
-    await visitAndAudit(
-      page,
-      '/admin/branding',
-      'multi-role-admin-branding'
-    );
+    await visitAndAudit(page, '/admin/branding', 'multi-role-admin-branding');
     await expectVisibleText(page, /branding|theme|logo|color/i);
   });
 

@@ -71,7 +71,11 @@ export function RemotionRoot() {
         fps={30}
         width={400}
         height={200}
-        defaultProps={{ targetValue: 500000, label: 'Active Learners', suffix: '+' }}
+        defaultProps={{
+          targetValue: 500000,
+          label: 'Active Learners',
+          suffix: '+',
+        }}
       />
     </>
   );

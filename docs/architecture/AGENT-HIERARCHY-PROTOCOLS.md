@@ -75,20 +75,20 @@ If a specialist does not return within 5 minutes:
 
 ### Allowed Tools (Lead ONLY uses these)
 
-| Tool | Permitted Use |
-|------|---------------|
-| `Agent` | Spawn specialists — PRIMARY tool |
-| `Read` | Read docs, upstream outputs, specialist results |
-| `Glob` / `Grep` | Scope analysis before delegating |
+| Tool               | Permitted Use                                             |
+| ------------------ | --------------------------------------------------------- |
+| `Agent`            | Spawn specialists — PRIMARY tool                          |
+| `Read`             | Read docs, upstream outputs, specialist results           |
+| `Glob` / `Grep`    | Scope analysis before delegating                          |
 | `Bash` (read-only) | `pnpm turbo test --filter=X`, `git diff`, verify commands |
-| Direct text output | Report to Orchestrator |
+| Direct text output | Report to Orchestrator                                    |
 
 ### FORBIDDEN Tools (Lead MUST NEVER use)
 
-| Tool | Why |
-|------|-----|
-| `Edit` / `Write` | Implementation = specialist work |
-| `Bash` (mutating) | Build/deploy = specialist work |
+| Tool              | Why                              |
+| ----------------- | -------------------------------- |
+| `Edit` / `Write`  | Implementation = specialist work |
+| `Bash` (mutating) | Build/deploy = specialist work   |
 
 ### Lead Behavioral Rules
 
@@ -111,20 +111,21 @@ Division Leads are MANAGERS. They must NEVER do implementation work directly. Th
 
 A Division Lead is VIOLATING its role if it does ANY of the following:
 
-| # | Violation | Severity |
-|---|-----------|----------|
-| 1 | Uses `Edit` or `Write` tool on any file in `apps/`, `packages/`, `tests/`, `infrastructure/`, or `scripts/` | CRITICAL |
-| 2 | Uses `Bash` to run `pnpm`, `npm`, `node`, build/test commands, `docker-compose build/up/down`, `git add/commit/push` | CRITICAL |
-| 3 | Uses `Read` on `.ts`, `.tsx`, `.js`, `.jsx`, `.graphql`, `.sql`, `.json` source files to debug or solve a problem (instead of spawning an Explore specialist) | HIGH |
-| 4 | Writes more than 5 lines of code in a message (even as "example" or "suggestion") | HIGH |
-| 5 | Directly fixes a bug, writes a test, modifies a config, or edits a Dockerfile | CRITICAL |
-| 6 | **Spawns 0 specialists and does all work itself** | **MOST CRITICAL** |
+| #   | Violation                                                                                                                                                     | Severity          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 1   | Uses `Edit` or `Write` tool on any file in `apps/`, `packages/`, `tests/`, `infrastructure/`, or `scripts/`                                                   | CRITICAL          |
+| 2   | Uses `Bash` to run `pnpm`, `npm`, `node`, build/test commands, `docker-compose build/up/down`, `git add/commit/push`                                          | CRITICAL          |
+| 3   | Uses `Read` on `.ts`, `.tsx`, `.js`, `.jsx`, `.graphql`, `.sql`, `.json` source files to debug or solve a problem (instead of spawning an Explore specialist) | HIGH              |
+| 4   | Writes more than 5 lines of code in a message (even as "example" or "suggestion")                                                                             | HIGH              |
+| 5   | Directly fixes a bug, writes a test, modifies a config, or edits a Dockerfile                                                                                 | CRITICAL          |
+| 6   | **Spawns 0 specialists and does all work itself**                                                                                                             | **MOST CRITICAL** |
 
 ### Real-World Violation Example
 
 **What happened:** A QA Lead received a task and made 38 direct tool calls (Edit, Write, Read source code) with 0 specialists spawned. The Lead acted as a solo developer instead of a manager.
 
 **What should have happened:** The QA Lead should have:
+
 1. Analyzed scope using Glob/Grep
 2. Spawned UnitInteg-Eng for unit test writing
 3. Spawned E2EPlaywright-Eng for E2E test writing

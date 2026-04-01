@@ -299,7 +299,10 @@ test.describe('Push Notifications — error handling', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             data: {
-              notifications: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } },
+              notifications: {
+                edges: [],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
             },
           }),
         });
@@ -320,9 +323,10 @@ test.describe('Push Notifications — error handling', () => {
     const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('[object Object]');
 
-    await expect(page).toHaveScreenshot(
-      'push-notifications-empty-state.png',
-      { fullPage: false, maxDiffPixels: 200, animations: 'disabled' }
-    );
+    await expect(page).toHaveScreenshot('push-notifications-empty-state.png', {
+      fullPage: false,
+      maxDiffPixels: 200,
+      animations: 'disabled',
+    });
   });
 });

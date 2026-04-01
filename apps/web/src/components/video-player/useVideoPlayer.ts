@@ -112,11 +112,17 @@ export function useVideoPlayer({
           break;
         case 'ArrowLeft':
           if (videoRef.current)
-            videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 5);
+            videoRef.current.currentTime = Math.max(
+              0,
+              videoRef.current.currentTime - 5
+            );
           break;
         case 'ArrowRight':
           if (videoRef.current)
-            videoRef.current.currentTime = Math.min(duration, videoRef.current.currentTime + 5);
+            videoRef.current.currentTime = Math.min(
+              duration,
+              videoRef.current.currentTime + 5
+            );
           break;
         case 'KeyF':
           if (!document.fullscreenElement) {

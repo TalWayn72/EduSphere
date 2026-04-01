@@ -185,8 +185,7 @@ describe('Cross-Tenant: webhooks', () => {
 
   it('webhook dispatch only sends events to matching tenant webhooks', () => {
     // Webhook dispatcher must filter by tenant_id when querying for matching webhooks
-    const dispatchQuery =
-      `SELECT * FROM webhooks WHERE tenant_id = $1 AND events @> ARRAY[$2] AND is_active = true`;
+    const dispatchQuery = `SELECT * FROM webhooks WHERE tenant_id = $1 AND events @> ARRAY[$2] AND is_active = true`;
     expect(dispatchQuery).toContain('tenant_id');
     expect(dispatchQuery).toContain('is_active');
   });
@@ -362,6 +361,8 @@ describe('SI-1: Correct RLS variable names across all org onboarding tables', ()
     const correctVariable = "current_setting('app.current_user_id', TRUE)";
     expect(correctVariable).toContain('app.current_user_id');
     // Negative check: must not use the buggy name without _id
-    expect(correctVariable).not.toMatch(/app\.current_user'|app\.current_user"/);
+    expect(correctVariable).not.toMatch(
+      /app\.current_user'|app\.current_user"/
+    );
   });
 });

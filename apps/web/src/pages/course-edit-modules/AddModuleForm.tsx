@@ -49,9 +49,7 @@ export function AddModuleForm({ onSubmit }: AddModuleFormProps) {
         <Input
           placeholder={t('moduleTitlePlaceholder')}
           value={form.title}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, title: e.target.value }))
-          }
+          onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSubmit();
             if (e.key === 'Escape') setShowForm(false);

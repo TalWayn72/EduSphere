@@ -15,11 +15,13 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-function renderLink(props: Partial<Parameters<typeof RequirementLink>[0]> = {}) {
+function renderLink(
+  props: Partial<Parameters<typeof RequirementLink>[0]> = {}
+) {
   return render(
     <MemoryRouter>
       <RequirementLink {...props} />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -27,7 +29,9 @@ describe('RequirementLink', () => {
   it('renders alert variant with warning text and link', () => {
     renderLink({ variant: 'alert' });
     expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
-    expect(screen.getByText(/AI features require your consent/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/AI features require your consent/)
+    ).toBeInTheDocument();
     expect(screen.getByText('Enable in Privacy Settings')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
@@ -41,13 +45,19 @@ describe('RequirementLink', () => {
   it('generates correct link href with highlight param', () => {
     renderLink({ highlight: 'ai-consent' });
     const link = screen.getByText('Enable in Privacy Settings');
-    expect(link.closest('a')).toHaveAttribute('href', '/settings?highlight=ai-consent');
+    expect(link.closest('a')).toHaveAttribute(
+      'href',
+      '/settings?highlight=ai-consent'
+    );
   });
 
   it('uses custom target path', () => {
     renderLink({ to: '/profile', highlight: 'email-verify' });
     const link = screen.getByText('Enable in Privacy Settings');
-    expect(link.closest('a')).toHaveAttribute('href', '/profile?highlight=email-verify');
+    expect(link.closest('a')).toHaveAttribute(
+      'href',
+      '/profile?highlight=email-verify'
+    );
   });
 
   it('defaults to alert variant', () => {

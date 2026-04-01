@@ -6,23 +6,70 @@
 
 // Semantic tokens that already adapt to dark mode — no dark: variant needed.
 const SEMANTIC_TOKENS = new Set([
-  'background', 'foreground', 'card', 'card-foreground',
-  'popover', 'popover-foreground', 'primary', 'primary-foreground',
-  'secondary', 'secondary-foreground', 'muted', 'muted-foreground',
-  'accent', 'accent-foreground', 'destructive', 'destructive-foreground',
-  'border', 'input', 'ring', 'sidebar', 'sidebar-foreground',
-  'sidebar-border', 'sidebar-ring', 'sidebar-accent',
-  'sidebar-accent-foreground', 'sidebar-primary', 'sidebar-primary-foreground',
-  'chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5',
+  'background',
+  'foreground',
+  'card',
+  'card-foreground',
+  'popover',
+  'popover-foreground',
+  'primary',
+  'primary-foreground',
+  'secondary',
+  'secondary-foreground',
+  'muted',
+  'muted-foreground',
+  'accent',
+  'accent-foreground',
+  'destructive',
+  'destructive-foreground',
+  'border',
+  'input',
+  'ring',
+  'sidebar',
+  'sidebar-foreground',
+  'sidebar-border',
+  'sidebar-ring',
+  'sidebar-accent',
+  'sidebar-accent-foreground',
+  'sidebar-primary',
+  'sidebar-primary-foreground',
+  'chart-1',
+  'chart-2',
+  'chart-3',
+  'chart-4',
+  'chart-5',
 ]);
 
 // Prefixes that need a dark: counterpart when paired with raw color scales.
 const COLOR_PREFIXES = ['bg', 'text', 'border'];
 
 // Raw color families that are NOT semantic tokens.
-const RAW_FAMILIES = ['white', 'black', 'gray', 'slate', 'zinc', 'neutral', 'stone',
-  'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal',
-  'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
+const RAW_FAMILIES = [
+  'white',
+  'black',
+  'gray',
+  'slate',
+  'zinc',
+  'neutral',
+  'stone',
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+];
 
 /**
  * Return true when `cls` is a raw color class like `bg-white`, `text-gray-700`.
@@ -58,7 +105,8 @@ module.exports = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Require a dark: counterpart for raw Tailwind color classes in className',
+      description:
+        'Require a dark: counterpart for raw Tailwind color classes in className',
       category: 'EduSphere Design System',
       recommended: true,
     },

@@ -38,7 +38,9 @@ function parseBlocks(raw: RawBlock[]): PortalBlock[] {
 export function PortalPage() {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data, fetching, error }] = useQuery({
     query: PUBLIC_PORTAL_QUERY,
     pause: !mounted,
@@ -52,9 +54,7 @@ export function PortalPage() {
   }, [fetching, error, data, navigate]);
 
   if (fetching) {
-    return (
-      <LoadingSpinner containerHeight="min-h-screen" />
-    );
+    return <LoadingSpinner containerHeight="min-h-screen" />;
   }
 
   if (error || !data?.publicPortal) {

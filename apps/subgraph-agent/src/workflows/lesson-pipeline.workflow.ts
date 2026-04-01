@@ -44,7 +44,9 @@ export interface LessonPipelineResult {
 export type CitationSearchFn = (
   query: string,
   limit: number
-) => Promise<{ id: string; text: string; similarity: number; source?: string }[]>;
+) => Promise<
+  { id: string; text: string; similarity: number; source?: string }[]
+>;
 
 interface PipelineContext {
   input: LessonPipelineInput;
@@ -62,7 +64,10 @@ interface PipelineContext {
 
 // ── Stage implementations ─────────────────────────────────────────────────────
 
-async function parsePrompt(ctx: PipelineContext, model: LanguageModel): Promise<PipelineContext> {
+async function parsePrompt(
+  ctx: PipelineContext,
+  model: LanguageModel
+): Promise<PipelineContext> {
   const { text } = await generateText({
     model,
     messages: [
@@ -99,11 +104,17 @@ async function fetchCitations(ctx: PipelineContext): Promise<PipelineContext> {
   return { ...ctx, citations: [], currentStage: 'generateOutline' };
 }
 
-async function generateOutline(ctx: PipelineContext, model: LanguageModel): Promise<PipelineContext> {
-  const citationBlock = ctx.citations.map(c => `- ${c.reference}: ${c.text}`).join('\n');
-  const archetypeInstructions = ctx.input.archetype === 'SEQUENTIAL'
-    ? 'Structure as a strict sequential progression through primary texts.'
-    : 'Structure as interconnected thematic clusters with cross-references.';
+async function generateOutline(
+  ctx: PipelineContext,
+  model: LanguageModel
+): Promise<PipelineContext> {
+  const citationBlock = ctx.citations
+    .map((c) => `- ${c.reference}: ${c.text}`)
+    .join('\n');
+  const archetypeInstructions =
+    ctx.input.archetype === 'SEQUENTIAL'
+      ? 'Structure as a strict sequential progression through primary texts.'
+      : 'Structure as interconnected thematic clusters with cross-references.';
 
   const { text } = await generateText({
     model,
@@ -120,28 +131,38 @@ async function generateOutline(ctx: PipelineContext, model: LanguageModel): Prom
 
 async function enrichWithGraph(ctx: PipelineContext): Promise<PipelineContext> {
   // Stub: in production, uses Apache AGE graph traversal to add concept links
-  const enriched = ctx.outline + '\n\n<!-- Knowledge Graph enrichment: concepts linked to EduSphere KG -->';
+  const enriched =
+    ctx.outline +
+    '\n\n<!-- Knowledge Graph enrichment: concepts linked to EduSphere KG -->';
   return { ...ctx, enrichedOutline: enriched, currentStage: 'verifyHebrew' };
 }
 
 async function verifyHebrew(ctx: PipelineContext): Promise<PipelineContext> {
   // Stub: in production, uses Hebrew NER on citations to extract entities
-  const entities: string[] = ctx.citations.map(c => c.reference);
+  const entities: string[] = ctx.citations.map((c) => c.reference);
   return { ...ctx, hebrewEntities: entities, currentStage: 'exportMarkdown' };
 }
 
-async function exportMarkdown(ctx: PipelineContext, model: LanguageModel): Promise<PipelineContext> {
+async function exportMarkdown(
+  ctx: PipelineContext,
+  model: LanguageModel
+): Promise<PipelineContext> {
   const { text } = await generateText({
     model,
     messages: [
       {
         role: 'user',
-        content: `Convert this lesson outline into a complete, ready-to-teach lesson in Markdown format.\n\nLanguage: ${ctx.input.language ?? 'he'}\nOutline:\n${ctx.enrichedOutline}\n\nCitations:\n${ctx.citations.map(c => `- **${c.reference}**: ${c.text}`).join('\n')}\n\nInclude: introduction, main sections, key concepts, discussion questions, and conclusion.`,
+        content: `Convert this lesson outline into a complete, ready-to-teach lesson in Markdown format.\n\nLanguage: ${ctx.input.language ?? 'he'}\nOutline:\n${ctx.enrichedOutline}\n\nCitations:\n${ctx.citations.map((c) => `- **${c.reference}**: ${c.text}`).join('\n')}\n\nInclude: introduction, main sections, key concepts, discussion questions, and conclusion.`,
       },
     ],
     maxOutputTokens: 2000,
   });
-  return { ...ctx, markdownContent: text.trim(), status: 'COMPLETE', currentStage: 'done' };
+  return {
+    ...ctx,
+    markdownContent: text.trim(),
+    status: 'COMPLETE',
+    currentStage: 'done',
+  };
 }
 
 // ── Main pipeline runner ──────────────────────────────────────────────────────
@@ -188,7 +209,7 @@ export async function runLessonPipeline(
     executionId,
     status: 'COMPLETE',
     markdownContent: ctx.markdownContent,
-    citations: ctx.citations.map(c => `${c.reference}: ${c.text}`),
+    citations: ctx.citations.map((c) => `${c.reference}: ${c.text}`),
     hebrewNerEntities: ctx.hebrewEntities,
     stage: 'done',
   };

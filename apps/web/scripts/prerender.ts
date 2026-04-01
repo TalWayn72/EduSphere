@@ -52,9 +52,14 @@ async function prerender(): Promise<void> {
     try {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
       // Wait for main content to be rendered
-      await page.waitForSelector('main, [role="main"], #root > *', { timeout: 10_000 });
+      await page.waitForSelector('main, [role="main"], #root > *', {
+        timeout: 10_000,
+      });
       const html = await page.content();
-      const fileName = route === '/' ? 'index.html' : `${route.slice(1).replace(/\//g, '-')}.html`;
+      const fileName =
+        route === '/'
+          ? 'index.html'
+          : `${route.slice(1).replace(/\//g, '-')}.html`;
       writeFileSync(join(PRERENDER_DIR, fileName), html, 'utf-8');
       console.log(`[prerender] ✅ ${route} → prerender/${fileName}`);
       results.push({ route, ok: true });
@@ -66,13 +71,17 @@ async function prerender(): Promise<void> {
 
   await browser.close();
 
-  const failed = results.filter(r => !r.ok);
+  const failed = results.filter((r) => !r.ok);
   if (failed.length > 0) {
-    console.error(`[prerender] ${failed.length} routes failed: ${failed.map(r => r.route).join(', ')}`);
+    console.error(
+      `[prerender] ${failed.length} routes failed: ${failed.map((r) => r.route).join(', ')}`
+    );
     process.exit(1);
   }
 
-  console.log(`[prerender] Done — ${results.length} routes pre-rendered to dist/prerender/`);
+  console.log(
+    `[prerender] Done — ${results.length} routes pre-rendered to dist/prerender/`
+  );
 }
 
 prerender().catch((err: unknown) => {

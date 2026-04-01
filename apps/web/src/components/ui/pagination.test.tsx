@@ -2,15 +2,17 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_, name) => {
+        if (name === '__esModule') return true;
+        return function MockIcon(props: Record<string, unknown>) {
+          return <span data-testid={`icon-${String(name)}`} {...props} />;
+        };
+      },
+    })
 );
 
 import { Pagination } from './pagination';

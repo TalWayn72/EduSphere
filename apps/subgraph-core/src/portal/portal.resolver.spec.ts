@@ -24,23 +24,23 @@ import type { GraphQLContext } from '../auth/auth.middleware.js';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Build context with authContext (JWT-extracted tenant/user). */
-function makeAuthCtx(
-  tenantId?: string,
-  userId?: string
-): GraphQLContext {
+function makeAuthCtx(tenantId?: string, userId?: string): GraphQLContext {
   return {
     req: { headers: {} },
     authContext: tenantId
-      ? { tenantId, userId: userId ?? 'user-from-jwt', email: 'a@b.com', roles: ['ORG_ADMIN'], scopes: [] }
+      ? {
+          tenantId,
+          userId: userId ?? 'user-from-jwt',
+          email: 'a@b.com',
+          roles: ['ORG_ADMIN'],
+          scopes: [],
+        }
       : undefined,
   } as unknown as GraphQLContext;
 }
 
 /** Build context with x-tenant-id header only (gateway fallback, no JWT). */
-function makeHeaderCtx(
-  tenantId?: string,
-  userId?: string
-): GraphQLContext {
+function makeHeaderCtx(tenantId?: string, userId?: string): GraphQLContext {
   return {
     req: {
       headers: {
@@ -58,7 +58,13 @@ function makeDualCtx(
 ): GraphQLContext {
   return {
     req: { headers: { 'x-tenant-id': headerTenantId } },
-    authContext: { tenantId: authTenantId, userId: 'jwt-user', email: 'a@b.com', roles: ['ORG_ADMIN'], scopes: [] },
+    authContext: {
+      tenantId: authTenantId,
+      userId: 'jwt-user',
+      email: 'a@b.com',
+      roles: ['ORG_ADMIN'],
+      scopes: [],
+    },
   } as unknown as GraphQLContext;
 }
 
@@ -161,7 +167,12 @@ describe('PortalResolver', () => {
     it('returns null when authContext exists but tenantId is undefined', async () => {
       const ctx = {
         req: { headers: {} },
-        authContext: { userId: 'u1', email: 'a@b.com', roles: ['STUDENT'], scopes: [] },
+        authContext: {
+          userId: 'u1',
+          email: 'a@b.com',
+          roles: ['STUDENT'],
+          scopes: [],
+        },
       } as unknown as GraphQLContext;
       const result = await resolver.myPortal(ctx);
       expect(result).toBeNull();
@@ -178,20 +189,28 @@ describe('PortalResolver', () => {
     });
 
     it('publicPortal ignores ctx.req.user.tenant_id', async () => {
-      const result = await resolver.publicPortal(makeOldPatternCtx('old-tenant'));
+      const result = await resolver.publicPortal(
+        makeOldPatternCtx('old-tenant')
+      );
       expect(result).toBeNull();
       expect(portalService.getPublishedPortalPage).not.toHaveBeenCalled();
     });
 
     it('publishPortal returns false with old pattern context', async () => {
-      const result = await resolver.publishPortal(makeOldPatternCtx('old-tenant'));
+      const result = await resolver.publishPortal(
+        makeOldPatternCtx('old-tenant')
+      );
       expect(result).toBe(false);
       expect(portalService.publishPortal).not.toHaveBeenCalled();
     });
 
     it('savePortalLayout throws with old pattern context', async () => {
       await expect(
-        resolver.savePortalLayout('Title', '[]', makeOldPatternCtx('old-tenant'))
+        resolver.savePortalLayout(
+          'Title',
+          '[]',
+          makeOldPatternCtx('old-tenant')
+        )
       ).rejects.toThrow('Missing tenant context');
     });
   });

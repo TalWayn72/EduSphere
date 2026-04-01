@@ -5,7 +5,10 @@ import type { LiveSessionsService } from './live-sessions.service';
 
 // ── Mock service factory ────────────────────────────────────────────────────
 
-function createMockService(): Record<keyof LiveSessionsService, ReturnType<typeof vi.fn>> {
+function createMockService(): Record<
+  keyof LiveSessionsService,
+  ReturnType<typeof vi.fn>
+> {
   return {
     startLiveSession: vi.fn(),
     endLiveSession: vi.fn(),
@@ -48,10 +51,17 @@ describe('LiveSessionsResolver', () => {
 
   describe('startLiveSession', () => {
     it('delegates to service with correct args', async () => {
-      const expected = { sessionId: 'ses-1', status: 'LIVE', startedAt: new Date() };
+      const expected = {
+        sessionId: 'ses-1',
+        status: 'LIVE',
+        startedAt: new Date(),
+      };
       mockService.startLiveSession.mockResolvedValue(expected);
 
-      const result = await resolver.startLiveSession('ses-1', makeAuthContext());
+      const result = await resolver.startLiveSession(
+        'ses-1',
+        makeAuthContext()
+      );
 
       expect(mockService.startLiveSession).toHaveBeenCalledWith(
         'ses-1',
@@ -85,10 +95,7 @@ describe('LiveSessionsResolver', () => {
 
     it('defaults to STUDENT when roles array is empty', async () => {
       mockService.startLiveSession.mockResolvedValue({});
-      await resolver.startLiveSession(
-        'ses-1',
-        makeAuthContext({ roles: [] })
-      );
+      await resolver.startLiveSession('ses-1', makeAuthContext({ roles: [] }));
 
       expect(mockService.startLiveSession).toHaveBeenCalledWith(
         'ses-1',
@@ -117,9 +124,9 @@ describe('LiveSessionsResolver', () => {
     });
 
     it('throws UnauthorizedException without auth', async () => {
-      await expect(
-        resolver.endLiveSession('ses-1', {})
-      ).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(resolver.endLiveSession('ses-1', {})).rejects.toBeInstanceOf(
+        UnauthorizedException
+      );
     });
   });
 

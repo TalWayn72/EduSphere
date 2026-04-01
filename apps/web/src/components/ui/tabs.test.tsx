@@ -67,7 +67,9 @@ describe('TabsTrigger', () => {
     render(
       <Tabs defaultValue="a">
         <TabsList>
-          <TabsTrigger value="a" className="px-6">A</TabsTrigger>
+          <TabsTrigger value="a" className="px-6">
+            A
+          </TabsTrigger>
         </TabsList>
       </Tabs>
     );
@@ -83,8 +85,12 @@ describe('TabsContent', () => {
   it('forwards className', () => {
     render(
       <Tabs defaultValue="a">
-        <TabsList><TabsTrigger value="a">A</TabsTrigger></TabsList>
-        <TabsContent value="a" className="p-4" data-testid="content">Body</TabsContent>
+        <TabsList>
+          <TabsTrigger value="a">A</TabsTrigger>
+        </TabsList>
+        <TabsContent value="a" className="p-4" data-testid="content">
+          Body
+        </TabsContent>
       </Tabs>
     );
     expect(screen.getByTestId('content')).toHaveClass('p-4');

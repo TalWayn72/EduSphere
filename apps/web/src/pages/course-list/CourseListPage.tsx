@@ -46,17 +46,13 @@ export function CourseList() {
       <div className="space-y-6">
         {error && (
           <OfflineBanner
-            onRetry={() =>
-              reexecuteCourses({ requestPolicy: 'network-only' })
-            }
+            onRetry={() => reexecuteCourses({ requestPolicy: 'network-only' })}
           />
         )}
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t('title')}
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
             <p className="text-muted-foreground">{t('exploreCollection')}</p>
           </div>
           {isInstructor && (

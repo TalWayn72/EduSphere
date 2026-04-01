@@ -48,7 +48,9 @@ async function setDevAuth(page: Page): Promise<void> {
  * with setDevAuth this gives us an authenticated page with no data.
  */
 async function blockAllGraphQL(page: Page): Promise<void> {
-  await page.route('**/graphql', (route) => route.abort('internetdisconnected'));
+  await page.route('**/graphql', (route) =>
+    route.abort('internetdisconnected')
+  );
 }
 
 /**
@@ -83,18 +85,23 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('BUG-039 Regression — Network Error Banner on CourseList', () => {
-
   // ── Core regression: banner appears on network failure ────────────────────
 
-  test('shows offline banner when GraphQL gateway is unreachable', async ({ page }) => {
+  test('shows offline banner when GraphQL gateway is unreachable', async ({
+    page,
+  }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('offline banner has role="alert" for accessibility', async ({ page }) => {
+  test('offline banner has role="alert" for accessibility', async ({
+    page,
+  }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
@@ -109,18 +116,24 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByTestId('offline-banner-retry')).toBeVisible();
   });
 
   // ── BUG-039 core guard: no raw technical strings visible ──────────────────
 
-  test('[BUG-039] no raw "[Network]" string shown to user when offline', async ({ page }) => {
+  test('[BUG-039] no raw "[Network]" string shown to user when offline', async ({
+    page,
+  }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
     // Wait for the banner to appear to confirm error state was reached
-    await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner"]', {
+      timeout: 10_000,
+    });
 
     const pageText = await page.textContent('body');
     expect(pageText).not.toContain('[Network]');
@@ -128,11 +141,15 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     expect(pageText).not.toContain('Network request failed');
   });
 
-  test('[BUG-039] no raw GraphQL error strings shown when offline', async ({ page }) => {
+  test('[BUG-039] no raw GraphQL error strings shown when offline', async ({
+    page,
+  }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner"]', {
+      timeout: 10_000,
+    });
 
     const pageText = await page.textContent('body');
     expect(pageText).not.toContain('[GraphQL]');
@@ -141,27 +158,37 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     expect(pageText).not.toContain('urql');
   });
 
-  test('[BUG-039] page shows mock fallback courses when offline (not blank)', async ({ page }) => {
+  test('[BUG-039] page shows mock fallback courses when offline (not blank)', async ({
+    page,
+  }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner"]', {
+      timeout: 10_000,
+    });
 
     // CourseList renders MOCK_COURSES_FALLBACK when GraphQL errors — page must
     // not be blank; at least the Courses heading or a course card should exist.
     const body = await page.textContent('body');
     const hasCourseContent =
-      /Courses|Introduction to Talmud|Chavruta|Knowledge Graph|Rambam/i.test(body ?? '');
+      /Courses|Introduction to Talmud|Chavruta|Knowledge Graph|Rambam/i.test(
+        body ?? ''
+      );
     expect(hasCourseContent).toBe(true);
   });
 
   // ── Retry button behaviour ────────────────────────────────────────────────
 
-  test('retry button is clickable and does not crash the page', async ({ page }) => {
+  test('retry button is clickable and does not crash the page', async ({
+    page,
+  }) => {
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="offline-banner-retry"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner-retry"]', {
+      timeout: 10_000,
+    });
 
     // Click retry — it calls reexecuteCourses({ requestPolicy: 'network-only' }).
     // With the gateway still blocked the banner should remain (not crash).
@@ -175,12 +202,16 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     expect(body).not.toContain('ChunkLoadError');
   });
 
-  test('offline banner disappears when network is restored via retry', async ({ page }) => {
+  test('offline banner disappears when network is restored via retry', async ({
+    page,
+  }) => {
     // Phase 1: block GraphQL — banner appears
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner"]', {
+      timeout: 10_000,
+    });
 
     // Phase 2: unblock GraphQL by routing to empty array response
     await page.unroute('**/graphql');
@@ -199,13 +230,17 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     expect(bodyText).not.toContain('Failed to fetch');
     // Log for CI diagnostic
     if (bannerVisible) {
-      console.warn('[network-error-banner] Banner still visible after retry — network may still be blocked in test env');
+      console.warn(
+        '[network-error-banner] Banner still visible after retry — network may still be blocked in test env'
+      );
     }
   });
 
   // ── Console errors guard ──────────────────────────────────────────────────
 
-  test('no unhandled JS errors logged when gateway is offline', async ({ page }) => {
+  test('no unhandled JS errors logged when gateway is offline', async ({
+    page,
+  }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -224,11 +259,14 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner"]', {
+      timeout: 10_000,
+    });
 
     // The [Search] course search error log is acceptable — filter it out
     const unexpectedErrors = consoleErrors.filter(
-      (e) => !e.includes('[Search] Course search failed') && !e.includes('net::ERR')
+      (e) =>
+        !e.includes('[Search] Course search failed') && !e.includes('net::ERR')
     );
     expect(unexpectedErrors).toHaveLength(0);
   });
@@ -237,12 +275,16 @@ test.describe('BUG-039 Regression — Network Error Banner on CourseList', () =>
 // ─── Visual regression ────────────────────────────────────────────────────────
 
 test.describe('BUG-039 — Visual regression screenshots', () => {
-  test('offline banner screenshot — clean UI with no raw error strings', async ({ page }) => {
+  test('offline banner screenshot — clean UI with no raw error strings', async ({
+    page,
+  }) => {
     await setDevAuth(page);
     await blockAllGraphQL(page);
     await page.goto(`${BASE_URL}/courses`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('[data-testid="offline-banner"]', { timeout: 10_000 });
+    await page.waitForSelector('[data-testid="offline-banner"]', {
+      timeout: 10_000,
+    });
 
     await expect(page).toHaveScreenshot('bug039-offline-banner.png', {
       maxDiffPixels: 400,

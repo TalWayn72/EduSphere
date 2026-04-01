@@ -9,7 +9,13 @@ import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import {
   SCIM_TOKENS_QUERY,
@@ -20,7 +26,11 @@ import {
 import { Shield, Copy } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
-import { ADMIN_ROLES, type ScimToken, type ScimSyncEntry } from './scim-settings.types';
+import {
+  ADMIN_ROLES,
+  type ScimToken,
+  type ScimSyncEntry,
+} from './scim-settings.types';
 import { ScimTokenList } from './ScimTokenList';
 import { ScimSyncLog } from './ScimSyncLog';
 import { GenerateTokenDialog } from './GenerateTokenDialog';
@@ -36,7 +46,9 @@ export function ScimSettingsPage() {
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [tokensResult, refetchTokens] = useQuery<{ scimTokens: ScimToken[] }>({
     query: SCIM_TOKENS_QUERY,
     pause: !mounted,
@@ -50,10 +62,15 @@ export function ScimSettingsPage() {
   const [, revokeToken] = useMutation(REVOKE_SCIM_TOKEN_MUTATION);
 
   useEffect(() => {
-    return () => { if (copyTimerRef.current) clearTimeout(copyTimerRef.current); };
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
   }, []);
 
-  if (!role || !ADMIN_ROLES.has(role)) { navigate('/dashboard'); return null; }
+  if (!role || !ADMIN_ROLES.has(role)) {
+    navigate('/dashboard');
+    return null;
+  }
 
   const scimBaseUrl = window.location.origin + '/scim/v2';
 
@@ -61,13 +78,18 @@ export function ScimSettingsPage() {
     await navigator.clipboard.writeText(scimBaseUrl);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
+    copyTimerRef.current = setTimeout(
+      () => setCopied(false),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
   const handleGenerateToken = async () => {
     if (!description.trim()) return;
     const days = expiresInDays ? parseInt(expiresInDays, 10) : undefined;
-    const result = await generateToken({ input: { description: description.trim(), expiresInDays: days } });
+    const result = await generateToken({
+      input: { description: description.trim(), expiresInDays: days },
+    });
     if (result.data?.generateScimToken?.rawToken) {
       setGeneratedToken(result.data.generateScimToken.rawToken);
       void refetchTokens({ requestPolicy: 'network-only' });
@@ -85,23 +107,33 @@ export function ScimSettingsPage() {
   return (
     <Layout>
       <PageShell size="md">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'SCIM' }]} />
+        <Breadcrumbs
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'SCIM' }]}
+        />
         <div className="flex items-center gap-3">
           <Shield className="h-6 w-6 text-primary" />
           <div>
             <h1 className="text-2xl font-bold">SCIM / HRIS Integration</h1>
-            <p className="text-muted-foreground text-sm">Manage SCIM 2.0 provisioning for Workday, BambooHR, ADP</p>
+            <p className="text-muted-foreground text-sm">
+              Manage SCIM 2.0 provisioning for Workday, BambooHR, ADP
+            </p>
           </div>
         </div>
         <Card>
           <CardHeader>
             <CardTitle>SCIM Endpoint</CardTitle>
-            <CardDescription>Use this URL in your HRIS system to provision users automatically</CardDescription>
+            <CardDescription>
+              Use this URL in your HRIS system to provision users automatically
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 p-3 bg-muted rounded-md font-mono text-sm">
               <span className="flex-1 truncate">{scimBaseUrl}</span>
-              <Button variant="ghost" size="sm" onClick={() => void handleCopyEndpoint()}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleCopyEndpoint()}
+              >
                 <Copy className="h-4 w-4" />
                 <span className="ml-1">{copied ? 'Copied!' : 'Copy'}</span>
               </Button>
@@ -111,7 +143,10 @@ export function ScimSettingsPage() {
         <ScimTokenList
           tokens={tokens}
           fetching={tokensResult.fetching}
-          onGenerateClick={() => { setShowModal(true); setGeneratedToken(null); }}
+          onGenerateClick={() => {
+            setShowModal(true);
+            setGeneratedToken(null);
+          }}
           onRevoke={(id) => void handleRevoke(id)}
         />
         <ScimSyncLog entries={logEntries} />
@@ -125,7 +160,12 @@ export function ScimSettingsPage() {
         onExpiresInDaysChange={setExpiresInDays}
         generatedToken={generatedToken}
         onGenerate={handleGenerateToken}
-        onDone={() => { setShowModal(false); setDescription(''); setExpiresInDays(''); setGeneratedToken(null); }}
+        onDone={() => {
+          setShowModal(false);
+          setDescription('');
+          setExpiresInDays('');
+          setGeneratedToken(null);
+        }}
       />
     </Layout>
   );

@@ -35,9 +35,7 @@ function createMockLogger(): Logger {
   } as unknown as Logger;
 }
 
-function createMockDeps(
-  overrides: Partial<ShutdownDeps> = {}
-): ShutdownDeps {
+function createMockDeps(overrides: Partial<ShutdownDeps> = {}): ShutdownDeps {
   return {
     server: createMockServer([0]),
     stopRateLimitCleanup: vi.fn(),
@@ -79,8 +77,8 @@ describe('waitForConnectionDrain', () => {
   it('returns false when timeout expires with remaining connections', async () => {
     // Always returns 5 connections — will never drain
     const server = {
-      getConnections: vi.fn(
-        (cb: (err: Error | null, count: number) => void) => cb(null, 5)
+      getConnections: vi.fn((cb: (err: Error | null, count: number) => void) =>
+        cb(null, 5)
       ),
     } as unknown as Server;
     const logger = createMockLogger();
@@ -95,16 +93,15 @@ describe('waitForConnectionDrain', () => {
 
   it('rejects when getConnections returns an error', async () => {
     const server = {
-      getConnections: vi.fn(
-        (cb: (err: Error | null, count: number) => void) =>
-          cb(new Error('socket error'), 0)
+      getConnections: vi.fn((cb: (err: Error | null, count: number) => void) =>
+        cb(new Error('socket error'), 0)
       ),
     } as unknown as Server;
     const logger = createMockLogger();
 
-    await expect(
-      waitForConnectionDrain(server, 5000, logger)
-    ).rejects.toThrow('socket error');
+    await expect(waitForConnectionDrain(server, 5000, logger)).rejects.toThrow(
+      'socket error'
+    );
   });
 });
 

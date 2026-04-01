@@ -3,7 +3,10 @@ interface SkillOverlapBarProps {
   maxVisible?: number;
 }
 
-export function SkillOverlapBar({ skills, maxVisible = 5 }: SkillOverlapBarProps) {
+export function SkillOverlapBar({
+  skills,
+  maxVisible = 5,
+}: SkillOverlapBarProps) {
   if (skills.length === 0) {
     return <p className="text-xs text-muted-foreground">No skills listed</p>;
   }

@@ -54,7 +54,9 @@ test.describe('Authenticated Layout Footer — presence on auth pages', () => {
 // ─── Suite 2: AuthFooter content ────────────────────────────────────────────
 
 test.describe('Authenticated Layout Footer — content verification', () => {
-  test('Dashboard AuthFooter shows current year copyright', async ({ page }) => {
+  test('Dashboard AuthFooter shows current year copyright', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('domcontentloaded');
 
@@ -124,9 +126,13 @@ test.describe('Authenticated Layout Footer — absent on public pages', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Landing page uses LandingFooter, not AuthFooter
-    await expect(page.getByTestId('auth-footer')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByTestId('auth-footer')).not.toBeVisible({
+      timeout: 3_000,
+    });
     // But it should have the landing footer
-    await expect(page.getByTestId('landing-footer')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('landing-footer')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('Login page does not have AuthFooter', async ({ page }) => {
@@ -135,7 +141,9 @@ test.describe('Authenticated Layout Footer — absent on public pages', () => {
     const freshPage = await page.context().newPage();
     await freshPage.goto('/login', { waitUntil: 'domcontentloaded' });
 
-    await expect(freshPage.getByTestId('auth-footer')).not.toBeVisible({ timeout: 3_000 });
+    await expect(freshPage.getByTestId('auth-footer')).not.toBeVisible({
+      timeout: 3_000,
+    });
     await freshPage.close();
   });
 });

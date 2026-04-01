@@ -35,15 +35,23 @@ export function ApiKeysPage() {
   const { t } = useTranslation('orgApi');
   const [mounted, setMounted] = useState(false);
   const [newToken, setNewToken] = useState<string | null>(null);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }, reexecute] = useQuery<{ apiKeys: ApiKey[] }>({
-    query: API_KEYS_QUERY, pause: !mounted,
+    query: API_KEYS_QUERY,
+    pause: !mounted,
   });
   const [, createKey] = useMutation(CREATE_KEY_MUTATION);
   const [, revokeKey] = useMutation(REVOKE_KEY_MUTATION);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(createSchema),
   });
 
@@ -63,17 +71,28 @@ export function ApiKeysPage() {
   };
 
   return (
-    <AdminLayout title={t('apiKeys.title')} description={t('apiKeys.description')}>
+    <AdminLayout
+      title={t('apiKeys.title')}
+      description={t('apiKeys.description')}
+    >
       <h1 className="sr-only">API Keys</h1>
       <div data-testid="api-keys-page" className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('apiKeys.createTitle')}</CardTitle>
+            <CardTitle className="text-base">
+              {t('apiKeys.createTitle')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onCreate)} className="flex gap-3 items-end" noValidate>
+            <form
+              onSubmit={handleSubmit(onCreate)}
+              className="flex gap-3 items-end"
+              noValidate
+            >
               <div className="flex-1 space-y-1">
-                <Label htmlFor="key-desc">{t('apiKeys.descriptionLabel')}</Label>
+                <Label htmlFor="key-desc">
+                  {t('apiKeys.descriptionLabel')}
+                </Label>
                 <Input
                   id="key-desc"
                   {...register('description')}
@@ -94,17 +113,33 @@ export function ApiKeysPage() {
         {newToken && (
           <Card className="border-green-500 dark:border-green-400">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-green-700 mb-1 dark:text-green-300">{t('apiKeys.tokenCreated')}</p>
-              <code className="block p-2 bg-muted rounded text-xs break-all font-mono">{newToken}</code>
-              <p className="text-xs text-muted-foreground mt-2">{t('apiKeys.tokenWarning')}</p>
-              <Button variant="ghost" size="sm" className="mt-2" onClick={() => setNewToken(null)}>
+              <p className="text-sm font-medium text-green-700 mb-1 dark:text-green-300">
+                {t('apiKeys.tokenCreated')}
+              </p>
+              <code className="block p-2 bg-muted rounded text-xs break-all font-mono">
+                {newToken}
+              </code>
+              <p className="text-xs text-muted-foreground mt-2">
+                {t('apiKeys.tokenWarning')}
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-2"
+                onClick={() => setNewToken(null)}
+              >
                 {t('apiKeys.dismiss')}
               </Button>
             </CardContent>
           </Card>
         )}
 
-        <ApiKeysTable keys={data?.apiKeys ?? []} fetching={fetching} onRevoke={onRevoke} t={t} />
+        <ApiKeysTable
+          keys={data?.apiKeys ?? []}
+          fetching={fetching}
+          onRevoke={onRevoke}
+          t={t}
+        />
       </div>
     </AdminLayout>
   );

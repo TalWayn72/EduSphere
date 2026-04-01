@@ -28,7 +28,9 @@ describe('Input', () => {
   it('handles value changes', () => {
     const handler = vi.fn();
     render(<Input onChange={handler} data-testid="input" />);
-    fireEvent.change(screen.getByTestId('input'), { target: { value: 'hello' } });
+    fireEvent.change(screen.getByTestId('input'), {
+      target: { value: 'hello' },
+    });
     expect(handler).toHaveBeenCalledTimes(1);
   });
 

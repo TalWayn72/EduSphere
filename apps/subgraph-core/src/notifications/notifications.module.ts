@@ -56,7 +56,11 @@ import { WhatsAppMetaProvider } from './channels/whatsapp-meta.provider';
         pushDispatch: PushDispatchService,
         dispatcher: NotificationDispatcherService
       ) => new NatsNotificationBridge(pubSub, pushDispatch, dispatcher),
-      inject: [NOTIFICATION_PUB_SUB, PushDispatchService, NotificationDispatcherService],
+      inject: [
+        NOTIFICATION_PUB_SUB,
+        PushDispatchService,
+        NotificationDispatcherService,
+      ],
     },
     NotificationsResolver,
     // Phase 65 providers

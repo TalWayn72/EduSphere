@@ -9,12 +9,9 @@ vi.mock('urql', () => ({
     strings.reduce(
       (acc: string, str: string, i: number) =>
         acc + str + String(values[i] ?? ''),
-      '',
+      ''
     ),
-  useMutation: vi.fn(() => [
-    { fetching: false, error: undefined },
-    vi.fn(),
-  ]),
+  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
   useQuery: vi.fn(() => [
     { data: undefined, fetching: false, error: undefined },
   ]),

@@ -37,41 +37,41 @@ export function QuizContentPage() {
         />
 
         <div className="space-y-4">
-        {fetching && (
-          <Card>
-            <CardContent className="p-6">
-              <SkeletonBlock />
-            </CardContent>
-          </Card>
-        )}
+          {fetching && (
+            <Card>
+              <CardContent className="p-6">
+                <SkeletonBlock />
+              </CardContent>
+            </Card>
+          )}
 
-        {!fetching && error && (
-          <Card>
-            <CardContent className="p-6 text-center text-sm text-red-600 dark:text-red-400">
-              Failed to load quiz: {error}
-            </CardContent>
-          </Card>
-        )}
+          {!fetching && error && (
+            <Card>
+              <CardContent className="p-6 text-center text-sm text-red-600 dark:text-red-400">
+                Failed to load quiz: {error}
+              </CardContent>
+            </Card>
+          )}
 
-        {!fetching && !error && !isQuiz && (
-          <Card>
-            <CardContent className="p-6 text-center text-sm text-muted-foreground">
-              This content item is not a quiz.
-            </CardContent>
-          </Card>
-        )}
+          {!fetching && !error && !isQuiz && (
+            <Card>
+              <CardContent className="p-6 text-center text-sm text-muted-foreground">
+                This content item is not a quiz.
+              </CardContent>
+            </Card>
+          )}
 
-        {!fetching && !error && isQuiz && quizContent && (
-          <QuizPlayer quizContent={quizContent} contentItemId={contentId} />
-        )}
+          {!fetching && !error && isQuiz && quizContent && (
+            <QuizPlayer quizContent={quizContent} contentItemId={contentId} />
+          )}
 
-        {!fetching && !error && isQuiz && !quizContent && (
-          <Card>
-            <CardContent className="p-6 text-center text-sm text-muted-foreground">
-              Quiz data is missing or invalid.
-            </CardContent>
-          </Card>
-        )}
+          {!fetching && !error && isQuiz && !quizContent && (
+            <Card>
+              <CardContent className="p-6 text-center text-sm text-muted-foreground">
+                Quiz data is missing or invalid.
+              </CardContent>
+            </Card>
+          )}
         </div>
       </PageShell>
     </Layout>

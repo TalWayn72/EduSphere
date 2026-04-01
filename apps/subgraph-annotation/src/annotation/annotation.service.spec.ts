@@ -564,13 +564,15 @@ describe('AnnotationService', () => {
     });
 
     it('create() with INLINE_COMMENT and textRange passes text_start/text_end to insert', async () => {
-      mockReturning.mockResolvedValue([{
-        ...MOCK_ANNOTATION,
-        annotation_type: 'INLINE_COMMENT',
-        text_start: 10,
-        text_end: 40,
-        range_type: 'character',
-      }]);
+      mockReturning.mockResolvedValue([
+        {
+          ...MOCK_ANNOTATION,
+          annotation_type: 'INLINE_COMMENT',
+          text_start: 10,
+          text_end: 40,
+          range_type: 'character',
+        },
+      ]);
       const result = await service.create(
         {
           assetId: 'asset-1',
@@ -593,13 +595,15 @@ describe('AnnotationService', () => {
     });
 
     it('create() with SUGGESTION and no textRange sets text_start/text_end to null', async () => {
-      mockReturning.mockResolvedValue([{
-        ...MOCK_ANNOTATION,
-        annotation_type: 'SUGGESTION',
-        text_start: null,
-        text_end: null,
-        range_type: null,
-      }]);
+      mockReturning.mockResolvedValue([
+        {
+          ...MOCK_ANNOTATION,
+          annotation_type: 'SUGGESTION',
+          text_start: null,
+          text_end: null,
+          range_type: null,
+        },
+      ]);
       await service.create(
         {
           assetId: 'asset-1',

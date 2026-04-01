@@ -32,11 +32,11 @@ async function elementOrPage(
   page: Page,
   selectors: string[],
   name: string,
-  opts: Record<string, unknown> = { animations: 'disabled' as const },
+  opts: Record<string, unknown> = { animations: 'disabled' as const }
 ) {
   const locator = selectors.reduce(
     (loc, sel, i) => (i === 0 ? page.locator(sel) : loc.or(page.locator(sel))),
-    page.locator(selectors[0]),
+    page.locator(selectors[0])
   );
   const el = locator.first();
   if (await el.isVisible({ timeout: 3_000 }).catch(() => false)) {
@@ -60,22 +60,38 @@ test.describe('Visual Regression — Exam List @visual-exams', () => {
 
   test('exam list — header section', async ({ page }) => {
     await goTo(page, '/exams');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-list-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'exams-list-header.png'
+    );
   });
 
   test('exam list — main content', async ({ page }) => {
     await goTo(page, '/exams');
-    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'exams-list-main.png');
+    await elementOrPage(
+      page,
+      ['main', '[role="main"]', '[data-testid="main-content"]'],
+      'exams-list-main.png'
+    );
   });
 
   test('exam list — exam cards grid', async ({ page }) => {
     await goTo(page, '/exams');
-    await elementOrPage(page, ['[data-testid="exam-grid"]', '.grid', '[role="list"]'], 'exams-list-grid.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="exam-grid"]', '.grid', '[role="list"]'],
+      'exams-list-grid.png'
+    );
   });
 
   test('exam list — filter controls', async ({ page }) => {
     await goTo(page, '/exams');
-    await elementOrPage(page, ['[data-testid="filters"]', '[role="search"]', '.filters'], 'exams-list-filters.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="filters"]', '[role="search"]', '.filters'],
+      'exams-list-filters.png'
+    );
   });
 });
 
@@ -93,17 +109,29 @@ test.describe('Visual Regression — Item Bank @visual-exams', () => {
 
   test('item bank — header section', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-itembank-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'exams-itembank-header.png'
+    );
   });
 
   test('item bank — question list', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    await elementOrPage(page, ['[data-testid="item-list"]', 'table', '[role="table"]', 'main'], 'exams-itembank-list.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="item-list"]', 'table', '[role="table"]', 'main'],
+      'exams-itembank-list.png'
+    );
   });
 
   test('item bank — sidebar categories', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    await elementOrPage(page, ['aside', '[data-testid="categories"]', 'nav'], 'exams-itembank-categories.png');
+    await elementOrPage(
+      page,
+      ['aside', '[data-testid="categories"]', 'nav'],
+      'exams-itembank-categories.png'
+    );
   });
 });
 
@@ -116,22 +144,37 @@ test.describe('Visual Regression — Exam Blueprint @visual-exams', () => {
 
   test('blueprint — full page', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    await expect(page).toHaveScreenshot('exams-blueprint-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'exams-blueprint-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('blueprint — header section', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-blueprint-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'exams-blueprint-header.png'
+    );
   });
 
   test('blueprint — main content', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    await elementOrPage(page, ['main', '[role="main"]', '[data-testid="main-content"]'], 'exams-blueprint-main.png');
+    await elementOrPage(
+      page,
+      ['main', '[role="main"]', '[data-testid="main-content"]'],
+      'exams-blueprint-main.png'
+    );
   });
 
   test('blueprint — topic distribution', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    await elementOrPage(page, ['[data-testid="topic-distribution"]', '.distribution', 'table'], 'exams-blueprint-distribution.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="topic-distribution"]', '.distribution', 'table'],
+      'exams-blueprint-distribution.png'
+    );
   });
 });
 
@@ -149,17 +192,29 @@ test.describe('Visual Regression — Exam Results @visual-exams', () => {
 
   test('results — header section', async ({ page }) => {
     await goTo(page, '/exams/results');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-results-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'exams-results-header.png'
+    );
   });
 
   test('results — summary statistics', async ({ page }) => {
     await goTo(page, '/exams/results');
-    await elementOrPage(page, ['[data-testid="results-summary"]', '.summary', 'main'], 'exams-results-summary.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="results-summary"]', '.summary', 'main'],
+      'exams-results-summary.png'
+    );
   });
 
   test('results — score table', async ({ page }) => {
     await goTo(page, '/exams/results');
-    await elementOrPage(page, ['table', '[data-testid="score-table"]', '[role="table"]'], 'exams-results-table.png');
+    await elementOrPage(
+      page,
+      ['table', '[data-testid="score-table"]', '[role="table"]'],
+      'exams-results-table.png'
+    );
   });
 });
 
@@ -177,36 +232,64 @@ test.describe('Visual Regression — Exam Security @visual-exams', () => {
 
   test('security settings — header section', async ({ page }) => {
     await goTo(page, '/exams/security');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'exams-security-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'exams-security-header.png'
+    );
   });
 
   test('security settings — configuration options', async ({ page }) => {
     await goTo(page, '/exams/security');
-    await elementOrPage(page, ['form', '[data-testid="security-config"]', 'main'], 'exams-security-config.png');
+    await elementOrPage(
+      page,
+      ['form', '[data-testid="security-config"]', 'main'],
+      'exams-security-config.png'
+    );
   });
 
   test('security settings — proctoring section', async ({ page }) => {
     await goTo(page, '/exams/security');
-    await elementOrPage(page, ['[data-testid="proctoring"]', '.proctoring-section', 'section'], 'exams-security-proctoring.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="proctoring"]', '.proctoring-section', 'section'],
+      'exams-security-proctoring.png'
+    );
   });
 
   test('exam list — sidebar navigation', async ({ page }) => {
     await goTo(page, '/exams');
-    await elementOrPage(page, ['aside', '[data-testid="sidebar"]', 'nav'], 'exams-list-sidebar.png');
+    await elementOrPage(
+      page,
+      ['aside', '[data-testid="sidebar"]', 'nav'],
+      'exams-list-sidebar.png'
+    );
   });
 
   test('item bank — action toolbar', async ({ page }) => {
     await goTo(page, '/exams/item-bank');
-    await elementOrPage(page, ['[data-testid="toolbar"]', '[role="toolbar"]', '.toolbar'], 'exams-itembank-toolbar.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="toolbar"]', '[role="toolbar"]', '.toolbar'],
+      'exams-itembank-toolbar.png'
+    );
   });
 
   test('blueprint — action buttons', async ({ page }) => {
     await goTo(page, '/exams/blueprint');
-    await elementOrPage(page, ['[data-testid="blueprint-actions"]', 'button', '.actions'], 'exams-blueprint-actions.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="blueprint-actions"]', 'button', '.actions'],
+      'exams-blueprint-actions.png'
+    );
   });
 
   test('security settings — lockdown options', async ({ page }) => {
     await goTo(page, '/exams/security');
-    await elementOrPage(page, ['[data-testid="lockdown-options"]', '.lockdown', 'form'], 'exams-security-lockdown.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="lockdown-options"]', '.lockdown', 'form'],
+      'exams-security-lockdown.png'
+    );
   });
 });

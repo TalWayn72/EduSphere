@@ -9,7 +9,12 @@
 export interface SocialFeedItemPayload {
   readonly actorId: string;
   readonly tenantId: string;
-  readonly verb: 'COMPLETED' | 'ENROLLED' | 'ACHIEVED_BADGE' | 'DISCUSSED' | 'STARTED_LEARNING';
+  readonly verb:
+    | 'COMPLETED'
+    | 'ENROLLED'
+    | 'ACHIEVED_BADGE'
+    | 'DISCUSSED'
+    | 'STARTED_LEARNING';
   readonly objectType: string;
   readonly objectId: string;
   readonly objectTitle: string;
@@ -69,7 +74,9 @@ export function isSocialFeedItemEvent(e: unknown): e is SocialFeedItemPayload {
   );
 }
 
-export function isPeerReviewAssignedEvent(e: unknown): e is PeerReviewAssignedPayload {
+export function isPeerReviewAssignedEvent(
+  e: unknown
+): e is PeerReviewAssignedPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   return (
@@ -79,7 +86,9 @@ export function isPeerReviewAssignedEvent(e: unknown): e is PeerReviewAssignedPa
   );
 }
 
-export function isPeerReviewCompletedEvent(e: unknown): e is PeerReviewCompletedPayload {
+export function isPeerReviewCompletedEvent(
+  e: unknown
+): e is PeerReviewCompletedPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   return (
@@ -89,7 +98,9 @@ export function isPeerReviewCompletedEvent(e: unknown): e is PeerReviewCompleted
   );
 }
 
-export function isDiscussionReplyEvent(e: unknown): e is DiscussionReplyPayload {
+export function isDiscussionReplyEvent(
+  e: unknown
+): e is DiscussionReplyPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   return (

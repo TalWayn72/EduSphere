@@ -8,16 +8,17 @@ interface SearchResultsGroupProps {
   query: string;
 }
 
-export const SearchResultsGroup = React.memo(function SearchResultsGroup({ results, query }: SearchResultsGroupProps) {
+export const SearchResultsGroup = React.memo(function SearchResultsGroup({
+  results,
+  query,
+}: SearchResultsGroupProps) {
   const grouped = useMemo(
-    () => results.reduce<Partial<Record<ResultType, SearchResult[]>>>(
-      (acc, r) => {
+    () =>
+      results.reduce<Partial<Record<ResultType, SearchResult[]>>>((acc, r) => {
         (acc[r.type] ??= []).push(r);
         return acc;
-      },
-      {}
-    ),
-    [results],
+      }, {}),
+    [results]
   );
 
   return (

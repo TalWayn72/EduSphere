@@ -42,6 +42,7 @@ Legal baseline for EduSphere: **WCAG 2.1 Level AA** (ADA Title II, DOJ Final Rul
 Target: **WCAG 2.2 Level AAA** for premium EdTech differentiation, particularly for institutional (K-12, higher ed) clients.
 
 The new WCAG 2.2 success criteria relevant to EduSphere:
+
 - 2.4.11 Focus Not Obscured Minimum (AA)
 - 2.4.12 Focus Not Obscured Enhanced (AAA) — new
 - 2.4.13 Focus Appearance (AAA) — new
@@ -57,9 +58,9 @@ The new WCAG 2.2 success criteria relevant to EduSphere:
 
 #### Standards Table
 
-| Level | Normal Text | Large Text (18pt / 14pt bold) | UI Components & Graphics |
-|-------|-------------|-------------------------------|--------------------------|
-| AA    | 4.5:1       | 3:1                           | 3:1                      |
+| Level | Normal Text | Large Text (18pt / 14pt bold) | UI Components & Graphics  |
+| ----- | ----------- | ----------------------------- | ------------------------- |
+| AA    | 4.5:1       | 3:1                           | 3:1                       |
 | AAA   | 7:1         | 4.5:1                         | 3:1 (no AAA for non-text) |
 
 **Focus indicators (WCAG 2.4.13 AAA):** The focus outline area must be at least as large as a 2 CSS pixel perimeter of the component, with 3:1 contrast between focused and unfocused states.
@@ -72,14 +73,14 @@ The new WCAG 2.2 success criteria relevant to EduSphere:
 
 :root {
   /* Primary text on white: must achieve 7:1 → use ≥ #595959 on white */
-  --color-text-primary: #1a1a1a;      /* ~17:1 on white — far exceeds AAA */
-  --color-text-secondary: #4a4a4a;    /* ~9.5:1 on white — AAA */
-  --color-text-muted: #595959;        /* ~7:1 on white — AAA threshold */
-  --color-text-on-dark: #ffffff;      /* 21:1 on dark backgrounds */
+  --color-text-primary: #1a1a1a; /* ~17:1 on white — far exceeds AAA */
+  --color-text-secondary: #4a4a4a; /* ~9.5:1 on white — AAA */
+  --color-text-muted: #595959; /* ~7:1 on white — AAA threshold */
+  --color-text-on-dark: #ffffff; /* 21:1 on dark backgrounds */
 
   /* Interactive elements: 3:1 minimum for UI components */
-  --color-border-focus: #0052cc;      /* Focus ring color */
-  --color-interactive: #0052cc;      /* Links, buttons */
+  --color-border-focus: #0052cc; /* Focus ring color */
+  --color-interactive: #0052cc; /* Links, buttons */
   --color-interactive-hover: #003d99; /* Hover state */
 }
 ```
@@ -125,7 +126,7 @@ export type ContrastLevel = 'fail' | 'AA' | 'AAA';
 
 export function getContrastLevel(
   ratio: number,
-  isLargeText: boolean,
+  isLargeText: boolean
 ): ContrastLevel {
   if (isLargeText) {
     if (ratio >= 4.5) return 'AAA';
@@ -248,7 +249,7 @@ export function useFocusTrap(isActive: boolean) {
     if (!container) return;
 
     const focusableElements = Array.from(
-      container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS),
+      container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
     );
     const first = focusableElements[0];
     const last = focusableElements[focusableElements.length - 1];
@@ -283,18 +284,18 @@ export function useFocusTrap(isActive: boolean) {
 
 #### Keyboard Navigation Patterns (ARIA Authoring Practices)
 
-| Component | Required Keys | Implementation |
-|-----------|---------------|----------------|
-| Button | Enter, Space | `<button>` native |
-| Link | Enter | `<a href>` native |
-| Checkbox | Space | Radix Checkbox |
-| Radio group | Arrow keys | Radix RadioGroup |
-| Select / Listbox | Arrow keys, Home, End, type-ahead | Radix Select |
-| Menu | Arrow keys, Enter, Escape, type-ahead | Radix DropdownMenu |
-| Tabs | Left/Right arrows (or Up/Down vertical), Home, End | Radix Tabs |
-| Dialog | Tab trapped, Escape to close | Radix Dialog |
-| Slider | Arrow keys, Home, End, Page Up/Down | Radix Slider |
-| Quiz / Drag-and-drop | Arrow keys + Enter/Space for keyboard drop | Custom (see below) |
+| Component            | Required Keys                                      | Implementation     |
+| -------------------- | -------------------------------------------------- | ------------------ |
+| Button               | Enter, Space                                       | `<button>` native  |
+| Link                 | Enter                                              | `<a href>` native  |
+| Checkbox             | Space                                              | Radix Checkbox     |
+| Radio group          | Arrow keys                                         | Radix RadioGroup   |
+| Select / Listbox     | Arrow keys, Home, End, type-ahead                  | Radix Select       |
+| Menu                 | Arrow keys, Enter, Escape, type-ahead              | Radix DropdownMenu |
+| Tabs                 | Left/Right arrows (or Up/Down vertical), Home, End | Radix Tabs         |
+| Dialog               | Tab trapped, Escape to close                       | Radix Dialog       |
+| Slider               | Arrow keys, Home, End, Page Up/Down                | Radix Slider       |
+| Quiz / Drag-and-drop | Arrow keys + Enter/Space for keyboard drop         | Custom (see below) |
 
 #### Focus Appearance (WCAG 2.4.13 AAA)
 
@@ -390,9 +391,7 @@ export function useAnnounce() {
   const announce = useCallback(
     (message: string, politeness: Politeness = 'polite') => {
       const regionId =
-        politeness === 'assertive'
-          ? 'aria-live-assertive'
-          : 'aria-live-polite';
+        politeness === 'assertive' ? 'aria-live-assertive' : 'aria-live-polite';
       const region = document.getElementById(regionId);
       if (!region) return;
 
@@ -403,7 +402,7 @@ export function useAnnounce() {
         region.textContent = message;
       });
     },
-    [],
+    []
   );
 
   return { announce };
@@ -421,9 +420,11 @@ const handleQuizSubmit = async (answers: QuizAnswers) => {
   // Announce result without moving focus
   announce(
     `Quiz submitted. You scored ${result.score} out of ${result.total}. ${
-      result.passed ? 'Congratulations, you passed!' : 'Please review and retry.'
+      result.passed
+        ? 'Congratulations, you passed!'
+        : 'Please review and retry.'
     }`,
-    'polite',
+    'polite'
   );
 };
 
@@ -496,13 +497,13 @@ announce(`Lesson progress: ${progress}% complete`, 'polite');
 
 #### Testing Matrix (Mandatory Before Release)
 
-| Screen Reader | Browser | OS | Priority |
-|---------------|---------|-----|----------|
-| NVDA 2024     | Chrome, Firefox | Windows 11 | P1 |
-| JAWS 2024     | Chrome, Edge | Windows 11 | P1 |
-| VoiceOver     | Safari | macOS/iOS | P1 |
-| TalkBack      | Chrome | Android | P2 |
-| Narrator      | Edge | Windows 11 | P3 |
+| Screen Reader | Browser         | OS         | Priority |
+| ------------- | --------------- | ---------- | -------- |
+| NVDA 2024     | Chrome, Firefox | Windows 11 | P1       |
+| JAWS 2024     | Chrome, Edge    | Windows 11 | P1       |
+| VoiceOver     | Safari          | macOS/iOS  | P1       |
+| TalkBack      | Chrome          | Android    | P2       |
+| Narrator      | Edge            | Windows 11 | P3       |
 
 #### Screen Reader Navigation Shortcuts to Verify
 
@@ -557,17 +558,17 @@ EduSphere uses a custom video player for lesson content. The following requireme
 
 #### WCAG Video Requirements by Level
 
-| Criterion | Level | Requirement |
-|-----------|-------|-------------|
-| 1.2.1 Audio/Video-only (prerecorded) | A | Text alternative or audio track |
-| 1.2.2 Captions (prerecorded) | A | Synchronized captions |
-| 1.2.3 Audio Description or Media Alt | A | AD or text transcript |
-| 1.2.4 Captions (live) | AA | Live captions for webinars |
-| 1.2.5 Audio Description (prerecorded) | AA | Full AD track |
-| 1.2.6 Sign Language (prerecorded) | AAA | Sign language interpretation |
-| 1.2.7 Extended Audio Description | AAA | Paused video for longer AD |
-| 1.2.8 Media Alternative (prerecorded) | AAA | Full text alternative |
-| 1.2.9 Audio-only (live) | AAA | Live text alternative |
+| Criterion                             | Level | Requirement                     |
+| ------------------------------------- | ----- | ------------------------------- |
+| 1.2.1 Audio/Video-only (prerecorded)  | A     | Text alternative or audio track |
+| 1.2.2 Captions (prerecorded)          | A     | Synchronized captions           |
+| 1.2.3 Audio Description or Media Alt  | A     | AD or text transcript           |
+| 1.2.4 Captions (live)                 | AA    | Live captions for webinars      |
+| 1.2.5 Audio Description (prerecorded) | AA    | Full AD track                   |
+| 1.2.6 Sign Language (prerecorded)     | AAA   | Sign language interpretation    |
+| 1.2.7 Extended Audio Description      | AAA   | Paused video for longer AD      |
+| 1.2.8 Media Alternative (prerecorded) | AAA   | Full text alternative           |
+| 1.2.9 Audio-only (live)               | AAA   | Live text alternative           |
 
 #### Video Player Component Requirements
 
@@ -576,17 +577,17 @@ EduSphere uses a custom video player for lesson content. The following requireme
 
 interface VideoPlayerProps {
   src: string;
-  captionTracks: CaptionTrack[];    // WebVTT files per language
-  audioDescriptionSrc?: string;     // Separate AD audio track
-  transcript?: string;              // Full text transcript
+  captionTracks: CaptionTrack[]; // WebVTT files per language
+  audioDescriptionSrc?: string; // Separate AD audio track
+  transcript?: string; // Full text transcript
   title: string;
   posterSrc?: string;
 }
 
 interface CaptionTrack {
-  src: string;       // URL to .vtt file
-  srclang: string;   // e.g. 'en', 'he'
-  label: string;     // e.g. 'English', 'Hebrew'
+  src: string; // URL to .vtt file
+  srclang: string; // e.g. 'en', 'he'
+  label: string; // e.g. 'English', 'Hebrew'
   kind: 'captions' | 'subtitles' | 'descriptions';
   default?: boolean;
 }
@@ -594,31 +595,31 @@ interface CaptionTrack {
 
 #### Keyboard Controls (All Required)
 
-| Key | Action | ARIA Announcement |
-|-----|--------|-------------------|
-| Space / K | Play / Pause | "Playing" / "Paused" |
-| M | Mute / Unmute | "Muted" / "Unmuted, volume X%" |
-| F | Fullscreen toggle | "Fullscreen" / "Exit fullscreen" |
-| C | Captions toggle | "Captions on: English" / "Captions off" |
-| Left / Right arrow | Seek ±5 seconds | "Position: X minutes Y seconds" |
-| Up / Down arrow | Volume ±10% | "Volume: X%" |
-| Home / End | Jump to start/end | "Beginning of video" / "End of video" |
-| 0–9 | Jump to 0–90% | "Jumped to X%" |
+| Key                | Action            | ARIA Announcement                       |
+| ------------------ | ----------------- | --------------------------------------- |
+| Space / K          | Play / Pause      | "Playing" / "Paused"                    |
+| M                  | Mute / Unmute     | "Muted" / "Unmuted, volume X%"          |
+| F                  | Fullscreen toggle | "Fullscreen" / "Exit fullscreen"        |
+| C                  | Captions toggle   | "Captions on: English" / "Captions off" |
+| Left / Right arrow | Seek ±5 seconds   | "Position: X minutes Y seconds"         |
+| Up / Down arrow    | Volume ±10%       | "Volume: X%"                            |
+| Home / End         | Jump to start/end | "Beginning of video" / "End of video"   |
+| 0–9                | Jump to 0–90%     | "Jumped to X%"                          |
 
 ```tsx
 // Video controls toolbar pattern
-<div
-  role="toolbar"
-  aria-label="Video controls"
-  aria-controls="video-player"
->
+<div role="toolbar" aria-label="Video controls" aria-controls="video-player">
   <button
     type="button"
     onClick={togglePlay}
     aria-label={isPlaying ? 'Pause video' : 'Play video'}
     aria-pressed={isPlaying}
   >
-    {isPlaying ? <PauseIcon aria-hidden="true" /> : <PlayIcon aria-hidden="true" />}
+    {isPlaying ? (
+      <PauseIcon aria-hidden="true" />
+    ) : (
+      <PlayIcon aria-hidden="true" />
+    )}
   </button>
 
   <div
@@ -675,10 +676,15 @@ export function AccessibleField({
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium text-[--color-text-primary]">
+      <label
+        htmlFor={id}
+        className="text-sm font-medium text-[--color-text-primary]"
+      >
         {label}
         {required && (
-          <span aria-hidden="true" className="text-red-600 ml-1">*</span>
+          <span aria-hidden="true" className="text-red-600 ml-1">
+            *
+          </span>
         )}
         {required && <span className="sr-only"> (required)</span>}
       </label>
@@ -703,7 +709,10 @@ export function AccessibleField({
           role="alert"
           className="text-sm text-red-600 flex items-center gap-1"
         >
-          <AlertCircleIcon aria-hidden="true" className="h-4 w-4 flex-shrink-0" />
+          <AlertCircleIcon
+            aria-hidden="true"
+            className="h-4 w-4 flex-shrink-0"
+          />
           {error}
         </p>
       )}
@@ -727,12 +736,13 @@ const enrollmentStore = useEnrollmentStore();
     defaultValue={enrollmentStore.personalInfo.name}
     // User can correct if needed, but doesn't need to re-type from scratch
   />
-</AccessibleField>
+</AccessibleField>;
 ```
 
 #### Accessible Authentication (WCAG 3.3.9 AAA — new in 2.2)
 
 Authentication must not require any cognitive function test. For EduSphere:
+
 - Login: Use Keycloak magic link (email link) or FIDO2/WebAuthn (passkey) as primary
 - TOTP codes are acceptable if the user can copy-paste (not transcribe from a different device)
 - CAPTCHA: Use an object recognition CAPTCHA (not text transcription) or allow audio alternative, OR prefer WebAuthn entirely
@@ -872,17 +882,18 @@ Allow users to set their own preference in their profile settings, stored in DB:
   --font-body-dyslexic: 'Atkinson Hyperlegible', 'OpenDyslexic', sans-serif;
 
   /* Default typography for AAA compliance */
-  --font-size-base: 1rem;         /* 16px minimum */
-  --line-height-base: 1.6;        /* WCAG 1.4.12: at least 1.5 */
-  --letter-spacing-base: 0.05em;  /* WCAG 1.4.12: at least 0.12em */
-  --word-spacing-base: 0.16em;    /* WCAG 1.4.12: at least 0.16em */
-  --paragraph-spacing: 1.6em;     /* WCAG 1.4.12: at least 2x font size */
+  --font-size-base: 1rem; /* 16px minimum */
+  --line-height-base: 1.6; /* WCAG 1.4.12: at least 1.5 */
+  --letter-spacing-base: 0.05em; /* WCAG 1.4.12: at least 0.12em */
+  --word-spacing-base: 0.16em; /* WCAG 1.4.12: at least 0.16em */
+  --paragraph-spacing: 1.6em; /* WCAG 1.4.12: at least 2x font size */
 }
 ```
 
 #### WCAG 1.4.12 Text Spacing (AA) — Must Not Break Layout
 
 Layouts must tolerate:
+
 - Line height at least 1.5x font size
 - Letter spacing at least 0.12em
 - Word spacing at least 0.16em
@@ -891,18 +902,18 @@ Layouts must tolerate:
 ```tsx
 // User preference toggle for dyslexia mode
 interface ReadingPreferences {
-  fontFamily: 'default' | 'dyslexic';       // OpenDyslexic / Atkinson Hyperlegible
-  fontSize: 'sm' | 'md' | 'lg' | 'xl';     // 14px / 16px / 18px / 22px
+  fontFamily: 'default' | 'dyslexic'; // OpenDyslexic / Atkinson Hyperlegible
+  fontSize: 'sm' | 'md' | 'lg' | 'xl'; // 14px / 16px / 18px / 22px
   lineHeight: 'normal' | 'relaxed' | 'loose'; // 1.4 / 1.7 / 2.0
-  letterSpacing: 'normal' | 'wide';         // 0 / 0.08em
-  wordSpacing: 'normal' | 'wide';           // 0 / 0.2em
-  columnWidth: 'full' | 'narrow';           // 100% / 70ch max-width
+  letterSpacing: 'normal' | 'wide'; // 0 / 0.08em
+  wordSpacing: 'normal' | 'wide'; // 0 / 0.2em
+  columnWidth: 'full' | 'narrow'; // 100% / 70ch max-width
 }
 ```
 
 ```css
 /* Applied via data attribute on <html> or content container */
-[data-reading-mode="dyslexic"] {
+[data-reading-mode='dyslexic'] {
   --font-body: 'Atkinson Hyperlegible', sans-serif;
   --line-height-base: 1.8;
   --letter-spacing-base: 0.08em;
@@ -913,7 +924,7 @@ interface ReadingPreferences {
 }
 
 /* Narrow column mode: optimal reading width */
-[data-reading-mode="narrow"] .lesson-content {
+[data-reading-mode='narrow'] .lesson-content {
   max-width: 70ch;
   margin-inline: auto;
 }
@@ -925,19 +936,20 @@ interface ReadingPreferences {
 
 Radix UI handles the following automatically — never override or re-implement:
 
-| Component | Built-in Accessibility |
-|-----------|------------------------|
-| `Dialog` | Focus trap, Escape to close, `aria-modal`, `role="dialog"` |
-| `DropdownMenu` | Arrow key navigation, Escape to close, type-ahead |
-| `Select` | Keyboard selection, `aria-expanded`, `aria-selected` |
-| `Tabs` | Arrow key navigation, `role="tablist"`, `aria-selected` |
-| `Checkbox` | `role="checkbox"`, `aria-checked` including indeterminate |
-| `RadioGroup` | `role="radio"`, Arrow key navigation |
-| `Slider` | `role="slider"`, Arrow key, Home/End |
-| `Tooltip` | Only shows on focus and hover, safe for keyboard users |
-| `AlertDialog` | `role="alertdialog"`, focus trap, `aria-describedby` |
+| Component      | Built-in Accessibility                                     |
+| -------------- | ---------------------------------------------------------- |
+| `Dialog`       | Focus trap, Escape to close, `aria-modal`, `role="dialog"` |
+| `DropdownMenu` | Arrow key navigation, Escape to close, type-ahead          |
+| `Select`       | Keyboard selection, `aria-expanded`, `aria-selected`       |
+| `Tabs`         | Arrow key navigation, `role="tablist"`, `aria-selected`    |
+| `Checkbox`     | `role="checkbox"`, `aria-checked` including indeterminate  |
+| `RadioGroup`   | `role="radio"`, Arrow key navigation                       |
+| `Slider`       | `role="slider"`, Arrow key, Home/End                       |
+| `Tooltip`      | Only shows on focus and hover, safe for keyboard users     |
+| `AlertDialog`  | `role="alertdialog"`, focus trap, `aria-describedby`       |
 
 **Critical rules:**
+
 1. Never use `<div onClick>` when a Radix primitive is available
 2. Never add `outline: none` without replacing with a custom focus style
 3. Always pass `aria-label` to icon-only Radix trigger buttons:
@@ -1020,6 +1032,7 @@ EduSphere serves enterprise tenants (universities, corporations, K-12 districts)
 3. **User preference** — Dark mode, font size, reduced motion, reading mode (stored in user profile)
 
 **Lessons from industry:**
+
 - **Notion:** Uses CSS variables scoped to `[data-theme]` attribute with user-level overrides in localStorage
 - **Linear:** Design token system with semantic tokens (not raw color values) — theme swaps at the semantic layer only
 - **Webflow:** Tenant theme is a compiled CSS file delivered via CDN per workspace slug
@@ -1044,6 +1057,7 @@ Tier 3: --button-primary-background: var(--semantic-color-interactive)
 ```
 
 **Tenants override ONLY Tier 1 primitives.** Tier 2 and 3 cascade automatically. This means:
+
 - A tenant changes `--primitive-brand-500` to their corporate blue
 - All buttons, links, focus rings, and progress bars update automatically
 - No risk of breaking the semantic system
@@ -1061,9 +1075,9 @@ export interface PrimitiveTokens {
   colorBrand200: string;
   colorBrand300: string;
   colorBrand400: string;
-  colorBrand500: string;   // Primary brand color
-  colorBrand600: string;   // Primary interactive
-  colorBrand700: string;   // Primary hover
+  colorBrand500: string; // Primary brand color
+  colorBrand600: string; // Primary interactive
+  colorBrand700: string; // Primary hover
   colorBrand800: string;
   colorBrand900: string;
 
@@ -1091,10 +1105,10 @@ export interface PrimitiveTokens {
   fontFamilyMono: string;
 
   // Border radius scale
-  borderRadiusSm: string;   // e.g. '4px'
-  borderRadiusMd: string;   // e.g. '8px'
-  borderRadiusLg: string;   // e.g. '12px'
-  borderRadiusXl: string;   // e.g. '16px'
+  borderRadiusSm: string; // e.g. '4px'
+  borderRadiusMd: string; // e.g. '8px'
+  borderRadiusLg: string; // e.g. '12px'
+  borderRadiusXl: string; // e.g. '16px'
   borderRadiusFull: string; // e.g. '9999px'
 
   // Shadows
@@ -1152,12 +1166,12 @@ export interface ComponentTokens {
 /** Full tenant theme structure stored in DB */
 export interface TenantTheme {
   tenantId: string;
-  name: string;                              // e.g. "Acme Corp Theme"
-  primitives: Partial<PrimitiveTokens>;      // Only overrides — platform defaults fill gaps
+  name: string; // e.g. "Acme Corp Theme"
+  primitives: Partial<PrimitiveTokens>; // Only overrides — platform defaults fill gaps
   logoUrl: string | null;
   faviconUrl: string | null;
   darkMode: 'system' | 'always-dark' | 'always-light' | 'disabled';
-  customCss: string | null;                  // Escape hatch — sanitized
+  customCss: string | null; // Escape hatch — sanitized
   updatedAt: Date;
 }
 ```
@@ -1173,7 +1187,7 @@ export interface TenantTheme {
 /* Tier 1: Primitive tokens — EduSphere defaults */
 :root {
   /* Brand palette */
-  --primitive-brand-50:  #eff6ff;
+  --primitive-brand-50: #eff6ff;
   --primitive-brand-100: #dbeafe;
   --primitive-brand-200: #bfdbfe;
   --primitive-brand-300: #93c5fd;
@@ -1185,7 +1199,7 @@ export interface TenantTheme {
   --primitive-brand-900: #1e3a8a;
 
   /* Neutral palette */
-  --primitive-neutral-50:  #f9fafb;
+  --primitive-neutral-50: #f9fafb;
   --primitive-neutral-100: #f3f4f6;
   --primitive-neutral-200: #e5e7eb;
   --primitive-neutral-300: #d1d5db;
@@ -1199,58 +1213,60 @@ export interface TenantTheme {
   /* Status */
   --primitive-success: #16a34a;
   --primitive-warning: #d97706;
-  --primitive-error:   #dc2626;
-  --primitive-info:    #0284c7;
+  --primitive-error: #dc2626;
+  --primitive-info: #0284c7;
 
   /* Typography */
-  --primitive-font-base:    'Inter', system-ui, -apple-system, sans-serif;
+  --primitive-font-base: 'Inter', system-ui, -apple-system, sans-serif;
   --primitive-font-heading: 'Inter', system-ui, sans-serif;
-  --primitive-font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+  --primitive-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Border radius */
-  --primitive-radius-sm:   4px;
-  --primitive-radius-md:   8px;
-  --primitive-radius-lg:   12px;
-  --primitive-radius-xl:   16px;
+  --primitive-radius-sm: 4px;
+  --primitive-radius-md: 8px;
+  --primitive-radius-lg: 12px;
+  --primitive-radius-xl: 16px;
   --primitive-radius-full: 9999px;
 
   /* Shadows */
   --primitive-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --primitive-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --primitive-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --primitive-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --primitive-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 /* Tier 2: Semantic tokens (light mode) */
 :root,
-[data-theme="light"] {
-  --color-text-primary:     var(--primitive-neutral-900);
-  --color-text-secondary:   var(--primitive-neutral-600);
-  --color-text-muted:       var(--primitive-neutral-500);
-  --color-text-on-brand:    #ffffff;
+[data-theme='light'] {
+  --color-text-primary: var(--primitive-neutral-900);
+  --color-text-secondary: var(--primitive-neutral-600);
+  --color-text-muted: var(--primitive-neutral-500);
+  --color-text-on-brand: #ffffff;
   --color-text-destructive: var(--primitive-error);
 
-  --color-bg-page:          var(--primitive-neutral-50);
-  --color-bg-surface:       #ffffff;
-  --color-bg-subtle:        var(--primitive-neutral-100);
-  --color-bg-brand:         var(--primitive-brand-600);
-  --color-bg-brand-subtle:  var(--primitive-brand-50);
+  --color-bg-page: var(--primitive-neutral-50);
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: var(--primitive-neutral-100);
+  --color-bg-brand: var(--primitive-brand-600);
+  --color-bg-brand-subtle: var(--primitive-brand-50);
 
-  --color-border-default:   var(--primitive-neutral-200);
-  --color-border-strong:    var(--primitive-neutral-300);
-  --color-border-brand:     var(--primitive-brand-600);
+  --color-border-default: var(--primitive-neutral-200);
+  --color-border-strong: var(--primitive-neutral-300);
+  --color-border-brand: var(--primitive-brand-600);
 
-  --color-interactive:      var(--primitive-brand-600);
+  --color-interactive: var(--primitive-brand-600);
   --color-interactive-hover: var(--primitive-brand-700);
   --color-interactive-focus: var(--primitive-brand-600);
 
-  --font-body:    var(--primitive-font-base);
+  --font-body: var(--primitive-font-base);
   --font-heading: var(--primitive-font-heading);
-  --font-mono:    var(--primitive-font-mono);
+  --font-mono: var(--primitive-font-mono);
 
-  --radius-sm:   var(--primitive-radius-sm);
-  --radius-md:   var(--primitive-radius-md);
-  --radius-lg:   var(--primitive-radius-lg);
-  --radius-xl:   var(--primitive-radius-xl);
+  --radius-sm: var(--primitive-radius-sm);
+  --radius-md: var(--primitive-radius-md);
+  --radius-lg: var(--primitive-radius-lg);
+  --radius-xl: var(--primitive-radius-xl);
   --radius-full: var(--primitive-radius-full);
 
   --shadow-sm: var(--primitive-shadow-sm);
@@ -1259,46 +1275,46 @@ export interface TenantTheme {
 }
 
 /* Dark mode semantic overrides */
-[data-theme="dark"] {
-  --color-text-primary:     var(--primitive-neutral-50);
-  --color-text-secondary:   var(--primitive-neutral-400);
-  --color-text-muted:       var(--primitive-neutral-500);
+[data-theme='dark'] {
+  --color-text-primary: var(--primitive-neutral-50);
+  --color-text-secondary: var(--primitive-neutral-400);
+  --color-text-muted: var(--primitive-neutral-500);
 
-  --color-bg-page:          var(--primitive-neutral-900);
-  --color-bg-surface:       var(--primitive-neutral-800);
-  --color-bg-subtle:        var(--primitive-neutral-700);
-  --color-bg-brand:         var(--primitive-brand-500);
-  --color-bg-brand-subtle:  var(--primitive-neutral-800);
+  --color-bg-page: var(--primitive-neutral-900);
+  --color-bg-surface: var(--primitive-neutral-800);
+  --color-bg-subtle: var(--primitive-neutral-700);
+  --color-bg-brand: var(--primitive-brand-500);
+  --color-bg-brand-subtle: var(--primitive-neutral-800);
 
-  --color-border-default:   var(--primitive-neutral-700);
-  --color-border-strong:    var(--primitive-neutral-600);
+  --color-border-default: var(--primitive-neutral-700);
+  --color-border-strong: var(--primitive-neutral-600);
 
-  --color-interactive:      var(--primitive-brand-400);
+  --color-interactive: var(--primitive-brand-400);
   --color-interactive-hover: var(--primitive-brand-300);
   --color-interactive-focus: var(--primitive-brand-400);
 }
 
 /* Tier 3: Component tokens (consumed by shadcn/ui + custom components) */
 :root {
-  --button-primary-bg:     var(--color-bg-brand);
-  --button-primary-text:   var(--color-text-on-brand);
-  --button-primary-hover:  var(--color-interactive-hover);
-  --button-secondary-bg:   var(--color-bg-surface);
+  --button-primary-bg: var(--color-bg-brand);
+  --button-primary-text: var(--color-text-on-brand);
+  --button-primary-hover: var(--color-interactive-hover);
+  --button-secondary-bg: var(--color-bg-surface);
   --button-secondary-text: var(--color-interactive);
   --button-secondary-border: var(--color-border-brand);
 
-  --card-bg:     var(--color-bg-surface);
+  --card-bg: var(--color-bg-surface);
   --card-border: var(--color-border-default);
   --card-shadow: var(--shadow-sm);
 
-  --nav-bg:       var(--color-bg-surface);
-  --nav-text:     var(--color-text-primary);
-  --nav-border:   var(--color-border-default);
+  --nav-bg: var(--color-bg-surface);
+  --nav-text: var(--color-text-primary);
+  --nav-border: var(--color-border-default);
 
   --progress-fill: var(--color-interactive);
-  --progress-bg:   var(--color-bg-subtle);
+  --progress-bg: var(--color-bg-subtle);
 
-  --badge-bg:   var(--color-bg-brand-subtle);
+  --badge-bg: var(--color-bg-brand-subtle);
   --badge-text: var(--color-interactive);
 }
 ```
@@ -1311,31 +1327,31 @@ With Tailwind v4's `@theme` directive, platform tokens map directly to utility c
 
 ```css
 /* apps/web/src/styles/tailwind.css */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Map semantic CSS variables to Tailwind theme tokens */
 @theme {
   /* Colors — these create bg-*, text-*, border-* utilities */
-  --color-brand:              var(--color-interactive);
-  --color-brand-hover:        var(--color-interactive-hover);
-  --color-surface:            var(--color-bg-surface);
-  --color-page:               var(--color-bg-page);
-  --color-subtle:             var(--color-bg-subtle);
-  --color-text:               var(--color-text-primary);
-  --color-text-muted:         var(--color-text-secondary);
-  --color-border:             var(--color-border-default);
-  --color-border-strong:      var(--color-border-strong);
+  --color-brand: var(--color-interactive);
+  --color-brand-hover: var(--color-interactive-hover);
+  --color-surface: var(--color-bg-surface);
+  --color-page: var(--color-bg-page);
+  --color-subtle: var(--color-bg-subtle);
+  --color-text: var(--color-text-primary);
+  --color-text-muted: var(--color-text-secondary);
+  --color-border: var(--color-border-default);
+  --color-border-strong: var(--color-border-strong);
 
   /* Typography */
-  --font-body:    var(--font-body);
+  --font-body: var(--font-body);
   --font-heading: var(--font-heading);
-  --font-mono:    var(--font-mono);
+  --font-mono: var(--font-mono);
 
   /* Border radius */
-  --radius-sm:   var(--radius-sm);
-  --radius-md:   var(--radius-md);
-  --radius-lg:   var(--radius-lg);
-  --radius-xl:   var(--radius-xl);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
   --radius-full: var(--radius-full);
 
   /* Shadows */
@@ -1431,24 +1447,39 @@ CREATE POLICY tenant_themes_isolation ON tenant_themes
 
 ```typescript
 // packages/db/src/schema/themes.ts
-import { pgTable, uuid, text, jsonb, boolean, timestamp, varchar, check } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  jsonb,
+  boolean,
+  timestamp,
+  varchar,
+  check,
+} from 'drizzle-orm/pg-core';
 import { tenants } from './tenants';
 import { users } from './users';
 
 export const tenantThemes = pgTable('tenant_themes', {
-  id:          uuid('id').primaryKey().defaultRandom(),
-  tenantId:    uuid('tenant_id').notNull().references(() => tenants.id, { onDelete: 'cascade' }),
-  name:        varchar('name', { length: 100 }).notNull().default('Default Theme'),
-  isActive:    boolean('is_active').notNull().default(true),
-  primitives:  jsonb('primitives').$type<Partial<PrimitiveTokens>>(),
-  logoUrl:     text('logo_url'),
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 100 }).notNull().default('Default Theme'),
+  isActive: boolean('is_active').notNull().default(true),
+  primitives: jsonb('primitives').$type<Partial<PrimitiveTokens>>(),
+  logoUrl: text('logo_url'),
   logoDarkUrl: text('logo_dark_url'),
-  faviconUrl:  text('favicon_url'),
-  darkMode:    varchar('dark_mode', { length: 20 }).notNull().default('system'),
-  customCss:   text('custom_css'),
-  createdBy:   uuid('created_by').references(() => users.id),
-  createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt:   timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  faviconUrl: text('favicon_url'),
+  darkMode: varchar('dark_mode', { length: 20 }).notNull().default('system'),
+  customCss: text('custom_css'),
+  createdBy: uuid('created_by').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type TenantThemeRow = typeof tenantThemes.$inferSelect;
@@ -1464,7 +1495,13 @@ export type NewTenantTheme = typeof tenantThemes.$inferInsert;
 ```typescript
 // apps/web/src/contexts/ThemeContext.tsx
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import type { TenantTheme, PrimitiveTokens } from '@edusphere/themes';
 import { applyThemeToDocument, buildCssVariables } from '@/lib/theme-utils';
 
@@ -1480,12 +1517,12 @@ interface ThemeContextValue {
   // Current resolved theme
   tenantTheme: TenantTheme | null;
   userPreferences: UserThemePreferences;
-  resolvedMode: 'light' | 'dark';          // The actual mode being rendered
+  resolvedMode: 'light' | 'dark'; // The actual mode being rendered
 
   // Actions
   setUserPreference: <K extends keyof UserThemePreferences>(
     key: K,
-    value: UserThemePreferences[K],
+    value: UserThemePreferences[K]
   ) => void;
   previewTheme: (primitives: Partial<PrimitiveTokens>) => void;
   cancelPreview: () => void;
@@ -1601,7 +1638,7 @@ import { PLATFORM_DEFAULTS } from '@edusphere/themes/defaults';
  * Only includes variables that differ from platform defaults.
  */
 export function buildCssVariables(
-  overrides: Partial<PrimitiveTokens>,
+  overrides: Partial<PrimitiveTokens>
 ): Record<string, string> {
   const merged = { ...PLATFORM_DEFAULTS, ...overrides };
   const vars: Record<string, string> = {};
@@ -1625,7 +1662,7 @@ export function buildCssVariables(
 export function applyThemeToDocument(
   cssVars: Record<string, string>,
   mode: 'light' | 'dark',
-  prefs: UserThemePreferences,
+  prefs: UserThemePreferences
 ): void {
   const root = document.documentElement;
 
@@ -1712,10 +1749,11 @@ function ColorToken({
 }
 
 export function ThemeEditor() {
-  const { tenantTheme, previewTheme, cancelPreview, isPreviewMode } = useTheme();
-  const [draftPrimitives, setDraftPrimitives] = useState<Partial<PrimitiveTokens>>(
-    tenantTheme?.primitives ?? {},
-  );
+  const { tenantTheme, previewTheme, cancelPreview, isPreviewMode } =
+    useTheme();
+  const [draftPrimitives, setDraftPrimitives] = useState<
+    Partial<PrimitiveTokens>
+  >(tenantTheme?.primitives ?? {});
 
   const handleColorChange = useCallback(
     (key: keyof PrimitiveTokens, value: string) => {
@@ -1724,7 +1762,7 @@ export function ThemeEditor() {
       // Instantly apply to DOM — no round-trip needed
       previewTheme(updated);
     },
-    [draftPrimitives, previewTheme],
+    [draftPrimitives, previewTheme]
   );
 
   const handleSave = async () => {
@@ -1741,7 +1779,9 @@ export function ThemeEditor() {
     <div className="grid grid-cols-[320px_1fr] gap-6">
       {/* Controls panel */}
       <aside className="bg-surface border border-border rounded-[--radius-lg] p-6">
-        <h2 className="text-text font-heading font-semibold mb-4">Brand Colors</h2>
+        <h2 className="text-text font-heading font-semibold mb-4">
+          Brand Colors
+        </h2>
 
         <div className="space-y-3">
           <ColorToken
@@ -1769,14 +1809,21 @@ export function ThemeEditor() {
           <button type="button" onClick={handleSave} className="btn-primary">
             Save theme
           </button>
-          <button type="button" onClick={handleCancel} className="btn-secondary">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="btn-secondary"
+          >
             Cancel
           </button>
         </div>
       </aside>
 
       {/* Live preview panel */}
-      <div aria-label="Theme preview" className="border border-border rounded-[--radius-lg] overflow-hidden">
+      <div
+        aria-label="Theme preview"
+        className="border border-border rounded-[--radius-lg] overflow-hidden"
+      >
         {/* Embedded preview of key UI components */}
         <ThemePreviewPanel />
       </div>
@@ -1851,11 +1898,11 @@ export function ThemeToggle() {
 
 ### 2.8 Industry Comparisons
 
-| Platform | Theme Storage | Runtime Application | Tenant Override |
-|----------|---------------|--------------------|-----------------|
-| **Notion** | User preference in DB + localStorage | `[data-theme]` attribute on `<html>` | Workspace-level color palette |
-| **Linear** | Workspace settings in DB | CSS variables on `:root` via inline style | Accent color + background only |
-| **Webflow** | Workspace design system in DB | Compiled CSS file per workspace slug, served via CDN | Full CSS control within design system |
+| Platform      | Theme Storage                           | Runtime Application                                      | Tenant Override                       |
+| ------------- | --------------------------------------- | -------------------------------------------------------- | ------------------------------------- |
+| **Notion**    | User preference in DB + localStorage    | `[data-theme]` attribute on `<html>`                     | Workspace-level color palette         |
+| **Linear**    | Workspace settings in DB                | CSS variables on `:root` via inline style                | Accent color + background only        |
+| **Webflow**   | Workspace design system in DB           | Compiled CSS file per workspace slug, served via CDN     | Full CSS control within design system |
 | **EduSphere** | Tenant primitives in PostgreSQL `jsonb` | CSS variables injected as `style` on `<html>` at runtime | Tier 1 primitives only (safe cascade) |
 
 #### EduSphere Advantages Over Naive Approaches
@@ -1919,5 +1966,5 @@ input UpdateTenantThemeInput {
 
 ---
 
-*Document generated: March 2026 — EduSphere Session 24 UX Research*
-*Sources: W3C WCAG 2.2 spec, Tailwind CSS v4 docs, Brad Frost Design Token Architecture, React Aria, Radix UI, Argos CI migration report*
+_Document generated: March 2026 — EduSphere Session 24 UX Research_
+_Sources: W3C WCAG 2.2 spec, Tailwind CSS v4 docs, Brad Frost Design Token Architecture, React Aria, Radix UI, Argos CI migration report_

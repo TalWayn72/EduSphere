@@ -12,7 +12,11 @@ interface ChatInputBarProps {
   onSend: () => void;
 }
 
-export function ChatInputBar({ input, onChangeText, onSend }: ChatInputBarProps) {
+export function ChatInputBar({
+  input,
+  onChangeText,
+  onSend,
+}: ChatInputBarProps) {
   const { t } = useTranslation('agents');
   return (
     <View style={styles.inputContainer}>
@@ -25,10 +29,7 @@ export function ChatInputBar({ input, onChangeText, onSend }: ChatInputBarProps)
         maxLength={500}
       />
       <TouchableOpacity
-        style={[
-          styles.sendButton,
-          !input.trim() && styles.sendButtonDisabled,
-        ]}
+        style={[styles.sendButton, !input.trim() && styles.sendButtonDisabled]}
         onPress={onSend}
         disabled={!input.trim()}
       >

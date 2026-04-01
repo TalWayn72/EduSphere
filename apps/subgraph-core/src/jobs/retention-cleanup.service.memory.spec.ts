@@ -6,7 +6,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@edusphere/db', () => ({
   db: {
-    delete: vi.fn(() => ({ where: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]) })) })),
+    delete: vi.fn(() => ({
+      where: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]) })),
+    })),
   },
   RETENTION_DEFAULTS: {},
   agentMessages: {},

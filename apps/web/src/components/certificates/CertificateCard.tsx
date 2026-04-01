@@ -48,7 +48,8 @@ export function CertificateCard({ cert, onDownload }: CertificateCardProps) {
 
       <CardContent className="flex-1 space-y-3">
         <p className="text-sm text-muted-foreground">
-          Issued: <span className="font-medium">{formatDate(cert.issuedAt)}</span>
+          Issued:{' '}
+          <span className="font-medium">{formatDate(cert.issuedAt)}</span>
         </p>
 
         <div className="flex items-center gap-2">

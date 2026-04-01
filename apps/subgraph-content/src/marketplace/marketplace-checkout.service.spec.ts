@@ -120,14 +120,16 @@ describe('MarketplaceCheckoutService', () => {
     delete process.env['STRIPE_SECRET_KEY'];
 
     mockWithTenantContext
-      .mockResolvedValueOnce([{
-        id: 'listing-1',
-        courseId: 'course-1',
-        priceCents: 2999,
-        currency: 'USD',
-        isPublished: true,
-        revenueSplitPercent: 70,
-      }])
+      .mockResolvedValueOnce([
+        {
+          id: 'listing-1',
+          courseId: 'course-1',
+          priceCents: 2999,
+          currency: 'USD',
+          isPublished: true,
+          revenueSplitPercent: 70,
+        },
+      ])
       .mockResolvedValueOnce([{ title: 'Test Course' }]);
 
     const result = await service.createCheckoutSession('listing-1', TENANT_CTX);
@@ -152,15 +154,17 @@ describe('MarketplaceCheckoutService', () => {
     recentDate.setDate(recentDate.getDate() - 5); // 5 days ago
 
     mockWithTenantContext
-      .mockResolvedValueOnce([{
-        id: 'purchase-1',
-        courseId: 'course-1',
-        tenantId: 'tenant-1',
-        status: 'COMPLETE',
-        stripePaymentIntentId: 'pi_test_123',
-        amountCents: 4999,
-        purchasedAt: recentDate,
-      }])
+      .mockResolvedValueOnce([
+        {
+          id: 'purchase-1',
+          courseId: 'course-1',
+          tenantId: 'tenant-1',
+          status: 'COMPLETE',
+          stripePaymentIntentId: 'pi_test_123',
+          amountCents: 4999,
+          purchasedAt: recentDate,
+        },
+      ])
       .mockResolvedValueOnce(undefined) // update
       .mockResolvedValueOnce([{ title: 'Test Course' }]); // course title
 
@@ -177,15 +181,17 @@ describe('MarketplaceCheckoutService', () => {
     const oldDate = new Date();
     oldDate.setDate(oldDate.getDate() - 15); // 15 days ago
 
-    mockWithTenantContext.mockResolvedValueOnce([{
-      id: 'purchase-1',
-      courseId: 'course-1',
-      tenantId: 'tenant-1',
-      status: 'COMPLETE',
-      stripePaymentIntentId: 'pi_test_123',
-      amountCents: 4999,
-      purchasedAt: oldDate,
-    }]);
+    mockWithTenantContext.mockResolvedValueOnce([
+      {
+        id: 'purchase-1',
+        courseId: 'course-1',
+        tenantId: 'tenant-1',
+        status: 'COMPLETE',
+        stripePaymentIntentId: 'pi_test_123',
+        amountCents: 4999,
+        purchasedAt: oldDate,
+      },
+    ]);
 
     await expect(
       service.requestRefund('purchase-1', TENANT_CTX)
@@ -193,15 +199,17 @@ describe('MarketplaceCheckoutService', () => {
   });
 
   it('6. rejects refund for already-refunded purchase', async () => {
-    mockWithTenantContext.mockResolvedValueOnce([{
-      id: 'purchase-1',
-      courseId: 'course-1',
-      tenantId: 'tenant-1',
-      status: 'REFUNDED',
-      stripePaymentIntentId: 'pi_test_123',
-      amountCents: 4999,
-      purchasedAt: new Date(),
-    }]);
+    mockWithTenantContext.mockResolvedValueOnce([
+      {
+        id: 'purchase-1',
+        courseId: 'course-1',
+        tenantId: 'tenant-1',
+        status: 'REFUNDED',
+        stripePaymentIntentId: 'pi_test_123',
+        amountCents: 4999,
+        purchasedAt: new Date(),
+      },
+    ]);
 
     await expect(
       service.requestRefund('purchase-1', TENANT_CTX)
@@ -213,15 +221,17 @@ describe('MarketplaceCheckoutService', () => {
     thirteenDaysAgo.setDate(thirteenDaysAgo.getDate() - 13);
 
     mockWithTenantContext
-      .mockResolvedValueOnce([{
-        id: 'purchase-2',
-        courseId: 'course-2',
-        tenantId: 'tenant-1',
-        status: 'COMPLETE',
-        stripePaymentIntentId: 'pi_test_456',
-        amountCents: 1999,
-        purchasedAt: thirteenDaysAgo,
-      }])
+      .mockResolvedValueOnce([
+        {
+          id: 'purchase-2',
+          courseId: 'course-2',
+          tenantId: 'tenant-1',
+          status: 'COMPLETE',
+          stripePaymentIntentId: 'pi_test_456',
+          amountCents: 1999,
+          purchasedAt: thirteenDaysAgo,
+        },
+      ])
       .mockResolvedValueOnce(undefined) // update
       .mockResolvedValueOnce([{ title: 'Course 2' }]); // title
 

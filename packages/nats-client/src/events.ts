@@ -31,7 +31,10 @@ export * from './notification-events.js';
 
 // ─── Discriminated Union ─────────────────────────────────────────────────────
 
-import type { AgentSessionPayload, AgentMessagePayload } from './agent-events.js';
+import type {
+  AgentSessionPayload,
+  AgentMessagePayload,
+} from './agent-events.js';
 import type { AnnotationPayload } from './annotation-events.js';
 import type {
   ContentPayload,
@@ -39,8 +42,15 @@ import type {
   TranscriptionPayload,
   ContentTranslationPayload,
 } from './content-events.js';
-import type { KnowledgeConceptPayload, KnowledgeConceptDeletedPayload } from './knowledge-events.js';
-import type { LessonPayload, LessonPipelineModuleCompletedPayload, LessonNEREntitiesPayload } from './lesson-events.js';
+import type {
+  KnowledgeConceptPayload,
+  KnowledgeConceptDeletedPayload,
+} from './knowledge-events.js';
+import type {
+  LessonPayload,
+  LessonPipelineModuleCompletedPayload,
+  LessonNEREntitiesPayload,
+} from './lesson-events.js';
 import type {
   SocialFeedItemPayload,
   PeerReviewAssignedPayload,
@@ -48,7 +58,10 @@ import type {
   DiscussionReplyPayload,
   UserFollowedPayload,
 } from './social-events.js';
-import type { GatewayPubSubPayload, PollVotePayload } from './gateway-events.js';
+import type {
+  GatewayPubSubPayload,
+  PollVotePayload,
+} from './gateway-events.js';
 import type {
   NotificationDispatchPayload,
   DeliveryStatusPayload,

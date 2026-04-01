@@ -160,7 +160,11 @@ export class ScormResolver {
   async exportCourseAsScorm2004(
     @Args('courseId') courseId: string,
     @Context() ctx: GraphQLContext
-  ): Promise<{ downloadUrl: string; expiresAt: string; fileSizeBytes: number }> {
+  ): Promise<{
+    downloadUrl: string;
+    expiresAt: string;
+    fileSizeBytes: number;
+  }> {
     const auth = this.requireAuth(ctx);
     this.logger.log(
       `exportCourseAsScorm2004: courseId=${courseId} userId=${auth.userId} tenantId=${auth.tenantId}`

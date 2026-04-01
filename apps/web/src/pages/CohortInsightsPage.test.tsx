@@ -8,12 +8,22 @@ import React from 'react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
-  useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
-  useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -31,7 +41,11 @@ vi.mock('@/components/Layout', () => ({
 
 vi.mock('@/components/cohort-insights/CohortInsightsWidget', () => ({
   CohortInsightsWidget: (props: Record<string, unknown>) => (
-    <div data-testid="cohort-insights-widget" data-concept-id={props.conceptId} data-course-id={props.courseId}>
+    <div
+      data-testid="cohort-insights-widget"
+      data-concept-id={props.conceptId}
+      data-course-id={props.courseId}
+    >
       CohortInsightsWidget Mock
     </div>
   ),
@@ -39,9 +53,14 @@ vi.mock('@/components/cohort-insights/CohortInsightsWidget', () => ({
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => ({
-    id: 'u-1', username: 'testuser', email: 'test@example.com',
-    firstName: 'Alice', lastName: 'Smith', tenantId: 't-1',
-    role: 'STUDENT', scopes: ['read'],
+    id: 'u-1',
+    username: 'testuser',
+    email: 'test@example.com',
+    firstName: 'Alice',
+    lastName: 'Smith',
+    tenantId: 't-1',
+    role: 'STUDENT',
+    scopes: ['read'],
   })),
   DEV_MODE: true,
   logout: vi.fn(),
@@ -49,12 +68,25 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/contexts/ThemeContext', () => ({
   useTheme: vi.fn(() => ({
-    resolvedMode: 'light', setThemeMode: vi.fn(), tenantPrimitives: {},
-    userPreferences: { mode: 'system', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
-    setTenantTheme: vi.fn(), setFontSize: vi.fn(), setReadingMode: vi.fn(),
-    setMotionPreference: vi.fn(), previewThemeChanges: vi.fn(),
+    resolvedMode: 'light',
+    setThemeMode: vi.fn(),
+    tenantPrimitives: {},
+    userPreferences: {
+      mode: 'system',
+      fontSize: 'md',
+      readingMode: false,
+      motionPreference: 'full',
+      contrastMode: 'normal',
+    },
+    setTenantTheme: vi.fn(),
+    setFontSize: vi.fn(),
+    setReadingMode: vi.fn(),
+    setMotionPreference: vi.fn(),
+    previewThemeChanges: vi.fn(),
   })),
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock('@/components/AppSidebar', () => ({
@@ -92,7 +124,9 @@ describe('CohortInsightsPage', () => {
 
   it('displays translated subtitle text', () => {
     renderPage();
-    expect(screen.getByText('Discover how past cohorts approached the same concepts')).toBeInTheDocument();
+    expect(
+      screen.getByText('Discover how past cohorts approached the same concepts')
+    ).toBeInTheDocument();
   });
 
   it('renders CohortInsightsWidget', () => {
@@ -102,12 +136,18 @@ describe('CohortInsightsPage', () => {
 
   it('passes conceptId=general to widget', () => {
     renderPage();
-    expect(screen.getByTestId('cohort-insights-widget')).toHaveAttribute('data-concept-id', 'general');
+    expect(screen.getByTestId('cohort-insights-widget')).toHaveAttribute(
+      'data-concept-id',
+      'general'
+    );
   });
 
   it('passes courseId=all to widget', () => {
     renderPage();
-    expect(screen.getByTestId('cohort-insights-widget')).toHaveAttribute('data-course-id', 'all');
+    expect(screen.getByTestId('cohort-insights-widget')).toHaveAttribute(
+      'data-course-id',
+      'all'
+    );
   });
 
   it('title is inside an h1 element', () => {
@@ -118,7 +158,9 @@ describe('CohortInsightsPage', () => {
 
   it('subtitle is a paragraph element', () => {
     renderPage();
-    const subtitle = screen.getByText('Discover how past cohorts approached the same concepts');
+    const subtitle = screen.getByText(
+      'Discover how past cohorts approached the same concepts'
+    );
     expect(subtitle.tagName).toBe('P');
   });
 
@@ -176,7 +218,9 @@ describe('CohortInsightsPage', () => {
 
   it('subtitle has muted foreground styling', () => {
     renderPage();
-    const subtitle = screen.getByText('Discover how past cohorts approached the same concepts');
+    const subtitle = screen.getByText(
+      'Discover how past cohorts approached the same concepts'
+    );
     expect(subtitle.className).toContain('text-muted-foreground');
   });
 

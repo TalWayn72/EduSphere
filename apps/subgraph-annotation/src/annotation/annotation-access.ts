@@ -1,7 +1,11 @@
 import { sql } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
-export type AnnotationLayer = 'PERSONAL' | 'SHARED' | 'INSTRUCTOR' | 'AI_GENERATED';
+export type AnnotationLayer =
+  | 'PERSONAL'
+  | 'SHARED'
+  | 'INSTRUCTOR'
+  | 'AI_GENERATED';
 export type AnnotationType =
   | 'TEXT'
   | 'SKETCH'

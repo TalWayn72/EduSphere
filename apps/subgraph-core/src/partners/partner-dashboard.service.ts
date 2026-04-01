@@ -5,7 +5,12 @@
  * Raw key returned exactly ONCE on regeneration — caller must deliver securely.
  * Memory safety: OnModuleDestroy closes all DB pools.
  */
-import { Injectable, Logger, OnModuleDestroy, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  NotFoundException,
+} from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
   createDatabaseConnection,
@@ -79,9 +84,7 @@ export class PartnerDashboardService implements OnModuleDestroy {
     };
   }
 
-  async regenerateApiKey(
-    partnerId: string
-  ): Promise<RegeneratedApiKeyResult> {
+  async regenerateApiKey(partnerId: string): Promise<RegeneratedApiKeyResult> {
     const rawKey = randomBytes(32).toString('hex');
     const hash = createHash('sha256').update(rawKey).digest('hex');
 

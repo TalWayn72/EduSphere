@@ -60,11 +60,7 @@ export function KnowledgeGraphPreview({
               </div>
             ))}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full mt-2 text-xs h-7"
-          >
+          <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-7">
             {t('content:exploreFullGraph')}{' '}
             <ChevronRight className="h-3 w-3 ml-1" />
           </Button>
@@ -120,9 +116,7 @@ function SearchResults({
 }: SearchResultsProps) {
   const results = [
     ...transcript
-      .filter((s) =>
-        s.text.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      .filter((s) => s.text.toLowerCase().includes(searchQuery.toLowerCase()))
       .map((s) => ({
         type: 'transcript' as const,
         id: s.id,
@@ -140,9 +134,7 @@ function SearchResults({
         ts: a.contentTimestamp,
       })),
     ...mockGraphData.nodes
-      .filter((n) =>
-        n.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      .filter((n) => n.label.toLowerCase().includes(searchQuery.toLowerCase()))
       .map((n) => ({
         type: 'concept' as const,
         id: n.id,

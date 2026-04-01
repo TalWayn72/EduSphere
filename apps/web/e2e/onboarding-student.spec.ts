@@ -16,7 +16,9 @@ test.describe('Student Onboarding — DEV_MODE guard', () => {
   });
 
   test('/onboarding page renders without crash overlay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -25,15 +27,21 @@ test.describe('Student Onboarding — DEV_MODE guard', () => {
   });
 
   test('no MOCK_ sentinel strings in onboarding DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
   });
 
-  test('no [object Object] serialization in onboarding DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+  test('no [object Object] serialization in onboarding DOM', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -58,7 +66,9 @@ test.describe('Student Onboarding — Live backend', () => {
 
     // Banner may or may not be shown (student may have already completed onboarding)
     // — if shown, assert it has correct ARIA role
-    const banner = page.getByRole('status').filter({ hasText: /profile setup/i });
+    const banner = page
+      .getByRole('status')
+      .filter({ hasText: /profile setup/i });
     const isVisible = await banner.isVisible().catch(() => false);
     if (isVisible) {
       await expect(banner).toBeVisible();
@@ -69,7 +79,9 @@ test.describe('Student Onboarding — Live backend', () => {
   });
 
   test('/onboarding page renders step wizard for student', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Should not show raw MOCK_ strings
@@ -89,8 +101,12 @@ test.describe('Student Onboarding — Flow tests', () => {
     await login(page);
   });
 
-  test('welcome screen displays greeting and get-started CTA', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+  test('welcome screen displays greeting and get-started CTA', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Welcome heading or greeting should be visible
@@ -108,13 +124,17 @@ test.describe('Student Onboarding — Flow tests', () => {
   });
 
   test('profile setup step allows name and avatar entry', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Look for profile-related inputs (name, display name, avatar upload)
-    const nameInput = page.locator(
-      'input[name*="name"], input[placeholder*="name" i], input[aria-label*="name" i]'
-    ).first();
+    const nameInput = page
+      .locator(
+        'input[name*="name"], input[placeholder*="name" i], input[aria-label*="name" i]'
+      )
+      .first();
     const nameExists = await nameInput.isVisible().catch(() => false);
 
     if (nameExists) {
@@ -128,17 +148,25 @@ test.describe('Student Onboarding — Flow tests', () => {
     });
   });
 
-  test('first course enrollment step shows available courses', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+  test('first course enrollment step shows available courses', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Navigate through steps to reach course selection if multi-step
-    const nextBtn = page.getByRole('button', { name: /next|continue/i }).first();
+    const nextBtn = page
+      .getByRole('button', { name: /next|continue/i })
+      .first();
     const hasNext = await nextBtn.isVisible().catch(() => false);
     if (hasNext) {
       // Click through initial steps to reach course enrollment
       for (let i = 0; i < 3; i++) {
-        const btn = page.getByRole('button', { name: /next|continue/i }).first();
+        const btn = page
+          .getByRole('button', { name: /next|continue/i })
+          .first();
         const visible = await btn.isVisible().catch(() => false);
         if (visible) await btn.click();
         await page.waitForLoadState('domcontentloaded');
@@ -154,7 +182,9 @@ test.describe('Student Onboarding — Flow tests', () => {
   });
 
   test('skip option allows bypassing onboarding', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Look for a skip link/button
@@ -181,7 +211,9 @@ test.describe('Student Onboarding — Flow tests', () => {
   });
 
   test('progress indicator shows current step', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Look for step indicators (dots, numbers, progress bar)
@@ -204,8 +236,12 @@ test.describe('Student Onboarding — Flow tests', () => {
     expect(indicatorExists || stepTextExists).toBe(true);
   });
 
-  test('language selection is available during onboarding', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+  test('language selection is available during onboarding', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Look for a language selector (combobox, select, or dedicated dropdown)
@@ -227,13 +263,17 @@ test.describe('Student Onboarding — Flow tests', () => {
   });
 
   test('tutorial completion navigates to dashboard', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Try to complete the onboarding by clicking through all steps
     for (let i = 0; i < 10; i++) {
       const finishBtn = page
-        .getByRole('button', { name: /finish|complete|done|get started|submit/i })
+        .getByRole('button', {
+          name: /finish|complete|done|get started|submit/i,
+        })
         .first();
       const finishVisible = await finishBtn.isVisible().catch(() => false);
       if (finishVisible) {
@@ -241,7 +281,9 @@ test.describe('Student Onboarding — Flow tests', () => {
         break;
       }
 
-      const nextBtn = page.getByRole('button', { name: /next|continue/i }).first();
+      const nextBtn = page
+        .getByRole('button', { name: /next|continue/i })
+        .first();
       const nextVisible = await nextBtn.isVisible().catch(() => false);
       if (nextVisible) {
         await nextBtn.click();
@@ -260,7 +302,9 @@ test.describe('Student Onboarding — Flow tests', () => {
 
   test('visual regression — onboarding welcome screen', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForLoadState('domcontentloaded');
 
@@ -279,7 +323,9 @@ test.describe('Student Onboarding — Flow tests', () => {
       }
     });
 
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Filter out known benign errors (e.g., favicon, sourcemap)
@@ -292,8 +338,12 @@ test.describe('Student Onboarding — Flow tests', () => {
     expect(realErrors).toHaveLength(0);
   });
 
-  test('onboarding page is accessible — no missing alt or role', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+  test('onboarding page is accessible — no missing alt or role', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // All images should have alt text
@@ -302,7 +352,9 @@ test.describe('Student Onboarding — Flow tests', () => {
     expect(imgCount, 'All images must have alt attributes').toBe(0);
 
     // All buttons should have accessible names
-    const buttons = page.locator('button:not([aria-label]):not([aria-labelledby])');
+    const buttons = page.locator(
+      'button:not([aria-label]):not([aria-labelledby])'
+    );
     const btnCount = await buttons.count();
     for (let i = 0; i < btnCount; i++) {
       const text = await buttons.nth(i).textContent();

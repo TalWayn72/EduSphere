@@ -2,12 +2,22 @@ import { useState } from 'react';
 
 // ── ResultCard ───────────────────────────────────────────────────────────────
 
-export function ResultCard({ icon, title, children, testId }: {
-  icon: string; title: string; children: React.ReactNode; testId: string;
+export function ResultCard({
+  icon,
+  title,
+  children,
+  testId,
+}: {
+  icon: string;
+  title: string;
+  children: React.ReactNode;
+  testId: string;
 }) {
   return (
     <div className="bg-card border rounded-xl p-4" data-testid={testId}>
-      <h2 className="text-base font-semibold mb-3">{icon} {title}</h2>
+      <h2 className="text-base font-semibold mb-3">
+        {icon} {title}
+      </h2>
       {children}
     </div>
   );
@@ -15,12 +25,23 @@ export function ResultCard({ icon, title, children, testId }: {
 
 // ── ExpandableText ───────────────────────────────────────────────────────────
 
-export function ExpandableText({ text, limit = 600, testId }: { text: string; limit?: number; testId: string }) {
+export function ExpandableText({
+  text,
+  limit = 600,
+  testId,
+}: {
+  text: string;
+  limit?: number;
+  testId: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const truncated = text.length > limit && !expanded;
   return (
     <div>
-      <pre className="text-xs whitespace-pre-wrap font-sans leading-relaxed text-foreground" data-testid={testId}>
+      <pre
+        className="text-xs whitespace-pre-wrap font-sans leading-relaxed text-foreground"
+        data-testid={testId}
+      >
         {truncated ? text.slice(0, limit) + '...' : text}
       </pre>
       {text.length > limit && (

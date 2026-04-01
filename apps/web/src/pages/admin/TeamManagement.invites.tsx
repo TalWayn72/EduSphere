@@ -5,7 +5,12 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 
 interface Invite {
@@ -21,7 +26,11 @@ interface PendingInvitesTableProps {
   t: (key: string) => string;
 }
 
-export function PendingInvitesTable({ invites, fetching, t }: PendingInvitesTableProps) {
+export function PendingInvitesTable({
+  invites,
+  fetching,
+  t,
+}: PendingInvitesTableProps) {
   return (
     <Card>
       <CardHeader>

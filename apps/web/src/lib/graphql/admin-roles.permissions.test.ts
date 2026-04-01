@@ -32,7 +32,7 @@ describe('admin-roles.permissions', () => {
     it('is computed from PERMISSION_GROUPS and contains all permission keys', () => {
       const expectedCount = PERMISSION_GROUPS.reduce(
         (sum, g) => sum + g.permissions.length,
-        0,
+        0
       );
       expect(ALL_PERMISSIONS).toHaveLength(expectedCount);
     });
@@ -65,7 +65,7 @@ describe('admin-roles.permissions', () => {
       const student = DEFAULT_ROLE_PERMISSIONS['STUDENT'];
       expect(student.length).toBeGreaterThan(0);
       expect(student.length).toBeLessThan(
-        DEFAULT_ROLE_PERMISSIONS['INSTRUCTOR'].length,
+        DEFAULT_ROLE_PERMISSIONS['INSTRUCTOR'].length
       );
     });
   });

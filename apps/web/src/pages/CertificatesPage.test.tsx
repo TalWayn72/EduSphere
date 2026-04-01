@@ -92,7 +92,8 @@ function mockQueries(
   vi.mocked(useQuery).mockImplementation((opts) => {
     const doc = String(opts.query);
     if (doc.includes('MyCertificates')) return makeState(certsOverrides);
-    if (doc.includes('CertificateDownloadUrl')) return makeState(downloadOverrides);
+    if (doc.includes('CertificateDownloadUrl'))
+      return makeState(downloadOverrides);
     return NOOP_STATE;
   });
 }
@@ -121,7 +122,9 @@ describe('CertificatesPage', () => {
 
   it('renders "Certificates" heading', async () => {
     await renderPage();
-    expect(screen.getByTestId('page-heading')).toHaveTextContent('Certificates');
+    expect(screen.getByTestId('page-heading')).toHaveTextContent(
+      'Certificates'
+    );
   });
 
   // ── 2. Skeleton ──────────────────────────────────────────────────────────
@@ -129,7 +132,9 @@ describe('CertificatesPage', () => {
   it('shows skeleton cards when fetching is true', async () => {
     mockQueries({ fetching: true });
     await renderPage();
-    const skeletons = document.querySelectorAll('[data-testid="cert-skeleton"]');
+    const skeletons = document.querySelectorAll(
+      '[data-testid="cert-skeleton"]'
+    );
     expect(skeletons.length).toBe(3);
   });
 

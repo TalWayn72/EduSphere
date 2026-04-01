@@ -40,7 +40,10 @@ export function AppSidebar() {
   }, [collapsed]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--sidebar-w', collapsed ? '64px' : '240px');
+    document.documentElement.style.setProperty(
+      '--sidebar-w',
+      collapsed ? '64px' : '240px'
+    );
   }, [collapsed]);
 
   return (
@@ -56,7 +59,11 @@ export function AppSidebar() {
       {/* Logo area */}
       <div className="flex items-center gap-3 px-4 py-5 shrink-0">
         <img
-          src={collapsed ? (branding.logoMarkUrl ?? branding.logoUrl) : branding.logoUrl}
+          src={
+            collapsed
+              ? (branding.logoMarkUrl ?? branding.logoUrl)
+              : branding.logoUrl
+          }
           alt={branding.organizationName}
           className="h-7 w-7 shrink-0 object-contain"
           data-testid="sidebar-logo-icon"
@@ -77,14 +84,21 @@ export function AppSidebar() {
           {(branding.organizationName?.[0] ?? 'E').toUpperCase()}
         </div>
         {!collapsed && (
-          <span className="text-lg font-bold text-foreground truncate" data-testid="sidebar-brand-name">
+          <span
+            className="text-lg font-bold text-foreground truncate"
+            data-testid="sidebar-brand-name"
+          >
             {branding.organizationName}
           </span>
         )}
       </div>
 
       {/* Main nav -- grouped by role */}
-      <nav id="main-nav" className="flex-1 overflow-y-auto py-2" aria-label="Main navigation">
+      <nav
+        id="main-nav"
+        className="flex-1 overflow-y-auto py-2"
+        aria-label="Main navigation"
+      >
         {visibleGroups.map((group, groupIdx) => (
           <div key={group.key} data-testid={`nav-group-${group.key}`}>
             {groupIdx > 0 && <hr className="border-border mx-4 my-2" />}
@@ -98,7 +112,9 @@ export function AppSidebar() {
             )}
             {group.items.map(({ to, icon: Icon, labelKey }) => {
               const label = t(labelKey);
-              const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+              const isActive =
+                location.pathname === to ||
+                location.pathname.startsWith(to + '/');
               return (
                 <NavLink
                   key={to}
@@ -130,7 +146,9 @@ export function AppSidebar() {
         user={user}
         hideEduSphereBranding={!!branding.hideEduSphereBranding}
         onToggleCollapse={() => setCollapsed((prev) => !prev)}
-        onToggleTheme={() => setThemeMode(resolvedMode === 'dark' ? 'light' : 'dark')}
+        onToggleTheme={() =>
+          setThemeMode(resolvedMode === 'dark' ? 'light' : 'dark')
+        }
       />
     </aside>
   );

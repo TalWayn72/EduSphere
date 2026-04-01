@@ -93,7 +93,8 @@ export function ChatMessage({
   const location = useLocation();
   const isAgent = message.role === 'agent';
   const isConsentRequired =
-    message.type === 'consent-required' || message.content === 'consent-required';
+    message.type === 'consent-required' ||
+    message.content === 'consent-required';
 
   // Split by paragraphs for better formatting
   const paragraphs = isConsentRequired ? [] : message.content.split('\n\n');

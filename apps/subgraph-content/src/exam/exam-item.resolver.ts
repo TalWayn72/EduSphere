@@ -26,10 +26,7 @@ export class ExamItemResolver {
     @Context() ctx: GraphQLContext
   ) {
     const { tenantId, userId } = this.extractAuth(ctx);
-    this.logger.log(
-      { courseId, tenantId, userId },
-      'examItemBank query'
-    );
+    this.logger.log({ courseId, tenantId, userId }, 'examItemBank query');
     return this.itemService.getItemBank(
       courseId,
       filters as Parameters<typeof this.itemService.getItemBank>[1],
@@ -71,10 +68,7 @@ export class ExamItemResolver {
   }
 
   @Mutation('retireExamItem')
-  async retireExamItem(
-    @Args('id') id: string,
-    @Context() ctx: GraphQLContext
-  ) {
+  async retireExamItem(@Args('id') id: string, @Context() ctx: GraphQLContext) {
     const { tenantId, userId } = this.extractAuth(ctx);
     this.logger.log({ id, tenantId }, 'retireExamItem mutation');
     return this.itemService.retireItem(id, tenantId, userId);

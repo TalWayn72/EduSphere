@@ -7,10 +7,34 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 /** Reserved subdomains that cannot be claimed by orgs. */
 const RESERVED_SUBDOMAINS = new Set([
-  'www', 'api', 'app', 'admin', 'mail', 'smtp', 'ftp', 'ssh',
-  'login', 'auth', 'sso', 'cdn', 'static', 'assets', 'docs',
-  'help', 'support', 'status', 'blog', 'test', 'staging', 'dev',
-  'sandbox', 'demo', 'beta', 'preview', 'internal', 'portal',
+  'www',
+  'api',
+  'app',
+  'admin',
+  'mail',
+  'smtp',
+  'ftp',
+  'ssh',
+  'login',
+  'auth',
+  'sso',
+  'cdn',
+  'static',
+  'assets',
+  'docs',
+  'help',
+  'support',
+  'status',
+  'blog',
+  'test',
+  'staging',
+  'dev',
+  'sandbox',
+  'demo',
+  'beta',
+  'preview',
+  'internal',
+  'portal',
 ]);
 
 export type DnsStatus = 'idle' | 'checking' | 'valid' | 'invalid' | 'error';

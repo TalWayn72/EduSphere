@@ -52,7 +52,7 @@ describe('ExamSecurityService', () => {
       await service.recordBrowserEvent(
         'session-1',
         { type: 'TAB_SWITCH', timestamp: '2025-01-01T00:00:00Z' },
-        'tenant-1',
+        'tenant-1'
       );
 
       expect(mockTx.execute).toHaveBeenCalled();
@@ -143,7 +143,7 @@ describe('ExamSecurityService', () => {
 
       expect(result).toBe(true);
       expect(chain.set).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'VOIDED' }),
+        expect.objectContaining({ status: 'VOIDED' })
       );
     });
   });

@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -59,11 +64,7 @@ export class LessonPlanService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  async createPlan(
-    courseId: string,
-    tenantCtx: TenantContext,
-    title: string
-  ) {
+  async createPlan(courseId: string, tenantCtx: TenantContext, title: string) {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [row] = await tx
         .insert(schema.course_lesson_plans)
@@ -136,19 +137,17 @@ export class LessonPlanService implements OnModuleDestroy {
         .where(eq(schema.course_lesson_steps.plan_id, planId))
         .orderBy(asc(schema.course_lesson_steps.step_order));
       const nextOrder = existing.length;
-      await tx
-        .insert(schema.course_lesson_steps)
-        .values({
-          plan_id: planId,
-          step_type: stepType as
-            | 'VIDEO'
-            | 'QUIZ'
-            | 'DISCUSSION'
-            | 'AI_CHAT'
-            | 'SUMMARY',
-          step_order: nextOrder,
-          config,
-        });
+      await tx.insert(schema.course_lesson_steps).values({
+        plan_id: planId,
+        step_type: stepType as
+          | 'VIDEO'
+          | 'QUIZ'
+          | 'DISCUSSION'
+          | 'AI_CHAT'
+          | 'SUMMARY',
+        step_order: nextOrder,
+        config,
+      });
       const [plan] = await tx
         .select()
         .from(schema.course_lesson_plans)
@@ -167,7 +166,11 @@ export class LessonPlanService implements OnModuleDestroy {
     });
   }
 
-  async reorderSteps(planId: string, tenantCtx: TenantContext, stepIds: string[]) {
+  async reorderSteps(
+    planId: string,
+    tenantCtx: TenantContext,
+    stepIds: string[]
+  ) {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       for (let i = 0; i < stepIds.length; i++) {
         const stepId = stepIds[i];

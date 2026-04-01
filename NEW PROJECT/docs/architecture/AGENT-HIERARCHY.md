@@ -10,11 +10,11 @@
 
 ### 3-Level Hierarchy
 
-| Level | Role | Count | Responsibility |
-|-------|------|-------|----------------|
-| **Level 0** | Orchestrator | 1 | Coordinates Leads, tracks progress, communicates with user |
-| **Level 1** | Division Leads | 10 | Plans, delegates to specialists, verifies quality gates, reports |
-| **Level 2** | Specialists | 33+ | Implements code, tests, docs, security audits, deployments |
+| Level       | Role           | Count | Responsibility                                                   |
+| ----------- | -------------- | ----- | ---------------------------------------------------------------- |
+| **Level 0** | Orchestrator   | 1     | Coordinates Leads, tracks progress, communicates with user       |
+| **Level 1** | Division Leads | 10    | Plans, delegates to specialists, verifies quality gates, reports |
+| **Level 2** | Specialists    | 33+   | Implements code, tests, docs, security audits, deployments       |
 
 ---
 
@@ -159,13 +159,13 @@ stateDiagram-v2
 
 ### Division 2: Product & Requirements
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | ProductLead | Division report | `product-skills`, `sequential-thinking` | `memory`, `tavily` |
-| Spec 1 | PRD-Analyst | PRD delta doc | `product-skills`, `brainstorming` | `tavily`, `memory` |
-| Spec 2 | EdgeCase-Analyst | Edge case catalog | `stride-analysis-patterns`, `systems-thinking` | `sequential-thinking`, `tavily` |
-| Spec 3 | AccCriteria-Eng | Given/When/Then criteria | `product-skills`, `test-driven-development` | `memory` |
-| Spec 4 | Risk-Analyst | Risk matrix | `stride-analysis-patterns`, `systems-thinking` | `tavily`, `sequential-thinking` |
+| Role     | Agent            | Produces                 | Skills                                         | MCP Tools                       |
+| -------- | ---------------- | ------------------------ | ---------------------------------------------- | ------------------------------- |
+| **Lead** | ProductLead      | Division report          | `product-skills`, `sequential-thinking`        | `memory`, `tavily`              |
+| Spec 1   | PRD-Analyst      | PRD delta doc            | `product-skills`, `brainstorming`              | `tavily`, `memory`              |
+| Spec 2   | EdgeCase-Analyst | Edge case catalog        | `stride-analysis-patterns`, `systems-thinking` | `sequential-thinking`, `tavily` |
+| Spec 3   | AccCriteria-Eng  | Given/When/Then criteria | `product-skills`, `test-driven-development`    | `memory`                        |
+| Spec 4   | Risk-Analyst     | Risk matrix              | `stride-analysis-patterns`, `systems-thinking` | `tavily`, `sequential-thinking` |
 
 **Quality Gate:** All acceptance criteria testable. Risk matrix has mitigations for HIGH items. Edge cases cover multi-tenant + offline + concurrent.
 
@@ -173,12 +173,12 @@ stateDiagram-v2
 
 ### Division 3: Software Architecture
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | ArchLead | ADR, impact, perf budget | `architecture-patterns`, `architecture-decision-records` | `memory`, `sequential-thinking` |
-| Spec 1 | SystemImpact-Analyst | Affected services map | `microservices-patterns`, `{API_FRAMEWORK}-patterns` | `graphql`, `postgres` |
-| Spec 2 | Perf-Architect | Latency/memory budgets | `performance-profiling`, `caching-strategies` | `postgres`, `sequential-thinking` |
-| Spec 3 | DomainModeler | Entity relationships | `graphql-architect`, `database-design-patterns` | `graphql`, `postgres` |
+| Role     | Agent                | Produces                 | Skills                                                   | MCP Tools                         |
+| -------- | -------------------- | ------------------------ | -------------------------------------------------------- | --------------------------------- |
+| **Lead** | ArchLead             | ADR, impact, perf budget | `architecture-patterns`, `architecture-decision-records` | `memory`, `sequential-thinking`   |
+| Spec 1   | SystemImpact-Analyst | Affected services map    | `microservices-patterns`, `{API_FRAMEWORK}-patterns`     | `graphql`, `postgres`             |
+| Spec 2   | Perf-Architect       | Latency/memory budgets   | `performance-profiling`, `caching-strategies`            | `postgres`, `sequential-thinking` |
+| Spec 3   | DomainModeler        | Entity relationships     | `graphql-architect`, `database-design-patterns`          | `graphql`, `postgres`             |
 
 **Quality Gate:** ADR produced for non-trivial decisions. Service entity ownership clear. Performance budget defined.
 
@@ -186,13 +186,13 @@ stateDiagram-v2
 
 ### Division 4: UX/UI Design
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | UXLead | UX review, a11y report | `accessibility-compliance`, `design-system-creator` | `{E2E_FRAMEWORK}`, `memory` |
-| Spec 1 | FlowDesigner | User flow diagrams | `interaction-design`, `responsive-design` | `{E2E_FRAMEWORK}` |
-| Spec 2 | A11y-Auditor | WCAG 2.1 AA checklist | `wcag-audit-patterns`, `screen-reader-testing` | `{E2E_FRAMEWORK}` |
-| Spec 3 | DesignSys-Eng | {UI_LIBRARY}/{CSS_FRAMEWORK} compliance | `design-system-patterns`, `{CSS_FRAMEWORK}-patterns` | `context7` |
-| Spec 4 | Microcopy-Reviewer | i18n/{RTL_SUPPORT} coverage | `internationalization-i18n`, `responsive-design` | `tavily` |
+| Role     | Agent              | Produces                                | Skills                                               | MCP Tools                   |
+| -------- | ------------------ | --------------------------------------- | ---------------------------------------------------- | --------------------------- |
+| **Lead** | UXLead             | UX review, a11y report                  | `accessibility-compliance`, `design-system-creator`  | `{E2E_FRAMEWORK}`, `memory` |
+| Spec 1   | FlowDesigner       | User flow diagrams                      | `interaction-design`, `responsive-design`            | `{E2E_FRAMEWORK}`           |
+| Spec 2   | A11y-Auditor       | WCAG 2.1 AA checklist                   | `wcag-audit-patterns`, `screen-reader-testing`       | `{E2E_FRAMEWORK}`           |
+| Spec 3   | DesignSys-Eng      | {UI_LIBRARY}/{CSS_FRAMEWORK} compliance | `design-system-patterns`, `{CSS_FRAMEWORK}-patterns` | `context7`                  |
+| Spec 4   | Microcopy-Reviewer | i18n/{RTL_SUPPORT} coverage             | `internationalization-i18n`, `responsive-design`     | `tavily`                    |
 
 **Quality Gate:** All flows have error states. WCAG AA complete. No hardcoded {LANGUAGE}. {RTL_SUPPORT} verified. Design tokens consistent.
 
@@ -200,12 +200,12 @@ stateDiagram-v2
 
 ### Division 5: Frontend Engineering
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | FELead | Verified FE deliverables | `{FRONTEND_FRAMEWORK}-expert`, `{FRONTEND_FRAMEWORK}-state-management` | `typescript-diagnostics`, `eslint` |
-| Spec 1 | Component-Architect | {FRONTEND_FRAMEWORK} components, hooks | `{FRONTEND_FRAMEWORK}-expert`, `{FRONTEND_FRAMEWORK}-composition-patterns`, `typescript-advanced-patterns` | `eslint`, `typescript-diagnostics`, `context7` |
-| Spec 2 | StatePerf-Eng | {SERVER_STATE_LIB}/{CLIENT_STATE_LIB} integration | `{FRONTEND_FRAMEWORK}-state-management`, `{FRONTEND_FRAMEWORK}-performance-optimizer` | `eslint`, `typescript-diagnostics`, `graphql` |
-| Spec 3 | ResponsiveA11y-Eng | Responsive + ARIA + {RTL_SUPPORT} | `responsive-web-design`, `accessibility-compliance`, `internationalization-i18n` | `eslint`, `{E2E_FRAMEWORK}`, `typescript-diagnostics` |
+| Role     | Agent               | Produces                                          | Skills                                                                                                     | MCP Tools                                             |
+| -------- | ------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Lead** | FELead              | Verified FE deliverables                          | `{FRONTEND_FRAMEWORK}-expert`, `{FRONTEND_FRAMEWORK}-state-management`                                     | `typescript-diagnostics`, `eslint`                    |
+| Spec 1   | Component-Architect | {FRONTEND_FRAMEWORK} components, hooks            | `{FRONTEND_FRAMEWORK}-expert`, `{FRONTEND_FRAMEWORK}-composition-patterns`, `typescript-advanced-patterns` | `eslint`, `typescript-diagnostics`, `context7`        |
+| Spec 2   | StatePerf-Eng       | {SERVER_STATE_LIB}/{CLIENT_STATE_LIB} integration | `{FRONTEND_FRAMEWORK}-state-management`, `{FRONTEND_FRAMEWORK}-performance-optimizer`                      | `eslint`, `typescript-diagnostics`, `graphql`         |
+| Spec 3   | ResponsiveA11y-Eng  | Responsive + ARIA + {RTL_SUPPORT}                 | `responsive-web-design`, `accessibility-compliance`, `internationalization-i18n`                           | `eslint`, `{E2E_FRAMEWORK}`, `typescript-diagnostics` |
 
 **Quality Gate:** `typecheck` 0 errors. `lint` 0 errors. All components tested. No `any`. No `console.log`. Files ≤150 lines.
 
@@ -213,12 +213,12 @@ stateDiagram-v2
 
 ### Division 6: Backend Engineering
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | BELead | Verified BE deliverables | `{BACKEND_FRAMEWORK}-best-practices`, `graphql-architect` | `typescript-diagnostics`, `eslint`, `graphql` |
-| Spec 1 | API-Architect | SDL, resolvers, stubs | `{API_FRAMEWORK}-patterns`, `graphql-architect`, `api-federation` | `eslint`, `typescript-diagnostics`, `graphql`, `context7` |
-| Spec 2 | DomainLogic-Eng | Services, {VALIDATION_LIB} schemas | `{BACKEND_FRAMEWORK}-best-practices`, `error-handling-patterns`, `{VALIDATION_LIB}` | `eslint`, `typescript-diagnostics`, `postgres`, `context7` |
-| Spec 3 | BackgroundJobs-Eng | {EVENT_BUS} handlers, async | `{EVENT_BUS}-patterns`, `nodejs-backend-patterns` | `eslint`, `typescript-diagnostics`, `{EVENT_BUS}` |
+| Role     | Agent              | Produces                           | Skills                                                                              | MCP Tools                                                  |
+| -------- | ------------------ | ---------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Lead** | BELead             | Verified BE deliverables           | `{BACKEND_FRAMEWORK}-best-practices`, `graphql-architect`                           | `typescript-diagnostics`, `eslint`, `graphql`              |
+| Spec 1   | API-Architect      | SDL, resolvers, stubs              | `{API_FRAMEWORK}-patterns`, `graphql-architect`, `api-federation`                   | `eslint`, `typescript-diagnostics`, `graphql`, `context7`  |
+| Spec 2   | DomainLogic-Eng    | Services, {VALIDATION_LIB} schemas | `{BACKEND_FRAMEWORK}-best-practices`, `error-handling-patterns`, `{VALIDATION_LIB}` | `eslint`, `typescript-diagnostics`, `postgres`, `context7` |
+| Spec 3   | BackgroundJobs-Eng | {EVENT_BUS} handlers, async        | `{EVENT_BUS}-patterns`, `nodejs-backend-patterns`                                   | `eslint`, `typescript-diagnostics`, `{EVENT_BUS}`          |
 
 **Quality Gate:** All mutations have {VALIDATION_LIB}. All resolvers tested. No raw SQL. {LOGGER} logger. `{LIFECYCLE_CLEANUP_HOOK}` for connections.
 
@@ -226,12 +226,12 @@ stateDiagram-v2
 
 ### Division 7: Database & Data
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | DBLead | Verified DB deliverables | `{ORM}-patterns`, `{DATABASE}-optimization` | `postgres`, `eslint` |
-| Spec 1 | Schema-Architect | {ORM} schemas, RLS | `{ORM}-patterns`, `{DATABASE}-table-design`, `access-control-rbac` | `postgres`, `eslint` |
-| Spec 2 | QueryOptimizer | EXPLAIN plans, indexes | `{DATABASE}-optimization`, `sql-optimization-patterns` | `postgres`, `sequential-thinking` |
-| Spec 3 | Migration-Eng | Migrations, rollback, seeds | `{ORM}-migrations`, `database-migration` | `postgres`, `eslint` |
+| Role     | Agent            | Produces                    | Skills                                                             | MCP Tools                         |
+| -------- | ---------------- | --------------------------- | ------------------------------------------------------------------ | --------------------------------- |
+| **Lead** | DBLead           | Verified DB deliverables    | `{ORM}-patterns`, `{DATABASE}-optimization`                        | `postgres`, `eslint`              |
+| Spec 1   | Schema-Architect | {ORM} schemas, RLS          | `{ORM}-patterns`, `{DATABASE}-table-design`, `access-control-rbac` | `postgres`, `eslint`              |
+| Spec 2   | QueryOptimizer   | EXPLAIN plans, indexes      | `{DATABASE}-optimization`, `sql-optimization-patterns`             | `postgres`, `sequential-thinking` |
+| Spec 3   | Migration-Eng    | Migrations, rollback, seeds | `{ORM}-migrations`, `database-migration`                           | `postgres`, `eslint`              |
 
 **Quality Gate:** All tables RLS-enabled. `{TENANT_CONTEXT_WRAPPER}` everywhere. Rollback path exists. `test:rls` passes. No `new Pool()`.
 
@@ -239,12 +239,12 @@ stateDiagram-v2
 
 ### Division 8: Security & Compliance
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | SecurityLead | {SI-1}..{SI-N} audit | `security-auditor`, `access-control-rbac` | `postgres`, `sequential-thinking`, `memory` |
-| Spec 1 | AppSec-Analyst | XSS/injection/secret scans | `security-reviewer`, `api-security-hardening` | `eslint`, `postgres` |
-| Spec 2 | PenTest-Spec | Auth bypass, IDOR, RLS escape | `vulnerability-scanning`, `stride-analysis-patterns` | `postgres`, `{E2E_FRAMEWORK}` |
-| Spec 3 | AuthPrivacy-Eng | JWT scopes, GDPR, {SI-N} | `auth-implementation-patterns`, `gdpr-data-handling`, `hipaa-compliance` | `postgres`, `graphql` |
+| Role     | Agent           | Produces                      | Skills                                                                   | MCP Tools                                   |
+| -------- | --------------- | ----------------------------- | ------------------------------------------------------------------------ | ------------------------------------------- |
+| **Lead** | SecurityLead    | {SI-1}..{SI-N} audit          | `security-auditor`, `access-control-rbac`                                | `postgres`, `sequential-thinking`, `memory` |
+| Spec 1   | AppSec-Analyst  | XSS/injection/secret scans    | `security-reviewer`, `api-security-hardening`                            | `eslint`, `postgres`                        |
+| Spec 2   | PenTest-Spec    | Auth bypass, IDOR, RLS escape | `vulnerability-scanning`, `stride-analysis-patterns`                     | `postgres`, `{E2E_FRAMEWORK}`               |
+| Spec 3   | AuthPrivacy-Eng | JWT scopes, GDPR, {SI-N}      | `auth-implementation-patterns`, `gdpr-data-handling`, `hipaa-compliance` | `postgres`, `graphql`                       |
 
 **Quality Gate:** {SI-1}..{SI-N} all PASS. `test:security` passes. No unprotected endpoints. No PII without encryption.
 
@@ -252,13 +252,13 @@ stateDiagram-v2
 
 ### Division 9: QA & Validation
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | QALead | Full test report | `{E2E_FRAMEWORK}-expert`, `e2e-testing-patterns` | `{E2E_FRAMEWORK}`, `eslint`, `typescript-diagnostics` |
-| Spec 1 | UnitInteg-Eng | Unit + integration tests | `javascript-testing-patterns`, `{TEST_FRAMEWORK}-testing-patterns` | `eslint`, `typescript-diagnostics` |
-| Spec 2 | E2E-Eng | E2E specs, screenshots | `{E2E_FRAMEWORK}-expert`, `{E2E_FRAMEWORK}-screenshot-inspector` | `{E2E_FRAMEWORK}`, `eslint` |
-| Spec 3 | LoadCompat-Eng | Load tests, cross-browser | `web-performance-audit`, `api-testing` | `{E2E_FRAMEWORK}`, `postgres` |
-| Spec 4 | Regression-Eng | Bug reproducers, pattern-clean | `systematic-debugging`, `test-driven-development` | `eslint`, `typescript-diagnostics` |
+| Role     | Agent          | Produces                       | Skills                                                             | MCP Tools                                             |
+| -------- | -------------- | ------------------------------ | ------------------------------------------------------------------ | ----------------------------------------------------- |
+| **Lead** | QALead         | Full test report               | `{E2E_FRAMEWORK}-expert`, `e2e-testing-patterns`                   | `{E2E_FRAMEWORK}`, `eslint`, `typescript-diagnostics` |
+| Spec 1   | UnitInteg-Eng  | Unit + integration tests       | `javascript-testing-patterns`, `{TEST_FRAMEWORK}-testing-patterns` | `eslint`, `typescript-diagnostics`                    |
+| Spec 2   | E2E-Eng        | E2E specs, screenshots         | `{E2E_FRAMEWORK}-expert`, `{E2E_FRAMEWORK}-screenshot-inspector`   | `{E2E_FRAMEWORK}`, `eslint`                           |
+| Spec 3   | LoadCompat-Eng | Load tests, cross-browser      | `web-performance-audit`, `api-testing`                             | `{E2E_FRAMEWORK}`, `postgres`                         |
+| Spec 4   | Regression-Eng | Bug reproducers, pattern-clean | `systematic-debugging`, `test-driven-development`                  | `eslint`, `typescript-diagnostics`                    |
 
 **Quality Gate:** `{TEST_COMMAND}` 100%. `typecheck` 0 errors. `lint` 0 errors. All E2E pass. {TEST_USERS} authenticate. Health-check passes. Coverage met.
 
@@ -266,12 +266,12 @@ stateDiagram-v2
 
 ### Division 10: Documentation
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | DocLead | Verified doc updates | `api-reference-documentation`, `architecture-decision-records` | `memory`, `github` |
-| Spec 1 | APIDocs-Writer | {API_CONTRACTS_FILE}, schema docs | `api-reference-documentation`, `graphql-schema` | `graphql`, `memory` |
-| Spec 2 | UserGuide-Writer | README, OPEN_ISSUES | `technical-writer`, `changelog-automation` | `github`, `memory` |
-| Spec 3 | ArchDocs-Writer | Architecture, ADRs, Mermaid | `architecture-decision-records`, `mermaid-graph-writer` | `memory` |
+| Role     | Agent            | Produces                          | Skills                                                         | MCP Tools           |
+| -------- | ---------------- | --------------------------------- | -------------------------------------------------------------- | ------------------- |
+| **Lead** | DocLead          | Verified doc updates              | `api-reference-documentation`, `architecture-decision-records` | `memory`, `github`  |
+| Spec 1   | APIDocs-Writer   | {API_CONTRACTS_FILE}, schema docs | `api-reference-documentation`, `graphql-schema`                | `graphql`, `memory` |
+| Spec 2   | UserGuide-Writer | README, OPEN_ISSUES               | `technical-writer`, `changelog-automation`                     | `github`, `memory`  |
+| Spec 3   | ArchDocs-Writer  | Architecture, ADRs, Mermaid       | `architecture-decision-records`, `mermaid-graph-writer`        | `memory`            |
 
 **Quality Gate:** All changed APIs documented. OPEN_ISSUES.md updated. README accurate. Mermaid present for new architecture.
 
@@ -279,12 +279,12 @@ stateDiagram-v2
 
 ### Division 11: DevOps & Release
 
-| Role | Agent | Produces | Skills | MCP Tools |
-|------|-------|----------|--------|-----------|
-| **Lead** | DevOpsLead | Deploy readiness report | `devops-engineer`, `deployment-pipeline-design` | `github`, `postgres` |
-| Spec 1 | CICD-Eng | Actions validation | `github-actions-pipeline-builder`, `github-actions-templates` | `github` |
-| Spec 2 | Deploy-Validator | Docker health, blue-green | `docker-containerization`, `monitoring-expert` | `postgres` |
-| Spec 3 | GitOps-Eng | Commits, push, CI verify | `git-advanced-workflows`, `{BUILD_ORCHESTRATOR}-caching` | `github` |
+| Role     | Agent            | Produces                  | Skills                                                        | MCP Tools            |
+| -------- | ---------------- | ------------------------- | ------------------------------------------------------------- | -------------------- |
+| **Lead** | DevOpsLead       | Deploy readiness report   | `devops-engineer`, `deployment-pipeline-design`               | `github`, `postgres` |
+| Spec 1   | CICD-Eng         | Actions validation        | `github-actions-pipeline-builder`, `github-actions-templates` | `github`             |
+| Spec 2   | Deploy-Validator | Docker health, blue-green | `docker-containerization`, `monitoring-expert`                | `postgres`           |
+| Spec 3   | GitOps-Eng       | Commits, push, CI verify  | `git-advanced-workflows`, `{BUILD_ORCHESTRATOR}-caching`      | `github`             |
 
 **Quality Gate:** `{CONTAINER_ORCHESTRATION} build` succeeds. Health-check passes. 5 containers healthy. CI green. Blue-green followed.
 
@@ -361,20 +361,20 @@ If a specialist does not return within 5 minutes:
 
 ### Allowed Tools (Lead ONLY uses these)
 
-| Tool | Permitted Use |
-|------|---------------|
-| `Agent` | Spawn specialists — PRIMARY tool |
-| `Read` | Read docs, upstream outputs, specialist results |
-| `Glob` / `Grep` | Scope analysis before delegating |
+| Tool               | Permitted Use                                            |
+| ------------------ | -------------------------------------------------------- |
+| `Agent`            | Spawn specialists — PRIMARY tool                         |
+| `Read`             | Read docs, upstream outputs, specialist results          |
+| `Glob` / `Grep`    | Scope analysis before delegating                         |
 | `Bash` (read-only) | `{TEST_COMMAND} --filter=X`, `git diff`, verify commands |
-| Direct text output | Report to Orchestrator |
+| Direct text output | Report to Orchestrator                                   |
 
 ### FORBIDDEN Tools (Lead MUST NEVER use)
 
-| Tool | Why |
-|------|-----|
-| `Edit` / `Write` | Implementation = specialist work |
-| `Bash` (mutating) | Build/deploy = specialist work |
+| Tool              | Why                              |
+| ----------------- | -------------------------------- |
+| `Edit` / `Write`  | Implementation = specialist work |
+| `Bash` (mutating) | Build/deploy = specialist work   |
 
 ### Lead Behavioral Rules
 
@@ -397,20 +397,21 @@ Division Leads are MANAGERS. They must NEVER do implementation work directly. Th
 
 A Division Lead is VIOLATING its role if it does ANY of the following:
 
-| # | Violation | Severity |
-|---|-----------|----------|
-| 1 | Uses `Edit` or `Write` tool on any file in source directories | CRITICAL |
-| 2 | Uses `Bash` to run `{PACKAGE_MANAGER}`, `npm`, `node`, build/test commands, `{CONTAINER_ORCHESTRATION} build/up/down`, `git add/commit/push` | CRITICAL |
-| 3 | Uses `Read` on `.ts`, `.tsx`, `.js`, `.jsx`, `.graphql`, `.sql`, `.json` source files to debug or solve a problem (instead of spawning an Explore specialist) | HIGH |
-| 4 | Writes more than 5 lines of code in a message (even as "example" or "suggestion") | HIGH |
-| 5 | Directly fixes a bug, writes a test, modifies a config, or edits a Dockerfile | CRITICAL |
-| 6 | **Spawns 0 specialists and does all work itself** | **MOST CRITICAL** |
+| #   | Violation                                                                                                                                                     | Severity          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 1   | Uses `Edit` or `Write` tool on any file in source directories                                                                                                 | CRITICAL          |
+| 2   | Uses `Bash` to run `{PACKAGE_MANAGER}`, `npm`, `node`, build/test commands, `{CONTAINER_ORCHESTRATION} build/up/down`, `git add/commit/push`                  | CRITICAL          |
+| 3   | Uses `Read` on `.ts`, `.tsx`, `.js`, `.jsx`, `.graphql`, `.sql`, `.json` source files to debug or solve a problem (instead of spawning an Explore specialist) | HIGH              |
+| 4   | Writes more than 5 lines of code in a message (even as "example" or "suggestion")                                                                             | HIGH              |
+| 5   | Directly fixes a bug, writes a test, modifies a config, or edits a Dockerfile                                                                                 | CRITICAL          |
+| 6   | **Spawns 0 specialists and does all work itself**                                                                                                             | **MOST CRITICAL** |
 
 ### Real-World Violation Example
 
 **What happened:** A QA Lead received a task and made 38 direct tool calls (Edit, Write, Read source code) with 0 specialists spawned. The Lead acted as a solo developer instead of a manager.
 
 **What should have happened:** The QA Lead should have:
+
 1. Analyzed scope using Glob/Grep
 2. Spawned UnitInteg-Eng for unit test writing
 3. Spawned E2E-Eng for E2E test writing
@@ -465,44 +466,44 @@ stateDiagram-v2
 
 ### MCP Tool Assignment (by Division)
 
-| MCP Server | Product | Arch | UX | FE | BE | DB | Security | QA | Docs | DevOps |
-|------------|---------|------|----|----|----|----|----------|----|----|--------|
-| `memory` | Y | Y | — | — | — | — | Y | — | Y | — |
-| `sequential-thinking` | Y | Y | — | — | — | Y | Y | — | — | — |
-| `eslint` | — | — | — | Y | Y | Y | Y | Y | — | — |
-| `github` | — | — | — | — | — | — | — | — | Y | Y |
-| `tavily` | Y | Y | Y | — | — | — | — | — | — | — |
-| `postgres` | — | Y | — | — | Y | Y | Y | Y | — | Y |
-| `graphql` | — | Y | — | Y | Y | — | Y | Y | Y | — |
-| `{EVENT_BUS}` | — | — | — | — | Y | — | — | — | — | — |
-| `typescript-diagnostics` | — | — | — | Y | Y | — | — | Y | — | — |
-| `{E2E_FRAMEWORK}` | — | — | Y | Y | — | — | Y | Y | — | — |
-| `context7` | — | — | Y | Y | Y | — | — | — | — | — |
+| MCP Server               | Product | Arch | UX  | FE  | BE  | DB  | Security | QA  | Docs | DevOps |
+| ------------------------ | ------- | ---- | --- | --- | --- | --- | -------- | --- | ---- | ------ |
+| `memory`                 | Y       | Y    | —   | —   | —   | —   | Y        | —   | Y    | —      |
+| `sequential-thinking`    | Y       | Y    | —   | —   | —   | Y   | Y        | —   | —    | —      |
+| `eslint`                 | —       | —    | —   | Y   | Y   | Y   | Y        | Y   | —    | —      |
+| `github`                 | —       | —    | —   | —   | —   | —   | —        | —   | Y    | Y      |
+| `tavily`                 | Y       | Y    | Y   | —   | —   | —   | —        | —   | —    | —      |
+| `postgres`               | —       | Y    | —   | —   | Y   | Y   | Y        | Y   | —    | Y      |
+| `graphql`                | —       | Y    | —   | Y   | Y   | —   | Y        | Y   | Y    | —      |
+| `{EVENT_BUS}`            | —       | —    | —   | —   | Y   | —   | —        | —   | —    | —      |
+| `typescript-diagnostics` | —       | —    | —   | Y   | Y   | —   | —        | Y   | —    | —      |
+| `{E2E_FRAMEWORK}`        | —       | —    | Y   | Y   | —   | —   | Y        | Y   | —    | —      |
+| `context7`               | —       | —    | Y   | Y   | Y   | —   | —        | —   | —    | —      |
 
 ### Core Skills (per Specialist)
 
-| Specialist | Skill 1 | Skill 2 | Skill 3 | Skill 4 |
-|-----------|---------|---------|---------|---------|
-| Component-Architect | `{FRONTEND_FRAMEWORK}-expert` | `{FRONTEND_FRAMEWORK}-composition-patterns` | `typescript-advanced-patterns` | — |
-| StatePerf-Eng | `{FRONTEND_FRAMEWORK}-state-management` | `{FRONTEND_FRAMEWORK}-performance-optimizer` | — | — |
-| ResponsiveA11y-Eng | `responsive-web-design` | `accessibility-compliance` | `internationalization-i18n` | — |
-| API-Architect | `{API_FRAMEWORK}-patterns` | `graphql-architect` | `api-federation` | — |
-| DomainLogic-Eng | `{BACKEND_FRAMEWORK}-best-practices` | `error-handling-patterns` | `{VALIDATION_LIB}` | — |
-| BackgroundJobs-Eng | `{EVENT_BUS}-patterns` | `nodejs-backend-patterns` | — | — |
-| Schema-Architect | `{ORM}-patterns` | `{DATABASE}-table-design` | `access-control-rbac` | — |
-| QueryOptimizer | `{DATABASE}-optimization` | `sql-optimization-patterns` | — | — |
-| Migration-Eng | `{ORM}-migrations` | `database-migration` | — | — |
-| AppSec-Analyst | `security-reviewer` | `api-security-hardening` | — | — |
-| PenTest-Spec | `vulnerability-scanning` | `stride-analysis-patterns` | — | — |
-| AuthPrivacy-Eng | `auth-implementation-patterns` | `gdpr-data-handling` | — | — |
-| UnitInteg-Eng | `javascript-testing-patterns` | `{TEST_FRAMEWORK}-testing-patterns` | — | — |
-| E2E-Eng | `{E2E_FRAMEWORK}-expert` | `{E2E_FRAMEWORK}-screenshot-inspector` | — | — |
-| Regression-Eng | `systematic-debugging` | `test-driven-development` | — | — |
-| APIDocs-Writer | `api-reference-documentation` | `graphql-schema` | — | — |
-| ArchDocs-Writer | `architecture-decision-records` | `mermaid-graph-writer` | — | — |
-| CICD-Eng | `github-actions-pipeline-builder` | `github-actions-templates` | — | — |
-| Deploy-Validator | `docker-containerization` | `monitoring-expert` | — | — |
-| GitOps-Eng | `git-advanced-workflows` | `{BUILD_ORCHESTRATOR}-caching` | — | — |
+| Specialist          | Skill 1                                 | Skill 2                                      | Skill 3                        | Skill 4 |
+| ------------------- | --------------------------------------- | -------------------------------------------- | ------------------------------ | ------- |
+| Component-Architect | `{FRONTEND_FRAMEWORK}-expert`           | `{FRONTEND_FRAMEWORK}-composition-patterns`  | `typescript-advanced-patterns` | —       |
+| StatePerf-Eng       | `{FRONTEND_FRAMEWORK}-state-management` | `{FRONTEND_FRAMEWORK}-performance-optimizer` | —                              | —       |
+| ResponsiveA11y-Eng  | `responsive-web-design`                 | `accessibility-compliance`                   | `internationalization-i18n`    | —       |
+| API-Architect       | `{API_FRAMEWORK}-patterns`              | `graphql-architect`                          | `api-federation`               | —       |
+| DomainLogic-Eng     | `{BACKEND_FRAMEWORK}-best-practices`    | `error-handling-patterns`                    | `{VALIDATION_LIB}`             | —       |
+| BackgroundJobs-Eng  | `{EVENT_BUS}-patterns`                  | `nodejs-backend-patterns`                    | —                              | —       |
+| Schema-Architect    | `{ORM}-patterns`                        | `{DATABASE}-table-design`                    | `access-control-rbac`          | —       |
+| QueryOptimizer      | `{DATABASE}-optimization`               | `sql-optimization-patterns`                  | —                              | —       |
+| Migration-Eng       | `{ORM}-migrations`                      | `database-migration`                         | —                              | —       |
+| AppSec-Analyst      | `security-reviewer`                     | `api-security-hardening`                     | —                              | —       |
+| PenTest-Spec        | `vulnerability-scanning`                | `stride-analysis-patterns`                   | —                              | —       |
+| AuthPrivacy-Eng     | `auth-implementation-patterns`          | `gdpr-data-handling`                         | —                              | —       |
+| UnitInteg-Eng       | `javascript-testing-patterns`           | `{TEST_FRAMEWORK}-testing-patterns`          | —                              | —       |
+| E2E-Eng             | `{E2E_FRAMEWORK}-expert`                | `{E2E_FRAMEWORK}-screenshot-inspector`       | —                              | —       |
+| Regression-Eng      | `systematic-debugging`                  | `test-driven-development`                    | —                              | —       |
+| APIDocs-Writer      | `api-reference-documentation`           | `graphql-schema`                             | —                              | —       |
+| ArchDocs-Writer     | `architecture-decision-records`         | `mermaid-graph-writer`                       | —                              | —       |
+| CICD-Eng            | `github-actions-pipeline-builder`       | `github-actions-templates`                   | —                              | —       |
+| Deploy-Validator    | `docker-containerization`               | `monitoring-expert`                          | —                              | —       |
+| GitOps-Eng          | `git-advanced-workflows`                | `{BUILD_ORCHESTRATOR}-caching`               | —                              | —       |
 
 ---
 
@@ -556,6 +557,7 @@ graph LR
 ### Sub-Wave Handling
 
 If a wave has more than 5 Leads (unlikely but possible for special tasks):
+
 1. First 5 Leads launch simultaneously
 2. As Leads complete, remaining Leads launch
 3. This is transparent to the user
@@ -619,14 +621,14 @@ sequenceDiagram
 
 ### Bug Fix Division Mapping
 
-| Bug Fix Phase | Lead | Specialists Used |
-|---------------|------|-----------------|
-| Phase 0 (Reproduce) | QALead | E2E-Eng, Regression-Eng |
-| Phase 1 (Discovery) | QALead | Regression-Eng (3-wave search) |
-| Phase 2 (Root Cause) | FELead or BELead | Component-Architect or DomainLogic-Eng |
-| Phase 3 (Fix Rounds) | FELead + BELead + DBLead | All relevant specialists |
-| Phase 4 (Verification) | QALead + SecurityLead | E2E-Eng, UnitInteg-Eng, AppSec-Analyst |
-| Phase 5 (Documentation) | DocLead | UserGuide-Writer |
+| Bug Fix Phase           | Lead                     | Specialists Used                       |
+| ----------------------- | ------------------------ | -------------------------------------- |
+| Phase 0 (Reproduce)     | QALead                   | E2E-Eng, Regression-Eng                |
+| Phase 1 (Discovery)     | QALead                   | Regression-Eng (3-wave search)         |
+| Phase 2 (Root Cause)    | FELead or BELead         | Component-Architect or DomainLogic-Eng |
+| Phase 3 (Fix Rounds)    | FELead + BELead + DBLead | All relevant specialists               |
+| Phase 4 (Verification)  | QALead + SecurityLead    | E2E-Eng, UnitInteg-Eng, AppSec-Analyst |
+| Phase 5 (Documentation) | DocLead                  | UserGuide-Writer                       |
 
 ---
 
@@ -634,21 +636,21 @@ sequenceDiagram
 
 ### Silence Escalation Protocol
 
-| Time Since Last Response | Action |
-|--------------------------|--------|
-| 3 minutes | Lead pings specialist with status request |
-| 5 minutes | Lead re-spawns specialist with simplified scope |
-| 7 minutes | Lead reports BLOCKED to Orchestrator with diagnostics |
-| 10 minutes | Orchestrator re-spawns the Lead with fresh context |
+| Time Since Last Response | Action                                                |
+| ------------------------ | ----------------------------------------------------- |
+| 3 minutes                | Lead pings specialist with status request             |
+| 5 minutes                | Lead re-spawns specialist with simplified scope       |
+| 7 minutes                | Lead reports BLOCKED to Orchestrator with diagnostics |
+| 10 minutes               | Orchestrator re-spawns the Lead with fresh context    |
 
 ### Availability Guarantees
 
-| Entity | Available To | Guarantee |
-|--------|-------------|-----------|
-| **Orchestrator** | User | Continuously available throughout task execution. Proactive status updates every 3 minutes. Never goes silent. |
+| Entity            | Available To | Guarantee                                                                                                                                     |
+| ----------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Orchestrator**  | User         | Continuously available throughout task execution. Proactive status updates every 3 minutes. Never goes silent.                                |
 | **Division Lead** | Orchestrator | Continuously available during division's active phase. Reports immediately on completion, failure, or blocking. Max response time: 5 minutes. |
-| **Division Lead** | Specialists | Continuously available to receive specialist outputs and provide re-briefs. Never delays specialist unblocking. |
-| **Specialist** | Lead | Returns result upon completion. If running >5 min without output, Lead proactively checks status. |
+| **Division Lead** | Specialists  | Continuously available to receive specialist outputs and provide re-briefs. Never delays specialist unblocking.                               |
+| **Specialist**    | Lead         | Returns result upon completion. If running >5 min without output, Lead proactively checks status.                                             |
 
 **Iron Rule:** No entity in the hierarchy may go silent. If a Lead does not report within 7 minutes, the Orchestrator re-spawns it. If a Specialist does not return within 5 minutes, the Lead re-spawns it.
 
@@ -668,15 +670,16 @@ The Orchestrator reports to the user every 3 minutes using this format:
 
 The hierarchical model extends the tracking table with Lead/Specialist distinction:
 
-| ID | Level | Division | Mission | Status |
-|----|-------|----------|---------|--------|
-| Agent-1 | Lead | QA & Validation | Reproduce BUG-NNN, write E2E | Running |
-| Agent-1a | Specialist | QA & Validation | E2E reproducer | Running |
-| Agent-1b | Specialist | QA & Validation | Regression pattern search | Running |
-| Agent-2 | Lead | Frontend Engineering | Fix layout overflow | Waiting |
-| Agent-3 | Lead | Security & Compliance | Verify no XSS | Waiting |
+| ID       | Level      | Division              | Mission                      | Status  |
+| -------- | ---------- | --------------------- | ---------------------------- | ------- |
+| Agent-1  | Lead       | QA & Validation       | Reproduce BUG-NNN, write E2E | Running |
+| Agent-1a | Specialist | QA & Validation       | E2E reproducer               | Running |
+| Agent-1b | Specialist | QA & Validation       | Regression pattern search    | Running |
+| Agent-2  | Lead       | Frontend Engineering  | Fix layout overflow          | Waiting |
+| Agent-3  | Lead       | Security & Compliance | Verify no XSS                | Waiting |
 
 **Naming convention:**
+
 - `Agent-N` = Lead (top-level agent spawned by Orchestrator)
 - `Agent-Na` / `Agent-Nb` / `Agent-Nc` = Specialists (spawned by Lead N)
 

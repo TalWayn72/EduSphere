@@ -95,8 +95,11 @@ test.describe('Dashboard Real Data — Live backend', () => {
   test('dashboard screenshot — live backend render', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await expect(page).toHaveScreenshot('dashboard-realdata-chromium-win32.png', {
-      maxDiffPixels: 200,
-    });
+    await expect(page).toHaveScreenshot(
+      'dashboard-realdata-chromium-win32.png',
+      {
+        maxDiffPixels: 200,
+      }
+    );
   });
 });

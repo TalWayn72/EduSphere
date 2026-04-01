@@ -15,7 +15,7 @@ const SNAP_POINTS = ['25%', '50%', '90%'];
 
 function resolveActiveAnchor(
   anchors: VisualAnchor[],
-  activeAnchorId: string | null,
+  activeAnchorId: string | null
 ): VisualAnchor | null {
   if (!activeAnchorId) return null;
   return anchors.find((a) => a.id === activeAnchorId) ?? null;
@@ -122,7 +122,9 @@ describe('VisualBottomSheet — visual asset image URI', () => {
       storageUrl: 'https://cdn.example.com/figure-1.png',
       webpUrl: 'https://cdn.example.com/figure-1.webp',
     });
-    expect(resolveImageUri(asset)).toBe('https://cdn.example.com/figure-1.webp');
+    expect(resolveImageUri(asset)).toBe(
+      'https://cdn.example.com/figure-1.webp'
+    );
   });
 
   it('falls back to storageUrl when webpUrl is null', () => {
@@ -140,20 +142,27 @@ describe('VisualBottomSheet — visual asset image URI', () => {
 
   it('displays current anchor image when visualAsset is provided', () => {
     const anchor = makeAnchor({
-      visualAsset: makeAsset({ storageUrl: 'https://cdn.example.com/figure-2.png', webpUrl: null }),
+      visualAsset: makeAsset({
+        storageUrl: 'https://cdn.example.com/figure-2.png',
+        webpUrl: null,
+      }),
     });
     const uri = resolveImageUri(anchor.visualAsset!);
     expect(uri).toBe('https://cdn.example.com/figure-2.png');
   });
 
   it('provides correct accessibilityLabel from altText when available', () => {
-    const asset = makeAsset({ metadata: { altText: 'A diagram of a cell', width: 800, height: 600 } });
+    const asset = makeAsset({
+      metadata: { altText: 'A diagram of a cell', width: 800, height: 600 },
+    });
     const label = asset.metadata?.altText ?? asset.filename;
     expect(label).toBe('A diagram of a cell');
   });
 
   it('falls back to filename as accessibilityLabel when altText is null', () => {
-    const asset = makeAsset({ metadata: { altText: null, width: 800, height: 600 } });
+    const asset = makeAsset({
+      metadata: { altText: null, width: 800, height: 600 },
+    });
     const label = asset.metadata?.altText ?? asset.filename;
     expect(label).toBe('figure-1.png');
   });
@@ -161,7 +170,9 @@ describe('VisualBottomSheet — visual asset image URI', () => {
 
 describe('VisualBottomSheet — anchor text display', () => {
   it('displays anchor text from the active anchor', () => {
-    const anchor = makeAnchor({ anchorText: 'Photosynthesis occurs in chloroplasts' });
+    const anchor = makeAnchor({
+      anchorText: 'Photosynthesis occurs in chloroplasts',
+    });
     expect(anchor.anchorText).toBe('Photosynthesis occurs in chloroplasts');
   });
 
@@ -204,9 +215,9 @@ describe('VisualBottomSheet — handleSheetChange callback', () => {
   it('calls onSheetChange handler (smoke test for callback integration)', () => {
     const handler = vi.fn();
     // Simulate bottom-sheet calling onChange with index values
-    handler(0);  // 25% snap
-    handler(1);  // 50% snap
-    handler(2);  // 90% snap
+    handler(0); // 25% snap
+    handler(1); // 50% snap
+    handler(2); // 90% snap
     handler(-1); // closed
     expect(handler).toHaveBeenCalledTimes(4);
     expect(handler).toHaveBeenCalledWith(0);

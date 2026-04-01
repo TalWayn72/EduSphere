@@ -12,8 +12,22 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 
 const MOCK_USERS = {
   nodes: [
-    { id: 'u1', name: 'Alice', email: 'alice@example.com', role: 'STUDENT', status: 'active', lastLogin: '2026-03-01' },
-    { id: 'u2', name: 'Bob', email: 'bob@example.com', role: 'INSTRUCTOR', status: 'inactive', lastLogin: null },
+    {
+      id: 'u1',
+      name: 'Alice',
+      email: 'alice@example.com',
+      role: 'STUDENT',
+      status: 'active',
+      lastLogin: '2026-03-01',
+    },
+    {
+      id: 'u2',
+      name: 'Bob',
+      email: 'bob@example.com',
+      role: 'INSTRUCTOR',
+      status: 'inactive',
+      lastLogin: null,
+    },
   ],
   totalCount: 2,
   pageInfo: { hasNextPage: false, hasPreviousPage: false },
@@ -46,7 +60,9 @@ describe('AdminUserManagementPage', () => {
 
   it('renders without crashing', () => {
     renderPage();
-    expect(screen.getByTestId('admin-user-management-page')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('admin-user-management-page')
+    ).toBeInTheDocument();
   });
 
   it('shows loading skeleton when fetching', () => {

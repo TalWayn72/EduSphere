@@ -11,7 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { EMBEDDING_ACTIVITY_QUERY } from '@/lib/graphql/embedding.queries';
 
@@ -28,22 +33,32 @@ const POLL_INTERVAL_MS = 30_000;
 
 function StatusBadge({ status }: { status: EmbeddingActivity['status'] }) {
   const { t } = useTranslation('admin');
-  const variants: Record<EmbeddingActivity['status'], { label: string; className: string }> = {
+  const variants: Record<
+    EmbeddingActivity['status'],
+    { label: string; className: string }
+  > = {
     completed: {
       label: t('embeddings.statusCompleted', 'Completed'),
-      className: 'border-green-300 dark:border-green-600 text-green-700 dark:text-green-400',
+      className:
+        'border-green-300 dark:border-green-600 text-green-700 dark:text-green-400',
     },
     in_progress: {
       label: t('embeddings.statusInProgress', 'In Progress'),
-      className: 'border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400',
+      className:
+        'border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400',
     },
     failed: {
       label: t('embeddings.statusFailed', 'Failed'),
-      className: 'border-red-300 dark:border-red-600 text-red-700 dark:text-red-400',
+      className:
+        'border-red-300 dark:border-red-600 text-red-700 dark:text-red-400',
     },
   };
   const v = variants[status];
-  return <Badge variant="outline" className={v.className}>{v.label}</Badge>;
+  return (
+    <Badge variant="outline" className={v.className}>
+      {v.label}
+    </Badge>
+  );
 }
 
 export function EmbeddingActivityLog() {
@@ -51,9 +66,13 @@ export function EmbeddingActivityLog() {
   const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [result, reexecute] = useQuery<{ embeddingActivity: EmbeddingActivity[] }>({
+  const [result, reexecute] = useQuery<{
+    embeddingActivity: EmbeddingActivity[];
+  }>({
     query: EMBEDDING_ACTIVITY_QUERY,
     pause: !mounted,
   });
@@ -100,8 +119,16 @@ export function EmbeddingActivityLog() {
   if (fetching && activities.length === 0) {
     return (
       <Card data-testid="embedding-activity-log">
-        <CardHeader><CardTitle className="text-base">{t('embeddings.activityTitle', 'Recent Activity')}</CardTitle></CardHeader>
-        <CardContent className="space-y-2" aria-busy="true" aria-label={t('embeddings.loadingActivity', 'Loading activity log')}>
+        <CardHeader>
+          <CardTitle className="text-base">
+            {t('embeddings.activityTitle', 'Recent Activity')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent
+          className="space-y-2"
+          aria-busy="true"
+          aria-label={t('embeddings.loadingActivity', 'Loading activity log')}
+        >
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-8 w-full" />
           ))}
@@ -113,8 +140,15 @@ export function EmbeddingActivityLog() {
   if (error && activities.length === 0) {
     return (
       <Card data-testid="embedding-activity-log">
-        <CardHeader><CardTitle className="text-base">{t('embeddings.activityTitle', 'Recent Activity')}</CardTitle></CardHeader>
-        <CardContent role="alert" className="py-4 text-center text-sm text-destructive">
+        <CardHeader>
+          <CardTitle className="text-base">
+            {t('embeddings.activityTitle', 'Recent Activity')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent
+          role="alert"
+          className="py-4 text-center text-sm text-destructive"
+        >
           {t('embeddings.activityError', 'Failed to load activity log')}
         </CardContent>
       </Card>
@@ -137,11 +171,21 @@ export function EmbeddingActivityLog() {
           <Table aria-label={t('embeddings.activityTitle', 'Recent Activity')}>
             <TableHeader>
               <TableRow>
-                <TableHead scope="col">{t('embeddings.colTimestamp', 'Timestamp')}</TableHead>
-                <TableHead scope="col">{t('embeddings.colCourse', 'Course')}</TableHead>
-                <TableHead scope="col">{t('embeddings.colOperation', 'Operation')}</TableHead>
-                <TableHead scope="col" className="text-center">{t('embeddings.colStatus', 'Status')}</TableHead>
-                <TableHead scope="col" className="text-right">{t('embeddings.colCount', 'Count')}</TableHead>
+                <TableHead scope="col">
+                  {t('embeddings.colTimestamp', 'Timestamp')}
+                </TableHead>
+                <TableHead scope="col">
+                  {t('embeddings.colCourse', 'Course')}
+                </TableHead>
+                <TableHead scope="col">
+                  {t('embeddings.colOperation', 'Operation')}
+                </TableHead>
+                <TableHead scope="col" className="text-center">
+                  {t('embeddings.colStatus', 'Status')}
+                </TableHead>
+                <TableHead scope="col" className="text-right">
+                  {t('embeddings.colCount', 'Count')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -150,10 +194,16 @@ export function EmbeddingActivityLog() {
                   <TableCell className="text-sm tabular-nums">
                     {new Date(a.timestamp).toLocaleString()}
                   </TableCell>
-                  <TableCell className="font-medium truncate max-w-[180px]">{a.courseName}</TableCell>
+                  <TableCell className="font-medium truncate max-w-[180px]">
+                    {a.courseName}
+                  </TableCell>
                   <TableCell className="capitalize">{a.operation}</TableCell>
-                  <TableCell className="text-center"><StatusBadge status={a.status} /></TableCell>
-                  <TableCell className="text-right tabular-nums">{a.count}</TableCell>
+                  <TableCell className="text-center">
+                    <StatusBadge status={a.status} />
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {a.count}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

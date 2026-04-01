@@ -8,7 +8,8 @@ const mockUpdate = vi.fn();
 const mockExecute = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -23,20 +24,28 @@ function makeChain(rows: unknown[] = []) {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-    fn({
-      update: mockUpdate,
-      select: vi.fn(() => makeChain([{ total: 5 }])),
-      execute: mockExecute,
-    })
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({
+        update: mockUpdate,
+        select: vi.fn(() => makeChain([{ total: 5 }])),
+        execute: mockExecute,
+      })
   ),
   buildRelayConnection: vi.fn((items, limit, total) => ({
-    edges: items.slice(0, limit).map((n: unknown) => ({ node: n, cursor: 'c' })),
+    edges: items
+      .slice(0, limit)
+      .map((n: unknown) => ({ node: n, cursor: 'c' })),
     pageInfo: { hasNextPage: items.length > limit, endCursor: 'c' },
     totalCount: total,
   })),
   schema: {
-    users: { id: 'id', role: 'role', deleted_at: 'deleted_at', updated_at: 'updated_at' },
+    users: {
+      id: 'id',
+      role: 'role',
+      deleted_at: 'deleted_at',
+      updated_at: 'updated_at',
+    },
   },
   eq: vi.fn((a, b) => ({ eq: [a, b] })),
   sql: Object.assign(vi.fn(), { raw: vi.fn() }),
@@ -81,7 +90,8 @@ describe('UserAdminService', () => {
 
   describe('bulkImportUsers', () => {
     it('should import valid CSV rows', async () => {
-      const csv = 'email,firstName,lastName,role\na@b.com,A,B,STUDENT\nc@d.com,C,D,INSTRUCTOR';
+      const csv =
+        'email,firstName,lastName,role\na@b.com,A,B,STUDENT\nc@d.com,C,D,INSTRUCTOR';
       const result = await service.bulkImportUsers(csv, makeAuth());
       expect(result.created).toBe(2);
       expect(result.failed).toBe(0);
@@ -129,8 +139,9 @@ describe('UserAdminService', () => {
         }),
       });
 
-      await expect(service.suspendUser('missing', true, makeAuth()))
-        .rejects.toThrow('User not found');
+      await expect(
+        service.suspendUser('missing', true, makeAuth())
+      ).rejects.toThrow('User not found');
     });
   });
 
@@ -150,7 +161,8 @@ describe('UserAdminService', () => {
     it('should return false when token fetch fails', async () => {
       process.env['KEYCLOAK_ADMIN_CLIENT_SECRET'] = 'secret';
       vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
-        ok: false, status: 401,
+        ok: false,
+        status: 401,
       } as Response);
 
       const result = await service.resetUserPassword('u1', makeAuth());

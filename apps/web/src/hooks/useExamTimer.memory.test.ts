@@ -28,7 +28,9 @@ describe('useExamTimer — memory safety', () => {
     const { unmount } = renderHook(() => useExamTimer(100, onExpire));
 
     // Verify interval is running
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(useExamSessionStore.getState().timeRemaining).toBe(99);
 
     unmount();
@@ -42,14 +44,18 @@ describe('useExamTimer — memory safety', () => {
     const onExpire = vi.fn();
     const { unmount } = renderHook(() => useExamTimer(100, onExpire));
 
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     const timeAfterOneTick = useExamSessionStore.getState().timeRemaining;
     expect(timeAfterOneTick).toBe(99);
 
     unmount();
 
     // Advance timers — store should NOT change after unmount
-    act(() => { vi.advanceTimersByTime(5000); });
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
     expect(useExamSessionStore.getState().timeRemaining).toBe(timeAfterOneTick);
   });
 });

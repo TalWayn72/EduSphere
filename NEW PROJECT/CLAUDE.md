@@ -54,27 +54,28 @@
 
 ### Allowed Tools (Orchestrator ONLY uses these)
 
-| Tool | Permitted Use |
-|------|---------------|
-| `Agent` | Spawn sub-agents for ALL implementation work — this is the PRIMARY tool |
-| `Read` | Read tracking docs ONLY (OPEN_ISSUES.md, CLAUDE.md, MEMORY.md, docs/*.md, plan files). NEVER read source code to solve problems — delegate to Explore agent |
-| `Glob` / `Grep` | ONLY for task decomposition analysis (understanding scope before spawning agents). NEVER to debug or fix issues |
+| Tool               | Permitted Use                                                                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Agent`            | Spawn sub-agents for ALL implementation work — this is the PRIMARY tool                                                                                           |
+| `Read`             | Read tracking docs ONLY (OPEN_ISSUES.md, CLAUDE.md, MEMORY.md, docs/\*.md, plan files). NEVER read source code to solve problems — delegate to Explore agent      |
+| `Glob` / `Grep`    | ONLY for task decomposition analysis (understanding scope before spawning agents). NEVER to debug or fix issues                                                   |
 | `Bash` (read-only) | ONLY: `git status`, `git log`, `git diff`, `docker ps`, `{HEALTH_CHECK_COMMAND}`. NEVER: `{PACKAGE_MANAGER}`, build commands, test commands, Docker build/up/down |
-| `TodoWrite` | Track agent progress and task state |
-| Direct text output | Communicate with user ({LANGUAGE}), report progress, present agent results |
+| `TodoWrite`        | Track agent progress and task state                                                                                                                               |
+| Direct text output | Communicate with user ({LANGUAGE}), report progress, present agent results                                                                                        |
 
 ### FORBIDDEN Tools (Orchestrator MUST NEVER use these directly)
 
-| Tool | Why Forbidden |
-|------|---------------|
-| `Edit` | Code changes are agent work — delegate to FE/BE/DB/DevOps agent |
-| `Write` | File creation is agent work — delegate to appropriate division agent |
-| `Bash` (mutating) | `{PACKAGE_MANAGER} test`, `{PACKAGE_MANAGER} build`, `docker-compose up`, `git commit`, `git push` — delegate to QA/DevOps agent |
-| `Read` (source code) | Reading source code files to solve a problem — delegate to an Explore agent |
+| Tool                 | Why Forbidden                                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `Edit`               | Code changes are agent work — delegate to FE/BE/DB/DevOps agent                                                                  |
+| `Write`              | File creation is agent work — delegate to appropriate division agent                                                             |
+| `Bash` (mutating)    | `{PACKAGE_MANAGER} test`, `{PACKAGE_MANAGER} build`, `docker-compose up`, `git commit`, `git push` — delegate to QA/DevOps agent |
+| `Read` (source code) | Reading source code files to solve a problem — delegate to an Explore agent                                                      |
 
 ### Violation Detection Rules
 
 The Orchestrator is VIOLATING its role if it does ANY of the following:
+
 1. Uses `Edit` or `Write` tool on any file in `apps/`, `packages/`, `tests/`, `infrastructure/`, or `scripts/`
 2. Uses `Bash` to run `{PACKAGE_MANAGER}`, `npm`, `node`, `docker-compose build/up/down`, `git add`, `git commit`, `git push`
 3. Uses `Read` on source code files to debug or solve a problem
@@ -104,6 +105,7 @@ Level 2 (L2): SPECIALISTS — 3-4 per Lead — execute actual implementation wor
 ```
 
 **Concurrency math:** Each parent can spawn ~5 concurrent children (SDK limit).
+
 - Orchestrator spawns up to 5 Leads per wave
 - Each Lead spawns 3-4 Specialists in parallel
 - **Peak concurrency: ~23 agents** (5 Leads x ~4 Specialists + 5 Leads)
@@ -111,35 +113,35 @@ Level 2 (L2): SPECIALISTS — 3-4 per Lead — execute actual implementation wor
 
 #### Division Leads Summary
 
-| # | Lead | Division | Specialists | Quality Gate |
-|---|------|----------|-------------|--------------|
-| 2 | **ProductLead** | Product & Requirements | PRD-Analyst, EdgeCase-Analyst, AccCriteria-Eng, Risk-Analyst (4) | All acceptance criteria testable, risk matrix complete |
-| 3 | **ArchLead** | Software Architecture | SystemImpact-Analyst, Perf-Architect, DomainModeler (3) | ADR produced, service ownership clear, perf budget defined |
-| 4 | **UXLead** | UX/UI Design | FlowDesigner, A11y-Auditor, DesignSys-Eng, Microcopy-Reviewer (4) | WCAG AA, no hardcoded strings, RTL verified |
-| 5 | **FELead** | Frontend Engineering | Component-Architect, StatePerf-Eng, ResponsiveA11y-Eng (3) | Typecheck 0 errors, lint 0 errors, files ≤150 lines |
-| 6 | **BELead** | Backend Engineering | API-Architect, DomainLogic-Eng, BackgroundJobs-Eng (3) | All mutations validated, structured logging, cleanup on destroy |
-| 7 | **DBLead** | Database & Data | Schema-Architect, QueryOptimizer, Migration-Eng (3) | All tables secured, tenant isolation enforced, rollback exists |
-| 8 | **SecurityLead** | Security & Compliance | AppSec-Analyst, PenTest-Spec, AuthPrivacy-Eng (3) | All security invariants PASS, security tests pass |
-| 9 | **QALead** | QA & Validation | UnitInteg-Eng, E2E-Eng, LoadCompat-Eng, Regression-Eng (4) | All tests 100%, all E2E pass, auth verification OK |
-| 10 | **DocLead** | Documentation | APIDocs-Writer, UserGuide-Writer, ArchDocs-Writer (3) | All APIs documented, OPEN_ISSUES updated, diagrams present |
-| 11 | **DevOpsLead** | DevOps & Release | CICD-Eng, Deploy-Validator, GitOps-Eng (3) | Docker build succeeds, health-check passes, CI green |
+| #   | Lead             | Division               | Specialists                                                       | Quality Gate                                                    |
+| --- | ---------------- | ---------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------- |
+| 2   | **ProductLead**  | Product & Requirements | PRD-Analyst, EdgeCase-Analyst, AccCriteria-Eng, Risk-Analyst (4)  | All acceptance criteria testable, risk matrix complete          |
+| 3   | **ArchLead**     | Software Architecture  | SystemImpact-Analyst, Perf-Architect, DomainModeler (3)           | ADR produced, service ownership clear, perf budget defined      |
+| 4   | **UXLead**       | UX/UI Design           | FlowDesigner, A11y-Auditor, DesignSys-Eng, Microcopy-Reviewer (4) | WCAG AA, no hardcoded strings, RTL verified                     |
+| 5   | **FELead**       | Frontend Engineering   | Component-Architect, StatePerf-Eng, ResponsiveA11y-Eng (3)        | Typecheck 0 errors, lint 0 errors, files ≤150 lines             |
+| 6   | **BELead**       | Backend Engineering    | API-Architect, DomainLogic-Eng, BackgroundJobs-Eng (3)            | All mutations validated, structured logging, cleanup on destroy |
+| 7   | **DBLead**       | Database & Data        | Schema-Architect, QueryOptimizer, Migration-Eng (3)               | All tables secured, tenant isolation enforced, rollback exists  |
+| 8   | **SecurityLead** | Security & Compliance  | AppSec-Analyst, PenTest-Spec, AuthPrivacy-Eng (3)                 | All security invariants PASS, security tests pass               |
+| 9   | **QALead**       | QA & Validation        | UnitInteg-Eng, E2E-Eng, LoadCompat-Eng, Regression-Eng (4)        | All tests 100%, all E2E pass, auth verification OK              |
+| 10  | **DocLead**      | Documentation          | APIDocs-Writer, UserGuide-Writer, ArchDocs-Writer (3)             | All APIs documented, OPEN_ISSUES updated, diagrams present      |
+| 11  | **DevOpsLead**   | DevOps & Release       | CICD-Eng, Deploy-Validator, GitOps-Eng (3)                        | Docker build succeeds, health-check passes, CI green            |
 
 **Total: 10 Leads + 33 Specialists = 43 agents across all divisions**
 
 #### Lead-Spawning Patterns (Orchestrator Reference)
 
-| Work Type | Lead to Spawn | Orchestrator Prompt Pattern |
-|-----------|--------------|----------------------------|
-| Frontend/UI component changes | FELead | `Agent("You are the Frontend Engineering Division Lead. Brief: Fix/build X component...")` |
-| Backend service/API changes | BELead | `Agent("You are the Backend Engineering Division Lead. Brief: Update Y service...")` |
-| Schema/migration changes | DBLead | `Agent("You are the Database & Data Division Lead. Brief: Add migration for Z...")` |
-| Docker/CI/deployment/git ops | DevOpsLead | `Agent("You are the DevOps & Release Division Lead. Brief: Rebuild and verify...")` |
-| Unit/integration/E2E tests | QALead | `Agent("You are the QA & Validation Division Lead. Brief: Write E2E test for X...")` |
-| Security audit | SecurityLead | `Agent("You are the Security & Compliance Division Lead. Brief: Audit security for X...")` |
-| Documentation updates | DocLead | `Agent("You are the Documentation Division Lead. Brief: Update OPEN_ISSUES...")` |
-| Code exploration/debugging | ArchLead | `Agent("You are the Architecture Division Lead. Brief: Investigate why X fails...")` |
-| Bug investigation (3 waves) | QALead | `Agent("You are the QA & Validation Division Lead. Brief: Run discovery waves for bug X...")` |
-| Planning/design decisions | ArchLead | `Agent("You are the Architecture Division Lead. Brief: Design approach for X...")` |
+| Work Type                     | Lead to Spawn | Orchestrator Prompt Pattern                                                                   |
+| ----------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
+| Frontend/UI component changes | FELead        | `Agent("You are the Frontend Engineering Division Lead. Brief: Fix/build X component...")`    |
+| Backend service/API changes   | BELead        | `Agent("You are the Backend Engineering Division Lead. Brief: Update Y service...")`          |
+| Schema/migration changes      | DBLead        | `Agent("You are the Database & Data Division Lead. Brief: Add migration for Z...")`           |
+| Docker/CI/deployment/git ops  | DevOpsLead    | `Agent("You are the DevOps & Release Division Lead. Brief: Rebuild and verify...")`           |
+| Unit/integration/E2E tests    | QALead        | `Agent("You are the QA & Validation Division Lead. Brief: Write E2E test for X...")`          |
+| Security audit                | SecurityLead  | `Agent("You are the Security & Compliance Division Lead. Brief: Audit security for X...")`    |
+| Documentation updates         | DocLead       | `Agent("You are the Documentation Division Lead. Brief: Update OPEN_ISSUES...")`              |
+| Code exploration/debugging    | ArchLead      | `Agent("You are the Architecture Division Lead. Brief: Investigate why X fails...")`          |
+| Bug investigation (3 waves)   | QALead        | `Agent("You are the QA & Validation Division Lead. Brief: Run discovery waves for bug X...")` |
+| Planning/design decisions     | ArchLead      | `Agent("You are the Architecture Division Lead. Brief: Design approach for X...")`            |
 
 **MANDATORY SUFFIX — Every Lead prompt MUST end with this paragraph:**
 
@@ -188,12 +190,12 @@ HANDOFF_TO: [{division_name}]
 
 Each Division Lead and its Specialists are pre-assigned specific MCP tools. The Orchestrator includes these in the Lead's brief; the Lead passes them to Specialists.
 
-| MCP Server | Product | Arch | UX | FE | BE | DB | Security | QA | Docs | DevOps |
-|------------|---------|------|----|----|----|----|----------|----|----|--------|
-| `{MCP_SERVER_1}` | Y | Y | — | — | — | — | Y | — | Y | — |
-| `{MCP_SERVER_2}` | — | — | — | Y | Y | Y | Y | Y | — | — |
-| `{MCP_SERVER_3}` | — | Y | — | Y | Y | — | Y | Y | Y | — |
-| `{MCP_SERVER_4}` | — | — | Y | Y | — | — | Y | Y | — | — |
+| MCP Server       | Product | Arch | UX  | FE  | BE  | DB  | Security | QA  | Docs | DevOps |
+| ---------------- | ------- | ---- | --- | --- | --- | --- | -------- | --- | ---- | ------ |
+| `{MCP_SERVER_1}` | Y       | Y    | —   | —   | —   | —   | Y        | —   | Y    | —      |
+| `{MCP_SERVER_2}` | —       | —    | —   | Y   | Y   | Y   | Y        | Y   | —    | —      |
+| `{MCP_SERVER_3}` | —       | Y    | —   | Y   | Y   | —   | Y        | Y   | Y    | —      |
+| `{MCP_SERVER_4}` | —       | —    | Y   | Y   | —   | —   | Y        | Y   | —    | —      |
 
 > Add rows for each MCP server in your project. Map Y/— per division.
 
@@ -283,25 +285,25 @@ Use `{LOGGER}` only (never `console.log`). Levels: error/warn/info/debug. Always
 
 ## Testing Requirements
 
-| Change Type | Required Tests |
-|-------------|----------------|
-| New API type/field | Unit tests for resolvers + integration test for end-to-end query |
-| New mutation | Unit test + tenant isolation test + E2E test |
-| Bug fix | Regression test + root cause documented in OPEN_ISSUES.md |
-| Database schema change | Migration test + security policy test |
-| New service | Composition/integration test + health check test |
+| Change Type            | Required Tests                                                   |
+| ---------------------- | ---------------------------------------------------------------- |
+| New API type/field     | Unit tests for resolvers + integration test for end-to-end query |
+| New mutation           | Unit test + tenant isolation test + E2E test                     |
+| Bug fix                | Regression test + root cause documented in OPEN_ISSUES.md        |
+| Database schema change | Migration test + security policy test                            |
+| New service            | Composition/integration test + health check test                 |
 
 ### Test File Locations
 
 <!-- Configure paths per your project structure -->
 
-| Type | Location |
-|------|----------|
-| Backend unit | `{BACKEND_SERVICES_DIR}/src/**/*.spec.ts` |
+| Type                | Location                                                |
+| ------------------- | ------------------------------------------------------- |
+| Backend unit        | `{BACKEND_SERVICES_DIR}/src/**/*.spec.ts`               |
 | Backend integration | `{BACKEND_SERVICES_DIR}/src/test/integration/*.spec.ts` |
-| Security validation | `{PACKAGES_DIR}/db/src/rls/*.test.ts` |
-| Frontend unit | `{FRONTEND_APP}/src/**/*.test.{ts,tsx}` |
-| E2E | `{FRONTEND_APP}/e2e/*.spec.ts` |
+| Security validation | `{PACKAGES_DIR}/db/src/rls/*.test.ts`                   |
+| Frontend unit       | `{FRONTEND_APP}/src/**/*.test.{ts,tsx}`                 |
+| E2E                 | `{FRONTEND_APP}/e2e/*.spec.ts`                          |
 
 ### Coverage Targets
 
@@ -317,18 +319,18 @@ These are non-negotiable. Any code violating these invariants must be rejected i
 
 <!-- Define your project's security invariants below. Examples provided as templates. -->
 
-| # | Invariant | Description |
-|---|-----------|-------------|
-| **SI-1** | Tenant isolation variable | Ensure correct session variable name for tenant isolation |
-| **SI-2** | CORS origin | Never use wildcard origin in production |
-| **SI-3** | PII encryption | Encrypt sensitive fields before every write |
-| **SI-4** | Brute-force protection | Auth provider must have brute-force protection enabled |
-| **SI-5** | SSL verification | Never disable SSL verification in containers |
-| **SI-6** | Inter-service transport | mTLS or HTTPS required between services in production |
-| **SI-7** | Event bus security | Event bus must use auth/TLS, never bare connections |
-| **SI-8** | Database access | All DB access through centralized pool factory only |
-| **SI-9** | Cross-tenant queries | All queries must use `{TENANT_CONTEXT_WRAPPER}` |
-| **SI-10** | Third-party API consent | Check user consent before forwarding data to external APIs |
+| #         | Invariant                 | Description                                                |
+| --------- | ------------------------- | ---------------------------------------------------------- |
+| **SI-1**  | Tenant isolation variable | Ensure correct session variable name for tenant isolation  |
+| **SI-2**  | CORS origin               | Never use wildcard origin in production                    |
+| **SI-3**  | PII encryption            | Encrypt sensitive fields before every write                |
+| **SI-4**  | Brute-force protection    | Auth provider must have brute-force protection enabled     |
+| **SI-5**  | SSL verification          | Never disable SSL verification in containers               |
+| **SI-6**  | Inter-service transport   | mTLS or HTTPS required between services in production      |
+| **SI-7**  | Event bus security        | Event bus must use auth/TLS, never bare connections        |
+| **SI-8**  | Database access           | All DB access through centralized pool factory only        |
+| **SI-9**  | Cross-tenant queries      | All queries must use `{TENANT_CONTEXT_WRAPPER}`            |
+| **SI-10** | Third-party API consent   | Check user consent before forwarding data to external APIs |
 
 > Customize each invariant with your project's specific WRONG/RIGHT patterns.
 
@@ -337,14 +339,14 @@ These are non-negotiable. Any code violating these invariants must be rejected i
 
 ### Pre-commit Security Gate
 
-| Check | Rule |
-|-------|------|
-| XSS | No unsanitized user input in API responses |
-| SQL Injection | All queries via {ORM} |
+| Check            | Rule                                             |
+| ---------------- | ------------------------------------------------ |
+| XSS              | No unsanitized user input in API responses       |
+| SQL Injection    | All queries via {ORM}                            |
 | Tenant Isolation | All tenant-scoped tables have isolation policies |
-| Auth | All mutations validate scopes and roles |
-| Input Validation | All mutations have `{VALIDATION_LIB}` schemas |
-| Secrets | No API keys, passwords, tokens in code |
+| Auth             | All mutations validate scopes and roles          |
+| Input Validation | All mutations have `{VALIDATION_LIB}` schemas    |
+| Secrets          | No API keys, passwords, tokens in code           |
 
 ---
 
@@ -352,34 +354,34 @@ These are non-negotiable. Any code violating these invariants must be rejected i
 
 <!-- Configure your CI workflows -->
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `{CI_WORKFLOW_1}` | Push/PR to main/develop | Lint + type check + unit tests + security scan |
+| Workflow          | Trigger                 | Purpose                                                |
+| ----------------- | ----------------------- | ------------------------------------------------------ |
+| `{CI_WORKFLOW_1}` | Push/PR to main/develop | Lint + type check + unit tests + security scan         |
 | `{CI_WORKFLOW_2}` | Push/PR to main/develop | Full test suite (unit + integration + E2E with Docker) |
-| `{CI_WORKFLOW_3}` | PR to main + tags | Docker builds for all services + vulnerability scan |
-| `{CI_WORKFLOW_4}` | Push to main | Deployment pipeline |
+| `{CI_WORKFLOW_3}` | PR to main + tags       | Docker builds for all services + vulnerability scan    |
+| `{CI_WORKFLOW_4}` | Push to main            | Deployment pipeline                                    |
 
 ### Post-Push CI Verification
 
 After every `git push`, verify that CI workflows are running:
 
-| Step | Command | Expected |
-|------|---------|----------|
-| 1. Check runs | `gh run list --limit 5` | Recent workflow runs visible |
-| 2. Watch run | `gh run watch` | Live status of current run |
-| 3. On failure | `gh run view <run-id> --log-failed` | View failure logs |
+| Step          | Command                             | Expected                     |
+| ------------- | ----------------------------------- | ---------------------------- |
+| 1. Check runs | `gh run list --limit 5`             | Recent workflow runs visible |
+| 2. Watch run  | `gh run watch`                      | Live status of current run   |
+| 3. On failure | `gh run view <run-id> --log-failed` | View failure logs            |
 
 **Iron rule:** Every push must trigger CI. If `gh run list` shows no new runs, investigate immediately.
 
 ## Git Policy
 
-| Trigger | Action |
-|---------|--------|
-| Bug fix | Commit immediately |
-| Complete feature | Commit at completion |
-| Complete phase | Commit after acceptance criteria pass |
-| Refactoring | Commit after logical change |
-| End of day | Commit + Push for backup |
+| Trigger          | Action                                |
+| ---------------- | ------------------------------------- |
+| Bug fix          | Commit immediately                    |
+| Complete feature | Commit at completion                  |
+| Complete phase   | Commit after acceptance criteria pass |
+| Refactoring      | Commit after logical change           |
+| End of day       | Commit + Push for backup              |
 
 **Flow:** Claude proposes commit → User approves → Claude executes.
 **Never auto-commit or auto-push without user approval.**
@@ -468,6 +470,7 @@ Co-Authored-By: Claude {MODEL_VERSION} <noreply@anthropic.com>
 Execute one fix round per logical grouping of similar issues.
 
 **Round structure:**
+
 - **Round 1**: Fix the original bug + add logging + **INVERT the reproducer test from Phase 0**
 - **Round 2**: Fix all similar issues found in Wave 2
 - **Round 3**: Fix all class-of-bug issues found in Wave 3
@@ -551,6 +554,7 @@ Orchestrator (coordinator) + 10 Divisions: Product & Requirements, Software Arch
 ### 1. Phase Completion Announcement (MANDATORY)
 
 After EVERY phase or major milestone completes, announce results and proceed:
+
 ```
 ═══════════════════════════════════════════════════
 PHASE [X] COMPLETE — [Phase Name]
@@ -588,20 +592,20 @@ Continuing automatically unless stopped.
 
 **MANDATORY:** Claude may NEVER declare a session, feature, or task "complete" without verifying every row.
 
-| # | Check | Command | Required Result |
-|---|-------|---------|----------------|
-| -1 | Orchestrator Compliance | Self-audit: Did Orchestrator use Edit/Write/mutating Bash directly? | 0 violations — all work done via agents |
-| 0 | Docker Up | `docker ps` | All expected containers healthy |
-| 1 | Unit Tests | `{TEST_COMMAND}` | 100% pass, 0 failures |
-| 2 | TypeScript | `{TYPECHECK_COMMAND}` | 0 errors |
-| 3 | Lint | `{LINT_COMMAND}` | 0 warnings/errors |
-| 4 | Security Tests | `{SECURITY_TEST_COMMAND}` | 0 failures |
-| 5 | E2E | `{E2E_TEST_COMMAND}` | All pass |
-| 6 | Health Check | `{HEALTH_CHECK_COMMAND}` | All services UP |
-| 7 | Auth Verification | Login x all test roles | All login OK |
-| 8 | GitHub CI | `gh run list --limit 3` | All green |
-| 9 | Git Push | `git log --oneline -1` | Commit pushed |
-| 10 | OPEN_ISSUES.md | Updated with E2E files listed | Status updated |
+| #   | Check                   | Command                                                             | Required Result                         |
+| --- | ----------------------- | ------------------------------------------------------------------- | --------------------------------------- |
+| -1  | Orchestrator Compliance | Self-audit: Did Orchestrator use Edit/Write/mutating Bash directly? | 0 violations — all work done via agents |
+| 0   | Docker Up               | `docker ps`                                                         | All expected containers healthy         |
+| 1   | Unit Tests              | `{TEST_COMMAND}`                                                    | 100% pass, 0 failures                   |
+| 2   | TypeScript              | `{TYPECHECK_COMMAND}`                                               | 0 errors                                |
+| 3   | Lint                    | `{LINT_COMMAND}`                                                    | 0 warnings/errors                       |
+| 4   | Security Tests          | `{SECURITY_TEST_COMMAND}`                                           | 0 failures                              |
+| 5   | E2E                     | `{E2E_TEST_COMMAND}`                                                | All pass                                |
+| 6   | Health Check            | `{HEALTH_CHECK_COMMAND}`                                            | All services UP                         |
+| 7   | Auth Verification       | Login x all test roles                                              | All login OK                            |
+| 8   | GitHub CI               | `gh run list --limit 3`                                             | All green                               |
+| 9   | Git Push                | `git log --oneline -1`                                              | Commit pushed                           |
+| 10  | OPEN_ISSUES.md          | Updated with E2E files listed                                       | Status updated                          |
 
 ### Iron Rules for Completion
 
@@ -616,27 +620,27 @@ Continuing automatically unless stopped.
 
 ## Documentation Sync
 
-| File | When to Update | What to Sync |
-|------|---------------|--------------|
-| `CLAUDE.md` | Work rules change, tech stack update | AI instructions, commands, patterns |
-| `README.md` | Stats change, new feature added | Test counts, phase status, architecture diagram |
-| `OPEN_ISSUES.md` | Every task/bug start or completion | Status, severity, files, problem, solution |
-| `{ROADMAP_FILE}` | Phase acceptance criteria change | Tasks, acceptance criteria |
-| `{API_CONTRACTS_FILE}` | API schema change | Types, queries, mutations, subscriptions |
+| File                   | When to Update                       | What to Sync                                    |
+| ---------------------- | ------------------------------------ | ----------------------------------------------- |
+| `CLAUDE.md`            | Work rules change, tech stack update | AI instructions, commands, patterns             |
+| `README.md`            | Stats change, new feature added      | Test counts, phase status, architecture diagram |
+| `OPEN_ISSUES.md`       | Every task/bug start or completion   | Status, severity, files, problem, solution      |
+| `{ROADMAP_FILE}`       | Phase acceptance criteria change     | Tasks, acceptance criteria                      |
+| `{API_CONTRACTS_FILE}` | API schema change                    | Types, queries, mutations, subscriptions        |
 
 ### Mermaid Diagram Rule (MANDATORY)
 
 Every new or updated `.md` file describing architecture, flows, relationships, state machines, or timelines **MUST** include Mermaid diagrams.
 
-| Content Pattern | Required Diagram Type |
-|-----------------|----------------------|
-| Service/component dependencies | `graph TD` |
-| Request/response flows | `sequenceDiagram` |
-| State transitions | `stateDiagram-v2` |
-| Timeline/roadmap | `gantt` |
-| Process/pipeline steps | `flowchart TD/LR` |
-| Data relationships | `erDiagram` |
-| Git workflow | `gitGraph` |
+| Content Pattern                | Required Diagram Type |
+| ------------------------------ | --------------------- |
+| Service/component dependencies | `graph TD`            |
+| Request/response flows         | `sequenceDiagram`     |
+| State transitions              | `stateDiagram-v2`     |
+| Timeline/roadmap               | `gantt`               |
+| Process/pipeline steps         | `flowchart TD/LR`     |
+| Data relationships             | `erDiagram`           |
+| Git workflow                   | `gitGraph`            |
 
 ---
 

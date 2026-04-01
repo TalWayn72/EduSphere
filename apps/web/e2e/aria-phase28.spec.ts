@@ -37,7 +37,7 @@ test.describe('ARIA Phase 28 — LiveSessionsPage', () => {
 
   test('tablist has an accessible label (aria-label)', async ({ page }) => {
     const tablist = page.locator('[role="tablist"]');
-    if (await tablist.count() > 0) {
+    if ((await tablist.count()) > 0) {
       const label = await tablist.first().getAttribute('aria-label');
       expect(label).toBeTruthy();
       expect(label!.length).toBeGreaterThan(0);
@@ -46,7 +46,7 @@ test.describe('ARIA Phase 28 — LiveSessionsPage', () => {
 
   test('Upcoming tab has role="tab"', async ({ page }) => {
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
-    if (await upcomingTab.count() > 0) {
+    if ((await upcomingTab.count()) > 0) {
       await expect(upcomingTab).toHaveAttribute('role', 'tab');
     } else {
       // Fallback: find any tab role
@@ -57,21 +57,21 @@ test.describe('ARIA Phase 28 — LiveSessionsPage', () => {
 
   test('Past tab has role="tab"', async ({ page }) => {
     const pastTab = page.locator('[data-testid="tab-past"]');
-    if (await pastTab.count() > 0) {
+    if ((await pastTab.count()) > 0) {
       await expect(pastTab).toHaveAttribute('role', 'tab');
     }
   });
 
   test('active tab has aria-selected="true"', async ({ page }) => {
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
-    if (await upcomingTab.count() > 0) {
+    if ((await upcomingTab.count()) > 0) {
       await expect(upcomingTab).toHaveAttribute('aria-selected', 'true');
     }
   });
 
   test('inactive tab has aria-selected="false"', async ({ page }) => {
     const pastTab = page.locator('[data-testid="tab-past"]');
-    if (await pastTab.count() > 0) {
+    if ((await pastTab.count()) > 0) {
       await expect(pastTab).toHaveAttribute('aria-selected', 'false');
     }
   });
@@ -82,10 +82,7 @@ test.describe('ARIA Phase 28 — LiveSessionsPage', () => {
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
     const pastTab = page.locator('[data-testid="tab-past"]');
 
-    if (
-      (await upcomingTab.count()) > 0 &&
-      (await pastTab.count()) > 0
-    ) {
+    if ((await upcomingTab.count()) > 0 && (await pastTab.count()) > 0) {
       await expect(upcomingTab).toHaveAttribute('tabindex', '0');
       await expect(pastTab).toHaveAttribute('tabindex', '-1');
     }
@@ -96,7 +93,7 @@ test.describe('ARIA Phase 28 — LiveSessionsPage', () => {
   }) => {
     // The sessions grid (aria-live="polite") is the live region for tab panel content
     const grid = page.locator('[data-testid="sessions-grid"]');
-    if (await grid.count() > 0) {
+    if ((await grid.count()) > 0) {
       const live = await grid.getAttribute('aria-live');
       expect(live).toBe('polite');
     }
@@ -199,9 +196,9 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
   });
 
   test('level filter group has role="group"', async ({ page }) => {
-    const group = page.locator('[data-testid="level-filter-group"]').or(
-      page.locator('[role="group"][aria-label*="level" i]')
-    );
+    const group = page
+      .locator('[data-testid="level-filter-group"]')
+      .or(page.locator('[role="group"][aria-label*="level" i]'));
     await expect(group.first()).toBeVisible({ timeout: 10_000 });
     const role = await group.first().getAttribute('role');
     expect(role).toBe('group');
@@ -222,7 +219,9 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
     const levels = ['Any Level', 'Beginner', 'Intermediate', 'Advanced'];
     for (const lvl of levels) {
       const btn = page.getByRole('button', { name: lvl }).first();
-      const visible = await btn.isVisible({ timeout: 5_000 }).catch(() => false);
+      const visible = await btn
+        .isVisible({ timeout: 5_000 })
+        .catch(() => false);
       if (visible) {
         const pressed = await btn.getAttribute('aria-pressed');
         // aria-pressed must be "true" or "false"
@@ -251,31 +250,31 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
 
     await expect(intermediateBtn).toHaveAttribute('aria-pressed', 'true');
 
-    const anyLevelBtn = page
-      .getByRole('button', { name: 'Any Level' })
-      .first();
+    const anyLevelBtn = page.getByRole('button', { name: 'Any Level' }).first();
     await expect(anyLevelBtn).toHaveAttribute('aria-pressed', 'false');
   });
 
   test('sort select has an associated label element', async ({ page }) => {
     // Label via htmlFor="sort-select" or nearby "Sort by" text
-    const label = page.locator('label[for="sort-select"]').or(
-      page.locator('label', { hasText: /Sort by/i }).first()
-    );
+    const label = page
+      .locator('label[for="sort-select"]')
+      .or(page.locator('label', { hasText: /Sort by/i }).first());
     await expect(label.first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('sort select trigger has aria-label or is labelled', async ({
     page,
   }) => {
-    const trigger = page.locator('[data-testid="sort-select"]').or(
-      page.locator('#sort-select')
-    );
+    const trigger = page
+      .locator('[data-testid="sort-select"]')
+      .or(page.locator('#sort-select'));
     await expect(trigger.first()).toBeVisible({ timeout: 10_000 });
 
     // Check for aria-label or labelledby or associated label
     const ariaLabel = await trigger.first().getAttribute('aria-label');
-    const ariaLabelledBy = await trigger.first().getAttribute('aria-labelledby');
+    const ariaLabelledBy = await trigger
+      .first()
+      .getAttribute('aria-labelledby');
     const id = await trigger.first().getAttribute('id');
 
     let hasAssociatedLabel = false;
@@ -299,9 +298,9 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
   });
 
   test('search input has aria-label', async ({ page }) => {
-    const input = page.locator('[data-testid="course-search-input"]').or(
-      page.locator('input[aria-label*="Search" i]').first()
-    );
+    const input = page
+      .locator('[data-testid="course-search-input"]')
+      .or(page.locator('input[aria-label*="Search" i]').first());
     await expect(input.first()).toBeVisible({ timeout: 10_000 });
     const ariaLabel = await input.first().getAttribute('aria-label');
     expect(ariaLabel).toBeTruthy();
@@ -309,9 +308,9 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
   });
 
   test('course listing grid has aria-label', async ({ page }) => {
-    const grid = page.locator('[data-testid="courses-grid"]').or(
-      page.locator('[aria-label="Course listing"]')
-    );
+    const grid = page
+      .locator('[data-testid="courses-grid"]')
+      .or(page.locator('[aria-label="Course listing"]'));
     await expect(grid.first()).toBeVisible({ timeout: 10_000 });
     const label = await grid.first().getAttribute('aria-label');
     expect(label?.length).toBeGreaterThan(0);
@@ -320,9 +319,9 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
   test('view mode toggle group has role="group" and aria-label', async ({
     page,
   }) => {
-    const viewToggle = page.locator('[data-testid="view-toggle"]').or(
-      page.locator('[role="group"][aria-label*="view" i]')
-    );
+    const viewToggle = page
+      .locator('[data-testid="view-toggle"]')
+      .or(page.locator('[role="group"][aria-label*="view" i]'));
     const count = await viewToggle.count();
     if (count > 0) {
       const role = await viewToggle.first().getAttribute('role');

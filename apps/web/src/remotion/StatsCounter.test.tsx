@@ -18,12 +18,24 @@ const useVideoConfigMock = vi.fn(() => ({
 vi.mock('remotion', () => ({
   useCurrentFrame: (...args: unknown[]) => useCurrentFrameMock(...args),
   useVideoConfig: (...args: unknown[]) => useVideoConfigMock(...args),
-  AbsoluteFill: ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) =>
-    React.createElement('div', { 'data-testid': 'absolute-fill', style }, children),
+  AbsoluteFill: ({
+    children,
+    style,
+  }: {
+    children: React.ReactNode;
+    style?: React.CSSProperties;
+  }) =>
+    React.createElement(
+      'div',
+      { 'data-testid': 'absolute-fill', style },
+      children
+    ),
   spring: vi.fn(() => 0.5),
-  interpolate: vi.fn((_input: number, _inputRange: number[], outputRange: number[]) => {
-    return outputRange[0];
-  }),
+  interpolate: vi.fn(
+    (_input: number, _inputRange: number[], outputRange: number[]) => {
+      return outputRange[0];
+    }
+  ),
 }));
 
 import { StatsCounter } from './StatsCounter';

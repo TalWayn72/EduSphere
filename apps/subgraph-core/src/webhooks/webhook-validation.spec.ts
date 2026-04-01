@@ -37,71 +37,86 @@ describe('webhook-validation', () => {
 
   describe('validateWebhookUrl', () => {
     it('accepts valid HTTPS URL', () => {
-      expect(() => validateWebhookUrl('https://api.example.com/webhook')).not.toThrow();
+      expect(() =>
+        validateWebhookUrl('https://api.example.com/webhook')
+      ).not.toThrow();
     });
 
     it('accepts HTTPS URL with port', () => {
-      expect(() => validateWebhookUrl('https://hooks.example.com:8443/v1')).not.toThrow();
+      expect(() =>
+        validateWebhookUrl('https://hooks.example.com:8443/v1')
+      ).not.toThrow();
     });
 
     it('accepts HTTPS URL with path and query', () => {
-      expect(() => validateWebhookUrl('https://example.com/hook?token=abc')).not.toThrow();
+      expect(() =>
+        validateWebhookUrl('https://example.com/hook?token=abc')
+      ).not.toThrow();
     });
 
     it('rejects HTTP URL (non-HTTPS)', () => {
-      expect(() => validateWebhookUrl('http://example.com/hook'))
-        .toThrow(BadRequestException);
+      expect(() => validateWebhookUrl('http://example.com/hook')).toThrow(
+        BadRequestException
+      );
     });
 
     it('rejects invalid URL format', () => {
-      expect(() => validateWebhookUrl('not-a-url'))
-        .toThrow(BadRequestException);
+      expect(() => validateWebhookUrl('not-a-url')).toThrow(
+        BadRequestException
+      );
     });
 
     it('rejects empty string', () => {
-      expect(() => validateWebhookUrl(''))
-        .toThrow(BadRequestException);
+      expect(() => validateWebhookUrl('')).toThrow(BadRequestException);
     });
 
     // SSRF protection tests
     it('rejects 10.x.x.x private IP', () => {
-      expect(() => validateWebhookUrl('https://10.0.0.1/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://10.0.0.1/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects 172.16-31.x.x private IP', () => {
-      expect(() => validateWebhookUrl('https://172.16.0.1/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://172.16.0.1/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects 192.168.x.x private IP', () => {
-      expect(() => validateWebhookUrl('https://192.168.1.1/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://192.168.1.1/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects 127.x.x.x loopback', () => {
-      expect(() => validateWebhookUrl('https://127.0.0.1/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://127.0.0.1/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects 0.x.x.x', () => {
-      expect(() => validateWebhookUrl('https://0.0.0.0/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://0.0.0.0/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects localhost (case insensitive)', () => {
-      expect(() => validateWebhookUrl('https://localhost/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://localhost/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects Localhost (mixed case)', () => {
-      expect(() => validateWebhookUrl('https://Localhost:3000/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://Localhost:3000/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('rejects IPv6 loopback [::1]', () => {
-      expect(() => validateWebhookUrl('https://[::1]/hook'))
-        .toThrow('private IPs');
+      expect(() => validateWebhookUrl('https://[::1]/hook')).toThrow(
+        'private IPs'
+      );
     });
 
     it('allows public IPs like 8.8.8.8', () => {
@@ -127,8 +142,9 @@ describe('webhook-validation', () => {
     });
 
     it('rejects unknown event types', () => {
-      expect(() => validateWebhookEvents(['course.deleted']))
-        .toThrow(BadRequestException);
+      expect(() => validateWebhookEvents(['course.deleted'])).toThrow(
+        BadRequestException
+      );
     });
 
     it('includes invalid event names in error message', () => {
@@ -142,8 +158,9 @@ describe('webhook-validation', () => {
     });
 
     it('rejects when mix of valid and invalid events', () => {
-      expect(() => validateWebhookEvents(['badge.issued', 'invalid.event']))
-        .toThrow('invalid.event');
+      expect(() =>
+        validateWebhookEvents(['badge.issued', 'invalid.event'])
+      ).toThrow('invalid.event');
     });
   });
 });

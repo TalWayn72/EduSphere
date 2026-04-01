@@ -8,12 +8,22 @@ import React from 'react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
-  useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
-  useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -32,8 +42,21 @@ vi.mock('@/components/Layout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children, className }: { children: React.ReactNode; size?: string; spacing?: string; className?: string }) => (
-    <div data-testid="page-shell" className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 ${className ?? ''}`}>{children}</div>
+  PageShell: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    size?: string;
+    spacing?: string;
+    className?: string;
+  }) => (
+    <div
+      data-testid="page-shell"
+      className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 ${className ?? ''}`}
+    >
+      {children}
+    </div>
   ),
 }));
 
@@ -43,7 +66,12 @@ vi.mock('@/components/PageHeader', () => ({
 
 vi.mock('@/components/AssessmentForm', () => ({
   AssessmentForm: (props: Record<string, unknown>) => (
-    <div data-testid="assessment-form" data-campaign-id={props.campaignId} data-proctoring={String(props.proctoringEnabled)} data-rater-role={props.raterRole}>
+    <div
+      data-testid="assessment-form"
+      data-campaign-id={props.campaignId}
+      data-proctoring={String(props.proctoringEnabled)}
+      data-rater-role={props.raterRole}
+    >
       AssessmentForm Mock
     </div>
   ),
@@ -51,9 +79,14 @@ vi.mock('@/components/AssessmentForm', () => ({
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => ({
-    id: 'u-1', username: 'testuser', email: 'test@example.com',
-    firstName: 'Alice', lastName: 'Smith', tenantId: 't-1',
-    role: 'STUDENT', scopes: ['read'],
+    id: 'u-1',
+    username: 'testuser',
+    email: 'test@example.com',
+    firstName: 'Alice',
+    lastName: 'Smith',
+    tenantId: 't-1',
+    role: 'STUDENT',
+    scopes: ['read'],
   })),
   DEV_MODE: true,
   logout: vi.fn(),
@@ -61,12 +94,25 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/contexts/ThemeContext', () => ({
   useTheme: vi.fn(() => ({
-    resolvedMode: 'light', setThemeMode: vi.fn(), tenantPrimitives: {},
-    userPreferences: { mode: 'system', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
-    setTenantTheme: vi.fn(), setFontSize: vi.fn(), setReadingMode: vi.fn(),
-    setMotionPreference: vi.fn(), previewThemeChanges: vi.fn(),
+    resolvedMode: 'light',
+    setThemeMode: vi.fn(),
+    tenantPrimitives: {},
+    userPreferences: {
+      mode: 'system',
+      fontSize: 'md',
+      readingMode: false,
+      motionPreference: 'full',
+      contrastMode: 'normal',
+    },
+    setTenantTheme: vi.fn(),
+    setFontSize: vi.fn(),
+    setReadingMode: vi.fn(),
+    setMotionPreference: vi.fn(),
+    previewThemeChanges: vi.fn(),
   })),
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock('@/components/AppSidebar', () => ({
@@ -99,22 +145,34 @@ describe('AssessmentPage', () => {
 
   it('passes assessmentId from route params as campaignId', () => {
     renderPage();
-    expect(screen.getByTestId('assessment-form')).toHaveAttribute('data-campaign-id', 'assess-123');
+    expect(screen.getByTestId('assessment-form')).toHaveAttribute(
+      'data-campaign-id',
+      'assess-123'
+    );
   });
 
   it('passes assessmentId prop to AssessmentForm', () => {
     renderPage();
-    expect(screen.getByTestId('assessment-form')).toHaveAttribute('data-campaign-id', 'assess-123');
+    expect(screen.getByTestId('assessment-form')).toHaveAttribute(
+      'data-campaign-id',
+      'assess-123'
+    );
   });
 
   it('enables proctoring by default', () => {
     renderPage();
-    expect(screen.getByTestId('assessment-form')).toHaveAttribute('data-proctoring', 'true');
+    expect(screen.getByTestId('assessment-form')).toHaveAttribute(
+      'data-proctoring',
+      'true'
+    );
   });
 
   it('sets rater role to PEER', () => {
     renderPage();
-    expect(screen.getByTestId('assessment-form')).toHaveAttribute('data-rater-role', 'PEER');
+    expect(screen.getByTestId('assessment-form')).toHaveAttribute(
+      'data-rater-role',
+      'PEER'
+    );
   });
 
   it('renders content within max-w-4xl container (PageShell size="md")', () => {

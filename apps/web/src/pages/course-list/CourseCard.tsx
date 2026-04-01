@@ -9,13 +9,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  Clock,
-  EyeOff,
-  CheckCircle2,
-  Pencil,
-  Globe,
-} from 'lucide-react';
+import { Clock, EyeOff, CheckCircle2, Pencil, Globe } from 'lucide-react';
 import type { CourseItem } from './types';
 
 interface CourseCardProps {
@@ -75,9 +69,7 @@ export const CourseCard = React.memo(function CourseCard({
             {t('open')}
           </Button>
         </div>
-        <CardTitle className="text-xl leading-snug">
-          {course.title}
-        </CardTitle>
+        <CardTitle className="text-xl leading-snug">{course.title}</CardTitle>
         <CardDescription className="line-clamp-2">
           {course.description}
         </CardDescription>

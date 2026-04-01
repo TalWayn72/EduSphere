@@ -24,7 +24,9 @@ export class NotificationPreferencesResolver {
   constructor(private readonly prefService: NotificationPreferencesService) {}
 
   @Query('myNotificationPreferences')
-  async myNotificationPreferences(@Context() ctx: GraphQLContext): Promise<PreferenceDto[]> {
+  async myNotificationPreferences(
+    @Context() ctx: GraphQLContext
+  ): Promise<PreferenceDto[]> {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth.tenantId) {
       throw new UnauthorizedException('Authentication required');

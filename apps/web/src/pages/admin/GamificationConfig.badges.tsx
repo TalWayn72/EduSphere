@@ -12,7 +12,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { Pencil, Trash2 } from 'lucide-react';
 import {
@@ -163,11 +168,7 @@ export function GamificationBadgeForm({
             </div>
           </div>
 
-          <BadgeAutoAwardEditor
-            value={criteria}
-            onChange={setCriteria}
-            t={t}
-          />
+          <BadgeAutoAwardEditor value={criteria} onChange={setCriteria} t={t} />
 
           <div className="flex gap-2">
             <Button type="submit" className="flex-1">
@@ -235,11 +236,7 @@ export function GamificationBadgeTable({
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {b.iconUrl && (
-                      <img
-                        src={b.iconUrl}
-                        alt=""
-                        className="h-5 w-5 rounded"
-                      />
+                      <img src={b.iconUrl} alt="" className="h-5 w-5 rounded" />
                     )}
                     <span className="font-medium">{b.name}</span>
                   </div>

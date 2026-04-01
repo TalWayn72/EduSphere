@@ -2,14 +2,14 @@
 
 **EU AI Act Article 11 — Technical Documentation for High-Risk AI Systems**
 
-| Field | Value |
-|---|---|
-| **Organisation** | EduSphere Ltd |
-| **Document Keeper** | Head of AI Engineering / DPO |
-| **Initial Version** | 1.0 — March 2026 |
-| **Retention Period** | 10 years from date of placing on market / putting into service (Art. 11(3)) |
-| **Applies To** | AI systems deployed within EduSphere platform that qualify as high-risk or general-purpose AI |
-| **Review Trigger** | Any material update to model, training data, or deployment scope |
+| Field                | Value                                                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| **Organisation**     | EduSphere Ltd                                                                                 |
+| **Document Keeper**  | Head of AI Engineering / DPO                                                                  |
+| **Initial Version**  | 1.0 — March 2026                                                                              |
+| **Retention Period** | 10 years from date of placing on market / putting into service (Art. 11(3))                   |
+| **Applies To**       | AI systems deployed within EduSphere platform that qualify as high-risk or general-purpose AI |
+| **Review Trigger**   | Any material update to model, training data, or deployment scope                              |
 
 > **Regulatory basis:** EU AI Act (Regulation 2024/1689), in force August 2024. High-risk AI systems in education (Annex III, point 3(b) — AI used to evaluate learning outcomes and assessments) require technical documentation under Art. 11 and conformity assessment before deployment in EU markets.
 
@@ -58,6 +58,7 @@ flowchart TD
 ### 1.2 Technical Description
 
 **Architecture:**
+
 ```
 LangGraph.js State Machine:
   assess → quiz → explain → debate → summarise
@@ -66,22 +67,26 @@ LangGraph.js State Machine:
 ```
 
 **Models used:**
+
 - Development / on-premises: Ollama + Llama 3 / Mistral (local, no data leaves infrastructure)
 - Production (with consent): OpenAI GPT-4o or Anthropic Claude 3 Sonnet (via consent-gated API calls)
 - Embedding: nomic-embed-text (768-dimensional, local via Ollama)
 
 **Input data:**
+
 - Current learner message (text)
 - Conversation history (prior turns, last N turns with sliding window)
 - Active concept context (from knowledge graph — concept node + related prerequisites)
 - Learner mastery score for current concept (0–1 float)
 
 **Output data:**
+
 - AI tutor response (text)
 - Suggested next state (assess / quiz / explain / debate)
 - Updated mastery signal (provisional — confirmed by system after learner response)
 
 **State persistence:**
+
 - Conversation turns stored in PostgreSQL (`ai_sessions` table, RLS-isolated per tenant)
 - LangGraph checkpointer wrapped in NestJS Injectable with OnModuleDestroy (memory safety)
 
@@ -93,14 +98,14 @@ No fine-tuning on learner data is performed without explicit DPA approval and up
 
 ### 1.4 Performance Metrics
 
-| Metric | Target | Measurement Method |
-|---|---|---|
-| Response latency (P95) | < 3 seconds (local Ollama) | OpenTelemetry trace in Jaeger |
-| Response latency (P95) | < 5 seconds (cloud LLM) | OpenTelemetry trace |
-| Session completion rate | > 60% of sessions reach summarise state | Analytics aggregate |
-| Learner mastery improvement | > 15% average mastery gain post-session | A/B comparison vs. static content |
-| Consent compliance | 100% — no LLM calls without consent flag | `tests/security/ai-compliance.spec.ts` |
-| Hallucination rate | Monitored — target < 5% flagged responses | Instructor review reports |
+| Metric                      | Target                                    | Measurement Method                     |
+| --------------------------- | ----------------------------------------- | -------------------------------------- |
+| Response latency (P95)      | < 3 seconds (local Ollama)                | OpenTelemetry trace in Jaeger          |
+| Response latency (P95)      | < 5 seconds (cloud LLM)                   | OpenTelemetry trace                    |
+| Session completion rate     | > 60% of sessions reach summarise state   | Analytics aggregate                    |
+| Learner mastery improvement | > 15% average mastery gain post-session   | A/B comparison vs. static content      |
+| Consent compliance          | 100% — no LLM calls without consent flag  | `tests/security/ai-compliance.spec.ts` |
+| Hallucination rate          | Monitored — target < 5% flagged responses | Instructor review reports              |
 
 ### 1.5 Known Limitations
 
@@ -143,18 +148,21 @@ No fine-tuning on learner data is performed without explicit DPA approval and up
 **Algorithm: HybridRAG (Hybrid Retrieval-Augmented Generation)**
 
 Two parallel retrieval pathways fused before final ranking:
+
 1. **Semantic similarity (pgvector):** 768-dim embedding of learner's current knowledge state vs. content embeddings. HNSW index, cosine similarity. Identifies conceptually adjacent content.
 2. **Graph traversal (Apache AGE):** Cypher query on `edusphere_graph` knowledge graph. Traverses prerequisite edges from current mastered concepts to identify unlocked next concepts.
 
 Fusion: both retrieval results scored and blended (weighted sum, weights configurable per tenant pedagogy). Top-K results returned as recommendations.
 
 **Input data:**
+
 - Learner user ID
 - Mastery scores for all previously encountered concepts
 - Current course context (tenant, course ID)
 - Optional: explicit learner preference signals (clicked recommendations, skipped content)
 
 **Output data:**
+
 - Ordered list of recommended next content modules (up to N=5)
 - Confidence score per recommendation (0–1)
 - Explanation reason (for transparency: "Recommended because you've mastered [Concept X] and [Concept Y]")
@@ -164,10 +172,12 @@ Fusion: both retrieval results scored and blended (weighted sum, weights configu
 ### 2.3 Fairness Considerations
 
 **Identified risks:**
+
 - Recommendations may perpetuate lower expectations for learners who start with lower mastery scores — "recommendation trap" where system keeps recommending remedial content
 - Content embedding quality may be lower for non-English content, disadvantaging learners using translated materials
 
 **Mitigations:**
+
 - Minimum mastery threshold to unlock advanced content is configurable by instructor (not fixed by AI)
 - Learners can override recommendations and choose any unlocked content manually
 - Embedding quality monitoring: if Hebrew/other-language content has lower retrieval precision, flag for instructor review
@@ -219,12 +229,14 @@ Learners may disable AI-driven recommendations at any time via **Profile Setting
 ```
 
 **Input data:**
+
 - Answer text submitted by learner
 - Rubric provided by instructor (mandatory — system refuses to grade without rubric)
 - Maximum marks available
 - Course and assessment context (not learner identity — blind grading by default)
 
 **Output data:**
+
 - Provisional grade (numeric)
 - Per-rubric-criterion score and narrative justification
 - Overall written feedback (formative, not evaluative labels)
@@ -236,12 +248,12 @@ Learners may disable AI-driven recommendations at any time via **Profile Setting
 
 Accuracy is measured against instructor confirmed/overridden grades at the end of each term.
 
-| Metric | Target | Current (March 2026) |
-|---|---|---|
-| Grade alignment (AI provisional = instructor final, ±5%) | > 75% | Baseline collection in progress |
-| Override rate | < 25% | Baseline collection in progress |
-| Feedback helpfulness (learner survey) | > 3.5/5.0 | Baseline collection in progress |
-| Turnaround time (submission to provisional grade) | < 2 minutes | OpenTelemetry trace |
+| Metric                                                   | Target      | Current (March 2026)            |
+| -------------------------------------------------------- | ----------- | ------------------------------- |
+| Grade alignment (AI provisional = instructor final, ±5%) | > 75%       | Baseline collection in progress |
+| Override rate                                            | < 25%       | Baseline collection in progress |
+| Feedback helpfulness (learner survey)                    | > 3.5/5.0   | Baseline collection in progress |
+| Turnaround time (submission to provisional grade)        | < 2 minutes | OpenTelemetry trace             |
 
 > **Note:** Accuracy baselines will be collected during first production term. Targets will be revised based on observed performance.
 
@@ -257,6 +269,7 @@ Accuracy is measured against instructor confirmed/overridden grades at the end o
 ### 3.5 Appeal Mechanism
 
 Learners who receive a grade they dispute may:
+
 1. Click "Appeal this grade" on their results page
 2. Submit a written appeal explaining their reasoning
 3. Appeal is routed to the instructor (not back to AI)
@@ -278,27 +291,27 @@ In compliance with GDPR Art. 22 and EU AI Act obligations, **automated-only grad
 
 All three AI systems comply with the following data governance requirements:
 
-| Requirement | Implementation |
-|---|---|
-| Data minimisation | AI systems receive only the minimum data needed for their specific task |
-| Purpose limitation | AI outputs used only for the declared educational purpose |
-| Consent for third-party LLM | SI-10 invariant: consent gate enforced in code (`llm-consent.guard.ts`) |
-| Right to explanation | Recommendation explanations and grading justifications provided to learners |
-| Opt-out | Recommendation engine opt-out in profile settings; AI grading is instructor opt-in per course |
-| Audit trail | All AI decisions logged with `tenantId`, `userId`, `timestamp`, `outcome` |
+| Requirement                 | Implementation                                                                                |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| Data minimisation           | AI systems receive only the minimum data needed for their specific task                       |
+| Purpose limitation          | AI outputs used only for the declared educational purpose                                     |
+| Consent for third-party LLM | SI-10 invariant: consent gate enforced in code (`llm-consent.guard.ts`)                       |
+| Right to explanation        | Recommendation explanations and grading justifications provided to learners                   |
+| Opt-out                     | Recommendation engine opt-out in profile settings; AI grading is instructor opt-in per course |
+| Audit trail                 | All AI decisions logged with `tenantId`, `userId`, `timestamp`, `outcome`                     |
 
 ### 4.2 EU AI Act Conformity Obligations
 
-| Obligation | Article | Status |
-|---|---|---|
-| Technical documentation | Art. 11 | This document |
-| Automatic logging | Art. 12 | Pino + Jaeger — implemented |
-| Transparency to users | Art. 13 | AI labels on all AI interactions — implemented |
-| Human oversight | Art. 14 | Instructor review mandatory for grading — implemented |
-| Accuracy, robustness | Art. 15 | Metrics tracked (see per-system sections) — baseline in progress |
-| Conformity assessment | Art. 43 | Required before EU commercial deployment — in progress |
-| EU declaration of conformity | Art. 47 | Required before EU market placement — pending |
-| Registration in EU database | Art. 49 | Required before EU market placement — pending |
+| Obligation                   | Article | Status                                                           |
+| ---------------------------- | ------- | ---------------------------------------------------------------- |
+| Technical documentation      | Art. 11 | This document                                                    |
+| Automatic logging            | Art. 12 | Pino + Jaeger — implemented                                      |
+| Transparency to users        | Art. 13 | AI labels on all AI interactions — implemented                   |
+| Human oversight              | Art. 14 | Instructor review mandatory for grading — implemented            |
+| Accuracy, robustness         | Art. 15 | Metrics tracked (see per-system sections) — baseline in progress |
+| Conformity assessment        | Art. 43 | Required before EU commercial deployment — in progress           |
+| EU declaration of conformity | Art. 47 | Required before EU market placement — pending                    |
+| Registration in EU database  | Art. 49 | Required before EU market placement — pending                    |
 
 ### 4.3 Prohibited AI Practices (EU AI Act Title II)
 
@@ -316,13 +329,13 @@ EduSphere AI systems are verified as NOT implementing any prohibited practices:
 
 ## Section 5 — Version History
 
-| Version | Date | Changes | Author |
-|---|---|---|---|
-| 1.0 | March 2026 | Initial documentation — all three systems | EduSphere Engineering |
+| Version | Date       | Changes                                   | Author                |
+| ------- | ---------- | ----------------------------------------- | --------------------- |
+| 1.0     | March 2026 | Initial documentation — all three systems | EduSphere Engineering |
 
 ---
 
-*Document owner: Head of AI Engineering / DPO (on appointment)*
-*Retention: 10 years from service commencement per EU AI Act Art. 11(3)*
-*Stored at: `docs/compliance/EU-AI-ACT-TECHNICAL-DOCUMENTATION.md`*
-*Related: `DPIA.md`, `ROPA.md` (Activity 3, 4, 11)*
+_Document owner: Head of AI Engineering / DPO (on appointment)_
+_Retention: 10 years from service commencement per EU AI Act Art. 11(3)_
+_Stored at: `docs/compliance/EU-AI-ACT-TECHNICAL-DOCUMENTATION.md`_
+_Related: `DPIA.md`, `ROPA.md` (Activity 3, 4, 11)_

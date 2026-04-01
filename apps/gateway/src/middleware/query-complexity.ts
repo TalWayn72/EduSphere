@@ -35,7 +35,10 @@ function isListField(name: string): boolean {
   // Reject camelCase names: if any character after position 0 is uppercase,
   // this is a compound name, not a simple plural noun.
   for (let i = 1; i < name.length; i++) {
-    if (name[i] === name[i].toUpperCase() && name[i] !== name[i].toLowerCase()) {
+    if (
+      name[i] === name[i].toUpperCase() &&
+      name[i] !== name[i].toLowerCase()
+    ) {
       return false;
     }
   }

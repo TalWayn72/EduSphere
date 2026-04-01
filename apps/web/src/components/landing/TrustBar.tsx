@@ -28,14 +28,21 @@ export function TrustBar() {
           {t('landing.trustBar.tagline')}
         </p>
         {/* Compliance mini-badges */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8" role="list" aria-label="Compliance certifications">
+        <div
+          className="flex flex-wrap justify-center gap-2 mb-8"
+          role="list"
+          aria-label="Compliance certifications"
+        >
           {BADGES.map((badge) => (
             <div
               key={badge}
               role="listitem"
               className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200"
             >
-              <Shield className="h-3 w-3 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <Shield
+                className="h-3 w-3 text-indigo-600 dark:text-indigo-400"
+                aria-hidden="true"
+              />
               {badge}
             </div>
           ))}

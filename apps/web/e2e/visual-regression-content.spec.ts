@@ -32,11 +32,11 @@ async function elementOrPage(
   page: Page,
   selectors: string[],
   name: string,
-  opts: Record<string, unknown> = { animations: 'disabled' as const },
+  opts: Record<string, unknown> = { animations: 'disabled' as const }
 ) {
   const locator = selectors.reduce(
     (loc, sel, i) => (i === 0 ? page.locator(sel) : loc.or(page.locator(sel))),
-    page.locator(selectors[0]),
+    page.locator(selectors[0])
   );
   const el = locator.first();
   if (await el.isVisible({ timeout: 3_000 }).catch(() => false)) {
@@ -60,22 +60,43 @@ test.describe('Visual Regression — Content Import @visual-content', () => {
 
   test('content import — header section', async ({ page }) => {
     await goTo(page, '/content-import');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-import-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'content-import-header.png'
+    );
   });
 
   test('content import — upload area', async ({ page }) => {
     await goTo(page, '/content-import');
-    await elementOrPage(page, ['[data-testid="upload-area"]', '[role="button"]', '.upload-zone', 'main'], 'content-import-upload.png');
+    await elementOrPage(
+      page,
+      [
+        '[data-testid="upload-area"]',
+        '[role="button"]',
+        '.upload-zone',
+        'main',
+      ],
+      'content-import-upload.png'
+    );
   });
 
   test('content import — format options', async ({ page }) => {
     await goTo(page, '/content-import');
-    await elementOrPage(page, ['[data-testid="format-options"]', '.format-list', 'section'], 'content-import-formats.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="format-options"]', '.format-list', 'section'],
+      'content-import-formats.png'
+    );
   });
 
   test('content import — recent imports', async ({ page }) => {
     await goTo(page, '/content-import');
-    await elementOrPage(page, ['[data-testid="recent-imports"]', 'table', '[role="table"]'], 'content-import-recent.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="recent-imports"]', 'table', '[role="table"]'],
+      'content-import-recent.png'
+    );
   });
 });
 
@@ -93,17 +114,29 @@ test.describe('Visual Regression — Drive Import @visual-content', () => {
 
   test('drive import — header section', async ({ page }) => {
     await goTo(page, '/content-import/drive');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-drive-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'content-drive-header.png'
+    );
   });
 
   test('drive import — file browser', async ({ page }) => {
     await goTo(page, '/content-import/drive');
-    await elementOrPage(page, ['[data-testid="file-browser"]', '[role="tree"]', 'main'], 'content-drive-browser.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="file-browser"]', '[role="tree"]', 'main'],
+      'content-drive-browser.png'
+    );
   });
 
   test('drive import — connection status', async ({ page }) => {
     await goTo(page, '/content-import/drive');
-    await elementOrPage(page, ['[data-testid="connection-status"]', '.status', 'section'], 'content-drive-status.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="connection-status"]', '.status', 'section'],
+      'content-drive-status.png'
+    );
   });
 });
 
@@ -116,22 +149,37 @@ test.describe('Visual Regression — Course Creation @visual-content', () => {
 
   test('course creation — full page', async ({ page }) => {
     await goTo(page, '/courses/create');
-    await expect(page).toHaveScreenshot('content-coursecreate-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'content-coursecreate-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('course creation — header section', async ({ page }) => {
     await goTo(page, '/courses/create');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-coursecreate-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'content-coursecreate-header.png'
+    );
   });
 
   test('course creation — form fields', async ({ page }) => {
     await goTo(page, '/courses/create');
-    await elementOrPage(page, ['form', '[data-testid="course-form"]', 'main'], 'content-coursecreate-form.png');
+    await elementOrPage(
+      page,
+      ['form', '[data-testid="course-form"]', 'main'],
+      'content-coursecreate-form.png'
+    );
   });
 
   test('course creation — action buttons', async ({ page }) => {
     await goTo(page, '/courses/create');
-    await elementOrPage(page, ['[data-testid="form-actions"]', '.actions', 'footer', 'button'], 'content-coursecreate-actions.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="form-actions"]', '.actions', 'footer', 'button'],
+      'content-coursecreate-actions.png'
+    );
   });
 });
 
@@ -144,22 +192,37 @@ test.describe('Visual Regression — Course Editing @visual-content', () => {
 
   test('course editing — full page', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    await expect(page).toHaveScreenshot('content-courseedit-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'content-courseedit-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('course editing — header section', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-courseedit-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'content-courseedit-header.png'
+    );
   });
 
   test('course editing — editor area', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    await elementOrPage(page, ['[data-testid="course-editor"]', 'form', 'main'], 'content-courseedit-editor.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="course-editor"]', 'form', 'main'],
+      'content-courseedit-editor.png'
+    );
   });
 
   test('course editing — module list', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    await elementOrPage(page, ['[data-testid="module-list"]', '[role="list"]', 'aside'], 'content-courseedit-modules.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="module-list"]', '[role="list"]', 'aside'],
+      'content-courseedit-modules.png'
+    );
   });
 });
 
@@ -177,36 +240,64 @@ test.describe('Visual Regression — Portal Builder @visual-content', () => {
 
   test('portal builder — header section', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    await elementOrPage(page, ['header', '[data-testid="page-header"]', 'h1'], 'content-portal-header.png');
+    await elementOrPage(
+      page,
+      ['header', '[data-testid="page-header"]', 'h1'],
+      'content-portal-header.png'
+    );
   });
 
   test('portal builder — design canvas', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    await elementOrPage(page, ['[data-testid="portal-canvas"]', '.canvas', 'main'], 'content-portal-canvas.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="portal-canvas"]', '.canvas', 'main'],
+      'content-portal-canvas.png'
+    );
   });
 
   test('portal builder — component palette', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    await elementOrPage(page, ['[data-testid="component-palette"]', 'aside', 'nav'], 'content-portal-palette.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="component-palette"]', 'aside', 'nav'],
+      'content-portal-palette.png'
+    );
   });
 
   test('content import — sidebar navigation', async ({ page }) => {
     await goTo(page, '/content-import');
-    await elementOrPage(page, ['aside', '[data-testid="sidebar"]', 'nav'], 'content-import-sidebar.png');
+    await elementOrPage(
+      page,
+      ['aside', '[data-testid="sidebar"]', 'nav'],
+      'content-import-sidebar.png'
+    );
   });
 
   test('course creation — metadata section', async ({ page }) => {
     await goTo(page, '/courses/create');
-    await elementOrPage(page, ['[data-testid="course-metadata"]', '.metadata', 'section'], 'content-coursecreate-metadata.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="course-metadata"]', '.metadata', 'section'],
+      'content-coursecreate-metadata.png'
+    );
   });
 
   test('course editing — toolbar', async ({ page }) => {
     await goTo(page, '/courses/1/edit');
-    await elementOrPage(page, ['[data-testid="editor-toolbar"]', '[role="toolbar"]', '.toolbar'], 'content-courseedit-toolbar.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="editor-toolbar"]', '[role="toolbar"]', '.toolbar'],
+      'content-courseedit-toolbar.png'
+    );
   });
 
   test('portal builder — preview panel', async ({ page }) => {
     await goTo(page, '/portal-builder');
-    await elementOrPage(page, ['[data-testid="portal-preview"]', '.preview', 'iframe'], 'content-portal-preview.png');
+    await elementOrPage(
+      page,
+      ['[data-testid="portal-preview"]', '.preview', 'iframe'],
+      'content-portal-preview.png'
+    );
   });
 });

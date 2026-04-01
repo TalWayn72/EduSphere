@@ -34,7 +34,9 @@ test.describe('Consent Link — RequirementLink in AI Course Creator Modal', () 
       localStorage.removeItem('edusphere_consent_AI_PROCESSING');
     });
 
-    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/new`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // Open the AI Course Creator modal
     const launchBtn = page.locator('[data-testid="launch-ai-builder-btn"]');
@@ -43,13 +45,17 @@ test.describe('Consent Link — RequirementLink in AI Course Creator Modal', () 
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
   });
 
-  test('RequirementLink component is visible in the modal', async ({ page }) => {
+  test('RequirementLink component is visible in the modal', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     const reqLink = dialog.locator('[data-testid="requirement-link"]');
     await expect(reqLink).toBeVisible({ timeout: 10_000 });
   });
 
-  test('consent warning contains a clickable link (not just plain text)', async ({ page }) => {
+  test('consent warning contains a clickable link (not just plain text)', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     const reqLink = dialog.locator('[data-testid="requirement-link"]');
     // The RequirementLink must contain an <a> element — if it's just text, the bug has regressed
@@ -70,14 +76,18 @@ test.describe('Consent Link — RequirementLink in AI Course Creator Modal', () 
     expect(linkText?.trim().length).toBeGreaterThan(0);
   });
 
-  test('clicking the consent link navigates to /settings?highlight=ai-consent', async ({ page }) => {
+  test('clicking the consent link navigates to /settings?highlight=ai-consent', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     const reqLink = dialog.locator('[data-testid="requirement-link"]');
     const link = reqLink.locator('a');
     await link.click();
 
     // Wait for navigation to settings page
-    await page.waitForURL(/\/settings\?highlight=ai-consent/, { timeout: 10_000 });
+    await page.waitForURL(/\/settings\?highlight=ai-consent/, {
+      timeout: 10_000,
+    });
     expect(page.url()).toContain('/settings?highlight=ai-consent');
   });
 
@@ -87,16 +97,20 @@ test.describe('Consent Link — RequirementLink in AI Course Creator Modal', () 
     await expect(reqLink).toHaveAttribute('role', 'alert');
   });
 
-  test('no raw technical error strings visible in the consent warning area', async ({ page }) => {
+  test('no raw technical error strings visible in the consent warning area', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
-    const bodyText = await dialog.textContent() ?? '';
+    const bodyText = (await dialog.textContent()) ?? '';
     expect(bodyText).not.toContain('urql error');
     expect(bodyText).not.toContain('GraphQL error');
     expect(bodyText).not.toContain('Cannot read properties');
     expect(bodyText).not.toContain('[object Object]');
   });
 
-  test('visual screenshot: consent link visible in AI modal', async ({ page }) => {
+  test('visual screenshot: consent link visible in AI modal', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     const reqLink = dialog.locator('[data-testid="requirement-link"]');
     await expect(reqLink).toBeVisible({ timeout: 10_000 });
@@ -110,7 +124,9 @@ test.describe('Consent Link — RequirementLink in AI Course Creator Modal', () 
 // ─── Suite 2: Consent granted — link should NOT appear ──────────────────────
 
 test.describe('Consent Link — Hidden when consent is already granted', () => {
-  test('RequirementLink is NOT visible when AI consent is already granted', async ({ page }) => {
+  test('RequirementLink is NOT visible when AI consent is already granted', async ({
+    page,
+  }) => {
     await routeGraphQL(page, () => null);
     await login(page);
 
@@ -119,7 +135,9 @@ test.describe('Consent Link — Hidden when consent is already granted', () => {
       localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
     });
 
-    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/new`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     const launchBtn = page.locator('[data-testid="launch-ai-builder-btn"]');
     await launchBtn.waitFor({ timeout: 10_000 });
@@ -128,6 +146,8 @@ test.describe('Consent Link — Hidden when consent is already granted', () => {
 
     const dialog = page.getByRole('dialog');
     // RequirementLink should NOT be visible when consent is already granted
-    await expect(dialog.locator('[data-testid="requirement-link"]')).not.toBeVisible({ timeout: 5_000 });
+    await expect(
+      dialog.locator('[data-testid="requirement-link"]')
+    ).not.toBeVisible({ timeout: 5_000 });
   });
 });

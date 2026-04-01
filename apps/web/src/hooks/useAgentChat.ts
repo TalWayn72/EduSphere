@@ -61,13 +61,18 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     return () => {
       if (mockTimeoutRef.current) clearTimeout(mockTimeoutRef.current);
-      if (streamingTimeoutRef.current) clearTimeout(streamingTimeoutRef.current);
+      if (streamingTimeoutRef.current)
+        clearTimeout(streamingTimeoutRef.current);
     };
   }, []);
 
@@ -106,10 +111,16 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       const existingIdx = prev.findIndex((m) => m.id === msg.id);
       if (existingIdx !== -1) {
         const updated = [...prev];
-        updated[existingIdx] = { ...updated[existingIdx]!, content: msg.content };
+        updated[existingIdx] = {
+          ...updated[existingIdx]!,
+          content: msg.content,
+        };
         return updated;
       }
-      return [...prev, { id: msg.id, role: incomingRole, content: msg.content }];
+      return [
+        ...prev,
+        { id: msg.id, role: incomingRole, content: msg.content },
+      ];
     });
     if (incomingRole === 'agent') setIsStreaming(false);
   }, [streamResult.data]);
@@ -125,7 +136,8 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const appendMockResponse = useCallback(() => {
     setIsStreaming(true);
     mockTimeoutRef.current = setTimeout(() => {
-      const reply = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)] ?? '';
+      const reply =
+        MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)] ?? '';
       setConfirmedMessages((prev) => [
         ...prev,
         { id: Date.now().toString(), role: 'agent', content: reply },
@@ -143,12 +155,20 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       setConfirmedMessages((prev) => [
         ...prev,
         { id: `temp-${Date.now()}`, role: 'user', content: trimmed },
-        { id: `consent-${Date.now()}`, role: 'agent', content: 'consent-required' },
+        {
+          id: `consent-${Date.now()}`,
+          role: 'agent',
+          content: 'consent-required',
+        },
       ]);
       return;
     }
 
-    const userMsg: ChatMessage = { id: `temp-${Date.now()}`, role: 'user', content: trimmed };
+    const userMsg: ChatMessage = {
+      id: `temp-${Date.now()}`,
+      role: 'user',
+      content: trimmed,
+    };
     setChatInput('');
     setIsStreaming(true);
     setConfirmedMessages((prev) => [...prev, userMsg]);
@@ -157,7 +177,8 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       let sid = sessionId;
       if (!sid) {
         const res = await startSession({
-          templateType: 'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
+          templateType:
+            'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
           context: { contentId },
         });
         if (res.error) {
@@ -167,7 +188,11 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           if (consentErr) {
             setConfirmedMessages((prev) => [
               ...prev,
-              { id: `consent-${Date.now()}`, role: 'agent' as const, content: 'consent-required' },
+              {
+                id: `consent-${Date.now()}`,
+                role: 'agent' as const,
+                content: 'consent-required',
+              },
             ]);
             setIsStreaming(false);
             return;
@@ -178,7 +203,10 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       }
 
       if (sid) {
-        const res = await sendAgentMessage({ sessionId: sid, content: trimmed });
+        const res = await sendAgentMessage({
+          sessionId: sid,
+          content: trimmed,
+        });
         if (res.error) {
           const consentErr = res.error.graphQLErrors?.find(
             (e) => e.extensions?.code === 'CONSENT_REQUIRED'
@@ -186,7 +214,11 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           if (consentErr) {
             setConfirmedMessages((prev) => [
               ...prev,
-              { id: `consent-${Date.now()}`, role: 'agent' as const, content: 'consent-required' },
+              {
+                id: `consent-${Date.now()}`,
+                role: 'agent' as const,
+                content: 'consent-required',
+              },
             ]);
             setIsStreaming(false);
             return;
@@ -197,18 +229,31 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           setConfirmedMessages((prev) => {
             const alreadyPresent = prev.some((m) => m.id === reply.id);
             if (alreadyPresent) return prev;
-            return [...prev, { id: reply.id, role: 'agent' as const, content: reply.content }];
+            return [
+              ...prev,
+              { id: reply.id, role: 'agent' as const, content: reply.content },
+            ];
           });
           setIsStreaming(false);
           return;
         }
-        streamingTimeoutRef.current = setTimeout(() => setIsStreaming(false), 30_000);
+        streamingTimeoutRef.current = setTimeout(
+          () => setIsStreaming(false),
+          30_000
+        );
         return;
       }
 
       appendMockResponse();
     });
-  }, [chatInput, contentId, sessionId, startSession, sendAgentMessage, appendMockResponse]);
+  }, [
+    chatInput,
+    contentId,
+    sessionId,
+    startSession,
+    sendAgentMessage,
+    appendMockResponse,
+  ]);
 
   const stopGeneration = useCallback(() => {
     setIsStreaming(false);

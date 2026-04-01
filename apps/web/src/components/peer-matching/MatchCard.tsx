@@ -25,7 +25,10 @@ export function MatchCard({
           <p className="text-sm font-medium text-foreground">
             Learner {userId.slice(0, 6)}
           </p>
-          <p className="text-xs text-muted-foreground">{sharedCourseCount} shared course{sharedCourseCount !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-muted-foreground">
+            {sharedCourseCount} shared course
+            {sharedCourseCount !== 1 ? 's' : ''}
+          </p>
         </div>
       </div>
 

@@ -9,7 +9,12 @@
  * Memory safety: OnModuleDestroy clears timer + drains NATS + closes DB pools.
  * SI-9 enforced: all DB reads via Drizzle (no raw SQL).
  */
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -76,28 +81,42 @@ export class YauEnforcementService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit(): void {
     if (process.env['YAU_ENFORCEMENT_ENABLED'] !== 'true') {
-      this.logger.log('[YauEnforcementService] Disabled — YAU_ENFORCEMENT_ENABLED not set');
+      this.logger.log(
+        '[YauEnforcementService] Disabled — YAU_ENFORCEMENT_ENABLED not set'
+      );
       return;
     }
     const delayMs = msUntil2Am();
-    this.logger.log(`[YauEnforcementService] Daily check in ${Math.round(delayMs / 60000)} min`);
+    this.logger.log(
+      `[YauEnforcementService] Daily check in ${Math.round(delayMs / 60000)} min`
+    );
     this.initTimeout = setTimeout(() => {
       this.initTimeout = null;
       void this.checkAllTenants();
-      this.intervalHandle = setInterval(() => { void this.checkAllTenants(); }, ONE_DAY_MS);
+      this.intervalHandle = setInterval(() => {
+        void this.checkAllTenants();
+      }, ONE_DAY_MS);
     }, delayMs);
   }
 
   async onModuleDestroy(): Promise<void> {
-    if (this.initTimeout) { clearTimeout(this.initTimeout); this.initTimeout = null; }
-    if (this.intervalHandle) { clearInterval(this.intervalHandle); this.intervalHandle = null; }
+    if (this.initTimeout) {
+      clearTimeout(this.initTimeout);
+      this.initTimeout = null;
+    }
+    if (this.intervalHandle) {
+      clearInterval(this.intervalHandle);
+      this.intervalHandle = null;
+    }
     try {
       if (this.nats && !this.nats.isClosed()) await this.nats.drain();
     } catch (err) {
       this.logger.warn({ err }, '[YauEnforcementService] NATS drain error');
     }
     await closeAllPools();
-    this.logger.log('[YauEnforcementService] Destroyed — timers cleared, pools closed');
+    this.logger.log(
+      '[YauEnforcementService] Destroyed — timers cleared, pools closed'
+    );
   }
 
   /** Count distinct active users for a tenant in the given calendar year. */
@@ -136,15 +155,27 @@ export class YauEnforcementService implements OnModuleInit, OnModuleDestroy {
 
     if (pct >= SOFT_WARN_PCT && pct < HARD_BLOCK_PCT) {
       this.emitEvent(YAU_WARN_SUBJECT, { tenantId, currentYau, maxYau, pct });
-      this.logger.warn({ tenantId, currentYau, maxYau }, '[YauEnforcementService] 80% warning');
+      this.logger.warn(
+        { tenantId, currentYau, maxYau },
+        '[YauEnforcementService] 80% warning'
+      );
     }
     if (blocked) {
       this.emitEvent(YAU_BLOCK_SUBJECT, { tenantId, currentYau, maxYau, pct });
-      this.logger.error({ tenantId, currentYau, maxYau }, '[YauEnforcementService] BLOCKED');
+      this.logger.error(
+        { tenantId, currentYau, maxYau },
+        '[YauEnforcementService] BLOCKED'
+      );
       throw new QuotaExceededError(tenantId, currentYau, maxYau);
     }
 
-    return { tenantId, currentYau, maxYau, utilizationPct: Math.round(pct * 100), blocked };
+    return {
+      tenantId,
+      currentYau,
+      maxYau,
+      utilizationPct: Math.round(pct * 100),
+      blocked,
+    };
   }
 
   /** Daily cron: check all tenants with active subscriptions. */
@@ -159,17 +190,26 @@ export class YauEnforcementService implements OnModuleInit, OnModuleDestroy {
           await this.enforce(tenantId);
         } catch (err) {
           if (err instanceof QuotaExceededError) continue; // expected for blocked tenants
-          this.logger.error({ err, tenantId }, '[YauEnforcementService] check failed');
+          this.logger.error(
+            { err, tenantId },
+            '[YauEnforcementService] check failed'
+          );
         }
       }
     } catch (err) {
-      this.logger.error({ err }, '[YauEnforcementService] checkAllTenants failed');
+      this.logger.error(
+        { err },
+        '[YauEnforcementService] checkAllTenants failed'
+      );
     }
   }
 
   private emitEvent(subject: string, data: Record<string, unknown>): void {
     if (!this.nats || this.nats.isClosed()) return;
-    const payload = JSON.stringify({ ...data, timestamp: new Date().toISOString() });
+    const payload = JSON.stringify({
+      ...data,
+      timestamp: new Date().toISOString(),
+    });
     this.nats.publish(subject, new TextEncoder().encode(payload));
   }
 }

@@ -7,11 +7,15 @@ vi.mock('urql', () => ({
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: React.InputHTMLAttributes<HTMLInputElement>) => <input {...props} />,
+  Input: (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input {...props} />
+  ),
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children }: { children: React.ReactNode }) => <label>{children}</label>,
+  Label: ({ children }: { children: React.ReactNode }) => (
+    <label>{children}</label>
+  ),
 }));
 
 import { SlugField } from './SlugField';

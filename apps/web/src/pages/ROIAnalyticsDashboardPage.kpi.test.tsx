@@ -52,12 +52,16 @@ describe('CostPerUser', () => {
 
   it('shows "Contact for pricing" for ENTERPRISE plan', () => {
     render(<CostPerUser plan="ENTERPRISE" yearlyActiveUsers={500} />);
-    expect(screen.getByTestId('cost-per-user')).toHaveTextContent('Contact for pricing');
+    expect(screen.getByTestId('cost-per-user')).toHaveTextContent(
+      'Contact for pricing'
+    );
   });
 
   it('shows "Contact for pricing" for PILOT plan (free)', () => {
     render(<CostPerUser plan="PILOT" yearlyActiveUsers={50} />);
-    expect(screen.getByTestId('cost-per-user')).toHaveTextContent('Contact for pricing');
+    expect(screen.getByTestId('cost-per-user')).toHaveTextContent(
+      'Contact for pricing'
+    );
   });
 
   it('shows dash when yearlyActiveUsers is 0', () => {
@@ -67,7 +71,9 @@ describe('CostPerUser', () => {
 
   it('shows plan name in the per-YAU label', () => {
     render(<CostPerUser plan="UNIVERSITY" yearlyActiveUsers={1000} />);
-    expect(screen.getByTestId('cost-per-user')).toHaveTextContent('UNIVERSITY plan');
+    expect(screen.getByTestId('cost-per-user')).toHaveTextContent(
+      'UNIVERSITY plan'
+    );
   });
 
   it('calculates GROWTH plan cost correctly', () => {

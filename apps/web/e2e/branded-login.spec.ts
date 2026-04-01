@@ -50,10 +50,13 @@ const MOCK_BRANDED_LOGIN_DATA_WITH_SSO = {
 
 async function mockBrandedLoginSuccess(
   page: import('@playwright/test').Page,
-  data = MOCK_BRANDED_LOGIN_DATA,
+  data = MOCK_BRANDED_LOGIN_DATA
 ): Promise<void> {
   await routeGraphQL(page, (op) => {
-    if (op === 'BrandedLoginData' || op.toLowerCase().includes('brandedlogin')) {
+    if (
+      op === 'BrandedLoginData' ||
+      op.toLowerCase().includes('brandedlogin')
+    ) {
       return JSON.stringify({ data: { brandedLoginData: data } });
     }
     return null;
@@ -61,10 +64,13 @@ async function mockBrandedLoginSuccess(
 }
 
 async function mockBrandedLoginNotFound(
-  page: import('@playwright/test').Page,
+  page: import('@playwright/test').Page
 ): Promise<void> {
   await routeGraphQL(page, (op) => {
-    if (op === 'BrandedLoginData' || op.toLowerCase().includes('brandedlogin')) {
+    if (
+      op === 'BrandedLoginData' ||
+      op.toLowerCase().includes('brandedlogin')
+    ) {
       return JSON.stringify({ data: { brandedLoginData: null } });
     }
     return null;

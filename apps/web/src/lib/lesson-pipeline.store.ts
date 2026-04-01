@@ -102,7 +102,9 @@ interface LessonPipelineState {
   updateNodeConfig: (id: string, config: Record<string, unknown>) => void;
   clearNodes: () => void;
   loadTemplate: (templateName: 'THEMATIC' | 'SEQUENTIAL' | 'CUSTOM') => void;
-  loadServerTemplate: (nodes: Array<{ moduleType: string; [key: string]: unknown }>) => void;
+  loadServerTemplate: (
+    nodes: Array<{ moduleType: string; [key: string]: unknown }>
+  ) => void;
   setSelectedNode: (id: string | null) => void;
   resetDirty: () => void;
   setModuleStatus: (moduleType: string, status: ModuleStatusValue) => void;
@@ -111,7 +113,12 @@ interface LessonPipelineState {
   redo: () => void;
 }
 
-function pushSnapshot(state: LessonPipelineState): Pick<LessonPipelineState, 'undoStack' | 'redoStack' | 'canUndo' | 'canRedo'> {
+function pushSnapshot(
+  state: LessonPipelineState
+): Pick<
+  LessonPipelineState,
+  'undoStack' | 'redoStack' | 'canUndo' | 'canRedo'
+> {
   const snapshot: UndoSnapshot = {
     nodes: state.nodes.map((n) => ({ ...n })),
     selectedNodeId: state.selectedNodeId,
@@ -241,7 +248,9 @@ export const useLessonPipelineStore = create<LessonPipelineState>()(
         selectedNodeId: state.selectedNodeId,
       };
       const newUndo = state.undoStack.slice(0, -1);
-      const newRedo = [...state.redoStack, currentSnapshot].slice(-MAX_UNDO_STACK);
+      const newRedo = [...state.redoStack, currentSnapshot].slice(
+        -MAX_UNDO_STACK
+      );
       set({
         nodes: prev.nodes,
         selectedNodeId: prev.selectedNodeId,
@@ -262,7 +271,9 @@ export const useLessonPipelineStore = create<LessonPipelineState>()(
         selectedNodeId: state.selectedNodeId,
       };
       const newRedo = state.redoStack.slice(0, -1);
-      const newUndo = [...state.undoStack, currentSnapshot].slice(-MAX_UNDO_STACK);
+      const newUndo = [...state.undoStack, currentSnapshot].slice(
+        -MAX_UNDO_STACK
+      );
       set({
         nodes: next.nodes,
         selectedNodeId: next.selectedNodeId,

@@ -19,7 +19,7 @@ import { AnnotationLayer, type Annotation } from '@/types/annotations';
 // ── Test data ────────────────────────────────────────────────────────────────
 
 function makeAnnotation(
-  overrides: Partial<Annotation> & { id: string },
+  overrides: Partial<Annotation> & { id: string }
 ): Annotation {
   return {
     content: 'test content',
@@ -84,7 +84,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     expect(screen.getByTestId('pdf-annotation-layer')).toBeInTheDocument();
@@ -100,12 +100,14 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     // ann-3 is on page 2 — should not appear
     const buttons = screen.getAllByRole('button');
-    const annotationIds = buttons.map((b) => b.getAttribute('data-annotation-id'));
+    const annotationIds = buttons.map((b) =>
+      b.getAttribute('data-annotation-id')
+    );
     expect(annotationIds).not.toContain('ann-3');
   });
 
@@ -116,7 +118,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={2}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     const buttons = screen.getAllByRole('button');
@@ -131,7 +133,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -145,7 +147,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -159,7 +161,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={2}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -173,7 +175,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -189,7 +191,7 @@ describe('PdfAnnotationLayer', () => {
         canvasWidth={800}
         canvasHeight={600}
         onAnnotationClick={onClick}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByRole('button'));
@@ -204,10 +206,12 @@ describe('PdfAnnotationLayer', () => {
         pageNum={99}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
-    expect(screen.queryByTestId('pdf-annotation-layer')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('pdf-annotation-layer')
+    ).not.toBeInTheDocument();
   });
 
   it('renders nothing for empty annotations array', () => {
@@ -217,10 +221,12 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
-    expect(screen.queryByTestId('pdf-annotation-layer')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('pdf-annotation-layer')
+    ).not.toBeInTheDocument();
   });
 
   it('positions highlight rects based on spatialData', () => {
@@ -230,7 +236,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -250,7 +256,7 @@ describe('PdfAnnotationLayer', () => {
         canvasWidth={800}
         canvasHeight={600}
         focusedAnnotationId="ann-1"
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -265,7 +271,7 @@ describe('PdfAnnotationLayer', () => {
         canvasWidth={800}
         canvasHeight={600}
         focusedAnnotationId="other-id"
-      />,
+      />
     );
 
     const button = screen.getByRole('button');
@@ -279,10 +285,12 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
-    expect(screen.getAllByLabelText(/Annotation highlight/).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByLabelText(/Annotation highlight/).length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('falls back to textRange-based rects when no spatialData rects', () => {
@@ -298,7 +306,7 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
     // Should render highlight(s) from text range estimation
@@ -313,9 +321,11 @@ describe('PdfAnnotationLayer', () => {
         pageNum={1}
         canvasWidth={800}
         canvasHeight={600}
-      />,
+      />
     );
 
-    expect(screen.getByLabelText(/Annotation highlights on page/)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Annotation highlights on page/)
+    ).toBeInTheDocument();
   });
 });

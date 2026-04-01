@@ -24,7 +24,11 @@ export const Large: Story = {
 
 export const WithMessages: Story = {
   args: {
-    messages: ['Loading course data...', 'Fetching quiz results...', 'Almost ready...'],
+    messages: [
+      'Loading course data...',
+      'Fetching quiz results...',
+      'Almost ready...',
+    ],
   },
 };
 

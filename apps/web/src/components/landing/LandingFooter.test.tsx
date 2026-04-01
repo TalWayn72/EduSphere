@@ -4,14 +4,21 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { LandingFooter } from './LandingFooter';
 
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_, name) => {
-    if (name === '__esModule') return true;
-    return function MockIcon(props: Record<string, unknown>) {
-      return <span data-testid={`icon-${String(name)}`} {...props} />;
-    };
-  },
-}));
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
+);
 
 function renderWithRouter(ui: React.ReactElement) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -39,7 +46,9 @@ describe('LandingFooter', () => {
   it('renders all column links as React Router Links with correct paths', () => {
     const { container } = renderWithRouter(<LandingFooter />);
     const allLinks = Array.from(container.querySelectorAll('a'));
-    const hrefMap = Object.fromEntries(allLinks.map((a) => [a.textContent?.trim(), a.getAttribute('href')]));
+    const hrefMap = Object.fromEntries(
+      allLinks.map((a) => [a.textContent?.trim(), a.getAttribute('href')])
+    );
 
     // Product — hash links now point to root landing page
     expect(hrefMap['Features']).toBe('/#features');
@@ -72,9 +81,15 @@ describe('LandingFooter', () => {
   it('renders bottom-bar legal links as React Router Links', () => {
     const { container } = renderWithRouter(<LandingFooter />);
     const allLinks = Array.from(container.querySelectorAll('a'));
-    const privacyLinks = allLinks.filter((a) => a.getAttribute('href') === '/privacy');
-    const termsLinks = allLinks.filter((a) => a.getAttribute('href') === '/terms');
-    const a11yLinks = allLinks.filter((a) => a.getAttribute('href') === '/accessibility');
+    const privacyLinks = allLinks.filter(
+      (a) => a.getAttribute('href') === '/privacy'
+    );
+    const termsLinks = allLinks.filter(
+      (a) => a.getAttribute('href') === '/terms'
+    );
+    const a11yLinks = allLinks.filter(
+      (a) => a.getAttribute('href') === '/accessibility'
+    );
     // Privacy appears in column + bottom bar
     expect(privacyLinks.length).toBeGreaterThanOrEqual(1);
     expect(termsLinks.length).toBeGreaterThanOrEqual(1);

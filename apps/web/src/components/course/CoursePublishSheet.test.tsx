@@ -5,7 +5,13 @@
  * enable/disable logic, confirmation dialog, urql mock patterns.
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -29,38 +35,64 @@ vi.mock('@/lib/graphql/content.queries', () => ({
 vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div data-testid="mock-dialog">{children}</div> : null,
-  DialogContent: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <div {...props}>{children}</div>
+  DialogContent: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
-  DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2>{children}</h2>
+  ),
+  DialogDescription: ({ children }: { children: React.ReactNode }) => (
+    <p>{children}</p>
+  ),
+  DialogFooter: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   DialogClose: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; asChild?: boolean }) => (
-    <button {...props}>{children}</button>
-  ),
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    asChild?: boolean;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+  Badge: ({ children }: { children: React.ReactNode }) => (
+    <span>{children}</span>
+  ),
 }));
 
 vi.mock('lucide-react', () => ({
   CheckCircle2: ({ className }: { className: string }) => (
-    <span data-testid="icon-check" className={className}>check</span>
+    <span data-testid="icon-check" className={className}>
+      check
+    </span>
   ),
   XCircle: ({ className }: { className: string }) => (
-    <span data-testid="icon-x" className={className}>x</span>
+    <span data-testid="icon-x" className={className}>
+      x
+    </span>
   ),
   Loader2: ({ className }: { className: string }) => (
-    <span data-testid="icon-loader" className={className}>loading</span>
+    <span data-testid="icon-loader" className={className}>
+      loading
+    </span>
   ),
   Send: ({ className }: { className: string }) => (
-    <span data-testid="icon-send" className={className}>send</span>
+    <span data-testid="icon-send" className={className}>
+      send
+    </span>
   ),
 }));
 
@@ -85,7 +117,9 @@ const SOME_FAIL_CHECKS = [
   { name: 'has_pipeline_results', passed: true, message: null },
 ];
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 const NOOP_MUTATION = [{ fetching: false }, NOOP_EXECUTE] as never;
 
 function makeReadinessQuery(checks: typeof ALL_PASS_CHECKS, ready: boolean) {
@@ -128,7 +162,9 @@ describe('CoursePublishSheet', () => {
     render(<CoursePublishSheet {...defaultProps} />);
 
     expect(screen.getByText('פרסום קורס')).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: /readiness checks/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('list', { name: /readiness checks/i })
+    ).toBeInTheDocument();
     expect(screen.getAllByRole('listitem')).toHaveLength(5);
   });
 

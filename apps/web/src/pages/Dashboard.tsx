@@ -56,7 +56,9 @@ export function Dashboard() {
 
         {/* Instructor / Admin quick actions */}
         {localUser &&
-          ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(localUser.role) && (
+          ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
+            localUser.role
+          ) && (
             <Card className="border-primary/20 bg-primary/5">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -113,13 +115,20 @@ export function Dashboard() {
 
         {/* Course Progress + Weekly Stats */}
         <div className="relative">
-          <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA DATA</span>
-          <LearningStats courses={MOCK_COURSE_PROGRESS} weeklyStats={MOCK_WEEKLY_STATS} />
+          <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+            BETA DATA
+          </span>
+          <LearningStats
+            courses={MOCK_COURSE_PROGRESS}
+            weeklyStats={MOCK_WEEKLY_STATS}
+          />
         </div>
 
         {/* Activity Heatmap */}
         <Card className="relative">
-          <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA DATA</span>
+          <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+            BETA DATA
+          </span>
           <CardHeader>
             <CardTitle>{t('studyActivity')}</CardTitle>
             <CardDescription>{t('activityDescription')}</CardDescription>
@@ -132,7 +141,9 @@ export function Dashboard() {
         {/* Activity Feed + Profile */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="relative">
-            <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">BETA DATA</span>
+            <span className="absolute -top-2 right-3 z-10 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+              BETA DATA
+            </span>
             <CardHeader>
               <CardTitle>{t('recentActivity')}</CardTitle>
               <CardDescription>{t('latestEvents')}</CardDescription>

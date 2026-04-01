@@ -24,7 +24,9 @@ export class NotificationService {
 
   async initialize(): Promise<PushNotificationToken | null> {
     if (!Device.isDevice) {
-      console.error('[NotificationService] Push notifications only work on physical devices');
+      console.error(
+        '[NotificationService] Push notifications only work on physical devices'
+      );
       return null;
     }
 
@@ -39,7 +41,9 @@ export class NotificationService {
     }
 
     if (finalStatus !== 'granted') {
-      console.error('[NotificationService] Push notification permissions not granted');
+      console.error(
+        '[NotificationService] Push notification permissions not granted'
+      );
       return null;
     }
 

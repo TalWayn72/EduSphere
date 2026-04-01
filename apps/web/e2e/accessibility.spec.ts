@@ -280,17 +280,17 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
 // -------------------------------------------------------------------------
 
 test.describe('ARIA Snapshot — Navigation landmarks', () => {
-  test('AppSidebar navigation landmark is present on /dashboard', async ({ page }) => {
+  test('AppSidebar navigation landmark is present on /dashboard', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('domcontentloaded');
 
     // The sidebar renders as a <nav> or <aside> with an aria-label containing
     // "navigation" (English) or "ניווט" (Hebrew when i18n is active).
-    const sidebar = page
-      .locator('nav[aria-label], aside[aria-label]')
-      .first();
+    const sidebar = page.locator('nav[aria-label], aside[aria-label]').first();
 
-    if (await sidebar.count() > 0) {
+    if ((await sidebar.count()) > 0) {
       // Verify the landmark exposes at least a navigation role in the ARIA tree.
       await expect(sidebar).toMatchAriaSnapshot(`
         - navigation
@@ -307,7 +307,7 @@ test.describe('ARIA Snapshot — Navigation landmarks', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const main = page.locator('main').first();
-    if (await main.count() > 0) {
+    if ((await main.count()) > 0) {
       await expect(main).toMatchAriaSnapshot(`
         - main
       `);

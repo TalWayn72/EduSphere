@@ -37,7 +37,7 @@ export function PageShell({
         SIZE_MAP[size],
         size !== 'full' && 'mx-auto px-4 sm:px-6 lg:px-8',
         SPACING_MAP[spacing],
-        className,
+        className
       )}
     >
       {children}

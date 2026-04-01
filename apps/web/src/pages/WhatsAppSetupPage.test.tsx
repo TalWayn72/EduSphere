@@ -4,14 +4,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as urql from 'urql';
 import { WhatsAppSetupPage } from './WhatsAppSetupPage';
 
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_, name) => {
-    if (name === '__esModule') return true;
-    return function MockIcon(props: Record<string, unknown>) {
-      return <span data-testid={`icon-${String(name)}`} {...props} />;
-    };
-  },
-}));
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
+);
 
 vi.mock('urql', async () => {
   const actual = await vi.importActual('urql');
@@ -35,7 +42,9 @@ function setup(registerSuccess = true) {
 }
 
 describe('WhatsAppSetupPage', () => {
-  beforeEach(() => { vi.restoreAllMocks(); });
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it('renders page title', () => {
     setup();
@@ -54,7 +63,9 @@ describe('WhatsAppSetupPage', () => {
   it('submit is disabled without consent', () => {
     setup();
     render(<WhatsAppSetupPage />);
-    const submitBtn = screen.getByRole('button', { name: /send verification/i });
+    const submitBtn = screen.getByRole('button', {
+      name: /send verification/i,
+    });
     expect(submitBtn).toBeDisabled();
   });
 
@@ -62,7 +73,9 @@ describe('WhatsAppSetupPage', () => {
     setup();
     render(<WhatsAppSetupPage />);
     fireEvent.click(screen.getByLabelText(/whatsapp consent/i));
-    const submitBtn = screen.getByRole('button', { name: /send verification/i });
+    const submitBtn = screen.getByRole('button', {
+      name: /send verification/i,
+    });
     expect(submitBtn).toBeDisabled();
   });
 
@@ -70,8 +83,12 @@ describe('WhatsAppSetupPage', () => {
     setup();
     render(<WhatsAppSetupPage />);
     fireEvent.click(screen.getByLabelText(/whatsapp consent/i));
-    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: '5551234' } });
-    const submitBtn = screen.getByRole('button', { name: /send verification/i });
+    fireEvent.change(screen.getByLabelText(/phone number/i), {
+      target: { value: '5551234' },
+    });
+    const submitBtn = screen.getByRole('button', {
+      name: /send verification/i,
+    });
     expect(submitBtn).not.toBeDisabled();
   });
 
@@ -79,7 +96,9 @@ describe('WhatsAppSetupPage', () => {
     const { registerFn } = setup(true);
     render(<WhatsAppSetupPage />);
     fireEvent.click(screen.getByLabelText(/whatsapp consent/i));
-    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: '5551234' } });
+    fireEvent.change(screen.getByLabelText(/phone number/i), {
+      target: { value: '5551234' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /send verification/i }));
     await waitFor(() => {
       expect(registerFn).toHaveBeenCalled();
@@ -91,7 +110,9 @@ describe('WhatsAppSetupPage', () => {
     setup(true);
     render(<WhatsAppSetupPage />);
     fireEvent.click(screen.getByLabelText(/whatsapp consent/i));
-    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: '5551234' } });
+    fireEvent.change(screen.getByLabelText(/phone number/i), {
+      target: { value: '5551234' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /send verification/i }));
     await waitFor(() => screen.getByLabelText(/verification code/i));
     expect(screen.getByRole('button', { name: /^verify$/i })).toBeDisabled();
@@ -101,14 +122,20 @@ describe('WhatsAppSetupPage', () => {
     setup(true);
     render(<WhatsAppSetupPage />);
     fireEvent.click(screen.getByLabelText(/whatsapp consent/i));
-    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: '5551234' } });
+    fireEvent.change(screen.getByLabelText(/phone number/i), {
+      target: { value: '5551234' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /send verification/i }));
-    await waitFor(() => expect(screen.getByText(/resend code/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/resend code/i)).toBeInTheDocument()
+    );
   });
 
   it('has accessible form labels', () => {
     setup();
     render(<WhatsAppSetupPage />);
-    expect(screen.getByRole('form', { name: /whatsapp registration/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('form', { name: /whatsapp registration/i })
+    ).toBeInTheDocument();
   });
 });

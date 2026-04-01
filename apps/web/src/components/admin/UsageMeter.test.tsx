@@ -20,7 +20,9 @@ describe('UsageMeter', () => {
 
   it('shows correct percentage text', () => {
     render(<UsageMeter current={250} limit={500} />);
-    expect(screen.getByTestId('usage-meter-pct')).toHaveTextContent('50% utilized');
+    expect(screen.getByTestId('usage-meter-pct')).toHaveTextContent(
+      '50% utilized'
+    );
   });
 
   it('SVG progress circle has green stroke when utilization < 80%', () => {
@@ -47,11 +49,15 @@ describe('UsageMeter', () => {
 
   it('shows 100% when over limit', () => {
     render(<UsageMeter current={600} limit={500} />);
-    expect(screen.getByTestId('usage-meter-pct')).toHaveTextContent('120% utilized');
+    expect(screen.getByTestId('usage-meter-pct')).toHaveTextContent(
+      '120% utilized'
+    );
   });
 
   it('renders label when provided', () => {
-    render(<UsageMeter current={100} limit={500} label="Yearly Active Users" />);
+    render(
+      <UsageMeter current={100} limit={500} label="Yearly Active Users" />
+    );
     expect(screen.getByText('Yearly Active Users')).toBeInTheDocument();
   });
 });

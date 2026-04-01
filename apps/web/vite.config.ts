@@ -62,7 +62,8 @@ export default defineConfig({
       '/sitemap.xml': {
         target: 'http://localhost:4002',
         changeOrigin: true,
-        rewrite: (path: string) => path.replace(/^\/sitemap\.xml/, '/aeo/sitemap.xml'),
+        rewrite: (path: string) =>
+          path.replace(/^\/sitemap\.xml/, '/aeo/sitemap.xml'),
       },
     },
   },
@@ -77,7 +78,8 @@ export default defineConfig({
       '/sitemap.xml': {
         target: 'http://localhost:4002',
         changeOrigin: true,
-        rewrite: (path: string) => path.replace(/^\/sitemap\.xml/, '/aeo/sitemap.xml'),
+        rewrite: (path: string) =>
+          path.replace(/^\/sitemap\.xml/, '/aeo/sitemap.xml'),
       },
     },
   },

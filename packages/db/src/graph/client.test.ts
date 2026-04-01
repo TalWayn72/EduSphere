@@ -674,8 +674,7 @@ describe('parseAgtypeValue()', () => {
   });
 
   it('handles vertex with empty properties', () => {
-    const vertexStr =
-      '{"id": 1, "label": "Empty", "properties": {}}::vertex';
+    const vertexStr = '{"id": 1, "label": "Empty", "properties": {}}::vertex';
     expect(parseAgtypeValue(vertexStr)).toEqual({});
   });
 

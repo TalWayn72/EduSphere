@@ -96,12 +96,16 @@ test.describe('Auto-Grading Results — Data Loaded', () => {
   });
 
   test('page loads with auto-grading container', async ({ page }) => {
-    await expect(page.locator('[data-testid="auto-grading-page"]')).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.locator('[data-testid="auto-grading-page"]')).toBeVisible(
+      {
+        timeout: 10_000,
+      }
+    );
   });
 
-  test('overall score summary is rendered with correct percentage', async ({ page }) => {
+  test('overall score summary is rendered with correct percentage', async ({
+    page,
+  }) => {
     const summary = page.locator('[data-testid="overall-score-summary"]');
     await expect(summary).toBeVisible({ timeout: 10_000 });
     const text = (await summary.textContent()) ?? '';
@@ -165,9 +169,12 @@ test.describe('Auto-Grading Results — Empty State', () => {
   test.beforeEach(async ({ page }) => {
     await mockGradingEmpty(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-e2e-empty`, {
-      waitUntil: 'domcontentloaded',
-    });
+    await page.goto(
+      `${BASE_URL}/admin/auto-grading?submissionId=sub-e2e-empty`,
+      {
+        waitUntil: 'domcontentloaded',
+      }
+    );
     await page.waitForLoadState('domcontentloaded');
   });
 
@@ -182,7 +189,9 @@ test.describe('Auto-Grading Results — Empty State', () => {
     await expect(el).toHaveText(/No grading results yet/i, { timeout: 10_000 });
   });
 
-  test('overall score summary is NOT visible in empty state', async ({ page }) => {
+  test('overall score summary is NOT visible in empty state', async ({
+    page,
+  }) => {
     await expect(
       page.locator('[data-testid="overall-score-summary"]')
     ).not.toBeVisible();
@@ -224,9 +233,12 @@ test.describe('Auto-Grading Results — Loading Skeleton', () => {
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-e2e-loading`, {
-      waitUntil: 'domcontentloaded',
-    });
+    await page.goto(
+      `${BASE_URL}/admin/auto-grading?submissionId=sub-e2e-loading`,
+      {
+        waitUntil: 'domcontentloaded',
+      }
+    );
 
     // Skeleton should be visible during loading
     await expect(page.locator('[data-testid="grading-skeleton"]')).toBeVisible({

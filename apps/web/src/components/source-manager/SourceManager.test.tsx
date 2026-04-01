@@ -36,7 +36,10 @@ vi.mock('@/lib/graphql/sources.queries', () => ({
 }));
 
 // Mock PDF component to avoid pdfjs-dist DOMMatrix requirement in jsdom
-vi.mock('pdfjs-dist', () => ({ getDocument: vi.fn(), GlobalWorkerOptions: { workerSrc: '' } }));
+vi.mock('pdfjs-dist', () => ({
+  getDocument: vi.fn(),
+  GlobalWorkerOptions: { workerSrc: '' },
+}));
 vi.mock('@/components/pdf', () => ({ PdfDocumentViewer: () => null }));
 
 function createWrapper() {
@@ -76,8 +79,8 @@ describe('SourceManager — BUG-098 regression', () => {
     });
     expect(
       screen.getByText(
-        /The system analyzes and indexes sources for semantic search/,
-      ),
+        /The system analyzes and indexes sources for semantic search/
+      )
     ).toBeInTheDocument();
   });
 
@@ -167,7 +170,7 @@ describe('SourceManager — embedding status badges', () => {
       () => {
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     );
     // READY status text should be rendered (from STATUS_I18N_KEYS)
     const readyElements = screen.queryAllByText('Ready');
@@ -182,7 +185,7 @@ describe('SourceManager — embedding status badges', () => {
       () => {
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     );
     // DEV_MODE mock data includes sources with chunkCount
     const chunksText = screen.queryAllByText(/chunk/i);
@@ -197,7 +200,7 @@ describe('SourceManager — embedding status badges', () => {
       () => {
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     );
     // After loading, source count text or "no sources" text should appear
     const bodyText = document.body.textContent ?? '';
@@ -212,7 +215,7 @@ describe('SourceManager — embedding status badges', () => {
       () => {
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     );
     // Source items have cursor-pointer class
     const sourceItems = document.querySelectorAll('.cursor-pointer');
@@ -243,8 +246,10 @@ describe('SourceManager — Accessibility', () => {
 
   async function waitForSourcesLoaded() {
     await waitFor(
-      () => { expect(screen.queryByText('Loading...')).not.toBeInTheDocument(); },
-      { timeout: 5000 },
+      () => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      },
+      { timeout: 5000 }
     );
   }
 

@@ -41,14 +41,14 @@ export function LoadingSpinner({
       className={cn(
         'flex flex-col items-center justify-center gap-3',
         containerHeight,
-        className,
+        className
       )}
       aria-label={label}
     >
       <div
         className={cn(
           'animate-spin rounded-full border-b-2 border-primary',
-          SPINNER_SIZE[size],
+          SPINNER_SIZE[size]
         )}
       />
       {messages && messages.length > 0 && (

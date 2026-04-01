@@ -16,8 +16,20 @@ const MOCK_COURSES = [
       avgQuizScore: 81,
       activeLearnersLast7Days: 12,
       dropOffFunnel: [
-        { moduleId: 'm1', moduleName: 'Basics', learnersStarted: 40, learnersCompleted: 38, dropOffRate: 5 },
-        { moduleId: 'm2', moduleName: 'Advanced', learnersStarted: 38, learnersCompleted: 20, dropOffRate: 47 },
+        {
+          moduleId: 'm1',
+          moduleName: 'Basics',
+          learnersStarted: 40,
+          learnersCompleted: 38,
+          dropOffRate: 5,
+        },
+        {
+          moduleId: 'm2',
+          moduleName: 'Advanced',
+          learnersStarted: 38,
+          learnersCompleted: 20,
+          dropOffRate: 47,
+        },
       ],
     },
   },
@@ -28,10 +40,13 @@ const MOCK_COURSES = [
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: { myCourses: MOCK_COURSES }, fetching: false }]),
+  useQuery: vi.fn(() => [
+    { data: { myCourses: MOCK_COURSES }, fetching: false },
+  ]),
 }));
 
 vi.mock('@/lib/graphql/analytics.queries', () => ({
@@ -52,16 +67,31 @@ vi.mock('@/components/Layout', () => ({
 }));
 
 vi.mock('@/components/Breadcrumbs', () => ({
-  Breadcrumbs: () => React.createElement('nav', { 'data-testid': 'breadcrumbs' }),
+  Breadcrumbs: () =>
+    React.createElement('nav', { 'data-testid': 'breadcrumbs' }),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    React.createElement('div', { 'data-testid': 'page-shell', className }, children),
+  PageShell: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) =>
+    React.createElement(
+      'div',
+      { 'data-testid': 'page-shell', className },
+      children
+    ),
 }));
 
 vi.mock('@/components/analytics/DropOffFunnelChart', () => ({
-  DropOffFunnelChart: ({ data }: { data: { moduleName: string; dropOffRate: number }[] }) =>
+  DropOffFunnelChart: ({
+    data,
+  }: {
+    data: { moduleName: string; dropOffRate: number }[];
+  }) =>
     React.createElement(
       'div',
       { 'data-testid': 'drop-off-chart' },
@@ -71,7 +101,10 @@ vi.mock('@/components/analytics/DropOffFunnelChart', () => ({
 
 vi.mock('@/components/analytics/AtRiskLearnersPanel', () => ({
   AtRiskLearnersPanel: ({ courseId }: { courseId: string }) =>
-    React.createElement('div', { 'data-testid': 'at-risk-panel', 'data-course-id': courseId }),
+    React.createElement('div', {
+      'data-testid': 'at-risk-panel',
+      'data-course-id': courseId,
+    }),
 }));
 
 vi.mock('@/components/ui/card', () => ({
@@ -86,11 +119,14 @@ vi.mock('@/components/ui/card', () => ({
 }));
 
 vi.mock('lucide-react', () => ({
-  AlertCircle: () => React.createElement('span', { 'data-testid': 'alert-circle' }),
+  AlertCircle: () =>
+    React.createElement('span', { 'data-testid': 'alert-circle' }),
   Users: () => React.createElement('span', { 'data-testid': 'users-icon' }),
-  TrendingUp: () => React.createElement('span', { 'data-testid': 'trending-icon' }),
+  TrendingUp: () =>
+    React.createElement('span', { 'data-testid': 'trending-icon' }),
   Star: () => React.createElement('span', { 'data-testid': 'star-icon' }),
-  Activity: () => React.createElement('span', { 'data-testid': 'activity-icon' }),
+  Activity: () =>
+    React.createElement('span', { 'data-testid': 'activity-icon' }),
   Home: () => React.createElement('span', { 'data-testid': 'icon-home' }),
   ChevronRight: () => React.createElement('span', {}),
   ArrowLeft: () => React.createElement('span', {}),
@@ -165,7 +201,9 @@ describe('InstructorAnalyticsDashboard', () => {
       .getAllByRole('tab')
       .find((t) => t.textContent === 'Learner Engagement');
     expect(engagementTab).toBeDefined();
-    act(() => { engagementTab!.click(); });
+    act(() => {
+      engagementTab!.click();
+    });
     expect(screen.getByTestId('drop-off-chart')).toBeDefined();
   });
 
@@ -175,7 +213,9 @@ describe('InstructorAnalyticsDashboard', () => {
       .getAllByRole('tab')
       .find((t) => t.textContent === 'At-Risk Learners');
     expect(atRiskTab).toBeDefined();
-    act(() => { atRiskTab!.click(); });
+    act(() => {
+      atRiskTab!.click();
+    });
     expect(screen.getByTestId('at-risk-panel')).toBeDefined();
   });
 
@@ -187,7 +227,9 @@ describe('InstructorAnalyticsDashboard', () => {
     const atRiskTab = screen
       .getAllByRole('tab')
       .find((t) => t.textContent === 'At-Risk Learners');
-    act(() => { atRiskTab!.click(); });
+    act(() => {
+      atRiskTab!.click();
+    });
     expect(document.body.textContent).toContain('No at-risk learners');
   });
 

@@ -50,7 +50,9 @@ describe('RejectDialog', () => {
     render(<RejectDialog {...defaultProps} />);
     expect(screen.getByTestId('confirm-reject-btn')).toBeInTheDocument();
     // "Reject Proposal" appears both as title and button text — check the button specifically
-    expect(screen.getByTestId('confirm-reject-btn')).toHaveTextContent('Reject Proposal');
+    expect(screen.getByTestId('confirm-reject-btn')).toHaveTextContent(
+      'Reject Proposal'
+    );
   });
 
   it('calls onClose when Cancel clicked', () => {

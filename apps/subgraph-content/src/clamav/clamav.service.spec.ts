@@ -47,7 +47,10 @@ describe('ClamavService', () => {
 
   it('returns isInfected=false and hasError=false for a clean file', async () => {
     mockScanBuffer.mockResolvedValueOnce({ isInfected: false, viruses: [] });
-    const result = await service.scanBuffer(Buffer.from('clean content'), 'clean.jpg');
+    const result = await service.scanBuffer(
+      Buffer.from('clean content'),
+      'clean.jpg'
+    );
     expect(result).toEqual({ isInfected: false, viruses: [], hasError: false });
   });
 
@@ -58,7 +61,10 @@ describe('ClamavService', () => {
       isInfected: true,
       viruses: ['EICAR-Test-Signature'],
     });
-    const result = await service.scanBuffer(Buffer.from('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR'), 'eicar.com');
+    const result = await service.scanBuffer(
+      Buffer.from('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR'),
+      'eicar.com'
+    );
     expect(result.isInfected).toBe(true);
     expect(result.viruses).toContain('EICAR-Test-Signature');
     expect(result.hasError).toBe(false);

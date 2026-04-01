@@ -36,33 +36,39 @@ const mockPollService = {
 
 // ── Context helpers — NEW authContext pattern ─────────────────────────────────
 
-function makeCtx(opts: {
-  tenantId?: string;
-  userId?: string;
-  headerTenantId?: string;
-} = {}): GraphQLContext {
+function makeCtx(
+  opts: {
+    tenantId?: string;
+    userId?: string;
+    headerTenantId?: string;
+  } = {}
+): GraphQLContext {
   return {
     req: {
       headers: {
         ...(opts.headerTenantId ? { 'x-tenant-id': opts.headerTenantId } : {}),
       },
     },
-    authContext: opts.tenantId || opts.userId
-      ? {
-          tenantId: opts.tenantId,
-          userId: opts.userId ?? '',
-          email: 'test@example.com',
-          username: 'testuser',
-          roles: [],
-          scopes: [],
-          isSuperAdmin: false,
-        }
-      : undefined,
+    authContext:
+      opts.tenantId || opts.userId
+        ? {
+            tenantId: opts.tenantId,
+            userId: opts.userId ?? '',
+            email: 'test@example.com',
+            username: 'testuser',
+            roles: [],
+            scopes: [],
+            isSuperAdmin: false,
+          }
+        : undefined,
   } as unknown as GraphQLContext;
 }
 
 /** Context with ONLY the old broken pattern — proves regression is guarded. */
-function makeOldCtx(opts: { tenant_id?: string; sub?: string }): Record<string, unknown> {
+function makeOldCtx(opts: {
+  tenant_id?: string;
+  sub?: string;
+}): Record<string, unknown> {
   return {
     req: {
       user: opts,
@@ -246,7 +252,10 @@ describe('LiveSessionExtensionsResolver', () => {
       const rooms = [{ id: 'room-1', roomName: 'Group A', capacity: 5 }];
       mockBreakoutService.listRooms.mockResolvedValue(rooms);
 
-      const result = await resolver.breakoutRooms('session-99', AUTH_CTX as never);
+      const result = await resolver.breakoutRooms(
+        'session-99',
+        AUTH_CTX as never
+      );
 
       expect(result).toEqual(rooms);
     });
@@ -255,7 +264,10 @@ describe('LiveSessionExtensionsResolver', () => {
       const polls = [{ id: 'poll-1', question: 'Agree?' }];
       mockPollService.listPolls.mockResolvedValue(polls);
 
-      const result = await resolver.sessionPolls('session-1', AUTH_CTX as never);
+      const result = await resolver.sessionPolls(
+        'session-1',
+        AUTH_CTX as never
+      );
 
       expect(mockPollService.listPolls).toHaveBeenCalledWith(
         'session-1',
@@ -287,7 +299,11 @@ describe('LiveSessionExtensionsResolver', () => {
       const rooms = [{ roomName: 'Room A', capacity: 4 }];
       mockBreakoutService.createBreakoutRooms.mockResolvedValue([]);
 
-      await resolver.createBreakoutRooms('session-1', rooms as never, AUTH_CTX as never);
+      await resolver.createBreakoutRooms(
+        'session-1',
+        rooms as never,
+        AUTH_CTX as never
+      );
 
       expect(mockBreakoutService.createBreakoutRooms).toHaveBeenCalledWith(
         'session-1',
@@ -298,7 +314,11 @@ describe('LiveSessionExtensionsResolver', () => {
     });
 
     it('createPoll — passes question, options, tenantId, userId', async () => {
-      const poll = { id: 'poll-new', question: 'Is this useful?', options: ['Yes', 'No'] };
+      const poll = {
+        id: 'poll-new',
+        question: 'Is this useful?',
+        options: ['Yes', 'No'],
+      };
       mockPollService.createPoll.mockResolvedValue(poll);
 
       const result = await resolver.createPoll(
@@ -319,7 +339,10 @@ describe('LiveSessionExtensionsResolver', () => {
     });
 
     it('activatePoll — passes pollId, tenantId, userId', async () => {
-      mockPollService.activatePoll.mockResolvedValue({ id: 'poll-1', isActive: true });
+      mockPollService.activatePoll.mockResolvedValue({
+        id: 'poll-1',
+        isActive: true,
+      });
 
       await resolver.activatePoll('poll-1', AUTH_CTX as never);
 
@@ -331,7 +354,10 @@ describe('LiveSessionExtensionsResolver', () => {
     });
 
     it('closePoll — passes pollId, tenantId, userId', async () => {
-      mockPollService.closePoll.mockResolvedValue({ pollId: 'poll-1', totalVotes: 5 });
+      mockPollService.closePoll.mockResolvedValue({
+        pollId: 'poll-1',
+        totalVotes: 5,
+      });
 
       await resolver.closePoll('poll-1', AUTH_CTX as never);
 

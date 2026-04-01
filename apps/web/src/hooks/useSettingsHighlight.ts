@@ -21,7 +21,9 @@ export function useSettingsHighlight(): UseSettingsHighlightReturn {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHighlighted, setIsHighlighted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const highlightId = searchParams.get('highlight');
 
@@ -42,15 +44,18 @@ export function useSettingsHighlight(): UseSettingsHighlightReturn {
 
         timerRef.current = setTimeout(() => {
           setIsHighlighted(false);
-          setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            next.delete('highlight');
-            return next;
-          }, { replace: true });
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              next.delete('highlight');
+              return next;
+            },
+            { replace: true }
+          );
         }, HIGHLIGHT_DURATION_MS);
       }, SCROLL_DELAY_MS);
     },
-    [highlightId, setSearchParams],
+    [highlightId, setSearchParams]
   );
 
   const highlightClass = isHighlighted ? 'animate-settings-highlight' : '';

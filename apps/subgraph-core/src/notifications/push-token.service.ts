@@ -1,4 +1,10 @@
-import { Injectable, OnModuleDestroy, Logger, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleDestroy,
+  Logger,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -151,7 +157,8 @@ export class PushTokenService implements OnModuleDestroy {
         .select({
           platform: schema.pushNotificationTokens.platform,
           expoPushToken: schema.pushNotificationTokens.expoPushToken,
-          webPushSubscription: schema.pushNotificationTokens.webPushSubscription,
+          webPushSubscription:
+            schema.pushNotificationTokens.webPushSubscription,
         })
         .from(schema.pushNotificationTokens)
         .where(eq(schema.pushNotificationTokens.userId, userId));

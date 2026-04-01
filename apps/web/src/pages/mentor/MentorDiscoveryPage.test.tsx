@@ -15,12 +15,16 @@ vi.mock('urql', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 import * as urql from 'urql';
 
-const EMPTY_QUERY_RESULT = [{ data: undefined, fetching: false, error: undefined }] as never;
+const EMPTY_QUERY_RESULT = [
+  { data: undefined, fetching: false, error: undefined },
+] as never;
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -32,9 +36,12 @@ function renderWithCourse(courseId = 'course-abc') {
   return render(
     <MemoryRouter initialEntries={[`/mentor/discover/${courseId}`]}>
       <Routes>
-        <Route path="/mentor/discover/:courseId?" element={<MentorDiscoveryPage />} />
+        <Route
+          path="/mentor/discover/:courseId?"
+          element={<MentorDiscoveryPage />}
+        />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -42,9 +49,12 @@ function renderWithoutCourse() {
   return render(
     <MemoryRouter initialEntries={['/mentor/discover']}>
       <Routes>
-        <Route path="/mentor/discover/:courseId?" element={<MentorDiscoveryPage />} />
+        <Route
+          path="/mentor/discover/:courseId?"
+          element={<MentorDiscoveryPage />}
+        />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -91,7 +101,9 @@ describe('MentorDiscoveryPage', () => {
     renderWithCourse();
 
     expect(
-      screen.getByText('No mentors found yet. Be the first to complete this path!'),
+      screen.getByText(
+        'No mentors found yet. Be the first to complete this path!'
+      )
     ).toBeInTheDocument();
   });
 
@@ -119,9 +131,7 @@ describe('MentorDiscoveryPage', () => {
 
   it('shows guidance message when no courseId provided', () => {
     renderWithoutCourse();
-    expect(
-      screen.getByText(/No course selected/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No course selected/)).toBeInTheDocument();
   });
 
   it('renders Request Mentoring button for each mentor', () => {
@@ -144,7 +154,7 @@ describe('MentorDiscoveryPage', () => {
     renderWithCourse();
 
     expect(
-      screen.getByRole('button', { name: /Request mentoring from abcdef01/i }),
+      screen.getByRole('button', { name: /Request mentoring from abcdef01/i })
     ).toBeInTheDocument();
   });
 });

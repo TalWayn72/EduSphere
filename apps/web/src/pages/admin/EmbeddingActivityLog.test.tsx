@@ -54,7 +54,11 @@ const ACTIVITIES: EmbeddingActivity[] = [
 describe('EmbeddingActivityLog', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    mockResult = { data: { embeddingActivity: ACTIVITIES }, fetching: false, error: undefined };
+    mockResult = {
+      data: { embeddingActivity: ACTIVITIES },
+      fetching: false,
+      error: undefined,
+    };
     mockReexecute.mockClear();
   });
 
@@ -100,19 +104,29 @@ describe('EmbeddingActivityLog', () => {
   });
 
   it('shows empty state when no activities', () => {
-    mockResult = { data: { embeddingActivity: [] }, fetching: false, error: undefined };
+    mockResult = {
+      data: { embeddingActivity: [] },
+      fetching: false,
+      error: undefined,
+    };
     render(<EmbeddingActivityLog />);
-    expect(screen.getByText(/No recent embedding operations/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No recent embedding operations/)
+    ).toBeInTheDocument();
   });
 
   it('auto-refreshes every 30 seconds', () => {
     render(<EmbeddingActivityLog />);
     expect(mockReexecute).not.toHaveBeenCalled();
 
-    act(() => { vi.advanceTimersByTime(30_000); });
+    act(() => {
+      vi.advanceTimersByTime(30_000);
+    });
     expect(mockReexecute).toHaveBeenCalledTimes(1);
 
-    act(() => { vi.advanceTimersByTime(30_000); });
+    act(() => {
+      vi.advanceTimersByTime(30_000);
+    });
     expect(mockReexecute).toHaveBeenCalledTimes(2);
   });
 
@@ -121,7 +135,9 @@ describe('EmbeddingActivityLog', () => {
     unmount();
 
     mockReexecute.mockClear();
-    act(() => { vi.advanceTimersByTime(60_000); });
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
     expect(mockReexecute).not.toHaveBeenCalled();
   });
 
@@ -129,16 +145,30 @@ describe('EmbeddingActivityLog', () => {
     render(<EmbeddingActivityLog />);
 
     // Simulate tab becoming hidden
-    Object.defineProperty(document, 'hidden', { value: true, writable: true, configurable: true });
-    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    Object.defineProperty(document, 'hidden', {
+      value: true,
+      writable: true,
+      configurable: true,
+    });
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
 
     mockReexecute.mockClear();
-    act(() => { vi.advanceTimersByTime(60_000); });
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
     expect(mockReexecute).not.toHaveBeenCalled();
 
     // Restore visibility
-    Object.defineProperty(document, 'hidden', { value: false, writable: true, configurable: true });
-    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    Object.defineProperty(document, 'hidden', {
+      value: false,
+      writable: true,
+      configurable: true,
+    });
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
 
     // Should immediately refresh on becoming visible
     expect(mockReexecute).toHaveBeenCalledTimes(1);
@@ -148,7 +178,10 @@ describe('EmbeddingActivityLog', () => {
     const removeSpy = vi.spyOn(document, 'removeEventListener');
     const { unmount } = render(<EmbeddingActivityLog />);
     unmount();
-    expect(removeSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith(
+      'visibilitychange',
+      expect.any(Function)
+    );
     removeSpy.mockRestore();
   });
 });
@@ -156,7 +189,11 @@ describe('EmbeddingActivityLog', () => {
 describe('EmbeddingActivityLog — Accessibility', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    mockResult = { data: { embeddingActivity: ACTIVITIES }, fetching: false, error: undefined };
+    mockResult = {
+      data: { embeddingActivity: ACTIVITIES },
+      fetching: false,
+      error: undefined,
+    };
     mockReexecute.mockClear();
   });
 
@@ -179,7 +216,9 @@ describe('EmbeddingActivityLog — Accessibility', () => {
 
   it('main content has aria-live="polite" for auto-refresh announcements', () => {
     render(<EmbeddingActivityLog />);
-    const content = screen.getByTestId('embedding-activity-log').querySelector('[aria-live="polite"]');
+    const content = screen
+      .getByTestId('embedding-activity-log')
+      .querySelector('[aria-live="polite"]');
     expect(content).toBeInTheDocument();
   });
 

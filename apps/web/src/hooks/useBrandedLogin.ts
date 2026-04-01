@@ -55,7 +55,7 @@ export function buildKeycloakUrl(slug: string, idpHint?: string): string {
   const realm = import.meta.env.VITE_KEYCLOAK_REALM || 'edusphere';
   const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'edusphere-web';
   const redirectUri = encodeURIComponent(
-    `${window.location.origin}/oauth/google/callback`,
+    `${window.location.origin}/oauth/google/callback`
   );
   let url =
     `${base}/realms/${realm}/protocol/openid-connect/auth` +
@@ -87,15 +87,14 @@ export function useBrandedLogin(slug: string): BrandedLoginConfig {
 
   const buildSsoUrl = useMemo(
     () => (idpHint: string) => buildKeycloakUrl(slug, idpHint),
-    [slug],
+    [slug]
   );
 
   return {
     orgName: branding?.orgName ?? DEFAULT_BRANDING.organizationName,
     logoUrl: branding?.logoUrl ?? null,
     primaryColor: branding?.primaryColor ?? DEFAULT_BRANDING.primaryColor,
-    secondaryColor:
-      branding?.secondaryColor ?? DEFAULT_BRANDING.secondaryColor,
+    secondaryColor: branding?.secondaryColor ?? DEFAULT_BRANDING.secondaryColor,
     welcomeMessage: branding?.welcomeMessage ?? null,
     ssoProviders: branding?.ssoProviders ?? [],
     isLoading: fetching,

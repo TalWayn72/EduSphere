@@ -33,7 +33,9 @@ interface Props {
 
 export function AtRiskLearnersPanel({ courseId }: Props) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data, fetching }] = useQuery<AtRiskResult>({
     query: AT_RISK_LEARNERS_QUERY,
     variables: { courseId },
@@ -75,15 +77,17 @@ export function AtRiskLearnersPanel({ courseId }: Props) {
         <tbody>
           {learners.map((l) => (
             <tr key={l.learnerId} className="border-b last:border-0">
-              <td className="py-2 pr-4 font-mono text-xs">{l.learnerId.slice(0, 8)}…</td>
+              <td className="py-2 pr-4 font-mono text-xs">
+                {l.learnerId.slice(0, 8)}…
+              </td>
               <td className="py-2 pr-4">
                 <span
                   className={
                     l.riskScore >= 70
                       ? 'text-destructive font-semibold'
                       : l.riskScore >= 40
-                      ? 'text-amber-600 font-semibold'
-                      : 'text-emerald-600'
+                        ? 'text-amber-600 font-semibold'
+                        : 'text-emerald-600'
                   }
                 >
                   {l.riskScore}

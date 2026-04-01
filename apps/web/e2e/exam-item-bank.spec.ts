@@ -27,7 +27,12 @@ const MOCK_ITEMS = [
     source: 'HUMAN',
     pilotN: 120,
     createdAt: '2026-03-01T10:00:00Z',
-    questionData: { type: 'MULTIPLE_CHOICE', question: 'What is 2+2?', options: [], correctOptionIds: [] },
+    questionData: {
+      type: 'MULTIPLE_CHOICE',
+      question: 'What is 2+2?',
+      options: [],
+      correctOptionIds: [],
+    },
   },
   {
     id: 'item-2',
@@ -39,7 +44,12 @@ const MOCK_ITEMS = [
     source: 'AI_GENERATED',
     pilotN: 30,
     createdAt: '2026-03-02T10:00:00Z',
-    questionData: { type: 'MULTIPLE_CHOICE', question: 'Unit of force?', options: [], correctOptionIds: [] },
+    questionData: {
+      type: 'MULTIPLE_CHOICE',
+      question: 'Unit of force?',
+      options: [],
+      correctOptionIds: [],
+    },
   },
 ];
 
@@ -47,7 +57,10 @@ function handleGraphQL(op: string): string | null {
   if (op === 'ExamItems' || op === 'GetExamItems') {
     return JSON.stringify({
       data: {
-        examItems: { edges: MOCK_ITEMS.map((n) => ({ node: n })), pageInfo: { hasNextPage: false, endCursor: null } },
+        examItems: {
+          edges: MOCK_ITEMS.map((n) => ({ node: n })),
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
       },
     });
   }
@@ -69,13 +82,20 @@ function handleGraphQL(op: string): string | null {
     });
   }
   if (op === 'RetireExamItem') {
-    return JSON.stringify({ data: { retireExamItem: { id: 'item-1', calibrationStatus: 'RETIRED' } } });
+    return JSON.stringify({
+      data: { retireExamItem: { id: 'item-1', calibrationStatus: 'RETIRED' } },
+    });
   }
   if (op === 'GenerateExamItems') {
     return JSON.stringify({
       data: {
         generateExamItems: [
-          { id: 'ai-1', domain: 'Mathematics', bloomLevel: 'APPLY', source: 'AI_GENERATED' },
+          {
+            id: 'ai-1',
+            domain: 'Mathematics',
+            bloomLevel: 'APPLY',
+            source: 'AI_GENERATED',
+          },
         ],
       },
     });
@@ -91,21 +111,26 @@ test.describe('exam-item-bank', () => {
 
   test('displays exam items in table', async ({ page }) => {
     await page.goto('/exam/item-bank');
-    await expect(page.getByText('What is 2+2?').or(page.getByText('Mathematics'))).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByText('What is 2+2?').or(page.getByText('Mathematics'))
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('shows bloom level filter options', async ({ page }) => {
     await page.goto('/exam/item-bank');
     await page.waitForLoadState('domcontentloaded');
     // Look for filter controls
-    const filterArea = page.locator('[data-testid="bloom-filter"]').or(page.getByText(/bloom/i).first());
+    const filterArea = page
+      .locator('[data-testid="bloom-filter"]')
+      .or(page.getByText(/bloom/i).first());
     await expect(filterArea).toBeVisible({ timeout: 10_000 });
   });
 
   test('navigates to create new item page', async ({ page }) => {
     await page.goto('/exam/item-bank');
     await page.waitForLoadState('domcontentloaded');
-    const createBtn = page.getByRole('link', { name: /create|new item/i })
+    const createBtn = page
+      .getByRole('link', { name: /create|new item/i })
       .or(page.getByRole('button', { name: /create|new item/i }));
     await expect(createBtn).toBeVisible({ timeout: 10_000 });
     await createBtn.click();
@@ -116,7 +141,8 @@ test.describe('exam-item-bank', () => {
     await page.goto('/exam/item-bank/generate');
     await page.waitForLoadState('domcontentloaded');
     // The generator page should have a form or CTA
-    const heading = page.getByRole('heading', { name: /generate|ai/i })
+    const heading = page
+      .getByRole('heading', { name: /generate|ai/i })
       .or(page.getByText(/generate exam items/i));
     await expect(heading).toBeVisible({ timeout: 10_000 });
   });

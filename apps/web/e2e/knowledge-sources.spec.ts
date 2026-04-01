@@ -87,7 +87,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
     page,
   }) => {
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByRole('button', { name: /Add source|Add Source/i })).toBeVisible({
+    await expect(
+      page.getByRole('button', { name: /Add source|Add Source/i })
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -96,7 +98,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Modal should appear with tab selector
-    await expect(page.getByText(/URL|Link|Add Knowledge Source/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/URL|Link|Add Knowledge Source/i).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -145,7 +149,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Wait for modal to appear
-    await expect(page.getByText(/URL|Link|Add Knowledge Source/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/URL|Link|Add Knowledge Source/i).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
     await page.keyboard.press('Escape');
@@ -237,10 +243,7 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   test('can add raw text source', async ({ page }) => {
     await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Click Text tab
-    await page
-      .getByRole('button', { name: /text/i })
-      .first()
-      .click();
+    await page.getByRole('button', { name: /text/i }).first().click();
     await page
       .getByPlaceholder(/הדבק טקסט|paste text/i)
       .fill('Test raw text content for E2E');
@@ -444,10 +447,14 @@ test.describe('Knowledge Sources — Loading state fix (sources must not be stuc
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
 
     // Source title should be visible
-    await expect(page.getByText('מבוא לתלמוד')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText('מבוא לתלמוד')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     // The loading indicator should NOT be visible
     const bodyText = await page.evaluate(() => document.body.textContent ?? '');
     expect(bodyText).not.toContain('טוען מקורות');
@@ -475,7 +482,9 @@ test.describe('Knowledge Sources — Loading state fix (sources must not be stuc
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
 
     // Should show error indicator (⚠️) and retry button, NOT stuck on "טוען..."
     // Wait for react-query retries to exhaust (retry: 2)
@@ -518,7 +527,9 @@ test.describe('Knowledge Sources — Loading state fix (sources must not be stuc
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByText('מבוא לתלמוד')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText('מבוא לתלמוד')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     await expect(page.getByTestId('sources-panel')).toHaveScreenshot(
       'sources-panel-loaded.png'
     );
@@ -542,10 +553,14 @@ test.describe('CourseEditPage — Sources tab', () => {
     });
   });
 
-  test('clicking Sources tab shows the SourceManager panel', async ({ page }) => {
+  test('clicking Sources tab shows the SourceManager panel', async ({
+    page,
+  }) => {
     await page.getByRole('tab', { name: /מקורות מידע/i }).click();
     // SourceManager should render with its header
-    await expect(page.getByText(/Knowledge Sources|מקורות מידע/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/Knowledge Sources|מקורות מידע/i).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -660,13 +675,13 @@ test.describe('Knowledge Sources — BUG-081 (pdfParse is not a function)', () =
     page,
   }) => {
     // Source title should be visible
-    await expect(
-      page.getByText('הנחיות לפורים פו.pdf').first()
-    ).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText('הנחיות לפורים פו.pdf').first()).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     // Error status should show friendly message
-    await expect(
-      page.getByText(/שגיאה|Error|failed/i).first()
-    ).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText(/שגיאה|Error|failed/i).first()).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     // But raw technical error must NOT be in the DOM
     await expect(page.getByText(RAW_PDFPARSE_ERROR)).not.toBeVisible();
   });

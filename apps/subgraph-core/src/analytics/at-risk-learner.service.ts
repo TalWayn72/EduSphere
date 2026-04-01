@@ -13,11 +13,7 @@
  *
  * All queries scoped via withTenantContext (RLS enforced).
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -172,15 +168,17 @@ export class AtRiskLearnerService implements OnModuleDestroy {
     userId: string
   ): Promise<LearnerDetailResult | null> {
     return withTenantContext(this.db, ctx, async (tx) => {
-      const [userRow] = await tx.execute<{
-        user_id: string;
-        email: string;
-        name: string;
-        courses_enrolled: string;
-        courses_completed: string;
-        avg_quiz_score: string;
-        total_learning_hours: string;
-      }>(sql`
+      const [userRow] = await tx
+        .execute<{
+          user_id: string;
+          email: string;
+          name: string;
+          courses_enrolled: string;
+          courses_completed: string;
+          avg_quiz_score: string;
+          total_learning_hours: string;
+        }>(
+          sql`
         SELECT
           u.id::text AS user_id,
           u.email,
@@ -196,16 +194,20 @@ export class AtRiskLearnerService implements OnModuleDestroy {
         WHERE u.id = ${userId}::uuid
           AND u.tenant_id = ${ctx.tenantId}::uuid
         GROUP BY u.id, u.email, u.first_name, u.last_name
-      `).then((r) => r.rows);
+      `
+        )
+        .then((r) => r.rows);
 
       if (!userRow) return null;
 
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const activityRows = await tx.execute<{
-        activity_date: Date;
-        activity_type: string;
-        description: string;
-      }>(sql`
+      const activityRows = await tx
+        .execute<{
+          activity_date: Date;
+          activity_type: string;
+          description: string;
+        }>(
+          sql`
         SELECT
           up.last_accessed_at AS activity_date,
           'content_access' AS activity_type,
@@ -215,7 +217,9 @@ export class AtRiskLearnerService implements OnModuleDestroy {
           AND up.last_accessed_at >= ${thirtyDaysAgo.toISOString()}::timestamptz
         ORDER BY up.last_accessed_at DESC
         LIMIT 50
-      `).then((r) => r.rows);
+      `
+        )
+        .then((r) => r.rows);
 
       return {
         userId: userRow.user_id,
@@ -224,7 +228,8 @@ export class AtRiskLearnerService implements OnModuleDestroy {
         coursesEnrolled: Number(userRow.courses_enrolled),
         coursesCompleted: Number(userRow.courses_completed),
         avgQuizScore: Math.round(Number(userRow.avg_quiz_score) * 100) / 100,
-        totalLearningHours: Math.round(Number(userRow.total_learning_hours) * 100) / 100,
+        totalLearningHours:
+          Math.round(Number(userRow.total_learning_hours) * 100) / 100,
         activityTimeline: activityRows.map((r) => ({
           date: r.activity_date,
           type: r.activity_type,
@@ -245,12 +250,19 @@ export class AtRiskLearnerService implements OnModuleDestroy {
 
     // Check borderline: within 20% of thresholds
     const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-    const borderlineInactive = lastActive !== null
-      && lastActive < new Date(fourteenDaysAgo.getTime() + 14 * 24 * 60 * 60 * 1000 * BORDERLINE_FACTOR);
-    const borderlineQuiz = quizPassRate < QUIZ_PASS_RATE_THRESHOLD * (1 + BORDERLINE_FACTOR)
-      && quizPassRate >= QUIZ_PASS_RATE_THRESHOLD;
-    const borderlineCompletion = completionRate < COMPLETION_RATE_THRESHOLD * (1 + BORDERLINE_FACTOR)
-      && completionRate >= COMPLETION_RATE_THRESHOLD;
+    const borderlineInactive =
+      lastActive !== null &&
+      lastActive <
+        new Date(
+          fourteenDaysAgo.getTime() +
+            14 * 24 * 60 * 60 * 1000 * BORDERLINE_FACTOR
+        );
+    const borderlineQuiz =
+      quizPassRate < QUIZ_PASS_RATE_THRESHOLD * (1 + BORDERLINE_FACTOR) &&
+      quizPassRate >= QUIZ_PASS_RATE_THRESHOLD;
+    const borderlineCompletion =
+      completionRate < COMPLETION_RATE_THRESHOLD * (1 + BORDERLINE_FACTOR) &&
+      completionRate >= COMPLETION_RATE_THRESHOLD;
 
     if (borderlineInactive || borderlineQuiz || borderlineCompletion) {
       return 'LOW';

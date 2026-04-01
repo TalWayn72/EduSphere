@@ -28,11 +28,12 @@ export interface PdfDocumentViewerProps {
   className?: string;
 }
 
-const MODE_ITEMS: { id: ViewerMode; label: string; Icon: React.ElementType }[] = [
-  { id: 'view', label: 'View', Icon: MousePointer2 },
-  { id: 'annotate', label: 'Annotate', Icon: MessageSquare },
-  { id: 'sketch', label: 'Sketch', Icon: Pencil },
-];
+const MODE_ITEMS: { id: ViewerMode; label: string; Icon: React.ElementType }[] =
+  [
+    { id: 'view', label: 'View', Icon: MousePointer2 },
+    { id: 'annotate', label: 'Annotate', Icon: MessageSquare },
+    { id: 'sketch', label: 'Sketch', Icon: Pencil },
+  ];
 
 export function PdfDocumentViewer({
   url,
@@ -45,7 +46,9 @@ export function PdfDocumentViewer({
   const [mode, setMode] = useState<ViewerMode>('view');
   const [activeTool, setActiveTool] = useState<DrawingTool>('freehand');
   const [currentPage, setCurrentPage] = useState(1);
-  const [focusedAnnotationId, setFocusedAnnotationId] = useState<string | null>(null);
+  const [focusedAnnotationId, setFocusedAnnotationId] = useState<string | null>(
+    null
+  );
   const [canvasSize] = useState({ width: 800, height: 600 });
 
   const handleTextSelect = useCallback(
@@ -55,7 +58,7 @@ export function PdfDocumentViewer({
       const text = sel?.toString().trim() ?? '';
       if (text) onAnnotationCreate?.({ text, page: currentPage });
     },
-    [mode, currentPage, onAnnotationCreate],
+    [mode, currentPage, onAnnotationCreate]
   );
 
   const handleAnnotationClick = useCallback(
@@ -63,15 +66,16 @@ export function PdfDocumentViewer({
       setFocusedAnnotationId(id);
       onAnnotationClick?.(id);
     },
-    [onAnnotationClick],
+    [onAnnotationClick]
   );
 
   const pageAnnotations = useMemo(
-    () => annotations.filter((a) => {
-      const page = (a.spatialData?.page as number) ?? 1;
-      return page === currentPage;
-    }),
-    [annotations, currentPage],
+    () =>
+      annotations.filter((a) => {
+        const page = (a.spatialData?.page as number) ?? 1;
+        return page === currentPage;
+      }),
+    [annotations, currentPage]
   );
 
   return (
@@ -96,7 +100,7 @@ export function PdfDocumentViewer({
             aria-pressed={mode === id}
             className={cn(
               'h-7 px-2 text-xs gap-1',
-              mode === id && 'bg-accent text-accent-foreground',
+              mode === id && 'bg-accent text-accent-foreground'
             )}
             onClick={() => setMode(id)}
           >
@@ -106,32 +110,47 @@ export function PdfDocumentViewer({
         ))}
 
         {mode === 'sketch' && (
-          <div data-testid="sketch-tool-bar" role="toolbar" aria-label="Sketch drawing tools" className="flex items-center gap-0.5 ml-2 border-l pl-2">
-            {(['freehand', 'eraser', 'rect', 'ellipse', 'arrow', 'text'] as DrawingTool[]).map(
-              (tool) => (
-                <button
-                  key={tool}
-                  data-testid={`viewer-sketch-tool-${tool}`}
-                  aria-pressed={activeTool === tool}
-                  aria-label={`${tool} drawing tool`}
-                  className={cn(
-                    'px-1.5 py-0.5 rounded text-xs transition-colors',
-                    activeTool === tool
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-accent',
-                  )}
-                  onClick={() => setActiveTool(tool)}
-                >
-                  {tool}
-                </button>
-              ),
-            )}
+          <div
+            data-testid="sketch-tool-bar"
+            role="toolbar"
+            aria-label="Sketch drawing tools"
+            className="flex items-center gap-0.5 ml-2 border-l pl-2"
+          >
+            {(
+              [
+                'freehand',
+                'eraser',
+                'rect',
+                'ellipse',
+                'arrow',
+                'text',
+              ] as DrawingTool[]
+            ).map((tool) => (
+              <button
+                key={tool}
+                data-testid={`viewer-sketch-tool-${tool}`}
+                aria-pressed={activeTool === tool}
+                aria-label={`${tool} drawing tool`}
+                className={cn(
+                  'px-1.5 py-0.5 rounded text-xs transition-colors',
+                  activeTool === tool
+                    ? 'bg-primary text-primary-foreground'
+                    : 'hover:bg-accent'
+                )}
+                onClick={() => setActiveTool(tool)}
+              >
+                {tool}
+              </button>
+            ))}
           </div>
         )}
       </div>
 
       {/* PDF content area */}
-      <div className="flex-1 relative overflow-hidden" data-testid="pdf-content-area">
+      <div
+        className="flex-1 relative overflow-hidden"
+        data-testid="pdf-content-area"
+      >
         <PdfViewer
           fileUrl={url}
           onTextSelect={mode === 'annotate' ? handleTextSelect : undefined}
@@ -173,7 +192,10 @@ export function PdfDocumentViewer({
             onMouseUp={() => {
               const sel = window.getSelection();
               if (sel?.toString().trim()) {
-                onAnnotationCreate?.({ text: sel.toString(), page: currentPage });
+                onAnnotationCreate?.({
+                  text: sel.toString(),
+                  page: currentPage,
+                });
               }
             }}
           />

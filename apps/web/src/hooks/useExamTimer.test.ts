@@ -39,10 +39,14 @@ describe('useExamTimer', () => {
     const onExpire = vi.fn();
     renderHook(() => useExamTimer(10, onExpire));
 
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(useExamSessionStore.getState().timeRemaining).toBe(9);
 
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(useExamSessionStore.getState().timeRemaining).toBe(8);
   });
 
@@ -51,7 +55,9 @@ describe('useExamTimer', () => {
     const onExpire = vi.fn();
     renderHook(() => useExamTimer(2, onExpire));
 
-    act(() => { vi.advanceTimersByTime(2000); });
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
     expect(onExpire).toHaveBeenCalledTimes(1);
   });
 

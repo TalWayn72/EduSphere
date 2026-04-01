@@ -9,14 +9,25 @@ vi.mock('@/lib/mock-content-data', () => ({
 
 vi.mock('@/lib/mock-annotations', () => ({
   getThreadedAnnotations: () => [
-    { id: 'a-1', content: 'Talmud annotation', userName: 'User', layer: 'personal', contentTimestamp: 5 },
+    {
+      id: 'a-1',
+      content: 'Talmud annotation',
+      userName: 'User',
+      layer: 'personal',
+      contentTimestamp: 5,
+    },
   ],
 }));
 
 vi.mock('@/lib/mock-graph-data', () => ({
   mockGraphData: {
     nodes: [
-      { id: 'n-1', label: 'Talmud Concept', type: 'Concept', description: 'A concept' },
+      {
+        id: 'n-1',
+        label: 'Talmud Concept',
+        type: 'Concept',
+        description: 'A concept',
+      },
     ],
   },
 }));
@@ -53,8 +64,10 @@ describe('mockSearch', () => {
 
   it('returns results with type field', () => {
     const results = mockSearch('Talmud');
-    results.forEach(r => {
-      expect(['course', 'transcript', 'annotation', 'concept']).toContain(r.type);
+    results.forEach((r) => {
+      expect(['course', 'transcript', 'annotation', 'concept']).toContain(
+        r.type
+      );
     });
   });
 });

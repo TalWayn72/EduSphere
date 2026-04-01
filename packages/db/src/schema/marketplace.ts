@@ -51,7 +51,9 @@ export const courseListings = pgTable(
     stripePriceId: text('stripe_price_id'),
     isPublished: boolean('is_published').notNull().default(false),
     revenueSplitPercent: integer('revenue_split_percent').notNull().default(70),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     uniqueIndex('course_listings_course_unique').on(t.courseId, t.tenantId),
@@ -73,7 +75,9 @@ export const stripeCustomers = pgTable(
     userId: uuid('user_id').notNull(),
     tenantId: uuid('tenant_id').notNull(),
     stripeCustomerId: text('stripe_customer_id').notNull().unique(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     index('stripe_customers_user_idx').on(t.userId),
@@ -101,7 +105,9 @@ export const purchases = pgTable(
     stripePaymentIntentId: text('stripe_payment_intent_id').notNull().unique(),
     amountCents: integer('amount_cents').notNull(),
     status: purchaseStatusEnum('status').notNull().default('PENDING'),
-    purchasedAt: timestamp('purchased_at', { withTimezone: true }).notNull().defaultNow(),
+    purchasedAt: timestamp('purchased_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     index('purchases_user_idx').on(t.userId),
@@ -131,7 +137,9 @@ export const instructorPayouts = pgTable(
     periodStart: timestamp('period_start', { withTimezone: true }).notNull(),
     periodEnd: timestamp('period_end', { withTimezone: true }).notNull(),
     status: payoutStatusEnum('status').notNull().default('PENDING'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     index('instructor_payouts_instructor_idx').on(t.instructorId),

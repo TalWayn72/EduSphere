@@ -94,14 +94,22 @@ export function IngestionConfig({
       <ConfigField label={t('pipeline.contentLanguage')}>
         <ConfigSelect
           value={(config['locale'] as string) ?? defaultLocale}
-          onChange={(v) => { onChange('locale', v); onLocaleChange(v); }}
-          options={ASR_LANGUAGES.map((l) => ({ value: l.value, label: l.label }))}
+          onChange={(v) => {
+            onChange('locale', v);
+            onLocaleChange(v);
+          }}
+          options={ASR_LANGUAGES.map((l) => ({
+            value: l.value,
+            label: l.label,
+          }))}
         />
       </ConfigField>
       <ConfigField label={t('pipeline.uploadFromDevice')}>
         <label
           className={`flex items-center gap-2 cursor-pointer border rounded px-2 py-1.5 text-sm transition-colors ${
-            uploading ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-400'
+            uploading
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:border-blue-400'
           }`}
         >
           <span>{'\uD83D\uDCC2'}</span>

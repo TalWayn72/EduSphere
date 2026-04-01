@@ -96,7 +96,7 @@ describe('AnnotationItem — Propose to Official button', () => {
     render(
       <AnnotationItem
         annotation={PERSONAL_ANNOTATION}
-        currentUserId="user-99"  // different user
+        currentUserId="user-99" // different user
         currentUserRole="student"
         onReply={vi.fn()}
         onEdit={vi.fn()}

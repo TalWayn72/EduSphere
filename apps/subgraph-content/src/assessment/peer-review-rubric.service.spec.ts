@@ -9,11 +9,7 @@ import type { RaterScore } from './peer-review-rubric.service.js';
 const { mockCloseAllPools, mockWithTenantContext } = vi.hoisted(() => ({
   mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
   mockWithTenantContext: vi.fn(
-    async (
-      _db: unknown,
-      _ctx: unknown,
-      fn: () => Promise<unknown>
-    ) => fn()
+    async (_db: unknown, _ctx: unknown, fn: () => Promise<unknown>) => fn()
   ),
 }));
 
@@ -66,7 +62,11 @@ describe('PeerReviewRubricService', () => {
 
   it('logger.log called with correct context on scoreResponse', async () => {
     const logSpy = vi.spyOn(
-      (service as unknown as { logger: { log: (obj: unknown, msg: string) => void } }).logger,
+      (
+        service as unknown as {
+          logger: { log: (obj: unknown, msg: string) => void };
+        }
+      ).logger,
       'log'
     );
     const scores: RaterScore[] = [

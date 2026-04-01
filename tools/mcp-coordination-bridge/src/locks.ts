@@ -20,7 +20,7 @@ function cleanExpiredLocks(): void {
 export function acquireLock(
   path: string,
   agentId: string,
-  ttlMs: number = 300_000,
+  ttlMs: number = 300_000
 ): LockResult {
   const db = getDb();
   cleanExpiredLocks();
@@ -37,7 +37,7 @@ export function acquireLock(
   }
 
   db.prepare(
-    'INSERT INTO locks (path, agent_id, acquired_at, expires_at) VALUES (?, ?, ?, ?)',
+    'INSERT INTO locks (path, agent_id, acquired_at, expires_at) VALUES (?, ?, ?, ?)'
   ).run(path, agentId, now, expiresAt);
 
   return { locked: true, owner: agentId };
@@ -45,7 +45,7 @@ export function acquireLock(
 
 export function releaseLock(
   path: string,
-  agentId: string,
+  agentId: string
 ): { released: boolean } {
   const db = getDb();
   const result = db

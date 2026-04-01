@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Use vi.hoisted so mock functions are available when the factory runs
-const { execSyncMock, runSyncMock, getAllSyncMock, getFirstSyncMock } = vi.hoisted(() => ({
-  execSyncMock: vi.fn(),
-  runSyncMock: vi.fn(),
-  getAllSyncMock: vi.fn(),
-  getFirstSyncMock: vi.fn(),
-}));
+const { execSyncMock, runSyncMock, getAllSyncMock, getFirstSyncMock } =
+  vi.hoisted(() => ({
+    execSyncMock: vi.fn(),
+    runSyncMock: vi.fn(),
+    getAllSyncMock: vi.fn(),
+    getFirstSyncMock: vi.fn(),
+  }));
 
 vi.mock('expo-sqlite', () => ({
   openDatabaseSync: () => ({
@@ -33,7 +34,7 @@ describe('XapiOfflineQueue', () => {
   it('initXapiQueue calls execSync with CREATE TABLE', () => {
     initXapiQueue();
     expect(execSyncMock).toHaveBeenCalledWith(
-      expect.stringContaining('CREATE TABLE IF NOT EXISTS xapi_queue'),
+      expect.stringContaining('CREATE TABLE IF NOT EXISTS xapi_queue')
     );
   });
 
@@ -42,7 +43,7 @@ describe('XapiOfflineQueue', () => {
     // INSERT call
     expect(runSyncMock).toHaveBeenCalledWith(
       'INSERT INTO xapi_queue VALUES (?, ?, ?, ?)',
-      expect.arrayContaining(['tenant-1']),
+      expect.arrayContaining(['tenant-1'])
     );
     // evictOldStatements also calls runSync (DELETE)
     expect(runSyncMock).toHaveBeenCalledTimes(2);
@@ -53,7 +54,7 @@ describe('XapiOfflineQueue', () => {
     const result = getPendingStatements(25);
     expect(getAllSyncMock).toHaveBeenCalledWith(
       expect.stringContaining('ORDER BY created_at ASC LIMIT ?'),
-      [25],
+      [25]
     );
     expect(result).toEqual([]);
   });

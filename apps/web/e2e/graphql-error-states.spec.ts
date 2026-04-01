@@ -52,7 +52,9 @@ async function assertNoRawErrors(page: Page) {
 test.describe('graphql-error-states — T-01: AI Course Builder server error', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('generateCourseFromPrompt null response shows friendly error, not raw GraphQL', async ({ page }) => {
+  test('generateCourseFromPrompt null response shows friendly error, not raw GraphQL', async ({
+    page,
+  }) => {
     // Mock: GenerateCourseFromPrompt returns a null data + GraphQL error
     await routeGraphQL(page, (opName) => {
       if (opName === 'GenerateCourseFromPrompt') {
@@ -85,7 +87,9 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
     await textarea.fill('Introduction to Machine Learning for beginners');
 
     // Click Generate
-    const generateBtn = page.getByRole('dialog').getByRole('button', { name: /generate/i });
+    const generateBtn = page
+      .getByRole('dialog')
+      .getByRole('button', { name: /generate/i });
     await generateBtn.click();
 
     // Wait for the mutation response
@@ -98,7 +102,9 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
     ).not.toBeVisible({ timeout: 3_000 });
 
     // Friendly error MUST appear in the modal
-    const friendlyMsg = page.getByRole('dialog').locator('[class*="destructive"]');
+    const friendlyMsg = page
+      .getByRole('dialog')
+      .locator('[class*="destructive"]');
     await expect(friendlyMsg.first()).toBeVisible({ timeout: 8_000 });
 
     // Visual regression
@@ -107,12 +113,19 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
     });
   });
 
-  test('error state shows AlertTriangle icon with friendly text', async ({ page }) => {
+  test('error state shows AlertTriangle icon with friendly text', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'GenerateCourseFromPrompt') {
         return JSON.stringify({
           data: { generateCourseFromPrompt: null },
-          errors: [{ message: 'Service temporarily unavailable', extensions: { code: 'SERVICE_UNAVAILABLE' } }],
+          errors: [
+            {
+              message: 'Service temporarily unavailable',
+              extensions: { code: 'SERVICE_UNAVAILABLE' },
+            },
+          ],
         });
       }
       return null;
@@ -120,12 +133,21 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
 
     await loginAndNavigate(page, '/courses/create');
     await page.getByTestId('launch-ai-builder-btn').click();
-    await page.getByRole('dialog').locator('textarea').first().fill('Test course');
-    await page.getByRole('dialog').getByRole('button', { name: /generate/i }).click();
+    await page
+      .getByRole('dialog')
+      .locator('textarea')
+      .first()
+      .fill('Test course');
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /generate/i })
+      .click();
     await page.waitForLoadState('domcontentloaded');
 
     // Raw service message must NOT be shown directly
-    await expect(page.getByText('Service temporarily unavailable')).not.toBeVisible({ timeout: 3_000 });
+    await expect(
+      page.getByText('Service temporarily unavailable')
+    ).not.toBeVisible({ timeout: 3_000 });
 
     // Modal must still be open (user can retry)
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -135,27 +157,51 @@ test.describe('graphql-error-states — T-01: AI Course Builder server error', (
 // ─── T-02: AI Course Builder — network failure → friendly message ─────────────
 
 test.describe('graphql-error-states — T-02: AI Course Builder network failure', () => {
-  test('network error on generation shows friendly message (not raw CombinedError)', async ({ page }) => {
+  test('network error on generation shows friendly message (not raw CombinedError)', async ({
+    page,
+  }) => {
     // Abort the request to simulate network failure
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'content-type, authorization' } });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+        });
         return;
       }
       let parsed: Record<string, unknown> = {};
-      try { parsed = JSON.parse(req.postData() ?? '{}') as Record<string, unknown>; } catch { /* ignore */ }
+      try {
+        parsed = JSON.parse(req.postData() ?? '{}') as Record<string, unknown>;
+      } catch {
+        /* ignore */
+      }
       if ((parsed.operationName as string) === 'GenerateCourseFromPrompt') {
         await route.abort('failed');
         return;
       }
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await loginAndNavigate(page, '/courses/create');
     await page.getByTestId('launch-ai-builder-btn').click();
-    await page.getByRole('dialog').locator('textarea').first().fill('Introduction to Python');
-    await page.getByRole('dialog').getByRole('button', { name: /generate/i }).click();
+    await page
+      .getByRole('dialog')
+      .locator('textarea')
+      .first()
+      .fill('Introduction to Python');
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /generate/i })
+      .click();
     await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: raw network error terms must NOT appear
@@ -177,18 +223,29 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
   const COURSE_ID = '00000000-0000-0000-0000-000000000001';
   const MODULE_ID = '00000000-0000-0000-0000-000000000002';
 
-  test('createContentItem failure shows friendly toast, not raw GraphQL error', async ({ page }) => {
+  test('createContentItem failure shows friendly toast, not raw GraphQL error', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'CreateContentItem') {
         return JSON.stringify({
           data: { createContentItem: null },
-          errors: [{ message: 'Internal Server Error: relation "content_items" does not exist', extensions: { code: 'INTERNAL_SERVER_ERROR' } }],
+          errors: [
+            {
+              message:
+                'Internal Server Error: relation "content_items" does not exist',
+              extensions: { code: 'INTERNAL_SERVER_ERROR' },
+            },
+          ],
         });
       }
       return null;
     });
 
-    await loginAndNavigate(page, `/courses/${COURSE_ID}/modules/${MODULE_ID}/quiz/new`);
+    await loginAndNavigate(
+      page,
+      `/courses/${COURSE_ID}/modules/${MODULE_ID}/quiz/new`
+    );
 
     // Fill in quiz title
     const titleInput = page.locator('#quiz-title');
@@ -208,7 +265,9 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
     }
 
     // Submit form
-    const submitBtn = page.getByRole('button', { name: /save quiz|create quiz|submit/i }).last();
+    const submitBtn = page
+      .getByRole('button', { name: /save quiz|create quiz|submit/i })
+      .last();
     if (await submitBtn.isVisible()) {
       await submitBtn.click();
       await page.waitForLoadState('domcontentloaded');
@@ -226,7 +285,9 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
     });
   });
 
-  test('quiz builder shows friendly toast "Failed to create quiz" on mutation error', async ({ page }) => {
+  test('quiz builder shows friendly toast "Failed to create quiz" on mutation error', async ({
+    page,
+  }) => {
     let mutationIntercepted = false;
     await routeGraphQL(page, (opName) => {
       if (opName === 'CreateContentItem') {
@@ -239,7 +300,10 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
       return null;
     });
 
-    await loginAndNavigate(page, `/courses/${COURSE_ID}/modules/${MODULE_ID}/quiz/new`);
+    await loginAndNavigate(
+      page,
+      `/courses/${COURSE_ID}/modules/${MODULE_ID}/quiz/new`
+    );
     await page.locator('#quiz-title').waitFor({ timeout: 10_000 });
     await page.locator('#quiz-title').fill('Test Quiz');
 
@@ -248,24 +312,34 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
     if (await addQuestionBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
       await addQuestionBtn.click();
       // Fill first question text
-      const questionInput = page.locator('input[placeholder*="question"]').first();
-      if (await questionInput.isVisible({ timeout: 2_000 }).catch(() => false)) {
+      const questionInput = page
+        .locator('input[placeholder*="question"]')
+        .first();
+      if (
+        await questionInput.isVisible({ timeout: 2_000 }).catch(() => false)
+      ) {
         await questionInput.fill('What is 2+2?');
       }
     }
 
-    const submitBtn = page.getByRole('button', { name: /save quiz|save|submit/i }).last();
+    const submitBtn = page
+      .getByRole('button', { name: /save quiz|save|submit/i })
+      .last();
     if (await submitBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
       await submitBtn.click();
       await page.waitForLoadState('domcontentloaded');
 
       if (mutationIntercepted) {
         // Friendly toast message should appear
-        const friendlyToast = page.getByText(/failed to create quiz|please try again/i);
+        const friendlyToast = page.getByText(
+          /failed to create quiz|please try again/i
+        );
         await expect(friendlyToast).toBeVisible({ timeout: 5_000 });
 
         // Raw GraphQL error must NOT appear
-        await expect(page.getByText('Permission denied')).not.toBeVisible({ timeout: 2_000 });
+        await expect(page.getByText('Permission denied')).not.toBeVisible({
+          timeout: 2_000,
+        });
       }
     }
   });
@@ -276,25 +350,44 @@ test.describe('graphql-error-states — T-03: Quiz Builder save error', () => {
 test.describe('graphql-error-states — T-04: Pipeline Builder publish error', () => {
   const COURSE_ID = '00000000-0000-0000-0000-000000000001';
 
-  test('publishLessonPlan error shows friendly toast, not raw GraphQL', async ({ page }) => {
+  test('publishLessonPlan error shows friendly toast, not raw GraphQL', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'PublishLessonPlan') {
         return JSON.stringify({
           data: { publishLessonPlan: null },
-          errors: [{ message: 'Cannot transition from DRAFT to PUBLISHED: validation failed on step 3', extensions: { code: 'INVALID_STATE_TRANSITION' } }],
+          errors: [
+            {
+              message:
+                'Cannot transition from DRAFT to PUBLISHED: validation failed on step 3',
+              extensions: { code: 'INVALID_STATE_TRANSITION' },
+            },
+          ],
         });
       }
       if (opName === 'CreateLessonPlan') {
         return JSON.stringify({
           data: {
-            createLessonPlan: { id: 'plan-uuid-test-001', title: 'Test Plan', status: 'DRAFT', courseId: COURSE_ID, steps: [] },
+            createLessonPlan: {
+              id: 'plan-uuid-test-001',
+              title: 'Test Plan',
+              status: 'DRAFT',
+              courseId: COURSE_ID,
+              steps: [],
+            },
           },
         });
       }
       if (opName === 'AddLessonStep') {
         return JSON.stringify({
           data: {
-            addLessonStep: { id: 'step-uuid-001', stepType: 'VIDEO', stepOrder: 1, config: {} },
+            addLessonStep: {
+              id: 'step-uuid-001',
+              stepType: 'VIDEO',
+              stepOrder: 1,
+              config: {},
+            },
           },
         });
       }
@@ -345,7 +438,9 @@ test.describe('graphql-error-states — T-04: Pipeline Builder publish error', (
     });
 
     await loginAndNavigate(page, `/courses/${COURSE_ID}/pipeline/builder`);
-    await expect(page.getByTestId('builder-heading')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('builder-heading')).toBeVisible({
+      timeout: 10_000,
+    });
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('pipeline-builder-loaded.png', {
@@ -357,14 +452,22 @@ test.describe('graphql-error-states — T-04: Pipeline Builder publish error', (
 // ─── T-05: Course Create Wizard — createCourse fails → friendly toast ──────────
 
 test.describe('graphql-error-states — T-05: Course Create submit error', () => {
-  test('createCourse GraphQL error shows friendly toast, not raw error message', async ({ page }) => {
-    const RAW_ERROR_MSG = 'duplicate key value violates unique constraint "courses_slug_key"';
+  test('createCourse GraphQL error shows friendly toast, not raw error message', async ({
+    page,
+  }) => {
+    const RAW_ERROR_MSG =
+      'duplicate key value violates unique constraint "courses_slug_key"';
 
     await routeGraphQL(page, (opName) => {
       if (opName === 'CreateCourse') {
         return JSON.stringify({
           data: { createCourse: null },
-          errors: [{ message: RAW_ERROR_MSG, extensions: { code: 'CONSTRAINT_VIOLATION' } }],
+          errors: [
+            {
+              message: RAW_ERROR_MSG,
+              extensions: { code: 'CONSTRAINT_VIOLATION' },
+            },
+          ],
         });
       }
       return null;
@@ -373,7 +476,11 @@ test.describe('graphql-error-states — T-05: Course Create submit error', () =>
     await loginAndNavigate(page, '/courses/create');
 
     // Step 0: fill course title (must be ≥3 chars to enable Next)
-    const titleInput = page.locator('input[name="title"], input[placeholder*="title"], input[placeholder*="course"]').first();
+    const titleInput = page
+      .locator(
+        'input[name="title"], input[placeholder*="title"], input[placeholder*="course"]'
+      )
+      .first();
     await titleInput.waitFor({ timeout: 10_000 });
     await titleInput.fill('Test Course Title For Error State');
 
@@ -387,13 +494,17 @@ test.describe('graphql-error-states — T-05: Course Create submit error', () =>
     }
 
     // Click Save Draft / Publish on the last step
-    const submitBtn = page.getByRole('button', { name: /save draft|save as draft|publish/i }).first();
+    const submitBtn = page
+      .getByRole('button', { name: /save draft|save as draft|publish/i })
+      .first();
     if (await submitBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await submitBtn.click();
       await page.waitForLoadState('domcontentloaded');
 
       // REGRESSION GUARD: raw DB constraint error must NOT appear in toast or anywhere
-      await expect(page.getByText(RAW_ERROR_MSG)).not.toBeVisible({ timeout: 3_000 });
+      await expect(page.getByText(RAW_ERROR_MSG)).not.toBeVisible({
+        timeout: 3_000,
+      });
       await assertNoRawErrors(page);
     }
 
@@ -407,7 +518,9 @@ test.describe('graphql-error-states — T-05: Course Create submit error', () =>
     await loginAndNavigate(page, '/courses/create');
 
     // The AI CTA block should be visible
-    await expect(page.getByTestId('ai-builder-cta')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('ai-builder-cta')).toBeVisible({
+      timeout: 10_000,
+    });
     await assertNoRawErrors(page);
 
     await expect(page).toHaveScreenshot('course-create-step0.png', {
@@ -419,31 +532,60 @@ test.describe('graphql-error-states — T-05: Course Create submit error', () =>
 // ─── T-01b: AI modal — "Generate Course" button is disabled while generating ───
 
 test.describe('graphql-error-states — T-01b: AI builder button state', () => {
-  test('Generate button is disabled while generation is in progress', async ({ page }) => {
+  test('Generate button is disabled while generation is in progress', async ({
+    page,
+  }) => {
     // Slow mock — never resolves (simulate long-running generation)
     let resolveSlowMock: (() => void) | undefined;
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'content-type, authorization' } });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+        });
         return;
       }
       let parsed: Record<string, unknown> = {};
-      try { parsed = JSON.parse(req.postData() ?? '{}') as Record<string, unknown>; } catch { /* ignore */ }
+      try {
+        parsed = JSON.parse(req.postData() ?? '{}') as Record<string, unknown>;
+      } catch {
+        /* ignore */
+      }
       if ((parsed.operationName as string) === 'GenerateCourseFromPrompt') {
         // Hold the request for the duration of the test
-        await new Promise<void>((resolve) => { resolveSlowMock = resolve; });
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+        await new Promise<void>((resolve) => {
+          resolveSlowMock = resolve;
+        });
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: {} }),
+        });
         return;
       }
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await loginAndNavigate(page, '/courses/create');
     await page.getByTestId('launch-ai-builder-btn').click();
-    await page.getByRole('dialog').locator('textarea').first().fill('Machine Learning course');
+    await page
+      .getByRole('dialog')
+      .locator('textarea')
+      .first()
+      .fill('Machine Learning course');
 
-    const genBtn = page.getByRole('dialog').getByRole('button', { name: /generate/i });
+    const genBtn = page
+      .getByRole('dialog')
+      .getByRole('button', { name: /generate/i });
     await genBtn.click();
 
     // While generating, button should be disabled

@@ -193,9 +193,7 @@ export class MediaResolver {
     )
       ? (rawAnimations as { name: string; duration: number }[]).filter(
           (a) =>
-            a &&
-            typeof a.name === 'string' &&
-            typeof a.duration === 'number'
+            a && typeof a.name === 'string' && typeof a.duration === 'number'
         )
       : [];
 

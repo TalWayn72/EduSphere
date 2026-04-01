@@ -7,17 +7,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: vi.fn(),
-  withTenantContext: vi.fn((_db, _ctx, fn) => fn({
-    select: vi.fn().mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([]),
+  withTenantContext: vi.fn((_db, _ctx, fn) =>
+    fn({
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([]),
+        }),
       }),
-    }),
-    execute: vi.fn().mockResolvedValue({ rows: [{ cnt: '0' }] }),
-    insert: vi.fn().mockReturnValue({
-      values: vi.fn().mockResolvedValue(undefined),
-    }),
-  })),
+      execute: vi.fn().mockResolvedValue({ rows: [{ cnt: '0' }] }),
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockResolvedValue(undefined),
+      }),
+    })
+  ),
   schema: {
     orgBadges: {
       tenantId: 'tenant_id',
@@ -50,19 +52,20 @@ describe('BadgeAutoAwardService', () => {
     // Since it's private, we test through the class pattern
 
     it('should match COURSE_COMPLETE criteria', async () => {
-      const { BadgeAutoAwardService } = await import(
-        './badge-auto-award.service'
-      );
+      const { BadgeAutoAwardService } =
+        await import('./badge-auto-award.service');
       const service = new BadgeAutoAwardService();
 
       // Access private method for testing
-      const matchesCriteria = (service as unknown as {
-        matchesCriteria: (
-          criteria: { type: string; courseId?: string },
-          payload: { courseId?: string },
-          subject: string
-        ) => boolean;
-      }).matchesCriteria.bind(service);
+      const matchesCriteria = (
+        service as unknown as {
+          matchesCriteria: (
+            criteria: { type: string; courseId?: string },
+            payload: { courseId?: string },
+            subject: string
+          ) => boolean;
+        }
+      ).matchesCriteria.bind(service);
 
       expect(
         matchesCriteria(
@@ -92,27 +95,24 @@ describe('BadgeAutoAwardService', () => {
 
       // Wrong subject
       expect(
-        matchesCriteria(
-          { type: 'COURSE_COMPLETE' },
-          {},
-          'EDUSPHERE.xp.earned'
-        )
+        matchesCriteria({ type: 'COURSE_COMPLETE' }, {}, 'EDUSPHERE.xp.earned')
       ).toBe(false);
     });
 
     it('should match XP_THRESHOLD criteria', async () => {
-      const { BadgeAutoAwardService } = await import(
-        './badge-auto-award.service'
-      );
+      const { BadgeAutoAwardService } =
+        await import('./badge-auto-award.service');
       const service = new BadgeAutoAwardService();
 
-      const matchesCriteria = (service as unknown as {
-        matchesCriteria: (
-          criteria: { type: string; amount?: number },
-          payload: { xpAmount?: number },
-          subject: string
-        ) => boolean;
-      }).matchesCriteria.bind(service);
+      const matchesCriteria = (
+        service as unknown as {
+          matchesCriteria: (
+            criteria: { type: string; amount?: number },
+            payload: { xpAmount?: number },
+            subject: string
+          ) => boolean;
+        }
+      ).matchesCriteria.bind(service);
 
       expect(
         matchesCriteria(
@@ -132,18 +132,19 @@ describe('BadgeAutoAwardService', () => {
     });
 
     it('should match STREAK_DAYS criteria', async () => {
-      const { BadgeAutoAwardService } = await import(
-        './badge-auto-award.service'
-      );
+      const { BadgeAutoAwardService } =
+        await import('./badge-auto-award.service');
       const service = new BadgeAutoAwardService();
 
-      const matchesCriteria = (service as unknown as {
-        matchesCriteria: (
-          criteria: { type: string; count?: number },
-          payload: { streakDays?: number },
-          subject: string
-        ) => boolean;
-      }).matchesCriteria.bind(service);
+      const matchesCriteria = (
+        service as unknown as {
+          matchesCriteria: (
+            criteria: { type: string; count?: number },
+            payload: { streakDays?: number },
+            subject: string
+          ) => boolean;
+        }
+      ).matchesCriteria.bind(service);
 
       expect(
         matchesCriteria(
@@ -163,18 +164,19 @@ describe('BadgeAutoAwardService', () => {
     });
 
     it('should match QUIZ_SCORE criteria', async () => {
-      const { BadgeAutoAwardService } = await import(
-        './badge-auto-award.service'
-      );
+      const { BadgeAutoAwardService } =
+        await import('./badge-auto-award.service');
       const service = new BadgeAutoAwardService();
 
-      const matchesCriteria = (service as unknown as {
-        matchesCriteria: (
-          criteria: { type: string; minScore?: number },
-          payload: { quizScore?: number },
-          subject: string
-        ) => boolean;
-      }).matchesCriteria.bind(service);
+      const matchesCriteria = (
+        service as unknown as {
+          matchesCriteria: (
+            criteria: { type: string; minScore?: number },
+            payload: { quizScore?: number },
+            subject: string
+          ) => boolean;
+        }
+      ).matchesCriteria.bind(service);
 
       expect(
         matchesCriteria(
@@ -194,18 +196,19 @@ describe('BadgeAutoAwardService', () => {
     });
 
     it('should return false for unknown criteria type', async () => {
-      const { BadgeAutoAwardService } = await import(
-        './badge-auto-award.service'
-      );
+      const { BadgeAutoAwardService } =
+        await import('./badge-auto-award.service');
       const service = new BadgeAutoAwardService();
 
-      const matchesCriteria = (service as unknown as {
-        matchesCriteria: (
-          criteria: { type: string },
-          payload: Record<string, unknown>,
-          subject: string
-        ) => boolean;
-      }).matchesCriteria.bind(service);
+      const matchesCriteria = (
+        service as unknown as {
+          matchesCriteria: (
+            criteria: { type: string },
+            payload: Record<string, unknown>,
+            subject: string
+          ) => boolean;
+        }
+      ).matchesCriteria.bind(service);
 
       expect(
         matchesCriteria(
@@ -219,9 +222,8 @@ describe('BadgeAutoAwardService', () => {
 
   describe('onModuleDestroy', () => {
     it('should clean up resources', async () => {
-      const { BadgeAutoAwardService } = await import(
-        './badge-auto-award.service'
-      );
+      const { BadgeAutoAwardService } =
+        await import('./badge-auto-award.service');
       const service = new BadgeAutoAwardService();
       const { closeAllPools } = await import('@edusphere/db');
 

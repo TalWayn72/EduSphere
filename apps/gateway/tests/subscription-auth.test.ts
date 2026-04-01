@@ -51,9 +51,7 @@ function resolveAuthHeader(initialCtx: GatewayInitialCtx): string | null {
  * shouldForwardAuth mirrors the onFetch plugin in createGateway.
  * Returns the Authorization header value that would be forwarded, or null.
  */
-function shouldForwardAuth(
-  context: unknown
-): string | null {
+function shouldForwardAuth(context: unknown): string | null {
   const ctx = context as
     | { headers?: { authorization?: string | null } }
     | null
@@ -211,7 +209,9 @@ describe('BUG-049 — onFetch plugin auth forwarding', () => {
     const ctx = { headers: { authorization: 'Bearer forwarded-token' } };
     const auth = shouldForwardAuth(ctx);
     if (auth) {
-      const prev = incomingOptions.headers as Record<string, string> | undefined;
+      const prev = incomingOptions.headers as
+        | Record<string, string>
+        | undefined;
       updatedOptions = {
         ...incomingOptions,
         headers: { ...(prev ?? {}), authorization: auth },
@@ -219,9 +219,9 @@ describe('BUG-049 — onFetch plugin auth forwarding', () => {
     }
 
     expect(updatedOptions).not.toBeNull();
-    expect((updatedOptions!.headers as Record<string, string>)['authorization']).toBe(
-      'Bearer forwarded-token'
-    );
+    expect(
+      (updatedOptions!.headers as Record<string, string>)['authorization']
+    ).toBe('Bearer forwarded-token');
     // Original headers are preserved
     expect(
       (updatedOptions!.headers as Record<string, string>)['content-type']
@@ -243,7 +243,9 @@ describe('BUG-049 — onFetch plugin auth forwarding', () => {
     }
 
     expect(modified).toBe(false);
-    expect(incomingOptions.headers).toEqual({ 'content-type': 'application/json' });
+    expect(incomingOptions.headers).toEqual({
+      'content-type': 'application/json',
+    });
   });
 });
 

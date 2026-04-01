@@ -24,7 +24,7 @@ beforeAll(() => {
   if (!existsSync(SUPERGRAPH_PATH)) {
     throw new Error(
       `supergraph.graphql not found at ${SUPERGRAPH_PATH}.\n` +
-        'Run: pnpm --filter @edusphere/gateway compose',
+        'Run: pnpm --filter @edusphere/gateway compose'
     );
   }
   schemaSDL = readFileSync(SUPERGRAPH_PATH, 'utf-8');
@@ -42,7 +42,9 @@ describe('BUG-104: Supergraph contains Pipeline types', () => {
   it('contains pipelineTemplates query', () => {
     expect(schemaSDL).toContain('pipelineTemplates');
     // Verify it returns the correct type
-    expect(schemaSDL).toMatch(/pipelineTemplates.*\[LessonPipelineTemplate!\]!/);
+    expect(schemaSDL).toMatch(
+      /pipelineTemplates.*\[LessonPipelineTemplate!\]!/
+    );
   });
 
   it('contains lessonPipelineRun query', () => {

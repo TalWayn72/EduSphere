@@ -46,8 +46,6 @@ export function validateWebhookUrl(url: string): void {
 export function validateWebhookEvents(events: string[]): void {
   const invalid = events.filter((e) => !VALID_EVENTS.includes(e));
   if (invalid.length > 0) {
-    throw new BadRequestException(
-      `Invalid events: ${invalid.join(', ')}`
-    );
+    throw new BadRequestException(`Invalid events: ${invalid.join(', ')}`);
   }
 }

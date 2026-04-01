@@ -67,7 +67,10 @@ export function AssessmentResponsePage() {
         <div className="container mx-auto p-6 max-w-xl">
           <Card>
             <CardContent className="py-12 text-center space-y-3">
-              <ClipboardList className="h-12 w-12 text-primary mx-auto" aria-hidden="true" />
+              <ClipboardList
+                className="h-12 w-12 text-primary mx-auto"
+                aria-hidden="true"
+              />
               <p className="text-lg font-semibold">
                 {t('assessmentResponse.thankYou')}
               </p>
@@ -83,21 +86,31 @@ export function AssessmentResponsePage() {
       <div className="container mx-auto p-6 max-w-xl space-y-6">
         <Breadcrumbs
           items={[
-            { label: t('assessmentResponse.breadcrumbAssessments'), href: '/assessments' },
-            { label: t('assessmentResponse.breadcrumbAssessment'), href: `/assessments/${campaignId}` },
+            {
+              label: t('assessmentResponse.breadcrumbAssessments'),
+              href: '/assessments',
+            },
+            {
+              label: t('assessmentResponse.breadcrumbAssessment'),
+              href: `/assessments/${campaignId}`,
+            },
             { label: t('assessmentResponse.breadcrumbRespond') },
           ]}
         />
         <div className="flex items-center gap-3">
           <ClipboardList className="h-8 w-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">{t('assessmentResponse.pageTitle')}</h1>
+          <h1 className="text-3xl font-bold">
+            {t('assessmentResponse.pageTitle')}
+          </h1>
         </div>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
           {/* Role selector */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">{t('assessmentResponse.yourRole')}</CardTitle>
+              <CardTitle className="text-base">
+                {t('assessmentResponse.yourRole')}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
@@ -123,13 +136,18 @@ export function AssessmentResponsePage() {
           {/* Criteria sliders */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">{t('assessmentResponse.criteriaScores')}</CardTitle>
+              <CardTitle className="text-base">
+                {t('assessmentResponse.criteriaScores')}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {CRITERIA.map((c) => (
                 <div key={c.id}>
                   <div className="flex items-center justify-between mb-1">
-                    <label htmlFor={`slider-${c.id}`} className="text-sm font-medium">
+                    <label
+                      htmlFor={`slider-${c.id}`}
+                      className="text-sm font-medium"
+                    >
                       {c.label}
                     </label>
                     <span className="text-sm font-semibold text-primary">
@@ -164,7 +182,9 @@ export function AssessmentResponsePage() {
           {/* Narrative */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">{t('assessmentResponse.narrativeTitle')}</CardTitle>
+              <CardTitle className="text-base">
+                {t('assessmentResponse.narrativeTitle')}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <textarea
@@ -180,7 +200,10 @@ export function AssessmentResponsePage() {
 
           <Button type="submit" disabled={fetching} className="w-full">
             {fetching ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+              <Loader2
+                className="h-4 w-4 mr-2 animate-spin"
+                aria-hidden="true"
+              />
             ) : null}
             {t('assessmentResponse.submitAssessment')}
           </Button>

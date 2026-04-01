@@ -1,4 +1,5 @@
 # AEO Security Report — EduSphere
+
 **Phase:** 50 (AEO Infrastructure)
 **Date:** 2026-03-11
 **Author:** Security Audit Agent
@@ -13,6 +14,7 @@ This report assesses the security posture of the Answer Engine Optimization (AEO
 **Overall Risk:** LOW–MEDIUM. No critical vulnerabilities were identified. Several medium-severity gaps require remediation before production launch.
 
 **Key Findings:**
+
 - robots.txt does not yet exist in `apps/web/public/` — must be created before launch
 - llms.txt / llms-full.txt do not yet exist — content guidelines are defined in this report
 - The existing gateway rate limiter (G-09) covers GraphQL endpoints but does NOT cover the static public assets served by Vite/CDN
@@ -25,19 +27,19 @@ This report assesses the security posture of the Answer Engine Optimization (AEO
 
 ### 2.1 Component Risk Matrix
 
-| Component | Risk Level | CVSS v3 (approx.) | Category |
-|---|---|---|---|
-| robots.txt — missing file | HIGH | 7.5 | Information Disclosure |
-| robots.txt — listing sensitive routes | MEDIUM | 5.3 | Information Disclosure |
-| llms.txt — stack fingerprinting | MEDIUM | 5.3 | Information Disclosure |
-| llms.txt — internal URLs/ports | HIGH | 7.1 | Information Disclosure |
-| NestJS AeoController — no rate limit | MEDIUM | 5.8 | DoS / Resource Exhaustion |
-| NestJS AeoController — private course exposure | MEDIUM | 6.5 | Unauthorized Data Access |
-| react-helmet-async — meta tag injection | LOW | 3.7 | XSS (mitigated by React) |
-| JSON-LD structured data — script injection | LOW | 3.1 | XSS (mitigated by JSON.stringify) |
-| sitemap.xml — authenticated route exposure | LOW | 3.1 | Information Disclosure |
-| Public routes (/faq, /features, /glossary) — DoS | LOW | 4.0 | Resource Exhaustion |
-| Canonical URL construction — open redirect | LOW | 3.7 | Phishing / Open Redirect |
+| Component                                        | Risk Level | CVSS v3 (approx.) | Category                          |
+| ------------------------------------------------ | ---------- | ----------------- | --------------------------------- |
+| robots.txt — missing file                        | HIGH       | 7.5               | Information Disclosure            |
+| robots.txt — listing sensitive routes            | MEDIUM     | 5.3               | Information Disclosure            |
+| llms.txt — stack fingerprinting                  | MEDIUM     | 5.3               | Information Disclosure            |
+| llms.txt — internal URLs/ports                   | HIGH       | 7.1               | Information Disclosure            |
+| NestJS AeoController — no rate limit             | MEDIUM     | 5.8               | DoS / Resource Exhaustion         |
+| NestJS AeoController — private course exposure   | MEDIUM     | 6.5               | Unauthorized Data Access          |
+| react-helmet-async — meta tag injection          | LOW        | 3.7               | XSS (mitigated by React)          |
+| JSON-LD structured data — script injection       | LOW        | 3.1               | XSS (mitigated by JSON.stringify) |
+| sitemap.xml — authenticated route exposure       | LOW        | 3.1               | Information Disclosure            |
+| Public routes (/faq, /features, /glossary) — DoS | LOW        | 4.0               | Resource Exhaustion               |
+| Canonical URL construction — open redirect       | LOW        | 3.7               | Phishing / Open Redirect          |
 
 ---
 
@@ -48,6 +50,7 @@ This report assesses the security posture of the Answer Engine Optimization (AEO
 **Status:** `apps/web/public/robots.txt` does NOT currently exist.
 
 **Risk:** Without a robots.txt, AI crawlers (GPTbot, ClaudeBot, PerplexityBot, Googlebot) will crawl all routes including authenticated paths. This does not breach authentication but:
+
 1. Reveals the full URL structure of the application (route names can leak feature names)
 2. AI training datasets may include internal route naming conventions
 3. No crawl-delay means aggressive bots could cause elevated load on CDN
@@ -61,6 +64,7 @@ This report assesses the security posture of the Answer Engine Optimization (AEO
 **Risk:** robots.txt is publicly readable by anyone. Listing `/admin`, `/api/`, `/graphql` in `Disallow:` blocks tells attackers exactly which paths are privileged.
 
 **Clarification:** This is a classic security-through-obscurity tradeoff. The correct approach is:
+
 - Routes MUST be secured at the application layer regardless (they are — see Section 3.8)
 - robots.txt Disallow entries are acceptable because they do not grant access, only guidance
 - HOWEVER: Specific admin sub-paths like `/admin/audit-log`, `/admin/security`, `/admin/users` should be covered by a blanket `/admin/` disallow, not listed individually (minimises route enumeration)
@@ -72,10 +76,12 @@ This report assesses the security posture of the Answer Engine Optimization (AEO
 ### 3.3 llms.txt — Technology Stack Fingerprinting (MEDIUM)
 
 **Risk:** llms.txt is designed to be read by AI systems. If it mentions specific library versions (e.g., "Powered by NestJS 10.3.2", "PostgreSQL 16.2", "Node.js v22.1.0"), attackers can:
+
 1. Cross-reference against CVE databases for known vulnerabilities
 2. Craft targeted exploits
 
 **Rules for llms.txt content:**
+
 - NEVER mention specific version numbers of infrastructure dependencies
 - NEVER mention internal hostnames, IP addresses, or port numbers (4001–4006, 5432, 4222, 6379)
 - MAY mention high-level tech stack (e.g., "built on AI and knowledge graph technology")
@@ -87,12 +93,14 @@ This report assesses the security posture of the Answer Engine Optimization (AEO
 ### 3.4 NestJS AeoController — Missing Rate Limiting (MEDIUM)
 
 **Risk:** If a `/aeo/sitemap` or `/aeo/courses` endpoint exists in `apps/subgraph-content/src/aeo/`, it generates dynamic database queries on each request. Without rate limiting:
+
 1. A bot could hammer the endpoint 1000×/sec, causing database connection exhaustion
 2. The sitemap endpoint may enumerate all published course IDs, which could assist IDOR attacks on related endpoints
 
 **Finding:** The `aeo/` directory does not yet exist at `apps/subgraph-content/src/aeo/`. This report provides requirements for when it is created.
 
 **Required mitigations when implementing AeoController:**
+
 ```typescript
 // Required: Throttle decorator from @nestjs/throttler
 @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 req/min per IP
@@ -101,6 +109,7 @@ export class AeoController { ... }
 ```
 
 **Required: Only return published courses:**
+
 ```typescript
 // MUST filter by status = 'published' AND visibility = 'public'
 // MUST NOT expose: enrollment counts, internal IDs beyond slug, pricing tiers, instructor emails
@@ -113,6 +122,7 @@ export class AeoController { ... }
 **Risk:** An `/aeo/courses` endpoint that returns course metadata must be carefully scoped.
 
 **Required fields for public AEO endpoint:**
+
 - `title` (string, safe)
 - `description` (string, truncated to 300 chars for safety)
 - `slug` (string)
@@ -121,6 +131,7 @@ export class AeoController { ... }
 - `schema.org/Course` structured data fields
 
 **Forbidden fields in public AEO response:**
+
 - `tenantId` (exposes multi-tenancy structure)
 - `enrollmentCount` (business intelligence leak)
 - `pricingTier` / `price` (use pricing page instead)
@@ -140,12 +151,15 @@ export class AeoController { ... }
 **Remaining risk (LOW):** Canonical URL construction. If the canonical URL is built from `window.location.href` without validation, a server-side rendered path with special characters could cause issues. All canonical URLs MUST be constructed from a hardcoded `BASE_URL` environment variable, not from `window.location`.
 
 **Required pattern:**
+
 ```typescript
-const BASE_URL = import.meta.env.VITE_PUBLIC_BASE_URL ?? 'https://app.edusphere.dev';
+const BASE_URL =
+  import.meta.env.VITE_PUBLIC_BASE_URL ?? 'https://app.edusphere.dev';
 const canonical = `${BASE_URL}${location.pathname}`; // pathname only, never full href
 ```
 
 **Forbidden:**
+
 ```typescript
 // NEVER use window.location.href directly in canonical
 const canonical = window.location.href; // vulnerable to URL parameter injection
@@ -158,15 +172,18 @@ const canonical = window.location.href; // vulnerable to URL parameter injection
 **Risk:** JSON-LD is injected as an inline `<script type="application/ld+json">` tag. If user-supplied data is serialized directly, a course title containing `</script>` could break out of the JSON-LD context.
 
 **Finding:** `JSON.stringify()` does NOT escape the string `</script>`. For example:
+
 ```javascript
-JSON.stringify({ title: '</script><script>alert(1)</script>' })
+JSON.stringify({ title: '</script><script>alert(1)</script>' });
 // → '{"title":"</script><script>alert(1)</script>"}'
 ```
+
 This closes the script tag and opens a new one.
 
 **Severity:** This is a real XSS vector if JSON-LD is rendered server-side or via `dangerouslySetInnerHTML`. In React with `react-helmet-async`, the library inserts the script tag safely. However, if direct `dangerouslySetInnerHTML` is used for JSON-LD injection, this is exploitable.
 
 **Required mitigation:** Replace `</` with `<\/` in all JSON-LD content before injection:
+
 ```typescript
 function safeJsonLd(data: object): string {
   return JSON.stringify(data).replace(/<\//g, '<\\/');
@@ -182,6 +199,7 @@ This is a mandatory hardening step regardless of the rendering method.
 **Finding:** Analysis of `apps/web/src/lib/router.tsx` confirms:
 
 **Correctly authenticated routes (sample):**
+
 - `/dashboard` → `guarded()` ✓
 - `/admin` → `guarded()` ✓
 - `/admin/audit-log` → `guarded()` ✓
@@ -192,6 +210,7 @@ This is a mandatory hardening step regardless of the rendering method.
 - `/agents/*` → `guarded()` ✓
 
 **Legitimately public routes:**
+
 - `/login` ← no auth required by design ✓
 - `/landing` ← marketing page ✓
 - `/accessibility` ← legal requirement ✓
@@ -202,6 +221,7 @@ This is a mandatory hardening step regardless of the rendering method.
 - `/lti/launch` ← LTI 1.3 deep-link handler ✓
 
 **Missing AEO public routes** (must be added before launch):
+
 - `/faq` — should be public, not yet in router
 - `/features` — should be public, not yet in router
 - `/glossary` — should be public, not yet in router
@@ -232,18 +252,18 @@ This is a mandatory hardening step regardless of the rendering method.
 
 ## 4. Recommended Mitigations Summary
 
-| # | Component | Action | Priority |
-|---|---|---|---|
-| M-1 | robots.txt | Create file (see Section 6) | CRITICAL before launch |
-| M-2 | llms.txt | Create file following content guidelines (Section 7) | HIGH before launch |
-| M-3 | AeoController | Add `@Throttle` decorator when implementing | HIGH |
-| M-4 | AeoController | Filter: published+public courses only | HIGH |
-| M-5 | AeoController | Strip forbidden fields from response | HIGH |
-| M-6 | JSON-LD | Apply `<\/` replacement before injection | MEDIUM |
-| M-7 | Canonical URL | Use `BASE_URL` env var, never `window.location.href` | MEDIUM |
-| M-8 | CDN/Nginx | Rate limit static AEO files at infrastructure layer | MEDIUM |
-| M-9 | llms.txt | Never include version numbers or internal ports | HIGH |
-| M-10 | Public routes | Add /faq, /features, /glossary as explicit public routes in router | LOW |
+| #    | Component     | Action                                                             | Priority               |
+| ---- | ------------- | ------------------------------------------------------------------ | ---------------------- |
+| M-1  | robots.txt    | Create file (see Section 6)                                        | CRITICAL before launch |
+| M-2  | llms.txt      | Create file following content guidelines (Section 7)               | HIGH before launch     |
+| M-3  | AeoController | Add `@Throttle` decorator when implementing                        | HIGH                   |
+| M-4  | AeoController | Filter: published+public courses only                              | HIGH                   |
+| M-5  | AeoController | Strip forbidden fields from response                               | HIGH                   |
+| M-6  | JSON-LD       | Apply `<\/` replacement before injection                           | MEDIUM                 |
+| M-7  | Canonical URL | Use `BASE_URL` env var, never `window.location.href`               | MEDIUM                 |
+| M-8  | CDN/Nginx     | Rate limit static AEO files at infrastructure layer                | MEDIUM                 |
+| M-9  | llms.txt      | Never include version numbers or internal ports                    | HIGH                   |
+| M-10 | Public routes | Add /faq, /features, /glossary as explicit public routes in router | LOW                    |
 
 ---
 
@@ -434,6 +454,7 @@ Sitemap: https://edusphere.dev/sitemap.xml
 ```
 
 **Security notes on this robots.txt:**
+
 1. The Disallow entries list route prefixes, NOT specific sub-paths — minimises route enumeration
 2. Authentication protects all listed routes regardless of robots.txt
 3. `GPTbot` and `ClaudeBot` receive explicit Allow lists for public marketing content with `Crawl-delay: 10` to prevent load spikes
@@ -503,18 +524,18 @@ documentation are not authorised for AI training or indexing.
 
 ## 8. Appendix: File Audit
 
-| File | Status | Notes |
-|---|---|---|
-| `apps/web/public/robots.txt` | MISSING | Must be created before launch |
-| `apps/web/public/llms.txt` | MISSING | Must be created before launch |
-| `apps/web/public/llms-full.txt` | MISSING | Optional but recommended |
-| `apps/web/public/sitemap.xml` | EXISTS — CLEAN | Only public routes, correct domain |
-| `apps/subgraph-content/src/aeo/` | MISSING | Not yet implemented |
-| `apps/web/src/lib/router.tsx` | EXISTS — REVIEWED | Auth coverage verified correct |
-| `apps/gateway/src/middleware/rate-limit.ts` | EXISTS — ADEQUATE | Covers GraphQL; CDN must cover static files |
-| `apps/gateway/src/middleware/security-headers.ts` | EXISTS — ADEQUATE | OWASP ASVS V14.4 compliant |
+| File                                              | Status            | Notes                                       |
+| ------------------------------------------------- | ----------------- | ------------------------------------------- |
+| `apps/web/public/robots.txt`                      | MISSING           | Must be created before launch               |
+| `apps/web/public/llms.txt`                        | MISSING           | Must be created before launch               |
+| `apps/web/public/llms-full.txt`                   | MISSING           | Optional but recommended                    |
+| `apps/web/public/sitemap.xml`                     | EXISTS — CLEAN    | Only public routes, correct domain          |
+| `apps/subgraph-content/src/aeo/`                  | MISSING           | Not yet implemented                         |
+| `apps/web/src/lib/router.tsx`                     | EXISTS — REVIEWED | Auth coverage verified correct              |
+| `apps/gateway/src/middleware/rate-limit.ts`       | EXISTS — ADEQUATE | Covers GraphQL; CDN must cover static files |
+| `apps/gateway/src/middleware/security-headers.ts` | EXISTS — ADEQUATE | OWASP ASVS V14.4 compliant                  |
 
 ---
 
-*Report generated by Security Audit Agent — EduSphere Phase 50*
-*Next review: After AeoController implementation and before production deploy*
+_Report generated by Security Audit Agent — EduSphere Phase 50_
+_Next review: After AeoController implementation and before production deploy_

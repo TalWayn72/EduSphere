@@ -15,10 +15,14 @@ export class DiscussionInsightsService {
 
   async summarizeThread(
     messages: Array<{ content: string; userId: string }>,
-    discussionTitle: string,
+    discussionTitle: string
   ): Promise<DiscussionSummary> {
-    const ollamaProvider = createOllama({ baseURL: (process.env.OLLAMA_URL ?? 'http://localhost:11434') + '/api' });
-    const model = ollamaProvider(process.env.OLLAMA_MODEL ?? 'llama3.2') as unknown as LanguageModel;
+    const ollamaProvider = createOllama({
+      baseURL: (process.env.OLLAMA_URL ?? 'http://localhost:11434') + '/api',
+    });
+    const model = ollamaProvider(
+      process.env.OLLAMA_MODEL ?? 'llama3.2'
+    ) as unknown as LanguageModel;
 
     // SEC-6: Use structured JSON data field — NOT string concatenation
     // userId is deliberately excluded from LLM payload for privacy
@@ -57,7 +61,7 @@ export class DiscussionInsightsService {
       };
     } catch {
       this.logger.warn(
-        `DiscussionInsightsService: LLM returned non-JSON for discussion "${discussionTitle}", using raw text as summary`,
+        `DiscussionInsightsService: LLM returned non-JSON for discussion "${discussionTitle}", using raw text as summary`
       );
       return {
         summary: text,

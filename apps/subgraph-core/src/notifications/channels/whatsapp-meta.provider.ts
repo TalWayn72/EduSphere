@@ -42,7 +42,12 @@ export class WhatsAppMetaProvider {
         name: templateName,
         language: { code: languageCode },
         components: variables.length
-          ? [{ type: 'body', parameters: variables.map((v) => ({ type: 'text', text: v })) }]
+          ? [
+              {
+                type: 'body',
+                parameters: variables.map((v) => ({ type: 'text', text: v })),
+              },
+            ]
           : [],
       },
     };
@@ -72,7 +77,9 @@ export class WhatsAppMetaProvider {
   ): Promise<WhatsAppSendResult> {
     const accessToken = process.env['WHATSAPP_ACCESS_TOKEN'];
     if (!accessToken) {
-      this.logger.warn('[WhatsAppMetaProvider] WHATSAPP_ACCESS_TOKEN not configured');
+      this.logger.warn(
+        '[WhatsAppMetaProvider] WHATSAPP_ACCESS_TOKEN not configured'
+      );
       return { success: false, messageId: null, error: 'Missing access token' };
     }
 
@@ -93,7 +100,11 @@ export class WhatsAppMetaProvider {
         this.logger.error(
           `[WhatsAppMetaProvider] API error ${response.status.toString()}: ${errBody.error?.message ?? 'unknown'}`
         );
-        return { success: false, messageId: null, error: errBody.error?.message ?? 'API error' };
+        return {
+          success: false,
+          messageId: null,
+          error: errBody.error?.message ?? 'API error',
+        };
       }
 
       const data = (await response.json()) as MetaSendResponse;

@@ -13,9 +13,7 @@ import { readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { describe, it, expect, beforeAll } from 'vitest';
 
-const BASE = resolve(
-  join(import.meta.dirname, '.')
-);
+const BASE = resolve(join(import.meta.dirname, '.'));
 
 function load(filename: string): string {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -60,16 +58,13 @@ describe('pgvector RLS cross-tenant audit (OWASP LLM06 / SI-9)', () => {
   });
 
   it('searchByVector accepts TenantContext parameter', () => {
-    const fnSignature = storeSrc.match(
-      /searchByVector\s*\([^)]+\)/s
-    )?.[0] ?? '';
+    const fnSignature =
+      storeSrc.match(/searchByVector\s*\([^)]+\)/s)?.[0] ?? '';
     expect(fnSignature).toMatch(/TenantContext/);
   });
 
   it('ilikeFallback accepts TenantContext parameter', () => {
-    const fnSignature = storeSrc.match(
-      /ilikeFallback\s*\([^)]+\)/s
-    )?.[0] ?? '';
+    const fnSignature = storeSrc.match(/ilikeFallback\s*\([^)]+\)/s)?.[0] ?? '';
     expect(fnSignature).toMatch(/TenantContext/);
   });
 
@@ -80,17 +75,15 @@ describe('pgvector RLS cross-tenant audit (OWASP LLM06 / SI-9)', () => {
   });
 
   it('semanticSearch receives TenantContext (not bare tenantId string)', () => {
-    const fnSignature = serviceSrc.match(
-      /semanticSearch\s*\([^)]+\)/s
-    )?.[0] ?? '';
+    const fnSignature =
+      serviceSrc.match(/semanticSearch\s*\([^)]+\)/s)?.[0] ?? '';
     expect(fnSignature).toMatch(/TenantContext/);
     expect(fnSignature).not.toMatch(/tenantId:\s*string/);
   });
 
   it('semanticSearchByVector receives TenantContext', () => {
-    const fnSignature = serviceSrc.match(
-      /semanticSearchByVector\s*\([^)]+\)/s
-    )?.[0] ?? '';
+    const fnSignature =
+      serviceSrc.match(/semanticSearchByVector\s*\([^)]+\)/s)?.[0] ?? '';
     expect(fnSignature).toMatch(/TenantContext/);
   });
 

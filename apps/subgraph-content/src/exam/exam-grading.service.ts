@@ -2,15 +2,8 @@
  * ExamGradingService — Score calculation engine.
  * Per-item grading, raw/scaled/domain/bloom scores, IRT theta, certificate event.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  closeAllPools,
-} from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, closeAllPools } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import type { ExamResult, ExamItem, ExamResponse } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
@@ -47,7 +40,11 @@ export class ExamGradingService implements OnModuleDestroy {
   }
 
   async gradeExam(sessionId: string, tenantId: string): Promise<ExamResult> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'INSTRUCTOR' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'INSTRUCTOR',
+    };
 
     const session = await this.persistence.loadSession(sessionId, ctx);
     const responses = await this.persistence.loadResponses(sessionId, ctx);
@@ -67,47 +64,76 @@ export class ExamGradingService implements OnModuleDestroy {
     const domainScores = this.calcDomainScores(graded, itemMap);
     const bloomScores = this.calcBloomScores(graded, itemMap);
     const irt = ExamIrtCalculator.calculateTheta(graded, itemMap);
-    const ci = irt ? ExamIrtCalculator.confidenceInterval(scaledScore, irt.sem) : null;
+    const ci = irt
+      ? ExamIrtCalculator.confidenceInterval(scaledScore, irt.sem)
+      : null;
 
     const result = await this.persistence.insertResult(ctx, {
-      tenantId, sessionId, blueprintId: session.blueprintId,
-      userId: session.userId, rawScore, scaledScore, passed,
-      thetaEstimate: irt?.theta ?? null, sem: irt?.sem ?? null,
-      confidenceInterval: ci, domainScores, bloomScores,
+      tenantId,
+      sessionId,
+      blueprintId: session.blueprintId,
+      userId: session.userId,
+      rawScore,
+      scaledScore,
+      passed,
+      thetaEstimate: irt?.theta ?? null,
+      sem: irt?.sem ?? null,
+      confidenceInterval: ci,
+      domainScores,
+      bloomScores,
       itemAnalysis: graded.map((g) => ({
-        itemId: g.itemId, correct: g.correct, timeSpentMs: g.timeSpentMs,
+        itemId: g.itemId,
+        correct: g.correct,
+        timeSpentMs: g.timeSpentMs,
       })),
       gradedAt: new Date(),
     });
 
-    await this.persistence.writeResponseLog(graded, tenantId, session.userId, ctx);
+    await this.persistence.writeResponseLog(
+      graded,
+      tenantId,
+      session.userId,
+      ctx
+    );
     await this.persistence.updateExposureCounts(questionOrder, ctx);
     await this.persistence.markResponseCorrectness(sessionId, graded, ctx);
 
     if (passed) await this.publishCertificateEvent(result, tenantId);
 
-    this.logger.log({
-      sessionId, rawScore, scaledScore, passed, theta: irt?.theta,
-    }, 'Exam graded');
+    this.logger.log(
+      {
+        sessionId,
+        rawScore,
+        scaledScore,
+        passed,
+        theta: irt?.theta,
+      },
+      'Exam graded'
+    );
 
     return result;
   }
 
   private gradeAllResponses(
-    responses: ExamResponse[], itemMap: Map<string, ExamItem>,
+    responses: ExamResponse[],
+    itemMap: Map<string, ExamItem>
   ): GradedItem[] {
     return responses.map((r) => {
       const item = itemMap.get(r.itemId);
-      if (!item) return { itemId: r.itemId, correct: false, timeSpentMs: r.timeSpentMs };
+      if (!item)
+        return { itemId: r.itemId, correct: false, timeSpentMs: r.timeSpentMs };
       const correct = gradeExamItem(
         item.questionData as Record<string, unknown>,
-        r.answerData,
+        r.answerData
       );
       return { itemId: r.itemId, correct, timeSpentMs: r.timeSpentMs };
     });
   }
 
-  private calcDomainScores(graded: GradedItem[], itemMap: Map<string, ExamItem>) {
+  private calcDomainScores(
+    graded: GradedItem[],
+    itemMap: Map<string, ExamItem>
+  ) {
     const map = new Map<string, { correct: number; total: number }>();
     for (const g of graded) {
       const domain = itemMap.get(g.itemId)?.domainTag ?? 'unknown';
@@ -117,12 +143,17 @@ export class ExamGradingService implements OnModuleDestroy {
       map.set(domain, e);
     }
     return [...map.entries()].map(([domain, s]) => ({
-      domain, correct: s.correct, total: s.total,
+      domain,
+      correct: s.correct,
+      total: s.total,
       scaledScore: Math.round(200 + 800 * (s.correct / (s.total || 1))),
     }));
   }
 
-  private calcBloomScores(graded: GradedItem[], itemMap: Map<string, ExamItem>) {
+  private calcBloomScores(
+    graded: GradedItem[],
+    itemMap: Map<string, ExamItem>
+  ) {
     const map = new Map<string, { correct: number; total: number }>();
     for (const g of graded) {
       const level = itemMap.get(g.itemId)?.bloomLevel ?? 'REMEMBER';
@@ -132,35 +163,53 @@ export class ExamGradingService implements OnModuleDestroy {
       map.set(level, e);
     }
     return [...map.entries()].map(([level, s]) => ({
-      level, correct: s.correct, total: s.total,
+      level,
+      correct: s.correct,
+      total: s.total,
     }));
   }
 
   private async ensureNatsConnection(): Promise<NatsConnection> {
     if (this.nc) return this.nc;
     if (!this.connectingPromise) {
-      this.connectingPromise = connect(buildNatsOptions()).then((nc) => {
-        this.nc = nc;
-        this.connectingPromise = null;
-        return nc;
-      }).catch((err) => {
-        this.connectingPromise = null;
-        throw err;
-      });
+      this.connectingPromise = connect(buildNatsOptions())
+        .then((nc) => {
+          this.nc = nc;
+          this.connectingPromise = null;
+          return nc;
+        })
+        .catch((err) => {
+          this.connectingPromise = null;
+          throw err;
+        });
     }
     return this.connectingPromise;
   }
 
-  private async publishCertificateEvent(result: ExamResult, tenantId: string): Promise<void> {
+  private async publishCertificateEvent(
+    result: ExamResult,
+    tenantId: string
+  ): Promise<void> {
     try {
       const nc = await this.ensureNatsConnection();
-      nc.publish(CERT_SUBJECT, this.sc.encode(JSON.stringify({
-        resultId: result.id, sessionId: result.sessionId,
-        userId: result.userId, blueprintId: result.blueprintId,
-        scaledScore: result.scaledScore, tenantId,
-        timestamp: new Date().toISOString(),
-      })));
-      this.logger.log({ resultId: result.id }, 'Certificate issuance event published');
+      nc.publish(
+        CERT_SUBJECT,
+        this.sc.encode(
+          JSON.stringify({
+            resultId: result.id,
+            sessionId: result.sessionId,
+            userId: result.userId,
+            blueprintId: result.blueprintId,
+            scaledScore: result.scaledScore,
+            tenantId,
+            timestamp: new Date().toISOString(),
+          })
+        )
+      );
+      this.logger.log(
+        { resultId: result.id },
+        'Certificate issuance event published'
+      );
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.error({ error: msg }, 'Failed to publish certificate event');

@@ -61,10 +61,7 @@ export function ProctoringReportCard({ session }: Props) {
             </>
           )}
           {session.endedAt && (
-            <>
-              {' '}
-              &middot; Ended: {new Date(session.endedAt).toLocaleString()}
-            </>
+            <> &middot; Ended: {new Date(session.endedAt).toLocaleString()}</>
           )}
         </p>
       </CardHeader>
@@ -83,7 +80,9 @@ export function ProctoringReportCard({ session }: Props) {
                   {new Date(f.timestamp).toLocaleString()}
                 </span>
                 {f.detail && (
-                  <span className="mt-0.5 text-xs text-foreground/70">{f.detail}</span>
+                  <span className="mt-0.5 text-xs text-foreground/70">
+                    {f.detail}
+                  </span>
                 )}
               </li>
             ))}

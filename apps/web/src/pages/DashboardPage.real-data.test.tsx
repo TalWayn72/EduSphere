@@ -7,12 +7,28 @@ import { MemoryRouter } from 'react-router-dom';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined, stale: false, hasNext: false }, vi.fn()]),
-  useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
-  useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  useQuery: vi.fn(() => [
+    {
+      data: undefined,
+      fetching: false,
+      error: undefined,
+      stale: false,
+      hasNext: false,
+    },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
 }));
 
 vi.mock('@/lib/auth', () => ({
@@ -42,14 +58,22 @@ vi.mock('@/contexts/ThemeContext', () => ({
     resolvedMode: 'light',
     setThemeMode: vi.fn(),
     tenantPrimitives: {},
-    userPreferences: { mode: 'system', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
+    userPreferences: {
+      mode: 'system',
+      fontSize: 'md',
+      readingMode: false,
+      motionPreference: 'full',
+      contrastMode: 'normal',
+    },
     setTenantTheme: vi.fn(),
     setFontSize: vi.fn(),
     setReadingMode: vi.fn(),
     setMotionPreference: vi.fn(),
     previewThemeChanges: vi.fn(),
   })),
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
@@ -65,7 +89,16 @@ vi.mock('@/components/AppSidebar', () => ({
 import * as urql from 'urql';
 import { DashboardPage } from './DashboardPage';
 
-const NOOP_QUERY = [{ fetching: false, data: undefined, error: undefined, stale: false, hasNext: false }, vi.fn()] as never;
+const NOOP_QUERY = [
+  {
+    fetching: false,
+    data: undefined,
+    error: undefined,
+    stale: false,
+    hasNext: false,
+  },
+  vi.fn(),
+] as never;
 
 const renderDashboard = () =>
   render(
@@ -83,8 +116,12 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
   it('shows mock in-progress courses as fallback when queries return no data', () => {
     renderDashboard();
     // MOCK_IN_PROGRESS fallback should render
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
-    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Advanced Chavruta Techniques')
+    ).toBeInTheDocument();
     expect(screen.getByText('Knowledge Graph Navigation')).toBeInTheDocument();
   });
 
@@ -92,22 +129,27 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myInProgressCourses')) {
-        return [{
-          fetching: false,
-          data: {
-            myInProgressCourses: [{
-              id: 'real-1',
-              courseId: 'c-real',
-              title: 'Real Course From Server',
-              progress: 50,
-              lastAccessedAt: '1 hour ago',
-              instructorName: 'Prof. Test',
-            }],
+        return [
+          {
+            fetching: false,
+            data: {
+              myInProgressCourses: [
+                {
+                  id: 'real-1',
+                  courseId: 'c-real',
+                  title: 'Real Course From Server',
+                  progress: 50,
+                  lastAccessedAt: '1 hour ago',
+                  instructorName: 'Prof. Test',
+                },
+              ],
+            },
+            error: undefined,
+            stale: false,
+            hasNext: false,
           },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -115,27 +157,34 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
     renderDashboard();
     expect(document.body.textContent).toContain('Real Course From Server');
     // Mock fallback courses should NOT appear when real data is present
-    expect(screen.queryByText('Introduction to Talmud Study')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Introduction to Talmud Study')
+    ).not.toBeInTheDocument();
   });
 
   it('renders real recommended courses when myRecommendedCourses query succeeds', () => {
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myRecommendedCourses')) {
-        return [{
-          fetching: false,
-          data: {
-            myRecommendedCourses: [{
-              courseId: 'r-1',
-              title: 'Real Recommended Course',
-              instructorName: 'Dr. Recommendation',
-              reason: 'Based on your learning path',
-            }],
+        return [
+          {
+            fetching: false,
+            data: {
+              myRecommendedCourses: [
+                {
+                  courseId: 'r-1',
+                  title: 'Real Recommended Course',
+                  instructorName: 'Dr. Recommendation',
+                  reason: 'Based on your learning path',
+                },
+              ],
+            },
+            error: undefined,
+            stale: false,
+            hasNext: false,
           },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -143,33 +192,42 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
     renderDashboard();
     expect(document.body.textContent).toContain('Real Recommended Course');
     // Mock recommended courses should NOT appear
-    expect(screen.queryByText('Mishnah: Laws of Damages')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Mishnah: Laws of Damages')
+    ).not.toBeInTheDocument();
   });
 
   it('renders real activity feed when myActivityFeed query succeeds', () => {
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myActivityFeed')) {
-        return [{
-          fetching: false,
-          data: {
-            myActivityFeed: [{
-              id: 'af-1',
-              eventType: 'study',
-              description: 'Real activity event from server',
-              occurredAt: '10 minutes ago',
-            }],
+        return [
+          {
+            fetching: false,
+            data: {
+              myActivityFeed: [
+                {
+                  id: 'af-1',
+                  eventType: 'study',
+                  description: 'Real activity event from server',
+                  occurredAt: '10 minutes ago',
+                },
+              ],
+            },
+            error: undefined,
+            stale: false,
+            hasNext: false,
           },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
 
     renderDashboard();
-    expect(document.body.textContent).toContain('Real activity event from server');
+    expect(document.body.textContent).toContain(
+      'Real activity event from server'
+    );
     // Mock activity should NOT appear
     expect(screen.queryByText(/Tractate Bava Metzia/)).not.toBeInTheDocument();
   });
@@ -178,21 +236,24 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('MyStatsWithStreak')) {
-        return [{
-          fetching: false,
-          data: {
-            myStats: {
-              coursesEnrolled: 5,
-              conceptsMastered: 12,
-              totalLearningMinutes: 300,
-              currentStreak: 42,
-              longestStreak: 60,
+        return [
+          {
+            fetching: false,
+            data: {
+              myStats: {
+                coursesEnrolled: 5,
+                conceptsMastered: 12,
+                totalLearningMinutes: 300,
+                currentStreak: 42,
+                longestStreak: 60,
+              },
             },
+            error: undefined,
+            stale: false,
+            hasNext: false,
           },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -207,18 +268,21 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myTopMasteryTopics')) {
-        return [{
-          fetching: false,
-          data: {
-            myTopMasteryTopics: [
-              { topicName: 'Real Topic Alpha', level: 'mastered' },
-              { topicName: 'Real Topic Beta', level: 'familiar' },
-            ],
+        return [
+          {
+            fetching: false,
+            data: {
+              myTopMasteryTopics: [
+                { topicName: 'Real Topic Alpha', level: 'mastered' },
+                { topicName: 'Real Topic Beta', level: 'familiar' },
+              ],
+            },
+            error: undefined,
+            stale: false,
+            hasNext: false,
           },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -231,30 +295,40 @@ describe('DashboardPage — new dashboard queries (real data)', () => {
   });
 
   it('falls back to mock data when queries error — no blank UI', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{
-      fetching: false,
-      data: undefined,
-      error: new Error('Network error'),
-      stale: false,
-      hasNext: false,
-    }, vi.fn()] as never);
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        fetching: false,
+        data: undefined,
+        error: new Error('Network error'),
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
 
     renderDashboard();
     // All mock fallbacks should still render
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
     expect(screen.getByText('Mishnah: Laws of Damages')).toBeInTheDocument();
     expect(screen.getByTestId('streak-widget')).toHaveTextContent('7');
     expect(screen.getByTestId('mastery-overview')).toBeInTheDocument();
   });
 
   it('does not expose raw GraphQL error messages to user', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{
-      fetching: false,
-      data: undefined,
-      error: { message: 'Cannot query field "myInProgressCourses" on type "Query"' } as Error,
-      stale: false,
-      hasNext: false,
-    }, vi.fn()] as never);
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        fetching: false,
+        data: undefined,
+        error: {
+          message: 'Cannot query field "myInProgressCourses" on type "Query"',
+        } as Error,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
 
     renderDashboard();
     const body = document.body.textContent ?? '';
@@ -284,13 +358,16 @@ describe('BUG-084 — empty array from query must fall back to mock data', () =>
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myTopMasteryTopics')) {
-        return [{
-          fetching: false,
-          data: { myTopMasteryTopics: [] },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+        return [
+          {
+            fetching: false,
+            data: { myTopMasteryTopics: [] },
+            error: undefined,
+            stale: false,
+            hasNext: false,
+          },
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -306,32 +383,40 @@ describe('BUG-084 — empty array from query must fall back to mock data', () =>
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myInProgressCourses')) {
-        return [{
-          fetching: false,
-          data: { myInProgressCourses: [] },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+        return [
+          {
+            fetching: false,
+            data: { myInProgressCourses: [] },
+            error: undefined,
+            stale: false,
+            hasNext: false,
+          },
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
 
     renderDashboard();
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
   });
 
   it('recommended section shows mock courses when query returns empty array', () => {
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myRecommendedCourses')) {
-        return [{
-          fetching: false,
-          data: { myRecommendedCourses: [] },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+        return [
+          {
+            fetching: false,
+            data: { myRecommendedCourses: [] },
+            error: undefined,
+            stale: false,
+            hasNext: false,
+          },
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -344,13 +429,16 @@ describe('BUG-084 — empty array from query must fall back to mock data', () =>
     vi.mocked(urql.useQuery).mockImplementation((opts) => {
       const doc = String((opts as { query: unknown }).query);
       if (doc.includes('myActivityFeed')) {
-        return [{
-          fetching: false,
-          data: { myActivityFeed: [] },
-          error: undefined,
-          stale: false,
-          hasNext: false,
-        }, vi.fn()] as never;
+        return [
+          {
+            fetching: false,
+            data: { myActivityFeed: [] },
+            error: undefined,
+            stale: false,
+            hasNext: false,
+          },
+          vi.fn(),
+        ] as never;
       }
       return NOOP_QUERY;
     });
@@ -360,25 +448,30 @@ describe('BUG-084 — empty array from query must fall back to mock data', () =>
   });
 
   it('all sections show mock data when ALL queries return empty arrays simultaneously', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{
-      fetching: false,
-      data: {
-        myInProgressCourses: [],
-        myRecommendedCourses: [],
-        myActivityFeed: [],
-        myTopMasteryTopics: [],
-        myEnrollments: [],
-        myStats: null,
-        myOnboardingState: null,
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        fetching: false,
+        data: {
+          myInProgressCourses: [],
+          myRecommendedCourses: [],
+          myActivityFeed: [],
+          myTopMasteryTopics: [],
+          myEnrollments: [],
+          myStats: null,
+          myOnboardingState: null,
+        },
+        error: undefined,
+        stale: false,
+        hasNext: false,
       },
-      error: undefined,
-      stale: false,
-      hasNext: false,
-    }, vi.fn()] as never);
+      vi.fn(),
+    ] as never);
 
     renderDashboard();
     // All mock fallbacks must render — no empty/white sections
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
     expect(screen.getByText('Mishnah: Laws of Damages')).toBeInTheDocument();
     expect(screen.getByText('Talmudic Reasoning')).toBeInTheDocument();
     expect(screen.getByText(/Tractate Bava Metzia/)).toBeInTheDocument();

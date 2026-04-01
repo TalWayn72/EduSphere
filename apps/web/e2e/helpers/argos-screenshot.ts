@@ -20,7 +20,7 @@ export interface VisualSnapshotOptions {
 export async function visualSnapshot(
   page: Page,
   name: string,
-  options?: VisualSnapshotOptions,
+  options?: VisualSnapshotOptions
 ): Promise<void> {
   const { fullPage = false, viewport, threshold } = options ?? {};
 

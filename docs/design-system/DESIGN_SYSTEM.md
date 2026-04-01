@@ -14,12 +14,12 @@
 EduSphere's design language is assembled from four best-in-class reference systems,
 each contributing a distinct layer:
 
-| Layer | Reference | What We Adopt |
-|-------|-----------|---------------|
-| **App shell & navigation** | Linear | Collapsible sidebar, compact topbar, content area, `Cmd+K` / `Ctrl+K` command palette |
-| **Domain patterns** | Canvas LMS (InstUI) | Course card grids, module accordions, gradebook tables, discussion threading, assignment submission flows |
-| **Token & theming** | Stripe | Semantic color tokens auto-derived from WCAG contrast algorithms, multi-tenant brand color generation from a single seed hue |
-| **Documentation** | IBM Carbon | Component anatomy diagrams, usage/do-don't matrices, decision tables per pattern |
+| Layer                      | Reference           | What We Adopt                                                                                                                |
+| -------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **App shell & navigation** | Linear              | Collapsible sidebar, compact topbar, content area, `Cmd+K` / `Ctrl+K` command palette                                        |
+| **Domain patterns**        | Canvas LMS (InstUI) | Course card grids, module accordions, gradebook tables, discussion threading, assignment submission flows                    |
+| **Token & theming**        | Stripe              | Semantic color tokens auto-derived from WCAG contrast algorithms, multi-tenant brand color generation from a single seed hue |
+| **Documentation**          | IBM Carbon          | Component anatomy diagrams, usage/do-don't matrices, decision tables per pattern                                             |
 
 ### Guiding Principles
 
@@ -36,18 +36,18 @@ each contributing a distinct layer:
 Every page in the application MUST include the elements listed below. The table
 shows which layout wrapper provides each element.
 
-| Element | Public Pages | Authenticated Pages | Admin Pages |
-|---------|-------------|---------------------|-------------|
-| Skip link (`Skip to main content`) | `PublicLayout` | `Layout` | `Layout` |
-| Logo (links to home `/`) | `PublicNav` | `AppSidebar` | `AppSidebar` |
-| Primary navigation | `PublicNav` | `AppSidebar` | `AppSidebar` + `AdminSidebar` |
-| `<main id="main-content">` | Yes | Yes | Yes |
-| `<h1>` (via `PageHeader`) | Yes | Yes | Yes |
-| Footer | `LandingFooter` | `AuthFooter` | `AuthFooter` |
-| Breadcrumbs (when depth > 1) | Optional | Required | Required |
-| Dark mode (semantic tokens) | Yes | Yes | Yes |
-| Mobile responsive | Yes | Yes | Yes |
-| Command palette (`Cmd+K`) | No | Yes | Yes |
+| Element                            | Public Pages    | Authenticated Pages | Admin Pages                   |
+| ---------------------------------- | --------------- | ------------------- | ----------------------------- |
+| Skip link (`Skip to main content`) | `PublicLayout`  | `Layout`            | `Layout`                      |
+| Logo (links to home `/`)           | `PublicNav`     | `AppSidebar`        | `AppSidebar`                  |
+| Primary navigation                 | `PublicNav`     | `AppSidebar`        | `AppSidebar` + `AdminSidebar` |
+| `<main id="main-content">`         | Yes             | Yes                 | Yes                           |
+| `<h1>` (via `PageHeader`)          | Yes             | Yes                 | Yes                           |
+| Footer                             | `LandingFooter` | `AuthFooter`        | `AuthFooter`                  |
+| Breadcrumbs (when depth > 1)       | Optional        | Required            | Required                      |
+| Dark mode (semantic tokens)        | Yes             | Yes                 | Yes                           |
+| Mobile responsive                  | Yes             | Yes                 | Yes                           |
+| Command palette (`Cmd+K`)          | No              | Yes                 | Yes                           |
 
 ### Layout Wrapper Responsibility
 
@@ -69,13 +69,13 @@ determines the `PageShell` size, expected child components, and structural patte
 > Browsable collections of entities.
 > Examples: `CourseListPage`, `NotificationsPage`, `UserManagementPage`
 
-| Property | Value |
-|----------|-------|
-| PageShell size | `md` to `xl` (depends on data density) |
-| PageHeader | Title + optional description + action buttons (Create, Import) |
-| Content | Filter bar + grid or virtualized list of items |
-| Empty state | Illustration + message + CTA button |
-| Pagination | Cursor-based (Relay spec) with Load More or infinite scroll |
+| Property       | Value                                                          |
+| -------------- | -------------------------------------------------------------- |
+| PageShell size | `md` to `xl` (depends on data density)                         |
+| PageHeader     | Title + optional description + action buttons (Create, Import) |
+| Content        | Filter bar + grid or virtualized list of items                 |
+| Empty state    | Illustration + message + CTA button                            |
+| Pagination     | Cursor-based (Relay spec) with Load More or infinite scroll    |
 
 ```
 PageShell (md–xl)
@@ -92,12 +92,12 @@ PageShell (md–xl)
 > Single-entity view with rich content sections.
 > Examples: `CourseDetailPage`, `ProfilePage`, `DiscussionThreadPage`
 
-| Property | Value |
-|----------|-------|
-| PageShell size | `md` |
-| PageHeader | Breadcrumbs + back button + title + entity status badge |
-| Content | Entity hero section + tabbed or sectioned content |
-| Actions | Edit / Delete / Share in header or floating action bar |
+| Property       | Value                                                   |
+| -------------- | ------------------------------------------------------- |
+| PageShell size | `md`                                                    |
+| PageHeader     | Breadcrumbs + back button + title + entity status badge |
+| Content        | Entity hero section + tabbed or sectioned content       |
+| Actions        | Edit / Delete / Share in header or floating action bar  |
 
 ```
 PageShell (md)
@@ -115,12 +115,12 @@ PageShell (md)
 > Overview pages with statistics, charts, and widget grids.
 > Examples: `DashboardPage`, `AdminDashboardPage`, `AnalyticsPage`
 
-| Property | Value |
-|----------|-------|
-| PageShell size | `2xl` |
-| PageHeader | Title + date range selector + refresh button |
-| Content | Stat cards grid + charts + activity feed |
-| Layout | CSS Grid with responsive column spans |
+| Property       | Value                                        |
+| -------------- | -------------------------------------------- |
+| PageShell size | `2xl`                                        |
+| PageHeader     | Title + date range selector + refresh button |
+| Content        | Stat cards grid + charts + activity feed     |
+| Layout         | CSS Grid with responsive column spans        |
 
 ```
 PageShell (2xl)
@@ -139,12 +139,12 @@ PageShell (2xl)
 > Create and edit workflows with validated inputs.
 > Examples: `CourseCreatePage`, `SettingsPage`, `ProfileEditPage`
 
-| Property | Value |
-|----------|-------|
-| PageShell size | `sm` to `md` |
-| PageHeader | Back button + title ("Create Course" / "Edit Profile") |
-| Content | Card-wrapped form sections with field groups |
-| Actions | Sticky bottom action bar (Cancel + Submit) |
+| Property       | Value                                                  |
+| -------------- | ------------------------------------------------------ |
+| PageShell size | `sm` to `md`                                           |
+| PageHeader     | Back button + title ("Create Course" / "Edit Profile") |
+| Content        | Card-wrapped form sections with field groups           |
+| Actions        | Sticky bottom action bar (Cancel + Submit)             |
 
 ```
 PageShell (sm–md)
@@ -163,12 +163,12 @@ PageShell (sm–md)
 > Long-form rich text, marketing, and informational pages.
 > Examples: `CompliancePage`, `TermsOfServicePage`, `BlogPostPage`
 
-| Property | Value |
-|----------|-------|
-| PageShell size | `lg` |
-| PageHeader | Title + optional subtitle + published date |
-| Content | Prose content with consistent typographic scale |
-| Navigation | Optional table of contents sidebar (sticky) |
+| Property       | Value                                           |
+| -------------- | ----------------------------------------------- |
+| PageShell size | `lg`                                            |
+| PageHeader     | Title + optional subtitle + published date      |
+| Content        | Prose content with consistent typographic scale |
+| Navigation     | Optional table of contents sidebar (sticky)     |
 
 ```
 PageShell (lg)
@@ -185,12 +185,12 @@ PageShell (lg)
 > Full-width builder interfaces with tool palettes and canvases.
 > Examples: `QuizBuilderPage`, `PortalBuilderPage`, `PipelineEditorPage`
 
-| Property | Value |
-|----------|-------|
-| PageShell size | `full` |
-| PageHeader | Compact (entity name + save status + action buttons) |
-| Content | Sidebar tool palette + main canvas + optional properties panel |
-| Scrolling | Canvas scrolls independently; palettes are fixed |
+| Property       | Value                                                          |
+| -------------- | -------------------------------------------------------------- |
+| PageShell size | `full`                                                         |
+| PageHeader     | Compact (entity name + save status + action buttons)           |
+| Content        | Sidebar tool palette + main canvas + optional properties panel |
+| Scrolling      | Canvas scrolls independently; palettes are fixed               |
 
 ```
 PageShell (full)
@@ -297,21 +297,21 @@ All colors in the application are expressed as CSS custom properties defined in
 `:root` (light) and `.dark` (dark). Components reference these tokens — never raw
 Tailwind palette values.
 
-| Token | Light Value | Dark Value | Usage |
-|-------|------------|------------|-------|
-| `--background` | white | slate-950 | Page background |
-| `--foreground` | slate-950 | slate-50 | Primary text |
-| `--muted` | slate-100 | slate-800 | Muted backgrounds |
-| `--muted-foreground` | slate-500 | slate-400 | Secondary text |
-| `--card` | white | slate-900 | Card backgrounds |
-| `--card-foreground` | slate-950 | slate-50 | Card text |
-| `--border` | slate-200 | slate-800 | Borders |
-| `--input` | slate-200 | slate-800 | Input borders |
-| `--primary` | indigo-600 | indigo-400 | Primary actions |
-| `--primary-foreground` | white | slate-950 | Text on primary |
-| `--destructive` | red-600 | red-400 | Destructive actions |
-| `--accent` | slate-100 | slate-800 | Hover / focus backgrounds |
-| `--ring` | indigo-600 | indigo-400 | Focus ring |
+| Token                  | Light Value | Dark Value | Usage                     |
+| ---------------------- | ----------- | ---------- | ------------------------- |
+| `--background`         | white       | slate-950  | Page background           |
+| `--foreground`         | slate-950   | slate-50   | Primary text              |
+| `--muted`              | slate-100   | slate-800  | Muted backgrounds         |
+| `--muted-foreground`   | slate-500   | slate-400  | Secondary text            |
+| `--card`               | white       | slate-900  | Card backgrounds          |
+| `--card-foreground`    | slate-950   | slate-50   | Card text                 |
+| `--border`             | slate-200   | slate-800  | Borders                   |
+| `--input`              | slate-200   | slate-800  | Input borders             |
+| `--primary`            | indigo-600  | indigo-400 | Primary actions           |
+| `--primary-foreground` | white       | slate-950  | Text on primary           |
+| `--destructive`        | red-600     | red-400    | Destructive actions       |
+| `--accent`             | slate-100   | slate-800  | Hover / focus backgrounds |
+| `--ring`               | indigo-600  | indigo-400 | Focus ring                |
 
 ### Rules
 
@@ -343,34 +343,34 @@ Tailwind palette values.
 
 ### PageShell Sizes
 
-| Size | Tailwind Class | Max Width | Use For |
-|------|---------------|-----------|---------|
-| `sm` | `max-w-2xl` | 672px | Forms, narrow content, login |
-| `md` | `max-w-4xl` | 896px | Standard pages, detail views |
-| `lg` | `max-w-5xl` | 1024px | Content pages, marketing |
-| `xl` | `max-w-6xl` | 1152px | Dense list pages |
-| `2xl` | `max-w-7xl` | 1280px | Dashboards, wide layouts |
-| `full` | (none) | 100% | Editors, builders |
+| Size   | Tailwind Class | Max Width | Use For                      |
+| ------ | -------------- | --------- | ---------------------------- |
+| `sm`   | `max-w-2xl`    | 672px     | Forms, narrow content, login |
+| `md`   | `max-w-4xl`    | 896px     | Standard pages, detail views |
+| `lg`   | `max-w-5xl`    | 1024px    | Content pages, marketing     |
+| `xl`   | `max-w-6xl`    | 1152px    | Dense list pages             |
+| `2xl`  | `max-w-7xl`    | 1280px    | Dashboards, wide layouts     |
+| `full` | (none)         | 100%      | Editors, builders            |
 
 All non-`full` sizes include: `mx-auto px-4 sm:px-6 lg:px-8`.
 
 ### Vertical Spacing
 
-| Density | Tailwind Class | Between Sections | Use For |
-|---------|---------------|------------------|---------|
-| `compact` | `space-y-4` | 16px | Dense data pages, admin tables |
-| `normal` | `space-y-6` | 24px | Standard pages (default) |
-| `relaxed` | `space-y-8` | 32px | Content pages, marketing, forms |
+| Density   | Tailwind Class | Between Sections | Use For                         |
+| --------- | -------------- | ---------------- | ------------------------------- |
+| `compact` | `space-y-4`    | 16px             | Dense data pages, admin tables  |
+| `normal`  | `space-y-6`    | 24px             | Standard pages (default)        |
+| `relaxed` | `space-y-8`    | 32px             | Content pages, marketing, forms |
 
 ### Standard Spacing Values
 
-| Use | Value | Tailwind |
-|-----|-------|----------|
-| Inline element gap | 8px | `gap-2` |
-| Card internal padding | 16px–24px | `p-4` to `p-6` |
-| Section gap | 24px–32px | `space-y-6` to `space-y-8` |
-| Page top padding | 24px–32px | `pt-6` to `pt-8` |
-| Page bottom padding | 48px | `pb-12` |
+| Use                   | Value     | Tailwind                   |
+| --------------------- | --------- | -------------------------- |
+| Inline element gap    | 8px       | `gap-2`                    |
+| Card internal padding | 16px–24px | `p-4` to `p-6`             |
+| Section gap           | 24px–32px | `space-y-6` to `space-y-8` |
+| Page top padding      | 24px–32px | `pt-6` to `pt-8`           |
+| Page bottom padding   | 48px      | `pb-12`                    |
 
 ---
 
@@ -379,12 +379,12 @@ All non-`full` sizes include: `mx-auto px-4 sm:px-6 lg:px-8`.
 Correct heading hierarchy is both an accessibility requirement (WCAG 1.3.1) and a
 design system rule.
 
-| Level | Component | Typical Styling | Usage |
-|-------|-----------|----------------|-------|
-| `<h1>` | `PageHeader` | `text-2xl font-bold tracking-tight` | Page title. Exactly ONE per page. |
-| `<h2>` | `SectionHeader` | `text-lg font-semibold` | Major content sections within the page. |
-| `<h3>` | `SectionHeader level="h3"` | `text-base font-semibold` | Sub-sections within an `<h2>` block. |
-| `<h4>` | Manual | `text-sm font-semibold` | Rare; use inside complex cards or accordions. |
+| Level  | Component                  | Typical Styling                     | Usage                                         |
+| ------ | -------------------------- | ----------------------------------- | --------------------------------------------- |
+| `<h1>` | `PageHeader`               | `text-2xl font-bold tracking-tight` | Page title. Exactly ONE per page.             |
+| `<h2>` | `SectionHeader`            | `text-lg font-semibold`             | Major content sections within the page.       |
+| `<h3>` | `SectionHeader level="h3"` | `text-base font-semibold`           | Sub-sections within an `<h2>` block.          |
+| `<h4>` | Manual                     | `text-sm font-semibold`             | Rare; use inside complex cards or accordions. |
 
 ### Rules
 
@@ -400,16 +400,16 @@ design system rule.
 
 ### When Breadcrumbs Are Required
 
-| Route Pattern | Required | Example |
-|--------------|----------|---------|
-| `/courses/:id` | Yes | Home > Courses > Introduction to AI |
-| `/courses/:id/lessons/:id` | Yes | Home > Courses > Intro to AI > Lesson 3 |
-| `/admin/*` | Yes | Home > Admin > User Management |
-| `/settings/*` | Yes | Home > Settings > Notifications |
-| `/discussions/:id` | Yes | Home > Discussions > Thread Title |
-| `/` (landing) | No | — |
-| `/courses` (top-level list) | No | — |
-| `/dashboard` | No | — |
+| Route Pattern               | Required | Example                                 |
+| --------------------------- | -------- | --------------------------------------- |
+| `/courses/:id`              | Yes      | Home > Courses > Introduction to AI     |
+| `/courses/:id/lessons/:id`  | Yes      | Home > Courses > Intro to AI > Lesson 3 |
+| `/admin/*`                  | Yes      | Home > Admin > User Management          |
+| `/settings/*`               | Yes      | Home > Settings > Notifications         |
+| `/discussions/:id`          | Yes      | Home > Discussions > Thread Title       |
+| `/` (landing)               | No       | —                                       |
+| `/courses` (top-level list) | No       | —                                       |
+| `/dashboard`                | No       | —                                       |
 
 ### Format
 
@@ -446,14 +446,14 @@ the theme provider (persisted in `localStorage`).
 
 ```css
 :root {
-  --background: 0 0% 100%;        /* white */
-  --foreground: 222.2 84% 4.9%;   /* slate-950 */
+  --background: 0 0% 100%; /* white */
+  --foreground: 222.2 84% 4.9%; /* slate-950 */
   /* ... all tokens ... */
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;   /* slate-950 */
-  --foreground: 210 40% 98%;      /* slate-50 */
+  --background: 222.2 84% 4.9%; /* slate-950 */
+  --foreground: 210 40% 98%; /* slate-50 */
   /* ... all tokens ... */
 }
 ```
@@ -480,21 +480,21 @@ the theme provider (persisted in `localStorage`).
 
 ### Mandatory Requirements
 
-| Requirement | WCAG Criterion | Implementation |
-|-------------|---------------|----------------|
-| Skip link | 2.4.1 | Every layout wrapper renders `<a href="#main-content" class="sr-only focus:not-sr-only">Skip to main content</a>` as the first focusable element. |
-| Landmarks | 1.3.1 | Every page has `<nav>`, `<main>`, and `<footer>` landmarks. Sidebar nav uses `<nav aria-label="Main navigation">`. |
-| Focus visible | 2.4.7 | 2px ring using `ring-2 ring-ring ring-offset-2`. Focus ring must not be obscured by sticky headers (`z-index` management). |
-| Target size | 2.5.8 | All interactive elements have a minimum 24x24px touch target. Compact table rows use padding to meet this. |
-| Heading hierarchy | 1.3.1 | No skipped heading levels. Enforced by automated test. |
-| Breadcrumbs | 2.4.8 | `<nav aria-label="Breadcrumb">` with `<ol>` structure. Current page marked with `aria-current="page"`. |
-| Page title | 2.4.2 | Unique `<title>` per route, set via `PageMeta` component or `document.title` in `useEffect`. |
-| Color contrast | 1.4.3 / 1.4.6 | Text: 4.5:1 ratio minimum. Large text (18px+ or 14px+ bold): 3:1 ratio minimum. |
-| Non-text contrast | 1.4.11 | UI components and graphical objects: 3:1 ratio against adjacent colors. |
-| Reflow | 1.4.10 | Content readable at 320px width without horizontal scrolling. |
-| Alt text | 1.1.1 | All `<img>` elements have descriptive `alt` text. Decorative images use `alt=""`. |
-| Form labels | 1.3.1 / 3.3.2 | Every form input has a visible `<label>` or `aria-label`. |
-| Error identification | 3.3.1 | Form errors are announced to screen readers and visually indicated with color + icon. |
+| Requirement          | WCAG Criterion | Implementation                                                                                                                                    |
+| -------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skip link            | 2.4.1          | Every layout wrapper renders `<a href="#main-content" class="sr-only focus:not-sr-only">Skip to main content</a>` as the first focusable element. |
+| Landmarks            | 1.3.1          | Every page has `<nav>`, `<main>`, and `<footer>` landmarks. Sidebar nav uses `<nav aria-label="Main navigation">`.                                |
+| Focus visible        | 2.4.7          | 2px ring using `ring-2 ring-ring ring-offset-2`. Focus ring must not be obscured by sticky headers (`z-index` management).                        |
+| Target size          | 2.5.8          | All interactive elements have a minimum 24x24px touch target. Compact table rows use padding to meet this.                                        |
+| Heading hierarchy    | 1.3.1          | No skipped heading levels. Enforced by automated test.                                                                                            |
+| Breadcrumbs          | 2.4.8          | `<nav aria-label="Breadcrumb">` with `<ol>` structure. Current page marked with `aria-current="page"`.                                            |
+| Page title           | 2.4.2          | Unique `<title>` per route, set via `PageMeta` component or `document.title` in `useEffect`.                                                      |
+| Color contrast       | 1.4.3 / 1.4.6  | Text: 4.5:1 ratio minimum. Large text (18px+ or 14px+ bold): 3:1 ratio minimum.                                                                   |
+| Non-text contrast    | 1.4.11         | UI components and graphical objects: 3:1 ratio against adjacent colors.                                                                           |
+| Reflow               | 1.4.10         | Content readable at 320px width without horizontal scrolling.                                                                                     |
+| Alt text             | 1.1.1          | All `<img>` elements have descriptive `alt` text. Decorative images use `alt=""`.                                                                 |
+| Form labels          | 1.3.1 / 3.3.2  | Every form input has a visible `<label>` or `aria-label`.                                                                                         |
+| Error identification | 3.3.1          | Form errors are announced to screen readers and visually indicated with color + icon.                                                             |
 
 ### Automated Testing
 
@@ -507,25 +507,25 @@ the theme provider (persisted in `localStorage`).
 
 ## Appendix A: File Locations
 
-| Artifact | Path |
-|----------|------|
-| Theme CSS variables | `apps/web/src/index.css` |
-| PageShell component | `apps/web/src/components/ui/page-shell.tsx` |
-| PageHeader component | `apps/web/src/components/ui/page-header.tsx` |
-| SectionHeader component | `apps/web/src/components/ui/section-header.tsx` |
-| Breadcrumbs component | `apps/web/src/components/ui/breadcrumbs.tsx` |
-| PublicLayout | `apps/web/src/layouts/PublicLayout.tsx` |
-| Layout (auth) | `apps/web/src/layouts/Layout.tsx` |
-| AdminLayout | `apps/web/src/layouts/AdminLayout.tsx` |
+| Artifact                | Path                                               |
+| ----------------------- | -------------------------------------------------- |
+| Theme CSS variables     | `apps/web/src/index.css`                           |
+| PageShell component     | `apps/web/src/components/ui/page-shell.tsx`        |
+| PageHeader component    | `apps/web/src/components/ui/page-header.tsx`       |
+| SectionHeader component | `apps/web/src/components/ui/section-header.tsx`    |
+| Breadcrumbs component   | `apps/web/src/components/ui/breadcrumbs.tsx`       |
+| PublicLayout            | `apps/web/src/layouts/PublicLayout.tsx`            |
+| Layout (auth)           | `apps/web/src/layouts/Layout.tsx`                  |
+| AdminLayout             | `apps/web/src/layouts/AdminLayout.tsx`             |
 | ESLint no-orphan-colors | `packages/eslint-config/rules/no-orphan-colors.js` |
-| Design System docs | `docs/design-system/` |
+| Design System docs      | `docs/design-system/`                              |
 
 ## Appendix B: Decision Log
 
-| Decision | Rationale | Date |
-|----------|-----------|------|
-| Linear-style app shell over top-nav | Sidebar scales better for 30+ nav items across roles; collapsible preserves screen space | 2026-03-16 |
-| Six templates (not fewer) | EditorPage and ContentPage have fundamentally different layout needs from ListPage/DetailPage | 2026-03-16 |
-| Semantic tokens over raw Tailwind | Enables multi-tenant theming + dark mode with a single token swap | 2026-03-16 |
-| PageHeader owns the H1 | Prevents duplicate or missing H1 — single enforcement point | 2026-03-16 |
-| Relay cursor pagination | Matches GraphQL Federation pagination spec (API Contracts) | 2026-03-16 |
+| Decision                            | Rationale                                                                                     | Date       |
+| ----------------------------------- | --------------------------------------------------------------------------------------------- | ---------- |
+| Linear-style app shell over top-nav | Sidebar scales better for 30+ nav items across roles; collapsible preserves screen space      | 2026-03-16 |
+| Six templates (not fewer)           | EditorPage and ContentPage have fundamentally different layout needs from ListPage/DetailPage | 2026-03-16 |
+| Semantic tokens over raw Tailwind   | Enables multi-tenant theming + dark mode with a single token swap                             | 2026-03-16 |
+| PageHeader owns the H1              | Prevents duplicate or missing H1 — single enforcement point                                   | 2026-03-16 |
+| Relay cursor pagination             | Matches GraphQL Federation pagination spec (API Contracts)                                    | 2026-03-16 |

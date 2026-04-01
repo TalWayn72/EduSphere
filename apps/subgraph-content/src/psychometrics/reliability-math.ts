@@ -19,9 +19,7 @@ export function computeKR20FromMatrix(matrix: number[][]): number {
   const k = matrix[0]!.length;
   if (k <= 1) return 0;
 
-  const totalScores = matrix.map((row) =>
-    row.reduce((s, v) => s + v, 0),
-  );
+  const totalScores = matrix.map((row) => row.reduce((s, v) => s + v, 0));
   const sigmaTotal = variance(totalScores);
   if (sigmaTotal === 0) return 0;
 
@@ -41,9 +39,7 @@ export function computeAlphaFromMatrix(matrix: number[][]): number {
   const k = matrix[0]!.length;
   if (k <= 1) return 0;
 
-  const totalScores = matrix.map((row) =>
-    row.reduce((s, v) => s + v, 0),
-  );
+  const totalScores = matrix.map((row) => row.reduce((s, v) => s + v, 0));
   const sigmaTotal = variance(totalScores);
   if (sigmaTotal === 0) return 0;
 

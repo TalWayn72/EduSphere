@@ -20,7 +20,9 @@ vi.mock('urql', async (importOriginal) => {
 // ─── Mock @/lib/webPush ────────────────────────────────────────────────────
 
 vi.mock('@/lib/webPush', () => ({
-  subscribeWebPush: vi.fn().mockResolvedValue('{"endpoint":"https://fcm.example.com"}'),
+  subscribeWebPush: vi
+    .fn()
+    .mockResolvedValue('{"endpoint":"https://fcm.example.com"}'),
   unsubscribeWebPush: vi.fn().mockResolvedValue(true),
 }));
 
@@ -78,10 +80,14 @@ describe('usePushNotifications', () => {
     mockRegisterToken.mockResolvedValue({
       data: { registerPushToken: { id: '1', platform: 'WEB', createdAt: '' } },
     });
-    mockUnregisterToken.mockResolvedValue({ data: { unregisterPushToken: true } });
+    mockUnregisterToken.mockResolvedValue({
+      data: { unregisterPushToken: true },
+    });
     setupServiceWorker(null);
     setupUrqlMutations();
-    vi.mocked(subscribeWebPush).mockResolvedValue('{"endpoint":"https://fcm.example.com"}');
+    vi.mocked(subscribeWebPush).mockResolvedValue(
+      '{"endpoint":"https://fcm.example.com"}'
+    );
     vi.mocked(unsubscribeWebPush).mockResolvedValue(true);
   });
 
@@ -93,20 +99,26 @@ describe('usePushNotifications', () => {
     setupServiceWorker(null);
     const { result } = renderHook(() => usePushNotifications());
     expect(result.current.isEnabled).toBe(false);
-    await act(async () => { await Promise.resolve(); });
+    await act(async () => {
+      await Promise.resolve();
+    });
     expect(result.current.isEnabled).toBe(false);
   });
 
   it('sets isEnabled=true when an existing subscription is found on mount', async () => {
     setupServiceWorker({ endpoint: 'https://fcm.example.com' });
     const { result } = renderHook(() => usePushNotifications());
-    await act(async () => { await Promise.resolve(); });
+    await act(async () => {
+      await Promise.resolve();
+    });
     expect(result.current.isEnabled).toBe(true);
   });
 
   it('enable() calls subscribeWebPush + registerToken mutation and sets isEnabled=true', async () => {
     const { result } = renderHook(() => usePushNotifications());
-    await act(async () => { await result.current.enable(); });
+    await act(async () => {
+      await result.current.enable();
+    });
     expect(subscribeWebPush).toHaveBeenCalledOnce();
     expect(mockRegisterToken).toHaveBeenCalledWith({
       platform: 'WEB',
@@ -118,7 +130,9 @@ describe('usePushNotifications', () => {
   it('enable() does NOT set isEnabled when subscribeWebPush returns null (denied)', async () => {
     vi.mocked(subscribeWebPush).mockResolvedValue(null);
     const { result } = renderHook(() => usePushNotifications());
-    await act(async () => { await result.current.enable(); });
+    await act(async () => {
+      await result.current.enable();
+    });
     expect(result.current.isEnabled).toBe(false);
     expect(mockRegisterToken).not.toHaveBeenCalled();
   });
@@ -126,9 +140,13 @@ describe('usePushNotifications', () => {
   it('disable() calls unsubscribeWebPush + unregisterToken mutation and sets isEnabled=false', async () => {
     setupServiceWorker({ endpoint: 'https://fcm.example.com' });
     const { result } = renderHook(() => usePushNotifications());
-    await act(async () => { await Promise.resolve(); }); // let mount checkStatus run
+    await act(async () => {
+      await Promise.resolve();
+    }); // let mount checkStatus run
 
-    await act(async () => { await result.current.disable(); });
+    await act(async () => {
+      await result.current.disable();
+    });
     expect(unsubscribeWebPush).toHaveBeenCalledOnce();
     expect(mockUnregisterToken).toHaveBeenCalledWith({ platform: 'WEB' });
     expect(result.current.isEnabled).toBe(false);
@@ -137,12 +155,16 @@ describe('usePushNotifications', () => {
   it('isLoading is true during enable() and false after', async () => {
     let resolveSubscribe!: (v: string) => void;
     vi.mocked(subscribeWebPush).mockReturnValue(
-      new Promise((res) => { resolveSubscribe = res; })
+      new Promise((res) => {
+        resolveSubscribe = res;
+      })
     );
 
     const { result } = renderHook(() => usePushNotifications());
     let enablePromise!: Promise<void>;
-    act(() => { enablePromise = result.current.enable(); });
+    act(() => {
+      enablePromise = result.current.enable();
+    });
 
     expect(result.current.isLoading).toBe(true);
 
@@ -155,7 +177,11 @@ describe('usePushNotifications', () => {
 
   it('memory safety: unmounting before checkStatus resolves does not setState', async () => {
     let resolveGetSub!: (v: null) => void;
-    mockGetSubscription.mockReturnValue(new Promise((res) => { resolveGetSub = res; }));
+    mockGetSubscription.mockReturnValue(
+      new Promise((res) => {
+        resolveGetSub = res;
+      })
+    );
 
     const { unmount } = renderHook(() => usePushNotifications());
     unmount(); // unmount while async checkStatus is still pending

@@ -52,10 +52,12 @@ export class DocumentParserService {
   async parsePdf(buffer: Buffer): Promise<ParseResult> {
     // pdf-parse v2.4.5 exports `PDFParse` class (not a callable default).
     // Constructor accepts { data: Buffer } for in-memory PDFs.
-    const { PDFParse } = await import('pdf-parse') as { PDFParse: new (opts: { data: Buffer }) => {
-      getText(): Promise<{ text: string; total: number }>;
-      destroy(): Promise<void>;
-    }};
+    const { PDFParse } = (await import('pdf-parse')) as {
+      PDFParse: new (opts: { data: Buffer }) => {
+        getText(): Promise<{ text: string; total: number }>;
+        destroy(): Promise<void>;
+      };
+    };
     const parser = new PDFParse({ data: buffer });
     const result = await parser.getText();
     await parser.destroy();

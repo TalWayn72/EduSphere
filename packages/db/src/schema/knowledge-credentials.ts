@@ -42,14 +42,19 @@ export const chavrutaPartnerSessions = pgTable(
     // PENDING | ACTIVE | COMPLETED | DECLINED
     status: varchar('status', { length: 20 }).notNull().default('PENDING'),
     agentSessionId: uuid('agent_session_id'),
-    initiatedAt: timestamp('initiated_at', { withTimezone: true }).notNull().defaultNow(),
+    initiatedAt: timestamp('initiated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     startedAt: timestamp('started_at', { withTimezone: true }),
     completedAt: timestamp('completed_at', { withTimezone: true }),
   },
   (t) => [
     index('idx_chavruta_partner_sessions_initiator').on(t.initiatorId),
     index('idx_chavruta_partner_sessions_partner').on(t.partnerId),
-    index('idx_chavruta_partner_sessions_tenant_status').on(t.tenantId, t.status),
+    index('idx_chavruta_partner_sessions_tenant_status').on(
+      t.tenantId,
+      t.status
+    ),
     pgPolicy('chavruta_partner_sessions_tenant_isolation', {
       using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
@@ -87,7 +92,9 @@ export const knowledgePathCredentials = pgTable(
     coverageScore: real('coverage_score').notNull().default(0),
     // minimum mastery required per concept
     masteryThreshold: real('mastery_threshold').notNull().default(0.7),
-    verifiedAt: timestamp('verified_at', { withTimezone: true }).notNull().defaultNow(),
+    verifiedAt: timestamp('verified_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     metadata: jsonb('metadata').notNull().default({}),
   },
   (t) => [
@@ -110,8 +117,12 @@ export const knowledgePathCredentials = pgTable(
 // Inferred types
 // ---------------------------------------------------------------------------
 
-export type ChavrutaPartnerSession = typeof chavrutaPartnerSessions.$inferSelect;
-export type NewChavrutaPartnerSession = typeof chavrutaPartnerSessions.$inferInsert;
+export type ChavrutaPartnerSession =
+  typeof chavrutaPartnerSessions.$inferSelect;
+export type NewChavrutaPartnerSession =
+  typeof chavrutaPartnerSessions.$inferInsert;
 
-export type KnowledgePathCredential = typeof knowledgePathCredentials.$inferSelect;
-export type NewKnowledgePathCredential = typeof knowledgePathCredentials.$inferInsert;
+export type KnowledgePathCredential =
+  typeof knowledgePathCredentials.$inferSelect;
+export type NewKnowledgePathCredential =
+  typeof knowledgePathCredentials.$inferInsert;

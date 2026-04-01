@@ -61,7 +61,10 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   test('profile -- sidebar RTL position', async ({ page }) => {
     await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside'))
+      .first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
       await expect(sidebar).toHaveScreenshot('rtl-auth-profile-sidebar.png', {
         animations: 'disabled',
@@ -76,7 +79,9 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   // --- Notifications ---
 
   test('notifications -- full page RTL layout', async ({ page }) => {
-    await page.goto(`${BASE_URL}/notifications`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('rtl-auth-notifications-full.png', {
       ...LOOSE_OPTS,
@@ -85,7 +90,9 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   });
 
   test('notifications -- list RTL alignment', async ({ page }) => {
-    await page.goto(`${BASE_URL}/notifications`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     const main = page.locator('main').first();
     if (await main.isVisible({ timeout: 3000 }).catch(() => false)) {
@@ -102,13 +109,21 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   });
 
   test('notifications -- topbar RTL alignment', async ({ page }) => {
-    await page.goto(`${BASE_URL}/notifications`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
-    const topbar = page.getByTestId('topbar').or(page.locator('header')).first();
+    const topbar = page
+      .getByTestId('topbar')
+      .or(page.locator('header'))
+      .first();
     if (await topbar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(topbar).toHaveScreenshot('rtl-auth-notifications-topbar.png', {
-        animations: 'disabled',
-      });
+      await expect(topbar).toHaveScreenshot(
+        'rtl-auth-notifications-topbar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('rtl-auth-notifications-topbar.png', {
         animations: 'disabled',
@@ -119,39 +134,69 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   // --- Cross-page RTL consistency ---
 
   test('all auth pages -- consistent RTL sidebar', async ({ page }) => {
-    const pages = ['/dashboard', '/courses', '/search', '/profile', '/notifications'];
+    const pages = [
+      '/dashboard',
+      '/courses',
+      '/search',
+      '/profile',
+      '/notifications',
+    ];
     for (const path of pages) {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(500);
-      const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+      const sidebar = page
+        .getByTestId('app-sidebar')
+        .or(page.locator('aside'))
+        .first();
       const slug = path.replace('/', '');
       if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await expect(sidebar).toHaveScreenshot(`rtl-auth-consistency-sidebar-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(sidebar).toHaveScreenshot(
+          `rtl-auth-consistency-sidebar-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       } else {
-        await expect(page).toHaveScreenshot(`rtl-auth-consistency-sidebar-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(page).toHaveScreenshot(
+          `rtl-auth-consistency-sidebar-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       }
     }
   });
 
   test('all auth pages -- consistent RTL topbar', async ({ page }) => {
-    const pages = ['/dashboard', '/courses', '/search', '/profile', '/notifications'];
+    const pages = [
+      '/dashboard',
+      '/courses',
+      '/search',
+      '/profile',
+      '/notifications',
+    ];
     for (const path of pages) {
       await page.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(500);
-      const topbar = page.getByTestId('topbar').or(page.locator('header')).first();
+      const topbar = page
+        .getByTestId('topbar')
+        .or(page.locator('header'))
+        .first();
       const slug = path.replace('/', '');
       if (await topbar.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await expect(topbar).toHaveScreenshot(`rtl-auth-consistency-topbar-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(topbar).toHaveScreenshot(
+          `rtl-auth-consistency-topbar-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       } else {
-        await expect(page).toHaveScreenshot(`rtl-auth-consistency-topbar-${slug}.png`, {
-          animations: 'disabled',
-        });
+        await expect(page).toHaveScreenshot(
+          `rtl-auth-consistency-topbar-${slug}.png`,
+          {
+            animations: 'disabled',
+          }
+        );
       }
     }
   });
@@ -178,7 +223,10 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   test('courses -- topbar RTL alignment', async ({ page }) => {
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const topbar = page.getByTestId('topbar').or(page.locator('header')).first();
+    const topbar = page
+      .getByTestId('topbar')
+      .or(page.locator('header'))
+      .first();
     if (await topbar.isVisible({ timeout: 3000 }).catch(() => false)) {
       await expect(topbar).toHaveScreenshot('rtl-auth-courses-topbar.png', {
         animations: 'disabled',
@@ -193,7 +241,10 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   test('search -- sidebar RTL position', async ({ page }) => {
     await page.goto(`${BASE_URL}/search`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside'))
+      .first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
       await expect(sidebar).toHaveScreenshot('rtl-auth-search-sidebar.png', {
         animations: 'disabled',
@@ -206,24 +257,38 @@ test.describe('Visual RTL -- Authenticated Pages Part 2 @visual @rtl', () => {
   });
 
   test('notifications -- sidebar RTL position', async ({ page }) => {
-    await page.goto(`${BASE_URL}/notifications`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/notifications`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
-    const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside'))
+      .first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sidebar).toHaveScreenshot('rtl-auth-notifications-sidebar.png', {
-        animations: 'disabled',
-      });
+      await expect(sidebar).toHaveScreenshot(
+        'rtl-auth-notifications-sidebar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('rtl-auth-notifications-sidebar.png', {
-        animations: 'disabled',
-      });
+      await expect(page).toHaveScreenshot(
+        'rtl-auth-notifications-sidebar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     }
   });
 
   test('profile -- topbar RTL alignment', async ({ page }) => {
     await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const topbar = page.getByTestId('topbar').or(page.locator('header')).first();
+    const topbar = page
+      .getByTestId('topbar')
+      .or(page.locator('header'))
+      .first();
     if (await topbar.isVisible({ timeout: 3000 }).catch(() => false)) {
       await expect(topbar).toHaveScreenshot('rtl-auth-profile-topbar.png', {
         animations: 'disabled',

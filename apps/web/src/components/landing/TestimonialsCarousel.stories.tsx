@@ -32,7 +32,8 @@ export const StaticFirstSlide: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Shows the carousel in its initial state (first testimonial visible).',
+        story:
+          'Shows the carousel in its initial state (first testimonial visible).',
       },
     },
   },

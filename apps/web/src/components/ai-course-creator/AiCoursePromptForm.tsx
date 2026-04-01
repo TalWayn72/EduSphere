@@ -59,7 +59,9 @@ export function AiCoursePromptForm({
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">{t('aiCreator.audienceLevel')}</label>
+          <label className="text-sm font-medium">
+            {t('aiCreator.audienceLevel')}
+          </label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={level}
@@ -86,7 +88,9 @@ export function AiCoursePromptForm({
           />
         </div>
       </div>
-      {(needsConsent || isConsentError) && <RequirementLink variant="alert" returnTo={returnTo} />}
+      {(needsConsent || isConsentError) && (
+        <RequirementLink variant="alert" returnTo={returnTo} />
+      )}
       {errorMsg && !isConsentError && !needsConsent && (
         <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
           <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -109,7 +113,9 @@ export function AiCoursePromptForm({
         </Button>
         <Button
           onClick={onGenerate}
-          disabled={generating || !prompt.trim() || needsConsent || isConsentError}
+          disabled={
+            generating || !prompt.trim() || needsConsent || isConsentError
+          }
         >
           {generating ? (
             <ProgressStatus

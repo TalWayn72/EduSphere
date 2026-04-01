@@ -44,9 +44,7 @@ export class ProgramService implements OnModuleDestroy {
   private readonly logger = new Logger(ProgramService.name);
   private readonly db = createDatabaseConnection();
 
-  constructor(
-    private readonly enrollmentService: ProgramEnrollmentService
-  ) {}
+  constructor(private readonly enrollmentService: ProgramEnrollmentService) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
@@ -174,8 +172,16 @@ export class ProgramService implements OnModuleDestroy {
     return this.enrollmentService.getUserEnrollments(userId, tenantId);
   }
 
-  async getProgramProgress(programId: string, userId: string, tenantId: string) {
-    return this.enrollmentService.getProgramProgress(programId, userId, tenantId);
+  async getProgramProgress(
+    programId: string,
+    userId: string,
+    tenantId: string
+  ) {
+    return this.enrollmentService.getProgramProgress(
+      programId,
+      userId,
+      tenantId
+    );
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────

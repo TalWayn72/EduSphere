@@ -54,7 +54,7 @@ describe('MarketplacePayoutService', () => {
       'course-1',
       'instructor-1',
       10000, // $100.00
-      70,    // 70% split
+      70, // 70% split
       'tenant-1'
     );
 
@@ -70,7 +70,7 @@ describe('MarketplacePayoutService', () => {
       'course-2',
       'instructor-2',
       5000, // $50.00
-      80,   // 80% split → $40.00 to instructor
+      80, // 80% split → $40.00 to instructor
       'tenant-1'
     );
 

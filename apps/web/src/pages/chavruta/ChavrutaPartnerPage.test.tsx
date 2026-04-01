@@ -16,12 +16,16 @@ vi.mock('urql', () => ({
 
 // ── Layout mock ───────────────────────────────────────────────────────────────
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 import * as urql from 'urql';
 
-const EMPTY_QUERY_RESULT = [{ data: undefined, fetching: false, error: undefined }] as never;
+const EMPTY_QUERY_RESULT = [
+  { data: undefined, fetching: false, error: undefined },
+] as never;
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -33,7 +37,7 @@ function renderPage() {
   return render(
     <MemoryRouter>
       <ChavrutaPartnerPage />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -45,7 +49,9 @@ describe('ChavrutaPartnerPage', () => {
 
   it('renders the course ID input', () => {
     renderPage();
-    expect(screen.getByPlaceholderText('Enter course ID...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Enter course ID...')
+    ).toBeInTheDocument();
   });
 
   it('renders partner cards when query returns matches', () => {
@@ -73,7 +79,9 @@ describe('ChavrutaPartnerPage', () => {
     expect(screen.getByText('Alice Cohen')).toBeInTheDocument();
     expect(screen.getByText('87% match')).toBeInTheDocument();
     expect(screen.getByText('Epistemology')).toBeInTheDocument();
-    expect(screen.getByText('Complementary viewpoints on philosophy')).toBeInTheDocument();
+    expect(
+      screen.getByText('Complementary viewpoints on philosophy')
+    ).toBeInTheDocument();
   });
 
   it('renders Request Session button for each partner', () => {
@@ -99,7 +107,9 @@ describe('ChavrutaPartnerPage', () => {
     renderPage();
 
     expect(
-      screen.getByRole('button', { name: /Request Chavruta session with Bob Levi/i }),
+      screen.getByRole('button', {
+        name: /Request Chavruta session with Bob Levi/i,
+      })
     ).toBeInTheDocument();
   });
 
@@ -125,7 +135,7 @@ describe('ChavrutaPartnerPage', () => {
     renderPage();
 
     expect(
-      screen.getByText('Failed to load partners. Please try again.'),
+      screen.getByText('Failed to load partners. Please try again.')
     ).toBeInTheDocument();
     // Confirm raw error message is NOT shown to user
     expect(screen.queryByText('Network error')).not.toBeInTheDocument();
@@ -142,8 +152,6 @@ describe('ChavrutaPartnerPage', () => {
 
     renderPage();
 
-    expect(
-      screen.queryByText(/\[urql\]/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/\[urql\]/)).not.toBeInTheDocument();
   });
 });

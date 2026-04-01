@@ -63,7 +63,9 @@ describe('UserSearchPage', () => {
     renderPage();
     const input = screen.getByPlaceholderText(/Search people/i);
     fireEvent.change(input, { target: { value: 'Ali' } });
-    expect(screen.queryByText(/at least 3 characters/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/at least 3 characters/i)
+    ).not.toBeInTheDocument();
   });
 
   it('renders search results when data available', () => {

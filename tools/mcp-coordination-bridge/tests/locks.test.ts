@@ -74,7 +74,7 @@ describe('expired lock cleanup', () => {
   it('cleans up expired locks on acquire', () => {
     const pastExpiry = Date.now() / 1000 - 10;
     db.prepare(
-      'INSERT INTO locks (path, agent_id, acquired_at, expires_at) VALUES (?, ?, ?, ?)',
+      'INSERT INTO locks (path, agent_id, acquired_at, expires_at) VALUES (?, ?, ?, ?)'
     ).run('expired.ts', 'old-agent', pastExpiry - 100, pastExpiry);
 
     const result = acquireLock('expired.ts', 'new-agent');
@@ -85,7 +85,7 @@ describe('expired lock cleanup', () => {
   it('cleans up expired locks on checkLock', () => {
     const pastExpiry = Date.now() / 1000 - 10;
     db.prepare(
-      'INSERT INTO locks (path, agent_id, acquired_at, expires_at) VALUES (?, ?, ?, ?)',
+      'INSERT INTO locks (path, agent_id, acquired_at, expires_at) VALUES (?, ?, ?, ?)'
     ).run('expired2.ts', 'old-agent', pastExpiry - 100, pastExpiry);
 
     expect(checkLock('expired2.ts').locked).toBe(false);

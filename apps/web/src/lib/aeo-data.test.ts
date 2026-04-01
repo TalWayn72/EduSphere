@@ -66,7 +66,12 @@ describe('GLOSSARY_TERMS', () => {
   });
 
   it('categories are from a valid set', () => {
-    const validCategories = ['AI & Technology', 'Pedagogy', 'Standards', 'Technical'];
+    const validCategories = [
+      'AI & Technology',
+      'Pedagogy',
+      'Standards',
+      'Technical',
+    ];
     GLOSSARY_TERMS.forEach((term) => {
       expect(validCategories).toContain(term.category);
     });

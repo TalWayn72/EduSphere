@@ -92,12 +92,15 @@ export function ComplianceLibraryPage() {
     <PageShell size="xl" className="p-6">
       <header className="mb-8">
         <div className="flex items-center gap-3">
-          <ShieldCheck className="h-8 w-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <ShieldCheck
+            className="h-8 w-8 text-indigo-600 dark:text-indigo-400"
+            aria-hidden="true"
+          />
           <div>
             <h1 className="text-2xl font-bold">Compliance Course Library</h1>
             <p className="text-muted-foreground mt-1">
-              Pre-built, ready-to-deploy compliance courses. Click &ldquo;Add to my
-              org&rdquo; to customize.
+              Pre-built, ready-to-deploy compliance courses. Click &ldquo;Add to
+              my org&rdquo; to customize.
             </p>
           </div>
         </div>
@@ -139,7 +142,8 @@ export function ComplianceLibraryPage() {
                     <span
                       key={tag}
                       className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        INDUSTRY_BADGE_COLORS[tag] ?? 'bg-gray-100 text-gray-700'
+                        INDUSTRY_BADGE_COLORS[tag] ??
+                        'bg-gray-100 text-gray-700'
                       }`}
                     >
                       {tag}

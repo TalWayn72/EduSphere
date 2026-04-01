@@ -37,8 +37,12 @@ export const contentItems = pgTable('content_items', {
   fileId: uuid('file_id'),
   duration: integer('duration'),
   orderIndex: integer('order_index').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const contentItemsRLS = sql`

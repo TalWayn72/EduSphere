@@ -52,45 +52,87 @@ describe('SortablePipelineNode', () => {
 
   it('renders with correct testid', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={3} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={3}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     expect(screen.getByTestId('pipeline-node-ASR')).toBeInTheDocument();
   });
 
   it('shows Hebrew label', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={3} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={3}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     expect(screen.getByText('תמלול')).toBeInTheDocument();
   });
 
   it('shows English label', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={3} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={3}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     expect(screen.getByText('Transcription (ASR)')).toBeInTheDocument();
   });
 
   it('displays 1-based index number', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={2} total={5} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={2}
+        total={5}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
   it('has correct aria-label with module position', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={1} total={4} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={1}
+        total={4}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     expect(screen.getByTestId('pipeline-node-ASR')).toHaveAttribute(
       'aria-label',
-      'תמלול — מודול 2 מתוך 4',
+      'תמלול — מודול 2 מתוך 4'
     );
   });
 
   it('has role=listitem and aria-roledescription=sortable', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={1} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={1}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     const el = screen.getByTestId('pipeline-node-ASR');
     expect(el).toHaveAttribute('role', 'listitem');
@@ -99,7 +141,14 @@ describe('SortablePipelineNode', () => {
 
   it('calls onSelect when label clicked', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={1} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={1}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     fireEvent.click(screen.getByLabelText('הגדרות תמלול'));
     expect(onSelect).toHaveBeenCalledTimes(1);
@@ -107,7 +156,14 @@ describe('SortablePipelineNode', () => {
 
   it('calls onRemove when remove button clicked', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={1} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={1}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     fireEvent.click(screen.getByLabelText('הסר תמלול'));
     expect(onRemove).toHaveBeenCalledTimes(1);
@@ -115,14 +171,28 @@ describe('SortablePipelineNode', () => {
 
   it('drag handle has correct aria-label', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={1} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={1}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     expect(screen.getByLabelText('גרור תמלול')).toBeInTheDocument();
   });
 
   it('applies selected border class when isSelected', () => {
     render(
-      <SortablePipelineNode node={NODE} idx={0} total={1} isSelected={true} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={NODE}
+        idx={0}
+        total={1}
+        isSelected={true}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     const node = screen.getByTestId('pipeline-node-ASR');
     expect(node.className).toContain('border-blue-500');
@@ -130,7 +200,14 @@ describe('SortablePipelineNode', () => {
 
   it('applies muted class when node is disabled', () => {
     render(
-      <SortablePipelineNode node={DISABLED_NODE} idx={0} total={1} isSelected={false} onSelect={onSelect} onRemove={onRemove} />,
+      <SortablePipelineNode
+        node={DISABLED_NODE}
+        idx={0}
+        total={1}
+        isSelected={false}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     );
     const node = screen.getByTestId('pipeline-node-ASR');
     expect(node.className).toContain('opacity-50');

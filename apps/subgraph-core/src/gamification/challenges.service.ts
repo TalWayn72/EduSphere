@@ -37,7 +37,10 @@ export class ChallengesService implements OnModuleDestroy {
     this.db = createDatabaseConnection();
   }
 
-  async getUserChallenges(userId: string, tenantId: string): Promise<UserChallenge[]> {
+  async getUserChallenges(
+    userId: string,
+    tenantId: string
+  ): Promise<UserChallenge[]> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
       const result = await tx.execute<{
@@ -111,7 +114,11 @@ export class ChallengesService implements OnModuleDestroy {
         `);
 
         const progress = progressResult.rows[0];
-        if (progress && !progress.completed && progress.current_value >= challenge.target_value) {
+        if (
+          progress &&
+          !progress.completed &&
+          progress.current_value >= challenge.target_value
+        ) {
           await tx.execute(sql`
             UPDATE user_challenge_progress
             SET completed = true, completed_at = NOW()

@@ -62,7 +62,12 @@ type CourseGenStateType = typeof CourseGenState.State;
 
 // ── BUG-095: Auto-select fastest available Ollama model ──────────────────────
 // Sorted by parameter size ascending — smaller models generate faster on CPU.
-const PREFERRED_MODELS = ['qwen2.5:0.5b', 'qwen2.5:1.5b', 'llama3.2:1b', 'llama3.2'];
+const PREFERRED_MODELS = [
+  'qwen2.5:0.5b',
+  'qwen2.5:1.5b',
+  'llama3.2:1b',
+  'llama3.2',
+];
 const FALLBACK_MODEL = 'llama3.2';
 
 /** Cache resolved model name to avoid repeated /api/tags calls. */
@@ -78,7 +83,7 @@ async function resolveOllamaModel(): Promise<string> {
       signal: AbortSignal.timeout(5000),
     });
     if (!resp.ok) return FALLBACK_MODEL;
-    const data = await resp.json() as { models?: { name: string }[] };
+    const data = (await resp.json()) as { models?: { name: string }[] };
     const available = new Set(data.models?.map((m) => m.name) ?? []);
     for (const candidate of PREFERRED_MODELS) {
       if (available.has(candidate) || available.has(`${candidate}:latest`)) {
@@ -102,7 +107,7 @@ const OLLAMA_FETCH_TIMEOUT_MS = 10 * 60 * 1000;
 
 async function generateViaOllama(
   systemPrompt: string,
-  userPrompt: string,
+  userPrompt: string
 ): Promise<GeneratedCourse> {
   const model = await resolveOllamaModel();
   const url = `${ollamaConfig.url}/api/chat`;
@@ -124,10 +129,12 @@ async function generateViaOllama(
   });
 
   if (!response.ok) {
-    throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Ollama API error: ${response.status} ${response.statusText}`
+    );
   }
 
-  const data = await response.json() as { message?: { content?: string } };
+  const data = (await response.json()) as { message?: { content?: string } };
   const content = data.message?.content;
   if (!content) {
     throw new Error('Ollama returned empty response');
@@ -141,9 +148,9 @@ async function generateViaOllama(
       if (!mod.contentItemTitles && Array.isArray(mod.content_items)) {
         mod.contentItemTitles = mod.content_items;
       } else if (!mod.contentItemTitles && Array.isArray(mod.lessons)) {
-        mod.contentItemTitles = (mod.lessons as Array<string | { title?: string }>).map(
-          (l) => (typeof l === 'string' ? l : l.title ?? '')
-        );
+        mod.contentItemTitles = (
+          mod.lessons as Array<string | { title?: string }>
+        ).map((l) => (typeof l === 'string' ? l : (l.title ?? '')));
       } else if (!mod.contentItemTitles && Array.isArray(mod.topics)) {
         mod.contentItemTitles = mod.topics;
       }

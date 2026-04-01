@@ -25,7 +25,12 @@ export interface ChatMsg {
 }
 
 // Re-export the tuple type derived from the mode array
-export type AgentModeId = 'chavruta' | 'quiz' | 'summarize' | 'research' | 'explain';
+export type AgentModeId =
+  | 'chavruta'
+  | 'quiz'
+  | 'summarize'
+  | 'research'
+  | 'explain';
 
 // Maps local mode id → GraphQL TemplateType enum value
 export const TEMPLATE_TYPE: Record<AgentModeId, string> = {

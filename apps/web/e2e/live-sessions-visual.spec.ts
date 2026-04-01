@@ -109,7 +109,7 @@ async function mockEmptySessions(page: Page): Promise<void> {
 /** Fulfill ListLiveSessions with given sessions, everything else continues */
 async function mockSessionsList(
   page: Page,
-  sessions: typeof SCHEDULED_SESSION[]
+  sessions: (typeof SCHEDULED_SESSION)[]
 ): Promise<void> {
   await mockGraphQL(page, (body) => {
     if (body.includes('ListLiveSessions') || body.includes('liveSessions')) {
@@ -143,7 +143,12 @@ async function mockSessionDetail(
     }
     // Mutations: return success
     if (body.includes('JoinLiveSession') || body.includes('EndLiveSession')) {
-      return { data: { joinLiveSession: { success: true }, endLiveSession: { success: true } } };
+      return {
+        data: {
+          joinLiveSession: { success: true },
+          endLiveSession: { success: true },
+        },
+      };
     }
     return { data: {} };
   });
@@ -363,11 +368,14 @@ test.describe('LiveSessionsPage — visual regression', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
-    await expect(page).toHaveScreenshot('live-sessions-upcoming-list-dark.png', {
-      fullPage: false,
-      threshold: 0.05,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'live-sessions-upcoming-list-dark.png',
+      {
+        fullPage: false,
+        threshold: 0.05,
+        animations: 'disabled',
+      }
+    );
   });
 });
 
@@ -397,14 +405,11 @@ test.describe('LiveSessionDetailPage — visual regression', () => {
       await expect(scheduledBadge).toBeVisible();
     }
 
-    await expect(page).toHaveScreenshot(
-      'live-session-detail-scheduled.png',
-      {
-        fullPage: false,
-        threshold: 0.05,
-        animations: 'disabled',
-      }
-    );
+    await expect(page).toHaveScreenshot('live-session-detail-scheduled.png', {
+      fullPage: false,
+      threshold: 0.05,
+      animations: 'disabled',
+    });
   });
 
   test('screenshot: LIVE state (pulsing indicator visible)', async ({

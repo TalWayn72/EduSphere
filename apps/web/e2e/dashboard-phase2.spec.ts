@@ -66,9 +66,9 @@ test.describe('Dashboard — Phase 2 redesign (widget presence)', () => {
 
   test('renders the mastery overview panel', async ({ page }) => {
     // Phase 2: MasteryOverview must carry data-testid="mastery-overview"
-    await expect(
-      page.locator('[data-testid="mastery-overview"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="mastery-overview"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('renders the page heading', async ({ page }) => {

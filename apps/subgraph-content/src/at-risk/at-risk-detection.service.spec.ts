@@ -66,7 +66,9 @@ function makeSelectChain(rows: unknown[]) {
   const limit = vi.fn().mockResolvedValue(rows);
   const where = vi.fn().mockReturnValue({ limit, then: undefined });
   const from = vi.fn().mockReturnValue({ where });
-  const innerJoin = vi.fn().mockReturnValue({ where, innerJoin: vi.fn().mockReturnValue({ where }) });
+  const innerJoin = vi
+    .fn()
+    .mockReturnValue({ where, innerJoin: vi.fn().mockReturnValue({ where }) });
   return { from, where, limit, innerJoin };
 }
 
@@ -112,21 +114,23 @@ describe('AtRiskDetectionService', () => {
       // Tenants
       const tenantChain = makeSelectChain([{ id: 't1' }]);
       // Enrollments (one active enrollment)
-      const enrollChain = makeSelectChainJoin([{
-        userId: 'u1',
-        courseId: 'c1',
-        enrolledAt: new Date('2025-01-01'),
-        estimatedHours: 10,
-      }]);
+      const enrollChain = makeSelectChainJoin([
+        {
+          userId: 'u1',
+          courseId: 'c1',
+          enrolledAt: new Date('2025-01-01'),
+          estimatedHours: 10,
+        },
+      ]);
       // progress rows — empty (no activity = high risk)
       const progressChain = makeSelectChainJoin([]);
       const quizChain = makeSelectChainJoin([]);
 
       mockTx.select
-        .mockReturnValueOnce({ from: tenantChain.from })  // tenants
-        .mockReturnValueOnce({ from: enrollChain.from })   // enrollments
+        .mockReturnValueOnce({ from: tenantChain.from }) // tenants
+        .mockReturnValueOnce({ from: enrollChain.from }) // enrollments
         .mockReturnValueOnce({ from: progressChain.from }) // progress
-        .mockReturnValueOnce({ from: quizChain.from });    // quizzes
+        .mockReturnValueOnce({ from: quizChain.from }); // quizzes
 
       mockFlagService.findActiveFlag.mockResolvedValue(null);
       mockFlagService.createFlag.mockResolvedValue(undefined);
@@ -135,17 +139,25 @@ describe('AtRiskDetectionService', () => {
       await service.runNightlyDetection();
 
       expect(mockFlagService.createFlag).toHaveBeenCalledWith(
-        'u1', 'c1', 't1', expect.any(Number), expect.any(Object),
+        'u1',
+        'c1',
+        't1',
+        expect.any(Number),
+        expect.any(Object)
       );
       expect(mockFlagService.publishFlagEvent).toHaveBeenCalled();
     });
 
     it('resolves flag when learner is no longer at-risk', async () => {
       const tenantChain = makeSelectChain([{ id: 't1' }]);
-      const enrollChain = makeSelectChainJoin([{
-        userId: 'u1', courseId: 'c1',
-        enrolledAt: new Date(), estimatedHours: 100,
-      }]);
+      const enrollChain = makeSelectChainJoin([
+        {
+          userId: 'u1',
+          courseId: 'c1',
+          enrolledAt: new Date(),
+          estimatedHours: 100,
+        },
+      ]);
       // Recent activity -> not at risk (daysSince = 0)
       const now = new Date();
       const progressChain = makeSelectChainJoin([
@@ -165,16 +177,21 @@ describe('AtRiskDetectionService', () => {
       await service.runNightlyDetection();
 
       expect(mockFlagService.resolveFlag).toHaveBeenCalledWith(
-        'flag-1', expect.any(Object),
+        'flag-1',
+        expect.any(Object)
       );
     });
 
     it('does nothing when risk status is unchanged', async () => {
       const tenantChain = makeSelectChain([{ id: 't1' }]);
-      const enrollChain = makeSelectChainJoin([{
-        userId: 'u1', courseId: 'c1',
-        enrolledAt: new Date('2025-01-01'), estimatedHours: 10,
-      }]);
+      const enrollChain = makeSelectChainJoin([
+        {
+          userId: 'u1',
+          courseId: 'c1',
+          enrolledAt: new Date('2025-01-01'),
+          estimatedHours: 10,
+        },
+      ]);
       const progressChain = makeSelectChainJoin([]);
       const quizChain = makeSelectChainJoin([]);
 

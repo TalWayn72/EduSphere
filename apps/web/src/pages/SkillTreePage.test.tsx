@@ -44,8 +44,14 @@ vi.mock('lucide-react', () => ({
   Loader2: () => <span data-testid="icon-loader" />,
 }));
 
-const NOOP_QUERY = [{ fetching: false, error: undefined, data: undefined }, vi.fn()] as never;
-const NOOP_MUTATION = [{ fetching: false, error: undefined }, vi.fn().mockResolvedValue({})] as never;
+const NOOP_QUERY = [
+  { fetching: false, error: undefined, data: undefined },
+  vi.fn(),
+] as never;
+const NOOP_MUTATION = [
+  { fetching: false, error: undefined },
+  vi.fn().mockResolvedValue({}),
+] as never;
 
 function renderPage(courseId = 'all') {
   return render(
@@ -88,7 +94,9 @@ describe('SkillTreePage', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
       {
         fetching: false,
-        error: new urql.CombinedError({ networkError: new Error('Network error') }),
+        error: new urql.CombinedError({
+          networkError: new Error('Network error'),
+        }),
         data: undefined,
       },
       vi.fn(),
@@ -132,7 +140,9 @@ describe('SkillTreePage', () => {
     expect(screen.getByTestId('skill-node-node-1')).toBeInTheDocument();
     expect(screen.getByTestId('skill-node-node-2')).toBeInTheDocument();
     // Should NOT show sample notice
-    expect(screen.queryByTestId('skill-tree-sample-notice')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('skill-tree-sample-notice')
+    ).not.toBeInTheDocument();
   });
 
   it('shows node actions panel when a node is clicked with live data', () => {
@@ -164,7 +174,9 @@ describe('SkillTreePage', () => {
   });
 
   it('calls updateMastery mutation when Advance Mastery is clicked', async () => {
-    const mockUpdate = vi.fn().mockResolvedValue({ data: {}, error: undefined });
+    const mockUpdate = vi
+      .fn()
+      .mockResolvedValue({ data: {}, error: undefined });
     vi.mocked(urql.useMutation).mockReturnValue([
       { fetching: false, error: undefined },
       mockUpdate,

@@ -29,7 +29,7 @@ export function DownloadedCoursesSection() {
           style: 'destructive',
           onPress: () => void deleteCourse(course.id),
         },
-      ],
+      ]
     );
   };
 
@@ -66,7 +66,9 @@ export function DownloadedCoursesSection() {
               <TouchableOpacity
                 style={styles.deleteBtn}
                 onPress={() => handleDelete(item)}
-                accessibilityLabel={t('downloads.deleteLabel', { title: item.title })}
+                accessibilityLabel={t('downloads.deleteLabel', {
+                  title: item.title,
+                })}
                 accessibilityRole="button"
               >
                 <Text style={styles.deleteBtnText}>{t('common.delete')}</Text>

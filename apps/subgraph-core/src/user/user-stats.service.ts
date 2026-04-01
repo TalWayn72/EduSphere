@@ -186,9 +186,7 @@ export class UserStatsService implements OnModuleDestroy {
         LIMIT 1
       `
     );
-    const row = rows.rows[0] as
-      | { total_xp: number; level: number }
-      | undefined;
+    const row = rows.rows[0] as { total_xp: number; level: number } | undefined;
     return {
       totalXp: Number(row?.total_xp ?? 0),
       level: Number(row?.level ?? 1),

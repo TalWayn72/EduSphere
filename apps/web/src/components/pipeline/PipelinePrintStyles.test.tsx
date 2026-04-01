@@ -5,7 +5,10 @@ vi.mock('@/components/ui/button', () => ({
   Button: (props: Record<string, unknown>) => <button {...props} />,
 }));
 
-import { PipelineExportButton, PipelinePrintStylesheet } from './PipelinePrintStyles';
+import {
+  PipelineExportButton,
+  PipelinePrintStylesheet,
+} from './PipelinePrintStyles';
 
 describe('PipelineExportButton', () => {
   it('renders with Hebrew label', () => {
@@ -24,7 +27,9 @@ describe('PipelineExportButton', () => {
   });
 
   it('calls window.print() on click', () => {
-    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => undefined);
+    const printSpy = vi
+      .spyOn(window, 'print')
+      .mockImplementation(() => undefined);
     render(<PipelineExportButton lessonTitle="Lesson 1" hasResults={true} />);
     fireEvent.click(screen.getByTestId('export-pdf-btn'));
     expect(printSpy).toHaveBeenCalledTimes(1);

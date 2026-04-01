@@ -65,7 +65,9 @@ function LoadingSkeleton() {
         </CardContent>
       </Card>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+        {[...Array(4)].map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
       </div>
     </div>
   );
@@ -77,7 +79,9 @@ export function ROIAnalyticsDashboardPage() {
   const role = useAuthRole();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: TENANT_ROI_METRICS,
@@ -107,61 +111,65 @@ export function ROIAnalyticsDashboardPage() {
           title="ROI Analytics"
           description="Return on investment from AI-powered learning"
         />
-      <div data-testid="roi-dashboard-page">
-        {fetching && <LoadingSkeleton />}
+        <div data-testid="roi-dashboard-page">
+          {fetching && <LoadingSkeleton />}
 
-        {error && !fetching && (
-          <Card>
-            <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load ROI data. Please try again.
-            </CardContent>
-          </Card>
-        )}
-
-        {usage && !fetching && (
-          <>
-            {/* Section 1 — ROI Summary */}
-            <Card data-testid="roi-summary-card" className="mb-6">
-              <CardHeader>
-                <CardTitle>ROI Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-4xl font-bold text-primary">
-                  Estimated Value: ${estimatedValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Based on {yau.toLocaleString()} active users × 60% AI productivity gain
-                </p>
+          {error && !fetching && (
+            <Card>
+              <CardContent className="py-8 text-center text-destructive text-sm">
+                Failed to load ROI data. Please try again.
               </CardContent>
             </Card>
+          )}
 
-            {/* Section 2 — KPI Grid */}
-            <KpiGrid
-              yearlyActiveUsers={usage.yearlyActiveUsers}
-              monthlyActiveUsers={usage.monthlyActiveUsers}
-              seatUtilizationPct={usage.seatUtilizationPct}
-              plan={usage.plan}
-            />
+          {usage && !fetching && (
+            <>
+              {/* Section 1 — ROI Summary */}
+              <Card data-testid="roi-summary-card" className="mb-6">
+                <CardHeader>
+                  <CardTitle>ROI Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-4xl font-bold text-primary">
+                    Estimated Value: $
+                    {estimatedValue.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                    })}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Based on {yau.toLocaleString()} active users × 60% AI
+                    productivity gain
+                  </p>
+                </CardContent>
+              </Card>
 
-            {/* Section 3 — Cost Per Active User */}
-            <CostPerUser
-              plan={usage.plan}
-              yearlyActiveUsers={usage.yearlyActiveUsers}
-            />
+              {/* Section 2 — KPI Grid */}
+              <KpiGrid
+                yearlyActiveUsers={usage.yearlyActiveUsers}
+                monthlyActiveUsers={usage.monthlyActiveUsers}
+                seatUtilizationPct={usage.seatUtilizationPct}
+                plan={usage.plan}
+              />
 
-            {/* Section 4 — PDF Export */}
-            <div className="flex justify-end mt-4">
-              <Button
-                data-testid="export-roi-pdf-btn"
-                onClick={handleExportPdf}
-                variant="outline"
-              >
-                Download ROI Report (PDF)
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
+              {/* Section 3 — Cost Per Active User */}
+              <CostPerUser
+                plan={usage.plan}
+                yearlyActiveUsers={usage.yearlyActiveUsers}
+              />
+
+              {/* Section 4 — PDF Export */}
+              <div className="flex justify-end mt-4">
+                <Button
+                  data-testid="export-roi-pdf-btn"
+                  onClick={handleExportPdf}
+                  variant="outline"
+                >
+                  Download ROI Report (PDF)
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
       </PageShell>
     </AdminLayout>
   );

@@ -4,15 +4,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_, name) => {
+        if (name === '__esModule') return true;
+        return function MockIcon(props: Record<string, unknown>) {
+          return <span data-testid={`icon-${String(name)}`} {...props} />;
+        };
+      },
+    })
 );
 
 vi.mock('@/components/seo', () => ({
@@ -20,7 +22,9 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 import { SolutionsPage } from './SolutionsPage';
@@ -57,11 +61,15 @@ describe('SolutionsPage', () => {
   it('renders feature bullet points for each solution', () => {
     renderPage();
     // Universities features
-    expect(screen.getByText('AI tutoring & Socratic debate')).toBeInTheDocument();
+    expect(
+      screen.getByText('AI tutoring & Socratic debate')
+    ).toBeInTheDocument();
     // Enterprises features
     expect(screen.getByText('Custom branding & SSO')).toBeInTheDocument();
     // Government features
-    expect(screen.getByText('Air-gapped deployment option')).toBeInTheDocument();
+    expect(
+      screen.getByText('Air-gapped deployment option')
+    ).toBeInTheDocument();
     // Training companies features
     expect(screen.getByText('SCORM / xAPI export')).toBeInTheDocument();
   });

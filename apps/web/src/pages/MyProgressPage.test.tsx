@@ -60,7 +60,11 @@ describe('MyProgressPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myGamificationStats: MOCK_STATS }, fetching: false, error: undefined },
+      {
+        data: { myGamificationStats: MOCK_STATS },
+        fetching: false,
+        error: undefined,
+      },
     ] as never);
   });
 
@@ -95,12 +99,18 @@ describe('MyProgressPage', () => {
 
   it('shows empty state when no stats data', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myGamificationStats: null }, fetching: false, error: undefined },
+      {
+        data: { myGamificationStats: null },
+        fetching: false,
+        error: undefined,
+      },
     ] as never);
 
     renderPage();
 
-    expect(screen.getByText('Start a course to track your progress')).toBeDefined();
+    expect(
+      screen.getByText('Start a course to track your progress')
+    ).toBeDefined();
   });
 
   it('does NOT show raw [GraphQL] error messages', () => {

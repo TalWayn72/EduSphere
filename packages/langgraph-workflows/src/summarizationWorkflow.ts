@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -101,7 +107,9 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     );
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Summarize this Hebrew lesson transcript:\n\n${state.text.slice(0, 8000)}`,
       schema: z.object({
@@ -120,7 +128,9 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     state: SummarizationState
   ): Promise<Partial<SummarizationState>> {
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: injectLocale(
         'Extract key conceptual points from the lesson summary as a numbered list in Hebrew.',
         this.locale
@@ -135,7 +145,9 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     state: SummarizationState
   ): Promise<Partial<SummarizationState>> {
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: injectLocale(
         'Generate thoughtful discussion questions in Hebrew for a study group based on the lesson content.',
         this.locale

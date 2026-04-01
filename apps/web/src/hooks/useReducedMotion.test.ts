@@ -7,9 +7,11 @@ function mockMatchMedia(matches: boolean) {
   const listeners: ((e: MediaQueryListEvent) => void)[] = [];
   const mq = {
     matches,
-    addEventListener: vi.fn((_: string, cb: (e: MediaQueryListEvent) => void) => {
-      listeners.push(cb);
-    }),
+    addEventListener: vi.fn(
+      (_: string, cb: (e: MediaQueryListEvent) => void) => {
+        listeners.push(cb);
+      }
+    ),
     removeEventListener: vi.fn(),
   };
   Object.defineProperty(window, 'matchMedia', {

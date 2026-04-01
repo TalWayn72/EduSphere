@@ -25,8 +25,12 @@ import { BASE_URL } from './env';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Extract all JSON-LD schemas from the page */
-async function getAllSchemas(page: import('@playwright/test').Page): Promise<unknown[]> {
-  const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+async function getAllSchemas(
+  page: import('@playwright/test').Page
+): Promise<unknown[]> {
+  const ldScripts = await page
+    .locator('script[type="application/ld+json"]')
+    .all();
   const schemas: unknown[] = [];
   for (const script of ldScripts) {
     const text = await script.textContent();
@@ -49,18 +53,26 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
     // Wait until react-helmet-async injects a Course-specific JSON-LD (not just static index.html ones)
     await page.waitForFunction(
       () => {
-        const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+        const scripts = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
         for (const s of scripts) {
           try {
             const d = JSON.parse(s.textContent ?? '');
             const type = d['@type'];
-            if (type === 'Course' || (Array.isArray(type) && (type as string[]).includes('Course'))) return true;
+            if (
+              type === 'Course' ||
+              (Array.isArray(type) && (type as string[]).includes('Course'))
+            )
+              return true;
             if (type === 'BreadcrumbList') return true;
-          } catch { /* */ }
+          } catch {
+            /* */
+          }
         }
         return false;
       },
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     );
   });
 
@@ -69,24 +81,34 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
     expect(response.status()).toBe(200);
   });
 
-  test('catalog page has CourseSchema JSON-LD with @type Course', async ({ page }) => {
+  test('catalog page has CourseSchema JSON-LD with @type Course', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const courseSchemas = schemas.filter((s: any) => {
       const type = s['@type'];
-      return type === 'Course' || (Array.isArray(type) && type.includes('Course'));
+      return (
+        type === 'Course' || (Array.isArray(type) && type.includes('Course'))
+      );
     });
     expect(courseSchemas.length).toBeGreaterThan(0);
   });
 
   test('catalog page has at least 6 courses listed', async ({ page }) => {
     // Courses render as <article> elements with role implicit from "article" tag
-    const courseArticles = await page.locator('article[aria-label^="Course:"]').all();
+    const courseArticles = await page
+      .locator('article[aria-label^="Course:"]')
+      .all();
     expect(courseArticles.length).toBeGreaterThanOrEqual(6);
   });
 
-  test('catalog page has unique canonical URL pointing to /catalog', async ({ page }) => {
-    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  test('catalog page has unique canonical URL pointing to /catalog', async ({
+    page,
+  }) => {
+    const canonical = await page
+      .locator('link[rel="canonical"]')
+      .getAttribute('href');
     expect(canonical).toBeTruthy();
     expect(canonical).toContain('/catalog');
     // Must not point to a different page
@@ -97,31 +119,45 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
   test('catalog page has correct OG title', async ({ page }) => {
     // Multiple og:title tags may exist (base HTML + react-helmet-async override).
     // Check that at least one of them mentions courses/catalog or EduSphere.
-    const ogTitleElements = await page.locator('meta[property="og:title"]').all();
+    const ogTitleElements = await page
+      .locator('meta[property="og:title"]')
+      .all();
     expect(ogTitleElements.length).toBeGreaterThan(0);
-    const ogTitles = await Promise.all(ogTitleElements.map((el) => el.getAttribute('content')));
-    const hasCorrectTitle = ogTitles.some((t) => t && /course|catalog|EduSphere/i.test(t));
+    const ogTitles = await Promise.all(
+      ogTitleElements.map((el) => el.getAttribute('content'))
+    );
+    const hasCorrectTitle = ogTitles.some(
+      (t) => t && /course|catalog|EduSphere/i.test(t)
+    );
     expect(hasCorrectTitle).toBe(true);
   });
 
-  test('catalog page has main heading "Featured Learning Programs"', async ({ page }) => {
+  test('catalog page has main heading "Featured Learning Programs"', async ({
+    page,
+  }) => {
     await expect(
       page.getByRole('heading', { name: /Featured Learning Programs/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('catalog page lists at least one known course title', async ({ page }) => {
+  test('catalog page lists at least one known course title', async ({
+    page,
+  }) => {
     await expect(
       page.getByRole('heading', { name: /Introduction to Machine Learning/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('CourseSchema JSON-LD has required schema.org fields', async ({ page }) => {
+  test('CourseSchema JSON-LD has required schema.org fields', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const courseSchema = schemas.find((s: any) => {
       const type = s['@type'];
-      return type === 'Course' || (Array.isArray(type) && type.includes('Course'));
+      return (
+        type === 'Course' || (Array.isArray(type) && type.includes('Course'))
+      );
     }) as Record<string, unknown> | undefined;
     expect(courseSchema).toBeTruthy();
     if (courseSchema) {
@@ -134,12 +170,16 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
     }
   });
 
-  test('CourseSchema JSON-LD does not expose forbidden fields', async ({ page }) => {
+  test('CourseSchema JSON-LD does not expose forbidden fields', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const courseSchemas = schemas.filter((s: any) => {
       const type = s['@type'];
-      return type === 'Course' || (Array.isArray(type) && type.includes('Course'));
+      return (
+        type === 'Course' || (Array.isArray(type) && type.includes('Course'))
+      );
     }) as Record<string, unknown>[];
     courseSchemas.forEach((schema) => {
       expect(Object.keys(schema)).not.toContain('tenantId');
@@ -153,7 +193,9 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
   test('catalog page has BreadcrumbList JSON-LD', async ({ page }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const breadcrumb = schemas.find((s: any) => s['@type'] === 'BreadcrumbList') as any;
+    const breadcrumb = schemas.find(
+      (s: any) => s['@type'] === 'BreadcrumbList'
+    ) as any;
     expect(breadcrumb).toBeTruthy();
     expect(breadcrumb.itemListElement).toBeInstanceOf(Array);
     expect(breadcrumb.itemListElement.length).toBeGreaterThanOrEqual(2);
@@ -162,7 +204,9 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
   // ─── Security ────────────────────────────────────────────────────────────────
 
   test('no </script> XSS vectors in catalog JSON-LD', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     for (const script of ldScripts) {
       const text = await script.textContent();
       // </script> inside JSON-LD would break out of the script block — must be escaped
@@ -170,7 +214,9 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
     }
   });
 
-  test('catalog page does not expose DB connection strings or API keys in body', async ({ page }) => {
+  test('catalog page does not expose DB connection strings or API keys in body', async ({
+    page,
+  }) => {
     await page.waitForLoadState('domcontentloaded');
     const bodyHtml = await page.locator('html').innerHTML();
     expect(bodyHtml).not.toMatch(/DATABASE_URL|postgres:\/\/|postgresql:\/\//i);
@@ -178,7 +224,9 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
     expect(bodyHtml).not.toMatch(/bearer\s+[a-zA-Z0-9._-]{20,}/i);
   });
 
-  test('catalog page does not expose localhost or internal ports in body text', async ({ page }) => {
+  test('catalog page does not expose localhost or internal ports in body text', async ({
+    page,
+  }) => {
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toMatch(/localhost:\d{4}/);
     expect(bodyText).not.toMatch(/127\.0\.0\.1/);
@@ -187,10 +235,14 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
 
   // ─── Pre-render verification ─────────────────────────────────────────────────
 
-  test('catalog page has JSON-LD visible without JS execution delay', async ({ page }) => {
+  test('catalog page has JSON-LD visible without JS execution delay', async ({
+    page,
+  }) => {
     // Navigate with domcontentloaded to test if schemas are present in early DOM
     await page.goto(`${BASE_URL}/catalog`, { waitUntil: 'domcontentloaded' });
-    const scripts = await page.locator('script[type="application/ld+json"]').all();
+    const scripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     // React-helmet-async injects schemas synchronously on hydration
     expect(scripts.length).toBeGreaterThan(0);
   });
@@ -210,21 +262,27 @@ test.describe('AEO Phase 2 — Course Catalog (/catalog)', () => {
 
 test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${BASE_URL}/instructors`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/instructors`, {
+      waitUntil: 'domcontentloaded',
+    });
     // Wait until react-helmet-async injects a Person-specific JSON-LD
     await page.waitForFunction(
       () => {
-        const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+        const scripts = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
         for (const s of scripts) {
           try {
             const d = JSON.parse(s.textContent ?? '');
             const type = d['@type'];
             if (type === 'Person' || type === 'BreadcrumbList') return true;
-          } catch { /* */ }
+          } catch {
+            /* */
+          }
         }
         return false;
       },
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     );
   });
 
@@ -233,20 +291,30 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
     expect(response.status()).toBe(200);
   });
 
-  test('instructors page has PersonSchema JSON-LD with @type Person', async ({ page }) => {
+  test('instructors page has PersonSchema JSON-LD with @type Person', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const personSchemas = schemas.filter((s: any) => s['@type'] === 'Person');
     expect(personSchemas.length).toBeGreaterThan(0);
   });
 
-  test('instructors page has at least 4 instructors listed', async ({ page }) => {
-    const instructorArticles = await page.locator('article[aria-label^="Instructor:"]').all();
+  test('instructors page has at least 4 instructors listed', async ({
+    page,
+  }) => {
+    const instructorArticles = await page
+      .locator('article[aria-label^="Instructor:"]')
+      .all();
     expect(instructorArticles.length).toBeGreaterThanOrEqual(4);
   });
 
-  test('instructors page has unique canonical URL pointing to /instructors', async ({ page }) => {
-    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  test('instructors page has unique canonical URL pointing to /instructors', async ({
+    page,
+  }) => {
+    const canonical = await page
+      .locator('link[rel="canonical"]')
+      .getAttribute('href');
     expect(canonical).toBeTruthy();
     expect(canonical).toContain('/instructors');
     expect(canonical).not.toContain('/catalog');
@@ -254,27 +322,41 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
 
   test('instructors page has correct OG title', async ({ page }) => {
     // Multiple og:title tags may exist (base HTML + react-helmet-async override).
-    const ogTitleElements = await page.locator('meta[property="og:title"]').all();
+    const ogTitleElements = await page
+      .locator('meta[property="og:title"]')
+      .all();
     expect(ogTitleElements.length).toBeGreaterThan(0);
-    const ogTitles = await Promise.all(ogTitleElements.map((el) => el.getAttribute('content')));
-    const hasCorrectTitle = ogTitles.some((t) => t && /instructor|educator|EduSphere/i.test(t));
+    const ogTitles = await Promise.all(
+      ogTitleElements.map((el) => el.getAttribute('content'))
+    );
+    const hasCorrectTitle = ogTitles.some(
+      (t) => t && /instructor|educator|EduSphere/i.test(t)
+    );
     expect(hasCorrectTitle).toBe(true);
   });
 
-  test('instructors page has main heading "Meet Our Instructors"', async ({ page }) => {
+  test('instructors page has main heading "Meet Our Instructors"', async ({
+    page,
+  }) => {
     await expect(
       page.getByRole('heading', { name: /Meet Our Instructors/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('instructors page shows Dr. Sarah Chen', async ({ page }) => {
-    await expect(page.getByText('Dr. Sarah Chen')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Dr. Sarah Chen')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('PersonSchema JSON-LD has required schema.org fields', async ({ page }) => {
+  test('PersonSchema JSON-LD has required schema.org fields', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const personSchema = schemas.find((s: any) => s['@type'] === 'Person') as Record<string, unknown> | undefined;
+    const personSchema = schemas.find((s: any) => s['@type'] === 'Person') as
+      | Record<string, unknown>
+      | undefined;
     expect(personSchema).toBeTruthy();
     if (personSchema) {
       expect(personSchema['@context']).toBe('https://schema.org');
@@ -286,10 +368,14 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
     }
   });
 
-  test('PersonSchema JSON-LD does not expose forbidden PII fields', async ({ page }) => {
+  test('PersonSchema JSON-LD does not expose forbidden PII fields', async ({
+    page,
+  }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const personSchemas = schemas.filter((s: any) => s['@type'] === 'Person') as Record<string, unknown>[];
+    const personSchemas = schemas.filter(
+      (s: any) => s['@type'] === 'Person'
+    ) as Record<string, unknown>[];
     expect(personSchemas.length).toBeGreaterThan(0);
     personSchemas.forEach((schema) => {
       expect(Object.keys(schema)).not.toContain('email');
@@ -303,7 +389,9 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
   test('instructors page has BreadcrumbList JSON-LD', async ({ page }) => {
     const schemas = await getAllSchemas(page);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const breadcrumb = schemas.find((s: any) => s['@type'] === 'BreadcrumbList') as any;
+    const breadcrumb = schemas.find(
+      (s: any) => s['@type'] === 'BreadcrumbList'
+    ) as any;
     expect(breadcrumb).toBeTruthy();
     expect(breadcrumb.itemListElement.length).toBeGreaterThanOrEqual(2);
   });
@@ -311,21 +399,29 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
   // ─── Security ────────────────────────────────────────────────────────────────
 
   test('no </script> XSS vectors in instructors JSON-LD', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     for (const script of ldScripts) {
       const text = await script.textContent();
       expect(text).not.toContain('</script>');
     }
   });
 
-  test('instructors page does not expose auth tokens or internal user IDs', async ({ page }) => {
+  test('instructors page does not expose auth tokens or internal user IDs', async ({
+    page,
+  }) => {
     await page.waitForLoadState('domcontentloaded');
     const bodyHtml = await page.locator('html').innerHTML();
     expect(bodyHtml).not.toMatch(/bearer\s+[a-zA-Z0-9._-]{20,}/i);
-    expect(bodyHtml).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
+    expect(bodyHtml).not.toMatch(
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
+    );
   });
 
-  test('instructors page does not expose localhost or internal ports in body text', async ({ page }) => {
+  test('instructors page does not expose localhost or internal ports in body text', async ({
+    page,
+  }) => {
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toMatch(/localhost:\d{4}/);
     expect(bodyText).not.toMatch(/127\.0\.0\.1/);
@@ -333,9 +429,15 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
 
   // ─── Pre-render verification ─────────────────────────────────────────────────
 
-  test('instructors page has JSON-LD visible without JS execution delay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/instructors`, { waitUntil: 'domcontentloaded' });
-    const scripts = await page.locator('script[type="application/ld+json"]').all();
+  test('instructors page has JSON-LD visible without JS execution delay', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/instructors`, {
+      waitUntil: 'domcontentloaded',
+    });
+    const scripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     expect(scripts.length).toBeGreaterThan(0);
   });
 
@@ -360,7 +462,9 @@ test.describe('AEO Phase 2 — Instructor Directory (/instructors)', () => {
 
 test.describe('AEO Phase 2 — Sitemap verification', () => {
   // Helper: fetch sitemap and return body. Works for both static and proxied versions.
-  async function fetchSitemapContent(page: import('@playwright/test').Page): Promise<string | null> {
+  async function fetchSitemapContent(
+    page: import('@playwright/test').Page
+  ): Promise<string | null> {
     // Try direct HTTP request via playwright request context
     const response = await page.request.get(`${BASE_URL}/sitemap.xml`);
     if (response.ok()) {
@@ -374,7 +478,10 @@ test.describe('AEO Phase 2 — Sitemap verification', () => {
     const content = await fetchSitemapContent(page);
     if (!content) {
       // Skip gracefully when sitemap backend is not running
-      test.skip(true, 'Sitemap backend (subgraph-content port 4002) not running — static file verified in aeo-security.spec.ts');
+      test.skip(
+        true,
+        'Sitemap backend (subgraph-content port 4002) not running — static file verified in aeo-security.spec.ts'
+      );
       return;
     }
     expect(content).toContain('/catalog');
@@ -383,7 +490,10 @@ test.describe('AEO Phase 2 — Sitemap verification', () => {
   test('sitemap.xml includes /instructors route', async ({ page }) => {
     const content = await fetchSitemapContent(page);
     if (!content) {
-      test.skip(true, 'Sitemap backend not running — static file verified in aeo-security.spec.ts');
+      test.skip(
+        true,
+        'Sitemap backend not running — static file verified in aeo-security.spec.ts'
+      );
       return;
     }
     expect(content).toContain('/instructors');
@@ -392,7 +502,10 @@ test.describe('AEO Phase 2 — Sitemap verification', () => {
   test('sitemap.xml includes /faq route', async ({ page }) => {
     const content = await fetchSitemapContent(page);
     if (!content) {
-      test.skip(true, 'Sitemap backend not running — static file verified in aeo-security.spec.ts');
+      test.skip(
+        true,
+        'Sitemap backend not running — static file verified in aeo-security.spec.ts'
+      );
       return;
     }
     expect(content).toContain('/faq');
@@ -401,7 +514,10 @@ test.describe('AEO Phase 2 — Sitemap verification', () => {
   test('sitemap.xml includes /features route', async ({ page }) => {
     const content = await fetchSitemapContent(page);
     if (!content) {
-      test.skip(true, 'Sitemap backend not running — static file verified in aeo-security.spec.ts');
+      test.skip(
+        true,
+        'Sitemap backend not running — static file verified in aeo-security.spec.ts'
+      );
       return;
     }
     expect(content).toContain('/features');
@@ -410,16 +526,24 @@ test.describe('AEO Phase 2 — Sitemap verification', () => {
   test('sitemap.xml includes /glossary route', async ({ page }) => {
     const content = await fetchSitemapContent(page);
     if (!content) {
-      test.skip(true, 'Sitemap backend not running — static file verified in aeo-security.spec.ts');
+      test.skip(
+        true,
+        'Sitemap backend not running — static file verified in aeo-security.spec.ts'
+      );
       return;
     }
     expect(content).toContain('/glossary');
   });
 
-  test('sitemap.xml does not include authenticated routes', async ({ page }) => {
+  test('sitemap.xml does not include authenticated routes', async ({
+    page,
+  }) => {
     const content = await fetchSitemapContent(page);
     if (!content) {
-      test.skip(true, 'Sitemap backend not running — static file verified in aeo-security.spec.ts');
+      test.skip(
+        true,
+        'Sitemap backend not running — static file verified in aeo-security.spec.ts'
+      );
       return;
     }
     expect(content).not.toContain('/dashboard');

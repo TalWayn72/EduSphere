@@ -132,9 +132,10 @@ export class GraphragAuditService implements OnModuleDestroy {
       const meta = row.metadata as Record<string, unknown> | null;
       if (!meta) continue;
 
-      const score = typeof meta['confidenceScore'] === 'number'
-        ? meta['confidenceScore']
-        : 0;
+      const score =
+        typeof meta['confidenceScore'] === 'number'
+          ? meta['confidenceScore']
+          : 0;
       confidenceSum += score;
 
       const sources = Array.isArray(meta['sourceDocuments'])

@@ -10,7 +10,9 @@ const { mockNatsConn } = vi.hoisted(() => {
 });
 
 vi.mock('nats', () => ({ connect: vi.fn().mockResolvedValue(mockNatsConn) }));
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn(() => ({})) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi.fn(() => ({})),
+}));
 
 import { SrsSchedulingService } from './srs-scheduling.service';
 

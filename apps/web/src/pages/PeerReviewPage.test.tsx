@@ -32,7 +32,9 @@ describe('PeerReviewPage', () => {
         <PeerReviewPage />
       </MemoryRouter>
     );
-    expect(screen.getByRole('heading', { name: /Peer Review/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Peer Review/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Assignments to Review section', () => {
@@ -59,6 +61,8 @@ describe('PeerReviewPage', () => {
         <PeerReviewPage />
       </MemoryRouter>
     );
-    expect(screen.getByText(/No pending review assignments/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No pending review assignments/i)
+    ).toBeInTheDocument();
   });
 });

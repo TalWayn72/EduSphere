@@ -40,7 +40,9 @@ interface ProgramEnrollment {
 export function ProgramsPage(): React.ReactElement {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [programsResult] = useQuery<{ programs: CredentialProgram[] }>({
     query: PROGRAMS_QUERY,
@@ -83,96 +85,99 @@ export function ProgramsPage(): React.ReactElement {
 
   return (
     <Layout>
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Nanodegree Programs</h1>
-        <p className="text-muted-foreground mt-2">
-          Complete all courses in a program to earn a stackable credential.
-        </p>
-      </div>
-
-      {programs.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          No programs available yet.
+      <div className="container mx-auto py-8 px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Nanodegree Programs</h1>
+          <p className="text-muted-foreground mt-2">
+            Complete all courses in a program to earn a stackable credential.
+          </p>
         </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {programs.map((program) => {
-            const enrollment = enrollmentMap.get(program.id);
-            const isEnrolled = Boolean(enrollment);
-            const isCompleted = Boolean(enrollment?.completedAt);
 
-            return (
-              <Card
-                key={program.id}
-                className="flex flex-col hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-4xl">{program.badgeEmoji}</span>
-                    {isCompleted ? (
-                      <Badge variant="default" className="bg-green-500 dark:bg-green-600">
-                        Completed
-                      </Badge>
-                    ) : isEnrolled ? (
-                      <Badge variant="secondary">Enrolled</Badge>
-                    ) : null}
-                  </div>
-                  <CardTitle className="text-lg mt-2">
-                    {program.title}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {program.description}
-                  </CardDescription>
-                </CardHeader>
+        {programs.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            No programs available yet.
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {programs.map((program) => {
+              const enrollment = enrollmentMap.get(program.id);
+              const isEnrolled = Boolean(enrollment);
+              const isCompleted = Boolean(enrollment?.completedAt);
 
-                <CardContent className="flex flex-col gap-4 mt-auto">
-                  <div className="flex gap-4 text-sm text-muted-foreground">
-                    <span>{program.requiredCourseIds.length} courses</span>
-                    <span>{program.totalHours}h total</span>
-                    <span>{program.enrollmentCount} enrolled</span>
-                  </div>
+              return (
+                <Card
+                  key={program.id}
+                  className="flex flex-col hover:shadow-lg transition-shadow"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-4xl">{program.badgeEmoji}</span>
+                      {isCompleted ? (
+                        <Badge
+                          variant="default"
+                          className="bg-green-500 dark:bg-green-600"
+                        >
+                          Completed
+                        </Badge>
+                      ) : isEnrolled ? (
+                        <Badge variant="secondary">Enrolled</Badge>
+                      ) : null}
+                    </div>
+                    <CardTitle className="text-lg mt-2">
+                      {program.title}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {program.description}
+                    </CardDescription>
+                  </CardHeader>
 
-                  {isEnrolled && !isCompleted && (
-                    <Progress
-                      value={0}
-                      className="h-2"
-                      aria-label="Program progress"
-                    />
-                  )}
+                  <CardContent className="flex flex-col gap-4 mt-auto">
+                    <div className="flex gap-4 text-sm text-muted-foreground">
+                      <span>{program.requiredCourseIds.length} courses</span>
+                      <span>{program.totalHours}h total</span>
+                      <span>{program.enrollmentCount} enrolled</span>
+                    </div>
 
-                  <div className="flex gap-2">
-                    {isEnrolled ? (
+                    {isEnrolled && !isCompleted && (
+                      <Progress
+                        value={0}
+                        className="h-2"
+                        aria-label="Program progress"
+                      />
+                    )}
+
+                    <div className="flex gap-2">
+                      {isEnrolled ? (
+                        <Button
+                          className="flex-1"
+                          onClick={() => navigate(`/programs/${program.id}`)}
+                        >
+                          {isCompleted ? 'View Certificate' : 'Continue'}
+                        </Button>
+                      ) : (
+                        <Button
+                          className="flex-1"
+                          variant="outline"
+                          onClick={() => handleEnroll(program.id)}
+                        >
+                          Enroll
+                        </Button>
+                      )}
                       <Button
-                        className="flex-1"
+                        variant="ghost"
+                        size="sm"
                         onClick={() => navigate(`/programs/${program.id}`)}
                       >
-                        {isCompleted ? 'View Certificate' : 'Continue'}
+                        Details
                       </Button>
-                    ) : (
-                      <Button
-                        className="flex-1"
-                        variant="outline"
-                        onClick={() => handleEnroll(program.id)}
-                      >
-                        Enroll
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/programs/${program.id}`)}
-                    >
-                      Details
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-    </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </Layout>
   );
 }

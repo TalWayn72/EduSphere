@@ -7,7 +7,11 @@ interface MotionCardProps {
   className?: string;
 }
 
-export function MotionCard({ children, delay = 0, className }: MotionCardProps) {
+export function MotionCard({
+  children,
+  delay = 0,
+  className,
+}: MotionCardProps) {
   const prefersReducedMotion = useReducedMotion();
 
   if (prefersReducedMotion) {

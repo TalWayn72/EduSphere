@@ -8,13 +8,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import {
-  schema,
-  eq,
-  desc,
-  withTenantContext,
-  sql,
-} from '@edusphere/db';
+import { schema, eq, desc, withTenantContext, sql } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import type { AddMessageInput } from './discussion.schemas';
 import { DiscussionThreadService } from './discussion-thread.service';
@@ -99,7 +93,9 @@ export class DiscussionMessageService {
   ) {
     // SEC-3: maxLength 2000 — enforce content length limit
     if (input.content.length > 2000) {
-      throw new BadRequestException('Message content exceeds 2000 character limit');
+      throw new BadRequestException(
+        'Message content exceeds 2000 character limit'
+      );
     }
     // SEC-3: Sanitize — strip all HTML tags to prevent stored XSS
     const sanitizedContent = input.content.replace(/<[^>]*>/g, '').trim();

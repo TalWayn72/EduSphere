@@ -27,6 +27,11 @@ import { AgentSandboxService } from '../sandbox/agent-sandbox.service.js';
     LessonPipelineResolver,
     AgentSandboxService,
   ],
-  exports: [AgentService, AIService, CourseGeneratorService, AgentSandboxService],
+  exports: [
+    AgentService,
+    AIService,
+    CourseGeneratorService,
+    AgentSandboxService,
+  ],
 })
 export class AgentModule {}

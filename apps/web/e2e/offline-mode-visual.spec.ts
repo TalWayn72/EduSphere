@@ -60,7 +60,10 @@ async function goOnline(page: Page): Promise<void> {
  * to localStorage under the key 'edusphere-offline-queue'.
  * We inject a pre-populated state so the pending badge appears.
  */
-async function seedOfflineQueue(page: Page, pendingCount: number): Promise<void> {
+async function seedOfflineQueue(
+  page: Page,
+  pendingCount: number
+): Promise<void> {
   const items = Array.from({ length: pendingCount }, (_, i) => ({
     id: `pending-${i}`,
     type: 'mutation',
@@ -90,7 +93,9 @@ const FULL_VIEWPORT_CLIP = { x: 0, y: 0, width: 1280, height: 720 };
 // ─── Suite 1: Online state ────────────────────────────────────────────────────
 
 test.describe('OfflineBanner — online state (banner absent)', () => {
-  test('screenshot: online — banner NOT visible at bottom', async ({ page }) => {
+  test('screenshot: online — banner NOT visible at bottom', async ({
+    page,
+  }) => {
     await gotoHome(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
@@ -99,14 +104,19 @@ test.describe('OfflineBanner — online state (banner absent)', () => {
     await expect(banner).not.toBeVisible();
 
     // Screenshot the bottom strip to confirm it is empty
-    await expect(page).toHaveScreenshot('offline-banner-online-bottom-strip.png', {
-      clip: BANNER_CLIP,
-      threshold: 0.05,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'offline-banner-online-bottom-strip.png',
+      {
+        clip: BANNER_CLIP,
+        threshold: 0.05,
+        animations: 'disabled',
+      }
+    );
   });
 
-  test('screenshot: online — full viewport (no amber banner)', async ({ page }) => {
+  test('screenshot: online — full viewport (no amber banner)', async ({
+    page,
+  }) => {
     await gotoHome(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
@@ -143,11 +153,14 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     expect(bannerText).not.toContain('Error:');
 
     // Screenshot the bottom strip showing the amber banner
-    await expect(page).toHaveScreenshot('offline-banner-offline-bottom-strip.png', {
-      clip: BANNER_CLIP,
-      threshold: 0.05,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'offline-banner-offline-bottom-strip.png',
+      {
+        clip: BANNER_CLIP,
+        threshold: 0.05,
+        animations: 'disabled',
+      }
+    );
   });
 
   test('screenshot: offline — full viewport with amber banner', async ({
@@ -157,7 +170,9 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await goOffline(page);
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5_000,
+    });
 
     await expect(page).toHaveScreenshot('offline-banner-offline-full.png', {
       fullPage: false,
@@ -175,7 +190,9 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await goOffline(page);
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5_000,
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
@@ -194,7 +211,9 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await goOffline(page);
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5_000,
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
@@ -212,7 +231,9 @@ test.describe('OfflineBanner — offline state (banner visible)', () => {
     await gotoHome(page);
     await goOffline(page);
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5_000,
+    });
 
     await expect(page).toHaveScreenshot('offline-banner-offline-dark.png', {
       clip: BANNER_CLIP,
@@ -231,11 +252,15 @@ test.describe('OfflineBanner — reconnect transition', () => {
 
     // Go offline
     await goOffline(page);
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5_000,
+    });
 
     // Come back online
     await goOnline(page);
-    await expect(page.getByTestId('offline-banner')).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).not.toBeVisible({
+      timeout: 5_000,
+    });
 
     // Screenshot confirms banner is gone
     await expect(page).toHaveScreenshot('offline-banner-reconnected.png', {
@@ -276,10 +301,13 @@ test.describe('OfflineBanner — component-level screenshots', () => {
     const banner = page.getByTestId('offline-banner');
     await expect(banner).toBeVisible({ timeout: 5_000 });
 
-    await expect(banner).toHaveScreenshot('offline-banner-element-pending-5.png', {
-      threshold: 0.05,
-      animations: 'disabled',
-    });
+    await expect(banner).toHaveScreenshot(
+      'offline-banner-element-pending-5.png',
+      {
+        threshold: 0.05,
+        animations: 'disabled',
+      }
+    );
   });
 
   // ── Accessibility regression (not visual but complements the suite) ────────
@@ -305,7 +333,9 @@ test.describe('OfflineBanner — component-level screenshots', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await goOffline(page);
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5_000,
+    });
 
     await expect(page).toHaveScreenshot('offline-banner-1280x720.png', {
       clip: FULL_VIEWPORT_CLIP,

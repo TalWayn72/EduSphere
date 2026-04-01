@@ -24,13 +24,7 @@ import {
   REVOKE_BI_API_KEY_MUTATION,
 } from '@/lib/graphql/bi-export.queries';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import {
-  BarChart2,
-  Copy,
-  Plus,
-  Trash2,
-  Loader2,
-} from 'lucide-react';
+import { BarChart2, Copy, Plus, Trash2, Loader2 } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
 import { BiExportTokenModal } from './BiExportTokenModal';
 
@@ -60,10 +54,14 @@ export function BiExportSettingsPage() {
   const [description, setDescription] = useState('');
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [tokensResult, refetchTokens] = useQuery<{ biApiTokens: BiApiToken[] }>(
     { query: BI_API_TOKENS_QUERY, pause: !mounted }
   );
@@ -77,7 +75,10 @@ export function BiExportSettingsPage() {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[BiExportSettingsPage] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[BiExportSettingsPage] cleanup: copy timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -91,7 +92,10 @@ export function BiExportSettingsPage() {
     await navigator.clipboard.writeText(url);
     setCopiedUrl(url);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopiedUrl(null), TOAST_AUTO_DISMISS_MS);
+    copyTimerRef.current = setTimeout(
+      () => setCopiedUrl(null),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
   const handleGenerate = async () => {
@@ -114,10 +118,7 @@ export function BiExportSettingsPage() {
     <Layout>
       <PageShell size="md">
         <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'BI Export' },
-          ]}
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'BI Export' }]}
         />
         <div className="flex items-center gap-3">
           <BarChart2 className="h-6 w-6 text-primary" />

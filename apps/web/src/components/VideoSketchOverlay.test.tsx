@@ -3,10 +3,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import {
-  VideoSketchOverlay,
-  type ExistingSketch,
-} from './VideoSketchOverlay';
+import { VideoSketchOverlay, type ExistingSketch } from './VideoSketchOverlay';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -24,18 +21,12 @@ describe('VideoSketchOverlay', () => {
   // ── Toggle / inactive state ──────────────────────────────────────────────
 
   it('renders the Sketch toggle button by default', () => {
-    render(
-      <VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />
-    );
-    expect(
-      screen.getByTestId('sketch-toggle-btn')
-    ).toBeInTheDocument();
+    render(<VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />);
+    expect(screen.getByTestId('sketch-toggle-btn')).toBeInTheDocument();
   });
 
   it('does not render the canvas or toolbar when inactive', () => {
-    render(
-      <VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />
-    );
+    render(<VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />);
     expect(screen.queryByRole('presentation')).toBeNull();
     expect(screen.queryByTestId('sketch-toolbar')).toBeNull();
   });
@@ -43,27 +34,21 @@ describe('VideoSketchOverlay', () => {
   // ── Activating sketch mode ────────────────────────────────────────────────
 
   it('shows toolbar and hides toggle button after clicking Sketch', () => {
-    render(
-      <VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />
-    );
+    render(<VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
     expect(screen.getByTestId('sketch-toolbar')).toBeInTheDocument();
     expect(screen.queryByTestId('sketch-toggle-btn')).toBeNull();
   });
 
   it('renders the canvas element in active mode', () => {
-    render(
-      <VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />
-    );
+    render(<VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
     const canvas = document.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
   });
 
   it('canvas has aria-label describing its purpose', () => {
-    render(
-      <VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />
-    );
+    render(<VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
     const canvas = document.querySelector('canvas');
     expect(canvas?.getAttribute('aria-label')).toMatch(/sketch/i);
@@ -72,9 +57,7 @@ describe('VideoSketchOverlay', () => {
   // ── Cancel ────────────────────────────────────────────────────────────────
 
   it('returns to inactive state when Cancel is clicked', () => {
-    render(
-      <VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />
-    );
+    render(<VideoSketchOverlay currentTime={30} onSave={makeOnSave()} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
     fireEvent.click(screen.getByTestId('sketch-cancel-btn'));
     expect(screen.getByTestId('sketch-toggle-btn')).toBeInTheDocument();
@@ -85,9 +68,7 @@ describe('VideoSketchOverlay', () => {
 
   it('calls onSave with timestamp when Save is clicked with paths', async () => {
     const onSave = makeOnSave();
-    render(
-      <VideoSketchOverlay currentTime={42} onSave={onSave} />
-    );
+    render(<VideoSketchOverlay currentTime={42} onSave={onSave} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
 
     // Simulate a mouse draw: mousedown → mousemove → mouseup
@@ -104,10 +85,19 @@ describe('VideoSketchOverlay', () => {
       lineTo: vi.fn(),
       stroke: vi.fn(),
     };
-    vi.spyOn(canvas, 'getContext').mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+    vi.spyOn(canvas, 'getContext').mockReturnValue(
+      ctx as unknown as CanvasRenderingContext2D
+    );
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-      left: 0, top: 0, width: 100, height: 100,
-      right: 100, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      right: 100,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     } as DOMRect);
 
     fireEvent.mouseDown(canvas, { clientX: 10, clientY: 10 });
@@ -126,9 +116,7 @@ describe('VideoSketchOverlay', () => {
 
   it('does not call onSave if no paths drawn', async () => {
     const onSave = makeOnSave();
-    render(
-      <VideoSketchOverlay currentTime={10} onSave={onSave} />
-    );
+    render(<VideoSketchOverlay currentTime={10} onSave={onSave} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
 
     await act(async () => {
@@ -141,22 +129,39 @@ describe('VideoSketchOverlay', () => {
   it('shows "Saving…" text while save is in flight', async () => {
     let resolveSave!: () => void;
     const onSave = vi.fn(
-      () => new Promise<void>((res) => { resolveSave = res; })
+      () =>
+        new Promise<void>((res) => {
+          resolveSave = res;
+        })
     );
-    render(
-      <VideoSketchOverlay currentTime={5} onSave={onSave} />
-    );
+    render(<VideoSketchOverlay currentTime={5} onSave={onSave} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
 
     const canvas = document.querySelector('canvas')!;
     const ctx = {
-      clearRect: vi.fn(), beginPath: vi.fn(), strokeStyle: '', lineWidth: 0,
-      lineCap: '', lineJoin: '', moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(),
+      clearRect: vi.fn(),
+      beginPath: vi.fn(),
+      strokeStyle: '',
+      lineWidth: 0,
+      lineCap: '',
+      lineJoin: '',
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
     };
-    vi.spyOn(canvas, 'getContext').mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+    vi.spyOn(canvas, 'getContext').mockReturnValue(
+      ctx as unknown as CanvasRenderingContext2D
+    );
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-      left: 0, top: 0, width: 100, height: 100,
-      right: 100, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      right: 100,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     } as DOMRect);
 
     fireEvent.mouseDown(canvas, { clientX: 5, clientY: 5 });
@@ -169,7 +174,9 @@ describe('VideoSketchOverlay', () => {
     expect(screen.getByText(/saving/i)).toBeInTheDocument();
 
     // Resolve and clean up
-    await act(async () => { resolveSave(); });
+    await act(async () => {
+      resolveSave();
+    });
   });
 
   // ── Existing sketches (SVG display) ──────────────────────────────────────
@@ -181,7 +188,10 @@ describe('VideoSketchOverlay', () => {
         timestamp: 30,
         paths: [
           {
-            points: [{ x: 0.1, y: 0.2 }, { x: 0.3, y: 0.4 }],
+            points: [
+              { x: 0.1, y: 0.2 },
+              { x: 0.3, y: 0.4 },
+            ],
             color: '#ef4444',
             width: 3,
           },
@@ -208,7 +218,10 @@ describe('VideoSketchOverlay', () => {
         timestamp: 100,
         paths: [
           {
-            points: [{ x: 0.1, y: 0.1 }, { x: 0.5, y: 0.5 }],
+            points: [
+              { x: 0.1, y: 0.1 },
+              { x: 0.5, y: 0.5 },
+            ],
             color: '#ef4444',
             width: 3,
           },
@@ -232,7 +245,10 @@ describe('VideoSketchOverlay', () => {
         timestamp: 30,
         paths: [
           {
-            points: [{ x: 0.1, y: 0.1 }, { x: 0.5, y: 0.5 }],
+            points: [
+              { x: 0.1, y: 0.1 },
+              { x: 0.5, y: 0.5 },
+            ],
             color: '#ef4444',
             width: 3,
           },
@@ -255,9 +271,7 @@ describe('VideoSketchOverlay', () => {
   // ── Toolbar buttons ───────────────────────────────────────────────────────
 
   it('renders Save, Clear, and Cancel buttons in active mode', () => {
-    render(
-      <VideoSketchOverlay currentTime={0} onSave={makeOnSave()} />
-    );
+    render(<VideoSketchOverlay currentTime={0} onSave={makeOnSave()} />);
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
     expect(screen.getByTestId('sketch-save-btn')).toBeInTheDocument();
     expect(screen.getByTestId('sketch-cancel-btn')).toBeInTheDocument();

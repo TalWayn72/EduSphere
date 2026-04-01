@@ -11,15 +11,27 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  Card: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="card">{children}</div>
+  ),
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2>{children}</h2>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/course/CoursePublishSheet', () => ({
@@ -45,7 +57,9 @@ const baseProps = {
     estimatedHours: 3,
     isPublished: true,
     instructorId: 'u-1',
-    modules: [{ id: 'm-1', title: 'Module 1', orderIndex: 0, contentItems: [] }],
+    modules: [
+      { id: 'm-1', title: 'Module 1', orderIndex: 0, contentItems: [] },
+    ],
   },
   courseId: 'c-1',
   canEdit: true,
@@ -70,29 +84,48 @@ describe('CourseHeaderCard', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('renders course title', () => {
-    render(<MemoryRouter><CourseHeaderCard {...baseProps} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseHeaderCard {...baseProps} />
+      </MemoryRouter>
+    );
     expect(screen.getByText('Test Course')).toBeInTheDocument();
   });
 
   it('renders course description', () => {
-    render(<MemoryRouter><CourseHeaderCard {...baseProps} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseHeaderCard {...baseProps} />
+      </MemoryRouter>
+    );
     expect(screen.getByText('A test course description')).toBeInTheDocument();
   });
 
   it('renders without crash when canEdit is false', () => {
-    render(<MemoryRouter><CourseHeaderCard {...baseProps} canEdit={false} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseHeaderCard {...baseProps} canEdit={false} />
+      </MemoryRouter>
+    );
     expect(screen.getByText('Test Course')).toBeInTheDocument();
   });
 
   it('renders without crash when optimisticEnrolled', () => {
-    const { container } = render(<MemoryRouter><CourseHeaderCard {...baseProps} optimisticEnrolled={true} /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <CourseHeaderCard {...baseProps} optimisticEnrolled={true} />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 
   it('renders without crash when progress provided', () => {
     const { container } = render(
       <MemoryRouter>
-        <CourseHeaderCard {...baseProps} progress={{ totalItems: 10, completedItems: 5, percentComplete: 50 }} />
+        <CourseHeaderCard
+          {...baseProps}
+          progress={{ totalItems: 10, completedItems: 5, percentComplete: 50 }}
+        />
       </MemoryRouter>
     );
     expect(container).toBeTruthy();

@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { connect, StringCodec } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import {
@@ -89,7 +94,10 @@ export class TranslationService implements OnModuleDestroy {
         })
         .returning();
 
-      if (!row) throw new InternalServerErrorException('Failed to upsert translation record');
+      if (!row)
+        throw new InternalServerErrorException(
+          'Failed to upsert translation record'
+        );
 
       this.logger.log(
         `Translation requested: item=${contentItemId} locale=${targetLocale} id=${row.id}`

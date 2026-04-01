@@ -68,10 +68,7 @@ export function BadgeAutoAwardEditor({
   return (
     <div className="space-y-3" data-testid="auto-award-editor">
       <Label>{t('gamification.autoAwardCriteria')}</Label>
-      <Select
-        value={value?.type ?? 'none'}
-        onValueChange={handleTypeChange}
-      >
+      <Select value={value?.type ?? 'none'} onValueChange={handleTypeChange}>
         <SelectTrigger>
           <SelectValue placeholder={t('gamification.selectCriteriaType')} />
         </SelectTrigger>

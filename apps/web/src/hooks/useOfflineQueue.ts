@@ -50,7 +50,9 @@ export interface UseOfflineQueueOptions {
   onFlush?: (item: QueuedItem) => Promise<void>;
 }
 
-export function useOfflineQueue(options?: UseOfflineQueueOptions): OfflineQueue {
+export function useOfflineQueue(
+  options?: UseOfflineQueueOptions
+): OfflineQueue {
   const [queue, setQueue] = useState<QueuedItem[]>(() => readQueue());
 
   // Store callback in a ref so the online event listener is not re-registered

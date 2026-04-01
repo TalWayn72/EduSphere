@@ -78,7 +78,10 @@ export class KnowledgeSourceProcessingService {
       })
       .returning();
 
-    if (!source) throw new InternalServerErrorException('Failed to create knowledge source');
+    if (!source)
+      throw new InternalServerErrorException(
+        'Failed to create knowledge source'
+      );
 
     if (input.fileBuffer && fileKey) {
       const contentType =
@@ -91,7 +94,10 @@ export class KnowledgeSourceProcessingService {
         );
         const [failed] = await this.db
           .update(schema.knowledgeSources)
-          .set({ status: 'FAILED', error_message: `MinIO upload failed: ${err}` })
+          .set({
+            status: 'FAILED',
+            error_message: `MinIO upload failed: ${err}`,
+          })
           .where(eq(schema.knowledgeSources.id, source.id))
           .returning();
         return failed ?? source;
@@ -169,7 +175,9 @@ export class KnowledgeSourceProcessingService {
       );
 
       if (!updated) {
-        throw new InternalServerErrorException(`Failed to update source ${sourceId} to READY`);
+        throw new InternalServerErrorException(
+          `Failed to update source ${sourceId} to READY`
+        );
       }
       return updated;
     } catch (error) {
@@ -184,7 +192,9 @@ export class KnowledgeSourceProcessingService {
         .returning();
 
       if (!failed) {
-        throw new InternalServerErrorException(`Failed to mark source ${sourceId} as FAILED`);
+        throw new InternalServerErrorException(
+          `Failed to mark source ${sourceId} as FAILED`
+        );
       }
       return failed;
     }
@@ -217,7 +227,11 @@ export class KnowledgeSourceProcessingService {
   async reindexCourseEmbeddings(
     tenantId: string,
     courseId: string
-  ): Promise<{ sourcesProcessed: number; embeddingsGenerated: number; errors: string[] }> {
+  ): Promise<{
+    sourcesProcessed: number;
+    embeddingsGenerated: number;
+    errors: string[];
+  }> {
     const sources = await this.db
       .select()
       .from(schema.knowledgeSources)
@@ -274,7 +288,9 @@ export class KnowledgeSourceProcessingService {
         count++;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        this.logger.warn(`Reindex embed failed for source ${source.id} chunk ${chunk.index}: ${msg}`);
+        this.logger.warn(
+          `Reindex embed failed for source ${source.id} chunk ${chunk.index}: ${msg}`
+        );
       }
     }
 

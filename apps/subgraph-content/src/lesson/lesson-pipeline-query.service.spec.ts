@@ -39,7 +39,9 @@ function makeChain(rows: unknown[]) {
 function _makeChainNoLimit(rows: unknown[]) {
   const _orderBy = vi.fn().mockResolvedValue(rows);
   const limit = vi.fn().mockResolvedValue(rows);
-  const where = vi.fn().mockReturnValue({ orderBy: vi.fn().mockReturnValue({ limit }) });
+  const where = vi
+    .fn()
+    .mockReturnValue({ orderBy: vi.fn().mockReturnValue({ limit }) });
   const from = vi.fn().mockReturnValue({ where });
   return { from, where, limit };
 }
@@ -124,10 +126,17 @@ describe('LessonPipelineQueryService', () => {
 
   describe('findByLesson()', () => {
     it('returns mapped pipeline for lesson', async () => {
-      const chain = makeChain([{
-        id: 'p1', lesson_id: 'l1', status: 'ACTIVE',
-        template_name: null, nodes: [], config: {}, created_at: null,
-      }]);
+      const chain = makeChain([
+        {
+          id: 'p1',
+          lesson_id: 'l1',
+          status: 'ACTIVE',
+          template_name: null,
+          nodes: [],
+          config: {},
+          created_at: null,
+        },
+      ]);
       mockSelect.mockReturnValue({ from: chain.from });
 
       const result = await service.findByLesson('l1');
@@ -145,9 +154,13 @@ describe('LessonPipelineQueryService', () => {
 
   describe('findRunById()', () => {
     it('returns mapped run', async () => {
-      const chain = makeChain([{
-        id: 'r1', pipeline_id: 'p1', status: 'COMPLETED',
-      }]);
+      const chain = makeChain([
+        {
+          id: 'r1',
+          pipeline_id: 'p1',
+          status: 'COMPLETED',
+        },
+      ]);
       mockSelect.mockReturnValue({ from: chain.from });
 
       const result = await service.findRunById('r1');

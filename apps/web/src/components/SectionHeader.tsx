@@ -27,7 +27,7 @@ export function SectionHeader({
           id={headingId}
           className={cn(
             'font-semibold tracking-tight text-foreground',
-            level === 'h2' ? 'text-lg' : 'text-base',
+            level === 'h2' ? 'text-lg' : 'text-base'
           )}
         >
           {title}
@@ -36,7 +36,9 @@ export function SectionHeader({
           <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
-      {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
+      {actions && (
+        <div className="flex items-center gap-2 shrink-0">{actions}</div>
+      )}
     </div>
   );
 }

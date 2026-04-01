@@ -4,7 +4,9 @@ import { guarded } from './helpers';
 
 // ── Lazy loaded social & collaboration pages ─────────────────────────────────
 const DiscussionsPage = lazy(() =>
-  import('@/pages/DiscussionsPage').then((m) => ({ default: m.DiscussionsPage }))
+  import('@/pages/DiscussionsPage').then((m) => ({
+    default: m.DiscussionsPage,
+  }))
 );
 const DiscussionDetailPage = lazy(() =>
   import('@/pages/DiscussionDetailPage').then((m) => ({
@@ -84,11 +86,17 @@ export const socialRoutes: RouteObject[] = [
   // Chavruta Partner Finder — find a human debate partner
   { path: '/chavruta/partner', element: guarded(<ChavrutaPartnerPage />) },
   // Mentor Discovery — find a mentor by knowledge path topology
-  { path: '/mentor/discover/:courseId?', element: guarded(<MentorDiscoveryPage />) },
+  {
+    path: '/mentor/discover/:courseId?',
+    element: guarded(<MentorDiscoveryPage />),
+  },
   // Cohort Insights — GAP-7: cross-cohort institutional knowledge
   { path: '/cohort-insights', element: guarded(<CohortInsightsPage />) },
   // Collaboration
   { path: '/collaboration', element: guarded(<CollaborationPage />) },
-  { path: '/collaboration/session', element: guarded(<CollaborationSessionPage />) },
+  {
+    path: '/collaboration/session',
+    element: guarded(<CollaborationSessionPage />),
+  },
   { path: '/annotations', element: guarded(<AnnotationsPage />) },
 ];

@@ -19,11 +19,21 @@ import {
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import { isInstructorRole } from './annotation-access';
-import type { CreateAnnotationInput, UpdateAnnotationInput } from './annotation-access';
+import type {
+  CreateAnnotationInput,
+  UpdateAnnotationInput,
+} from './annotation-access';
 import { AnnotationQueriesService } from './annotation-queries.service';
 
-export type { CreateAnnotationInput, UpdateAnnotationInput } from './annotation-access';
-export type { AnnotationLayer, AnnotationType, TextRange } from './annotation-access';
+export type {
+  CreateAnnotationInput,
+  UpdateAnnotationInput,
+} from './annotation-access';
+export type {
+  AnnotationLayer,
+  AnnotationType,
+  TextRange,
+} from './annotation-access';
 
 @Injectable()
 export class AnnotationService implements OnModuleDestroy {
@@ -155,13 +165,17 @@ export class AnnotationService implements OnModuleDestroy {
 
       const isOwner = existing.user_id === authContext.userId;
       if (!isOwner && !isInstructorRole(authContext)) {
-        throw new ForbiddenException('You can only update your own annotations');
+        throw new ForbiddenException(
+          'You can only update your own annotations'
+        );
       }
 
       const updateData: Record<string, unknown> = {};
       if (input.content !== undefined) updateData.content = input.content;
-      if (input.spatialData !== undefined) updateData.spatial_data = input.spatialData;
-      if (input.isResolved !== undefined) updateData.is_resolved = input.isResolved;
+      if (input.spatialData !== undefined)
+        updateData.spatial_data = input.spatialData;
+      if (input.isResolved !== undefined)
+        updateData.is_resolved = input.isResolved;
 
       const [annotation] = await tx
         .update(schema.annotations)
@@ -262,7 +276,9 @@ export class AnnotationService implements OnModuleDestroy {
 
       const isOwner = existing.user_id === authContext.userId;
       if (!isOwner && !isInstructorRole(authContext)) {
-        throw new ForbiddenException('You can only delete your own annotations');
+        throw new ForbiddenException(
+          'You can only delete your own annotations'
+        );
       }
 
       const [deleted] = await tx

@@ -50,7 +50,9 @@ describe('MergeRequestCard', () => {
   it('renders proposal content', () => {
     render(<MergeRequestCard {...defaultProps} />);
     expect(screen.getByTestId('proposal-content-mr-1')).toBeInTheDocument();
-    expect(screen.getByText(/This section refers to the Mishnah Berurah/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/This section refers to the Mishnah Berurah/)
+    ).toBeInTheDocument();
   });
 
   it('renders description/reason', () => {

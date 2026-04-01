@@ -30,7 +30,8 @@ export function SoftwareApplicationSchema() {
           priceCurrency: 'USD',
           unitText: 'MONTH',
         },
-        description: 'Unlimited courses, unlimited AI tutor, knowledge graph access',
+        description:
+          'Unlimited courses, unlimited AI tutor, knowledge graph access',
       },
     ],
     aggregateRating: {

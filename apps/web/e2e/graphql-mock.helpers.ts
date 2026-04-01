@@ -50,7 +50,10 @@ async function fulfillCors(route: Route): Promise<void> {
  */
 export async function routeGraphQL(
   page: Page,
-  handler: (operationName: string, body: Record<string, unknown>) => string | null,
+  handler: (
+    operationName: string,
+    body: Record<string, unknown>
+  ) => string | null
 ): Promise<void> {
   await page.route('**/graphql', async (route) => {
     const request = route.request();
@@ -74,7 +77,10 @@ export async function routeGraphQL(
     // 3. Parse operation name from request body
     let parsed: Record<string, unknown> = {};
     try {
-      parsed = (JSON.parse(request.postData() ?? '{}') as Record<string, unknown>);
+      parsed = JSON.parse(request.postData() ?? '{}') as Record<
+        string,
+        unknown
+      >;
     } catch {
       // Malformed body — return empty data
     }

@@ -146,7 +146,9 @@ describe('BrandingSettingsPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() => {
-      expect(screen.getByText(/failed to save branding settings/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/failed to save branding settings/i)
+      ).toBeInTheDocument();
     });
   });
 

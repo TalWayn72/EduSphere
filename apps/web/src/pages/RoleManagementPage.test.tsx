@@ -29,7 +29,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 
 vi.mock('@/components/PageShell', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: any) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({

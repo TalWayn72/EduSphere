@@ -57,13 +57,17 @@ export function AltTextModal({
         .mutation(UPDATE_MEDIA_ALT_TEXT_MUTATION, { mediaId, altText: trimmed })
         .toPromise();
       if (result.error) {
-        setError(t('altText.saveFailed', 'Failed to save alt-text. Please try again.'));
+        setError(
+          t('altText.saveFailed', 'Failed to save alt-text. Please try again.')
+        );
         return;
       }
       onSaved(trimmed);
       onClose();
     } catch {
-      setError(t('altText.saveFailed', 'Failed to save alt-text. Please try again.'));
+      setError(
+        t('altText.saveFailed', 'Failed to save alt-text. Please try again.')
+      );
     } finally {
       setSaving(false);
     }

@@ -4,7 +4,10 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { KnowledgeSkillTree, SAMPLE_SKILL_TREE_DATA } from './KnowledgeSkillTree';
+import {
+  KnowledgeSkillTree,
+  SAMPLE_SKILL_TREE_DATA,
+} from './KnowledgeSkillTree';
 import type { SkillNode } from './KnowledgeSkillTree';
 import { getVisibleOrder } from './useTreeKeyboard';
 
@@ -64,9 +67,15 @@ describe('KnowledgeSkillTree — rendering', () => {
 
   it('renders a progress bar for each node', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
-    expect(screen.getByTestId('skill-node-progress-node-a')).toBeInTheDocument();
-    expect(screen.getByTestId('skill-node-progress-node-b')).toBeInTheDocument();
-    expect(screen.getByTestId('skill-node-progress-node-c')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('skill-node-progress-node-a')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('skill-node-progress-node-b')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('skill-node-progress-node-c')
+    ).toBeInTheDocument();
   });
 
   it('calls onNodeClick for unlocked node clicks', () => {
@@ -90,14 +99,24 @@ describe('KnowledgeSkillTree — rendering', () => {
 
   it('renders node labels correctly', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
-    expect(screen.getByTestId('skill-node-label-node-a')).toHaveTextContent('Node A');
-    expect(screen.getByTestId('skill-node-label-node-b')).toHaveTextContent('Node B');
-    expect(screen.getByTestId('skill-node-label-node-c')).toHaveTextContent('Node C');
+    expect(screen.getByTestId('skill-node-label-node-a')).toHaveTextContent(
+      'Node A'
+    );
+    expect(screen.getByTestId('skill-node-label-node-b')).toHaveTextContent(
+      'Node B'
+    );
+    expect(screen.getByTestId('skill-node-label-node-c')).toHaveTextContent(
+      'Node C'
+    );
   });
 
   it('exports SAMPLE_SKILL_TREE_DATA with 8 nodes', () => {
     expect(SAMPLE_SKILL_TREE_DATA).toHaveLength(8);
-    expect(SAMPLE_SKILL_TREE_DATA.every((n) => n.id && n.label && n.mastery !== undefined)).toBe(true);
+    expect(
+      SAMPLE_SKILL_TREE_DATA.every(
+        (n) => n.id && n.label && n.mastery !== undefined
+      )
+    ).toBe(true);
   });
 
   it('has required data-testid attributes', () => {
@@ -139,10 +158,19 @@ describe('KnowledgeSkillTree — ARIA APG Tree View', () => {
   it('sets aria-level matching BFS depth (1-based)', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
     // node-a is a root → depth 1
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('aria-level', '1');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'aria-level',
+      '1'
+    );
     // node-b and node-c are children of node-a → depth 2
-    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute('aria-level', '2');
-    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute('aria-level', '2');
+    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute(
+      'aria-level',
+      '2'
+    );
+    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute(
+      'aria-level',
+      '2'
+    );
   });
 
   it('sets aria-expanded on expandable nodes', () => {
@@ -170,39 +198,65 @@ describe('KnowledgeSkillTree — ARIA APG Tree View', () => {
   it('sets aria-selected=true after clicking an unlocked node', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
     fireEvent.click(screen.getByTestId('skill-node-node-a'));
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
   });
 
   it('sets aria-posinset and aria-setsize correctly', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
     // node-a is the only root → posinset=1, setsize=1
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('aria-posinset', '1');
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('aria-setsize', '1');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'aria-posinset',
+      '1'
+    );
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'aria-setsize',
+      '1'
+    );
     // node-b and node-c are siblings at depth 2 → setsize=2
-    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute('aria-setsize', '2');
-    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute('aria-setsize', '2');
+    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute(
+      'aria-setsize',
+      '2'
+    );
+    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute(
+      'aria-setsize',
+      '2'
+    );
   });
 
   it('includes mastery level in aria-label', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
     const nodeA = screen.getByTestId('skill-node-node-a');
-    expect(nodeA).toHaveAttribute('aria-label', expect.stringContaining('Node A'));
-    expect(nodeA).toHaveAttribute('aria-label', expect.stringContaining('Mastered'));
+    expect(nodeA).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('Node A')
+    );
+    expect(nodeA).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('Mastered')
+    );
   });
 
   it('renders screen reader instructions (sr-only)', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
     // The sr-only div should exist in the DOM even if visually hidden
-    expect(document.getElementById('skill-tree-keyboard-instructions')).toBeInTheDocument();
-    expect(document.getElementById('skill-tree-keyboard-instructions')?.textContent).toMatch(
-      /arrow keys/i
-    );
+    expect(
+      document.getElementById('skill-tree-keyboard-instructions')
+    ).toBeInTheDocument();
+    expect(
+      document.getElementById('skill-tree-keyboard-instructions')?.textContent
+    ).toMatch(/arrow keys/i);
   });
 
   it('tree container is linked to instructions via aria-describedby', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
     const tree = screen.getByRole('tree');
-    expect(tree).toHaveAttribute('aria-describedby', 'skill-tree-keyboard-instructions');
+    expect(tree).toHaveAttribute(
+      'aria-describedby',
+      'skill-tree-keyboard-instructions'
+    );
   });
 
   it('sets tabIndex=0 on first node (roving tabindex)', () => {
@@ -214,8 +268,14 @@ describe('KnowledgeSkillTree — ARIA APG Tree View', () => {
 
   it('sets tabIndex=-1 on non-focused nodes', () => {
     render(<KnowledgeSkillTree nodes={MOCK_NODES} />);
-    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute('tabindex', '-1');
-    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute(
+      'tabindex',
+      '-1'
+    );
+    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute(
+      'tabindex',
+      '-1'
+    );
   });
 
   it('progress bar has role="progressbar" with correct aria attributes', () => {
@@ -223,7 +283,9 @@ describe('KnowledgeSkillTree — ARIA APG Tree View', () => {
     const bars = screen.getAllByRole('progressbar');
     expect(bars.length).toBe(MOCK_NODES.length);
     // node-a has progress 100
-    const barA = bars.find((b) => b.getAttribute('aria-label') === 'Node A progress');
+    const barA = bars.find(
+      (b) => b.getAttribute('aria-label') === 'Node A progress'
+    );
     expect(barA).toHaveAttribute('aria-valuenow', '100');
     expect(barA).toHaveAttribute('aria-valuemin', '0');
     expect(barA).toHaveAttribute('aria-valuemax', '100');
@@ -244,8 +306,14 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     const tree = screen.getByRole('tree');
     // Initial focus is on node-a; ArrowDown → node-b (first child in visible order)
     fireEvent.keyDown(tree, { key: 'ArrowDown' });
-    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute('tabindex', '0');
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByTestId('skill-node-node-b')).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'tabindex',
+      '-1'
+    );
   });
 
   it('ArrowUp moves focus to the previous visible node', () => {
@@ -254,7 +322,10 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     // Move down first (node-a → node-b), then up (node-b → node-a)
     fireEvent.keyDown(tree, { key: 'ArrowDown' });
     fireEvent.keyDown(tree, { key: 'ArrowUp' });
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
   });
 
   it('ArrowDown at last node keeps focus on last node', () => {
@@ -262,9 +333,13 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     const tree = screen.getByRole('tree');
     // Move to end
     fireEvent.keyDown(tree, { key: 'End' });
-    const lastFocused = screen.getAllByRole('treeitem').find((el) => el.getAttribute('tabindex') === '0');
+    const lastFocused = screen
+      .getAllByRole('treeitem')
+      .find((el) => el.getAttribute('tabindex') === '0');
     fireEvent.keyDown(tree, { key: 'ArrowDown' });
-    const stillFocused = screen.getAllByRole('treeitem').find((el) => el.getAttribute('tabindex') === '0');
+    const stillFocused = screen
+      .getAllByRole('treeitem')
+      .find((el) => el.getAttribute('tabindex') === '0');
     expect(stillFocused).toBe(lastFocused);
   });
 
@@ -273,7 +348,10 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     const tree = screen.getByRole('tree');
     fireEvent.keyDown(tree, { key: 'ArrowDown' });
     fireEvent.keyDown(tree, { key: 'Home' });
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
   });
 
   it('End moves focus to the last visible node', () => {
@@ -281,7 +359,10 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     const tree = screen.getByRole('tree');
     fireEvent.keyDown(tree, { key: 'End' });
     // node-c is last in BFS order [node-a, node-b, node-c]
-    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByTestId('skill-node-node-c')).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
   });
 
   it('Enter activates (selects) the focused unlocked node', () => {
@@ -291,7 +372,10 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     // Focus is on node-a (unlocked)
     fireEvent.keyDown(tree, { key: 'Enter' });
     expect(onNodeClick).toHaveBeenCalledWith('node-a');
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
   });
 
   it('Space activates the focused unlocked node', () => {
@@ -315,8 +399,22 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
   it('ArrowRight expands a collapsed expandable node', () => {
     // Render with node-a's children explicitly collapsed to test expansion
     const nodes: SkillNode[] = [
-      { id: 'p', label: 'Parent', mastery: 'mastered', progress: 100, children: ['c'], unlocked: true },
-      { id: 'c', label: 'Child', mastery: 'none', progress: 0, children: [], unlocked: true },
+      {
+        id: 'p',
+        label: 'Parent',
+        mastery: 'mastered',
+        progress: 100,
+        children: ['c'],
+        unlocked: true,
+      },
+      {
+        id: 'c',
+        label: 'Child',
+        mastery: 'none',
+        progress: 0,
+        children: [],
+        unlocked: true,
+      },
     ];
     render(<KnowledgeSkillTree nodes={nodes} />);
     const tree = screen.getByRole('tree');
@@ -324,19 +422,39 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     fireEvent.keyDown(tree, { key: 'ArrowLeft' });
     // Parent is now collapsed — ArrowRight should re-expand
     fireEvent.keyDown(tree, { key: 'ArrowRight' });
-    expect(screen.getByTestId('skill-node-p')).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('skill-node-p')).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
   });
 
   it('ArrowLeft collapses an expanded node', () => {
     const nodes: SkillNode[] = [
-      { id: 'p', label: 'Parent', mastery: 'mastered', progress: 100, children: ['c'], unlocked: true },
-      { id: 'c', label: 'Child', mastery: 'none', progress: 0, children: [], unlocked: true },
+      {
+        id: 'p',
+        label: 'Parent',
+        mastery: 'mastered',
+        progress: 100,
+        children: ['c'],
+        unlocked: true,
+      },
+      {
+        id: 'c',
+        label: 'Child',
+        mastery: 'none',
+        progress: 0,
+        children: [],
+        unlocked: true,
+      },
     ];
     render(<KnowledgeSkillTree nodes={nodes} />);
     const tree = screen.getByRole('tree');
     // Parent starts expanded; ArrowLeft collapses it
     fireEvent.keyDown(tree, { key: 'ArrowLeft' });
-    expect(screen.getByTestId('skill-node-p')).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('skill-node-p')).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   it('ArrowLeft on root leaf node does nothing (no parent)', () => {
@@ -346,7 +464,10 @@ describe('KnowledgeSkillTree — keyboard navigation', () => {
     fireEvent.keyDown(tree, { key: 'ArrowLeft' });
     // Now ArrowLeft again: no parent → focus stays on node-a
     fireEvent.keyDown(tree, { key: 'ArrowLeft' });
-    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByTestId('skill-node-node-a')).toHaveAttribute(
+      'tabindex',
+      '0'
+    );
   });
 });
 

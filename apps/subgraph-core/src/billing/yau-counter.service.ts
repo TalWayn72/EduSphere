@@ -43,7 +43,10 @@ export class YauCounterService implements OnModuleDestroy {
   constructor() {
     this.db = createDatabaseConnection();
     this.initNats().catch((err) =>
-      this.logger.warn({ err }, '[YauCounterService] NATS init skipped (non-fatal)')
+      this.logger.warn(
+        { err },
+        '[YauCounterService] NATS init skipped (non-fatal)'
+      )
     );
   }
 
@@ -58,7 +61,10 @@ export class YauCounterService implements OnModuleDestroy {
         await this.nats.drain();
       }
     } catch (err) {
-      this.logger.warn({ err }, '[YauCounterService] NATS drain error on destroy');
+      this.logger.warn(
+        { err },
+        '[YauCounterService] NATS drain error on destroy'
+      );
     }
     await closeAllPools();
   }
@@ -103,7 +109,10 @@ export class YauCounterService implements OnModuleDestroy {
 
       // Check YAU limit asynchronously (non-blocking, best-effort)
       void this.checkYauLimit(tenantId, year).catch((err) =>
-        this.logger.warn({ err, tenantId }, '[YauCounterService] YAU limit check failed')
+        this.logger.warn(
+          { err, tenantId },
+          '[YauCounterService] YAU limit check failed'
+        )
       );
     } catch (err) {
       this.logger.error(
@@ -141,7 +150,9 @@ export class YauCounterService implements OnModuleDestroy {
   /**
    * Build a usage snapshot for billing dashboard display.
    */
-  async getMonthlyUsageSnapshot(tenantId: string): Promise<UsageSnapshotResult> {
+  async getMonthlyUsageSnapshot(
+    tenantId: string
+  ): Promise<UsageSnapshotResult> {
     const year = new Date().getFullYear();
     try {
       const [yauResult, userResult] = await Promise.all([

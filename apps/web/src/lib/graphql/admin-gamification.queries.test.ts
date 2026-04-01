@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { ADMIN_BADGES_QUERY, CREATE_BADGE_MUTATION, UPDATE_BADGE_MUTATION, DELETE_BADGE_MUTATION } from './admin-gamification.queries';
+import {
+  ADMIN_BADGES_QUERY,
+  CREATE_BADGE_MUTATION,
+  UPDATE_BADGE_MUTATION,
+  DELETE_BADGE_MUTATION,
+} from './admin-gamification.queries';
 
 describe('admin-gamification.queries', () => {
   it('exports ADMIN_BADGES_QUERY as a query string', () => {
@@ -25,5 +30,4 @@ describe('admin-gamification.queries', () => {
     expect(typeof DELETE_BADGE_MUTATION).toBe('string');
     expect(DELETE_BADGE_MUTATION).toContain('mutation DeleteBadge');
   });
-
 });

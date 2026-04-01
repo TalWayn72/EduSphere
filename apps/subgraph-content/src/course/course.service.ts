@@ -21,7 +21,10 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { CoursePublishService, type CourseReadiness } from './course-publish.service';
+import {
+  CoursePublishService,
+  type CourseReadiness,
+} from './course-publish.service';
 
 interface CreateCourseInput {
   tenantId?: string;
@@ -48,9 +51,7 @@ export class CourseService implements OnModuleDestroy {
   private readonly logger = new Logger(CourseService.name);
   private db = createDatabaseConnection();
 
-  constructor(
-    private readonly publishService: CoursePublishService
-  ) {}
+  constructor(private readonly publishService: CoursePublishService) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
@@ -76,8 +77,7 @@ export class CourseService implements OnModuleDestroy {
         course['estimated_hours'] !== undefined
           ? course['estimated_hours']
           : course['estimatedHours'] || null,
-      forkedFromId:
-        course['forked_from_id'] || course['forkedFromId'] || null,
+      forkedFromId: course['forked_from_id'] || course['forkedFromId'] || null,
       createdAt: course['created_at'] || course['createdAt'] || null,
       updatedAt: course['updated_at'] || course['updatedAt'] || null,
     };
@@ -85,9 +85,13 @@ export class CourseService implements OnModuleDestroy {
 
   async findById(id: string) {
     const [course] = await withReadReplica((db) =>
-      db.select().from(schema.courses).where(
-        and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at))
-      ).limit(1)
+      db
+        .select()
+        .from(schema.courses)
+        .where(
+          and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at))
+        )
+        .limit(1)
     );
     return this.mapCourse(course as Record<string, unknown>) || null;
   }
@@ -95,7 +99,9 @@ export class CourseService implements OnModuleDestroy {
   async findAll(limit: number, offset: number) {
     try {
       const rows = await withReadReplica((db) =>
-        db.select().from(schema.courses)
+        db
+          .select()
+          .from(schema.courses)
           .where(isNull(schema.courses.deleted_at))
           .orderBy(desc(schema.courses.created_at))
           .limit(limit)
@@ -104,7 +110,9 @@ export class CourseService implements OnModuleDestroy {
       return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
     } catch (err) {
       this.logger.error(`Failed to fetch courses: ${String(err)}`);
-      throw new BadRequestException('Failed to fetch courses. Please try again.');
+      throw new BadRequestException(
+        'Failed to fetch courses. Please try again.'
+      );
     }
   }
 
@@ -113,7 +121,9 @@ export class CourseService implements OnModuleDestroy {
     const pattern = `%${query.trim()}%`;
     try {
       const rows = await withReadReplica((db) =>
-        db.select().from(schema.courses)
+        db
+          .select()
+          .from(schema.courses)
           .where(
             and(
               isNull(schema.courses.deleted_at),
@@ -126,11 +136,17 @@ export class CourseService implements OnModuleDestroy {
           .orderBy(desc(schema.courses.created_at))
           .limit(limit)
       );
-      this.logger.log(`[CourseService] searchCourses("${query}") returned ${rows.length} results`);
+      this.logger.log(
+        `[CourseService] searchCourses("${query}") returned ${rows.length} results`
+      );
       return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
     } catch (err) {
-      this.logger.error(`[CourseService] searchCourses("${query}") failed: ${String(err)}`);
-      throw new BadRequestException('Failed to search courses. Please try again.');
+      this.logger.error(
+        `[CourseService] searchCourses("${query}") failed: ${String(err)}`
+      );
+      throw new BadRequestException(
+        'Failed to search courses. Please try again.'
+      );
     }
   }
 
@@ -157,7 +173,9 @@ export class CourseService implements OnModuleDestroy {
       this.logger.log(`Course created: ${course?.id} - "${input.title}"`);
       return this.mapCourse(course as Record<string, unknown>);
     } catch (err) {
-      this.logger.error(`Failed to create course "${input.title}": ${String(err)}`);
+      this.logger.error(
+        `Failed to create course "${input.title}": ${String(err)}`
+      );
       throw new BadRequestException('Failed to create course.');
     }
   }
@@ -181,28 +199,40 @@ export class CourseService implements OnModuleDestroy {
   async delete(id: string, tenantCtx: TenantContext): Promise<boolean> {
     return withTenantContext(this.db, tenantCtx, async (db) => {
       const [course] = await db
-        .select().from(schema.courses)
-        .where(and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at)));
+        .select()
+        .from(schema.courses)
+        .where(
+          and(eq(schema.courses.id, id), isNull(schema.courses.deleted_at))
+        );
 
       if (!course) throw new NotFoundException('Course not found');
 
       const rawCourse = course as Record<string, unknown>;
-      if (tenantCtx.userRole === 'INSTRUCTOR' && rawCourse['instructor_id'] !== tenantCtx.userId) {
-        throw new ForbiddenException('You do not have permission to delete this course');
+      if (
+        tenantCtx.userRole === 'INSTRUCTOR' &&
+        rawCourse['instructor_id'] !== tenantCtx.userId
+      ) {
+        throw new ForbiddenException(
+          'You do not have permission to delete this course'
+        );
       }
 
-      await db.update(schema.courses)
+      await db
+        .update(schema.courses)
         .set({ deleted_at: new Date() })
         .where(eq(schema.courses.id, id));
 
-      this.logger.log(`[CourseService] Course soft-deleted: ${id} by user ${tenantCtx.userId} in tenant ${tenantCtx.tenantId}`);
+      this.logger.log(
+        `[CourseService] Course soft-deleted: ${id} by user ${tenantCtx.userId} in tenant ${tenantCtx.tenantId}`
+      );
       return true;
     });
   }
 
   async getEnrollmentCount(courseId: string): Promise<number> {
     const result = await withReadReplica((db) =>
-      db.select({ count: sql<number>`count(*)` })
+      db
+        .select({ count: sql<number>`count(*)` })
         .from(schema.userCourses)
         .where(eq(schema.userCourses.courseId, courseId))
     );
@@ -212,14 +242,18 @@ export class CourseService implements OnModuleDestroy {
   async update(id: string, input: UpdateCourseInput) {
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (input.title !== undefined) updateData['title'] = input.title;
-    if (input.description !== undefined) updateData['description'] = input.description;
+    if (input.description !== undefined)
+      updateData['description'] = input.description;
     if (input.slug !== undefined) updateData['slug'] = input.slug;
-    if (input.thumbnailUrl !== undefined) updateData['thumbnailUrl'] = input.thumbnailUrl;
-    if (input.estimatedHours !== undefined) updateData['estimatedHours'] = input.estimatedHours;
+    if (input.thumbnailUrl !== undefined)
+      updateData['thumbnailUrl'] = input.thumbnailUrl;
+    if (input.estimatedHours !== undefined)
+      updateData['estimatedHours'] = input.estimatedHours;
 
     try {
       const [course] = await this.db
-        .update(schema.courses).set(updateData)
+        .update(schema.courses)
+        .set(updateData)
         .where(eq(schema.courses.id, id))
         .returning();
       return this.mapCourse(course as Record<string, unknown>);
@@ -255,7 +289,9 @@ export class CourseService implements OnModuleDestroy {
       );
       return this.mapCourse(forked as Record<string, unknown>);
     } catch (err) {
-      this.logger.error(`[CourseService] Failed to fork course "${courseId}": ${String(err)}`);
+      this.logger.error(
+        `[CourseService] Failed to fork course "${courseId}": ${String(err)}`
+      );
       throw new BadRequestException('Failed to fork course.');
     }
   }

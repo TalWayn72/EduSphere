@@ -15,7 +15,10 @@ import {
   SAMPLE_SKILL_TREE_DATA,
 } from '@/components/KnowledgeSkillTree';
 import type { MasteryLevel } from '@/components/KnowledgeSkillTree';
-import { GET_SKILL_TREE_QUERY, UPDATE_MASTERY_LEVEL_MUTATION } from '@/lib/graphql/knowledge.queries';
+import {
+  GET_SKILL_TREE_QUERY,
+  UPDATE_MASTERY_LEVEL_MUTATION,
+} from '@/lib/graphql/knowledge.queries';
 import { Loader2, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ApiSkillTree } from './SkillTreePage.helpers';
@@ -48,7 +51,9 @@ export function SkillTreePage() {
     pause: !mounted || !validId,
   });
 
-  const [updateResult, updateMastery] = useMutation(UPDATE_MASTERY_LEVEL_MUTATION);
+  const [updateResult, updateMastery] = useMutation(
+    UPDATE_MASTERY_LEVEL_MUTATION
+  );
 
   const apiNodes = skillTreeResult.data?.skillTree?.nodes ?? [];
   const hasData = apiNodes.length > 0;
@@ -66,10 +71,12 @@ export function SkillTreePage() {
 
   const handleAdvanceMastery = async () => {
     if (!selectedNodeId || !hasData) return;
-    const current = masteryOverrides.get(selectedNodeId)
-      ?? (MASTERY_MAP[
-          apiNodes.find((n) => n.id === selectedNodeId)?.masteryLevel ?? 'NONE'
-        ] ?? 'none');
+    const current =
+      masteryOverrides.get(selectedNodeId) ??
+      MASTERY_MAP[
+        apiNodes.find((n) => n.id === selectedNodeId)?.masteryLevel ?? 'NONE'
+      ] ??
+      'none';
     const next = nextMastery(current as MasteryLevel);
 
     setMasteryOverrides((prev) => {
@@ -106,7 +113,9 @@ export function SkillTreePage() {
           data-testid="skill-tree-invalid-id"
           role="alert"
         >
-          <p className="text-lg font-semibold text-destructive">{t('skillTree.invalidId')}</p>
+          <p className="text-lg font-semibold text-destructive">
+            {t('skillTree.invalidId')}
+          </p>
           <p className="text-sm text-muted-foreground">
             {t('skillTree.invalidIdDesc', { courseId })}
           </p>

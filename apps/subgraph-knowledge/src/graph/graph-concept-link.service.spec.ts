@@ -61,17 +61,29 @@ describe('GraphConceptLinkService', () => {
   // ── findRelatedConcepts ───────────────────────────────────────────────────
 
   it('wraps findRelatedConcepts in withTenantContext', async () => {
-    mockFindRelated.mockResolvedValue([
-      { ...sampleNode, strength: 0.9 },
-    ]);
-    await service.findRelatedConcepts('c-1', 2, 10, 'tenant-1', 'user-1', 'STUDENT');
+    mockFindRelated.mockResolvedValue([{ ...sampleNode, strength: 0.9 }]);
+    await service.findRelatedConcepts(
+      'c-1',
+      2,
+      10,
+      'tenant-1',
+      'user-1',
+      'STUDENT'
+    );
     expect(mockWithTenantContext).toHaveBeenCalled();
     expect(mockFindRelated).toHaveBeenCalledWith('c-1', 'tenant-1', 2, 10);
   });
 
   it('maps related concepts to GQL shape with strength', async () => {
     mockFindRelated.mockResolvedValue([{ ...sampleNode, strength: 0.75 }]);
-    const result = await service.findRelatedConcepts('c-1', 1, 5, 'tenant-1', 'u1', 'STUDENT');
+    const result = await service.findRelatedConcepts(
+      'c-1',
+      1,
+      5,
+      'tenant-1',
+      'u1',
+      'STUDENT'
+    );
     expect(Array.isArray(result)).toBe(true);
     const first = (result as Array<{ concept: unknown; strength: number }>)[0];
     expect(first.strength).toBe(0.75);
@@ -80,7 +92,14 @@ describe('GraphConceptLinkService', () => {
 
   it('defaults strength to 1.0 when undefined', async () => {
     mockFindRelated.mockResolvedValue([{ ...sampleNode }]); // no strength
-    const result = await service.findRelatedConcepts('c-1', 1, 5, 'tenant-1', 'u1', 'STUDENT');
+    const result = await service.findRelatedConcepts(
+      'c-1',
+      1,
+      5,
+      'tenant-1',
+      'u1',
+      'STUDENT'
+    );
     const first = (result as Array<{ strength: number }>)[0];
     expect(first.strength).toBe(1.0);
   });
@@ -90,11 +109,20 @@ describe('GraphConceptLinkService', () => {
   it('wraps linkConceptsAndFetch in withTenantContext', async () => {
     mockLinkAndFetch.mockResolvedValue({ from: sampleNode, to: sampleNode });
     await service.linkConcepts(
-      'from-1', 'to-2', 'RELATED_TO', 0.8, 'desc', 'tenant-1', 'user-1', 'INSTRUCTOR'
+      'from-1',
+      'to-2',
+      'RELATED_TO',
+      0.8,
+      'desc',
+      'tenant-1',
+      'user-1',
+      'INSTRUCTOR'
     );
     expect(mockWithTenantContext).toHaveBeenCalled();
     expect(mockLinkAndFetch).toHaveBeenCalledWith(
-      'from-1', 'to-2', 'RELATED_TO',
+      'from-1',
+      'to-2',
+      'RELATED_TO',
       expect.objectContaining({ strength: 0.8, description: 'desc' }),
       'tenant-1'
     );
@@ -102,9 +130,20 @@ describe('GraphConceptLinkService', () => {
 
   it('returns relationship result with mapped fromConcept and toConcept', async () => {
     mockLinkAndFetch.mockResolvedValue({ from: sampleNode, to: sampleNode });
-    const result = await service.linkConcepts(
-      'from-1', 'to-2', 'PREREQ', null, null, 'tenant-1', 'user-1', 'STUDENT'
-    ) as { fromConcept: unknown; toConcept: unknown; relationshipType: string };
+    const result = (await service.linkConcepts(
+      'from-1',
+      'to-2',
+      'PREREQ',
+      null,
+      null,
+      'tenant-1',
+      'user-1',
+      'STUDENT'
+    )) as {
+      fromConcept: unknown;
+      toConcept: unknown;
+      relationshipType: string;
+    };
     expect(result.relationshipType).toBe('PREREQ');
     expect(result.fromConcept).not.toBeNull();
     expect(result.toConcept).not.toBeNull();

@@ -31,9 +31,7 @@ export class MinioUrlService implements OnModuleDestroy {
       requestChecksumCalculation: 'WHEN_REQUIRED',
       responseChecksumValidation: 'WHEN_REQUIRED',
     });
-    this.logger.log(
-      `MinioUrlService: bucket=${this.bucket}`
-    );
+    this.logger.log(`MinioUrlService: bucket=${this.bucket}`);
   }
 
   async onModuleDestroy(): Promise<void> {

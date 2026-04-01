@@ -15,7 +15,10 @@
 import { useOptimistic, useTransition } from 'react';
 
 interface EnrollMutationResult {
-  error?: { graphQLErrors?: Array<{ message: string }>; message: string } | null;
+  error?: {
+    graphQLErrors?: Array<{ message: string }>;
+    message: string;
+  } | null;
 }
 
 type MutationFn = (vars: { courseId: string }) => Promise<EnrollMutationResult>;

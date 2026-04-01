@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Logger } from 'pino';
 
 // Reset the singleton between tests by re-importing the module
-let createNatsPubSub: typeof import('./nats-subscriptions')['createNatsPubSub'];
-let shutdownNatsPubSub: typeof import('./nats-subscriptions')['shutdownNatsPubSub'];
+let createNatsPubSub: (typeof import('./nats-subscriptions'))['createNatsPubSub'];
+let shutdownNatsPubSub: (typeof import('./nats-subscriptions'))['shutdownNatsPubSub'];
 
 function createMockLogger(): Logger {
   return {

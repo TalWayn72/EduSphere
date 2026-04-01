@@ -51,7 +51,9 @@ test.describe('Content Viewer — Annotations | AI | Context tabs', () => {
     await page.goto('/learn/content-1');
     await page.waitForLoadState('domcontentloaded');
     // Wait for the tablist containing the three panel tabs
-    await page.getByRole('tablist').waitFor({ state: 'visible', timeout: 10_000 });
+    await page
+      .getByRole('tablist')
+      .waitFor({ state: 'visible', timeout: 10_000 });
   });
 
   test('Annotations tab is visible in the tools panel', async ({ page }) => {
@@ -833,13 +835,17 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   }) => {
     // Layer buttons use data-context="form" attribute and text labels from LAYER_META
     await expect(
-      page.locator('button[data-context="form"]').filter({ hasText: 'Personal' })
+      page
+        .locator('button[data-context="form"]')
+        .filter({ hasText: 'Personal' })
     ).toBeVisible({ timeout: 5_000 });
     await expect(
       page.locator('button[data-context="form"]').filter({ hasText: 'Shared' })
     ).toBeVisible();
     await expect(
-      page.locator('button[data-context="form"]').filter({ hasText: 'Instructor' })
+      page
+        .locator('button[data-context="form"]')
+        .filter({ hasText: 'Instructor' })
     ).toBeVisible();
   });
 

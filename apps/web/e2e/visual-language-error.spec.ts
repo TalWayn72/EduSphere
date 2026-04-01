@@ -92,10 +92,13 @@ test.describe('visual-language-error — light mode', () => {
       .catch(() => false);
 
     if (hasToast) {
-      await expect(page).toHaveScreenshot('language-save-error-toast-light.png', {
-        fullPage: false,
-        maxDiffPixelRatio: 0.05,
-      });
+      await expect(page).toHaveScreenshot(
+        'language-save-error-toast-light.png',
+        {
+          fullPage: false,
+          maxDiffPixelRatio: 0.05,
+        }
+      );
     } else {
       // DEV_MODE: screenshot the settings page without toast as baseline
       await expect(page).toHaveScreenshot('settings-page-light-no-toast.png', {
@@ -108,10 +111,13 @@ test.describe('visual-language-error — light mode', () => {
   test('success toast screenshot — light mode', async ({ page }) => {
     await openSettingsAndChangeLang(page, GQL_SUCCESS);
 
-    await expect(page).toHaveScreenshot('language-save-success-toast-light.png', {
-      fullPage: false,
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page).toHaveScreenshot(
+      'language-save-success-toast-light.png',
+      {
+        fullPage: false,
+        maxDiffPixelRatio: 0.05,
+      }
+    );
   });
 });
 
@@ -137,10 +143,13 @@ test.describe('visual-language-error — dark mode', () => {
       .catch(() => false);
 
     if (hasToast) {
-      await expect(page).toHaveScreenshot('language-save-error-toast-dark.png', {
-        fullPage: false,
-        maxDiffPixelRatio: 0.05,
-      });
+      await expect(page).toHaveScreenshot(
+        'language-save-error-toast-dark.png',
+        {
+          fullPage: false,
+          maxDiffPixelRatio: 0.05,
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('settings-page-dark-no-toast.png', {
         fullPage: false,
@@ -152,9 +161,12 @@ test.describe('visual-language-error — dark mode', () => {
   test('success toast screenshot — dark mode', async ({ page }) => {
     await openSettingsAndChangeLang(page, GQL_SUCCESS);
 
-    await expect(page).toHaveScreenshot('language-save-success-toast-dark.png', {
-      fullPage: false,
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page).toHaveScreenshot(
+      'language-save-success-toast-dark.png',
+      {
+        fullPage: false,
+        maxDiffPixelRatio: 0.05,
+      }
+    );
   });
 });

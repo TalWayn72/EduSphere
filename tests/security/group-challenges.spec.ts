@@ -32,15 +32,21 @@ const exists = (p: string): boolean => existsSync(resolve(ROOT, p));
 
 describe('Phase 46 Security — Self-match prevention', () => {
   it('peer-matching service has self-match guard', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
     expect(src).toMatch(
       /requesterId.*===.*matchedUserId|matchedUserId.*===.*requesterId|[Cc]annot match with yourself/i
     );
   });
 
   it('self-match guard throws BadRequestException (not silent)', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
-    expect(src).toMatch(/BadRequestException.*[Cc]annot match|throw.*BadRequestException/i);
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
+    expect(src).toMatch(
+      /BadRequestException.*[Cc]annot match|throw.*BadRequestException/i
+    );
   });
 });
 
@@ -48,12 +54,18 @@ describe('Phase 46 Security — Self-match prevention', () => {
 
 describe('Phase 46 Security — IDOR in peer match response', () => {
   it('respondToPeerMatch validates matched_user ownership before update', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
-    expect(src).toMatch(/matchedUserId.*!==.*userId|userId.*!==.*matchedUserId/i);
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
+    expect(src).toMatch(
+      /matchedUserId.*!==.*userId|userId.*!==.*matchedUserId/i
+    );
   });
 
   it('respondToPeerMatch throws on IDOR attempt', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
     expect(src).toMatch(
       /Only the matched user can respond|BadRequestException.*matched user|NotFoundException.*not found/i
     );
@@ -64,13 +76,17 @@ describe('Phase 46 Security — IDOR in peer match response', () => {
 
 describe('Phase 46 Security — Max participants enforcement', () => {
   it('joinChallenge checks participant count against maxParticipants', () => {
-    const src = read('apps/subgraph-core/src/challenges/group-challenge.service.ts');
+    const src = read(
+      'apps/subgraph-core/src/challenges/group-challenge.service.ts'
+    );
     expect(src).toMatch(/maxParticipants|max_participants/i);
     expect(src).toMatch(/full|capacity|exceeded/i);
   });
 
   it('joinChallenge throws BadRequestException when full', () => {
-    const src = read('apps/subgraph-core/src/challenges/group-challenge.service.ts');
+    const src = read(
+      'apps/subgraph-core/src/challenges/group-challenge.service.ts'
+    );
     expect(src).toMatch(/BadRequestException.*full|throw.*full/i);
   });
 });
@@ -79,7 +95,9 @@ describe('Phase 46 Security — Max participants enforcement', () => {
 
 describe('Phase 46 Security — Duplicate join prevention', () => {
   it('joinChallenge prevents duplicate participation', () => {
-    const src = read('apps/subgraph-core/src/challenges/group-challenge.service.ts');
+    const src = read(
+      'apps/subgraph-core/src/challenges/group-challenge.service.ts'
+    );
     expect(src).toMatch(/Already joined|duplicate|existing.*join/i);
   });
 });
@@ -120,12 +138,16 @@ describe('Phase 46 Security — RLS: challenge_participants tenant isolation', (
 describe('Phase 46 Security — RLS: peer_match_requests tenant + participant isolation', () => {
   it('peer_match_requests has pgPolicy checking both requester and matched_user', () => {
     const schema = read('packages/db/src/schema/group-challenges.ts');
-    expect(schema).toMatch(/requester_id.*current_setting|matched_user_id.*current_setting/i);
+    expect(schema).toMatch(
+      /requester_id.*current_setting|matched_user_id.*current_setting/i
+    );
   });
 
   it('peer_match_requests WITH CHECK only allows requester to write', () => {
     const schema = read('packages/db/src/schema/group-challenges.ts');
-    expect(schema).toMatch(/withCheck.*requester_id|requester_id.*current_setting.*app\.current_user_id/i);
+    expect(schema).toMatch(
+      /withCheck.*requester_id|requester_id.*current_setting.*app\.current_user_id/i
+    );
   });
 });
 
@@ -139,7 +161,9 @@ describe('Phase 46 Security — SI-1: app.current_user_id (not app.current_user)
   });
 
   it('migration uses app.current_user_id (SI-1)', () => {
-    const migration = read('packages/db/src/migrations/0028_group_challenges.sql');
+    const migration = read(
+      'packages/db/src/migrations/0028_group_challenges.sql'
+    );
     if (migration) {
       // If migration references user_id, it must use current_user_id
       if (migration.includes('current_setting')) {
@@ -154,15 +178,21 @@ describe('Phase 46 Security — SI-1: app.current_user_id (not app.current_user)
 
 describe('Phase 46 Security — AGE Cypher parameterized queries', () => {
   it('peer-matching service uses parameterized Cypher (no template string concat for user input)', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
     // Must use $userId / $tenantId parameters in the Cypher string, not `${userId}`
     expect(src).toMatch(/\$userId|\$tenantId/);
   });
 
   it('Cypher query parameters are passed as separate object (not concatenated)', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
     // executeCypher called with a params object containing userId and tenantId
-    expect(src).toMatch(/executeCypher.*userId.*tenantId|\{.*userId.*tenantId.*\}/s);
+    expect(src).toMatch(
+      /executeCypher.*userId.*tenantId|\{.*userId.*tenantId.*\}/s
+    );
   });
 });
 
@@ -170,18 +200,24 @@ describe('Phase 46 Security — AGE Cypher parameterized queries', () => {
 
 describe('Phase 46 Security — Memory safety: OnModuleDestroy on services', () => {
   it('GroupChallengeService implements OnModuleDestroy', () => {
-    const src = read('apps/subgraph-core/src/challenges/group-challenge.service.ts');
+    const src = read(
+      'apps/subgraph-core/src/challenges/group-challenge.service.ts'
+    );
     expect(src).toMatch(/OnModuleDestroy|onModuleDestroy/);
     expect(src).toMatch(/closeAllPools/);
   });
 
   it('GroupChallengeService drains NATS on destroy', () => {
-    const src = read('apps/subgraph-core/src/challenges/group-challenge.service.ts');
+    const src = read(
+      'apps/subgraph-core/src/challenges/group-challenge.service.ts'
+    );
     expect(src).toMatch(/nats.*drain|drain.*nats/i);
   });
 
   it('PeerMatchingService implements OnModuleDestroy', () => {
-    const src = read('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts');
+    const src = read(
+      'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+    );
     expect(src).toMatch(/OnModuleDestroy|onModuleDestroy/);
     expect(src).toMatch(/closeAllPools/);
   });
@@ -195,22 +231,34 @@ describe('Phase 46 Security — Required files exist', () => {
   });
 
   it('group-challenges migration exists', () => {
-    expect(exists('packages/db/src/migrations/0028_group_challenges.sql')).toBe(true);
+    expect(exists('packages/db/src/migrations/0028_group_challenges.sql')).toBe(
+      true
+    );
   });
 
   it('challenges SDL exists', () => {
-    expect(exists('apps/subgraph-core/src/challenges/challenges.graphql')).toBe(true);
+    expect(exists('apps/subgraph-core/src/challenges/challenges.graphql')).toBe(
+      true
+    );
   });
 
   it('peer-matching SDL exists', () => {
-    expect(exists('apps/subgraph-knowledge/src/peer-matching/peer-matching.graphql')).toBe(true);
+    expect(
+      exists('apps/subgraph-knowledge/src/peer-matching/peer-matching.graphql')
+    ).toBe(true);
   });
 
   it('GroupChallengeService exists', () => {
-    expect(exists('apps/subgraph-core/src/challenges/group-challenge.service.ts')).toBe(true);
+    expect(
+      exists('apps/subgraph-core/src/challenges/group-challenge.service.ts')
+    ).toBe(true);
   });
 
   it('PeerMatchingService exists', () => {
-    expect(exists('apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts')).toBe(true);
+    expect(
+      exists(
+        'apps/subgraph-knowledge/src/peer-matching/peer-matching.service.ts'
+      )
+    ).toBe(true);
   });
 });

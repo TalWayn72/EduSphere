@@ -72,7 +72,9 @@ export function InviteUserModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Invite User</DialogTitle>
-          <DialogDescription className="sr-only">Send an invitation to a new user with a specific role.</DialogDescription>
+          <DialogDescription className="sr-only">
+            Send an invitation to a new user with a specific role.
+          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -187,7 +189,9 @@ export function BulkImportModal({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Bulk Import Users</DialogTitle>
-          <DialogDescription className="sr-only">Import multiple users via CSV data.</DialogDescription>
+          <DialogDescription className="sr-only">
+            Import multiple users via CSV data.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">

@@ -24,7 +24,11 @@ const INSTRUCTORS: Instructor[] = [
     institution: 'EduSphere',
     credential: 'Stanford PhD, Computer Science',
     bio: 'Leading AI researcher with 10+ years in machine learning and neural network architectures. Former Google Brain researcher, author of 30+ peer-reviewed papers.',
-    expertise: ['Machine Learning', 'Deep Learning', 'Natural Language Processing'],
+    expertise: [
+      'Machine Learning',
+      'Deep Learning',
+      'Natural Language Processing',
+    ],
     courses: 4,
     url: 'https://app.edusphere.dev/instructors#sarah-chen',
   },
@@ -57,7 +61,11 @@ const INSTRUCTORS: Instructor[] = [
     institution: 'EduSphere',
     credential: '15 Years Corporate Training Experience',
     bio: 'Veteran corporate trainer specializing in leadership development and executive coaching. Built training programs for 30+ Fortune 500 companies across 4 continents.',
-    expertise: ['Leadership Development', 'Executive Coaching', 'Team Performance'],
+    expertise: [
+      'Leadership Development',
+      'Executive Coaching',
+      'Team Performance',
+    ],
     courses: 6,
     url: 'https://app.edusphere.dev/instructors#james-thompson',
   },
@@ -169,8 +177,9 @@ export function InstructorDirectoryPage() {
               Meet Our Instructors
             </h1>
             <p className="text-indigo-100 text-lg max-w-2xl mx-auto dark:text-indigo-300">
-              World-class educators from leading research institutions and Fortune 500 companies,
-              bringing real-world expertise to your organization.
+              World-class educators from leading research institutions and
+              Fortune 500 companies, bringing real-world expertise to your
+              organization.
             </p>
           </div>
         </div>

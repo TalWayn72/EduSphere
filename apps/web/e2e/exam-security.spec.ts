@@ -87,7 +87,7 @@ test.describe('exam-security', () => {
     await routeGraphQL(page, handleGraphQL);
     // Also intercept the REST browser-event endpoint
     await page.route('**/api/exam/browser-event', (route) =>
-      route.fulfill({ status: 200, body: '{"ok":true}' }),
+      route.fulfill({ status: 200, body: '{"ok":true}' })
     );
     await loginInDevMode(page);
   });
@@ -96,12 +96,15 @@ test.describe('exam-security', () => {
     await page.goto('/exam/session/sess-sec');
     await page.waitForLoadState('domcontentloaded');
     // Look for the secure mode indicator
-    const lockdownIndicator = page.getByRole('status', { name: /secure mode/i })
+    const lockdownIndicator = page
+      .getByRole('status', { name: /secure mode/i })
       .or(page.getByText(/secure mode active/i));
     await expect(lockdownIndicator).toBeVisible({ timeout: 10_000 });
   });
 
-  test('violation warning appears on simulated visibility change', async ({ page }) => {
+  test('violation warning appears on simulated visibility change', async ({
+    page,
+  }) => {
     await page.goto('/exam/session/sess-sec');
     await page.waitForLoadState('domcontentloaded');
 
@@ -110,12 +113,16 @@ test.describe('exam-security', () => {
 
     // Simulate a visibility change event (tab switch)
     await page.evaluate(() => {
-      Object.defineProperty(document, 'hidden', { value: true, writable: true });
+      Object.defineProperty(document, 'hidden', {
+        value: true,
+        writable: true,
+      });
       document.dispatchEvent(new Event('visibilitychange'));
     });
 
     // The violation warning dialog should appear
-    const warningDialog = page.getByText(/integrity violation/i)
+    const warningDialog = page
+      .getByText(/integrity violation/i)
       .or(page.getByText(/navigated away/i))
       .or(page.getByText(/warning/i));
     await expect(warningDialog).toBeVisible({ timeout: 10_000 });
@@ -131,10 +138,15 @@ test.describe('exam-security', () => {
       let defaultPrevented = false;
       document.addEventListener(
         'contextmenu',
-        (e) => { defaultPrevented = e.defaultPrevented; },
-        { once: true, capture: false },
+        (e) => {
+          defaultPrevented = e.defaultPrevented;
+        },
+        { once: true, capture: false }
       );
-      const evt = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+      const evt = new MouseEvent('contextmenu', {
+        bubbles: true,
+        cancelable: true,
+      });
       document.body.dispatchEvent(evt);
       return evt.defaultPrevented;
     });

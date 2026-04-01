@@ -32,7 +32,7 @@ export class PsychometricsResolver implements OnModuleDestroy {
   constructor(
     private readonly classicalService: ClassicalAnalysisService,
     private readonly irtService: IRTCalibrationService,
-    private readonly reliabilityService: TestReliabilityService,
+    private readonly reliabilityService: TestReliabilityService
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -43,13 +43,13 @@ export class PsychometricsResolver implements OnModuleDestroy {
   @Query('examItemStatistics')
   async examItemStatistics(
     @Args('itemId') itemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.extractAuth(ctx);
     const stats = await this.classicalService.analyzeItem(itemId, tenantId);
     const distractors = await this.classicalService.analyzeDistractors(
       itemId,
-      tenantId,
+      tenantId
     );
 
     const dbCtx = sysCtx(tenantId);
@@ -61,7 +61,7 @@ export class PsychometricsResolver implements OnModuleDestroy {
           irtC: schema.examItems.irtC,
         })
         .from(schema.examItems)
-        .where(eq(schema.examItems.id, itemId)),
+        .where(eq(schema.examItems.id, itemId))
     );
 
     return {
@@ -80,19 +80,16 @@ export class PsychometricsResolver implements OnModuleDestroy {
   @Query('examReliabilityReport')
   async examReliabilityReport(
     @Args('blueprintId') blueprintId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.extractAuth(ctx);
-    return this.reliabilityService.getReliabilityReport(
-      blueprintId,
-      tenantId,
-    );
+    return this.reliabilityService.getReliabilityReport(blueprintId, tenantId);
   }
 
   @Mutation('calibrateExamItems')
   async calibrateExamItems(
     @Args('blueprintId') blueprintId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.extractAuth(ctx);
     const dbCtx = sysCtx(tenantId);
@@ -101,13 +98,13 @@ export class PsychometricsResolver implements OnModuleDestroy {
       tx
         .select({ courseId: schema.examBlueprints.courseId })
         .from(schema.examBlueprints)
-        .where(eq(schema.examBlueprints.id, blueprintId)),
+        .where(eq(schema.examBlueprints.id, blueprintId))
     );
 
     if (!blueprint) {
       this.logger.warn(
         { blueprintId },
-        '[PsychometricsResolver] Blueprint not found',
+        '[PsychometricsResolver] Blueprint not found'
       );
       return false;
     }
@@ -119,9 +116,9 @@ export class PsychometricsResolver implements OnModuleDestroy {
         .where(
           and(
             eq(schema.examItems.courseId, blueprint.courseId),
-            eq(schema.examItems.tenantId, tenantId),
-          ),
-        ),
+            eq(schema.examItems.tenantId, tenantId)
+          )
+        )
     );
 
     let calibrated = 0;
@@ -132,7 +129,7 @@ export class PsychometricsResolver implements OnModuleDestroy {
 
     this.logger.log(
       { blueprintId, tenantId, calibrated, total: items.length },
-      '[PsychometricsResolver] Batch calibration complete',
+      '[PsychometricsResolver] Batch calibration complete'
     );
 
     return calibrated > 0;

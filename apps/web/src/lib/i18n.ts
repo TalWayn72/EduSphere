@@ -17,8 +17,8 @@ const localeModules = import.meta.glob<Record<string, unknown>>(
 
 /** Find a glob entry matching the given language + namespace */
 function findLocaleModule(lang: string, ns: string) {
-  return Object.entries(localeModules).find(
-    ([key]) => key.includes(`/${lang}/${ns}.json`)
+  return Object.entries(localeModules).find(([key]) =>
+    key.includes(`/${lang}/${ns}.json`)
   );
 }
 

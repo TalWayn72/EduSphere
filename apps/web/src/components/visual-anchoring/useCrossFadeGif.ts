@@ -14,7 +14,10 @@ function isGif(src: string, mimeType: string): boolean {
  * by replacing its src with a transparent 1×1 GIF data URI.
  * Memory-safe: setTimeout handle cleared on unmount.
  */
-export function useCrossFadeGif(outgoingSrc: string | null, outgoingMime: string) {
+export function useCrossFadeGif(
+  outgoingSrc: string | null,
+  outgoingMime: string
+) {
   const gifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const outgoingImgRef = useRef<HTMLImageElement | null>(null);
 

@@ -6,7 +6,12 @@ import {
 } from '@/lib/graphql/courses-discovery.queries';
 import { MY_ENROLLMENTS_QUERY } from '@/lib/graphql/content.queries';
 import { toDisplayCourse } from './helpers';
-import { PAGE_SIZE, type ApiCourse, type DisplayCourse, type SortOption } from './types';
+import {
+  PAGE_SIZE,
+  type ApiCourse,
+  type DisplayCourse,
+  type SortOption,
+} from './types';
 
 export function useCoursesDiscovery() {
   // Mounted guard -- urql iron rule: pause until mounted
@@ -70,9 +75,9 @@ export function useCoursesDiscovery() {
   const enrolledIds = useMemo(
     () =>
       new Set(
-        ((enrollmentData?.myEnrollments ?? []) as Array<{ courseId: string }>).map(
-          (e) => e.courseId
-        )
+        (
+          (enrollmentData?.myEnrollments ?? []) as Array<{ courseId: string }>
+        ).map((e) => e.courseId)
       ),
     [enrollmentData]
   );
@@ -125,7 +130,13 @@ export function useCoursesDiscovery() {
     }
 
     return results;
-  }, [allCourses, selectedCategory, selectedLevel, selectedDuration, selectedSort]);
+  }, [
+    allCourses,
+    selectedCategory,
+    selectedLevel,
+    selectedDuration,
+    selectedSort,
+  ]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;

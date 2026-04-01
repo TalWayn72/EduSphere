@@ -23,7 +23,8 @@ const mockUpdate = vi.fn();
 const mockDelete = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -43,8 +44,14 @@ vi.mock('@edusphere/db', () => ({
     delete: mockDelete,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ select: mockSelect, insert: mockInsert, update: mockUpdate, delete: mockDelete }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({
+        select: mockSelect,
+        insert: mockInsert,
+        update: mockUpdate,
+        delete: mockDelete,
+      })
   ),
   schema: {
     biApiTokens: {
@@ -66,7 +73,11 @@ vi.mock('@edusphere/db', () => ({
 
 import { ApiKeyService } from './api-key.service.js';
 
-const TENANT_CTX = { tenantId: 'tenant-001', userId: 'admin-001', role: 'ORG_ADMIN' };
+const TENANT_CTX = {
+  tenantId: 'tenant-001',
+  userId: 'admin-001',
+  role: 'ORG_ADMIN',
+};
 
 const VALID_SCOPES = ['lti:read', 'scim:write', 'webhook:manage', 'bi:export'];
 
@@ -76,7 +87,9 @@ describe('ApiKeyService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSelect.mockReturnValue(makeChain([]));
-    mockInsert.mockReturnValue(makeChain([{ id: 'key-001', tokenHash: 'abc123hash' }]));
+    mockInsert.mockReturnValue(
+      makeChain([{ id: 'key-001', tokenHash: 'abc123hash' }])
+    );
     service = new ApiKeyService();
   });
 
@@ -106,13 +119,19 @@ describe('ApiKeyService', () => {
 
     it('rejects key without description', async () => {
       await expect(
-        service.generateKey(TENANT_CTX, { description: '', scopes: ['bi:export'] }),
+        service.generateKey(TENANT_CTX, {
+          description: '',
+          scopes: ['bi:export'],
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects key with empty scopes', async () => {
       await expect(
-        service.generateKey(TENANT_CTX, { description: 'No scopes', scopes: [] }),
+        service.generateKey(TENANT_CTX, {
+          description: 'No scopes',
+          scopes: [],
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -121,7 +140,7 @@ describe('ApiKeyService', () => {
         service.generateKey(TENANT_CTX, {
           description: 'Bad scope',
           scopes: ['admin:nuclear-launch'],
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -129,8 +148,8 @@ describe('ApiKeyService', () => {
       await expect(
         service.generateKey(
           { ...TENANT_CTX, role: 'STUDENT' },
-          { description: 'Test', scopes: ['bi:export'] },
-        ),
+          { description: 'Test', scopes: ['bi:export'] }
+        )
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -140,12 +159,14 @@ describe('ApiKeyService', () => {
   describe('verifyKey()', () => {
     it('returns true for valid key matching stored hash', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'key-001',
-          tokenHash: 'matching-hash',
-          isActive: true,
-          scopes: ['bi:export'],
-        }]),
+        makeChain([
+          {
+            id: 'key-001',
+            tokenHash: 'matching-hash',
+            isActive: true,
+            scopes: ['bi:export'],
+          },
+        ])
       );
 
       const result = await service.verifyKey('raw-key-value');
@@ -162,12 +183,14 @@ describe('ApiKeyService', () => {
 
     it('rejects revoked (inactive) key', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'key-001',
-          tokenHash: 'matching-hash',
-          isActive: false,
-          scopes: ['bi:export'],
-        }]),
+        makeChain([
+          {
+            id: 'key-001',
+            tokenHash: 'matching-hash',
+            isActive: false,
+            scopes: ['bi:export'],
+          },
+        ])
       );
 
       const result = await service.verifyKey('raw-key-value');
@@ -176,12 +199,14 @@ describe('ApiKeyService', () => {
 
     it('updates lastUsedAt on successful verification', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'key-001',
-          tokenHash: 'matching-hash',
-          isActive: true,
-          scopes: ['bi:export'],
-        }]),
+        makeChain([
+          {
+            id: 'key-001',
+            tokenHash: 'matching-hash',
+            isActive: true,
+            scopes: ['bi:export'],
+          },
+        ])
       );
 
       await service.verifyKey('raw-key-value');
@@ -237,7 +262,9 @@ describe('ApiKeyService', () => {
   describe('revokeKey()', () => {
     it('marks key as inactive', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'key-001', tenantId: TENANT_CTX.tenantId, isActive: true }]),
+        makeChain([
+          { id: 'key-001', tenantId: TENANT_CTX.tenantId, isActive: true },
+        ])
       );
 
       await service.revokeKey(TENANT_CTX, 'key-001');
@@ -246,19 +273,19 @@ describe('ApiKeyService', () => {
 
     it('rejects revoking key from different tenant', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'key-001', tenantId: 'other-tenant', isActive: true }]),
+        makeChain([{ id: 'key-001', tenantId: 'other-tenant', isActive: true }])
       );
 
-      await expect(
-        service.revokeKey(TENANT_CTX, 'key-001'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.revokeKey(TENANT_CTX, 'key-001')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('returns 404 for non-existent key', async () => {
       mockSelect.mockReturnValue(makeChain([]));
 
       await expect(
-        service.revokeKey(TENANT_CTX, 'nonexistent'),
+        service.revokeKey(TENANT_CTX, 'nonexistent')
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -269,9 +296,19 @@ describe('ApiKeyService', () => {
     it('returns keys without full hash (prefix only)', async () => {
       mockSelect.mockReturnValueOnce(
         makeChain([
-          { id: 'key-001', description: 'BI Key', tokenHash: 'abcdef1234567890', isActive: true },
-          { id: 'key-002', description: 'LTI Key', tokenHash: 'xyz9876543210fed', isActive: false },
-        ]),
+          {
+            id: 'key-001',
+            description: 'BI Key',
+            tokenHash: 'abcdef1234567890',
+            isActive: true,
+          },
+          {
+            id: 'key-002',
+            description: 'LTI Key',
+            tokenHash: 'xyz9876543210fed',
+            isActive: false,
+          },
+        ])
       );
 
       const result = await service.listKeys(TENANT_CTX);
@@ -293,7 +330,7 @@ describe('ApiKeyService', () => {
         service.generateKey(TENANT_CTX, {
           description: 'One too many',
           scopes: ['bi:export'],
-        }),
+        })
       ).rejects.toThrow(ForbiddenException);
     });
   });

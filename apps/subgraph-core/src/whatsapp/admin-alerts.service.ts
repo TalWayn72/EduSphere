@@ -86,10 +86,16 @@ export class AdminAlertsService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('[AdminAlertsService] Destroyed');
   }
 
-  private async processMessages(subject: string, sub: Subscription): Promise<void> {
+  private async processMessages(
+    subject: string,
+    sub: Subscription
+  ): Promise<void> {
     for await (const msg of sub) {
       try {
-        const raw = JSON.parse(this.sc.decode(msg.data)) as Record<string, unknown>;
+        const raw = JSON.parse(this.sc.decode(msg.data)) as Record<
+          string,
+          unknown
+        >;
         const tenantId = String(raw['tenantId'] ?? '');
         if (!tenantId) continue;
 
@@ -128,7 +134,11 @@ export class AdminAlertsService implements OnModuleInit, OnModuleDestroy {
     title: string,
     body: string
   ): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
 
     const contacts = await withTenantContext(this.db, ctx, async (tx) => {
       return tx

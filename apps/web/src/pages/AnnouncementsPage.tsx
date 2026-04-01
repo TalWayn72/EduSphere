@@ -59,7 +59,9 @@ export function AnnouncementsPage() {
   const [form, setForm] = useState<AnnouncementFormValues>(BLANK);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data, fetching }, refetch] = useQuery({
     query: ADMIN_ANNOUNCEMENTS_QUERY,
     variables: { limit: 20, offset: 0 },

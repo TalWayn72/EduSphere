@@ -7,7 +7,10 @@ const meta: Meta<typeof Input> = {
   title: 'UI/Input',
   component: Input,
   argTypes: {
-    type: { control: 'select', options: ['text', 'email', 'password', 'search'] },
+    type: {
+      control: 'select',
+      options: ['text', 'email', 'password', 'search'],
+    },
     disabled: { control: 'boolean' },
   },
 };

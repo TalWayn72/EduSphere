@@ -2,15 +2,8 @@
  * Read-only queries for visual anchors and visual assets.
  * Extracted from VisualAnchorService for file-size compliance.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
-import {
-  S3Client,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   createDatabaseConnection,
@@ -24,7 +17,10 @@ import {
 } from '@edusphere/db';
 import { withTenantContext } from '@edusphere/db';
 import { minioConfig } from '@edusphere/config';
-import type { VisualAnchorRow, VisualAssetSearchResult } from './visual-anchor.types.js';
+import type {
+  VisualAnchorRow,
+  VisualAssetSearchResult,
+} from './visual-anchor.types.js';
 import type { VisualAssetRow } from './visual-asset-upload.helper';
 
 const PRESIGNED_URL_EXPIRY_SECONDS = 900;
@@ -55,7 +51,10 @@ export class VisualAnchorQueryService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  async findAllByMediaAsset(mediaAssetId: string, authCtx: TenantContext): Promise<VisualAnchorRow[]> {
+  async findAllByMediaAsset(
+    mediaAssetId: string,
+    authCtx: TenantContext
+  ): Promise<VisualAnchorRow[]> {
     const rows = await withTenantContext(this.db, authCtx, (tx) =>
       tx
         .select()
@@ -71,7 +70,10 @@ export class VisualAnchorQueryService implements OnModuleDestroy {
     return rows.map((r) => this.mapAnchor(r));
   }
 
-  async findAllAssetsByCourse(courseId: string, authCtx: TenantContext): Promise<VisualAssetRow[]> {
+  async findAllAssetsByCourse(
+    courseId: string,
+    authCtx: TenantContext
+  ): Promise<VisualAssetRow[]> {
     const rows = await withTenantContext(this.db, authCtx, (tx) =>
       tx
         .select()
@@ -110,14 +112,16 @@ export class VisualAnchorQueryService implements OnModuleDestroy {
           and(
             eq(schema.visualAssets.course_id, courseId),
             isNull(schema.visualAssets.deleted_at),
-            eq(schema.visualAssets.scan_status, 'CLEAN' as const),
+            eq(schema.visualAssets.scan_status, 'CLEAN' as const)
           )
         )
         .limit(20)
     );
 
     const q = query.toLowerCase();
-    const matched = rows.filter((r) => r.original_name.toLowerCase().includes(q));
+    const matched = rows.filter((r) =>
+      r.original_name.toLowerCase().includes(q)
+    );
 
     return matched.map((r) => ({
       asset: {
@@ -161,7 +165,9 @@ export class VisualAnchorQueryService implements OnModuleDestroy {
     };
   }
 
-  async mapAsset(r: typeof schema.visualAssets.$inferSelect): Promise<VisualAssetRow> {
+  async mapAsset(
+    r: typeof schema.visualAssets.$inferSelect
+  ): Promise<VisualAssetRow> {
     let storageUrl = '';
     let webpUrl: string | null = null;
     try {
@@ -178,7 +184,9 @@ export class VisualAnchorQueryService implements OnModuleDestroy {
         );
       }
     } catch {
-      this.logger.warn(`[VisualAnchorQueryService] Could not generate presigned URL for asset ${r.id}`);
+      this.logger.warn(
+        `[VisualAnchorQueryService] Could not generate presigned URL for asset ${r.id}`
+      );
     }
     return {
       id: r.id,

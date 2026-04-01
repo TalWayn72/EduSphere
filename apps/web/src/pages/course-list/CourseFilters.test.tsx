@@ -31,7 +31,9 @@ describe('CourseFilters', () => {
 
   it('calls onSearchChange when typing', () => {
     render(<CourseFilters {...baseProps} />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'react' } });
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'react' },
+    });
     expect(baseProps.onSearchChange).toHaveBeenCalledWith('react');
   });
 
@@ -60,6 +62,9 @@ describe('CourseFilters', () => {
 
   it('marks active tab as selected', () => {
     render(<CourseFilters {...baseProps} activeTab="enrolled" />);
-    expect(screen.getByRole('tab', { name: 'myCourses' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'myCourses' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
   });
 });

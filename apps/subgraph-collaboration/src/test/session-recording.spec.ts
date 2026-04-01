@@ -98,8 +98,11 @@ describe('Session Recording — document snapshot persistence', () => {
     };
 
     // Call private storeDocument through the service prototype
-    await (service as unknown as { storeDocument: (d: typeof storeData) => Promise<void> })
-      .storeDocument(storeData);
+    await (
+      service as unknown as {
+        storeDocument: (d: typeof storeData) => Promise<void>;
+      }
+    ).storeDocument(storeData);
 
     expect(mockUpdate).toHaveBeenCalledTimes(1);
     expect(mockSet).toHaveBeenCalledWith(
@@ -121,8 +124,11 @@ describe('Session Recording — document snapshot persistence', () => {
       context: { authContext: { userId: 'user-1', tenantId: 'tenant-1' } },
     };
 
-    await (service as unknown as { storeDocument: (d: typeof storeData) => Promise<void> })
-      .storeDocument(storeData);
+    await (
+      service as unknown as {
+        storeDocument: (d: typeof storeData) => Promise<void>;
+      }
+    ).storeDocument(storeData);
 
     expect(mockInsert).toHaveBeenCalledTimes(1);
     expect(mockInsertValues).toHaveBeenCalledWith(
@@ -149,10 +155,15 @@ describe('Session Recording — document snapshot persistence', () => {
       document: loadDoc,
     };
 
-    const resultDoc = await (service as unknown as { loadDocument: (d: typeof loadData) => Promise<Y.Doc> })
-      .loadDocument(loadData);
+    const resultDoc = await (
+      service as unknown as {
+        loadDocument: (d: typeof loadData) => Promise<Y.Doc>;
+      }
+    ).loadDocument(loadData);
 
     expect(resultDoc).toBe(loadDoc);
-    expect(loadDoc.getText('content').toString()).toBe('Previously recorded content');
+    expect(loadDoc.getText('content').toString()).toBe(
+      'Previously recorded content'
+    );
   });
 });

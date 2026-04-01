@@ -45,7 +45,9 @@ import { useLiveSessionActions } from './useLiveSessionActions';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function setupMutations(responses: Record<string, { data?: unknown; error?: { message: string } }>) {
+function setupMutations(
+  responses: Record<string, { data?: unknown; error?: { message: string } }>
+) {
   const fns: Record<string, ReturnType<typeof vi.fn>> = {};
   let callIndex = 0;
   const keys = Object.keys(responses);
@@ -56,7 +58,12 @@ function setupMutations(responses: Record<string, { data?: unknown; error?: { me
     const fn = fns[key] ?? vi.fn().mockResolvedValue(responses[key]);
     fns[key] = fn;
     return [
-      { fetching: false, data: undefined, error: undefined, stale: false } as never,
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+      } as never,
       fn,
     ];
   });

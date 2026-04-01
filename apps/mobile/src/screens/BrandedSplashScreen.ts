@@ -59,7 +59,7 @@ export function isCustomBranding(input: BrandingInput): boolean {
 /** Validate a hex color string. Returns the color or a fallback. */
 export function validateHexColor(
   hex: string,
-  fallback: string = DEFAULT_PRIMARY,
+  fallback: string = DEFAULT_PRIMARY
 ): string {
   const pattern = /^#[0-9a-fA-F]{6}$/;
   return pattern.test(hex) ? hex : fallback;
@@ -70,7 +70,7 @@ export function validateHexColor(
  * Pure function — no side effects, no React Native imports.
  */
 export function buildSplashScreenOptions(
-  input: BrandingInput,
+  input: BrandingInput
 ): SplashScreenOptions {
   const bgColor = validateHexColor(input.primaryColor);
   const custom = isCustomBranding(input);
@@ -101,7 +101,7 @@ export function computeAnimationDelay(isCustom: boolean): number {
  */
 export function formatSplashTagline(
   tagline: string | null | undefined,
-  maxLength: number = 80,
+  maxLength: number = 80
 ): string {
   if (!tagline) return '';
   const trimmed = tagline.trim();

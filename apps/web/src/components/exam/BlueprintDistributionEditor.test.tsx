@@ -11,7 +11,10 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BlueprintDistributionEditor, type DistributionItem } from './BlueprintDistributionEditor';
+import {
+  BlueprintDistributionEditor,
+  type DistributionItem,
+} from './BlueprintDistributionEditor';
 
 const items: DistributionItem[] = [
   { label: 'Algebra', weight: 40, minPercent: 30, maxPercent: 50 },
@@ -22,14 +25,22 @@ const items: DistributionItem[] = [
 describe('BlueprintDistributionEditor', () => {
   it('renders the title', () => {
     render(
-      <BlueprintDistributionEditor title="Domain Distribution" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Domain Distribution"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByText('Domain Distribution')).toBeInTheDocument();
   });
 
   it('renders all item labels', () => {
     render(
-      <BlueprintDistributionEditor title="Test" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByText('Algebra')).toBeInTheDocument();
     expect(screen.getByText('Geometry')).toBeInTheDocument();
@@ -38,14 +49,22 @@ describe('BlueprintDistributionEditor', () => {
 
   it('shows total percentage (100%)', () => {
     render(
-      <BlueprintDistributionEditor title="Test" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByText('Total: 100%')).toBeInTheDocument();
   });
 
   it('shows green total when valid (98-102%)', () => {
     render(
-      <BlueprintDistributionEditor title="Test" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     const total = screen.getByText('Total: 100%');
     expect(total.className).toContain('green');
@@ -57,24 +76,38 @@ describe('BlueprintDistributionEditor', () => {
       { label: 'B', weight: 30, minPercent: 0, maxPercent: 100 },
     ];
     render(
-      <BlueprintDistributionEditor title="Test" items={badItems} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={badItems}
+        onChange={vi.fn()}
+      />
     );
     const total = screen.getByText('Total: 50%');
     expect(total.className).toContain('red');
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText(/Weights must sum to approximately 100%/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Weights must sum to approximately 100%/)
+    ).toBeInTheDocument();
   });
 
   it('does not show alert when total is valid', () => {
     render(
-      <BlueprintDistributionEditor title="Test" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('renders slider aria labels for each item', () => {
     render(
-      <BlueprintDistributionEditor title="Test" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByLabelText('Algebra weight')).toBeInTheDocument();
     expect(screen.getByLabelText('Geometry weight')).toBeInTheDocument();
@@ -83,7 +116,11 @@ describe('BlueprintDistributionEditor', () => {
 
   it('renders min/max inputs for each item', () => {
     render(
-      <BlueprintDistributionEditor title="Test" items={items} onChange={vi.fn()} />,
+      <BlueprintDistributionEditor
+        title="Test"
+        items={items}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByLabelText('Algebra min %')).toBeInTheDocument();
     expect(screen.getByLabelText('Algebra max %')).toBeInTheDocument();

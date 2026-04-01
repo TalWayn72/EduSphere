@@ -7,7 +7,14 @@
  * Layout: flex row — video area (flex-1) | curriculum sidebar (320px, collapsible to 0).
  */
 import { useState, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, CheckCircle2, Circle, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  Circle,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CurriculumLesson {
@@ -46,7 +53,10 @@ function flatLessons(curriculum: CurriculumSection[]): CurriculumLesson[] {
 }
 
 function completedCount(curriculum: CurriculumSection[]): number {
-  return curriculum.reduce((acc, s) => acc + s.lessons.filter((l) => l.completed).length, 0);
+  return curriculum.reduce(
+    (acc, s) => acc + s.lessons.filter((l) => l.completed).length,
+    0
+  );
 }
 
 function totalCount(curriculum: CurriculumSection[]): number {
@@ -83,16 +93,23 @@ export function VideoPlayerWithCurriculum({
   const all = flatLessons(curriculum);
   const currentIndex = all.findIndex((l) => l.id === currentLessonId);
   const prevLesson = currentIndex > 0 ? all[currentIndex - 1] : null;
-  const nextLesson = currentIndex < all.length - 1 ? all[currentIndex + 1] : null;
+  const nextLesson =
+    currentIndex < all.length - 1 ? all[currentIndex + 1] : null;
 
   const currentLesson = all[currentIndex] ?? null;
   const done = completedCount(curriculum);
   const total = totalCount(curriculum);
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-background" data-testid="video-player-container">
+    <div
+      className="flex h-full w-full overflow-hidden bg-background"
+      data-testid="video-player-container"
+    >
       {/* ── Left: video area ─────────────────────────────────────────────── */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-y-auto" data-testid="video-player">
+      <div
+        className="flex flex-col flex-1 min-w-0 overflow-y-auto"
+        data-testid="video-player"
+      >
         {/* Video */}
         <div className="relative w-full bg-black aspect-video dark:bg-black">
           {videoUrl ? (
@@ -150,11 +167,19 @@ export function VideoPlayerWithCurriculum({
 
         {/* Lesson info */}
         <div className="p-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-foreground" data-testid="lesson-title">
+          <h2
+            className="text-lg font-semibold text-foreground"
+            data-testid="lesson-title"
+          >
             {currentLesson?.title ?? 'No lesson selected'}
           </h2>
-          <p className="text-sm text-muted-foreground mt-1" data-testid="lesson-description">
-            {currentLesson?.duration ? `Duration: ${currentLesson.duration}` : ''}
+          <p
+            className="text-sm text-muted-foreground mt-1"
+            data-testid="lesson-description"
+          >
+            {currentLesson?.duration
+              ? `Duration: ${currentLesson.duration}`
+              : ''}
           </p>
         </div>
 
@@ -201,7 +226,11 @@ export function VideoPlayerWithCurriculum({
         aria-label={sidebarOpen ? 'Collapse curriculum' : 'Expand curriculum'}
         data-testid="sidebar-toggle"
       >
-        {sidebarOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        {sidebarOpen ? (
+          <ChevronRight className="h-3 w-3" />
+        ) : (
+          <ChevronLeft className="h-3 w-3" />
+        )}
       </button>
 
       {/* ── Right: curriculum sidebar ────────────────────────────────────── */}
@@ -215,10 +244,16 @@ export function VideoPlayerWithCurriculum({
       >
         {/* Sidebar header */}
         <div className="p-4 border-b border-border flex-shrink-0">
-          <h3 className="font-semibold text-foreground text-sm leading-tight" data-testid="course-title">
+          <h3
+            className="font-semibold text-foreground text-sm leading-tight"
+            data-testid="course-title"
+          >
             {courseTitle}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1" data-testid="progress-count">
+          <p
+            className="text-xs text-muted-foreground mt-1"
+            data-testid="progress-count"
+          >
             {done} of {total} lessons completed
           </p>
         </div>
@@ -241,20 +276,37 @@ export function VideoPlayerWithCurriculum({
                     className={cn(
                       'w-full flex items-start gap-2 px-4 py-3 text-left transition-colors border-b border-border/50',
                       'hover:bg-muted/60',
-                      isCurrent && 'border-l-2 border-l-indigo-500 bg-indigo-50/60'
+                      isCurrent &&
+                        'border-l-2 border-l-indigo-500 bg-indigo-50/60'
                     )}
                     data-testid={`lesson-item-${lesson.id}`}
                   >
-                    <span className="mt-0.5 flex-shrink-0 text-muted-foreground" data-testid={lesson.completed ? 'lesson-completed-icon' : 'lesson-incomplete-icon'}>
-                      {lesson.completed
-                        ? <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
-                        : <Circle className="h-4 w-4" />}
+                    <span
+                      className="mt-0.5 flex-shrink-0 text-muted-foreground"
+                      data-testid={
+                        lesson.completed
+                          ? 'lesson-completed-icon'
+                          : 'lesson-incomplete-icon'
+                      }
+                    >
+                      {lesson.completed ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
+                      ) : (
+                        <Circle className="h-4 w-4" />
+                      )}
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className={cn('text-sm leading-tight block', isCurrent && 'font-medium text-indigo-700')}>
+                      <span
+                        className={cn(
+                          'text-sm leading-tight block',
+                          isCurrent && 'font-medium text-indigo-700'
+                        )}
+                      >
                         {lesson.title}
                       </span>
-                      <span className="text-xs text-muted-foreground">{lesson.duration}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {lesson.duration}
+                      </span>
                     </span>
                   </button>
                 );

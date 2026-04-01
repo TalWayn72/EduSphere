@@ -40,18 +40,18 @@ test.describe('CheckoutPage', () => {
     );
 
     // In test env, VITE_STRIPE_PUBLISHABLE_KEY is not set → Payment Unavailable shown
-    const heading = page.getByText('Payment Unavailable').or(
-      page.getByText('Complete Your Purchase')
-    );
+    const heading = page
+      .getByText('Payment Unavailable')
+      .or(page.getByText('Complete Your Purchase'));
     await expect(heading).toBeVisible({ timeout: 10_000 });
   });
 
   test('shows No Payment Session without secret param', async ({ page }) => {
     await page.goto(`${BASE_URL}/checkout`, { waitUntil: 'domcontentloaded' });
 
-    await expect(
-      page.getByText('No Payment Session')
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText('No Payment Session')).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('clientSecret is NOT visible in page text content', async ({ page }) => {
@@ -100,7 +100,9 @@ test.describe('PurchaseCourseButton → /checkout navigation', () => {
   test('navigates to /checkout with secret + session + course params after purchase mutation', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     let checkoutUrl: string | null = null;
     page.on('framenavigated', (frame) => {
@@ -182,7 +184,9 @@ test.describe('CheckoutPage — extended coverage', () => {
     expect(body).not.toMatch(/TypeError|Error:/);
   });
 
-  test('coupon code input — accepts text input without crash', async ({ page }) => {
+  test('coupon code input — accepts text input without crash', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (op) => {
       if (op === 'ValidateCoupon' || op === 'ApplyCoupon') {
         return JSON.stringify({
@@ -212,7 +216,10 @@ test.describe('CheckoutPage — extended coverage', () => {
         '[data-testid="apply-coupon-btn"], button:has-text("Apply")'
       );
       if ((await applyBtn.count()) > 0) {
-        await applyBtn.first().click().catch(() => {});
+        await applyBtn
+          .first()
+          .click()
+          .catch(() => {});
       }
     }
 
@@ -227,7 +234,13 @@ test.describe('CheckoutPage — extended coverage', () => {
     await routeGraphQL(page, (op) => {
       if (op === 'ValidateCoupon' || op === 'ApplyCoupon') {
         return JSON.stringify({
-          data: { validateCoupon: { valid: false, discountPercent: 0, code: 'INVALID' } },
+          data: {
+            validateCoupon: {
+              valid: false,
+              discountPercent: 0,
+              code: 'INVALID',
+            },
+          },
         });
       }
       return null;
@@ -263,10 +276,9 @@ test.describe('CheckoutPage — extended coverage', () => {
       return null;
     });
 
-    await page.goto(
-      `${BASE_URL}/checkout?course=c-free`,
-      { waitUntil: 'domcontentloaded' }
-    );
+    await page.goto(`${BASE_URL}/checkout?course=c-free`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // Page should not crash for free course flow
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -276,18 +288,25 @@ test.describe('CheckoutPage — extended coverage', () => {
     expect(body).not.toContain('[object Object]');
   });
 
-  test('declined card mock — error message is user-friendly', async ({ page }) => {
+  test('declined card mock — error message is user-friendly', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postDataJSON() as { operationName?: string };
-      if (body?.operationName === 'PurchaseCourse' || body?.operationName === 'ConfirmPayment') {
+      if (
+        body?.operationName === 'PurchaseCourse' ||
+        body?.operationName === 'ConfirmPayment'
+      ) {
         await route.fulfill({
           contentType: 'application/json',
           body: JSON.stringify({
             data: null,
-            errors: [{
-              message: 'StripeCardError: Your card was declined.',
-              extensions: { code: 'PAYMENT_FAILED' },
-            }],
+            errors: [
+              {
+                message: 'StripeCardError: Your card was declined.',
+                extensions: { code: 'PAYMENT_FAILED' },
+              },
+            ],
           }),
         });
         return;
@@ -325,10 +344,9 @@ test.describe('CheckoutPage — extended coverage', () => {
       return null;
     });
 
-    await page.goto(
-      `${BASE_URL}/checkout/success?session=pi_test&course=c-1`,
-      { waitUntil: 'domcontentloaded' }
-    );
+    await page.goto(`${BASE_URL}/checkout/success?session=pi_test&course=c-1`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -372,10 +390,9 @@ test.describe('CheckoutPage — extended coverage', () => {
   test('checkout page with malformed URL params does not crash', async ({
     page,
   }) => {
-    await page.goto(
-      `${BASE_URL}/checkout?secret=&session=&course=`,
-      { waitUntil: 'domcontentloaded' }
-    );
+    await page.goto(`${BASE_URL}/checkout?secret=&session=&course=`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
@@ -398,7 +415,9 @@ test.describe('CheckoutPage — extended coverage', () => {
   test('checkout — back button or cancel returns to previous page', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.goto(
       `${BASE_URL}/checkout?secret=cs_test&session=pi_test&course=c-1`,
       { waitUntil: 'domcontentloaded' }
@@ -408,7 +427,10 @@ test.describe('CheckoutPage — extended coverage', () => {
       '[data-testid="cancel-checkout"], button:has-text("Cancel"), a:has-text("Back")'
     );
     if ((await cancelBtn.count()) > 0) {
-      await cancelBtn.first().click().catch(() => {});
+      await cancelBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -451,9 +473,18 @@ test.describe('CheckoutPage — extended coverage', () => {
     );
     if ((await submitBtn.count()) > 0) {
       // Rapid clicks
-      await submitBtn.first().click().catch(() => {});
-      await submitBtn.first().click().catch(() => {});
-      await submitBtn.first().click().catch(() => {});
+      await submitBtn
+        .first()
+        .click()
+        .catch(() => {});
+      await submitBtn
+        .first()
+        .click()
+        .catch(() => {});
+      await submitBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -485,7 +516,12 @@ test.describe('CheckoutPage — extended coverage', () => {
       if (op === 'GetCourseForCheckout' || op === 'GetCourse') {
         return JSON.stringify({
           data: {
-            course: { id: 'c-1', title: 'GraphQL Mastery', price: 79.99, currency: 'USD' },
+            course: {
+              id: 'c-1',
+              title: 'GraphQL Mastery',
+              price: 79.99,
+              currency: 'USD',
+            },
           },
         });
       }

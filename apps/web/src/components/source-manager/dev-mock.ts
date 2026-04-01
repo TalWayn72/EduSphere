@@ -26,7 +26,8 @@ let _devSources: KnowledgeSource[] = [
   },
   {
     id: 'dev-src-2',
-    title: '\u05D4\u05E8\u05DE\u05D1"\u05DD - \u05DE\u05E9\u05E0\u05D4 \u05EA\u05D5\u05E8\u05D4',
+    title:
+      '\u05D4\u05E8\u05DE\u05D1"\u05DD - \u05DE\u05E9\u05E0\u05D4 \u05EA\u05D5\u05E8\u05D4',
     sourceType: 'TEXT',
     preview:
       '\u05D4\u05DC\u05DB\u05D5\u05EA \u05EA\u05E9\u05D5\u05D1\u05D4 \u2014 \u05E4\u05E8\u05E7 \u05D0.',
@@ -56,7 +57,7 @@ export function devQueryFn(): Promise<KnowledgeSource[]> {
 export function devAddSource(
   sourceType: SourceType,
   title: string,
-  origin?: string,
+  origin?: string
 ): KnowledgeSource {
   const mockContent =
     `(\u05EA\u05D5\u05DB\u05DF \u05DC\u05D3\u05D5\u05D2\u05DE\u05D4 \u2014 \u05E1\u05D1\u05D9\u05D1\u05EA \u05E4\u05D9\u05EA\u05D5\u05D7)\n\n` +

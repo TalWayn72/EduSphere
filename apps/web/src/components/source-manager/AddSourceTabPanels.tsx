@@ -11,7 +11,12 @@ interface UrlPanelProps {
   onTitleChange: (v: string) => void;
 }
 
-export function UrlPanel({ url, urlTitle, onUrlChange, onTitleChange }: UrlPanelProps) {
+export function UrlPanel({
+  url,
+  urlTitle,
+  onUrlChange,
+  onTitleChange,
+}: UrlPanelProps) {
   const { t } = useTranslation('content');
   return (
     <>
@@ -31,7 +36,9 @@ export function UrlPanel({ url, urlTitle, onUrlChange, onTitleChange }: UrlPanel
         value={urlTitle}
         onChange={(e) => onTitleChange(e.target.value)}
       />
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('sources.urlHint')}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        {t('sources.urlHint')}
+      </p>
     </>
   );
 }
@@ -43,7 +50,12 @@ interface TextPanelProps {
   onTitleChange: (v: string) => void;
 }
 
-export function TextPanel({ text, textTitle, onTextChange, onTitleChange }: TextPanelProps) {
+export function TextPanel({
+  text,
+  textTitle,
+  onTextChange,
+  onTitleChange,
+}: TextPanelProps) {
   const { t } = useTranslation('content');
   return (
     <>
@@ -70,7 +82,12 @@ interface YoutubePanelProps {
   onTitleChange: (v: string) => void;
 }
 
-export function YoutubePanel({ youtubeUrl, youtubeTitle, onUrlChange, onTitleChange }: YoutubePanelProps) {
+export function YoutubePanel({
+  youtubeUrl,
+  youtubeTitle,
+  onUrlChange,
+  onTitleChange,
+}: YoutubePanelProps) {
   const { t } = useTranslation('content');
   return (
     <>

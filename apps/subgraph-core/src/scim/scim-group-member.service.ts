@@ -3,11 +3,7 @@
  * Handles patch operations (add/remove/replace members) on SCIM groups.
  * Extracted from ScimGroupService to keep files under 300 lines.
  */
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,

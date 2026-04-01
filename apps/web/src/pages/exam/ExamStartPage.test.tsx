@@ -41,7 +41,7 @@ vi.mock('@/hooks/useExamSession', () => ({
 
 vi.mock('@/stores/exam-session.store', () => ({
   useExamSessionStore: vi.fn((sel: (s: Record<string, unknown>) => unknown) =>
-    sel({ setSession: vi.fn() }),
+    sel({ setSession: vi.fn() })
   ),
 }));
 

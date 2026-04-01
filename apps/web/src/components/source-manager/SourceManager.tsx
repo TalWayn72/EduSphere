@@ -45,7 +45,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [addedBanner, setAddedBanner] = useState<string | null>(null);
   const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
+    undefined
   );
 
   useEffect(() => {
@@ -55,7 +55,13 @@ export function SourceManager({ courseId }: { courseId: string }) {
     };
   }, []);
 
-  const { data, isLoading, isError, error: queryError, refetch } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    error: queryError,
+    refetch,
+  } = useQuery({
     queryKey: ['course-sources', courseId],
     queryFn: IS_DEV_MODE
       ? devQueryFn
@@ -65,7 +71,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
             .request(COURSE_KNOWLEDGE_SOURCES, { courseId }, authHeaders())
             .then(
               (r: { courseKnowledgeSources: KnowledgeSource[] }) =>
-                r.courseKnowledgeSources,
+                r.courseKnowledgeSources
             );
         },
     refetchInterval: IS_DEV_MODE
@@ -73,7 +79,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       : (query) => {
           const sources = query.state.data as KnowledgeSource[] | undefined;
           const hasProcessing = sources?.some(
-            (s) => s.status === 'PENDING' || s.status === 'PROCESSING',
+            (s) => s.status === 'PENDING' || s.status === 'PROCESSING'
           );
           return hasProcessing ? 3000 : false;
         },
@@ -88,7 +94,11 @@ export function SourceManager({ courseId }: { courseId: string }) {
         }
       : (id: string) => {
           requireAuth();
-          return graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders());
+          return graphqlClient.request(
+            DELETE_KNOWLEDGE_SOURCE,
+            { id },
+            authHeaders()
+          );
         },
     onSuccess: () => refetch(),
     onError: (e: unknown) => {
@@ -101,7 +111,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       e.stopPropagation();
       if (window.confirm(t('sources.deleteConfirm'))) deleteSource.mutate(id);
     },
-    [deleteSource, t],
+    [deleteSource, t]
   );
 
   return (
@@ -112,7 +122,10 @@ export function SourceManager({ courseId }: { courseId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-white dark:bg-gray-900">
         <div>
-          <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-100" data-testid="sources-title">
+          <h3
+            className="font-semibold text-sm text-gray-800 dark:text-gray-100"
+            data-testid="sources-title"
+          >
             {t('sources.title')}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -129,7 +142,9 @@ export function SourceManager({ courseId }: { courseId: string }) {
           data-testid="add-source-btn"
           aria-label={t('sources.addSource')}
         >
-          <span className="text-base leading-none" aria-hidden="true">+</span>
+          <span className="text-base leading-none" aria-hidden="true">
+            +
+          </span>
           {t('sources.addSource')}
         </button>
       </div>
@@ -143,7 +158,11 @@ export function SourceManager({ courseId }: { courseId: string }) {
       )}
 
       {/* Source list */}
-      <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1" role="list" aria-label={t('sources.title')}>
+      <div
+        className="flex-1 overflow-y-auto p-2 flex flex-col gap-1"
+        role="list"
+        aria-label={t('sources.title')}
+      >
         {isLoading && (
           <div className="text-center text-sm text-gray-400 mt-8 dark:text-gray-500">
             {t('sources.loadingSources')}
@@ -214,7 +233,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
               clearTimeout(addedBannerTimerRef.current);
             addedBannerTimerRef.current = setTimeout(
               () => setAddedBanner(null),
-              5000,
+              5000
             );
           }}
         />

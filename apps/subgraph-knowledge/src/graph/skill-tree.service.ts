@@ -84,7 +84,8 @@ export class SkillTreeService {
           ORDER BY c.title
           LIMIT 30
         `);
-        concepts = (conceptResult.rows ?? conceptResult) as unknown as ConceptRow[];
+        concepts = (conceptResult.rows ??
+          conceptResult) as unknown as ConceptRow[];
       } catch (err) {
         this.logger.warn(
           { courseId, tenantId, err },
@@ -116,7 +117,8 @@ export class SkillTreeService {
               AND tenant_id = ${tenantId}::uuid
               AND concept_id = ANY(${ids}::uuid[])
           `);
-          const rows = (masteryResult.rows ?? masteryResult) as unknown as MasteryRow[];
+          const rows = (masteryResult.rows ??
+            masteryResult) as unknown as MasteryRow[];
           for (const row of rows) {
             masteryMap.set(row.concept_id, toMasteryLevel(row.mastery_level));
           }

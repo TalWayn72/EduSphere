@@ -4,7 +4,11 @@ import type { FirecrawlPage } from './content-import.types';
 interface CrawlResponse {
   id?: string;
   status?: string;
-  data?: Array<{ url?: string; markdown?: string; metadata?: { title?: string } }>;
+  data?: Array<{
+    url?: string;
+    markdown?: string;
+    metadata?: { title?: string };
+  }>;
 }
 
 @Injectable()
@@ -33,7 +37,9 @@ export class FirecrawlClient {
     });
 
     if (!startRes.ok) {
-      throw new BadRequestException(`Firecrawl start error: ${startRes.status}`);
+      throw new BadRequestException(
+        `Firecrawl start error: ${startRes.status}`
+      );
     }
 
     const { id } = (await startRes.json()) as CrawlResponse;

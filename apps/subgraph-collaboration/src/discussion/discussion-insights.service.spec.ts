@@ -27,7 +27,7 @@ describe('DiscussionInsightsService', () => {
 
       await service.summarizeThread(
         [{ content: 'Hello', userId: 'u1' }],
-        'React Discussion',
+        'React Discussion'
       );
 
       const call = vi.mocked(ai.generateText).mock.calls[0][0] as {
@@ -48,7 +48,7 @@ describe('DiscussionInsightsService', () => {
 
       const result = await service.summarizeThread(
         [{ content: 'msg', userId: 'u1' }],
-        'Test',
+        'Test'
       );
 
       expect(result.summary).toBe('Test summary');
@@ -65,7 +65,7 @@ describe('DiscussionInsightsService', () => {
 
       const result = await service.summarizeThread(
         [{ content: 'msg', userId: 'u1' }],
-        'Test',
+        'Test'
       );
 
       expect(result.summary).toBe('Just plain text');
@@ -101,7 +101,7 @@ describe('DiscussionInsightsService', () => {
 
       await service.summarizeThread(
         [{ content: 'msg', userId: 'secret-user-id' }],
-        'Test',
+        'Test'
       );
 
       const call = vi.mocked(ai.generateText).mock.calls[0][0] as {
@@ -117,11 +117,13 @@ describe('DiscussionInsightsService', () => {
 
       const result = await service.summarizeThread(
         [{ content: 'msg', userId: 'u1' }],
-        'Test',
+        'Test'
       );
 
       expect(() => new Date(result.generatedAt)).not.toThrow();
-      expect(new Date(result.generatedAt).toISOString()).toBe(result.generatedAt);
+      expect(new Date(result.generatedAt).toISOString()).toBe(
+        result.generatedAt
+      );
     });
 
     it('uses discussionTitle in JSON payload', async () => {
@@ -131,7 +133,7 @@ describe('DiscussionInsightsService', () => {
 
       await service.summarizeThread(
         [{ content: 'msg', userId: 'u1' }],
-        'My Special Discussion Title',
+        'My Special Discussion Title'
       );
 
       const call = vi.mocked(ai.generateText).mock.calls[0][0] as {
@@ -145,10 +147,7 @@ describe('DiscussionInsightsService', () => {
         text: '{"summary":"ok","keyTopics":[],"suggestedFollowUp":null}',
       } as never);
 
-      await service.summarizeThread(
-        [{ content: 'msg', userId: 'u1' }],
-        'Test',
-      );
+      await service.summarizeThread([{ content: 'msg', userId: 'u1' }], 'Test');
 
       const call = vi.mocked(ai.generateText).mock.calls[0][0] as {
         maxOutputTokens: number;

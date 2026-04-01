@@ -14,7 +14,7 @@ export interface ExamQuestionData {
 
 export function gradeExamItem(
   questionData: Record<string, unknown>,
-  answerData: unknown,
+  answerData: unknown
 ): boolean {
   const qd = questionData as unknown as ExamQuestionData;
   const type = qd.type?.toUpperCase();
@@ -54,8 +54,7 @@ function gradeHotspot(qd: ExamQuestionData, answer: unknown): boolean {
   const selected = Array.isArray(answer) ? answer : [];
   const correct = qd.correctHotspotIds ?? [];
   return (
-    selected.length > 0 &&
-    selected.every((id) => correct.includes(String(id)))
+    selected.length > 0 && selected.every((id) => correct.includes(String(id)))
   );
 }
 
@@ -65,14 +64,16 @@ function gradeMatching(qd: ExamQuestionData, answer: unknown): boolean {
   if (correct.length === 0) return false;
   const matched = answer.filter((pair: Record<string, unknown>) =>
     correct.some(
-      (cp) => cp.leftId === pair['leftId'] && cp.rightId === pair['rightId'],
-    ),
+      (cp) => cp.leftId === pair['leftId'] && cp.rightId === pair['rightId']
+    )
   ).length;
   return matched === correct.length;
 }
 
 function gradeFillBlank(qd: ExamQuestionData, answer: unknown): boolean {
-  const userAnswer = String(answer ?? '').trim().toLowerCase();
+  const userAnswer = String(answer ?? '')
+    .trim()
+    .toLowerCase();
   const correctAnswer = (qd.correctAnswer ?? '').trim().toLowerCase();
   return correctAnswer.length > 0 && userAnswer === correctAnswer;
 }

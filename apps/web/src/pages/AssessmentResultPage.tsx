@@ -77,14 +77,22 @@ export function AssessmentResultPage() {
       <div className="container mx-auto p-6 space-y-6 max-w-3xl">
         <Breadcrumbs
           items={[
-            { label: t('assessmentResponse.breadcrumbAssessments'), href: '/assessments' },
-            { label: t('assessmentResponse.breadcrumbAssessment'), href: `/assessments/${campaignId}` },
+            {
+              label: t('assessmentResponse.breadcrumbAssessments'),
+              href: '/assessments',
+            },
+            {
+              label: t('assessmentResponse.breadcrumbAssessment'),
+              href: `/assessments/${campaignId}`,
+            },
             { label: t('assessmentResult.breadcrumbResults') },
           ]}
         />
         <div className="flex items-center gap-3">
           <ClipboardList className="h-8 w-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold">{t('assessmentResult.pageTitle')}</h1>
+          <h1 className="text-3xl font-bold">
+            {t('assessmentResult.pageTitle')}
+          </h1>
         </div>
 
         {!result ? (
@@ -99,7 +107,9 @@ export function AssessmentResultPage() {
             {radarCriteria.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">{t('assessmentResult.scoreOverview')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {t('assessmentResult.scoreOverview')}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <AssessmentRadarChart
@@ -114,26 +124,50 @@ export function AssessmentResultPage() {
             {result.aggregatedScores.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">{t('assessmentResult.detailedScores')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {t('assessmentResult.detailedScores')}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <table className="w-full text-sm" aria-label={t('assessmentResult.tableAriaLabel')}>
+                  <table
+                    className="w-full text-sm"
+                    aria-label={t('assessmentResult.tableAriaLabel')}
+                  >
                     <thead>
                       <tr className="border-b text-left text-muted-foreground">
-                        <th className="p-4">{t('assessmentResult.criterionHeader')}</th>
-                        <th className="p-4 text-right">{t('assessmentResult.selfHeader')}</th>
-                        <th className="p-4 text-right">{t('assessmentResult.peersHeader')}</th>
-                        <th className="p-4 text-right">{t('assessmentResult.managerHeader')}</th>
-                        <th className="p-4 text-right font-semibold text-foreground">{t('assessmentResult.overallHeader')}</th>
+                        <th className="p-4">
+                          {t('assessmentResult.criterionHeader')}
+                        </th>
+                        <th className="p-4 text-right">
+                          {t('assessmentResult.selfHeader')}
+                        </th>
+                        <th className="p-4 text-right">
+                          {t('assessmentResult.peersHeader')}
+                        </th>
+                        <th className="p-4 text-right">
+                          {t('assessmentResult.managerHeader')}
+                        </th>
+                        <th className="p-4 text-right font-semibold text-foreground">
+                          {t('assessmentResult.overallHeader')}
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {result.aggregatedScores.map((s) => (
-                        <tr key={s.criteriaId} className="border-b last:border-0">
+                        <tr
+                          key={s.criteriaId}
+                          className="border-b last:border-0"
+                        >
                           <td className="p-4 font-medium">{s.label}</td>
-                          <td className="p-4 text-right">{s.selfScore.toFixed(1)}</td>
-                          <td className="p-4 text-right">{s.peerAvg.toFixed(1)}</td>
-                          <td className="p-4 text-right">{s.managerScore.toFixed(1)}</td>
+                          <td className="p-4 text-right">
+                            {s.selfScore.toFixed(1)}
+                          </td>
+                          <td className="p-4 text-right">
+                            {s.peerAvg.toFixed(1)}
+                          </td>
+                          <td className="p-4 text-right">
+                            {s.managerScore.toFixed(1)}
+                          </td>
                           <td className="p-4 text-right font-semibold text-primary">
                             {s.overallAvg.toFixed(1)}
                           </td>
@@ -149,12 +183,15 @@ export function AssessmentResultPage() {
             {result.summary && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">{t('assessmentResult.aiSummary')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {t('assessmentResult.aiSummary')}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed">{result.summary}</p>
                   <p className="text-xs text-muted-foreground mt-3">
-                    {t('assessmentResult.generated')} {new Date(result.generatedAt).toLocaleString()}
+                    {t('assessmentResult.generated')}{' '}
+                    {new Date(result.generatedAt).toLocaleString()}
                   </p>
                 </CardContent>
               </Card>

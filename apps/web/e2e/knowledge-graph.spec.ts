@@ -410,9 +410,9 @@ test.describe('Knowledge Graph — BUG-043: clean error banner (no raw error str
     ).not.toBeVisible({ timeout: 2_000 });
 
     // Also check the specific error shown in the bug report
-    await expect(
-      page.getByText('[GraphQL]', { exact: false })
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('[GraphQL]', { exact: false })).not.toBeVisible(
+      { timeout: 2_000 }
+    );
 
     const file = path.join(
       SCREENSHOTS_DIR,

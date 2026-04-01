@@ -54,7 +54,11 @@ import {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function mockQuery(data: unknown = undefined, fetching = false, error?: string) {
+function mockQuery(
+  data: unknown = undefined,
+  fetching = false,
+  error?: string
+) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data,
@@ -66,10 +70,20 @@ function mockQuery(data: unknown = undefined, fetching = false, error?: string) 
   ]);
 }
 
-function mockMutation(resolveWith?: { data?: unknown; error?: { message: string } }) {
-  const executeFn = vi.fn().mockResolvedValue(resolveWith ?? { data: undefined, error: undefined });
+function mockMutation(resolveWith?: {
+  data?: unknown;
+  error?: { message: string };
+}) {
+  const executeFn = vi
+    .fn()
+    .mockResolvedValue(resolveWith ?? { data: undefined, error: undefined });
   vi.mocked(urql.useMutation).mockReturnValue([
-    { fetching: false, data: undefined, error: undefined, stale: false } as never,
+    {
+      fetching: false,
+      data: undefined,
+      error: undefined,
+      stale: false,
+    } as never,
     executeFn,
   ]);
   return executeFn;
@@ -132,10 +146,17 @@ describe('useCreateExamItem', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('returns a callback that calls execute with input', async () => {
-    const executeFn = mockMutation({ data: { createExamItem: { id: 'new-1' } } });
+    const executeFn = mockMutation({
+      data: { createExamItem: { id: 'new-1' } },
+    });
     const { result } = renderHook(() => useCreateExamItem());
 
-    const input = { courseId: 'c-1', domainTag: 'algebra', bloomLevel: 'REMEMBER' as const, questionData: {} };
+    const input = {
+      courseId: 'c-1',
+      domainTag: 'algebra',
+      bloomLevel: 'REMEMBER' as const,
+      questionData: {},
+    };
     await act(async () => {
       await result.current(input as never);
     });
@@ -155,7 +176,10 @@ describe('useUpdateExamItem', () => {
       await result.current('item-1', { domainTag: 'calculus' } as never);
     });
 
-    expect(executeFn).toHaveBeenCalledWith({ id: 'item-1', input: { domainTag: 'calculus' } });
+    expect(executeFn).toHaveBeenCalledWith({
+      id: 'item-1',
+      input: { domainTag: 'calculus' },
+    });
   });
 });
 
@@ -225,7 +249,12 @@ describe('useGenerateExamItems', () => {
   it('generate handles thrown exceptions', async () => {
     const executeFn = vi.fn().mockRejectedValue(new Error('Network failure'));
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false } as never,
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+      } as never,
       executeFn,
     ]);
 
@@ -291,7 +320,16 @@ describe('useCreateExamBlueprint', () => {
   it('returns callback that calls execute with input', async () => {
     const executeFn = mockMutation();
     const { result } = renderHook(() => useCreateExamBlueprint());
-    const input = { courseId: 'c-1', title: 'Quiz', timeLimitMinutes: 30, totalQuestions: 20, passingScore: 70, passingMethod: 'FIXED' as const, domainDistribution: {}, bloomDistribution: {} };
+    const input = {
+      courseId: 'c-1',
+      title: 'Quiz',
+      timeLimitMinutes: 30,
+      totalQuestions: 20,
+      passingScore: 70,
+      passingMethod: 'FIXED' as const,
+      domainDistribution: {},
+      bloomDistribution: {},
+    };
     await act(async () => {
       await result.current(input as never);
     });
@@ -308,7 +346,10 @@ describe('useUpdateExamBlueprint', () => {
     await act(async () => {
       await result.current('bp-1', { title: 'Updated' } as never);
     });
-    expect(executeFn).toHaveBeenCalledWith({ id: 'bp-1', input: { title: 'Updated' } });
+    expect(executeFn).toHaveBeenCalledWith({
+      id: 'bp-1',
+      input: { title: 'Updated' },
+    });
   });
 });
 

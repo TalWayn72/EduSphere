@@ -5,7 +5,13 @@ import { AnnotationLayer, type Annotation } from '@/types/annotations';
 
 // ── mock AnnotationCard ───────────────────────────────────────────────────────
 vi.mock('@/pages/AnnotationCard', () => ({
-  AnnotationCard: ({ ann, onSeek }: { ann: Annotation; onSeek: () => void }) => (
+  AnnotationCard: ({
+    ann,
+    onSeek,
+  }: {
+    ann: Annotation;
+    onSeek: () => void;
+  }) => (
     <div data-testid="annotation-card" onClick={onSeek}>
       {ann.content}
     </div>

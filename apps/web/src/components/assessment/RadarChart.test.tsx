@@ -4,11 +4,15 @@ import AssessmentRadarChart from './RadarChart';
 
 // Mock recharts — SVG rendering is unreliable in jsdom
 vi.mock('recharts', () => ({
-  RadarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  RadarChart: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   Radar: () => null,
   PolarGrid: () => null,
   PolarAngleAxis: ({ dataKey }: { dataKey: string }) => <span>{dataKey}</span>,
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   Tooltip: () => null,
 }));
 
@@ -20,16 +24,32 @@ const criteria = [
 
 describe('AssessmentRadarChart', () => {
   it('renders without crashing', () => {
-    render(<AssessmentRadarChart criteria={criteria} ariaLabel="Assessment radar chart" />);
+    render(
+      <AssessmentRadarChart
+        criteria={criteria}
+        ariaLabel="Assessment radar chart"
+      />
+    );
   });
 
   it('has aria-label for accessibility', () => {
-    render(<AssessmentRadarChart criteria={criteria} ariaLabel="Assessment results" />);
-    expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'Assessment results');
+    render(
+      <AssessmentRadarChart
+        criteria={criteria}
+        ariaLabel="Assessment results"
+      />
+    );
+    expect(screen.getByRole('img')).toHaveAttribute(
+      'aria-label',
+      'Assessment results'
+    );
   });
 
   it('uses default aria-label when not provided', () => {
     render(<AssessmentRadarChart criteria={criteria} />);
-    expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'Assessment radar chart');
+    expect(screen.getByRole('img')).toHaveAttribute(
+      'aria-label',
+      'Assessment radar chart'
+    );
   });
 });

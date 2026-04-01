@@ -6,20 +6,20 @@
 
 Use semantic color categories consistently across all diagrams:
 
-| Category | Fill | Stroke | Use For |
-|----------|------|--------|---------|
-| **client** | `#e1f5ff` | `#01579b` | Browser, mobile, PWA, user-facing |
-| **upload/initiation** | `#e3f2fd` | `#1565c0` | Upload flows, mutations, API calls |
-| **gateway** | `#fff9c4` | `#f57f17` | Gateway, reverse proxy, routing |
-| **subgraph/service** | `#c8e6c9` | `#2e7d32` | Backend services, subgraphs, resolvers |
-| **processing** | `#fff3e0` | `#e65100` | Workers, async jobs, transformations |
-| **storage/data** | `#ffccbc` | `#d84315` | PostgreSQL, MinIO, NATS, Redis |
-| **infra** | `#f3e5f5` | `#6a1b9a` | Keycloak, Jaeger, monitoring, auth |
-| **knowledge** | `#e8f5e9` | `#2e7d32` | Knowledge graph, embeddings, AI output |
-| **error/security** | `#ffebee` | `#c62828` | Errors, threats, security boundaries |
-| **llm/ai** | `#fce4ec` | `#c2185b` | LLM calls, AI models, inference |
-| **stream** | `#e0f2f1` | `#00695c` | WebSockets, subscriptions, real-time |
-| **worker** | `#e0f2f1` | `#00695c` | Background processes, consumers |
+| Category              | Fill      | Stroke    | Use For                                |
+| --------------------- | --------- | --------- | -------------------------------------- |
+| **client**            | `#e1f5ff` | `#01579b` | Browser, mobile, PWA, user-facing      |
+| **upload/initiation** | `#e3f2fd` | `#1565c0` | Upload flows, mutations, API calls     |
+| **gateway**           | `#fff9c4` | `#f57f17` | Gateway, reverse proxy, routing        |
+| **subgraph/service**  | `#c8e6c9` | `#2e7d32` | Backend services, subgraphs, resolvers |
+| **processing**        | `#fff3e0` | `#e65100` | Workers, async jobs, transformations   |
+| **storage/data**      | `#ffccbc` | `#d84315` | PostgreSQL, MinIO, NATS, Redis         |
+| **infra**             | `#f3e5f5` | `#6a1b9a` | Keycloak, Jaeger, monitoring, auth     |
+| **knowledge**         | `#e8f5e9` | `#2e7d32` | Knowledge graph, embeddings, AI output |
+| **error/security**    | `#ffebee` | `#c62828` | Errors, threats, security boundaries   |
+| **llm/ai**            | `#fce4ec` | `#c2185b` | LLM calls, AI models, inference        |
+| **stream**            | `#e0f2f1` | `#00695c` | WebSockets, subscriptions, real-time   |
+| **worker**            | `#e0f2f1` | `#00695c` | Background processes, consumers        |
 
 ### classDef Template
 
@@ -38,20 +38,21 @@ classDef stream fill:#e0f2f1,stroke:#00695c,stroke-width:2px
 
 ## 2. Diagram Direction
 
-| Diagram Purpose | Direction | Example |
-|-----------------|-----------|---------|
-| Architecture overviews | `graph TD` | System layers top-to-bottom |
-| Data/request flows | `graph LR` | Left-to-right pipeline |
-| Process/pipeline steps | `flowchart TD` or `flowchart LR` | CI/CD, bug fix protocol |
-| Request lifecycle | `sequenceDiagram` | Client-server interactions |
-| State transitions | `stateDiagram-v2` | Incident response, DR |
-| Timelines/roadmaps | `gantt` | Phase milestones |
-| Data models | `erDiagram` | Table relationships |
-| Git workflow | `gitGraph` | Branching strategy |
+| Diagram Purpose        | Direction                        | Example                     |
+| ---------------------- | -------------------------------- | --------------------------- |
+| Architecture overviews | `graph TD`                       | System layers top-to-bottom |
+| Data/request flows     | `graph LR`                       | Left-to-right pipeline      |
+| Process/pipeline steps | `flowchart TD` or `flowchart LR` | CI/CD, bug fix protocol     |
+| Request lifecycle      | `sequenceDiagram`                | Client-server interactions  |
+| State transitions      | `stateDiagram-v2`                | Incident response, DR       |
+| Timelines/roadmaps     | `gantt`                          | Phase milestones            |
+| Data models            | `erDiagram`                      | Table relationships         |
+| Git workflow           | `gitGraph`                       | Branching strategy          |
 
 ## 3. Node Rules
 
 ### Naming
+
 - **IDs**: UPPERCASE short names — `GATEWAY`, `PG`, `CORE`, `NATS`
 - **Labels**: Descriptive with `<br/>` for multi-line:
   ```
@@ -67,6 +68,7 @@ classDef stream fill:#e0f2f1,stroke:#00695c,stroke-width:2px
   ```
 
 ### Limits
+
 - **Max 15 nodes** per diagram — split into multiple diagrams if more
 - **Max 3 levels** of subgraph nesting
 - **All edges labeled** when the relationship isn't obvious
@@ -86,13 +88,13 @@ end
 
 ## 5. Edge Styles
 
-| Edge Type | Syntax | Use For |
-|-----------|--------|---------|
-| Solid arrow | `-->` | Direct dependency, sync call |
-| Dotted arrow | `-.->` | Async, optional, validation |
-| Labeled solid | `-->|label|` | Conditional flow, specific protocol |
+| Edge Type      | Syntax       | Use For                            |
+| -------------- | ------------ | ---------------------------------- | --- | ----------------------------------- |
+| Solid arrow    | `-->`        | Direct dependency, sync call       |
+| Dotted arrow   | `-.->`       | Async, optional, validation        |
+| Labeled solid  | `-->         | label                              | `   | Conditional flow, specific protocol |
 | Labeled dotted | `-.label.->` | JWT validation, traces, monitoring |
-| Thick arrow | `==>` | Critical path, primary flow |
+| Thick arrow    | `==>`        | Critical path, primary flow        |
 
 ## 6. Sequence Diagram Rules
 
@@ -126,16 +128,16 @@ gantt
 
 ## 8. When to Add Diagrams
 
-| Content Pattern | Required Diagram Type |
-|-----------------|----------------------|
-| Service/component dependencies described in text | `graph TD` |
-| Request/response flow described step-by-step | `sequenceDiagram` |
-| State transitions or lifecycle stages | `stateDiagram-v2` |
-| Timeline or roadmap with dates | `gantt` |
-| Process/pipeline with sequential steps | `flowchart TD/LR` |
-| Data model relationships | `erDiagram` |
-| Git branching strategy | `gitGraph` |
-| Comparison of options/decisions | Table (not diagram) |
+| Content Pattern                                  | Required Diagram Type |
+| ------------------------------------------------ | --------------------- |
+| Service/component dependencies described in text | `graph TD`            |
+| Request/response flow described step-by-step     | `sequenceDiagram`     |
+| State transitions or lifecycle stages            | `stateDiagram-v2`     |
+| Timeline or roadmap with dates                   | `gantt`               |
+| Process/pipeline with sequential steps           | `flowchart TD/LR`     |
+| Data model relationships                         | `erDiagram`           |
+| Git branching strategy                           | `gitGraph`            |
+| Comparison of options/decisions                  | Table (not diagram)   |
 
 ## 9. Anti-Patterns (Do NOT)
 
@@ -156,4 +158,4 @@ gantt
 
 ---
 
-*Last updated: March 2026 | Source: Extracted from `docs/architecture/ARCHITECTURE.md` existing conventions*
+_Last updated: March 2026 | Source: Extracted from `docs/architecture/ARCHITECTURE.md` existing conventions_

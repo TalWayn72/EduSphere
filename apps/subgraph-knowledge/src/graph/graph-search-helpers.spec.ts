@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { computeTextSimilarity, scoreConceptsByText } from './graph-search-helpers';
+import {
+  computeTextSimilarity,
+  scoreConceptsByText,
+} from './graph-search-helpers';
 import type { GraphConceptNode } from './graph-types';
 
 describe('computeTextSimilarity', () => {
@@ -14,7 +17,9 @@ describe('computeTextSimilarity', () => {
   });
 
   it('returns 0.85 for substring match', () => {
-    expect(computeTextSimilarity('linear algebra basics', 'algebra')).toBe(0.85);
+    expect(computeTextSimilarity('linear algebra basics', 'algebra')).toBe(
+      0.85
+    );
   });
 
   it('returns 0.5 for no word match', () => {
@@ -29,7 +34,10 @@ describe('computeTextSimilarity', () => {
   it('scores partial word matches proportionally', () => {
     // "linear algebra" has 2 words, "algebra" matches 1 → 0.5 + 0.35*(1/1) = 0.85
     // But substring match fires first
-    const score = computeTextSimilarity('study of calculus and geometry', 'calculus geometry');
+    const score = computeTextSimilarity(
+      'study of calculus and geometry',
+      'calculus geometry'
+    );
     // "calculus geometry" is NOT a substring of the text, so word matching:
     // 2 query words, both match → 0.5 + 0.35*(2/2) = 0.85
     expect(score).toBeCloseTo(0.85);
@@ -37,20 +45,34 @@ describe('computeTextSimilarity', () => {
 
   it('handles single word partial match', () => {
     // query "calculus physics" → 2 words, "calculus" matches, "physics" doesn't
-    const score = computeTextSimilarity('study of calculus', 'calculus physics');
+    const score = computeTextSimilarity(
+      'study of calculus',
+      'calculus physics'
+    );
     // 0.5 + 0.35 * (1/2) = 0.675
     expect(score).toBeCloseTo(0.675);
   });
 
   it('is case-insensitive for word matching', () => {
-    const score = computeTextSimilarity('ALGEBRA and GEOMETRY', 'algebra geometry');
+    const score = computeTextSimilarity(
+      'ALGEBRA and GEOMETRY',
+      'algebra geometry'
+    );
     expect(score).toBeGreaterThan(0.5);
   });
 });
 
 describe('scoreConceptsByText', () => {
-  const makeConcept = (id: string, name: string, definition?: string): GraphConceptNode =>
-    ({ id, name, definition: definition ?? null } as unknown as GraphConceptNode);
+  const makeConcept = (
+    id: string,
+    name: string,
+    definition?: string
+  ): GraphConceptNode =>
+    ({
+      id,
+      name,
+      definition: definition ?? null,
+    }) as unknown as GraphConceptNode;
 
   it('returns empty array for no matches', () => {
     const concepts = [makeConcept('1', 'Physics', 'Study of matter')];

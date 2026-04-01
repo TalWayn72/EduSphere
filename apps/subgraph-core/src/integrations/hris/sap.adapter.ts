@@ -4,7 +4,13 @@
  * Full implementation requires SAP API credentials and OData v2 client.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import type { IHrisAdapter, HrisConfig, HrisUser, HrisGroup, HrisSyncResult } from './hris-adapter.interface.js';
+import type {
+  IHrisAdapter,
+  HrisConfig,
+  HrisUser,
+  HrisGroup,
+  HrisSyncResult,
+} from './hris-adapter.interface.js';
 
 @Injectable()
 export class SapAdapter implements IHrisAdapter {
@@ -40,12 +46,17 @@ export class SapAdapter implements IHrisAdapter {
     return [];
   }
 
-  async syncUsers(_config: HrisConfig, _tenantId: string): Promise<HrisSyncResult> {
+  async syncUsers(
+    _config: HrisConfig,
+    _tenantId: string
+  ): Promise<HrisSyncResult> {
     return {
       usersUpserted: 0,
       usersDeactivated: 0,
       groupsSynced: 0,
-      errors: ['SAP adapter: full sync requires SAP SuccessFactors API credentials'],
+      errors: [
+        'SAP adapter: full sync requires SAP SuccessFactors API credentials',
+      ],
     };
   }
 }

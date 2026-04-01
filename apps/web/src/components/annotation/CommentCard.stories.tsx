@@ -10,7 +10,8 @@ const SAMPLE_ANNOTATION = {
   userId: 'user-001',
   authorName: 'Dr. Sarah Chen',
   layer: AnnotationLayer.INSTRUCTOR,
-  content: 'Great insight on knowledge graph traversal patterns. Consider expanding this section with Apache AGE examples.',
+  content:
+    'Great insight on knowledge graph traversal patterns. Consider expanding this section with Apache AGE examples.',
   startOffset: 100,
   endOffset: 200,
   createdAt: new Date(Date.now() - 3600000).toISOString(),
@@ -48,7 +49,11 @@ export const Focused: Story = {
 
 export const PersonalLayer: Story = {
   args: {
-    annotation: { ...SAMPLE_ANNOTATION, layer: AnnotationLayer.PERSONAL, authorName: 'You' },
+    annotation: {
+      ...SAMPLE_ANNOTATION,
+      layer: AnnotationLayer.PERSONAL,
+      authorName: 'You',
+    },
     isFocused: false,
   },
 };
@@ -59,7 +64,8 @@ export const AIGenerated: Story = {
       ...SAMPLE_ANNOTATION,
       layer: AnnotationLayer.AI_GENERATED,
       authorName: 'AI Assistant',
-      content: 'This paragraph could benefit from a concrete example of RLS policy implementation.',
+      content:
+        'This paragraph could benefit from a concrete example of RLS policy implementation.',
     },
     isFocused: false,
   },
@@ -69,7 +75,10 @@ export const LongContent: Story = {
   args: {
     annotation: {
       ...SAMPLE_ANNOTATION,
-      content: 'This is a very long comment that demonstrates how the component handles text overflow. '.repeat(5),
+      content:
+        'This is a very long comment that demonstrates how the component handles text overflow. '.repeat(
+          5
+        ),
     },
     isFocused: false,
   },

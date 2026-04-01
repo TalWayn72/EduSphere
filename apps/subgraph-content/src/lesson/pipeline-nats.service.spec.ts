@@ -13,7 +13,8 @@ vi.mock('nats', () => ({
 vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn(() => ({ servers: 'nats://test:4222' })),
   NatsSubjects: {
-    LESSON_PIPELINE_MODULE_COMPLETED: 'EDUSPHERE.lesson.pipeline.module.completed',
+    LESSON_PIPELINE_MODULE_COMPLETED:
+      'EDUSPHERE.lesson.pipeline.module.completed',
     LESSON_PIPELINE_COMPLETED: 'EDUSPHERE.lesson.pipeline.completed',
   },
 }));
@@ -74,7 +75,7 @@ describe('PipelineNatsService', () => {
       await new Promise((r) => setTimeout(r, 10));
       expect(mockPublish).toHaveBeenCalledWith(
         'EDUSPHERE.lesson.pipeline.module.completed',
-        expect.anything(),
+        expect.anything()
       );
     });
   });
@@ -87,7 +88,7 @@ describe('PipelineNatsService', () => {
       await new Promise((r) => setTimeout(r, 10));
       expect(mockPublish).toHaveBeenCalledWith(
         'EDUSPHERE.content.t1.ner.extracted',
-        expect.anything(),
+        expect.anything()
       );
     });
 
@@ -106,7 +107,7 @@ describe('PipelineNatsService', () => {
       await new Promise((r) => setTimeout(r, 10));
       expect(mockPublish).toHaveBeenCalledWith(
         'EDUSPHERE.lesson.pipeline.completed',
-        expect.anything(),
+        expect.anything()
       );
     });
   });

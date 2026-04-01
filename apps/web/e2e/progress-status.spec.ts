@@ -39,13 +39,15 @@ const MOCK_GENERATE_IN_PROGRESS = {
 /** Click a button inside a Radix Dialog bypassing backdrop overlay. */
 async function clickDialogButton(
   page: import('@playwright/test').Page,
-  buttonText: string,
+  buttonText: string
 ): Promise<void> {
   await page.evaluate((text: string) => {
     const dialog = document.querySelector('[role="dialog"]');
     if (!dialog) return;
     const buttons = Array.from(dialog.querySelectorAll('button'));
-    const btn = buttons.find((b) => (b.textContent ?? '').trim().includes(text));
+    const btn = buttons.find((b) =>
+      (b.textContent ?? '').trim().includes(text)
+    );
     (btn as HTMLElement | undefined)?.click();
   }, buttonText);
 }
@@ -56,7 +58,7 @@ async function clickDialogButton(
  */
 async function mockGenerateWithDelay(
   page: import('@playwright/test').Page,
-  delayMs = 3000,
+  delayMs = 3000
 ): Promise<void> {
   await page.route('**/graphql', async (route) => {
     const request = route.request();
@@ -76,8 +78,13 @@ async function mockGenerateWithDelay(
 
     let parsed: Record<string, unknown> = {};
     try {
-      parsed = JSON.parse(request.postData() ?? '{}') as Record<string, unknown>;
-    } catch { /* ignore */ }
+      parsed = JSON.parse(request.postData() ?? '{}') as Record<
+        string,
+        unknown
+      >;
+    } catch {
+      /* ignore */
+    }
 
     const op = (parsed.operationName as string | undefined) ?? '';
 
@@ -105,21 +112,29 @@ test.describe('Progress Status Indicator — AI Course Generation', () => {
   test.beforeEach(async ({ page }) => {
     await mockGenerateWithDelay(page, 4000);
     await login(page);
-    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.locator('[data-testid="launch-ai-builder-btn"]').click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
   });
 
-  test('progress status element with role="status" is visible after generate is clicked', async ({ page }) => {
+  test('progress status element with role="status" is visible after generate is clicked', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Quantum Computing');
     await clickDialogButton(page, 'Generate Course');
 
     // The ProgressStatus component renders with role="status"
-    await expect(page.getByRole('status').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('status').first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('progress status shows non-empty text while generating', async ({ page }) => {
+  test('progress status shows non-empty text while generating', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Quantum Computing');
     await clickDialogButton(page, 'Generate Course');
@@ -131,7 +146,9 @@ test.describe('Progress Status Indicator — AI Course Generation', () => {
     expect((text ?? '').trim().length).toBeGreaterThan(0);
   });
 
-  test('progress status text changes after a few seconds (cycling)', async ({ page }) => {
+  test('progress status text changes after a few seconds (cycling)', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Quantum Computing');
     await clickDialogButton(page, 'Generate Course');
@@ -139,12 +156,12 @@ test.describe('Progress Status Indicator — AI Course Generation', () => {
     const statusEl = page.getByRole('status').first();
     await expect(statusEl).toBeVisible({ timeout: 10_000 });
 
-    const firstText = (await statusEl.textContent() ?? '').trim();
+    const firstText = ((await statusEl.textContent()) ?? '').trim();
 
     // Wait long enough for at least one cycle (default interval is 2500ms)
     await page.waitForTimeout(3000);
 
-    const secondText = (await statusEl.textContent() ?? '').trim();
+    const secondText = ((await statusEl.textContent()) ?? '').trim();
 
     // Text may have cycled to a different message — at minimum it stays non-empty
     expect(secondText.length).toBeGreaterThan(0);
@@ -153,7 +170,9 @@ test.describe('Progress Status Indicator — AI Course Generation', () => {
     void firstText; // suppress unused-variable warning
   });
 
-  test('progress status has aria-live="polite" attribute for screen readers', async ({ page }) => {
+  test('progress status has aria-live="polite" attribute for screen readers', async ({
+    page,
+  }) => {
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('textbox').fill('Introduction to Quantum Computing');
     await clickDialogButton(page, 'Generate Course');
@@ -163,7 +182,9 @@ test.describe('Progress Status Indicator — AI Course Generation', () => {
     await expect(statusEl).toHaveAttribute('aria-live', 'polite');
   });
 
-  test('progress status is not visible before generation starts', async ({ page }) => {
+  test('progress status is not visible before generation starts', async ({
+    page,
+  }) => {
     // The dialog is open but Generate has not been clicked yet
     // ProgressStatus with active=false renders null → no role="status" element
     const statusElements = page.getByRole('status');
@@ -172,7 +193,7 @@ test.describe('Progress Status Indicator — AI Course Generation', () => {
     if (count > 0) {
       // If a status element exists, it must not contain generation-progress text
       for (let i = 0; i < count; i++) {
-        const text = (await statusElements.nth(i).textContent() ?? '').trim();
+        const text = ((await statusElements.nth(i).textContent()) ?? '').trim();
         expect(text).not.toMatch(/analyz|generat|processing|building/i);
       }
     } else {

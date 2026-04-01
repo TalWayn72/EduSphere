@@ -5,9 +5,18 @@
  */
 import React, { useState, useRef, useCallback, DragEvent } from 'react';
 import { useMutation, useClient } from 'urql';
-import { Upload, CheckCircle, AlertCircle, Loader2, ShieldAlert } from 'lucide-react';
+import {
+  Upload,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  ShieldAlert,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CONFIRM_VISUAL_ASSET_UPLOAD, GET_PRESIGNED_UPLOAD_URL } from './visual-anchor.graphql';
+import {
+  CONFIRM_VISUAL_ASSET_UPLOAD,
+  GET_PRESIGNED_UPLOAD_URL,
+} from './visual-anchor.graphql';
 import type { UploadStatus, VisualAsset } from './visual-anchor.types';
 
 const MAX_FILE_BYTES = 15 * 1024 * 1024;
@@ -19,7 +28,10 @@ interface AssetUploaderProps {
   onUploaded: (asset: VisualAsset) => void;
 }
 
-export default function AssetUploader({ courseId, onUploaded }: AssetUploaderProps) {
+export default function AssetUploader({
+  courseId,
+  onUploaded,
+}: AssetUploaderProps) {
   const client = useClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<UploadStatus>('idle');
@@ -32,7 +44,9 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       setErrorMessage(null);
 
       if (file.size > MAX_FILE_BYTES) {
-        setErrorMessage('File exceeds 15 MB limit. Please choose a smaller file.');
+        setErrorMessage(
+          'File exceeds 15 MB limit. Please choose a smaller file.'
+        );
         setStatus('error');
         return;
       }
@@ -46,14 +60,21 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
         courseId,
       });
 
-      if (presignedResult.error || !presignedResult.data?.getPresignedUploadUrl) {
-        console.error('[AssetUploader] presign failed:', presignedResult.error?.message ?? 'No URL returned');
+      if (
+        presignedResult.error ||
+        !presignedResult.data?.getPresignedUploadUrl
+      ) {
+        console.error(
+          '[AssetUploader] presign failed:',
+          presignedResult.error?.message ?? 'No URL returned'
+        );
         setErrorMessage('Could not initiate upload. Please try again.');
         setStatus('error');
         return;
       }
 
-      const { uploadUrl, fileKey } = presignedResult.data.getPresignedUploadUrl as {
+      const { uploadUrl, fileKey } = presignedResult.data
+        .getPresignedUploadUrl as {
         uploadUrl: string;
         fileKey: string;
         expiresAt: string;
@@ -73,7 +94,10 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           return;
         }
       } catch (err) {
-        console.error('[AssetUploader] upload network error:', err instanceof Error ? err.message : String(err));
+        console.error(
+          '[AssetUploader] upload network error:',
+          err instanceof Error ? err.message : String(err)
+        );
         setErrorMessage('Upload failed. Check your connection and try again.');
         setStatus('error');
         return;
@@ -89,8 +113,14 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
         declaredSize: file.size,
       });
 
-      if (confirmResult.error || !confirmResult.data?.confirmVisualAssetUpload) {
-        console.error('[AssetUploader] confirm failed:', confirmResult.error?.message ?? 'No confirmation data');
+      if (
+        confirmResult.error ||
+        !confirmResult.data?.confirmVisualAssetUpload
+      ) {
+        console.error(
+          '[AssetUploader] confirm failed:',
+          confirmResult.error?.message ?? 'No confirmation data'
+        );
         setErrorMessage('Upload confirmation failed. Please try again.');
         setStatus('error');
         return;
@@ -107,7 +137,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       setStatus('success');
       onUploaded(asset);
     },
-    [client, courseId, confirmUpload, onUploaded],
+    [client, courseId, confirmUpload, onUploaded]
   );
 
   const handleFiles = useCallback(
@@ -116,7 +146,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       if (!file) return;
       void uploadFile(file);
     },
-    [uploadFile],
+    [uploadFile]
   );
 
   const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
@@ -134,7 +164,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       setIsDragging(false);
       handleFiles(e.dataTransfer.files as HTMLInputElement['files']);
     },
-    [handleFiles],
+    [handleFiles]
   );
 
   const handleInputChange = useCallback(
@@ -143,7 +173,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       // Reset input so the same file can be re-selected after an error
       e.target.value = '';
     },
-    [handleFiles],
+    [handleFiles]
   );
 
   const handleReset = useCallback(() => {
@@ -162,7 +192,9 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           : '';
 
   const assertiveStatusMessage =
-    status === 'infected' ? (errorMessage ?? 'הקובץ נדחה על ידי סריקת אבטחה.') : '';
+    status === 'infected'
+      ? (errorMessage ?? 'הקובץ נדחה על ידי סריקת אבטחה.')
+      : '';
 
   const errorStatusMessage =
     status === 'error' ? (errorMessage ?? 'שגיאה בהעלאה.') : '';
@@ -216,8 +248,12 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           ].join(' ')}
         >
           <Upload className="h-8 w-8" aria-hidden="true" />
-          <p className="text-sm font-medium">Drop an image here or click to browse</p>
-          <p className="text-xs">PNG, JPG, GIF, SVG, TIFF, BMP, WebP — max 15 MB</p>
+          <p className="text-sm font-medium">
+            Drop an image here or click to browse
+          </p>
+          <p className="text-xs">
+            PNG, JPG, GIF, SVG, TIFF, BMP, WebP — max 15 MB
+          </p>
           <input
             ref={inputRef}
             type="file"
@@ -236,7 +272,10 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           role="status"
           aria-label={status === 'uploading' ? 'מעלה קובץ…' : 'סורק אבטחה…'}
         >
-          <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+          <Loader2
+            className="h-8 w-8 animate-spin text-primary"
+            aria-hidden="true"
+          />
           <p className="text-sm font-medium">
             {status === 'uploading' ? 'Uploading…' : 'Scanning for security…'}
           </p>
@@ -248,11 +287,19 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950"
           role="status"
         >
-          <CheckCircle className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" aria-hidden="true" />
+          <CheckCircle
+            className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400"
+            aria-hidden="true"
+          />
           <p className="text-sm text-green-700 dark:text-green-300">
             Image uploaded and ready to use.
           </p>
-          <Button variant="ghost" size="sm" className="ml-auto" onClick={handleReset}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-auto"
+            onClick={handleReset}
+          >
             Upload another
           </Button>
         </div>
@@ -264,9 +311,19 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           role="alert"
           aria-describedby="uploader-infected-msg"
         >
-          <ShieldAlert className="h-5 w-5 shrink-0 text-destructive" aria-hidden="true" />
-          <p id="uploader-infected-msg" className="text-sm text-destructive">{errorMessage}</p>
-          <Button variant="ghost" size="sm" className="ml-auto" onClick={handleReset}>
+          <ShieldAlert
+            className="h-5 w-5 shrink-0 text-destructive"
+            aria-hidden="true"
+          />
+          <p id="uploader-infected-msg" className="text-sm text-destructive">
+            {errorMessage}
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-auto"
+            onClick={handleReset}
+          >
             Try another file
           </Button>
         </div>
@@ -278,9 +335,19 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
           role="alert"
           aria-describedby="uploader-error-msg"
         >
-          <AlertCircle className="h-5 w-5 shrink-0 text-destructive" aria-hidden="true" />
-          <p id="uploader-error-msg" className="text-sm text-destructive">{errorMessage}</p>
-          <Button variant="ghost" size="sm" className="ml-auto" onClick={handleReset}>
+          <AlertCircle
+            className="h-5 w-5 shrink-0 text-destructive"
+            aria-hidden="true"
+          />
+          <p id="uploader-error-msg" className="text-sm text-destructive">
+            {errorMessage}
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-auto"
+            onClick={handleReset}
+          >
             Try again
           </Button>
         </div>

@@ -44,7 +44,9 @@ type OidcForm = z.infer<typeof oidcSchema>;
 export function SsoConfigPage() {
   const { t } = useTranslation('orgAdmin');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data }] = useQuery({ query: SSO_CONFIG_QUERY, pause: !mounted });
   const [, updateSso] = useMutation(UPDATE_SSO_MUTATION);
@@ -52,7 +54,9 @@ export function SsoConfigPage() {
   const samlForm = useForm<SamlForm>({ resolver: zodResolver(samlSchema) });
   const oidcForm = useForm<OidcForm>({ resolver: zodResolver(oidcSchema) });
 
-  const config = data?.ssoConfig as { provider: string; status: string } | undefined;
+  const config = data?.ssoConfig as
+    | { provider: string; status: string }
+    | undefined;
 
   const onSaml = async (d: SamlForm) => {
     await updateSso({ input: { provider: 'SAML', ...d } });
@@ -69,7 +73,11 @@ export function SsoConfigPage() {
           <div className="flex items-center gap-2">
             <span className="text-sm">{t('sso.currentProvider')}:</span>
             <Badge variant="outline">{config.provider}</Badge>
-            <Badge className={config.status === 'active' ? 'bg-green-100 text-green-800' : ''}>
+            <Badge
+              className={
+                config.status === 'active' ? 'bg-green-100 text-green-800' : ''
+              }
+            >
               {config.status}
             </Badge>
           </div>
@@ -83,21 +91,41 @@ export function SsoConfigPage() {
 
           <TabsContent value="saml">
             <Card>
-              <CardHeader><CardTitle className="text-base">{t('sso.samlTitle')}</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  {t('sso.samlTitle')}
+                </CardTitle>
+              </CardHeader>
               <CardContent>
-                <form onSubmit={samlForm.handleSubmit(onSaml)} className="space-y-4" noValidate>
+                <form
+                  onSubmit={samlForm.handleSubmit(onSaml)}
+                  className="space-y-4"
+                  noValidate
+                >
                   <div className="space-y-2">
                     <Label htmlFor="entityId">{t('sso.entityId')}</Label>
-                    <Input id="entityId" {...samlForm.register('entityId')} placeholder="https://idp.example.com/metadata" />
+                    <Input
+                      id="entityId"
+                      {...samlForm.register('entityId')}
+                      placeholder="https://idp.example.com/metadata"
+                    />
                     {samlForm.formState.errors.entityId && (
-                      <p className="text-destructive text-xs" role="alert">{samlForm.formState.errors.entityId.message}</p>
+                      <p className="text-destructive text-xs" role="alert">
+                        {samlForm.formState.errors.entityId.message}
+                      </p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="ssoUrl">{t('sso.ssoUrl')}</Label>
-                    <Input id="ssoUrl" {...samlForm.register('ssoUrl')} placeholder="https://idp.example.com/sso" />
+                    <Input
+                      id="ssoUrl"
+                      {...samlForm.register('ssoUrl')}
+                      placeholder="https://idp.example.com/sso"
+                    />
                     {samlForm.formState.errors.ssoUrl && (
-                      <p className="text-destructive text-xs" role="alert">{samlForm.formState.errors.ssoUrl.message}</p>
+                      <p className="text-destructive text-xs" role="alert">
+                        {samlForm.formState.errors.ssoUrl.message}
+                      </p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -109,7 +137,9 @@ export function SsoConfigPage() {
                       placeholder={t('sso.certificatePlaceholder')}
                     />
                     {samlForm.formState.errors.certificate && (
-                      <p className="text-destructive text-xs" role="alert">{samlForm.formState.errors.certificate.message}</p>
+                      <p className="text-destructive text-xs" role="alert">
+                        {samlForm.formState.errors.certificate.message}
+                      </p>
                     )}
                   </div>
                   <Button type="submit">{t('sso.save')}</Button>
@@ -120,20 +150,38 @@ export function SsoConfigPage() {
 
           <TabsContent value="oidc">
             <Card>
-              <CardHeader><CardTitle className="text-base">{t('sso.oidcTitle')}</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  {t('sso.oidcTitle')}
+                </CardTitle>
+              </CardHeader>
               <CardContent>
-                <form onSubmit={oidcForm.handleSubmit(onOidc)} className="space-y-4" noValidate>
+                <form
+                  onSubmit={oidcForm.handleSubmit(onOidc)}
+                  className="space-y-4"
+                  noValidate
+                >
                   <div className="space-y-2">
                     <Label htmlFor="issuer">{t('sso.issuer')}</Label>
-                    <Input id="issuer" {...oidcForm.register('issuer')} placeholder="https://accounts.google.com" />
+                    <Input
+                      id="issuer"
+                      {...oidcForm.register('issuer')}
+                      placeholder="https://accounts.google.com"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="clientId">{t('sso.clientId')}</Label>
                     <Input id="clientId" {...oidcForm.register('clientId')} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="clientSecret">{t('sso.clientSecret')}</Label>
-                    <Input id="clientSecret" type="password" {...oidcForm.register('clientSecret')} />
+                    <Label htmlFor="clientSecret">
+                      {t('sso.clientSecret')}
+                    </Label>
+                    <Input
+                      id="clientSecret"
+                      type="password"
+                      {...oidcForm.register('clientSecret')}
+                    />
                   </div>
                   <Button type="submit">{t('sso.save')}</Button>
                 </form>

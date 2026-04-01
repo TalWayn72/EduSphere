@@ -19,9 +19,15 @@ const mockCreateSession = vi.hoisted(() => vi.fn());
 
 vi.mock('./chavruta-partner.service', () => {
   class MockChavrutaPartnerMatchService {
-    findPartnerForDebate(...args: unknown[]) { return mockFindPartner(...args); }
-    getMyPartnerSessions(...args: unknown[]) { return mockGetSessions(...args); }
-    createPartnerSession(...args: unknown[]) { return mockCreateSession(...args); }
+    findPartnerForDebate(...args: unknown[]) {
+      return mockFindPartner(...args);
+    }
+    getMyPartnerSessions(...args: unknown[]) {
+      return mockGetSessions(...args);
+    }
+    createPartnerSession(...args: unknown[]) {
+      return mockCreateSession(...args);
+    }
   }
   return { ChavrutaPartnerMatchService: MockChavrutaPartnerMatchService };
 });
@@ -31,10 +37,12 @@ import { ChavrutaPartnerMatchService } from './chavruta-partner.service';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeContext(overrides: Partial<{
-  userId: string | null;
-  tenantId: string | null;
-}> = {}) {
+function makeContext(
+  overrides: Partial<{
+    userId: string | null;
+    tenantId: string | null;
+  }> = {}
+) {
   return {
     authContext: {
       userId: overrides.userId ?? 'user-1',
@@ -82,10 +90,7 @@ describe('ChavrutaPartnerMatchResolver', () => {
     mockFindPartner.mockResolvedValueOnce(matches);
 
     const input = { courseId: 'course-1', preferredTopic: 'Ethics' };
-    const result = await resolver.chavrutaPartnerMatches(
-      input,
-      makeContext()
-    );
+    const result = await resolver.chavrutaPartnerMatches(input, makeContext());
 
     expect(mockFindPartner).toHaveBeenCalledWith('user-1', 'tenant-1', input);
     expect(result).toEqual(matches);
@@ -100,46 +105,31 @@ describe('ChavrutaPartnerMatchResolver', () => {
       makeContext()
     );
 
-    expect(mockFindPartner).toHaveBeenCalledWith(
-      'user-1',
-      'tenant-1',
-      input
-    );
+    expect(mockFindPartner).toHaveBeenCalledWith('user-1', 'tenant-1', input);
   });
 
   it('chavrutaPartnerMatches throws without auth', async () => {
     await expect(
-      resolver.chavrutaPartnerMatches(
-        { courseId: 'c1' },
-        noAuthContext()
-      )
+      resolver.chavrutaPartnerMatches({ courseId: 'c1' }, noAuthContext())
     ).rejects.toThrow(UnauthorizedException);
   });
 
   it('chavrutaPartnerMatches throws when userId is null', async () => {
     await expect(
-      resolver.chavrutaPartnerMatches(
-        { courseId: 'c1' },
-        noUserIdContext()
-      )
+      resolver.chavrutaPartnerMatches({ courseId: 'c1' }, noUserIdContext())
     ).rejects.toThrow(UnauthorizedException);
   });
 
   it('chavrutaPartnerMatches throws when tenantId is null', async () => {
     await expect(
-      resolver.chavrutaPartnerMatches(
-        { courseId: 'c1' },
-        noTenantContext()
-      )
+      resolver.chavrutaPartnerMatches({ courseId: 'c1' }, noTenantContext())
     ).rejects.toThrow(UnauthorizedException);
   });
 
   // ── myChavrutaPartnerSessions ─────────────────────────────────────────────
 
   it('delegates to service.getMyPartnerSessions', async () => {
-    const sessions = [
-      { id: 'sess-1', topic: 'Free Will', status: 'ACTIVE' },
-    ];
+    const sessions = [{ id: 'sess-1', topic: 'Free Will', status: 'ACTIVE' }];
     mockGetSessions.mockResolvedValueOnce(sessions);
 
     const result = await resolver.myChavrutaPartnerSessions(makeContext());

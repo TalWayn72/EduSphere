@@ -18,26 +18,20 @@ function buildTenantCtx(auth: AuthContext): TenantContext {
   return {
     tenantId: auth.tenantId ?? '',
     userId: auth.userId ?? '',
-    userRole:
-      (auth.roles?.[0] as TenantContext['userRole']) ?? 'STUDENT',
+    userRole: (auth.roles?.[0] as TenantContext['userRole']) ?? 'STUDENT',
   };
 }
 
 @Resolver()
 export class AtRiskThresholdsResolver {
-  constructor(
-    private readonly thresholdsSvc: AtRiskThresholdsService
-  ) {}
+  constructor(private readonly thresholdsSvc: AtRiskThresholdsService) {}
 
   @Query('atRiskThresholds')
   async atRiskThresholds(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
     if (!auth) throw new UnauthorizedException('Unauthenticated');
     const tenantCtx = buildTenantCtx(auth);
-    return this.thresholdsSvc.getThresholds(
-      auth.tenantId ?? '',
-      tenantCtx
-    );
+    return this.thresholdsSvc.getThresholds(auth.tenantId ?? '', tenantCtx);
   }
 
   @Mutation('saveAtRiskThresholds')

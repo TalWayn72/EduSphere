@@ -128,7 +128,10 @@ export class UserErasureService implements OnModuleDestroy {
       );
       try {
         report.proof = await this.proofService.generateAndStore(
-          userId, tenantId, requestedBy, manifestEntries
+          userId,
+          tenantId,
+          requestedBy,
+          manifestEntries
         );
       } catch (proofError) {
         this.logger.error(

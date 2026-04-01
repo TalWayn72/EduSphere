@@ -27,8 +27,12 @@ export const portalPages = pgTable(
     layout: jsonb('layout').notNull().default('[]'), // PortalBlock[] JSON array
     published: boolean('published').notNull().default(false),
     createdBy: uuid('created_by').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     index('portal_pages_tenant_idx').on(t.tenantId),

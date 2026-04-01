@@ -4,7 +4,13 @@
  * Compatible with: Workday, Okta, Azure AD, BambooHR, ADP, and more.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import type { IHrisAdapter, HrisConfig, HrisUser, HrisGroup, HrisSyncResult } from './hris-adapter.interface.js';
+import type {
+  IHrisAdapter,
+  HrisConfig,
+  HrisUser,
+  HrisGroup,
+  HrisSyncResult,
+} from './hris-adapter.interface.js';
 
 interface ScimListResponse<T> {
   totalResults: number;
@@ -65,10 +71,14 @@ export class ScimAdapter implements IHrisAdapter {
         signal: AbortSignal.timeout(30_000),
       });
       if (!response.ok) {
-        this.logger.error({ status: response.status }, 'ScimAdapter: fetchUsers request failed');
+        this.logger.error(
+          { status: response.status },
+          'ScimAdapter: fetchUsers request failed'
+        );
         return [];
       }
-      const data = (await response.json()) as ScimListResponse<ScimUserResource>;
+      const data =
+        (await response.json()) as ScimListResponse<ScimUserResource>;
       return (data.Resources ?? []).map((r) => this.mapScimUser(r));
     } catch (err) {
       this.logger.error({ err }, 'ScimAdapter: fetchUsers error');
@@ -84,10 +94,14 @@ export class ScimAdapter implements IHrisAdapter {
         signal: AbortSignal.timeout(30_000),
       });
       if (!response.ok) {
-        this.logger.error({ status: response.status }, 'ScimAdapter: fetchGroups request failed');
+        this.logger.error(
+          { status: response.status },
+          'ScimAdapter: fetchGroups request failed'
+        );
         return [];
       }
-      const data = (await response.json()) as ScimListResponse<ScimGroupResource>;
+      const data =
+        (await response.json()) as ScimListResponse<ScimGroupResource>;
       return (data.Resources ?? []).map((g) => ({
         externalId: g.externalId ?? g.id,
         name: g.displayName,
@@ -99,13 +113,19 @@ export class ScimAdapter implements IHrisAdapter {
     }
   }
 
-  async syncUsers(config: HrisConfig, tenantId: string): Promise<HrisSyncResult> {
+  async syncUsers(
+    config: HrisConfig,
+    tenantId: string
+  ): Promise<HrisSyncResult> {
     const errors: string[] = [];
     let usersUpserted = 0;
 
     try {
       const users = await this.fetchUsers(config);
-      this.logger.log({ tenantId, count: users.length }, 'ScimAdapter: syncUsers fetched users');
+      this.logger.log(
+        { tenantId, count: users.length },
+        'ScimAdapter: syncUsers fetched users'
+      );
       usersUpserted = users.length;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -117,8 +137,10 @@ export class ScimAdapter implements IHrisAdapter {
   }
 
   private mapScimUser(r: ScimUserResource): HrisUser {
-    const enterprise = r['urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'];
-    const primaryEmail = r.emails?.find((e) => e.primary)?.value ?? r.emails?.[0]?.value ?? '';
+    const enterprise =
+      r['urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'];
+    const primaryEmail =
+      r.emails?.find((e) => e.primary)?.value ?? r.emails?.[0]?.value ?? '';
     return {
       externalId: r.externalId ?? r.id,
       email: primaryEmail,

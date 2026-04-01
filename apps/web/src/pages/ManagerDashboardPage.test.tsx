@@ -56,25 +56,43 @@ vi.mock('react-router-dom', async () => {
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
-  CardHeader: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
-  CardTitle: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
+  CardHeader: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
+  CardTitle: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant }: { children: React.ReactNode; variant?: string }) => (
-    <span data-variant={variant}>{children}</span>
-  ),
+  Badge: ({
+    children,
+    variant,
+  }: {
+    children: React.ReactNode;
+    variant?: string;
+  }) => <span data-variant={variant}>{children}</span>,
 }));
 
 vi.mock('@/components/ui/skeleton', () => ({
-  Skeleton: ({ className }: { className?: string }) => <div className={className} aria-busy="true" />,
+  Skeleton: ({ className }: { className?: string }) => (
+    <div className={className} aria-busy="true" />
+  ),
 }));
 
 vi.mock('@/lib/graphql/manager.queries', () => ({
@@ -99,7 +117,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText('Manager Dashboard')).toBeDefined();
   });
@@ -108,7 +126,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText('Alice Cohen')).toBeDefined();
   });
@@ -117,7 +135,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText('Bob Levi')).toBeDefined();
   });
@@ -126,7 +144,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText('At Risk')).toBeDefined();
   });
@@ -135,7 +153,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     const atRiskBadges = screen.queryAllByText('At Risk');
     // Only Bob Levi is at risk, Alice is not
@@ -146,7 +164,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     // Some labels appear in both stat cards and table headers — use textContent check
     expect(document.body.textContent).toContain('Team Members');
@@ -159,7 +177,7 @@ describe('ManagerDashboardPage', () => {
     render(
       <MemoryRouter>
         <ManagerDashboardPage />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(document.body.textContent).not.toContain('[GraphQL]');
     expect(document.body.textContent).not.toContain('Network error');

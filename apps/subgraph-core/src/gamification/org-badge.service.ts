@@ -24,13 +24,21 @@ import { z } from 'zod';
 
 // ── Zod Schemas ──────────────────────────────────────────────────────────────
 
-const autoAwardCriteriaSchema = z.object({
-  type: z.enum(['COURSE_COMPLETE', 'XP_THRESHOLD', 'STREAK_DAYS', 'QUIZ_SCORE']),
-  courseId: z.string().uuid().optional(),
-  amount: z.number().int().min(0).optional(),
-  count: z.number().int().min(1).optional(),
-  minScore: z.number().min(0).max(100).optional(),
-}).optional().nullable();
+const autoAwardCriteriaSchema = z
+  .object({
+    type: z.enum([
+      'COURSE_COMPLETE',
+      'XP_THRESHOLD',
+      'STREAK_DAYS',
+      'QUIZ_SCORE',
+    ]),
+    courseId: z.string().uuid().optional(),
+    amount: z.number().int().min(0).optional(),
+    count: z.number().int().min(1).optional(),
+    minScore: z.number().min(0).max(100).optional(),
+  })
+  .optional()
+  .nullable();
 
 export const CreateOrgBadgeSchema = z.object({
   name: z.string().min(2).max(200),
@@ -135,13 +143,17 @@ export class OrgBadgeService implements OnModuleDestroy {
       // Build update object from provided fields only
       const updateData: Record<string, unknown> = {};
       if (validated.name !== undefined) updateData.name = validated.name;
-      if (validated.description !== undefined) updateData.description = validated.description;
-      if (validated.iconUrl !== undefined) updateData.iconUrl = validated.iconUrl || null;
-      if (validated.xpRequired !== undefined) updateData.xpRequired = validated.xpRequired;
+      if (validated.description !== undefined)
+        updateData.description = validated.description;
+      if (validated.iconUrl !== undefined)
+        updateData.iconUrl = validated.iconUrl || null;
+      if (validated.xpRequired !== undefined)
+        updateData.xpRequired = validated.xpRequired;
       if (validated.autoAwardCriteria !== undefined) {
         updateData.autoAwardCriteria = validated.autoAwardCriteria;
       }
-      if (validated.isActive !== undefined) updateData.isActive = validated.isActive;
+      if (validated.isActive !== undefined)
+        updateData.isActive = validated.isActive;
 
       const [badge] = await tx
         .update(schema.orgBadges)
@@ -173,7 +185,8 @@ export class OrgBadgeService implements OnModuleDestroy {
           )
         )
         .returning({ id: schema.orgBadges.id });
-      if (result.length === 0) throw new NotFoundException('Org badge not found');
+      if (result.length === 0)
+        throw new NotFoundException('Org badge not found');
       this.logger.log(
         { tenantId: ctx.tenantId, badgeId: id },
         '[OrgBadgeService] Badge deleted'

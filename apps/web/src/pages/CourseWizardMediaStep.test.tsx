@@ -200,9 +200,16 @@ describe('CourseWizardMediaStep', () => {
     } as never);
 
     const { container } = renderStep();
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['%PDF-1.0'], 'test.pdf', { type: 'application/pdf' });
-    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    const file = new File(['%PDF-1.0'], 'test.pdf', {
+      type: 'application/pdf',
+    });
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
     fireEvent.change(fileInput);
 
     // Click Upload
@@ -228,9 +235,14 @@ describe('CourseWizardMediaStep', () => {
     } as never);
 
     const { container } = renderStep();
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     const file = new File(['data'], 'doc.pdf', { type: 'application/pdf' });
-    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
     fireEvent.change(fileInput);
 
     fireEvent.click(screen.getByRole('button', { name: /^Upload$/i }));
@@ -243,9 +255,13 @@ describe('CourseWizardMediaStep', () => {
     fireEvent.click(screen.getByRole('button', { name: /Retry/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /^Upload$/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /^Upload$/i })
+      ).toBeInTheDocument();
     });
-    expect(screen.queryByText('Failed to get upload URL')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Failed to get upload URL')
+    ).not.toBeInTheDocument();
   });
 
   it('logs error to console.error when presign fails (BUG-073)', async () => {
@@ -259,9 +275,14 @@ describe('CourseWizardMediaStep', () => {
     } as never);
 
     const { container } = renderStep();
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     const file = new File(['x'], 'f.pdf', { type: 'application/pdf' });
-    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
     fireEvent.change(fileInput);
     fireEvent.click(screen.getByRole('button', { name: /^Upload$/i }));
 

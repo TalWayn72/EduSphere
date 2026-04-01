@@ -15,10 +15,50 @@ import { StatsBar, ResolvedList } from './MergeQueueStats';
 import type { MergeRequest } from '@/pages/InstructorMergeQueuePage';
 
 const requests: MergeRequest[] = [
-  { id: '1', annotationId: 'a1', content: 'Note 1', description: 'desc', authorName: 'Alice', courseId: 'c1', courseName: 'Math', submittedAt: '2026-01-01T00:00:00Z', status: 'pending' },
-  { id: '2', annotationId: 'a2', content: 'Note 2', description: 'desc', authorName: 'Bob', courseId: 'c1', courseName: 'Math', submittedAt: '2026-01-01T00:00:00Z', status: 'pending' },
-  { id: '3', annotationId: 'a3', content: 'Note 3', description: 'desc', authorName: 'Carol', courseId: 'c1', courseName: 'Math', submittedAt: '2026-01-01T00:00:00Z', status: 'approved' },
-  { id: '4', annotationId: 'a4', content: 'Note 4', description: 'desc', authorName: 'Dave', courseId: 'c1', courseName: 'Math', submittedAt: '2026-01-01T00:00:00Z', status: 'rejected' },
+  {
+    id: '1',
+    annotationId: 'a1',
+    content: 'Note 1',
+    description: 'desc',
+    authorName: 'Alice',
+    courseId: 'c1',
+    courseName: 'Math',
+    submittedAt: '2026-01-01T00:00:00Z',
+    status: 'pending',
+  },
+  {
+    id: '2',
+    annotationId: 'a2',
+    content: 'Note 2',
+    description: 'desc',
+    authorName: 'Bob',
+    courseId: 'c1',
+    courseName: 'Math',
+    submittedAt: '2026-01-01T00:00:00Z',
+    status: 'pending',
+  },
+  {
+    id: '3',
+    annotationId: 'a3',
+    content: 'Note 3',
+    description: 'desc',
+    authorName: 'Carol',
+    courseId: 'c1',
+    courseName: 'Math',
+    submittedAt: '2026-01-01T00:00:00Z',
+    status: 'approved',
+  },
+  {
+    id: '4',
+    annotationId: 'a4',
+    content: 'Note 4',
+    description: 'desc',
+    authorName: 'Dave',
+    courseId: 'c1',
+    courseName: 'Math',
+    submittedAt: '2026-01-01T00:00:00Z',
+    status: 'rejected',
+  },
 ];
 
 describe('StatsBar', () => {

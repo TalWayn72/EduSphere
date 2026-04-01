@@ -3,15 +3,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_, name) => {
+        if (name === '__esModule') return true;
+        return function MockIcon(props: Record<string, unknown>) {
+          return <span data-testid={`icon-${String(name)}`} {...props} />;
+        };
+      },
+    })
 );
 
 // Import after mocks

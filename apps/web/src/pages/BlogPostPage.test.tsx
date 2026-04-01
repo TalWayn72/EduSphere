@@ -7,11 +7,16 @@ import { BlogPostPage } from './BlogPostPage';
 const mockNavigate = vi.fn();
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -26,8 +31,12 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('react-helmet-async', () => ({
-  Helmet: vi.fn(({ children }: { children: React.ReactNode }) => <>{children}</>),
-  HelmetProvider: vi.fn(({ children }: { children: React.ReactNode }) => <>{children}</>),
+  Helmet: vi.fn(({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  )),
+  HelmetProvider: vi.fn(({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  )),
 }));
 
 function renderAtSlug(slug: string) {
@@ -45,7 +54,10 @@ describe('BlogPostPage', () => {
   it('renders the post title for a known slug', () => {
     renderAtSlug('knowledge-graphs-in-education');
     expect(
-      screen.getByRole('heading', { level: 1, name: /Knowledge Graphs Are the Future/i })
+      screen.getByRole('heading', {
+        level: 1,
+        name: /Knowledge Graphs Are the Future/i,
+      })
     ).toBeInTheDocument();
   });
 
@@ -68,7 +80,9 @@ describe('BlogPostPage', () => {
 
   it('renders body content for the chavruta post', () => {
     renderAtSlug('ai-tutoring-chavruta-method');
-    expect(screen.getByRole('heading', { level: 1, name: /Chavruta Method/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /Chavruta Method/i })
+    ).toBeInTheDocument();
     expect(screen.getByText('Dr. Sarah Cohen')).toBeInTheDocument();
   });
 });

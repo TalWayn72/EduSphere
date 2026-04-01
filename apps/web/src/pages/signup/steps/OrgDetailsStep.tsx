@@ -8,25 +8,41 @@ import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { SlugField } from './SlugField';
 import type { OrgSignupFormData } from '../OrgSignupWizard.schema';
 
 const ORG_TYPES = [
-  'UNIVERSITY', 'COLLEGE', 'CORPORATE', 'GOVERNMENT', 'DEFENSE', 'NON_PROFIT',
+  'UNIVERSITY',
+  'COLLEGE',
+  'CORPORATE',
+  'GOVERNMENT',
+  'DEFENSE',
+  'NON_PROFIT',
 ] as const;
 
 const ORG_SIZES = ['1-50', '51-200', '201-1000', '1001-5000', '5000+'] as const;
 
 function toSlug(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 63);
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 63);
 }
 
 export function OrgDetailsStep() {
   const { t } = useTranslation('orgOnboarding');
   const {
-    register, formState: { errors }, setValue, watch,
+    register,
+    formState: { errors },
+    setValue,
+    watch,
   } = useFormContext<OrgSignupFormData>();
 
   const orgName = watch('orgName');
@@ -42,17 +58,23 @@ export function OrgDetailsStep() {
     }
   }, [orgName, slugManual, setValue]);
 
-  const handleSlugChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSlugManual(true);
-    const val = toSlug(e.target.value);
-    setValue('slug', val);
-    setSlugQuery(val);
-  }, [setValue]);
+  const handleSlugChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSlugManual(true);
+      const val = toSlug(e.target.value);
+      setValue('slug', val);
+      setSlugQuery(val);
+    },
+    [setValue]
+  );
 
-  const handleSuggestionPick = useCallback((s: string) => {
-    setValue('slug', s);
-    setSlugQuery(s);
-  }, [setValue]);
+  const handleSuggestionPick = useCallback(
+    (s: string) => {
+      setValue('slug', s);
+      setSlugQuery(s);
+    },
+    [setValue]
+  );
 
   return (
     <div className="space-y-5" data-testid="org-details-step">
@@ -66,7 +88,9 @@ export function OrgDetailsStep() {
           aria-invalid={!!errors.orgName}
         />
         {errors.orgName && (
-          <p className="text-destructive text-xs mt-1" role="alert">{errors.orgName.message}</p>
+          <p className="text-destructive text-xs mt-1" role="alert">
+            {errors.orgName.message}
+          </p>
         )}
       </div>
 
@@ -88,12 +112,16 @@ export function OrgDetailsStep() {
             </SelectTrigger>
             <SelectContent>
               {ORG_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>{t(`org.types.${type}`)}</SelectItem>
+                <SelectItem key={type} value={type}>
+                  {t(`org.types.${type}`)}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {errors.orgType && (
-            <p className="text-destructive text-xs mt-1" role="alert">{errors.orgType.message}</p>
+            <p className="text-destructive text-xs mt-1" role="alert">
+              {errors.orgType.message}
+            </p>
           )}
         </div>
 
@@ -105,7 +133,9 @@ export function OrgDetailsStep() {
             </SelectTrigger>
             <SelectContent>
               {ORG_SIZES.map((size) => (
-                <SelectItem key={size} value={size}>{size}</SelectItem>
+                <SelectItem key={size} value={size}>
+                  {size}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

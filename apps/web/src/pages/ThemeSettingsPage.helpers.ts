@@ -3,7 +3,11 @@
  */
 import type { ThemeMode, FontSize } from '@/lib/theme';
 
-export const THEME_MODES: { value: ThemeMode; label: string; iconName: string }[] = [
+export const THEME_MODES: {
+  value: ThemeMode;
+  label: string;
+  iconName: string;
+}[] = [
   { value: 'light', label: 'Light', iconName: 'Sun' },
   { value: 'dark', label: 'Dark', iconName: 'Moon' },
   { value: 'system', label: 'System', iconName: 'Monitor' },

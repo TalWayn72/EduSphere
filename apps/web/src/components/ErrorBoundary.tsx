@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error(
       `[ErrorBoundary:${context}] Uncaught render error:`,
       error,
-      info.componentStack,
+      info.componentStack
     );
   }
 

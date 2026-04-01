@@ -34,13 +34,15 @@ test.describe('Visual Regression — Laptop 1024×768 @visual', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
   });
 
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — laptop screenshot`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
 
@@ -65,7 +67,9 @@ test.describe('Visual Regression — Laptop 1024×768 @visual', () => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
     const hasOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
     );
     expect(hasOverflow).toBe(false);
   });

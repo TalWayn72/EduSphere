@@ -4,7 +4,10 @@
  * Imports pure helper functions from certificates.logic.ts directly.
  */
 import { describe, it, expect } from 'vitest';
-import { formatCertIssuedDate, maskVerificationCode } from '../certificates.logic';
+import {
+  formatCertIssuedDate,
+  maskVerificationCode,
+} from '../certificates.logic';
 
 // ---------------------------------------------------------------------------
 // formatCertIssuedDate

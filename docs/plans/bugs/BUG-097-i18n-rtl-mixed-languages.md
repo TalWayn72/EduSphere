@@ -1,7 +1,9 @@
 # BUG-097: Mixed Hebrew/English UI — i18n Not Applied to All Pages
 
 ## Status: ✅ FIXED
+
 ## Severity: 🔴 Critical (affects all Hebrew-speaking users)
+
 ## Reported: 2026-03-19
 
 ---
@@ -22,15 +24,18 @@ When a user selects Hebrew as their language, many pages still display English t
 ## Discovery Waves
 
 ### Wave 1 — Exact Match
+
 - 207 hardcoded English strings found across 30+ component/page files
 - 5 critical layout files with physical directional CSS properties
 
 ### Wave 2 — Similarity Search
+
 - 282 occurrences of physical CSS properties (`ml-`, `mr-`, `pl-`, `pr-`, `left-0`, `right-0`) across 127 files
 - 15+ components exposing raw `error.message` to users
 - 84% of TSX files (459 of 545) don't use `useTranslation`
 
 ### Wave 3 — Class of Bug
+
 - No Tailwind RTL plugin — logical properties not used anywhere
 - No `DirectionContext` for programmatic RTL support
 - Playwright config forces `en-US` locale, blocking RTL testing
@@ -40,6 +45,7 @@ When a user selects Hebrew as their language, many pages still display English t
 ## Fix Rounds
 
 ### Round 1: Core i18n Infrastructure (commit `c04ded08`)
+
 - Created `DirectionContext` + `useDirection()` hook for programmatic RTL support
 - Created 3 new i18n namespaces: `social`, `gamification`, `profile`
 - Extracted 207+ hardcoded English strings from P0 pages into translation keys
@@ -47,10 +53,12 @@ When a user selects Hebrew as their language, many pages still display English t
 - Added `globals.css` RTL overrides for directional utilities (`text-left`/`right`, rounded corners, tables, icon flip)
 
 ### Round 2: Hebrew Translation (commit `4bbd57b7`)
+
 - Translated all 11 Hebrew JSON files from English placeholders to real Hebrew text
 - Covers namespaces: `admin`, `auth`, `common`, `courses`, `errors`, `gamification`, `knowledge`, `nav`, `profile`, `settings`, `social`
 
 ### Round 3: Test Fixes (commits `0dd1a953`, `2871d3b8`, `1d5acf94`)
+
 - Fixed 17 test failures caused by the i18n infrastructure changes:
   - Missing namespaces in test setup (new namespaces not registered in test i18n config)
   - `ExamResult` test fixtures updated for new translation key structure
@@ -58,6 +66,7 @@ When a user selects Hebrew as their language, many pages still display English t
   - `AIChatPanel` tests wrapped with `Router` provider (required after layout changes)
 
 ### Round 4: Remaining Hardcoded Strings (commit `59cd59cc`)
+
 - `"Lv."` → `t('level')` in gamification components
 - `"followers"` → `t('followers')` in profile/social components
 - `"Log In"` → `t('logIn')` in auth components
@@ -68,86 +77,92 @@ When a user selects Hebrew as their language, many pages still display English t
 ## Files Modified
 
 ### Infrastructure
-| File | Change |
-|------|--------|
+
+| File                                         | Change                                           |
+| -------------------------------------------- | ------------------------------------------------ |
 | `apps/web/src/contexts/DirectionContext.tsx` | **NEW** — DirectionContext + useDirection() hook |
-| `apps/web/src/App.tsx` | Wired DirectionProvider |
-| `apps/web/src/i18n/index.ts` | Registered 3 new namespaces |
+| `apps/web/src/App.tsx`                       | Wired DirectionProvider                          |
+| `apps/web/src/i18n/index.ts`                 | Registered 3 new namespaces                      |
 
 ### i18n Namespace Files (NEW)
-| File | Keys |
-|------|------|
-| `packages/i18n/src/locales/en/social.json` | 20 keys |
-| `packages/i18n/src/locales/he/social.json` | 20 keys (Hebrew) |
-| `packages/i18n/src/locales/en/gamification.json` | 18 keys |
+
+| File                                             | Keys             |
+| ------------------------------------------------ | ---------------- |
+| `packages/i18n/src/locales/en/social.json`       | 20 keys          |
+| `packages/i18n/src/locales/he/social.json`       | 20 keys (Hebrew) |
+| `packages/i18n/src/locales/en/gamification.json` | 18 keys          |
 | `packages/i18n/src/locales/he/gamification.json` | 18 keys (Hebrew) |
-| `packages/i18n/src/locales/en/profile.json` | 17 keys |
-| `packages/i18n/src/locales/he/profile.json` | 17 keys (Hebrew) |
+| `packages/i18n/src/locales/en/profile.json`      | 17 keys          |
+| `packages/i18n/src/locales/he/profile.json`      | 17 keys (Hebrew) |
 
 ### RTL Layout Fixes
-| File | Change |
-|------|--------|
-| `apps/web/src/components/AppSidebar.tsx` | Physical → logical CSS properties |
-| `apps/web/src/components/Layout.tsx` | `marginLeft` → `marginInlineStart` |
+
+| File                                      | Change                                       |
+| ----------------------------------------- | -------------------------------------------- |
+| `apps/web/src/components/AppSidebar.tsx`  | Physical → logical CSS properties            |
+| `apps/web/src/components/Layout.tsx`      | `marginLeft` → `marginInlineStart`           |
 | `apps/web/src/components/AIChatPanel.tsx` | `right-0` → `end-0`, `border-l` → `border-s` |
-| `apps/web/src/styles/globals.css` | RTL overrides for directional utilities |
+| `apps/web/src/styles/globals.css`         | RTL overrides for directional utilities      |
 
 ### Page Components (P0 — Critical)
-| File | Strings Extracted |
-|------|-------------------|
-| `apps/web/src/pages/social/SocialFeedPage.tsx` | 8 |
-| `apps/web/src/pages/profile/PublicProfilePage.tsx` | 13 |
-| `apps/web/src/pages/gamification/GamificationPage.tsx` | 14 |
-| `apps/web/src/pages/progress/MyProgressPage.tsx` | 9 |
+
+| File                                                   | Strings Extracted |
+| ------------------------------------------------------ | ----------------- |
+| `apps/web/src/pages/social/SocialFeedPage.tsx`         | 8                 |
+| `apps/web/src/pages/profile/PublicProfilePage.tsx`     | 13                |
+| `apps/web/src/pages/gamification/GamificationPage.tsx` | 14                |
+| `apps/web/src/pages/progress/MyProgressPage.tsx`       | 9                 |
 
 ### Page Components (P1/P2)
-| File | Strings Extracted |
-|------|-------------------|
-| `apps/web/src/pages/gamification/LeaderboardPage.tsx` | ~8 |
-| `apps/web/src/pages/onboarding/OnboardingPage.tsx` | ~10 |
-| `apps/web/src/pages/manager/ManagerDashboardPage.tsx` | ~12 |
-| `apps/web/src/pages/checkout/CheckoutPage.tsx` | ~8 |
-| `apps/web/src/pages/skills/SkillTreePage.tsx` | ~6 |
-| `apps/web/src/pages/admin/AdminOverviewPage.tsx` | ~10 |
-| `apps/web/src/pages/admin/AdminUserManagementPage.tsx` | ~12 |
-| `apps/web/src/pages/admin/AdminAnnouncementsPage.tsx` | ~8 |
-| `apps/web/src/pages/admin/AdminAuditLogPage.tsx` | ~8 |
-| `apps/web/src/pages/admin/AdminRoleMatrixPage.tsx` | ~6 |
-| `apps/web/src/pages/settings/LanguageSettingsPage.tsx` | ~8 |
-| `apps/web/src/pages/admin/AdminNotificationAnalyticsPage.tsx` | ~10 |
+
+| File                                                          | Strings Extracted |
+| ------------------------------------------------------------- | ----------------- |
+| `apps/web/src/pages/gamification/LeaderboardPage.tsx`         | ~8                |
+| `apps/web/src/pages/onboarding/OnboardingPage.tsx`            | ~10               |
+| `apps/web/src/pages/manager/ManagerDashboardPage.tsx`         | ~12               |
+| `apps/web/src/pages/checkout/CheckoutPage.tsx`                | ~8                |
+| `apps/web/src/pages/skills/SkillTreePage.tsx`                 | ~6                |
+| `apps/web/src/pages/admin/AdminOverviewPage.tsx`              | ~10               |
+| `apps/web/src/pages/admin/AdminUserManagementPage.tsx`        | ~12               |
+| `apps/web/src/pages/admin/AdminAnnouncementsPage.tsx`         | ~8                |
+| `apps/web/src/pages/admin/AdminAuditLogPage.tsx`              | ~8                |
+| `apps/web/src/pages/admin/AdminRoleMatrixPage.tsx`            | ~6                |
+| `apps/web/src/pages/settings/LanguageSettingsPage.tsx`        | ~8                |
+| `apps/web/src/pages/admin/AdminNotificationAnalyticsPage.tsx` | ~10               |
 
 ### Security
-| File | Change |
-|------|--------|
-| `apps/web/src/utils/bidi-sanitize.ts` | **NEW** — stripBiDiControls utility |
-| `packages/i18n/src/locales/en/errors.json` | Added error translation keys |
+
+| File                                       | Change                                |
+| ------------------------------------------ | ------------------------------------- |
+| `apps/web/src/utils/bidi-sanitize.ts`      | **NEW** — stripBiDiControls utility   |
+| `packages/i18n/src/locales/en/errors.json` | Added error translation keys          |
 | `packages/i18n/src/locales/he/errors.json` | Added error translation keys (Hebrew) |
 
 ---
 
 ## Tests Added
 
-| File | Type | Purpose |
-|------|------|---------|
-| `apps/web/src/tests/bug097-i18n-coverage.test.ts` | Unit (static analysis) | Scans all page files for `useTranslation` import — fails if any page lacks it |
-| `apps/web/e2e/bug097-rtl-layout.spec.ts` | E2E (Playwright) | Verifies sidebar flips to right side in RTL, layout uses logical properties |
-| `apps/web/e2e/bug097-hebrew-strings.spec.ts` | E2E (Playwright) | Navigates all major pages in Hebrew locale, asserts no English UI strings visible |
-| `apps/web/e2e/bug097-all-locales.spec.ts` | E2E (Playwright) | Parameterized smoke test for all 10 supported locales |
+| File                                              | Type                   | Purpose                                                                           |
+| ------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------- |
+| `apps/web/src/tests/bug097-i18n-coverage.test.ts` | Unit (static analysis) | Scans all page files for `useTranslation` import — fails if any page lacks it     |
+| `apps/web/e2e/bug097-rtl-layout.spec.ts`          | E2E (Playwright)       | Verifies sidebar flips to right side in RTL, layout uses logical properties       |
+| `apps/web/e2e/bug097-hebrew-strings.spec.ts`      | E2E (Playwright)       | Navigates all major pages in Hebrew locale, asserts no English UI strings visible |
+| `apps/web/e2e/bug097-all-locales.spec.ts`         | E2E (Playwright)       | Parameterized smoke test for all 10 supported locales                             |
 
 ---
 
 ## Verification
 
-| Check | Result |
-|-------|--------|
-| Targeted tests (17 test files) | 391 pass |
-| i18n parity tests | 213 pass |
-| i18n coverage tests | 153 pass |
-| TypeScript | 0 errors |
-| Visual: Dashboard (Hebrew + RTL) | Confirmed |
-| Visual: Social Feed (Hebrew + RTL) | Confirmed |
+| Check                               | Result    |
+| ----------------------------------- | --------- |
+| Targeted tests (17 test files)      | 391 pass  |
+| i18n parity tests                   | 213 pass  |
+| i18n coverage tests                 | 153 pass  |
+| TypeScript                          | 0 errors  |
+| Visual: Dashboard (Hebrew + RTL)    | Confirmed |
+| Visual: Social Feed (Hebrew + RTL)  | Confirmed |
 | Visual: Gamification (Hebrew + RTL) | Confirmed |
-| Visual: Progress (Hebrew + RTL) | Confirmed |
+| Visual: Progress (Hebrew + RTL)     | Confirmed |
 
 ---
 

@@ -32,34 +32,37 @@ export function SecureExamWrapper({
   const [lastViolationType, setLastViolationType] = useState('');
   const pendingRef = useRef(false);
 
-  const handleViolation = useCallback((type: string) => {
-    if (isVoided || pendingRef.current) return;
-    pendingRef.current = true;
+  const handleViolation = useCallback(
+    (type: string) => {
+      if (isVoided || pendingRef.current) return;
+      pendingRef.current = true;
 
-    setViolationCount((prev) => {
-      const next = prev + 1;
-      setLastViolationType(type);
-      setWarningOpen(true);
+      setViolationCount((prev) => {
+        const next = prev + 1;
+        setLastViolationType(type);
+        setWarningOpen(true);
 
-      // Fire-and-forget server recording
-      void fetch('/api/exam/browser-event', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          event: { type, timestamp: new Date().toISOString() },
-        }),
-      }).catch(() => undefined);
+        // Fire-and-forget server recording
+        void fetch('/api/exam/browser-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId,
+            event: { type, timestamp: new Date().toISOString() },
+          }),
+        }).catch(() => undefined);
 
-      if (next >= maxViolations) {
-        setIsVoided(true);
-        onViolationThreshold?.();
-      }
+        if (next >= maxViolations) {
+          setIsVoided(true);
+          onViolationThreshold?.();
+        }
 
-      pendingRef.current = false;
-      return next;
-    });
-  }, [sessionId, maxViolations, isVoided, onViolationThreshold]);
+        pendingRef.current = false;
+        return next;
+      });
+    },
+    [sessionId, maxViolations, isVoided, onViolationThreshold]
+  );
 
   useBrowserLockdown({ enabled, onViolation: handleViolation });
 

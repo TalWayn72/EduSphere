@@ -33,7 +33,7 @@ const exists = (p: string): boolean => existsSync(resolve(ROOT, p));
 describe('Phase 47 Security — Graph-grounded credentials coverage gate', () => {
   it('verifyKnowledgePathCoverage returns covered=true only when coverageScore >= masteryThreshold', () => {
     const src = read(
-      'apps/subgraph-content/src/certificate/graph-credential.service.ts',
+      'apps/subgraph-content/src/certificate/graph-credential.service.ts'
     );
     // The coverage check: coverageScore >= masteryThreshold (default 0.7)
     expect(src).toMatch(/coverageScore\s*>=\s*masteryThreshold/);
@@ -41,7 +41,7 @@ describe('Phase 47 Security — Graph-grounded credentials coverage gate', () =>
 
   it('issueGraphGroundedBadge throws BadRequestException when coverage is insufficient', () => {
     const src = read(
-      'apps/subgraph-content/src/open-badges/open-badge.service.ts',
+      'apps/subgraph-content/src/open-badges/open-badge.service.ts'
     );
     expect(src).toMatch(/BadRequestException/);
     expect(src).toMatch(/coverage.*insufficient|insufficient.*coverage/i);
@@ -49,7 +49,7 @@ describe('Phase 47 Security — Graph-grounded credentials coverage gate', () =>
 
   it('coverage gate enforces 70% threshold in error message', () => {
     const src = read(
-      'apps/subgraph-content/src/open-badges/open-badge.service.ts',
+      'apps/subgraph-content/src/open-badges/open-badge.service.ts'
     );
     // Error message must reference the 70% requirement
     expect(src).toMatch(/70%|>=70|>=\s*0\.7|required.*70|0\.70/);
@@ -57,7 +57,7 @@ describe('Phase 47 Security — Graph-grounded credentials coverage gate', () =>
 
   it('masteryThreshold defaults to 0.7 in recordGraphCredential', () => {
     const src = read(
-      'apps/subgraph-content/src/certificate/graph-credential.service.ts',
+      'apps/subgraph-content/src/certificate/graph-credential.service.ts'
     );
     expect(src).toMatch(/masteryThreshold.*0\.7|0\.7.*masteryThreshold/);
   });
@@ -68,29 +68,32 @@ describe('Phase 47 Security — Graph-grounded credentials coverage gate', () =>
 describe('Phase 47 Security — IDOR: issueGraphGroundedBadge userId from JWT', () => {
   it('issueGraphGroundedBadge mutation uses user.userId from authContext (not client arg)', () => {
     const resolver = read(
-      'apps/subgraph-content/src/open-badges/open-badge.resolver.ts',
+      'apps/subgraph-content/src/open-badges/open-badge.resolver.ts'
     );
     // The mutation must extract userId from auth context, not from @Args
     expect(resolver).toMatch(/user\.userId/);
     // The issueGraphGroundedBadge mutation must NOT accept a userId @Args parameter
-    const mutationBlock = resolver.match(
-      /issueGraphGroundedBadge[\s\S]*?(?=\n\s*@(?:Query|Mutation)|$)/,
-    )?.[0] ?? '';
+    const mutationBlock =
+      resolver.match(
+        /issueGraphGroundedBadge[\s\S]*?(?=\n\s*@(?:Query|Mutation)|$)/
+      )?.[0] ?? '';
     // userId should NOT appear as an @Args parameter in this mutation
     expect(mutationBlock).not.toMatch(/@Args\('userId'\)/);
   });
 
   it('knowledgePathCoverage query uses user.userId from authContext', () => {
     const resolver = read(
-      'apps/subgraph-content/src/open-badges/open-badge.resolver.ts',
+      'apps/subgraph-content/src/open-badges/open-badge.resolver.ts'
     );
     expect(resolver).toMatch(/requireAuth\(ctx\)/);
-    expect(resolver).toMatch(/user\.userId.*user\.tenantId|user\.tenantId.*user\.userId/s);
+    expect(resolver).toMatch(
+      /user\.userId.*user\.tenantId|user\.tenantId.*user\.userId/s
+    );
   });
 
   it('resolver requireAuth throws UnauthorizedException when no authContext', () => {
     const resolver = read(
-      'apps/subgraph-content/src/open-badges/open-badge.resolver.ts',
+      'apps/subgraph-content/src/open-badges/open-badge.resolver.ts'
     );
     expect(resolver).toMatch(/UnauthorizedException/);
     expect(resolver).toMatch(/Authentication required/i);
@@ -102,7 +105,7 @@ describe('Phase 47 Security — IDOR: issueGraphGroundedBadge userId from JWT', 
 describe('Phase 47 Security — Memory safety: GraphGroundedCredentialService', () => {
   it('GraphGroundedCredentialService implements OnModuleDestroy', () => {
     const src = read(
-      'apps/subgraph-content/src/certificate/graph-credential.service.ts',
+      'apps/subgraph-content/src/certificate/graph-credential.service.ts'
     );
     expect(src).toMatch(/OnModuleDestroy/);
     expect(src).toMatch(/onModuleDestroy/);
@@ -110,14 +113,14 @@ describe('Phase 47 Security — Memory safety: GraphGroundedCredentialService', 
 
   it('GraphGroundedCredentialService calls closeAllPools in onModuleDestroy', () => {
     const src = read(
-      'apps/subgraph-content/src/certificate/graph-credential.service.ts',
+      'apps/subgraph-content/src/certificate/graph-credential.service.ts'
     );
     expect(src).toMatch(/closeAllPools/);
   });
 
   it('GraphGroundedCredentialService uses createDatabaseConnection (not new Pool)', () => {
     const src = read(
-      'apps/subgraph-content/src/certificate/graph-credential.service.ts',
+      'apps/subgraph-content/src/certificate/graph-credential.service.ts'
     );
     expect(src).toMatch(/createDatabaseConnection/);
     expect(src).not.toMatch(/new Pool\(\)/);
@@ -175,8 +178,12 @@ describe('Phase 47 Security — RLS: chavruta_partner_sessions', () => {
   it('chavruta_partner_sessions participant_access policy covers both initiator and partner', () => {
     const schema = read('packages/db/src/schema/knowledge-credentials.ts');
     expect(schema).toMatch(/chavruta_partner_sessions_participant_access/);
-    expect(schema).toMatch(/initiator_id.*current_setting.*app\.current_user_id/s);
-    expect(schema).toMatch(/partner_id.*current_setting.*app\.current_user_id/s);
+    expect(schema).toMatch(
+      /initiator_id.*current_setting.*app\.current_user_id/s
+    );
+    expect(schema).toMatch(
+      /partner_id.*current_setting.*app\.current_user_id/s
+    );
   });
 
   it('chavruta_partner_sessions uses enableRLS()', () => {
@@ -196,7 +203,7 @@ describe('Phase 47 Security — RLS: chavruta_partner_sessions', () => {
 describe('Phase 47 Security — Chavruta self-match prevention', () => {
   it('findPartnerForDebate excludes the requesting user via ne() guard', () => {
     const src = read(
-      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
+      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
     );
     // Uses Drizzle ne() to exclude the initiator from candidates
     expect(src).toMatch(/ne\s*\(.*userId|ne\s*\(.*userCourses\.userId/);
@@ -204,14 +211,14 @@ describe('Phase 47 Security — Chavruta self-match prevention', () => {
 
   it('chavruta-partner service imports ne from @edusphere/db', () => {
     const src = read(
-      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
+      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
     );
     expect(src).toMatch(/import.*\bne\b.*@edusphere\/db/s);
   });
 
   it('createPartnerSession does not allow initiator === partner (ne guard in candidate query)', () => {
     const src = read(
-      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
+      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
     );
     // The ne(userCourses.userId, userId) prevents self-matching at query level
     expect(src).toMatch(/ne\([^)]*userId[^)]*\)/);
@@ -223,7 +230,7 @@ describe('Phase 47 Security — Chavruta self-match prevention', () => {
 describe('Phase 47 Security — Memory safety: ChavrutaPartnerMatchService', () => {
   it('ChavrutaPartnerMatchService implements OnModuleDestroy', () => {
     const src = read(
-      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
+      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
     );
     expect(src).toMatch(/OnModuleDestroy/);
     expect(src).toMatch(/onModuleDestroy/);
@@ -231,14 +238,14 @@ describe('Phase 47 Security — Memory safety: ChavrutaPartnerMatchService', () 
 
   it('ChavrutaPartnerMatchService calls closeAllPools in onModuleDestroy', () => {
     const src = read(
-      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
+      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
     );
     expect(src).toMatch(/closeAllPools/);
   });
 
   it('ChavrutaPartnerMatchService uses withTenantContext for all DB operations', () => {
     const src = read(
-      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
+      'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
     );
     expect(src).toMatch(/withTenantContext/);
   });
@@ -249,21 +256,21 @@ describe('Phase 47 Security — Memory safety: ChavrutaPartnerMatchService', () 
 describe('Phase 47 Security — Cohort insights: tenant isolation via withTenantContext', () => {
   it('CohortInsightsService wraps all DB queries in withTenantContext', () => {
     const src = read(
-      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts',
+      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts'
     );
     expect(src).toMatch(/withTenantContext/);
   });
 
   it('CohortInsightsService passes tenantId and userId to TenantContext', () => {
     const src = read(
-      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts',
+      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts'
     );
     expect(src).toMatch(/tenantId.*userId.*userRole|TenantContext.*tenantId/s);
   });
 
   it('CohortInsightsService implements OnModuleDestroy with closeAllPools', () => {
     const src = read(
-      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts',
+      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts'
     );
     expect(src).toMatch(/OnModuleDestroy/);
     expect(src).toMatch(/closeAllPools/);
@@ -271,7 +278,7 @@ describe('Phase 47 Security — Cohort insights: tenant isolation via withTenant
 
   it('CohortInsightsService raw SQL uses parameterized tenantId (no string concat injection)', () => {
     const src = read(
-      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts',
+      'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts'
     );
     // Uses sql template tag with ${tenantId} interpolation (Drizzle parameterizes this)
     expect(src).toMatch(/sql`[\s\S]*?\$\{tenantId\}/);
@@ -283,41 +290,43 @@ describe('Phase 47 Security — Cohort insights: tenant isolation via withTenant
 describe('Phase 47 Security — Required files exist', () => {
   it('migration 0029_knowledge_graph_credentials.sql exists', () => {
     expect(
-      exists('packages/db/src/migrations/0029_knowledge_graph_credentials.sql'),
+      exists('packages/db/src/migrations/0029_knowledge_graph_credentials.sql')
     ).toBe(true);
   });
 
   it('graph-credential.service.ts exists', () => {
     expect(
-      exists('apps/subgraph-content/src/certificate/graph-credential.service.ts'),
+      exists(
+        'apps/subgraph-content/src/certificate/graph-credential.service.ts'
+      )
     ).toBe(true);
   });
 
   it('chavruta-partner.service.ts exists', () => {
     expect(
       exists(
-        'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts',
-      ),
+        'apps/subgraph-agent/src/chavruta-partner/chavruta-partner.service.ts'
+      )
     ).toBe(true);
   });
 
   it('cohort-insights.service.ts exists', () => {
     expect(
       exists(
-        'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts',
-      ),
+        'apps/subgraph-knowledge/src/cohort-insights/cohort-insights.service.ts'
+      )
     ).toBe(true);
   });
 
   it('knowledge-credentials.ts schema exists', () => {
-    expect(
-      exists('packages/db/src/schema/knowledge-credentials.ts'),
-    ).toBe(true);
+    expect(exists('packages/db/src/schema/knowledge-credentials.ts')).toBe(
+      true
+    );
   });
 
   it('open-badge.resolver.ts exists (hosts issueGraphGroundedBadge)', () => {
     expect(
-      exists('apps/subgraph-content/src/open-badges/open-badge.resolver.ts'),
+      exists('apps/subgraph-content/src/open-badges/open-badge.resolver.ts')
     ).toBe(true);
   });
 });

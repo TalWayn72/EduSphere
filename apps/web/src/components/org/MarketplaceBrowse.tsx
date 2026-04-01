@@ -7,8 +7,7 @@ import { useMarketplace } from '@/hooks/useMarketplace';
 
 export function MarketplaceBrowse() {
   const { t } = useTranslation('org');
-  const { listings, isLoading, licenseCourse, categories } =
-    useMarketplace();
+  const { listings, isLoading, licenseCourse, categories } = useMarketplace();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
 
@@ -16,7 +15,11 @@ export function MarketplaceBrowse() {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} data-testid="skeleton-card" className="h-48 animate-pulse rounded-lg bg-muted" />
+          <div
+            key={i}
+            data-testid="skeleton-card"
+            className="h-48 animate-pulse rounded-lg bg-muted"
+          />
         ))}
       </div>
     );
@@ -38,7 +41,10 @@ export function MarketplaceBrowse() {
           role="searchbox"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('orgOnboarding.searchPlaceholder', 'Search courses...')}
+          placeholder={t(
+            'orgOnboarding.searchPlaceholder',
+            'Search courses...'
+          )}
           className="flex-1 rounded-md border px-3 py-2 text-sm"
         />
         <select
@@ -48,9 +54,13 @@ export function MarketplaceBrowse() {
           onChange={(e) => setCategory(e.target.value)}
           className="rounded-md border px-3 py-2 text-sm"
         >
-          <option value="">{t('orgOnboarding.allCategories', 'All Categories')}</option>
+          <option value="">
+            {t('orgOnboarding.allCategories', 'All Categories')}
+          </option>
           {categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
           ))}
         </select>
       </div>
@@ -61,7 +71,9 @@ export function MarketplaceBrowse() {
             <h3 className="font-medium">{listing.title}</h3>
             <p className="text-sm text-muted-foreground">{listing.category}</p>
             <p className="text-sm">{listing.instructor}</p>
-            <p className="font-semibold">${(listing.priceUsdCents / 100).toFixed(2)}</p>
+            <p className="font-semibold">
+              ${(listing.priceUsdCents / 100).toFixed(2)}
+            </p>
             <button
               onClick={() => licenseCourse(listing.id)}
               className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground"

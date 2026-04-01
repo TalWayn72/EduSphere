@@ -23,7 +23,8 @@ module.exports = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Prefer <PageShell> over inline max-width container patterns in pages',
+      description:
+        'Prefer <PageShell> over inline max-width container patterns in pages',
       category: 'EduSphere Design System',
       recommended: true,
     },

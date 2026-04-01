@@ -17,14 +17,17 @@ describe('PipelineStepperSkeleton', () => {
 
   it('has aria-busy=true for loading state', () => {
     render(<PipelineStepperSkeleton />);
-    expect(screen.getByTestId('pipeline-stepper-skeleton')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('pipeline-stepper-skeleton')).toHaveAttribute(
+      'aria-busy',
+      'true'
+    );
   });
 
   it('has Hebrew aria-label', () => {
     render(<PipelineStepperSkeleton />);
     expect(screen.getByTestId('pipeline-stepper-skeleton')).toHaveAttribute(
       'aria-label',
-      'טוען סטטוס צנרת...',
+      'טוען סטטוס צנרת...'
     );
   });
 
@@ -37,6 +40,9 @@ describe('PipelineStepperSkeleton', () => {
 
   it('sets dir=rtl on container', () => {
     render(<PipelineStepperSkeleton />);
-    expect(screen.getByTestId('pipeline-stepper-skeleton')).toHaveAttribute('dir', 'rtl');
+    expect(screen.getByTestId('pipeline-stepper-skeleton')).toHaveAttribute(
+      'dir',
+      'rtl'
+    );
   });
 });

@@ -34,7 +34,11 @@ export const styles = StyleSheet.create({
   textContainer: { flex: 1 },
   nativeLabel: { fontSize: FONT.base, color: COLORS.textPrimary },
   selectedText: { color: COLORS.primary, fontWeight: '600' },
-  englishLabel: { fontSize: FONT.sm, color: COLORS.textSecondary, marginTop: 1 },
+  englishLabel: {
+    fontSize: FONT.sm,
+    color: COLORS.textSecondary,
+    marginTop: 1,
+  },
   checkmark: { fontSize: 18, color: COLORS.primary, fontWeight: 'bold' },
   syncIndicator: { marginLeft: SPACING.sm },
   loadingRow: { padding: SPACING.xl, alignItems: 'center' },
@@ -66,8 +70,16 @@ export const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   barFill: { height: '100%', borderRadius: 4 },
-  usageLabel: { fontSize: FONT.md, color: COLORS.textPrimary, fontVariant: ['tabular-nums'] },
-  usageSubLabel: { fontSize: FONT.sm, color: COLORS.textMuted, marginBottom: SPACING.lg },
+  usageLabel: {
+    fontSize: FONT.md,
+    color: COLORS.textPrimary,
+    fontVariant: ['tabular-nums'],
+  },
+  usageSubLabel: {
+    fontSize: FONT.sm,
+    color: COLORS.textMuted,
+    marginBottom: SPACING.lg,
+  },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -80,7 +92,11 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   actionButtonDanger: { borderColor: '#FCA5A5' },
-  actionButtonText: { fontSize: FONT.md, color: COLORS.textPrimary, fontWeight: '500' },
+  actionButtonText: {
+    fontSize: FONT.md,
+    color: COLORS.textPrimary,
+    fontWeight: '500',
+  },
   actionButtonTextDanger: { color: COLORS.error },
   wifiSection: { paddingBottom: SPACING.sm },
   switchRow: {

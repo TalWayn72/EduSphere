@@ -43,7 +43,10 @@ function renderPage(sessionId = 'sess-1') {
   return render(
     <MemoryRouter initialEntries={[`/sessions/${sessionId}`]}>
       <Routes>
-        <Route path="/sessions/:sessionId" element={<LiveSessionDetailPage />} />
+        <Route
+          path="/sessions/:sessionId"
+          element={<LiveSessionDetailPage />}
+        />
       </Routes>
     </MemoryRouter>
   );
@@ -77,7 +80,13 @@ describe('LiveSessionDetailPage', () => {
   beforeEach(() => {
     vi.mocked(getCurrentUser).mockReturnValue(null);
     vi.mocked(useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     vi.mocked(useMutation).mockReturnValue([
@@ -88,7 +97,13 @@ describe('LiveSessionDetailPage', () => {
 
   it('shows loading spinner while fetching', () => {
     vi.mocked(useQuery).mockReturnValue([
-      { data: undefined, fetching: true, error: undefined, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: true,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();

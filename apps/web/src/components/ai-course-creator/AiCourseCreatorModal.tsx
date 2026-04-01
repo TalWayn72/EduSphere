@@ -13,7 +13,10 @@ import { AiCoursePromptForm } from './AiCoursePromptForm';
 import { AiCourseOutlinePreview } from './AiCourseOutlinePreview';
 import type { AiCourseCreatorModalProps } from './types';
 
-export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProps) {
+export function AiCourseCreatorModal({
+  open,
+  onClose,
+}: AiCourseCreatorModalProps) {
   const { t } = useTranslation('courses');
   const {
     prompt,
@@ -35,7 +38,12 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
   } = useAiCourseCreator(open);
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

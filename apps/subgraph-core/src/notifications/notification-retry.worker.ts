@@ -3,7 +3,12 @@
  * Polls for failed deliveries and retries with exponential backoff.
  * Memory safety: interval handle stored and cleared in OnModuleDestroy.
  */
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -54,7 +59,11 @@ export class NotificationRetryWorker implements OnModuleInit, OnModuleDestroy {
   private async pollAndRetry(): Promise<void> {
     try {
       // Use ORG_ADMIN role to read across users within tenant context.
-      const ctx: TenantContext = { tenantId: 'system', userId: 'system', userRole: 'SUPER_ADMIN' };
+      const ctx: TenantContext = {
+        tenantId: 'system',
+        userId: 'system',
+        userRole: 'SUPER_ADMIN',
+      };
 
       const failedRows = await withTenantContext(this.db, ctx, async (tx) => {
         return tx
@@ -91,21 +100,37 @@ export class NotificationRetryWorker implements OnModuleInit, OnModuleDestroy {
       let success = false;
 
       if (row.channel === 'email') {
-        const result = await this.emailChannel.send(row.userId, row.title, row.body);
+        const result = await this.emailChannel.send(
+          row.userId,
+          row.title,
+          row.body
+        );
         success = !!result;
       } else if (row.channel === 'whatsapp') {
-        const result = await this.whatsAppChannel.sendTemplate(row.userId, 'notification_generic', [row.title]);
+        const result = await this.whatsAppChannel.sendTemplate(
+          row.userId,
+          'notification_generic',
+          [row.title]
+        );
         success = !!result;
       }
 
       const newRetryCount = row.retryCount + 1;
-      const ctx: TenantContext = { tenantId: row.tenantId, userId: row.userId, userRole: 'STUDENT' };
+      const ctx: TenantContext = {
+        tenantId: row.tenantId,
+        userId: row.userId,
+        userRole: 'STUDENT',
+      };
 
       if (success) {
         await withTenantContext(this.db, ctx, async (tx) => {
           await tx
             .update(schema.notificationDeliveries)
-            .set({ status: 'sent', sentAt: new Date(), retryCount: newRetryCount })
+            .set({
+              status: 'sent',
+              sentAt: new Date(),
+              retryCount: newRetryCount,
+            })
             .where(eq(schema.notificationDeliveries.id, row.id));
         });
       } else if (newRetryCount >= MAX_RETRIES) {
@@ -119,7 +144,8 @@ export class NotificationRetryWorker implements OnModuleInit, OnModuleDestroy {
           `[NotificationRetryWorker] Delivery bounced after ${MAX_RETRIES.toString()} retries — id=${row.id}`
         );
       } else {
-        const nextDelay = BACKOFF_MS[newRetryCount] ?? BACKOFF_MS[BACKOFF_MS.length - 1];
+        const nextDelay =
+          BACKOFF_MS[newRetryCount] ?? BACKOFF_MS[BACKOFF_MS.length - 1];
         const nextRetryAt = new Date(Date.now() + nextDelay);
         await withTenantContext(this.db, ctx, async (tx) => {
           await tx

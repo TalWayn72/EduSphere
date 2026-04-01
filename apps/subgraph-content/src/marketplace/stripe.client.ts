@@ -103,9 +103,7 @@ export class StripeClient {
   /**
    * Create a refund for a payment intent.
    */
-  async createRefund(
-    paymentIntentId: string
-  ): Promise<Stripe.Refund> {
+  async createRefund(paymentIntentId: string): Promise<Stripe.Refund> {
     return this.client.refunds.create({
       payment_intent: paymentIntentId,
     });

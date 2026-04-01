@@ -5,7 +5,8 @@ import { ChallengeCard } from './ChallengeCard';
 const SAMPLE_CHALLENGE = {
   id: 'ch-001',
   title: 'GraphQL Federation Mastery Challenge',
-  description: 'Build a federated schema with 3 subgraphs and demonstrate entity resolution.',
+  description:
+    'Build a federated schema with 3 subgraphs and demonstrate entity resolution.',
   challengeType: 'PROJECT',
   targetScore: 85,
   startDate: new Date(Date.now() - 86400000).toISOString(),
@@ -31,19 +32,31 @@ export const Default: Story = {
 
 export const QuizType: Story = {
   args: {
-    challenge: { ...SAMPLE_CHALLENGE, challengeType: 'QUIZ', title: 'Weekly Quiz Sprint' },
+    challenge: {
+      ...SAMPLE_CHALLENGE,
+      challengeType: 'QUIZ',
+      title: 'Weekly Quiz Sprint',
+    },
   },
 };
 
 export const DiscussionType: Story = {
   args: {
-    challenge: { ...SAMPLE_CHALLENGE, challengeType: 'DISCUSSION', title: 'Debate: AI in Education' },
+    challenge: {
+      ...SAMPLE_CHALLENGE,
+      challengeType: 'DISCUSSION',
+      title: 'Debate: AI in Education',
+    },
   },
 };
 
 export const AlmostFull: Story = {
   args: {
-    challenge: { ...SAMPLE_CHALLENGE, participantCount: 48, maxParticipants: 50 },
+    challenge: {
+      ...SAMPLE_CHALLENGE,
+      participantCount: 48,
+      maxParticipants: 50,
+    },
   },
 };
 

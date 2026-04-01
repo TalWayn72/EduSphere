@@ -21,14 +21,21 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
   return [
     // G-10: query depth + complexity validation
     {
-      onValidate({ addValidationRule }: { addValidationRule: (rule: unknown) => void }) {
+      onValidate({
+        addValidationRule,
+      }: {
+        addValidationRule: (rule: unknown) => void;
+      }) {
         addValidationRule(depthLimitRule());
         addValidationRule(complexityLimitRule());
       },
     },
     // G-09 + BUG-049: JWT auth context + header forwarding
     {
-      async onContextBuilding({ context, extendContext }: {
+      async onContextBuilding({
+        context,
+        extendContext,
+      }: {
         context: Record<string, unknown>;
         extendContext: (ext: Record<string, unknown>) => void;
       }) {
@@ -36,7 +43,9 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
         if (!request) return;
 
         // BUG-049 fix: WebSocket subscriptions send JWT in connectionParams
-        const wsConnectionParams = context['connectionParams'] as Record<string, unknown> | undefined;
+        const wsConnectionParams = context['connectionParams'] as
+          | Record<string, unknown>
+          | undefined;
         const wsAuthHeader =
           typeof wsConnectionParams?.['authorization'] === 'string'
             ? wsConnectionParams['authorization']
@@ -79,7 +88,10 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
             userId = '00000000-0000-0000-0000-000000000001';
             role = APP_ROLES.has(devRole) ? devRole : 'STUDENT';
             isAuthenticated = true;
-            logger.warn({ role }, 'SEC-1: dev-token bypass active — for E2E tests only');
+            logger.warn(
+              { role },
+              'SEC-1: dev-token bypass active — for E2E tests only'
+            );
           } else {
             try {
               const { payload } = await jwtVerify(token, JWKS, {
@@ -91,11 +103,11 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
               role =
                 (payload['role'] as string) ??
                 (
-                  (
-                    (payload['realm_access'] as Record<string, unknown>)
-                      ?.['roles'] as string[]
-                  )?.find((r) => APP_ROLES.has(r)) ?? null
-                );
+                  (payload['realm_access'] as Record<string, unknown>)?.[
+                    'roles'
+                  ] as string[]
+                )?.find((r) => APP_ROLES.has(r)) ??
+                null;
               isAuthenticated = true;
               if (wsAuthHeader && !request.headers.get('authorization')) {
                 logger.debug(
@@ -145,10 +157,16 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
         const auth = ctx?.headers?.authorization;
         if (!auth) return;
         const prev = options.headers as Record<string, string> | undefined;
-        const forwarded: Record<string, string> = { ...(prev ?? {}), authorization: auth };
-        if (ctx?.headers?.['x-tenant-id']) forwarded['x-tenant-id'] = ctx.headers['x-tenant-id'];
-        if (ctx?.headers?.['x-user-id']) forwarded['x-user-id'] = ctx.headers['x-user-id'];
-        if (ctx?.headers?.['x-user-role']) forwarded['x-user-role'] = ctx.headers['x-user-role'];
+        const forwarded: Record<string, string> = {
+          ...(prev ?? {}),
+          authorization: auth,
+        };
+        if (ctx?.headers?.['x-tenant-id'])
+          forwarded['x-tenant-id'] = ctx.headers['x-tenant-id'];
+        if (ctx?.headers?.['x-user-id'])
+          forwarded['x-user-id'] = ctx.headers['x-user-id'];
+        if (ctx?.headers?.['x-user-role'])
+          forwarded['x-user-role'] = ctx.headers['x-user-role'];
         setOptions({ ...options, headers: forwarded });
       },
     },

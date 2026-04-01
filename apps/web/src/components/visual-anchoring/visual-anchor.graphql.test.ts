@@ -20,7 +20,8 @@ describe('visual-anchor.graphql', () => {
 
   it('GET_VISUAL_ANCHORS contains mediaAssetId variable', () => {
     const source =
-      GET_VISUAL_ANCHORS.loc?.source?.body ?? JSON.stringify(GET_VISUAL_ANCHORS);
+      GET_VISUAL_ANCHORS.loc?.source?.body ??
+      JSON.stringify(GET_VISUAL_ANCHORS);
     expect(source).toContain('mediaAssetId');
   });
 

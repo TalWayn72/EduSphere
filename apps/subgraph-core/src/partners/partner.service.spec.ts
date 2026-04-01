@@ -84,7 +84,9 @@ describe('PartnerService', () => {
       let capturedValues: Record<string, unknown> | undefined;
       const mockValuesCapture = vi.fn((v: Record<string, unknown>) => {
         capturedValues = v;
-        return { returning: vi.fn().mockResolvedValue([{ id: 'partner-uuid-2' }]) };
+        return {
+          returning: vi.fn().mockResolvedValue([{ id: 'partner-uuid-2' }]),
+        };
       });
       mockDb.insert.mockReturnValueOnce({ values: mockValuesCapture });
 
@@ -95,7 +97,9 @@ describe('PartnerService', () => {
         partnerType: 'RESELLER',
       });
 
-      const expectedHash = createHash('sha256').update(result.apiKey).digest('hex');
+      const expectedHash = createHash('sha256')
+        .update(result.apiKey)
+        .digest('hex');
       expect(capturedValues?.['apiKeyHash']).toBe(expectedHash);
       expect(capturedValues?.['apiKeyHash']).not.toBe(result.apiKey);
     });

@@ -7,10 +7,7 @@ import { readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
-const NOTIFICATIONS_DIR = resolve(
-  join(import.meta.dirname, '.')
-);
-
+const NOTIFICATIONS_DIR = resolve(join(import.meta.dirname, '.'));
 
 /**
  * Services that manage resources (timers, connections, subscriptions)

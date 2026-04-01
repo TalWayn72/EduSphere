@@ -93,7 +93,10 @@ export class VisualAnchorResolver {
   ) {
     const authCtx = requireAuth(ctx);
     const anchor = await this.service.createAnchor(input, authCtx);
-    await pubSub.publish('anchorCreated', { anchorCreated: anchor, mediaAssetId: anchor.mediaAssetId });
+    await pubSub.publish('anchorCreated', {
+      anchorCreated: anchor,
+      mediaAssetId: anchor.mediaAssetId,
+    });
     return anchor;
   }
 
@@ -108,10 +111,7 @@ export class VisualAnchorResolver {
   }
 
   @Mutation('deleteVisualAnchor')
-  async deleteVisualAnchor(
-    @Args('id') id: string,
-    @Context() ctx: GqlContext
-  ) {
+  async deleteVisualAnchor(@Args('id') id: string, @Context() ctx: GqlContext) {
     const authCtx = requireAuth(ctx);
     const result = await this.service.deleteAnchor(id, authCtx);
     await pubSub.publish('anchorDeleted', { anchorDeleted: id });
@@ -140,8 +140,10 @@ export class VisualAnchorResolver {
   // ── Subscriptions ──────────────────────────────────────────────────────────
 
   @Subscription('anchorDeleted', {
-    filter: (payload: { anchorDeleted: string; mediaAssetId: string }, vars: { mediaAssetId: string }) =>
-      payload.mediaAssetId === vars.mediaAssetId,
+    filter: (
+      payload: { anchorDeleted: string; mediaAssetId: string },
+      vars: { mediaAssetId: string }
+    ) => payload.mediaAssetId === vars.mediaAssetId,
     resolve: (payload: { anchorDeleted: string }) => payload.anchorDeleted,
   })
   anchorDeleted(@Args('mediaAssetId') _mediaAssetId: string) {

@@ -95,7 +95,12 @@ export const CreateOrgBadgeSchema = z.object({
   xpRequired: z.number().int().min(0),
   autoAwardCriteria: z
     .object({
-      type: z.enum(['COURSE_COMPLETE', 'XP_THRESHOLD', 'STREAK_DAYS', 'QUIZ_SCORE']),
+      type: z.enum([
+        'COURSE_COMPLETE',
+        'XP_THRESHOLD',
+        'STREAK_DAYS',
+        'QUIZ_SCORE',
+      ]),
       courseId: z.string().uuid().optional(),
       amount: z.number().int().min(0).optional(),
       count: z.number().int().min(1).optional(),
@@ -112,7 +117,12 @@ export const UpdateOrgBadgeSchema = z.object({
   xpRequired: z.number().int().min(0).optional(),
   autoAwardCriteria: z
     .object({
-      type: z.enum(['COURSE_COMPLETE', 'XP_THRESHOLD', 'STREAK_DAYS', 'QUIZ_SCORE']),
+      type: z.enum([
+        'COURSE_COMPLETE',
+        'XP_THRESHOLD',
+        'STREAK_DAYS',
+        'QUIZ_SCORE',
+      ]),
       courseId: z.string().uuid().optional(),
       amount: z.number().int().min(0).optional(),
       count: z.number().int().min(1).optional(),

@@ -18,8 +18,24 @@ import { render, screen, fireEvent } from '@testing-library/react';
 const mockStore = {
   sessionId: 'session-1',
   questions: [
-    { itemId: 'q1', questionData: { type: 'MULTIPLE_CHOICE', question: 'Q1?', options: [], correctOptionIds: [] } },
-    { itemId: 'q2', questionData: { type: 'MULTIPLE_CHOICE', question: 'Q2?', options: [], correctOptionIds: [] } },
+    {
+      itemId: 'q1',
+      questionData: {
+        type: 'MULTIPLE_CHOICE',
+        question: 'Q1?',
+        options: [],
+        correctOptionIds: [],
+      },
+    },
+    {
+      itemId: 'q2',
+      questionData: {
+        type: 'MULTIPLE_CHOICE',
+        question: 'Q2?',
+        options: [],
+        correctOptionIds: [],
+      },
+    },
   ],
   currentIndex: 0,
   answers: {},
@@ -57,11 +73,15 @@ vi.mock('./ExamTimer', () => ({
 }));
 
 vi.mock('./ExamNavigationSidebar', () => ({
-  ExamNavigationSidebar: vi.fn(() => <div data-testid="exam-sidebar">Sidebar</div>),
+  ExamNavigationSidebar: vi.fn(() => (
+    <div data-testid="exam-sidebar">Sidebar</div>
+  )),
 }));
 
 vi.mock('./ExamQuestionRenderer', () => ({
-  ExamQuestionRenderer: vi.fn(() => <div data-testid="question-renderer">Question</div>),
+  ExamQuestionRenderer: vi.fn(() => (
+    <div data-testid="question-renderer">Question</div>
+  )),
 }));
 
 // ── Import after mocks ──────────────────────────────────────────────────────
@@ -75,8 +95,24 @@ describe('ExamPlayer', () => {
     vi.clearAllMocks();
     mockStore.currentIndex = 0;
     mockStore.questions = [
-      { itemId: 'q1', questionData: { type: 'MULTIPLE_CHOICE', question: 'Q1?', options: [], correctOptionIds: [] } },
-      { itemId: 'q2', questionData: { type: 'MULTIPLE_CHOICE', question: 'Q2?', options: [], correctOptionIds: [] } },
+      {
+        itemId: 'q1',
+        questionData: {
+          type: 'MULTIPLE_CHOICE',
+          question: 'Q1?',
+          options: [],
+          correctOptionIds: [],
+        },
+      },
+      {
+        itemId: 'q2',
+        questionData: {
+          type: 'MULTIPLE_CHOICE',
+          question: 'Q2?',
+          options: [],
+          correctOptionIds: [],
+        },
+      },
     ];
     mockStore.answers = {};
     mockStore.flagged = new Set();
@@ -134,7 +170,9 @@ describe('ExamPlayer', () => {
 
   it('returns null when no current question', () => {
     mockStore.questions = [];
-    const { container } = render(<ExamPlayer examTitle="Test" onSubmit={vi.fn()} />);
+    const { container } = render(
+      <ExamPlayer examTitle="Test" onSubmit={vi.fn()} />
+    );
     expect(container.firstChild).toBeNull();
   });
 

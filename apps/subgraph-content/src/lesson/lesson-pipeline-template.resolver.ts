@@ -27,7 +27,7 @@ function requireAuth(ctx: GqlContext): TenantContext {
 @Resolver('LessonPipelineTemplate')
 export class LessonPipelineTemplateResolver {
   constructor(
-    private readonly templateService: LessonPipelineTemplateService,
+    private readonly templateService: LessonPipelineTemplateService
   ) {}
 
   @Query('pipelineTemplates')
@@ -39,17 +39,21 @@ export class LessonPipelineTemplateResolver {
   @Mutation('createPipelineTemplate')
   async createPipelineTemplate(
     @Args('input') input: CreatePipelineTemplateInput,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    return this.templateService.create(input, tenantCtx.tenantId, tenantCtx.userId);
+    return this.templateService.create(
+      input,
+      tenantCtx.tenantId,
+      tenantCtx.userId
+    );
   }
 
   @Mutation('updatePipelineTemplate')
   async updatePipelineTemplate(
     @Args('id') id: string,
     @Args('input') input: UpdatePipelineTemplateInput,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.templateService.update(id, input, tenantCtx.tenantId);
@@ -58,7 +62,7 @@ export class LessonPipelineTemplateResolver {
   @Mutation('deletePipelineTemplate')
   async deletePipelineTemplate(
     @Args('id') id: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.templateService.delete(id, tenantCtx.tenantId);

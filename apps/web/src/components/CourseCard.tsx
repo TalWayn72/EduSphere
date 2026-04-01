@@ -20,24 +20,15 @@ export interface CourseCardProps {
 }
 
 export const CATEGORY_GRADIENTS: Record<string, string> = {
-  Programming:
-    'bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600',
-  Design:
-    'bg-gradient-to-br from-pink-500 via-rose-400 to-orange-400',
-  Business:
-    'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600',
-  Science:
-    'bg-gradient-to-br from-sky-500 via-blue-500 to-indigo-600',
-  Languages:
-    'bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-300',
-  Arts:
-    'bg-gradient-to-br from-fuchsia-500 via-purple-400 to-violet-500',
-  Mathematics:
-    'bg-gradient-to-br from-violet-600 via-indigo-500 to-blue-500',
-  History:
-    'bg-gradient-to-br from-amber-600 via-orange-500 to-red-400',
-  default:
-    'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600',
+  Programming: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600',
+  Design: 'bg-gradient-to-br from-pink-500 via-rose-400 to-orange-400',
+  Business: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600',
+  Science: 'bg-gradient-to-br from-sky-500 via-blue-500 to-indigo-600',
+  Languages: 'bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-300',
+  Arts: 'bg-gradient-to-br from-fuchsia-500 via-purple-400 to-violet-500',
+  Mathematics: 'bg-gradient-to-br from-violet-600 via-indigo-500 to-blue-500',
+  History: 'bg-gradient-to-br from-amber-600 via-orange-500 to-red-400',
+  default: 'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600',
 };
 
 function getCategoryInitials(category: string): string {

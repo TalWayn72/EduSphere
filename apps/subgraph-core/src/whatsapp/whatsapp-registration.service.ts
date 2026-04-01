@@ -4,7 +4,12 @@
  * SI-3: phone numbers are encrypted before storage.
  * OTP stored as SHA-256 hash, expires in 10 minutes.
  */
-import { Injectable, Logger, OnModuleDestroy, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  BadRequestException,
+} from '@nestjs/common';
 import { createHash, randomInt } from 'crypto';
 import {
   createDatabaseConnection,
@@ -88,7 +93,9 @@ export class WhatsAppRegistrationService implements OnModuleDestroy {
         );
       });
 
-    this.logger.log(`[WhatsAppRegistrationService] OTP generated — userId=${userId}`);
+    this.logger.log(
+      `[WhatsAppRegistrationService] OTP generated — userId=${userId}`
+    );
     return { success: true, message: 'Verification code sent via WhatsApp' };
   }
 
@@ -117,13 +124,17 @@ export class WhatsAppRegistrationService implements OnModuleDestroy {
     });
 
     if (rows.length === 0) {
-      throw new BadRequestException('No WhatsApp registration found — register first');
+      throw new BadRequestException(
+        'No WhatsApp registration found — register first'
+      );
     }
 
     const contact = rows[0];
 
     if (contact.otpExpiresAt && contact.otpExpiresAt < new Date()) {
-      throw new BadRequestException('Verification code expired — request a new one');
+      throw new BadRequestException(
+        'Verification code expired — request a new one'
+      );
     }
 
     if (contact.otpHash !== codeHash) {
@@ -144,7 +155,9 @@ export class WhatsAppRegistrationService implements OnModuleDestroy {
         .where(eq(schema.userWhatsappContacts.id, contact.id));
     });
 
-    this.logger.log(`[WhatsAppRegistrationService] Verified — userId=${userId}`);
+    this.logger.log(
+      `[WhatsAppRegistrationService] Verified — userId=${userId}`
+    );
     return { verified: true, message: 'WhatsApp number verified successfully' };
   }
 }

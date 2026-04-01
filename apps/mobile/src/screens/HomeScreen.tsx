@@ -106,7 +106,13 @@ export default function HomeScreen() {
     ? MOCK_STATS
     : resolveStats(
         statsLoading,
-        statsData?.myStats as { coursesEnrolled?: number; conceptsMastered?: number; totalLearningMinutes?: number } | undefined,
+        statsData?.myStats as
+          | {
+              coursesEnrolled?: number;
+              conceptsMastered?: number;
+              totalLearningMinutes?: number;
+            }
+          | undefined,
         MOCK_STATS
       );
   const recentCourses: CourseItem[] = DEV_MODE
@@ -130,10 +136,7 @@ export default function HomeScreen() {
           )}
           <View style={styles.streakRow}>
             <Text style={styles.streakFlame}>{'\uD83D\uDD25'}</Text>
-            <Text
-              style={styles.streakCount}
-              testID="streak-value"
-            >
+            <Text style={styles.streakCount} testID="streak-value">
               {stats.learningStreak}
             </Text>
             <Text style={styles.streakLabel}> day streak</Text>
@@ -195,7 +198,10 @@ export default function HomeScreen() {
             <View style={styles.progressContainer}>
               <View style={styles.progressBar}>
                 <View
-                  style={[styles.progressFill, { width: `${course.progress}%` }]}
+                  style={[
+                    styles.progressFill,
+                    { width: `${course.progress}%` },
+                  ]}
                 />
               </View>
               <Text style={styles.progressText}>{course.progress}%</Text>

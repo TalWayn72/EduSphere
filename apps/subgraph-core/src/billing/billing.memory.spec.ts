@@ -12,11 +12,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoisted mocks (must be defined before vi.mock factories run) ─────────────
 
-const { mockCloseAllPools, mockNatsDrain, mockNatsPublish } = vi.hoisted(() => ({
-  mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
-  mockNatsDrain: vi.fn().mockResolvedValue(undefined),
-  mockNatsPublish: vi.fn(),
-}));
+const { mockCloseAllPools, mockNatsDrain, mockNatsPublish } = vi.hoisted(
+  () => ({
+    mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
+    mockNatsDrain: vi.fn().mockResolvedValue(undefined),
+    mockNatsPublish: vi.fn(),
+  })
+);
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({

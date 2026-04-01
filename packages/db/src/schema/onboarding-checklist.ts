@@ -61,7 +61,6 @@ export const orgOnboardingChecklist = pgTable(
   ]
 ).enableRLS();
 
-export type OrgOnboardingChecklist =
-  typeof orgOnboardingChecklist.$inferSelect;
+export type OrgOnboardingChecklist = typeof orgOnboardingChecklist.$inferSelect;
 export type NewOrgOnboardingChecklist =
   typeof orgOnboardingChecklist.$inferInsert;

@@ -64,7 +64,9 @@ describe('stripBiDiControls', () => {
   });
 
   it('strips multiple BiDi controls in same string', () => {
-    expect(stripBiDiControls('\u202Ahello\u202B \u2066world\u2069')).toBe('hello world');
+    expect(stripBiDiControls('\u202Ahello\u202B \u2066world\u2069')).toBe(
+      'hello world'
+    );
   });
 
   it('preserves Hebrew text while stripping controls', () => {

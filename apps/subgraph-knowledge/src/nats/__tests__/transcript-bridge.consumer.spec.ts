@@ -47,9 +47,15 @@ describe('NatsConsumer — transcript bridge behavior', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     // Re-setup mock implementations after clearAllMocks
-    vi.mocked(mockCypherService.findConceptByNameCaseInsensitive!).mockResolvedValue(null);
-    vi.mocked(mockCypherService.createConcept!).mockResolvedValue('new-concept-id');
-    vi.mocked(mockCypherService.linkConceptsByName!).mockResolvedValue(undefined);
+    vi.mocked(
+      mockCypherService.findConceptByNameCaseInsensitive!
+    ).mockResolvedValue(null);
+    vi.mocked(mockCypherService.createConcept!).mockResolvedValue(
+      'new-concept-id'
+    );
+    vi.mocked(mockCypherService.linkConceptsByName!).mockResolvedValue(
+      undefined
+    );
     setupNatsMocks();
     const { connect } = await import('nats');
     vi.mocked(connect).mockResolvedValue({
@@ -101,13 +107,13 @@ describe('NatsConsumer — transcript bridge behavior', () => {
           definition: 'Subset of AI that learns from data',
           tenant_id: 'tenant-transcript-1',
           source_ids: ['course-transcript-1'],
-        }),
+        })
       );
     });
 
     it('creates RELATED_TO edges for concept related terms', async () => {
       vi.mocked(
-        mockCypherService.findConceptByNameCaseInsensitive!,
+        mockCypherService.findConceptByNameCaseInsensitive!
       ).mockResolvedValue({ id: 'existing', name: 'ML' });
 
       const payload = JSON.stringify({
@@ -144,22 +150,30 @@ describe('NatsConsumer — transcript bridge behavior', () => {
         'ML',
         'Statistics',
         'tenant-rel-1',
-        0.7,
+        0.7
       );
       expect(mockCypherService.linkConceptsByName).toHaveBeenCalledWith(
         'ML',
         'Data Science',
         'tenant-rel-1',
-        0.7,
+        0.7
       );
     });
 
     it('triggers persisted event after all concepts are processed', async () => {
       const payload = JSON.stringify({
         concepts: [
-          { name: 'NLP', definition: 'Natural Language Processing', relatedTerms: [] },
+          {
+            name: 'NLP',
+            definition: 'Natural Language Processing',
+            relatedTerms: [],
+          },
           { name: 'CV', definition: 'Computer Vision', relatedTerms: [] },
-          { name: 'RL', definition: 'Reinforcement Learning', relatedTerms: [] },
+          {
+            name: 'RL',
+            definition: 'Reinforcement Learning',
+            relatedTerms: [],
+          },
         ],
         courseId: 'course-multi',
         tenantId: 'tenant-multi',
@@ -195,12 +209,16 @@ describe('NatsConsumer — transcript bridge behavior', () => {
   describe('idempotency', () => {
     it('skips concept creation when concept already exists', async () => {
       vi.mocked(
-        mockCypherService.findConceptByNameCaseInsensitive!,
+        mockCypherService.findConceptByNameCaseInsensitive!
       ).mockResolvedValue({ id: 'existing-id', name: 'Existing' });
 
       const payload = JSON.stringify({
         concepts: [
-          { name: 'Existing', definition: 'Already in graph', relatedTerms: [] },
+          {
+            name: 'Existing',
+            definition: 'Already in graph',
+            relatedTerms: [],
+          },
         ],
         courseId: 'course-idem',
         tenantId: 'tenant-idem',
@@ -240,7 +258,7 @@ describe('NatsConsumer — transcript bridge behavior', () => {
 
       expect(mockSubscribe).toHaveBeenCalledWith(
         'knowledge.concepts.extracted',
-        expect.objectContaining({ queue: 'knowledge-workers' }),
+        expect.objectContaining({ queue: 'knowledge-workers' })
       );
     });
 
@@ -265,7 +283,7 @@ describe('NatsConsumer — transcript bridge behavior', () => {
               ],
               courseId: 'c-1',
               tenantId: 't-1',
-            }),
+            })
           ),
         },
         {
@@ -276,7 +294,7 @@ describe('NatsConsumer — transcript bridge behavior', () => {
               ],
               courseId: 'c-2',
               tenantId: 't-2',
-            }),
+            })
           ),
         },
       ];

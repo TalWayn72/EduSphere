@@ -15,7 +15,7 @@ import {
 } from '@/lib/scorm/scorm2004-data-model';
 
 interface Scorm2004PlayerProps {
-  packageUrl: string;       // URL to the SCORM 2004 entry point HTML
+  packageUrl: string; // URL to the SCORM 2004 entry point HTML
   learnerId: string;
   learnerName: string;
   onProgress?: (cmi: Partial<ScormCmiModel>) => void;
@@ -29,7 +29,9 @@ interface ScormApiMessage {
   value?: string;
 }
 
-function resolveCompletionStatus(cmi: ScormCmiModel): 'passed' | 'failed' | 'completed' {
+function resolveCompletionStatus(
+  cmi: ScormCmiModel
+): 'passed' | 'failed' | 'completed' {
   if (cmi['cmi.success_status'] === 'passed') return 'passed';
   if (cmi['cmi.success_status'] === 'failed') return 'failed';
   return 'completed';
@@ -44,7 +46,9 @@ export function Scorm2004Player({
   className,
 }: Scorm2004PlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const cmiRef = useRef<ScormCmiModel>(createDefaultCmiModel(learnerId, learnerName));
+  const cmiRef = useRef<ScormCmiModel>(
+    createDefaultCmiModel(learnerId, learnerName)
+  );
   const lastErrorRef = useRef<string>(SCORM2004_ERROR_CODES.NO_ERROR);
   const initializedRef = useRef(false);
 
@@ -57,7 +61,7 @@ export function Scorm2004Player({
       const reply = (result: string): void => {
         event.source?.postMessage(
           { action: `${msg.action}Result`, result },
-          { targetOrigin: '*' },
+          { targetOrigin: '*' }
         );
       };
 
@@ -74,15 +78,23 @@ export function Scorm2004Player({
             break;
           }
           if (msg.element in cmiRef.current) {
-            (cmiRef.current as unknown as Record<string, unknown>)[msg.element] = msg.value ?? '';
+            (cmiRef.current as unknown as Record<string, unknown>)[
+              msg.element
+            ] = msg.value ?? '';
             lastErrorRef.current = SCORM2004_ERROR_CODES.NO_ERROR;
-            onProgress?.({ [msg.element]: msg.value } as Partial<ScormCmiModel>);
-            if (msg.element === 'cmi.completion_status' && msg.value === 'completed') {
+            onProgress?.({
+              [msg.element]: msg.value,
+            } as Partial<ScormCmiModel>);
+            if (
+              msg.element === 'cmi.completion_status' &&
+              msg.value === 'completed'
+            ) {
               onComplete?.(resolveCompletionStatus(cmiRef.current));
             }
             reply('true');
           } else {
-            lastErrorRef.current = SCORM2004_ERROR_CODES.DATA_MODEL_ELEMENT_NOT_IMPLEMENTED;
+            lastErrorRef.current =
+              SCORM2004_ERROR_CODES.DATA_MODEL_ELEMENT_NOT_IMPLEMENTED;
             reply('false');
           }
           break;
@@ -92,7 +104,9 @@ export function Scorm2004Player({
             reply('');
             break;
           }
-          const val = (cmiRef.current as unknown as Record<string, unknown>)[msg.element];
+          const val = (cmiRef.current as unknown as Record<string, unknown>)[
+            msg.element
+          ];
           reply(val == null ? '' : String(val));
           break;
         }
@@ -107,7 +121,7 @@ export function Scorm2004Player({
         }
       }
     },
-    [onProgress, onComplete],
+    [onProgress, onComplete]
   );
 
   useEffect(() => {

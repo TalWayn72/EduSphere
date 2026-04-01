@@ -75,112 +75,112 @@ Every `{PLACEHOLDER}` used across all template files, organized by category.
 
 ### Project Identity
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{PROJECT_NAME}` | Your project name | "MyApp", "DataPlatform", "EduSphere" |
-| `{PROJECT_ROOT}` | Absolute path to project | `/home/user/myapp`, `C:\Users\dev\myapp` |
-| `{PROJECT_PACKAGE_PREFIX}` | Package scope prefix | `@myapp/`, `@company/`, `@edusphere/` |
-| `{LANGUAGE}` | Communication language with user | "English", "Hebrew", "Spanish" |
-| `{SCALE_TARGET}` | Target scale | "100,000+ users", "10M requests/day" |
+| Placeholder                | Description                      | Example Values                           |
+| -------------------------- | -------------------------------- | ---------------------------------------- |
+| `{PROJECT_NAME}`           | Your project name                | "MyApp", "DataPlatform", "EduSphere"     |
+| `{PROJECT_ROOT}`           | Absolute path to project         | `/home/user/myapp`, `C:\Users\dev\myapp` |
+| `{PROJECT_PACKAGE_PREFIX}` | Package scope prefix             | `@myapp/`, `@company/`, `@edusphere/`    |
+| `{LANGUAGE}`               | Communication language with user | "English", "Hebrew", "Spanish"           |
+| `{SCALE_TARGET}`           | Target scale                     | "100,000+ users", "10M requests/day"     |
 
 ### Architecture & Services
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{API_FRAMEWORK}` | API framework/protocol | "GraphQL Federation", "REST", "gRPC", "tRPC" |
-| `{SERVICE_COUNT}` | Number of backend services | "6", "3", "12" |
-| `{SERVICE_PORTS}` | Service port range | "4001-4006", "8001-8003" |
-| `{FRONTEND_PORT}` | Frontend dev port | "5173", "3000", "8080" |
-| `{FRONTEND_APP}` | Frontend app path | "apps/web", "packages/client" |
-| `{MOBILE_APP}` | Mobile app path | "apps/mobile", "packages/mobile" |
-| `{GATEWAY_APP}` | API gateway path | "apps/gateway", "packages/api" |
-| `{BACKEND_SERVICES_DIR}` | Backend services path pattern | "apps/subgraph-*", "services/*" |
-| `{PACKAGES_DIR}` | Shared packages path | "packages/*", "libs/*" |
-| `{INFRA_DIR}` | Infrastructure path | "infrastructure/", "infra/" |
+| Placeholder              | Description                   | Example Values                               |
+| ------------------------ | ----------------------------- | -------------------------------------------- |
+| `{API_FRAMEWORK}`        | API framework/protocol        | "GraphQL Federation", "REST", "gRPC", "tRPC" |
+| `{SERVICE_COUNT}`        | Number of backend services    | "6", "3", "12"                               |
+| `{SERVICE_PORTS}`        | Service port range            | "4001-4006", "8001-8003"                     |
+| `{FRONTEND_PORT}`        | Frontend dev port             | "5173", "3000", "8080"                       |
+| `{FRONTEND_APP}`         | Frontend app path             | "apps/web", "packages/client"                |
+| `{MOBILE_APP}`           | Mobile app path               | "apps/mobile", "packages/mobile"             |
+| `{GATEWAY_APP}`          | API gateway path              | "apps/gateway", "packages/api"               |
+| `{BACKEND_SERVICES_DIR}` | Backend services path pattern | "apps/subgraph-_", "services/_"              |
+| `{PACKAGES_DIR}`         | Shared packages path          | "packages/_", "libs/_"                       |
+| `{INFRA_DIR}`            | Infrastructure path           | "infrastructure/", "infra/"                  |
 
 ### Backend Stack
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{BACKEND_FRAMEWORK}` | Backend framework | "NestJS", "Express", "FastAPI", "Spring Boot" |
-| `{DATABASE}` | Primary database | "PostgreSQL", "MySQL", "MongoDB" |
-| `{ORM}` | ORM/query builder | "Drizzle", "Prisma", "TypeORM", "SQLAlchemy" |
-| `{AUTH_PROVIDER}` | Authentication provider | "Keycloak", "Auth0", "Firebase Auth", "Supabase Auth" |
-| `{EVENT_BUS}` | Event/message bus | "NATS", "Kafka", "RabbitMQ", "Redis Pub/Sub" |
-| `{LOGGER}` | Logging library | "Pino", "Winston", "Bunyan", "structlog" |
-| `{VALIDATION_LIB}` | Validation library | "Zod", "Yup", "Joi", "class-validator" |
-| `{LIFECYCLE_CLEANUP_HOOK}` | Service cleanup hook | "OnModuleDestroy", "onBeforeUnmount", "@PreDestroy" |
-| `{TENANT_CONTEXT_WRAPPER}` | Multi-tenant wrapper function | "withTenantContext()", "setTenantScope()" |
+| Placeholder                | Description                   | Example Values                                        |
+| -------------------------- | ----------------------------- | ----------------------------------------------------- |
+| `{BACKEND_FRAMEWORK}`      | Backend framework             | "NestJS", "Express", "FastAPI", "Spring Boot"         |
+| `{DATABASE}`               | Primary database              | "PostgreSQL", "MySQL", "MongoDB"                      |
+| `{ORM}`                    | ORM/query builder             | "Drizzle", "Prisma", "TypeORM", "SQLAlchemy"          |
+| `{AUTH_PROVIDER}`          | Authentication provider       | "Keycloak", "Auth0", "Firebase Auth", "Supabase Auth" |
+| `{EVENT_BUS}`              | Event/message bus             | "NATS", "Kafka", "RabbitMQ", "Redis Pub/Sub"          |
+| `{LOGGER}`                 | Logging library               | "Pino", "Winston", "Bunyan", "structlog"              |
+| `{VALIDATION_LIB}`         | Validation library            | "Zod", "Yup", "Joi", "class-validator"                |
+| `{LIFECYCLE_CLEANUP_HOOK}` | Service cleanup hook          | "OnModuleDestroy", "onBeforeUnmount", "@PreDestroy"   |
+| `{TENANT_CONTEXT_WRAPPER}` | Multi-tenant wrapper function | "withTenantContext()", "setTenantScope()"             |
 
 ### Frontend Stack
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{FRONTEND_FRAMEWORK}` | Frontend framework | "React", "Vue", "Angular", "Svelte" |
-| `{BUILD_TOOL}` | Frontend bundler | "Vite", "webpack", "esbuild", "Parcel" |
-| `{UI_LIBRARY}` | UI component library | "shadcn/ui", "MUI", "Ant Design", "Chakra UI" |
-| `{PRIMITIVE_UI_LIB}` | Primitive UI library | "Radix UI", "Headless UI", "React Aria" |
-| `{CSS_FRAMEWORK}` | CSS framework | "Tailwind CSS", "CSS Modules", "styled-components" |
-| `{SERVER_STATE_LIB}` | Server state management | "TanStack Query", "SWR", "Apollo Client" |
-| `{CLIENT_STATE_LIB}` | Client state management | "Zustand", "Redux", "Jotai", "MobX" |
-| `{FORM_LIB}` | Form library | "React Hook Form", "Formik" |
-| `{GRAPHQL_CLIENT}` | GraphQL client lib | "urql", "Apollo Client", "graphql-request" |
-| `{MOBILE_FRAMEWORK}` | Mobile framework | "Expo", "React Native CLI", "Flutter" |
+| Placeholder            | Description             | Example Values                                     |
+| ---------------------- | ----------------------- | -------------------------------------------------- |
+| `{FRONTEND_FRAMEWORK}` | Frontend framework      | "React", "Vue", "Angular", "Svelte"                |
+| `{BUILD_TOOL}`         | Frontend bundler        | "Vite", "webpack", "esbuild", "Parcel"             |
+| `{UI_LIBRARY}`         | UI component library    | "shadcn/ui", "MUI", "Ant Design", "Chakra UI"      |
+| `{PRIMITIVE_UI_LIB}`   | Primitive UI library    | "Radix UI", "Headless UI", "React Aria"            |
+| `{CSS_FRAMEWORK}`      | CSS framework           | "Tailwind CSS", "CSS Modules", "styled-components" |
+| `{SERVER_STATE_LIB}`   | Server state management | "TanStack Query", "SWR", "Apollo Client"           |
+| `{CLIENT_STATE_LIB}`   | Client state management | "Zustand", "Redux", "Jotai", "MobX"                |
+| `{FORM_LIB}`           | Form library            | "React Hook Form", "Formik"                        |
+| `{GRAPHQL_CLIENT}`     | GraphQL client lib      | "urql", "Apollo Client", "graphql-request"         |
+| `{MOBILE_FRAMEWORK}`   | Mobile framework        | "Expo", "React Native CLI", "Flutter"              |
 
 ### AI/ML Stack (optional — remove section if not applicable)
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{GRAPH_DB}` | Graph database | "Apache AGE", "Neo4j", "ArangoDB" |
-| `{VECTOR_DB}` | Vector database/extension | "pgvector", "Pinecone", "Weaviate", "Milvus" |
-| `{AGENT_FRAMEWORK}` | AI agent framework | "LangGraph", "CrewAI", "AutoGen" |
-| `{RAG_FRAMEWORK}` | RAG framework | "LlamaIndex", "LangChain" |
-| `{AI_SDK}` | AI SDK | "Vercel AI SDK", "LangChain", "Semantic Kernel" |
-| `{LOCAL_LLM}` | Local LLM runner | "Ollama", "vLLM", "llama.cpp" |
-| `{EMBEDDING_MODEL}` | Embedding model | "nomic-embed-text", "text-embedding-3-small" |
-| `{EMBEDDING_DIMENSIONS}` | Embedding vector dimensions | "768", "1536", "384" |
-| `{GRAPH_QUERY_LANG}` | Graph query language | "Cypher", "Gremlin", "SPARQL" |
-| `{SANDBOX_RUNTIME}` | Sandbox runtime for agents | "gVisor", "Firecracker", "Docker" |
+| Placeholder              | Description                 | Example Values                                  |
+| ------------------------ | --------------------------- | ----------------------------------------------- |
+| `{GRAPH_DB}`             | Graph database              | "Apache AGE", "Neo4j", "ArangoDB"               |
+| `{VECTOR_DB}`            | Vector database/extension   | "pgvector", "Pinecone", "Weaviate", "Milvus"    |
+| `{AGENT_FRAMEWORK}`      | AI agent framework          | "LangGraph", "CrewAI", "AutoGen"                |
+| `{RAG_FRAMEWORK}`        | RAG framework               | "LlamaIndex", "LangChain"                       |
+| `{AI_SDK}`               | AI SDK                      | "Vercel AI SDK", "LangChain", "Semantic Kernel" |
+| `{LOCAL_LLM}`            | Local LLM runner            | "Ollama", "vLLM", "llama.cpp"                   |
+| `{EMBEDDING_MODEL}`      | Embedding model             | "nomic-embed-text", "text-embedding-3-small"    |
+| `{EMBEDDING_DIMENSIONS}` | Embedding vector dimensions | "768", "1536", "384"                            |
+| `{GRAPH_QUERY_LANG}`     | Graph query language        | "Cypher", "Gremlin", "SPARQL"                   |
+| `{SANDBOX_RUNTIME}`      | Sandbox runtime for agents  | "gVisor", "Firecracker", "Docker"               |
 
 ### Build & Tooling
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{PACKAGE_MANAGER}` | Package manager | "pnpm", "npm", "yarn", "bun" |
-| `{BUILD_ORCHESTRATOR}` | Monorepo build tool | "Turborepo", "Nx", "Lerna", "Bazel" |
-| `{TEST_FRAMEWORK}` | Unit test framework | "Vitest", "Jest", "Mocha", "pytest" |
-| `{E2E_FRAMEWORK}` | E2E test framework | "Playwright", "Cypress", "Puppeteer" |
-| `{OBJECT_STORAGE}` | Object storage | "MinIO", "S3", "GCS", "Azure Blob" |
-| `{TRACING_TOOL}` | Distributed tracing | "Jaeger", "Zipkin", "Datadog APM" |
-| `{CONTAINER_ORCHESTRATION}` | Container tool | "docker-compose", "Kubernetes", "Podman" |
-| `{CI_PLATFORM}` | CI/CD platform | "GitHub Actions", "GitLab CI", "CircleCI" |
+| Placeholder                 | Description         | Example Values                            |
+| --------------------------- | ------------------- | ----------------------------------------- |
+| `{PACKAGE_MANAGER}`         | Package manager     | "pnpm", "npm", "yarn", "bun"              |
+| `{BUILD_ORCHESTRATOR}`      | Monorepo build tool | "Turborepo", "Nx", "Lerna", "Bazel"       |
+| `{TEST_FRAMEWORK}`          | Unit test framework | "Vitest", "Jest", "Mocha", "pytest"       |
+| `{E2E_FRAMEWORK}`           | E2E test framework  | "Playwright", "Cypress", "Puppeteer"      |
+| `{OBJECT_STORAGE}`          | Object storage      | "MinIO", "S3", "GCS", "Azure Blob"        |
+| `{TRACING_TOOL}`            | Distributed tracing | "Jaeger", "Zipkin", "Datadog APM"         |
+| `{CONTAINER_ORCHESTRATION}` | Container tool      | "docker-compose", "Kubernetes", "Podman"  |
+| `{CI_PLATFORM}`             | CI/CD platform      | "GitHub Actions", "GitLab CI", "CircleCI" |
 
 ### Commands
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{TEST_COMMAND}` | Run all tests | "pnpm turbo test", "npm test", "pytest" |
-| `{TYPECHECK_COMMAND}` | Type checking | "pnpm turbo typecheck", "tsc --noEmit", "mypy ." |
-| `{LINT_COMMAND}` | Linting | "pnpm turbo lint", "eslint .", "ruff check" |
-| `{HEALTH_CHECK_COMMAND}` | Health check script | "./scripts/health-check.sh", "make health" |
+| Placeholder              | Description         | Example Values                                   |
+| ------------------------ | ------------------- | ------------------------------------------------ |
+| `{TEST_COMMAND}`         | Run all tests       | "pnpm turbo test", "npm test", "pytest"          |
+| `{TYPECHECK_COMMAND}`    | Type checking       | "pnpm turbo typecheck", "tsc --noEmit", "mypy ." |
+| `{LINT_COMMAND}`         | Linting             | "pnpm turbo lint", "eslint .", "ruff check"      |
+| `{HEALTH_CHECK_COMMAND}` | Health check script | "./scripts/health-check.sh", "make health"       |
 
 ### Security & Auth
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{AUTH_DIRECTIVE}` | Auth check directive/decorator | "@authenticated", "@Authorized", "requireAuth" |
-| `{SCOPE_DIRECTIVE}` | Scope check directive | "@requiresScopes", "hasScope" |
-| `{ROLE_DIRECTIVE}` | Role check directive | "@requiresRole", "hasRole" |
-| `{SI-1}` through `{SI-N}` | Security invariants | Define per project security policy |
-| `{TEST_USERS}` | Test user accounts table | Define per project auth setup |
+| Placeholder               | Description                    | Example Values                                 |
+| ------------------------- | ------------------------------ | ---------------------------------------------- |
+| `{AUTH_DIRECTIVE}`        | Auth check directive/decorator | "@authenticated", "@Authorized", "requireAuth" |
+| `{SCOPE_DIRECTIVE}`       | Scope check directive          | "@requiresScopes", "hasScope"                  |
+| `{ROLE_DIRECTIVE}`        | Role check directive           | "@requiresRole", "hasRole"                     |
+| `{SI-1}` through `{SI-N}` | Security invariants            | Define per project security policy             |
+| `{TEST_USERS}`            | Test user accounts table       | Define per project auth setup                  |
 
 ### Documentation
 
-| Placeholder | Description | Example Values |
-|-------------|-------------|----------------|
-| `{ROADMAP_FILE}` | Roadmap document | "IMPLEMENTATION_ROADMAP.md", "ROADMAP.md" |
-| `{API_CONTRACTS_FILE}` | API contracts document | "API_CONTRACTS.md", "docs/api/README.md" |
-| `{MCP_SERVERS}` | MCP server list and config | Project-specific MCP configuration |
+| Placeholder            | Description                | Example Values                            |
+| ---------------------- | -------------------------- | ----------------------------------------- |
+| `{ROADMAP_FILE}`       | Roadmap document           | "IMPLEMENTATION_ROADMAP.md", "ROADMAP.md" |
+| `{API_CONTRACTS_FILE}` | API contracts document     | "API_CONTRACTS.md", "docs/api/README.md"  |
+| `{MCP_SERVERS}`        | MCP server list and config | Project-specific MCP configuration        |
 
 ---
 
@@ -189,6 +189,7 @@ Every `{PLACEHOLDER}` used across all template files, organized by category.
 Work through this checklist when adapting the template for your project:
 
 ### Core Setup
+
 - [ ] Replace ALL `{PLACEHOLDER}` tokens in CLAUDE.md (use search to find them all)
 - [ ] Update `{PROJECT_NAME}` in MEMORY.md
 - [ ] Set `{PROJECT_ROOT}` to your actual project path
@@ -196,24 +197,28 @@ Work through this checklist when adapting the template for your project:
 - [ ] Define `{PROJECT_PACKAGE_PREFIX}` for your monorepo scope
 
 ### Architecture
+
 - [ ] Define your service architecture: service names, ports, paths
 - [ ] Update the Architecture & Patterns section with your actual stack
 - [ ] Update Shared Packages section to match your monorepo structure
 - [ ] Configure the Environment Variables section for your services
 
 ### Lead Prompts
+
 - [ ] Update all 10 Lead prompt templates in `docs/architecture/agent-prompts/`
 - [ ] Replace framework-specific references with your stack
 - [ ] Update the MCP Division Matrix with your installed MCP servers
 - [ ] Customize Skills per Wave for your available skills
 
 ### Security
+
 - [ ] Define your security invariants (SI-1 through SI-N) — minimum 5 recommended
 - [ ] Configure test user accounts for auth verification
 - [ ] Set up pre-commit security checks for your stack
 - [ ] Define RLS/authorization patterns for your database
 
 ### Testing & CI
+
 - [ ] Set `{TEST_COMMAND}`, `{TYPECHECK_COMMAND}`, `{LINT_COMMAND}`
 - [ ] Configure `{HEALTH_CHECK_COMMAND}` — write the health check script
 - [ ] Define coverage targets for your project
@@ -221,18 +226,21 @@ Work through this checklist when adapting the template for your project:
 - [ ] Configure E2E test paths and patterns
 
 ### Infrastructure
+
 - [ ] Configure `{CONTAINER_ORCHESTRATION}` commands (docker-compose, k8s, etc.)
 - [ ] Update Service Startup table with your actual services
 - [ ] Define the Troubleshooting table for your common errors
 - [ ] Set up MCP servers and verify connectivity
 
 ### Bug Fix Protocol
+
 - [ ] Customize the Wave 2 directory checklist for your project structure
 - [ ] Update test file location table for your test conventions
 - [ ] Configure the Round Completion Gate with your specific checks
 - [ ] Set up test user accounts for auth verification in gates
 
 ### Documentation
+
 - [ ] Create `docs/INDEX.md` with your folder structure
 - [ ] Set up doc storage rules matching your conventions
 - [ ] Configure the Documentation Sync table for your key files
@@ -289,27 +297,32 @@ NEW PROJECT/
 ## Adapting for Different Project Types
 
 ### Monorepo (Full Stack)
+
 Use the template as-is. Fill in all placeholders. All 10 divisions are relevant.
 
 ### Backend-Only API
+
 - Remove or minimize: UXLead, FELead sections
 - Focus on: BELead, DBLead, SecurityLead, QALead
 - Reduce Wave 1 to: ProductLead + ArchLead
 - Reduce Wave 2 to: BELead + DBLead + SecurityLead + QALead
 
 ### Frontend-Only SPA
+
 - Remove or minimize: BELead, DBLead sections
 - Focus on: FELead, UXLead, QALead
 - Simplify security invariants to client-side concerns
 - Reduce Wave 2 to: FELead + SecurityLead + QALead
 
 ### Microservices (Many Services)
+
 - Increase `{SERVICE_COUNT}` and expand service tables
 - Each microservice may need its own Lead or Specialist
 - Consider splitting BELead into multiple domain-specific Leads
 - Increase parallel wave capacity
 
 ### Python/Go/Rust Projects
+
 - Replace TypeScript-specific rules (typecheck, ESLint) with language equivalents
 - Update `{TEST_FRAMEWORK}`: pytest, go test, cargo test
 - Update `{LINT_COMMAND}`: ruff, golangci-lint, clippy
@@ -317,6 +330,7 @@ Use the template as-is. Fill in all placeholders. All 10 divisions are relevant.
 - Adjust memory safety rules for language-specific patterns
 
 ### No AI/ML Components
+
 - Remove the entire AI/ML Architecture section from CLAUDE.md
 - Remove AI-related placeholders (`{AGENT_FRAMEWORK}`, `{RAG_FRAMEWORK}`, etc.)
 - Remove AI/ML Commands section

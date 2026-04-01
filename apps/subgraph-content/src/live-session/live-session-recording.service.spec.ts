@@ -124,7 +124,13 @@ describe('LiveSessionRecordingService', () => {
 
   it('publishSessionEnded publishes with duration', async () => {
     await expect(
-      svc.publishSessionEnded(SESSION_ID, TENANT_ID, new Date(), new Date(), 3600)
+      svc.publishSessionEnded(
+        SESSION_ID,
+        TENANT_ID,
+        new Date(),
+        new Date(),
+        3600
+      )
     ).resolves.not.toThrow();
   });
 
@@ -201,6 +207,8 @@ describe('LiveSessionRecordingService', () => {
   // ── publishLegacySessionEnded ─────────────────────────────────────────────
 
   it('publishLegacySessionEnded does not throw when natsConn is null', () => {
-    expect(() => svc.publishLegacySessionEnded(SESSION_ID, TENANT_ID)).not.toThrow();
+    expect(() =>
+      svc.publishLegacySessionEnded(SESSION_ID, TENANT_ID)
+    ).not.toThrow();
   });
 });

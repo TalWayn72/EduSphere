@@ -29,17 +29,29 @@ export function ResolvedList({ resolved }: { resolved: MergeRequest[] }) {
   if (resolved.length === 0) return null;
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Resolved</p>
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        Resolved
+      </p>
       {resolved.map((req) => (
-        <div key={req.id} className="flex items-start gap-3 p-3 rounded-md border bg-muted/30 text-sm" data-testid={`resolved-${req.id}`}>
-          {req.status === 'approved'
-            ? <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5 dark:text-green-400" />
-            : <XCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5 dark:text-red-400" />}
+        <div
+          key={req.id}
+          className="flex items-start gap-3 p-3 rounded-md border bg-muted/30 text-sm"
+          data-testid={`resolved-${req.id}`}
+        >
+          {req.status === 'approved' ? (
+            <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5 dark:text-green-400" />
+          ) : (
+            <XCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5 dark:text-red-400" />
+          )}
           <div className="min-w-0 flex-1">
             <p className="font-medium text-xs">{req.authorName}</p>
-            <p className="text-muted-foreground text-xs truncate">{req.content}</p>
+            <p className="text-muted-foreground text-xs truncate">
+              {req.content}
+            </p>
           </div>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${req.status === 'approved' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full ${req.status === 'approved' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}
+          >
             {req.status}
           </span>
         </div>

@@ -17,14 +17,14 @@ EduSphere's AI systems fall under **high-risk** classification per Annex III of 
 
 EduSphere deploys the following AI agent types:
 
-| Agent | Purpose | Model | Risk Level |
-|-------|---------|-------|------------|
-| Chavruta Debate Agent | Socratic dialogue partner for learners | Ollama (dev) / GPT-4 (prod) | High-Risk |
-| Quiz Generation Agent | Adaptive quiz creation from content | Ollama (dev) / GPT-4 (prod) | High-Risk |
-| Tutor Agent | Personalized tutoring and explanation | Ollama (dev) / GPT-4 (prod) | High-Risk |
-| Assessment Agent | Automated grading and feedback | Ollama (dev) / GPT-4 (prod) | High-Risk |
-| Content Summarizer | Summarize course materials | nomic-embed-text / text-embedding-3-small | Medium |
-| Knowledge Graph Indexer | Extract concepts and relationships | nomic-embed-text | Medium |
+| Agent                   | Purpose                                | Model                                     | Risk Level |
+| ----------------------- | -------------------------------------- | ----------------------------------------- | ---------- |
+| Chavruta Debate Agent   | Socratic dialogue partner for learners | Ollama (dev) / GPT-4 (prod)               | High-Risk  |
+| Quiz Generation Agent   | Adaptive quiz creation from content    | Ollama (dev) / GPT-4 (prod)               | High-Risk  |
+| Tutor Agent             | Personalized tutoring and explanation  | Ollama (dev) / GPT-4 (prod)               | High-Risk  |
+| Assessment Agent        | Automated grading and feedback         | Ollama (dev) / GPT-4 (prod)               | High-Risk  |
+| Content Summarizer      | Summarize course materials             | nomic-embed-text / text-embedding-3-small | Medium     |
+| Knowledge Graph Indexer | Extract concepts and relationships     | nomic-embed-text                          | Medium     |
 
 ## Data Retention
 

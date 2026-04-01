@@ -44,7 +44,10 @@ export function useUserPreferences(): UseUserPreferencesReturn {
   useEffect(() => {
     setMounted(true);
   }, []);
-  const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY, pause: !mounted });
+  const [meResult] = useQuery<MeQueryResult>({
+    query: ME_QUERY,
+    pause: !mounted,
+  });
   const [tenantLangResult] = useQuery<TenantLanguageSettingsResult>({
     query: MY_TENANT_LANGUAGE_SETTINGS_QUERY,
     pause: !mounted,
@@ -74,12 +77,10 @@ export function useUserPreferences(): UseUserPreferencesReturn {
     if (!(SUPPORTED_LOCALES as readonly string[]).includes(dbLocale)) return;
 
     const cachedLocale = localStorage.getItem('edusphere_locale');
-    const alreadySynced =
-      sessionStorage.getItem(LOCALE_SYNCED_KEY) === 'true';
+    const alreadySynced = sessionStorage.getItem(LOCALE_SYNCED_KEY) === 'true';
 
     const needsSync =
-      dbLocale !== i18n.language &&
-      (!cachedLocale || !alreadySynced);
+      dbLocale !== i18n.language && (!cachedLocale || !alreadySynced);
 
     if (needsSync) {
       void i18n.changeLanguage(dbLocale as SupportedLocale);

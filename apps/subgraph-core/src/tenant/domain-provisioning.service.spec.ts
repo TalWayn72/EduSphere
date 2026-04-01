@@ -51,11 +51,8 @@ vi.mock('@edusphere/db', () => {
     eq: vi.fn((a, b) => ({ field: a, value: b })),
     and: vi.fn((...args: unknown[]) => args),
     withTenantContext: vi.fn(
-      (
-        _db: unknown,
-        _ctx: unknown,
-        fn: (db: unknown) => Promise<unknown>
-      ) => fn(_db)
+      (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+        fn(_db)
     ),
   };
 });
@@ -64,7 +61,9 @@ vi.mock('@edusphere/db', () => {
 vi.mock('@edusphere/dns-provider', () => {
   return {
     MockDnsProvider: class {
-      createSubdomain = vi.fn().mockResolvedValue({ url: 'https://test.edusphere.io' });
+      createSubdomain = vi
+        .fn()
+        .mockResolvedValue({ url: 'https://test.edusphere.io' });
       deleteSubdomain = vi.fn().mockResolvedValue(undefined);
       requestDomainVerification = vi.fn().mockResolvedValue({
         token: 'verify-token-123',

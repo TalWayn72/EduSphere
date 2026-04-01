@@ -6,7 +6,9 @@ import { PricingPage } from './PricingPage';
 
 // Mock PublicLayout — nav and footer are tested in their own test files
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 // PricingSection uses useMutation internally — mock urql to avoid Provider requirement
@@ -72,12 +74,20 @@ describe('PricingPage', () => {
   it('renders all four FAQ questions', () => {
     renderPage();
     // PricingSection also has FAQs so use getAllByText for shared phrases
-    expect(screen.getAllByText(/What is a Yearly Active User/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Is white-label included/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/What is a Yearly Active User/i).length
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/Is white-label included/i).length
+    ).toBeGreaterThan(0);
     // "Can I upgrade mid-year?" appears in both PricingSection and PricingPage FAQ
-    expect(screen.getAllByText(/Can I upgrade mid-year/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/Can I upgrade mid-year/i).length
+    ).toBeGreaterThan(0);
     // Unique to PricingPage FAQ
-    expect(screen.getByText(/What happens when my pilot expires/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/What happens when my pilot expires/i)
+    ).toBeInTheDocument();
   });
 
   it('expands FAQ answer when question is clicked', () => {
@@ -85,13 +95,17 @@ describe('PricingPage', () => {
     const question = screen.getByText(/What is a Yearly Active User/i);
     fireEvent.click(question);
     expect(
-      screen.getByText(/A YAU is any user who logs in at least once per calendar year/i)
+      screen.getByText(
+        /A YAU is any user who logs in at least once per calendar year/i
+      )
     ).toBeInTheDocument();
   });
 
   it('renders page title heading', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /Pricing & Plans/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Pricing & Plans/i })
+    ).toBeInTheDocument();
   });
 
   it('renders inside PublicLayout wrapper', () => {
@@ -101,6 +115,8 @@ describe('PricingPage', () => {
 
   it('renders Start Free Pilot CTA link', () => {
     renderPage();
-    expect(screen.getByRole('link', { name: /Start Free Pilot/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Start Free Pilot/i })
+    ).toBeInTheDocument();
   });
 });

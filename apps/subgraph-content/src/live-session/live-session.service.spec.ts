@@ -284,7 +284,12 @@ describe('LiveSessionService', () => {
         },
       ]);
 
-      await service.createLiveSession('c-1', 'tenant-si3', new Date(), 'SI-3 Test');
+      await service.createLiveSession(
+        'c-1',
+        'tenant-si3',
+        new Date(),
+        'SI-3 Test'
+      );
 
       expect(encryptField).toHaveBeenCalled();
       expect(deriveTenantKey).toHaveBeenCalledWith('tenant-si3');
@@ -323,7 +328,10 @@ describe('LiveSessionService', () => {
       await service.getJoinUrl('session-si3', 'tenant-si3', 'Leila', 'LEARNER');
 
       // decryptField MUST have been called — never pass ciphertext directly to BBB
-      expect(decryptField).toHaveBeenCalledWith('encrypted:att-secret', expect.anything());
+      expect(decryptField).toHaveBeenCalledWith(
+        'encrypted:att-secret',
+        expect.anything()
+      );
     });
   });
 });

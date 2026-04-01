@@ -26,28 +26,38 @@ const MOCK_COURSE_ID = 'course-abc-123';
 test.describe('KnowledgeGraphPage — global route /knowledge-graph', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE}/knowledge-graph`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/knowledge-graph`, {
+      waitUntil: 'domcontentloaded',
+    });
   });
 
-  test('renders "Knowledge Graph" heading for global route', async ({ page }) => {
+  test('renders "Knowledge Graph" heading for global route', async ({
+    page,
+  }) => {
     await expect(
       page.getByRole('heading', { name: 'Knowledge Graph' })
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('does NOT show course-context badge on global route', async ({ page }) => {
+  test('does NOT show course-context badge on global route', async ({
+    page,
+  }) => {
     await page.waitForLoadState('domcontentloaded');
     const badge = page.getByTestId('kg-course-context-badge');
     expect(await badge.count()).toBe(0);
   });
 
-  test('no "Something went wrong" error overlay on global route', async ({ page }) => {
-    await expect(
-      page.getByText(/something went wrong/i)
-    ).not.toBeVisible({ timeout: 5_000 });
+  test('no "Something went wrong" error overlay on global route', async ({
+    page,
+  }) => {
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 
-  test('global route does not contain "404" or "Page not found"', async ({ page }) => {
+  test('global route does not contain "404" or "Page not found"', async ({
+    page,
+  }) => {
     const body = (await page.locator('body').textContent()) ?? '';
     expect(body).not.toContain('404');
     expect(body).not.toContain('Page not found');
@@ -71,13 +81,17 @@ test.describe('KnowledgeGraphPage — course-context route /knowledge-graph/:cou
     expect(page.url()).toContain(`/knowledge-graph/${MOCK_COURSE_ID}`);
   });
 
-  test('renders "Course Knowledge Graph" heading when courseId is provided', async ({ page }) => {
+  test('renders "Course Knowledge Graph" heading when courseId is provided', async ({
+    page,
+  }) => {
     await expect(
       page.getByRole('heading', { name: /Course Knowledge Graph/i })
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('shows course-context badge (kg-course-context-badge)', async ({ page }) => {
+  test('shows course-context badge (kg-course-context-badge)', async ({
+    page,
+  }) => {
     const badge = page.getByTestId('kg-course-context-badge');
     await expect(badge).toBeVisible({ timeout: 10_000 });
   });
@@ -95,10 +109,12 @@ test.describe('KnowledgeGraphPage — course-context route /knowledge-graph/:cou
     await expect(breadcrumb).toBeVisible({ timeout: 10_000 });
   });
 
-  test('no "Something went wrong" error overlay with courseId', async ({ page }) => {
-    await expect(
-      page.getByText(/something went wrong/i)
-    ).not.toBeVisible({ timeout: 5_000 });
+  test('no "Something went wrong" error overlay with courseId', async ({
+    page,
+  }) => {
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('no raw technical strings in page body', async ({ page }) => {
@@ -108,7 +124,9 @@ test.describe('KnowledgeGraphPage — course-context route /knowledge-graph/:cou
     expect(body).not.toContain('TypeError');
   });
 
-  test('visual screenshot — course-context knowledge graph @visual', async ({ page }) => {
+  test('visual screenshot — course-context knowledge graph @visual', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('networkidle').catch(() => {});
     await expect(page).toHaveScreenshot('knowledge-graph-course-context.png', {

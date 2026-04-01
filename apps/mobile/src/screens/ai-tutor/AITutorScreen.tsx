@@ -60,26 +60,38 @@ export default function AITutorScreen() {
         if (!cancelled) {
           const resolved = resolveSessionId(newId ?? null, 'demo-session');
           if (!newId && __DEV__) {
-            console.debug('[AITutorScreen] Session creation returned no id \u2014 falling back to demo-session');
+            console.debug(
+              '[AITutorScreen] Session creation returned no id \u2014 falling back to demo-session'
+            );
           }
           setSessionId(resolved);
         }
       } catch (err) {
         if (!cancelled) {
-          console.error('[AITutorScreen] Failed to create agent session, using demo-session fallback:', err);
+          console.error(
+            '[AITutorScreen] Failed to create agent session, using demo-session fallback:',
+            err
+          );
           setSessionId('demo-session');
         }
       } finally {
         if (!cancelled) setSessionLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [createSession]);
 
   useEffect(() => {
     if (data?.agentMessageCreated) {
-      setMessages((prev) => [...prev, data.agentMessageCreated as AgentMessage]);
-      setTimeout(() => { flatListRef.current?.scrollToEnd({ animated: true }); }, 100);
+      setMessages((prev) => [
+        ...prev,
+        data.agentMessageCreated as AgentMessage,
+      ]);
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     }
   }, [data]);
 
@@ -89,14 +101,22 @@ export default function AITutorScreen() {
       'This feature uses AI. Do you consent to sending your learning data to AI systems?',
       [
         { text: 'Decline', style: 'cancel', onPress: () => {} },
-        { text: 'Accept', onPress: () => { void grantAiConsent().then(() => setConsentGranted(true)); } },
+        {
+          text: 'Accept',
+          onPress: () => {
+            void grantAiConsent().then(() => setConsentGranted(true));
+          },
+        },
       ]
     );
   };
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    if (!consentGranted) { requestConsent(); return; }
+    if (!consentGranted) {
+      requestConsent();
+      return;
+    }
 
     const effectiveSessionId = sessionId ?? 'demo-session';
     const userMessage: AgentMessage = {
@@ -109,12 +129,21 @@ export default function AITutorScreen() {
     setInput('');
 
     try {
-      await sendMessage({ variables: { sessionId: effectiveSessionId, content: input } });
+      await sendMessage({
+        variables: { sessionId: effectiveSessionId, content: input },
+      });
     } catch (error: unknown) {
-      const gqlError = error as { graphQLErrors?: Array<{ extensions?: { code?: string } }> };
-      const consentErr = gqlError?.graphQLErrors?.find((e) => e.extensions?.code === 'CONSENT_REQUIRED');
+      const gqlError = error as {
+        graphQLErrors?: Array<{ extensions?: { code?: string } }>;
+      };
+      const consentErr = gqlError?.graphQLErrors?.find(
+        (e) => e.extensions?.code === 'CONSENT_REQUIRED'
+      );
       if (consentErr) {
-        Alert.alert('Consent Required', 'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.');
+        Alert.alert(
+          'Consent Required',
+          'AI features require your consent. Please enable AI processing in Settings \u2192 Privacy.'
+        );
       } else {
         Alert.alert('Error', 'Failed to send message. Please try again.');
       }
@@ -149,7 +178,11 @@ export default function AITutorScreen() {
           </View>
         }
       />
-      <ChatInputBar input={input} onChangeText={setInput} onSend={() => void handleSend()} />
+      <ChatInputBar
+        input={input}
+        onChangeText={setInput}
+        onSend={() => void handleSend()}
+      />
     </KeyboardAvoidingView>
   );
 }

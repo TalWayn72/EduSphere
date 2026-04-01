@@ -68,7 +68,10 @@ const MOCK_FORKED_COURSE = {
  */
 async function mockForkSuccess(page: Page): Promise<void> {
   await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as { query?: string; operationName?: string };
+    const body = route.request().postDataJSON() as {
+      query?: string;
+      operationName?: string;
+    };
     const q = body?.query ?? '';
     const op = body?.operationName ?? '';
 
@@ -81,7 +84,12 @@ async function mockForkSuccess(page: Page): Promise<void> {
     }
 
     // Course detail query
-    if (q.includes('course(id:') || q.includes('courseDetail') || op === 'CourseDetail' || op === 'Course') {
+    if (
+      q.includes('course(id:') ||
+      q.includes('courseDetail') ||
+      op === 'CourseDetail' ||
+      op === 'Course'
+    ) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -102,7 +110,10 @@ async function mockForkSuccess(page: Page): Promise<void> {
  */
 async function mockForkFailure(page: Page): Promise<void> {
   await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as { query?: string; operationName?: string };
+    const body = route.request().postDataJSON() as {
+      query?: string;
+      operationName?: string;
+    };
     const q = body?.query ?? '';
     const op = body?.operationName ?? '';
 
@@ -111,13 +122,23 @@ async function mockForkFailure(page: Page): Promise<void> {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          errors: [{ message: 'Failed to fork course', extensions: { code: 'INTERNAL_SERVER_ERROR' } }],
+          errors: [
+            {
+              message: 'Failed to fork course',
+              extensions: { code: 'INTERNAL_SERVER_ERROR' },
+            },
+          ],
           data: { forkCourse: null },
         }),
       });
     }
 
-    if (q.includes('course(id:') || q.includes('courseDetail') || op === 'CourseDetail' || op === 'Course') {
+    if (
+      q.includes('course(id:') ||
+      q.includes('courseDetail') ||
+      op === 'CourseDetail' ||
+      op === 'Course'
+    ) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -140,10 +161,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Fork Course — BUG-048 Regression', () => {
-
   // ── Fork button presence ──────────────────────────────────────────────────
 
-  test('fork course button is visible on CourseDetailPage', async ({ page }) => {
+  test('fork course button is visible on CourseDetailPage', async ({
+    page,
+  }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -156,7 +178,10 @@ test.describe('Fork Course — BUG-048 Regression', () => {
     if (!isVisible) {
       // DEV_MODE may not have resolved the course detail mock — check spinner
       const spinnerVisible = (await page.locator('.animate-spin').count()) > 0;
-      test.skip(spinnerVisible, 'Course detail still loading — fork button not yet rendered');
+      test.skip(
+        spinnerVisible,
+        'Course detail still loading — fork button not yet rendered'
+      );
       return;
     }
 
@@ -171,7 +196,8 @@ test.describe('Fork Course — BUG-048 Regression', () => {
     const forkBtn = page.getByTestId('fork-course-btn');
     const isVisible = await forkBtn.isVisible();
     if (!isVisible) {
-      test.skip(); return;
+      test.skip();
+      return;
     }
 
     // Button should have meaningful text or aria-label (not just an icon)
@@ -184,47 +210,63 @@ test.describe('Fork Course — BUG-048 Regression', () => {
 
   test.skip(!RUN_WRITE_TESTS, 'Skipped: RUN_WRITE_TESTS=false');
 
-  test('[BUG-048] successful fork navigates to forked course page', async ({ page }) => {
+  test('[BUG-048] successful fork navigates to forked course page', async ({
+    page,
+  }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
-    if (!(await forkBtn.isVisible())) { test.skip(); return; }
+    if (!(await forkBtn.isVisible())) {
+      test.skip();
+      return;
+    }
 
     await forkBtn.click();
 
     // After successful fork the page should navigate to /courses/:forkedCourseId
-    await expect(page).toHaveURL(
-      new RegExp(`/courses/${FORKED_COURSE_ID}`),
-      { timeout: 10_000 }
-    );
+    await expect(page).toHaveURL(new RegExp(`/courses/${FORKED_COURSE_ID}`), {
+      timeout: 10_000,
+    });
   });
 
   // ── Fork failure — clean error UI ─────────────────────────────────────────
 
-  test('[BUG-048] fork failure shows clean error banner (not raw error string)', async ({ page }) => {
+  test('[BUG-048] fork failure shows clean error banner (not raw error string)', async ({
+    page,
+  }) => {
     await mockForkFailure(page);
     await page.goto(DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
-    if (!(await forkBtn.isVisible())) { test.skip(); return; }
+    if (!(await forkBtn.isVisible())) {
+      test.skip();
+      return;
+    }
 
     await forkBtn.click();
     await page.waitForLoadState('domcontentloaded');
 
     // fork-error-banner should appear
-    await expect(page.getByTestId('fork-error-banner')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('fork-error-banner')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
-  test('[BUG-048] fork error banner contains no raw SQL or internal error strings', async ({ page }) => {
+  test('[BUG-048] fork error banner contains no raw SQL or internal error strings', async ({
+    page,
+  }) => {
     await mockForkFailure(page);
     await page.goto(DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
-    if (!(await forkBtn.isVisible())) { test.skip(); return; }
+    if (!(await forkBtn.isVisible())) {
+      test.skip();
+      return;
+    }
 
     await forkBtn.click();
     await page.waitForLoadState('domcontentloaded');
@@ -246,25 +288,35 @@ test.describe('Fork Course — BUG-048 Regression', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const forkBtn = page.getByTestId('fork-course-btn');
-    if (!(await forkBtn.isVisible())) { test.skip(); return; }
+    if (!(await forkBtn.isVisible())) {
+      test.skip();
+      return;
+    }
 
     await forkBtn.click();
     await page.waitForLoadState('domcontentloaded');
 
     const banner = page.getByTestId('fork-error-banner');
-    if (!(await banner.isVisible())) { test.skip(); return; }
+    if (!(await banner.isVisible())) {
+      test.skip();
+      return;
+    }
 
     // Dismiss button is inside the error banner
     const dismissBtn = banner.getByRole('button', { name: /dismiss/i });
     await dismissBtn.click();
 
     // Banner should disappear after dismissal
-    await expect(page.getByTestId('fork-error-banner')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByTestId('fork-error-banner')).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   // ── Page-level regression guards ──────────────────────────────────────────
 
-  test('CourseDetailPage loads without raw technical strings', async ({ page }) => {
+  test('CourseDetailPage loads without raw technical strings', async ({
+    page,
+  }) => {
     await mockForkSuccess(page);
     await page.goto(DETAIL_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -290,14 +342,16 @@ test.describe('Fork Course — Visual regression', () => {
 
     const forkBtn = page.getByTestId('fork-course-btn');
     if (!(await forkBtn.isVisible())) {
-      test.skip(); return;
+      test.skip();
+      return;
     }
 
     await forkBtn.click();
     await page.waitForLoadState('domcontentloaded');
 
     if (!(await page.getByTestId('fork-error-banner').isVisible())) {
-      test.skip(); return;
+      test.skip();
+      return;
     }
 
     await expect(page).toHaveScreenshot('fork-course-error.png', {

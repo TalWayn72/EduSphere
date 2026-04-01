@@ -5,7 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { UPDATE_ONBOARDING_STEP_MUTATION, COMPLETE_ONBOARDING_MUTATION } from '@/lib/graphql/onboarding.queries';
+import {
+  UPDATE_ONBOARDING_STEP_MUTATION,
+  COMPLETE_ONBOARDING_MUTATION,
+} from '@/lib/graphql/onboarding.queries';
 import { getCurrentUser } from '@/lib/auth';
 
 interface InstructorOnboardingStepsProps {
@@ -23,7 +26,11 @@ function useProfileDefaults() {
   };
 }
 
-export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: InstructorOnboardingStepsProps) {
+export function InstructorOnboardingSteps({
+  currentStep,
+  onComplete,
+  onSkip,
+}: InstructorOnboardingStepsProps) {
   const defaults = useProfileDefaults();
   const [step, setStep] = useState(currentStep);
   const [bio, setBio] = useState('');
@@ -42,7 +49,7 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
 
   const handleNext = useCallback(async () => {
     await updateStep({
-      input: { step, data: { bio, expertise, courseTitle, courseDescription } }
+      input: { step, data: { bio, expertise, courseTitle, courseDescription } },
     });
     if (step < totalSteps) {
       setStep(step + 1);
@@ -50,21 +57,33 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
       await completeOnboarding({});
       onComplete();
     }
-  }, [step, bio, expertise, courseTitle, courseDescription, updateStep, completeOnboarding, onComplete, totalSteps]);
+  }, [
+    step,
+    bio,
+    expertise,
+    courseTitle,
+    courseDescription,
+    updateStep,
+    completeOnboarding,
+    onComplete,
+    totalSteps,
+  ]);
 
   // Auto-advance if profile data already satisfies step 1
   useEffect(() => {
     if (step === 1 && isStep1Prefilled) {
       void handleNext();
     }
-  // Only run on mount to avoid looping
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only run on mount to avoid looping
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <Progress value={progress} className="h-2" />
-      <p className="text-sm text-muted-foreground text-center">Step {step} of {totalSteps}</p>
+      <p className="text-sm text-muted-foreground text-center">
+        Step {step} of {totalSteps}
+      </p>
 
       {step === 1 && (
         <div className="space-y-4">
@@ -125,19 +144,31 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
       {step === 3 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Add your first lesson</h2>
-          <p className="text-muted-foreground text-sm">Choose the type of content for your first lesson:</p>
+          <p className="text-muted-foreground text-sm">
+            Choose the type of content for your first lesson:
+          </p>
           <div className="grid grid-cols-1 gap-3">
             {[
-              { type: 'VIDEO', label: 'Video Lesson', desc: 'Upload or link a video lecture' },
+              {
+                type: 'VIDEO',
+                label: 'Video Lesson',
+                desc: 'Upload or link a video lecture',
+              },
               { type: 'QUIZ', label: 'Quiz', desc: 'Test student knowledge' },
-              { type: 'DISCUSSION', label: 'Discussion', desc: 'Prompt group conversation' },
+              {
+                type: 'DISCUSSION',
+                label: 'Discussion',
+                desc: 'Prompt group conversation',
+              },
             ].map(({ type, label, desc }) => (
               <Button
                 key={type}
                 variant="outline"
                 className="h-auto py-3 flex flex-col items-start text-left"
                 onClick={async () => {
-                  await updateStep({ input: { step, data: { firstLessonType: type } } });
+                  await updateStep({
+                    input: { step, data: { firstLessonType: type } },
+                  });
                   setStep(step + 1);
                 }}
               >
@@ -157,7 +188,8 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
           </p>
           <div className="rounded-lg border p-4 bg-green-50 dark:bg-green-950/20">
             <p className="text-sm text-green-700 dark:text-green-300">
-              Course &quot;{courseTitle || 'Your Course'}&quot; is saved as a draft.
+              Course &quot;{courseTitle || 'Your Course'}&quot; is saved as a
+              draft.
             </p>
           </div>
         </div>
@@ -165,7 +197,9 @@ export function InstructorOnboardingSteps({ currentStep, onComplete, onSkip }: I
 
       {step !== 3 && (
         <div className="flex justify-between pt-4">
-          <Button variant="ghost" onClick={onSkip}>Skip for now</Button>
+          <Button variant="ghost" onClick={onSkip}>
+            Skip for now
+          </Button>
           <Button onClick={handleNext}>
             {step === totalSteps ? 'Go to Dashboard' : 'Continue'}
           </Button>

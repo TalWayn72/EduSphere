@@ -8,7 +8,10 @@ vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...actual,
-    useParams: vi.fn(() => ({ courseId: 'cc000000-0000-0000-0000-000000000002', lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1' })),
+    useParams: vi.fn(() => ({
+      courseId: 'cc000000-0000-0000-0000-000000000002',
+      lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1',
+    })),
     useNavigate: vi.fn(() => mockNavigate),
   };
 });
@@ -31,7 +34,9 @@ vi.mock('@/components/Layout', () => ({
 
 vi.mock('@/components/PageShell', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: any) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/Breadcrumbs', () => ({
@@ -94,17 +99,25 @@ function makeQuery(overrides: Record<string, unknown> = {}) {
 describe('LessonDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(rrdom.useParams).mockReturnValue({ courseId: 'cc000000-0000-0000-0000-000000000002', lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1' });
+    vi.mocked(rrdom.useParams).mockReturnValue({
+      courseId: 'cc000000-0000-0000-0000-000000000002',
+      lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1',
+    });
     vi.mocked(urql.useQuery).mockReturnValue(makeQuery());
   });
 
   // ── BUG-049 regression: mounted guard prevents setState-during-render ────────
   it('BUG-049: renders without React "Cannot update a component while rendering" error', () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((msg: unknown) => {
-      if (typeof msg === 'string' && msg.includes('Cannot update a component')) {
-        throw new Error(`React render violation: ${msg}`);
-      }
-    });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation((msg: unknown) => {
+        if (
+          typeof msg === 'string' &&
+          msg.includes('Cannot update a component')
+        ) {
+          throw new Error(`React render violation: ${msg}`);
+        }
+      });
     render(
       <MemoryRouter>
         <LessonDetailPage />
@@ -255,13 +268,18 @@ describe('LessonDetailPage', () => {
       </MemoryRouter>
     );
     fireEvent.click(screen.getByRole('button', { name: /חזרה לקורס/ }));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/cc000000-0000-0000-0000-000000000002');
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/courses/cc000000-0000-0000-0000-000000000002'
+    );
   });
 
   // ── Invalid UUID guard ─────────────────────────────────────────────────────
 
   it('shows "השיעור לא נמצא" for non-UUID lessonId (e.g. "lesson-demo-1")', () => {
-    vi.mocked(rrdom.useParams).mockReturnValue({ courseId: 'cc000000-0000-0000-0000-000000000002', lessonId: 'lesson-demo-1' });
+    vi.mocked(rrdom.useParams).mockReturnValue({
+      courseId: 'cc000000-0000-0000-0000-000000000002',
+      lessonId: 'lesson-demo-1',
+    });
     render(
       <MemoryRouter>
         <LessonDetailPage />

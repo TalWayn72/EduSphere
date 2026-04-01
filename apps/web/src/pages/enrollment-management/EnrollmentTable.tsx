@@ -18,7 +18,10 @@ interface EnrollmentTableProps {
   onUnenroll: (userId: string, courseId: string) => void;
 }
 
-export function EnrollmentTable({ enrollments, onUnenroll }: EnrollmentTableProps) {
+export function EnrollmentTable({
+  enrollments,
+  onUnenroll,
+}: EnrollmentTableProps) {
   const { t } = useTranslation('admin');
 
   return (
@@ -29,7 +32,9 @@ export function EnrollmentTable({ enrollments, onUnenroll }: EnrollmentTableProp
           <TableHead>{t('enrollment.colStatus')}</TableHead>
           <TableHead>{t('enrollment.colEnrolled')}</TableHead>
           <TableHead>{t('enrollment.colCompleted')}</TableHead>
-          <TableHead className="text-right">{t('enrollment.colActions')}</TableHead>
+          <TableHead className="text-right">
+            {t('enrollment.colActions')}
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -48,7 +53,9 @@ export function EnrollmentTable({ enrollments, onUnenroll }: EnrollmentTableProp
                 {e.completedAt ? t('enrollment.completedStatus') : e.status}
               </Badge>
             </TableCell>
-            <TableCell className="text-sm">{formatDate(e.enrolledAt)}</TableCell>
+            <TableCell className="text-sm">
+              {formatDate(e.enrolledAt)}
+            </TableCell>
             <TableCell className="text-sm">
               {e.completedAt ? formatDate(e.completedAt) : '\u2014'}
             </TableCell>

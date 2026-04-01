@@ -4,17 +4,8 @@
  * Handles course purchases, Stripe payment intents, webhook processing,
  * and enrollment event publishing via NATS.
  */
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-} from '@nestjs/common';
-import {
-  schema,
-  eq,
-  and,
-  withTenantContext,
-} from '@edusphere/db';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { schema, eq, and, withTenantContext } from '@edusphere/db';
 import type { TenantContext, Database } from '@edusphere/db';
 import { StringCodec, type NatsConnection } from 'nats';
 import { sql } from 'drizzle-orm';
@@ -76,7 +67,11 @@ export class MarketplacePurchaseService {
       );
 
     const stripeCustomer = await this.getOrCreateStripeCustomer(
-      db, userId, tenantId, userEmail, userName
+      db,
+      userId,
+      tenantId,
+      userEmail,
+      userName
     );
     const intent = await this.stripeClient.createPaymentIntent(
       listing.priceCents,
@@ -156,7 +151,11 @@ export class MarketplacePurchaseService {
           .where(eq(schema.purchases.stripePaymentIntentId, intent.id))
       );
       await this.publishEnrollmentEvent(
-        db, intent.id, tenantId, ctx, getNatsConnection
+        db,
+        intent.id,
+        tenantId,
+        ctx,
+        getNatsConnection
       );
       this.logger.log(
         { intentId: intent.id, tenantId },

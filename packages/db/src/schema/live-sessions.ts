@@ -28,7 +28,9 @@ export const liveSessions = pgTable('live_sessions', {
   attendeePasswordEnc: text('attendee_password_enc').notNull(),
   moderatorPasswordEnc: text('moderator_password_enc').notNull(),
   status: liveSessionStatusEnum('status').notNull().default('SCHEDULED'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const liveSessionsRLS = sql`

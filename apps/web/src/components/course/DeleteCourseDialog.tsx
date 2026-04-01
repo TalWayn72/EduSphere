@@ -43,7 +43,9 @@ export function DeleteCourseDialog({
   const inputRef = useRef<HTMLInputElement>(null);
   const isConfirmed = typed === courseTitle;
 
-  const [{ fetching: deleting }, executeDelete] = useMutation(DELETE_COURSE_MUTATION);
+  const [{ fetching: deleting }, executeDelete] = useMutation(
+    DELETE_COURSE_MUTATION
+  );
 
   useEffect(() => {
     if (open) {
@@ -59,7 +61,8 @@ export function DeleteCourseDialog({
 
     const { error: mutationError } = await executeDelete({ id: courseId });
     if (mutationError) {
-      const msg = mutationError.graphQLErrors?.[0]?.message ?? mutationError.message;
+      const msg =
+        mutationError.graphQLErrors?.[0]?.message ?? mutationError.message;
       if (msg?.includes('permission') || msg?.includes('forbidden')) {
         setError(t('deleteCoursePermissionDenied'));
       } else if (msg?.includes('not found')) {
@@ -80,13 +83,9 @@ export function DeleteCourseDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent
-        data-testid="delete-course-dialog"
-      >
+      <DialogContent data-testid="delete-course-dialog">
         <DialogHeader>
-          <DialogTitle>
-            {t('deleteCourseDialogTitle')}
-          </DialogTitle>
+          <DialogTitle>{t('deleteCourseDialogTitle')}</DialogTitle>
           <DialogDescription>
             {t('deleteCourseDialogDescription', { title: courseTitle })}
           </DialogDescription>

@@ -139,9 +139,9 @@ describe('PlagiarismResolver', () => {
 
   describe('mySubmissions()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.myTextSubmissions('item-1', noAuthCtx)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        resolver.myTextSubmissions('item-1', noAuthCtx)
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {

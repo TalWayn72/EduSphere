@@ -74,7 +74,8 @@ export class AtRiskService implements OnModuleDestroy {
         );
 
       return rows.map((r) => {
-        const flaggedDate = r.flaggedAt instanceof Date ? r.flaggedAt : new Date(r.flaggedAt);
+        const flaggedDate =
+          r.flaggedAt instanceof Date ? r.flaggedAt : new Date(r.flaggedAt);
         const daysSinceActive = Math.floor(
           (Date.now() - flaggedDate.getTime()) / (1000 * 60 * 60 * 24)
         );

@@ -12,8 +12,13 @@ vi.mock('@/components/ui/dialog', () => ({
     onOpenChange?: (v: boolean) => void;
     children: React.ReactNode;
   }) => (open ? <div data-testid="dialog">{children}</div> : null),
-  DialogContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="dialog-content" {...props}>{children}</div>
+  DialogContent: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="dialog-content" {...props}>
+      {children}
+    </div>
   ),
   DialogHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="dialog-header">{children}</div>
@@ -21,11 +26,19 @@ vi.mock('@/components/ui/dialog', () => ({
   DialogTitle: ({ children }: { children: React.ReactNode }) => (
     <h2>{children}</h2>
   ),
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
-  DialogFooter: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="dialog-footer" {...props}>{children}</div>
+  DialogFooter: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="dialog-footer" {...props}>
+      {children}
+    </div>
   ),
 }));
 

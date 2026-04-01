@@ -78,4 +78,5 @@ export const notificationDeliveries = pgTable(
 ).enableRLS();
 
 export type NotificationDelivery = typeof notificationDeliveries.$inferSelect;
-export type NewNotificationDelivery = typeof notificationDeliveries.$inferInsert;
+export type NewNotificationDelivery =
+  typeof notificationDeliveries.$inferInsert;

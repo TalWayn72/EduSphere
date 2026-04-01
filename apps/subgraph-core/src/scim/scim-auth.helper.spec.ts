@@ -40,7 +40,9 @@ describe('ScimAuthHelper', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    const tokenService = new ScimTokenService() as InstanceType<typeof ScimTokenService>;
+    const tokenService = new ScimTokenService() as InstanceType<
+      typeof ScimTokenService
+    >;
     helper = new ScimAuthHelper(tokenService);
   });
 

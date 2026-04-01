@@ -39,7 +39,8 @@ const STRIPE_PUBLISHABLE_KEY =
  * tag on module evaluation) is never loaded in environments without the key.
  * The promise is cached so subsequent calls return the same instance.
  */
-let _stripePromise: Promise<import('@stripe/stripe-js').Stripe | null> | null = null;
+let _stripePromise: Promise<import('@stripe/stripe-js').Stripe | null> | null =
+  null;
 
 function getStripePromise() {
   if (!STRIPE_PUBLISHABLE_KEY) return null;
@@ -113,10 +114,10 @@ function CheckoutForm({ courseId }: CheckoutFormProps) {
         aria-live="polite"
       >
         <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4 dark:text-green-400" />
-        <h2 className="text-xl font-semibold mb-2">{t('checkout.paymentSuccessful')}</h2>
-        <p className="text-muted-foreground">
-          {t('checkout.redirecting')}
-        </p>
+        <h2 className="text-xl font-semibold mb-2">
+          {t('checkout.paymentSuccessful')}
+        </h2>
+        <p className="text-muted-foreground">{t('checkout.redirecting')}</p>
       </div>
     );
   }
@@ -173,9 +174,7 @@ export function CheckoutPage() {
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
           <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4 dark:text-amber-400" />
           <h1 className="text-2xl font-bold mb-2">{t('checkout.noSession')}</h1>
-          <p className="text-muted-foreground">
-            {t('checkout.selectCourse')}
-          </p>
+          <p className="text-muted-foreground">{t('checkout.selectCourse')}</p>
         </div>
       </Layout>
     );
@@ -189,7 +188,9 @@ export function CheckoutPage() {
       <Layout>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
           <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4 dark:text-amber-400" />
-          <h1 className="text-2xl font-bold mb-2">{t('checkout.unavailable')}</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            {t('checkout.unavailable')}
+          </h1>
           <p className="text-muted-foreground">
             {t('checkout.unavailableDesc')}
           </p>
@@ -206,7 +207,9 @@ export function CheckoutPage() {
         </h1>
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">{t('checkout.paymentDetails')}</CardTitle>
+            <CardTitle className="text-lg">
+              {t('checkout.paymentDetails')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Elements

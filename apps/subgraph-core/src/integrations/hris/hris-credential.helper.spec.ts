@@ -49,8 +49,14 @@ describe('hris-credential.helper', () => {
 
       expect(mockDeriveTenantKey).toHaveBeenCalledWith('t-001');
       expect(mockEncryptField).toHaveBeenCalledTimes(2);
-      expect(mockEncryptField).toHaveBeenCalledWith('my-client-id', 'tenant-derived-key');
-      expect(mockEncryptField).toHaveBeenCalledWith('my-secret', 'tenant-derived-key');
+      expect(mockEncryptField).toHaveBeenCalledWith(
+        'my-client-id',
+        'tenant-derived-key'
+      );
+      expect(mockEncryptField).toHaveBeenCalledWith(
+        'my-secret',
+        'tenant-derived-key'
+      );
       expect((result as TestHrisConfig).clientId).toBe('enc:my-client-id');
       expect((result as TestHrisConfig).clientSecret).toBe('enc:my-secret');
     });
@@ -59,7 +65,9 @@ describe('hris-credential.helper', () => {
       const result = encryptHrisCredentials(BASE_CONFIG as never);
 
       expect((result as TestHrisConfig).type).toBe('workday');
-      expect((result as TestHrisConfig).baseUrl).toBe('https://api.workday.com');
+      expect((result as TestHrisConfig).baseUrl).toBe(
+        'https://api.workday.com'
+      );
       expect((result as TestHrisConfig).tenantId).toBe('t-001');
     });
 
@@ -144,7 +152,10 @@ describe('hris-credential.helper', () => {
       expect(result['type']).toBe('workday');
       expect(result['baseUrl']).toBe('https://api.workday.com');
       expect(result['tenantId']).toBe('t-001');
-      expect(result['fieldMapping']).toEqual({ email: 'emailAddress', name: 'fullName' });
+      expect(result['fieldMapping']).toEqual({
+        email: 'emailAddress',
+        name: 'fullName',
+      });
     });
 
     it('sets clientId to undefined when originally falsy', () => {

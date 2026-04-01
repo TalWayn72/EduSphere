@@ -32,8 +32,10 @@ const RUBRIC = {
   ],
 };
 
-const GOOD_ANSWER = 'GraphQL is a query language for APIs with a strong type system.';
-const HTML_ANSWER = '<b>GraphQL</b> is a <script>alert("xss")</script>query language.';
+const GOOD_ANSWER =
+  'GraphQL is a query language for APIs with a strong type system.';
+const HTML_ANSWER =
+  '<b>GraphQL</b> is a <script>alert("xss")</script>query language.';
 const GRADING_RESPONSE =
   'Score: 8\nGraphQL is well explained.\nSuggestions: Add more detail about resolvers.';
 
@@ -83,7 +85,10 @@ describe('AutoGradingService', () => {
     await service.gradeAnswer(RUBRIC, GOOD_ANSWER, 'tenant-1');
 
     expect(mockGenerateTextFn).toHaveBeenCalledOnce();
-    const callArgs = mockGenerateTextFn.mock.calls[0][0] as Record<string, unknown>;
+    const callArgs = mockGenerateTextFn.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     const prompt = callArgs['prompt'] as string;
 
     // Prompt must be valid JSON (JSON.stringify output)
@@ -101,22 +106,26 @@ describe('AutoGradingService', () => {
 
   it('gradeAnswer throws BadRequestException for answer exceeding 5000 chars', async () => {
     const longAnswer = 'a'.repeat(5001);
-    await expect(service.gradeAnswer(RUBRIC, longAnswer, 'tenant-1')).rejects.toThrow(
-      BadRequestException
-    );
+    await expect(
+      service.gradeAnswer(RUBRIC, longAnswer, 'tenant-1')
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('gradeAnswer logger.log receives questionId and score but NOT studentAnswer', async () => {
     // Spy on the service's internal logger after construction
     const logSpy = vi.spyOn(
-      (service as unknown as { logger: { log: (...a: unknown[]) => void } }).logger,
+      (service as unknown as { logger: { log: (...a: unknown[]) => void } })
+        .logger,
       'log'
     );
 
     await service.gradeAnswer(RUBRIC, GOOD_ANSWER, 'tenant-1');
 
     expect(logSpy).toHaveBeenCalledOnce();
-    const [logPayload] = logSpy.mock.calls[0] as [Record<string, unknown>, ...unknown[]];
+    const [logPayload] = logSpy.mock.calls[0] as [
+      Record<string, unknown>,
+      ...unknown[],
+    ];
 
     // Must log questionId and score
     expect(logPayload).toHaveProperty('questionId', 'q-001');
@@ -132,7 +141,10 @@ describe('AutoGradingService', () => {
   it('batchGrade returns array with studentId field for each result', async () => {
     const answers = [
       { studentId: 'student-1', answer: 'GraphQL is a query language.' },
-      { studentId: 'student-2', answer: 'GraphQL uses a type system and queries.' },
+      {
+        studentId: 'student-2',
+        answer: 'GraphQL uses a type system and queries.',
+      },
     ];
 
     const results = await service.batchGrade(RUBRIC, answers, 'tenant-1');

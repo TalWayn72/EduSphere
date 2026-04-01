@@ -3,7 +3,10 @@ import { BadRequestException } from '@nestjs/common';
 import { ContentImportService } from './content-import.service';
 import type { YouTubeClient } from './youtube.client';
 import type { FirecrawlClient } from './firecrawl.client';
-import type { YouTubePlaylistItem, FirecrawlPage } from './content-import.types';
+import type {
+  YouTubePlaylistItem,
+  FirecrawlPage,
+} from './content-import.types';
 
 const makeYoutubeItem = (i: number): YouTubePlaylistItem => ({
   title: `Video ${i}`,
@@ -48,7 +51,11 @@ describe('ContentImportService', () => {
   describe('importFromYoutube', () => {
     it('extracts playlistId from URL and returns ImportJob', async () => {
       process.env['YOUTUBE_API_KEY'] = 'yt-key';
-      const items = [makeYoutubeItem(0), makeYoutubeItem(1), makeYoutubeItem(2)];
+      const items = [
+        makeYoutubeItem(0),
+        makeYoutubeItem(1),
+        makeYoutubeItem(2),
+      ];
       youtubeClient.getPlaylistItems.mockResolvedValue(items);
 
       const result = await service.importFromYoutube(
@@ -61,7 +68,10 @@ describe('ContentImportService', () => {
         'user-1'
       );
 
-      expect(youtubeClient.getPlaylistItems).toHaveBeenCalledWith('PLabc123', 'yt-key');
+      expect(youtubeClient.getPlaylistItems).toHaveBeenCalledWith(
+        'PLabc123',
+        'yt-key'
+      );
       expect(result.status).toBe('COMPLETE');
       expect(result.lessonCount).toBe(3);
       expect(result.estimatedMinutes).toBe(1);
@@ -74,7 +84,11 @@ describe('ContentImportService', () => {
       delete process.env['YOUTUBE_API_KEY'];
       await expect(
         service.importFromYoutube(
-          { playlistUrl: 'https://youtube.com/playlist?list=PLx', courseId: 'c1', moduleId: 'm1' },
+          {
+            playlistUrl: 'https://youtube.com/playlist?list=PLx',
+            courseId: 'c1',
+            moduleId: 'm1',
+          },
           'tenant-1',
           'user-1'
         )
@@ -85,7 +99,11 @@ describe('ContentImportService', () => {
       process.env['YOUTUBE_API_KEY'] = 'yt-key';
       await expect(
         service.importFromYoutube(
-          { playlistUrl: 'https://youtube.com/watch?v=abc', courseId: 'c1', moduleId: 'm1' },
+          {
+            playlistUrl: 'https://youtube.com/watch?v=abc',
+            courseId: 'c1',
+            moduleId: 'm1',
+          },
           'tenant-1',
           'user-1'
         )
@@ -121,7 +139,11 @@ describe('ContentImportService', () => {
       delete process.env['FIRECRAWL_API_KEY'];
       await expect(
         service.importFromWebsite(
-          { siteUrl: 'https://docs.example.com', courseId: 'c1', moduleId: 'm1' },
+          {
+            siteUrl: 'https://docs.example.com',
+            courseId: 'c1',
+            moduleId: 'm1',
+          },
           'tenant-1',
           'user-1'
         )

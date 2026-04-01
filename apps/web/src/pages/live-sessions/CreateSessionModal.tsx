@@ -20,7 +20,11 @@ export interface CreateSessionModalProps {
   loading: boolean;
 }
 
-export function CreateSessionModal({ onClose, onCreate, loading }: CreateSessionModalProps) {
+export function CreateSessionModal({
+  onClose,
+  onCreate,
+  loading,
+}: CreateSessionModalProps) {
   const [name, setName] = useState('');
   const [contentId] = useState('b0000000-0000-0000-0000-000000000001');
   const [scheduledAt, setScheduledAt] = useState('');
@@ -32,7 +36,12 @@ export function CreateSessionModal({ onClose, onCreate, loading }: CreateSession
   };
 
   return (
-    <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+    <Dialog
+      open
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
       <DialogContent data-testid="create-session-modal" className="max-w-md">
         <DialogHeader>
           <DialogTitle>Create Live Session</DialogTitle>
@@ -42,7 +51,10 @@ export function CreateSessionModal({ onClose, onCreate, loading }: CreateSession
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium block mb-1" htmlFor="session-name">
+            <label
+              className="text-sm font-medium block mb-1"
+              htmlFor="session-name"
+            >
               Session Title
             </label>
             <input
@@ -56,7 +68,10 @@ export function CreateSessionModal({ onClose, onCreate, loading }: CreateSession
             />
           </div>
           <div>
-            <label className="text-sm font-medium block mb-1" htmlFor="session-time">
+            <label
+              className="text-sm font-medium block mb-1"
+              htmlFor="session-time"
+            >
               Scheduled Time
             </label>
             <input

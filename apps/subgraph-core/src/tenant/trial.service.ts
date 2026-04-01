@@ -76,7 +76,10 @@ export class TrialService implements OnModuleDestroy {
     const trialEndsAt = new Date(trialEndsAtStr);
     const now = new Date();
     const diffMs = trialEndsAt.getTime() - now.getTime();
-    const daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    const daysRemaining = Math.max(
+      0,
+      Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+    );
 
     const gracePeriodEndsAt = new Date(trialEndsAt);
     gracePeriodEndsAt.setDate(gracePeriodEndsAt.getDate() + GRACE_PERIOD_DAYS);
@@ -93,7 +96,10 @@ export class TrialService implements OnModuleDestroy {
     };
   }
 
-  async extendTrial(tenantId: string, additionalDays: number): Promise<TrialStatus> {
+  async extendTrial(
+    tenantId: string,
+    additionalDays: number
+  ): Promise<TrialStatus> {
     if (additionalDays < 1 || additionalDays > 90) {
       throw new BadRequestException('Extension must be between 1 and 90 days');
     }

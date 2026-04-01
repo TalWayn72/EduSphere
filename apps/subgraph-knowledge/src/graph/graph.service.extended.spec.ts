@@ -9,7 +9,9 @@ import { GraphSourceClusterService } from './graph-source-cluster.service';
 
 vi.mock('@edusphere/db', () => ({
   db: {},
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: () => unknown) => cb()),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: () => unknown) => cb()
+  ),
 }));
 
 var mc = {
@@ -75,20 +77,41 @@ describe('GraphService extended', () => {
 
   it('findRelatedConcepts maps strength', async () => {
     mc.findRelatedConcepts.mockResolvedValue([{ ...RAW, strength: 0.9 }]);
-    var r = await svc.findRelatedConcepts('c-1', 2, 10, 't-1', 'u-1', 'STUDENT');
+    var r = await svc.findRelatedConcepts(
+      'c-1',
+      2,
+      10,
+      't-1',
+      'u-1',
+      'STUDENT'
+    );
     expect(r[0].strength).toBe(0.9);
   });
 
   it('findRelatedConcepts defaults strength to 1.0', async () => {
     mc.findRelatedConcepts.mockResolvedValue([RAW]);
-    var r = await svc.findRelatedConcepts('c-1', 2, 10, 't-1', 'u-1', 'STUDENT');
+    var r = await svc.findRelatedConcepts(
+      'c-1',
+      2,
+      10,
+      't-1',
+      'u-1',
+      'STUDENT'
+    );
     expect(r[0].strength).toBe(1.0);
   });
 
   it('linkConcepts returns relationship info', async () => {
     mc.linkConceptsAndFetch.mockResolvedValue({ from: null, to: null });
     var r = await svc.linkConcepts(
-      'c-1', 'c-2', 'RELATES_TO', 0.8, 'desc', 't-1', 'u-1', 'INSTRUCTOR'
+      'c-1',
+      'c-2',
+      'RELATES_TO',
+      0.8,
+      'desc',
+      't-1',
+      'u-1',
+      'INSTRUCTOR'
     );
     expect(r.relationshipType).toBe('RELATES_TO');
     expect(r.strength).toBe(0.8);
@@ -97,53 +120,89 @@ describe('GraphService extended', () => {
 
   it('findPersonById delegates to cypherService', async () => {
     mc.findPersonById.mockResolvedValue({ id: 'p-1' });
-    expect(await svc.findPersonById('p-1', 't-1', 'u-1', 'STUDENT')).toEqual({ id: 'p-1' });
+    expect(await svc.findPersonById('p-1', 't-1', 'u-1', 'STUDENT')).toEqual({
+      id: 'p-1',
+    });
   });
 
   it('findPersonByName delegates to cypherService', async () => {
     mc.findPersonByName.mockResolvedValue({ id: 'p-1' });
-    expect(await svc.findPersonByName('Maimonides', 't-1', 'u-1', 'STUDENT')).toEqual({ id: 'p-1' });
+    expect(
+      await svc.findPersonByName('Maimonides', 't-1', 'u-1', 'STUDENT')
+    ).toEqual({ id: 'p-1' });
   });
 
   it('createPerson delegates to cypherService', async () => {
     mc.createPerson.mockResolvedValue({ id: 'p-1' });
-    var r = await svc.createPerson('Maimonides', 'Bio', 't-1', 'u-1', 'INSTRUCTOR');
+    var r = await svc.createPerson(
+      'Maimonides',
+      'Bio',
+      't-1',
+      'u-1',
+      'INSTRUCTOR'
+    );
     expect(mc.createPerson).toHaveBeenCalledWith('Maimonides', 'Bio', 't-1');
     expect(r).toEqual({ id: 'p-1' });
   });
 
   it('findTermById delegates to cypherService', async () => {
     mc.findTermById.mockResolvedValue({ id: 't-1' });
-    expect(await svc.findTermById('t-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({ id: 't-1' });
+    expect(await svc.findTermById('t-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({
+      id: 't-1',
+    });
   });
 
   it('findTermByName delegates to cypherService', async () => {
     mc.findTermByName.mockResolvedValue({ id: 't-1' });
-    expect(await svc.findTermByName('Torah', 'ten-1', 'u-1', 'STUDENT')).toEqual({ id: 't-1' });
+    expect(
+      await svc.findTermByName('Torah', 'ten-1', 'u-1', 'STUDENT')
+    ).toEqual({ id: 't-1' });
   });
 
   it('createTerm delegates to cypherService', async () => {
     mc.createTerm.mockResolvedValue({ id: 't-1' });
-    var r = await svc.createTerm('Torah', 'Scriptures', 'ten-1', 'u-1', 'INSTRUCTOR');
+    var r = await svc.createTerm(
+      'Torah',
+      'Scriptures',
+      'ten-1',
+      'u-1',
+      'INSTRUCTOR'
+    );
     expect(mc.createTerm).toHaveBeenCalledWith('Torah', 'Scriptures', 'ten-1');
     expect(r).toEqual({ id: 't-1' });
   });
 
   it('findSourceById delegates to cypherService', async () => {
     mc.findSourceById.mockResolvedValue({ id: 's-1' });
-    expect(await svc.findSourceById('s-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({ id: 's-1' });
+    expect(await svc.findSourceById('s-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({
+      id: 's-1',
+    });
   });
 
   it('createSource delegates to cypherService', async () => {
     mc.createSource.mockResolvedValue({ id: 's-1' });
-    var r = await svc.createSource('Guide', 'BOOK', null, 'ten-1', 'u-1', 'INSTRUCTOR');
-    expect(mc.createSource).toHaveBeenCalledWith('Guide', 'BOOK', null, 'ten-1');
+    var r = await svc.createSource(
+      'Guide',
+      'BOOK',
+      null,
+      'ten-1',
+      'u-1',
+      'INSTRUCTOR'
+    );
+    expect(mc.createSource).toHaveBeenCalledWith(
+      'Guide',
+      'BOOK',
+      null,
+      'ten-1'
+    );
     expect(r).toEqual({ id: 's-1' });
   });
 
   it('findTopicClusterById delegates to cypherService', async () => {
     mc.findTopicClusterById.mockResolvedValue({ id: 'cl-1' });
-    expect(await svc.findTopicClusterById('cl-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({ id: 'cl-1' });
+    expect(
+      await svc.findTopicClusterById('cl-1', 'ten-1', 'u-1', 'STUDENT')
+    ).toEqual({ id: 'cl-1' });
   });
 
   it('findTopicClustersByCourse delegates to cypherService', async () => {
@@ -155,14 +214,31 @@ describe('GraphService extended', () => {
 
   it('createTopicCluster delegates to cypherService', async () => {
     mc.createTopicCluster.mockResolvedValue({ id: 'cl-1' });
-    var r = await svc.createTopicCluster('Cluster', null, 'ten-1', 'u-1', 'INSTRUCTOR');
-    expect(mc.createTopicCluster).toHaveBeenCalledWith('Cluster', null, 'ten-1');
+    var r = await svc.createTopicCluster(
+      'Cluster',
+      null,
+      'ten-1',
+      'u-1',
+      'INSTRUCTOR'
+    );
+    expect(mc.createTopicCluster).toHaveBeenCalledWith(
+      'Cluster',
+      null,
+      'ten-1'
+    );
     expect(r).toEqual({ id: 'cl-1' });
   });
 
   it('generateEmbedding returns false', async () => {
     expect(
-      await svc.generateEmbedding('text', 'Concept', 'c-1', 't-1', 'u-1', 'INSTRUCTOR')
+      await svc.generateEmbedding(
+        'text',
+        'Concept',
+        'c-1',
+        't-1',
+        'u-1',
+        'INSTRUCTOR'
+      )
     ).toBe(false);
   });
 });

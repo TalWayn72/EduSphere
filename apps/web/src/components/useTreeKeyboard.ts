@@ -51,7 +51,10 @@ export function getVisibleOrder(
 }
 
 /** Returns the parent ID of the given node, or null if root. */
-function findParentId(nodes: TreeKeyboardNode[], childId: string): string | null {
+function findParentId(
+  nodes: TreeKeyboardNode[],
+  childId: string
+): string | null {
   for (const n of nodes) {
     if (n.children.includes(childId)) return n.id;
   }

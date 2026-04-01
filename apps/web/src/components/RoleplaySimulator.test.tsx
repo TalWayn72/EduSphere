@@ -169,9 +169,7 @@ describe('RoleplaySimulator', () => {
 
   it('renders with BEGINNER difficulty level color', async () => {
     const beginnerScenario = { ...mockScenario, difficultyLevel: 'BEGINNER' };
-    render(
-      <RoleplaySimulator scenario={beginnerScenario} onClose={onClose} />
-    );
+    render(<RoleplaySimulator scenario={beginnerScenario} onClose={onClose} />);
     await waitFor(() => {
       expect(screen.getByText('BEGINNER')).toBeInTheDocument();
     });
@@ -179,9 +177,7 @@ describe('RoleplaySimulator', () => {
 
   it('renders with ADVANCED difficulty level color', async () => {
     const advancedScenario = { ...mockScenario, difficultyLevel: 'ADVANCED' };
-    render(
-      <RoleplaySimulator scenario={advancedScenario} onClose={onClose} />
-    );
+    render(<RoleplaySimulator scenario={advancedScenario} onClose={onClose} />);
     await waitFor(() => {
       expect(screen.getByText('ADVANCED')).toBeInTheDocument();
     });

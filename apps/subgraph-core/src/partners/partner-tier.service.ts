@@ -41,8 +41,8 @@ const TIER_ORDER: PartnerTier[] = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
 /** Revenue thresholds in USD cents (yearly gross) */
 export const TIER_THRESHOLDS: Record<PartnerTier, number> = {
   BRONZE: 0,
-  SILVER: 1_000_000,   // $10,000
-  GOLD: 5_000_000,     // $50,000
+  SILVER: 1_000_000, // $10,000
+  GOLD: 5_000_000, // $50,000
   PLATINUM: 20_000_000, // $200,000
 };
 
@@ -103,20 +103,28 @@ export class PartnerTierService implements OnModuleDestroy {
   getTierBenefits(tier: PartnerTier): TierBenefits {
     // Explicit switch avoids generic object-injection sink warning (security/detect-object-injection)
     switch (tier) {
-      case 'SILVER':   return TIER_BENEFITS.SILVER;
-      case 'GOLD':     return TIER_BENEFITS.GOLD;
-      case 'PLATINUM': return TIER_BENEFITS.PLATINUM;
-      default:         return TIER_BENEFITS.BRONZE;
+      case 'SILVER':
+        return TIER_BENEFITS.SILVER;
+      case 'GOLD':
+        return TIER_BENEFITS.GOLD;
+      case 'PLATINUM':
+        return TIER_BENEFITS.PLATINUM;
+      default:
+        return TIER_BENEFITS.BRONZE;
     }
   }
 
   /** Resolve threshold in cents for a known tier. */
   private tierThreshold(tier: PartnerTier): number {
     switch (tier) {
-      case 'SILVER':   return TIER_THRESHOLDS.SILVER;
-      case 'GOLD':     return TIER_THRESHOLDS.GOLD;
-      case 'PLATINUM': return TIER_THRESHOLDS.PLATINUM;
-      default:         return TIER_THRESHOLDS.BRONZE;
+      case 'SILVER':
+        return TIER_THRESHOLDS.SILVER;
+      case 'GOLD':
+        return TIER_THRESHOLDS.GOLD;
+      case 'PLATINUM':
+        return TIER_THRESHOLDS.PLATINUM;
+      default:
+        return TIER_THRESHOLDS.BRONZE;
     }
   }
 
@@ -136,10 +144,7 @@ export class PartnerTierService implements OnModuleDestroy {
           AND ${schema.partnerRevenue.month} LIKE ${yearPrefix + '%'}`
       );
 
-    const grossRevYtd = rows.reduce(
-      (sum, r) => sum + (r.grossRevUsd ?? 0),
-      0
-    );
+    const grossRevYtd = rows.reduce((sum, r) => sum + (r.grossRevUsd ?? 0), 0);
 
     const currentTier = this.calculateTier(grossRevYtd);
     const tierIndex = TIER_ORDER.indexOf(currentTier);
@@ -150,7 +155,10 @@ export class PartnerTierService implements OnModuleDestroy {
     if (nextTier) {
       const lo = this.tierThreshold(currentTier);
       const hi = this.tierThreshold(nextTier);
-      progressPct = Math.min(100, Math.round(((grossRevYtd - lo) / (hi - lo)) * 100));
+      progressPct = Math.min(
+        100,
+        Math.round(((grossRevYtd - lo) / (hi - lo)) * 100)
+      );
     }
 
     this.logger.log(

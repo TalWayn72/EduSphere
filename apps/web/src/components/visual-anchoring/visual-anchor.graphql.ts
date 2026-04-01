@@ -7,16 +7,30 @@ export const GET_VISUAL_ANCHORS = gql`
       mediaAssetId
       anchorText
       pageNumber
-      posX posY posW posH
-      pageEnd posXEnd posYEnd
+      posX
+      posY
+      posW
+      posH
+      pageEnd
+      posXEnd
+      posYEnd
       visualAssetId
       documentOrder
       isBroken
       createdAt
       updatedAt
       visualAsset {
-        id storageUrl webpUrl mimeType filename scanStatus
-        metadata { width height altText }
+        id
+        storageUrl
+        webpUrl
+        mimeType
+        filename
+        scanStatus
+        metadata {
+          width
+          height
+          altText
+        }
       }
     }
   }
@@ -25,8 +39,18 @@ export const GET_VISUAL_ANCHORS = gql`
 export const GET_VISUAL_ASSETS = gql`
   query GetVisualAssets($courseId: ID!) {
     getVisualAssets(courseId: $courseId) {
-      id filename mimeType sizeBytes storageUrl webpUrl scanStatus
-      metadata { width height altText }
+      id
+      filename
+      mimeType
+      sizeBytes
+      storageUrl
+      webpUrl
+      scanStatus
+      metadata {
+        width
+        height
+        altText
+      }
       createdAt
     }
   }
@@ -35,7 +59,11 @@ export const GET_VISUAL_ASSETS = gql`
 export const CREATE_VISUAL_ANCHOR = gql`
   mutation CreateVisualAnchor($input: CreateVisualAnchorInput!) {
     createVisualAnchor(input: $input) {
-      id anchorText documentOrder visualAssetId createdAt
+      id
+      anchorText
+      documentOrder
+      visualAssetId
+      createdAt
     }
   }
 `;
@@ -49,8 +77,14 @@ export const DELETE_VISUAL_ANCHOR = gql`
 export const ASSIGN_ASSET_TO_ANCHOR = gql`
   mutation AssignAssetToAnchor($anchorId: ID!, $visualAssetId: ID!) {
     assignAssetToAnchor(anchorId: $anchorId, visualAssetId: $visualAssetId) {
-      id visualAssetId
-      visualAsset { id storageUrl webpUrl mimeType }
+      id
+      visualAssetId
+      visualAsset {
+        id
+        storageUrl
+        webpUrl
+        mimeType
+      }
     }
   }
 `;
@@ -70,15 +104,31 @@ export const CONFIRM_VISUAL_ASSET_UPLOAD = gql`
       declaredMimeType: $declaredMimeType
       declaredSize: $declaredSize
     ) {
-      id filename storageUrl webpUrl scanStatus
-      metadata { width height altText }
+      id
+      filename
+      storageUrl
+      webpUrl
+      scanStatus
+      metadata {
+        width
+        height
+        altText
+      }
     }
   }
 `;
 
 export const GET_PRESIGNED_UPLOAD_URL = gql`
-  query GetPresignedUploadUrl($fileName: String!, $contentType: String!, $courseId: ID!) {
-    getPresignedUploadUrl(fileName: $fileName, contentType: $contentType, courseId: $courseId) {
+  query GetPresignedUploadUrl(
+    $fileName: String!
+    $contentType: String!
+    $courseId: ID!
+  ) {
+    getPresignedUploadUrl(
+      fileName: $fileName
+      contentType: $contentType
+      courseId: $courseId
+    ) {
       uploadUrl
       fileKey
       expiresAt

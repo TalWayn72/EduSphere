@@ -18,7 +18,9 @@ vi.mock('./useModuleMutations', () => ({
 }));
 
 vi.mock('./ModuleCard', () => ({
-  ModuleCard: ({ mod }: { mod: { title: string } }) => <div data-testid="module-card">{mod.title}</div>,
+  ModuleCard: ({ mod }: { mod: { title: string } }) => (
+    <div data-testid="module-card">{mod.title}</div>
+  ),
 }));
 
 vi.mock('./AddModuleForm', () => ({
@@ -36,19 +38,40 @@ describe('CourseEditModules', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('renders module cards', () => {
-    render(<CourseEditModules courseId="c-1" modules={modules} onRefetch={vi.fn()} onToast={vi.fn()} />);
+    render(
+      <CourseEditModules
+        courseId="c-1"
+        modules={modules}
+        onRefetch={vi.fn()}
+        onToast={vi.fn()}
+      />
+    );
     expect(screen.getAllByTestId('module-card')).toHaveLength(2);
   });
 
   it('renders modules sorted by orderIndex', () => {
-    render(<CourseEditModules courseId="c-1" modules={modules} onRefetch={vi.fn()} onToast={vi.fn()} />);
+    render(
+      <CourseEditModules
+        courseId="c-1"
+        modules={modules}
+        onRefetch={vi.fn()}
+        onToast={vi.fn()}
+      />
+    );
     const cards = screen.getAllByTestId('module-card');
     expect(cards[0]).toHaveTextContent('Module B');
     expect(cards[1]).toHaveTextContent('Module A');
   });
 
   it('renders add module form', () => {
-    render(<CourseEditModules courseId="c-1" modules={modules} onRefetch={vi.fn()} onToast={vi.fn()} />);
+    render(
+      <CourseEditModules
+        courseId="c-1"
+        modules={modules}
+        onRefetch={vi.fn()}
+        onToast={vi.fn()}
+      />
+    );
     expect(screen.getByTestId('add-module-form')).toBeInTheDocument();
   });
 });

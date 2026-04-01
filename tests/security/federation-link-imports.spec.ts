@@ -50,9 +50,7 @@ const FEDERATION_LEGAL_IMPORTS = new Set([
 ]);
 
 // Custom directives that are defined locally and must NOT appear in @link imports
-const LOCAL_CUSTOM_DIRECTIVES = [
-  '@requiresRole',
-];
+const LOCAL_CUSTOM_DIRECTIVES = ['@requiresRole'];
 
 function findAllGraphqlFiles(): string[] {
   const pattern = resolve(ROOT, 'apps/subgraph-*/src/**/*.graphql');
@@ -156,9 +154,9 @@ describe('Federation @link Import Integrity (BUG-065 regression guard)', () => {
     if (violations.length > 0) {
       throw new Error(
         `BUG-065 REGRESSION DETECTED — @link imports contain custom directives:\n` +
-        violations.map((v) => `  - ${v}`).join('\n') +
-        `\n\nFix: Remove the custom directive from the @link import list. ` +
-        `Custom directives must be defined locally with "directive @name ON FIELD_DEFINITION".`
+          violations.map((v) => `  - ${v}`).join('\n') +
+          `\n\nFix: Remove the custom directive from the @link import list. ` +
+          `Custom directives must be defined locally with "directive @name ON FIELD_DEFINITION".`
       );
     }
 
@@ -176,7 +174,7 @@ describe('Federation @link Import Integrity (BUG-065 regression guard)', () => {
         if (!FEDERATION_LEGAL_IMPORTS.has(imported)) {
           violations.push(
             `${relative(ROOT, filePath)}: unknown Federation import "${imported}" — ` +
-            `if this is a custom directive, define it locally instead`
+              `if this is a custom directive, define it locally instead`
           );
         }
       }
@@ -185,8 +183,8 @@ describe('Federation @link Import Integrity (BUG-065 regression guard)', () => {
     if (violations.length > 0) {
       throw new Error(
         `Unknown elements in Federation @link imports:\n` +
-        violations.map((v) => `  - ${v}`).join('\n') +
-        `\n\nLegal Federation v2.7 imports: ${[...FEDERATION_LEGAL_IMPORTS].join(', ')}`
+          violations.map((v) => `  - ${v}`).join('\n') +
+          `\n\nLegal Federation v2.7 imports: ${[...FEDERATION_LEGAL_IMPORTS].join(', ')}`
       );
     }
 
@@ -225,7 +223,14 @@ describe('Federation @link Import Integrity (BUG-065 regression guard)', () => {
 
 describe('Supergraph subgraph completeness (BUG-065 regression guard)', () => {
   const SUPERGRAPH_PATH = resolve(ROOT, 'apps/gateway/supergraph.graphql');
-  const REQUIRED_SUBGRAPHS = ['AGENT', 'ANNOTATION', 'COLLABORATION', 'CONTENT', 'CORE', 'KNOWLEDGE'] as const;
+  const REQUIRED_SUBGRAPHS = [
+    'AGENT',
+    'ANNOTATION',
+    'COLLABORATION',
+    'CONTENT',
+    'CORE',
+    'KNOWLEDGE',
+  ] as const;
 
   let supergraphContent: string;
 
@@ -253,9 +258,9 @@ describe('Supergraph subgraph completeness (BUG-065 regression guard)', () => {
     if (missing.length > 0) {
       throw new Error(
         `BUG-065 REGRESSION DETECTED — supergraph.graphql join__Graph enum is missing subgraphs:\n` +
-        missing.map((s) => `  - ${s}`).join('\n') +
-        `\n\nAll 6 subgraphs must be present: ${REQUIRED_SUBGRAPHS.join(', ')}.\n` +
-        `Run: pnpm --filter @edusphere/gateway compose`
+          missing.map((s) => `  - ${s}`).join('\n') +
+          `\n\nAll 6 subgraphs must be present: ${REQUIRED_SUBGRAPHS.join(', ')}.\n` +
+          `Run: pnpm --filter @edusphere/gateway compose`
       );
     }
 

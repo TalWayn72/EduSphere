@@ -11,7 +11,9 @@ interface PublicBranding {
 }
 
 export function usePublicBranding(slug: string | null) {
-  const [{ data, fetching }] = useQuery<{ publicBranding: PublicBranding | null }>({
+  const [{ data, fetching }] = useQuery<{
+    publicBranding: PublicBranding | null;
+  }>({
     query: PUBLIC_BRANDING_QUERY,
     variables: { slug: slug ?? '' },
     pause: !slug,

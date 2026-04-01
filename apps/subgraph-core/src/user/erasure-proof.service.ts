@@ -1,14 +1,11 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { createHash, createHmac } from 'crypto';
-import {
-  createDatabaseConnection,
-  schema,
-  closeAllPools,
-} from '@edusphere/db';
+import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 
-const SIGNING_KEY = process.env['GDPR_SIGNING_KEY'] ?? 'edusphere-gdpr-default-key';
+const SIGNING_KEY =
+  process.env['GDPR_SIGNING_KEY'] ?? 'edusphere-gdpr-default-key';
 
 /** Manifest entry: table name + row count (NO user data). */
 export interface ManifestEntry {
@@ -95,9 +92,7 @@ export class ErasureProofService implements OnModuleDestroy {
 
   /** Sign a manifest hash with HMAC-SHA256 using the server signing key. */
   signHash(manifestHash: string): string {
-    return createHmac('sha256', SIGNING_KEY)
-      .update(manifestHash)
-      .digest('hex');
+    return createHmac('sha256', SIGNING_KEY).update(manifestHash).digest('hex');
   }
 
   /** Build a self-contained verification token (base64-encoded signed payload). */
@@ -127,7 +122,10 @@ export class ErasureProofService implements OnModuleDestroy {
     const manifest = this.buildManifest(userId, tenantId, requestedBy, entries);
     const manifestHash = this.hashManifest(manifest);
     const signature = this.signHash(manifestHash);
-    const verificationToken = this.createVerificationToken(manifest, manifestHash);
+    const verificationToken = this.createVerificationToken(
+      manifest,
+      manifestHash
+    );
 
     await this.db.insert(schema.gdprErasureLog).values({
       userIdHash: this.hashUserId(userId),

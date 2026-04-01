@@ -22,7 +22,9 @@ import { routeGraphQL } from './graphql-mock.helpers';
 
 const BRANDING_ROUTE = '/admin/settings/branding';
 
-async function mockBrandingAPIs(page: import('@playwright/test').Page): Promise<void> {
+async function mockBrandingAPIs(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'GetTenantBranding' || op.toLowerCase().includes('branding')) {
       return JSON.stringify({
@@ -42,7 +44,10 @@ async function mockBrandingAPIs(page: import('@playwright/test').Page): Promise<
         },
       });
     }
-    if (op === 'UpdateTenantBranding' || op.toLowerCase().includes('updatebranding')) {
+    if (
+      op === 'UpdateTenantBranding' ||
+      op.toLowerCase().includes('updatebranding')
+    ) {
       return JSON.stringify({
         data: { updateTenantBranding: { success: true } },
       });
@@ -50,7 +55,12 @@ async function mockBrandingAPIs(page: import('@playwright/test').Page): Promise<
     if (op === 'Me' || op.toLowerCase().includes('me')) {
       return JSON.stringify({
         data: {
-          me: { id: 'user-001', email: 'admin@test.com', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' },
+          me: {
+            id: 'user-001',
+            email: 'admin@test.com',
+            roles: ['ORG_ADMIN'],
+            tenantId: 'tenant-001',
+          },
         },
       });
     }
@@ -58,7 +68,9 @@ async function mockBrandingAPIs(page: import('@playwright/test').Page): Promise<
   });
 }
 
-async function assertNoRawErrors(page: import('@playwright/test').Page): Promise<void> {
+async function assertNoRawErrors(
+  page: import('@playwright/test').Page
+): Promise<void> {
   const body = (await page.textContent('body')) ?? '';
   expect(body).not.toContain('urql error');
   expect(body).not.toContain('Cannot read properties');
@@ -70,32 +82,48 @@ async function assertNoRawErrors(page: import('@playwright/test').Page): Promise
 test.describe('Branding Editor — Structure', () => {
   test.beforeEach(async ({ page }) => {
     await mockBrandingAPIs(page);
-    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="branding-editor"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="branding-editor"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('branding editor page loads', async ({ page }) => {
-    await expect(page.locator('[data-testid="branding-editor"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="branding-editor"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('color picker for primary color is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="color-primary"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="color-primary"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('logo upload area is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="logo-upload"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="logo-upload"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('live preview panel is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="branding-preview"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="branding-preview"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('save button is present', async ({ page }) => {
-    await expect(page.locator('[data-testid="btn-save-branding"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="btn-save-branding"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   test('reset to defaults button is present', async ({ page }) => {
-    await expect(page.locator('[data-testid="btn-reset-defaults"]')).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="btn-reset-defaults"]')
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('no raw errors on initial load', async ({ page }) => {
@@ -108,8 +136,12 @@ test.describe('Branding Editor — Structure', () => {
 test.describe('Branding Editor — Color Changes', () => {
   test.beforeEach(async ({ page }) => {
     await mockBrandingAPIs(page);
-    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="branding-editor"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="branding-editor"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('changing primary color updates live preview', async ({ page }) => {
@@ -128,7 +160,9 @@ test.describe('Branding Editor — Color Changes', () => {
     await colorInput.fill('#GGGGGG');
     await colorInput.blur();
 
-    await expect(page.locator('[role="alert"]').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('[role="alert"]').first()).toBeVisible({
+      timeout: 5_000,
+    });
   });
 });
 
@@ -137,12 +171,18 @@ test.describe('Branding Editor — Color Changes', () => {
 test.describe('Branding Editor — Logo Upload', () => {
   test.beforeEach(async ({ page }) => {
     await mockBrandingAPIs(page);
-    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="branding-editor"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="branding-editor"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('logo upload accepts image files', async ({ page }) => {
-    const uploadArea = page.locator('[data-testid="logo-upload"] input[type="file"]');
+    const uploadArea = page.locator(
+      '[data-testid="logo-upload"] input[type="file"]'
+    );
     await expect(uploadArea).toBeAttached();
     // Verify accepted file types
     const accept = await uploadArea.getAttribute('accept');
@@ -155,8 +195,12 @@ test.describe('Branding Editor — Logo Upload', () => {
 test.describe('Branding Editor — Save & Reset', () => {
   test.beforeEach(async ({ page }) => {
     await mockBrandingAPIs(page);
-    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="branding-editor"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="branding-editor"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('save button triggers mutation', async ({ page }) => {
@@ -165,12 +209,16 @@ test.describe('Branding Editor — Save & Reset', () => {
     await page.locator('[data-testid="btn-save-branding"]').click();
 
     // Success feedback
-    await expect(page.locator('[data-testid="save-success"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="save-success"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('reset shows confirmation dialog', async ({ page }) => {
     await page.locator('[data-testid="btn-reset-defaults"]').click();
-    await expect(page.locator('[role="alertdialog"]')).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('[role="alertdialog"]')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 });
 
@@ -179,8 +227,14 @@ test.describe('Branding Editor — Save & Reset', () => {
 test.describe('Branding Editor — Visual Regression', () => {
   test('visual regression — default branding editor', async ({ page }) => {
     await mockBrandingAPIs(page);
-    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="branding-editor"]').waitFor({ timeout: 15_000 });
-    await expect(page).toHaveScreenshot('branding-editor-default.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}${BRANDING_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="branding-editor"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page).toHaveScreenshot('branding-editor-default.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });

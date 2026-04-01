@@ -151,7 +151,9 @@ describe('useGradeQuiz', () => {
     });
 
     expect(returned).toBeNull();
-    expect(result.current.error).toBe('Failed to grade quiz. Please try again.');
+    expect(result.current.error).toBe(
+      'Failed to grade quiz. Please try again.'
+    );
   });
 
   // Test 6 — gradeQuiz catches thrown errors
@@ -174,7 +176,9 @@ describe('useGradeQuiz', () => {
     });
 
     expect(returned).toBeNull();
-    expect(result.current.error).toBe('Failed to grade quiz. Please try again.');
+    expect(result.current.error).toBe(
+      'Failed to grade quiz. Please try again.'
+    );
     expect(result.current.loading).toBe(false);
   });
 
@@ -206,7 +210,9 @@ describe('useGradeQuiz', () => {
     await act(async () => {
       await result.current.gradeQuiz({ 0: 'A' });
     });
-    expect(result.current.error).toBe('Failed to grade quiz. Please try again.');
+    expect(result.current.error).toBe(
+      'Failed to grade quiz. Please try again.'
+    );
 
     // Second call should clear the error and succeed
     await act(async () => {

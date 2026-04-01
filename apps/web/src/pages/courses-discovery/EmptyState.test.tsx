@@ -3,7 +3,10 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string, opts?: Record<string, string>) => opts?.query ? `${k}: ${opts.query}` : k }),
+  useTranslation: () => ({
+    t: (k: string, opts?: Record<string, string>) =>
+      opts?.query ? `${k}: ${opts.query}` : k,
+  }),
 }));
 
 import { EmptyState } from './EmptyState';

@@ -41,7 +41,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -49,9 +51,7 @@ vi.mock('@/components/PageHeader', () => ({
 }));
 
 vi.mock('./TenantAnalyticsPage.charts', () => ({
-  TenantAnalyticsCharts: () => (
-    <div data-testid="analytics-charts">Charts</div>
-  ),
+  TenantAnalyticsCharts: () => <div data-testid="analytics-charts">Charts</div>,
 }));
 
 vi.mock('./TenantAnalyticsPage.cohort', () => ({
@@ -77,7 +77,13 @@ vi.mock('@/lib/graphql/tenant-analytics.queries', () => ({
 import { useAuthRole } from '@/hooks/useAuthRole';
 
 const NOOP_QUERY = [
-  { fetching: false, data: undefined, error: undefined, stale: false, hasNext: false },
+  {
+    fetching: false,
+    data: undefined,
+    error: undefined,
+    stale: false,
+    hasNext: false,
+  },
   vi.fn(),
 ] as never;
 
@@ -134,9 +140,10 @@ function renderDirect() {
 describe('TenantAnalyticsPage', () => {
   beforeEach(() => {
     vi.mocked(urql.useQuery).mockReturnValue(NOOP_QUERY);
-    vi.mocked(urql.useMutation).mockReturnValue(
-      [{ fetching: false }, vi.fn().mockResolvedValue({ data: undefined })] as never
-    );
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      vi.fn().mockResolvedValue({ data: undefined }),
+    ] as never);
     vi.mocked(useAuthRole).mockReturnValue('ORG_ADMIN');
     mockNavigate.mockClear();
   });
@@ -144,7 +151,9 @@ describe('TenantAnalyticsPage', () => {
   it('renders AdminLayout with title "Tenant Analytics"', () => {
     renderDirect();
     expect(screen.getByTestId('admin-layout')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Tenant Analytics' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Tenant Analytics' })
+    ).toBeInTheDocument();
   });
 
   it('renders period selector tabs', () => {
@@ -178,11 +187,19 @@ describe('TenantAnalyticsPage', () => {
 
   it('shows loading spinner while fetching', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { fetching: true, data: undefined, error: undefined, stale: false, hasNext: false },
+      {
+        fetching: true,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     const { container } = renderDirect();
-    expect(container.querySelector('[aria-label="Loading analytics"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[aria-label="Loading analytics"]')
+    ).toBeInTheDocument();
   });
 
   it('shows error message when query fails', () => {
@@ -202,7 +219,9 @@ describe('TenantAnalyticsPage', () => {
 
   it('does NOT show raw error object to user when there is no error', () => {
     renderDirect();
-    expect(screen.queryByText(/Failed to load analytics/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Failed to load analytics/)
+    ).not.toBeInTheDocument();
   });
 
   it('renders KPI cards when analytics data is present', () => {
@@ -260,7 +279,13 @@ describe('TenantAnalyticsPage', () => {
 
   it('does NOT show charts while loading', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { fetching: true, data: undefined, error: undefined, stale: false, hasNext: false },
+      {
+        fetching: true,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderDirect();

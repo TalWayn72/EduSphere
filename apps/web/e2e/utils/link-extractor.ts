@@ -39,5 +39,7 @@ export async function extractAllLinks(page: Page): Promise<ExtractedLink[]> {
  */
 export async function extractAnchorLinks(page: Page): Promise<string[]> {
   const links = await extractAllLinks(page);
-  return [...new Set(links.filter((l) => l.href.startsWith('#')).map((l) => l.href))];
+  return [
+    ...new Set(links.filter((l) => l.href.startsWith('#')).map((l) => l.href)),
+  ];
 }

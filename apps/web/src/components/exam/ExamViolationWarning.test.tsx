@@ -25,7 +25,9 @@ describe('ExamViolationWarning', () => {
 
   it('renders warning title when not voided', () => {
     render(<ExamViolationWarning {...defaultProps} />);
-    expect(screen.getByText('Warning: Exam Integrity Violation Detected')).toBeInTheDocument();
+    expect(
+      screen.getByText('Warning: Exam Integrity Violation Detected')
+    ).toBeInTheDocument();
   });
 
   it('renders voided title when isVoided', () => {
@@ -35,17 +37,30 @@ describe('ExamViolationWarning', () => {
 
   it('shows description for TAB_SWITCH violation', () => {
     render(<ExamViolationWarning {...defaultProps} />);
-    expect(screen.getByText('You navigated away from the exam tab.')).toBeInTheDocument();
+    expect(
+      screen.getByText('You navigated away from the exam tab.')
+    ).toBeInTheDocument();
   });
 
   it('shows description for CLIPBOARD_ATTEMPT', () => {
-    render(<ExamViolationWarning {...defaultProps} violationType="CLIPBOARD_ATTEMPT" />);
-    expect(screen.getByText('A clipboard operation was attempted.')).toBeInTheDocument();
+    render(
+      <ExamViolationWarning
+        {...defaultProps}
+        violationType="CLIPBOARD_ATTEMPT"
+      />
+    );
+    expect(
+      screen.getByText('A clipboard operation was attempted.')
+    ).toBeInTheDocument();
   });
 
   it('shows fallback description for unknown violation type', () => {
-    render(<ExamViolationWarning {...defaultProps} violationType="UNKNOWN_TYPE" />);
-    expect(screen.getByText('An integrity violation was detected.')).toBeInTheDocument();
+    render(
+      <ExamViolationWarning {...defaultProps} violationType="UNKNOWN_TYPE" />
+    );
+    expect(
+      screen.getByText('An integrity violation was detected.')
+    ).toBeInTheDocument();
   });
 
   it('shows violation count when not voided', () => {

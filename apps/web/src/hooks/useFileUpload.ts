@@ -78,7 +78,9 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
 
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
-export function useFileUpload(options: UseFileUploadOptions): UseFileUploadReturn {
+export function useFileUpload(
+  options: UseFileUploadOptions
+): UseFileUploadReturn {
   const { maxRetries = 3, onProgress, presign, confirm } = options;
 
   const [phase, setPhase] = useState<UploadPhase>('idle');
@@ -104,7 +106,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
       setProgress(pct);
       onProgress?.(pct);
     },
-    [onProgress],
+    [onProgress]
   );
 
   const executeUpload = useCallback(
@@ -131,7 +133,8 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
 
           const { uploadUrl, fileKey } = await presign(file);
           // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
-          if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} presign OK — fileKey=${fileKey}`);
+          if (import.meta.env.DEV)
+            console.debug(`${LOG_PREFIX} presign OK — fileKey=${fileKey}`);
 
           if (!mountedRef.current) return null;
 
@@ -142,16 +145,23 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
           const putResponse = await fetch(uploadUrl, {
             method: 'PUT',
             body: file,
-            headers: { 'Content-Type': file.type || 'application/octet-stream' },
+            headers: {
+              'Content-Type': file.type || 'application/octet-stream',
+            },
             signal: controller.signal,
           });
 
           if (!putResponse.ok) {
-            throw new Error(`PUT failed: ${putResponse.status} ${putResponse.statusText}`);
+            throw new Error(
+              `PUT failed: ${putResponse.status} ${putResponse.statusText}`
+            );
           }
 
           // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
-          if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} PUT OK — status=${putResponse.status}`);
+          if (import.meta.env.DEV)
+            console.debug(
+              `${LOG_PREFIX} PUT OK — status=${putResponse.status}`
+            );
           if (!mountedRef.current) return null;
 
           // ── Step 3: Confirm ────────────────────────────────────────
@@ -160,7 +170,8 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
 
           const result = await confirm(fileKey, file);
           // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
-          if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} confirm OK — id=${result.id}`);
+          if (import.meta.env.DEV)
+            console.debug(`${LOG_PREFIX} confirm OK — id=${result.id}`);
 
           if (!mountedRef.current) return null;
 
@@ -180,7 +191,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
 
           if (attempt > maxRetries) {
             console.error(
-              `${LOG_PREFIX} all ${maxRetries} retries exhausted — ${message}`,
+              `${LOG_PREFIX} all ${maxRetries} retries exhausted — ${message}`
             );
             if (mountedRef.current) {
               setPhase('error');
@@ -194,7 +205,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
           if (import.meta.env.DEV) {
             // eslint-disable-next-line no-console -- DEV-only retry trace
             console.debug(
-              `${LOG_PREFIX} attempt ${attempt}/${maxRetries} failed (${message}) — retrying in ${backoffMs}ms`,
+              `${LOG_PREFIX} attempt ${attempt}/${maxRetries} failed (${message}) — retrying in ${backoffMs}ms`
             );
           }
 
@@ -209,14 +220,15 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
 
       return null;
     },
-    [maxRetries, presign, confirm, reportProgress],
+    [maxRetries, presign, confirm, reportProgress]
   );
 
   const retry = useCallback(async (): Promise<ConfirmResult | null> => {
     const file = lastFileRef.current;
     if (!file) {
       // eslint-disable-next-line no-console -- DEV-only retry trace
-      if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} retry called with no previous file`);
+      if (import.meta.env.DEV)
+        console.debug(`${LOG_PREFIX} retry called with no previous file`);
       return null;
     }
     return executeUpload(file);
@@ -229,7 +241,16 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
     setProgress(0);
   }, []);
 
-  const uploading = phase === 'presigning' || phase === 'uploading' || phase === 'confirming';
+  const uploading =
+    phase === 'presigning' || phase === 'uploading' || phase === 'confirming';
 
-  return { upload: executeUpload, uploading, phase, error, progress, retry, reset };
+  return {
+    upload: executeUpload,
+    uploading,
+    phase,
+    error,
+    progress,
+    retry,
+    reset,
+  };
 }

@@ -125,13 +125,10 @@ for (const locale of LOCALES) {
     test.beforeEach(async ({ page }) => {
       // Inject the target locale into localStorage BEFORE any app scripts run.
       // Also collapse the sidebar so the layout fits narrow viewports.
-      await page.addInitScript(
-        (loc) => {
-          localStorage.setItem('edusphere_locale', loc);
-          localStorage.setItem('edusphere-sidebar-collapsed', 'true');
-        },
-        locale
-      );
+      await page.addInitScript((loc) => {
+        localStorage.setItem('edusphere_locale', loc);
+        localStorage.setItem('edusphere-sidebar-collapsed', 'true');
+      }, locale);
 
       // Dev-mode login — click the dev login button
       await page.goto(`${BASE_URL}/login`, {
@@ -150,12 +147,9 @@ for (const locale of LOCALES) {
       await page.waitForLoadState('domcontentloaded');
 
       // Re-set the locale after login (login may have overridden it)
-      await page.evaluate(
-        (loc) => {
-          localStorage.setItem('edusphere_locale', loc);
-        },
-        locale
-      );
+      await page.evaluate((loc) => {
+        localStorage.setItem('edusphere_locale', loc);
+      }, locale);
     });
 
     for (const { path, name } of PAGES) {
@@ -178,21 +172,16 @@ for (const locale of LOCALES) {
 
         // 3. RTL check for Hebrew (and any future RTL locales)
         if (RTL_LOCALES.has(locale)) {
-          const dir = await page.evaluate(
-            () => document.documentElement.dir
-          );
+          const dir = await page.evaluate(() => document.documentElement.dir);
           expect(dir).toBe('rtl');
         }
 
         // 4. Visual regression screenshot
-        await expect(page).toHaveScreenshot(
-          `i18n-${locale}-${name}.png`,
-          {
-            fullPage: false,
-            maxDiffPixels: 200,
-            animations: 'disabled',
-          }
-        );
+        await expect(page).toHaveScreenshot(`i18n-${locale}-${name}.png`, {
+          fullPage: false,
+          maxDiffPixels: 200,
+          animations: 'disabled',
+        });
       });
     }
   });

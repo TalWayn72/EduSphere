@@ -91,13 +91,14 @@ export class LessonPipelineResolver {
     const model = getModel();
 
     // Extract auth header for forwarding to knowledge subgraph
-    const authHeader =
-      (ctx as unknown as Record<string, unknown>)['authorization'] as string | undefined;
+    const authHeader = (ctx as unknown as Record<string, unknown>)[
+      'authorization'
+    ] as string | undefined;
     const searchFn = this.createSearchFn(authHeader);
 
     this.logger.log(
       { executionId, userId: ctx.authContext.userId },
-      '[LessonPipelineResolver] generateLesson started with real citations',
+      '[LessonPipelineResolver] generateLesson started with real citations'
     );
 
     return runLessonPipeline(input, model, executionId, searchFn);

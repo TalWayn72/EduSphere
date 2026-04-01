@@ -10,7 +10,9 @@ import { PageShell } from '@/components/PageShell';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import {
-  useGenerateExamItems, useCreateExamItem, useCourseModules,
+  useGenerateExamItems,
+  useCreateExamItem,
+  useCourseModules,
 } from '@/hooks/useExamApi';
 import { ExamItemReviewCard } from '@/components/exam/ExamItemReviewCard';
 import { GeneratorForm } from './GeneratorForm';
@@ -30,7 +32,9 @@ export function ExamItemGeneratorPage() {
   const role = useAuthRole();
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { modules } = useCourseModules(courseId ?? '');
   const { generate, loading, error } = useGenerateExamItems();
@@ -57,11 +61,16 @@ export function ExamItemGeneratorPage() {
       targetDifficulty: input.targetDifficulty,
     });
     if (result) {
-      setResults(result.items.map((item) => ({
-        domainTag: (item as unknown as Record<string, unknown>).domainTag as string,
-        bloomLevel: (item as unknown as Record<string, unknown>).bloomLevel as BloomLevel,
-        questionData: (item as unknown as Record<string, unknown>).questionData as QuizItem,
-      })));
+      setResults(
+        result.items.map((item) => ({
+          domainTag: (item as unknown as Record<string, unknown>)
+            .domainTag as string,
+          bloomLevel: (item as unknown as Record<string, unknown>)
+            .bloomLevel as BloomLevel,
+          questionData: (item as unknown as Record<string, unknown>)
+            .questionData as QuizItem,
+        }))
+      );
       toast.success(`Generated ${result.generatedCount} items`);
     }
   };
@@ -99,7 +108,9 @@ export function ExamItemGeneratorPage() {
           />
 
           {error && (
-            <p className="text-sm text-destructive" role="alert">{error}</p>
+            <p className="text-sm text-destructive" role="alert">
+              {error}
+            </p>
           )}
 
           {results.length > 0 && (
@@ -112,7 +123,9 @@ export function ExamItemGeneratorPage() {
                   key={`gen-${i}`}
                   item={item}
                   index={i}
-                  onApprove={(idx) => { void handleApprove(idx); }}
+                  onApprove={(idx) => {
+                    void handleApprove(idx);
+                  }}
                   onEdit={handleEdit}
                   onReject={handleReject}
                 />

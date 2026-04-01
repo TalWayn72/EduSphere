@@ -71,7 +71,9 @@ export function MarketplacePurchases() {
   const { t } = useTranslation('orgMarketplace');
   const [mounted, setMounted] = useState(false);
   const [refundingId, setRefundingId] = useState<string | null>(null);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }, reexecute] = useQuery<{
     purchases: PurchaseItem[];
@@ -100,7 +102,10 @@ export function MarketplacePurchases() {
   return (
     <AdminLayout
       title={t('marketplace.purchasesTitle', 'Purchase History')}
-      description={t('marketplace.purchasesDescription', 'View and manage your marketplace purchases.')}
+      description={t(
+        'marketplace.purchasesDescription',
+        'View and manage your marketplace purchases.'
+      )}
     >
       <div data-testid="marketplace-purchases-page" className="space-y-4">
         <Card>
@@ -149,8 +154,12 @@ export function MarketplacePurchases() {
                         className="border-b last:border-0"
                         data-testid={`purchase-row-${purchase.id}`}
                       >
-                        <td className="py-3 px-3">{purchase.courseTitle || purchase.listingId}</td>
-                        <td className="py-3 px-3">${purchase.price.toFixed(2)}</td>
+                        <td className="py-3 px-3">
+                          {purchase.courseTitle || purchase.listingId}
+                        </td>
+                        <td className="py-3 px-3">
+                          ${purchase.price.toFixed(2)}
+                        </td>
                         <td className="py-3 px-3">
                           <Badge variant={statusVariant(purchase.status)}>
                             {purchase.status}

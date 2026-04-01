@@ -19,20 +19,48 @@ import { routeGraphQL } from './graphql-mock.helpers';
 // ─── Routes to test ──────────────────────────────────────────────────────────
 
 const ORG_PAGES = [
-  { name: 'Signup Wizard', route: '/signup/organization', testId: 'org-signup-wizard' },
-  { name: 'Admin Dashboard', route: '/admin/dashboard', testId: 'admin-dashboard' },
-  { name: 'Branding Editor', route: '/admin/settings/branding', testId: 'branding-editor' },
-  { name: 'Marketplace', route: '/admin/marketplace', testId: 'marketplace-page' },
-  { name: 'Analytics', route: '/admin/analytics', testId: 'analytics-dashboard' },
-  { name: 'Gamification', route: '/admin/gamification', testId: 'gamification-config' },
+  {
+    name: 'Signup Wizard',
+    route: '/signup/organization',
+    testId: 'org-signup-wizard',
+  },
+  {
+    name: 'Admin Dashboard',
+    route: '/admin/dashboard',
+    testId: 'admin-dashboard',
+  },
+  {
+    name: 'Branding Editor',
+    route: '/admin/settings/branding',
+    testId: 'branding-editor',
+  },
+  {
+    name: 'Marketplace',
+    route: '/admin/marketplace',
+    testId: 'marketplace-page',
+  },
+  {
+    name: 'Analytics',
+    route: '/admin/analytics',
+    testId: 'analytics-dashboard',
+  },
+  {
+    name: 'Gamification',
+    route: '/admin/gamification',
+    testId: 'gamification-config',
+  },
   { name: 'API Keys', route: '/admin/api-keys', testId: 'api-keys-page' },
 ];
 
-async function mockAllOrgAPIs(page: import('@playwright/test').Page): Promise<void> {
+async function mockAllOrgAPIs(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
     if (op === 'Me' || op.toLowerCase().includes('me')) {
       return JSON.stringify({
-        data: { me: { id: 'user-001', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' } },
+        data: {
+          me: { id: 'user-001', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' },
+        },
       });
     }
     // Generic empty data for all other queries
@@ -50,7 +78,9 @@ test.describe('Org Pages — English (LTR)', () => {
 
       // Wait for page to render (with fallback timeout)
       try {
-        await page.locator(`[data-testid="${testId}"]`).waitFor({ timeout: 10_000 });
+        await page
+          .locator(`[data-testid="${testId}"]`)
+          .waitFor({ timeout: 10_000 });
       } catch {
         // Page may use different testid — check body content
       }
@@ -62,7 +92,9 @@ test.describe('Org Pages — English (LTR)', () => {
       const matches = body.match(untranslatedPattern);
       // Allow some tolerance — new keys may not be in locale files yet
       if (matches && matches.length > 5) {
-        throw new Error(`Found ${matches.length} untranslated orgOnboarding keys: ${matches.slice(0, 5).join(', ')}`);
+        throw new Error(
+          `Found ${matches.length} untranslated orgOnboarding keys: ${matches.slice(0, 5).join(', ')}`
+        );
       }
     });
   }
@@ -76,10 +108,14 @@ test.describe('Org Pages — Hebrew (RTL)', () => {
       await mockAllOrgAPIs(page);
 
       // Set Hebrew locale via URL param or cookie
-      await page.goto(`${BASE_URL}${route}?lng=he`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${route}?lng=he`, {
+        waitUntil: 'domcontentloaded',
+      });
 
       try {
-        await page.locator(`[data-testid="${testId}"]`).waitFor({ timeout: 10_000 });
+        await page
+          .locator(`[data-testid="${testId}"]`)
+          .waitFor({ timeout: 10_000 });
       } catch {
         // Fallback — page may render differently
       }
@@ -98,41 +134,61 @@ test.describe('Org Pages — Hebrew (RTL)', () => {
 
   test('signup wizard visual regression in Hebrew RTL', async ({ page }) => {
     await mockAllOrgAPIs(page);
-    await page.goto(`${BASE_URL}/signup/organization?lng=he`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/signup/organization?lng=he`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     try {
-      await page.locator('[data-testid="org-signup-wizard"]').waitFor({ timeout: 10_000 });
+      await page
+        .locator('[data-testid="org-signup-wizard"]')
+        .waitFor({ timeout: 10_000 });
     } catch {
       // May not have testid yet
     }
 
-    await expect(page).toHaveScreenshot('org-signup-wizard-hebrew-rtl.png', { maxDiffPixelRatio: 0.05 });
+    await expect(page).toHaveScreenshot('org-signup-wizard-hebrew-rtl.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 
-  test('analytics dashboard visual regression in Hebrew RTL', async ({ page }) => {
+  test('analytics dashboard visual regression in Hebrew RTL', async ({
+    page,
+  }) => {
     await mockAllOrgAPIs(page);
-    await page.goto(`${BASE_URL}/admin/analytics?lng=he`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/analytics?lng=he`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     try {
-      await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 10_000 });
+      await page
+        .locator('[data-testid="analytics-dashboard"]')
+        .waitFor({ timeout: 10_000 });
     } catch {
       // May not have testid yet
     }
 
-    await expect(page).toHaveScreenshot('org-analytics-hebrew-rtl.png', { maxDiffPixelRatio: 0.05 });
+    await expect(page).toHaveScreenshot('org-analytics-hebrew-rtl.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 
   test('API keys page visual regression in Hebrew RTL', async ({ page }) => {
     await mockAllOrgAPIs(page);
-    await page.goto(`${BASE_URL}/admin/api-keys?lng=he`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/api-keys?lng=he`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     try {
-      await page.locator('[data-testid="api-keys-page"]').waitFor({ timeout: 10_000 });
+      await page
+        .locator('[data-testid="api-keys-page"]')
+        .waitFor({ timeout: 10_000 });
     } catch {
       // May not have testid yet
     }
 
-    await expect(page).toHaveScreenshot('org-api-keys-hebrew-rtl.png', { maxDiffPixelRatio: 0.05 });
+    await expect(page).toHaveScreenshot('org-api-keys-hebrew-rtl.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });
 
@@ -156,7 +212,9 @@ test.describe('Branded Login — i18n', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/login?tenant=acme-university`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/login?tenant=acme-university`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // Branded elements should be visible
     const body = (await page.textContent('body')) ?? '';
@@ -180,8 +238,12 @@ test.describe('Branded Login — i18n', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/login?tenant=acme-university&lng=he`, { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveScreenshot('branded-login-hebrew.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}/login?tenant=acme-university&lng=he`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await expect(page).toHaveScreenshot('branded-login-hebrew.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });
 

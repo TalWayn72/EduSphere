@@ -78,7 +78,10 @@ describe('ClassicalAnalysisService', () => {
       ];
       const responseChain = makeSelectChain(responses);
       // computeUserTotalScores queries
-      const u1Chain = makeSelectChain([{ isCorrect: true }, { isCorrect: true }]);
+      const u1Chain = makeSelectChain([
+        { isCorrect: true },
+        { isCorrect: true },
+      ]);
       const u2Chain = makeSelectChain([{ isCorrect: false }]);
       const u3Chain = makeSelectChain([{ isCorrect: true }]);
       const u4Chain = makeSelectChain([{ isCorrect: false }]);
@@ -164,8 +167,20 @@ describe('ClassicalAnalysisService', () => {
       // Mock analyzeItem to return different stats
       const spy = vi.spyOn(service, 'analyzeItem' as never);
       (spy as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce({ itemId: 'i1', pValue: 0.10, dIndex: 0.1, rpbis: 0.1, totalResponses: 10 })
-        .mockResolvedValueOnce({ itemId: 'i2', pValue: 0.50, dIndex: 0.5, rpbis: 0.5, totalResponses: 10 });
+        .mockResolvedValueOnce({
+          itemId: 'i1',
+          pValue: 0.1,
+          dIndex: 0.1,
+          rpbis: 0.1,
+          totalResponses: 10,
+        })
+        .mockResolvedValueOnce({
+          itemId: 'i2',
+          pValue: 0.5,
+          dIndex: 0.5,
+          rpbis: 0.5,
+          totalResponses: 10,
+        });
 
       const result = await service.flagPoorItems('c1', 't1');
 
@@ -187,8 +202,14 @@ describe('ClassicalAnalysisService', () => {
         { userId: 'u1', isCorrect: true },
         { userId: 'u2', isCorrect: false },
       ];
-      const u1Chain = makeSelectChain([{ isCorrect: true }, { isCorrect: true }]);
-      const u2Chain = makeSelectChain([{ isCorrect: false }, { isCorrect: true }]);
+      const u1Chain = makeSelectChain([
+        { isCorrect: true },
+        { isCorrect: true },
+      ]);
+      const u2Chain = makeSelectChain([
+        { isCorrect: false },
+        { isCorrect: true },
+      ]);
 
       mockTx.select
         .mockReturnValueOnce({ from: u1Chain.from })

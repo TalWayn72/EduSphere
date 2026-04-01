@@ -38,7 +38,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-dashboard-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -48,7 +48,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-courses-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -58,17 +58,19 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-course-detail-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
     test('search results loading', async ({ page }) => {
       await holdGraphQL(page);
-      await page.goto('/search?q=mathematics', { waitUntil: 'domcontentloaded' });
+      await page.goto('/search?q=mathematics', {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-search-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
   });
@@ -80,7 +82,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-analytics-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -90,7 +92,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-analytics-detail-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -100,7 +102,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-exams-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -110,7 +112,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-exam-detail-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
   });
@@ -122,7 +124,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-social-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -132,7 +134,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-social-profile-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
   });
@@ -144,7 +146,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-admin-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -154,7 +156,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-admin-users-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
   });
@@ -166,7 +168,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-knowledge-graph-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -176,7 +178,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-content-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -186,7 +188,7 @@ test.describe('Visual Regression — Loading States (Part 1)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-content-import-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
   });

@@ -33,7 +33,7 @@ export function MentorDiscoveryPage() {
   });
 
   const [{ fetching: requesting }, requestMatch] = useMutation(
-    REQUEST_MENTOR_MATCH_MUTATION,
+    REQUEST_MENTOR_MATCH_MUTATION
   );
 
   const mentors: MentorMatch[] = data?.mentorsByPathTopology ?? [];
@@ -43,7 +43,7 @@ export function MentorDiscoveryPage() {
     if (result.error) {
       console.error(
         '[MentorDiscoveryPage] Failed to request mentor match:',
-        result.error.message,
+        result.error.message
       );
     }
   };
@@ -52,7 +52,9 @@ export function MentorDiscoveryPage() {
     <Layout>
       <div className="mx-auto max-w-2xl space-y-6 p-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('findMentor')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {t('findMentor')}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {t('findMentorDescription')}
           </p>
@@ -73,9 +75,7 @@ export function MentorDiscoveryPage() {
           </p>
         )}
         {!fetching && !error && courseId && mentors.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            {t('noMentorsFound')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('noMentorsFound')}</p>
         )}
 
         <div className="space-y-4" role="list" aria-label="Mentor candidates">
@@ -83,17 +83,28 @@ export function MentorDiscoveryPage() {
             <Card key={mentor.mentorId} role="listitem">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
-                  <span>{t('mentorLabel', { id: mentor.mentorId.slice(0, 8) })}</span>
+                  <span>
+                    {t('mentorLabel', { id: mentor.mentorId.slice(0, 8) })}
+                  </span>
                   <Badge variant="secondary">
-                    {t('pathOverlap', { percent: Math.round(mentor.pathOverlapScore * 100) })}
+                    {t('pathOverlap', {
+                      percent: Math.round(mentor.pathOverlapScore * 100),
+                    })}
                   </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {mentor.sharedConcepts.length > 0 && (
-                  <div className="mb-3 flex flex-wrap gap-1" aria-label="Shared concepts">
+                  <div
+                    className="mb-3 flex flex-wrap gap-1"
+                    aria-label="Shared concepts"
+                  >
                     {mentor.sharedConcepts.slice(0, 5).map((concept) => (
-                      <Badge key={concept} variant="outline" className="text-xs">
+                      <Badge
+                        key={concept}
+                        variant="outline"
+                        className="text-xs"
+                      >
                         {concept}
                       </Badge>
                     ))}

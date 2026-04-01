@@ -3,7 +3,12 @@
  * Raw tokens are NEVER stored; only SHA-256 hash is persisted.
  * Memory safety: OnModuleDestroy calls closeAllPools().
  */
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
   createDatabaseConnection,
@@ -79,7 +84,8 @@ export class ScimTokenService implements OnModuleDestroy {
     );
 
     const row = rows[0];
-    if (!row) throw new InternalServerErrorException('Failed to create SCIM token');
+    if (!row)
+      throw new InternalServerErrorException('Failed to create SCIM token');
     this.logger.log({ tenantId, description }, 'SCIM token generated');
     return {
       rawToken,

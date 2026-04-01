@@ -18,7 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { InviteUserModal, BulkImportModal } from '../UserManagementPage.modals';
 import { UserTableRow } from './UserTableRow';
@@ -44,8 +51,13 @@ export function UserManagementPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [editingRole, setEditingRole] = useState<Record<string, string>>({});
-  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(null);
-  const [confirmRoleChange, setConfirmRoleChange] = useState<{ userId: string; newRole: string } | null>(null);
+  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(
+    null
+  );
+  const [confirmRoleChange, setConfirmRoleChange] = useState<{
+    userId: string;
+    newRole: string;
+  } | null>(null);
 
   const [, deactivateUser] = useMutation(DEACTIVATE_USER);
   const [, resetPassword] = useMutation(RESET_PASSWORD);
@@ -56,7 +68,9 @@ export function UserManagementPage() {
   }, [role, navigate]);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }, refetch] = useQuery({
     query: ADMIN_USERS,
@@ -64,7 +78,9 @@ export function UserManagementPage() {
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE,
       search: appliedSearch || undefined,
-      role: (appliedRole === 'all' ? undefined : appliedRole) as UserRole | undefined,
+      role: (appliedRole === 'all' ? undefined : appliedRole) as
+        | UserRole
+        | undefined,
     },
     pause: !mounted,
   });
@@ -75,19 +91,30 @@ export function UserManagementPage() {
   const total: number = (data?.adminUsers?.total ?? 0) as number;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const handleApply = () => { setAppliedSearch(search); setAppliedRole(roleFilter); setPage(0); };
+  const handleApply = () => {
+    setAppliedSearch(search);
+    setAppliedRole(roleFilter);
+    setPage(0);
+  };
 
   const handleDeactivate = async (id: string) => {
     const result = await deactivateUser({ id });
     setConfirmDeactivate(null);
-    if (result.error) { toast.error('Failed to deactivate user'); }
-    else { toast.success('User deactivated'); refetch({ requestPolicy: 'network-only' }); }
+    if (result.error) {
+      toast.error('Failed to deactivate user');
+    } else {
+      toast.success('User deactivated');
+      refetch({ requestPolicy: 'network-only' });
+    }
   };
 
   const handleResetPassword = async (userId: string) => {
     const result = await resetPassword({ userId });
-    if (result.error) { toast.error('Failed to send password reset'); }
-    else { toast.success('Password reset email sent'); }
+    if (result.error) {
+      toast.error('Failed to send password reset');
+    } else {
+      toast.success('Password reset email sent');
+    }
   };
 
   const handleConfirmRoleChange = async () => {
@@ -97,9 +124,16 @@ export function UserManagementPage() {
     const result = await updateUser({ id: userId, input: { role: newRole } });
     setConfirmRoleChange(null);
     if (result.error) {
-      setEditingRole((prev) => { const next = { ...prev }; delete next[userId]; return next; });
+      setEditingRole((prev) => {
+        const next = { ...prev };
+        delete next[userId];
+        return next;
+      });
       toast.error('Failed to update role');
-    } else { toast.success('Role updated successfully'); refetch({ requestPolicy: 'network-only' }); }
+    } else {
+      toast.success('Role updated successfully');
+      refetch({ requestPolicy: 'network-only' });
+    }
   };
 
   const tenantId = getCurrentUser()?.tenantId ?? '';
@@ -107,14 +141,30 @@ export function UserManagementPage() {
   return (
     <AdminLayout>
       <PageShell size="xl">
-        <PageHeader title="User Management" description="Manage users, roles, and access" breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'User Management' }]} />
+        <PageHeader
+          title="User Management"
+          description="Manage users, roles, and access"
+          breadcrumbs={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'User Management' },
+          ]}
+        />
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2 items-end">
             <div className="flex-1 min-w-48">
-              <Input placeholder="Search by name or email..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleApply(); }} />
+              <Input
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleApply();
+                }}
+              />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-40"><SelectValue placeholder="All Roles" /></SelectTrigger>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
                 <SelectItem value="STUDENT">Student</SelectItem>
@@ -126,7 +176,9 @@ export function UserManagementPage() {
             </Select>
             <Button onClick={handleApply}>Apply</Button>
             <div className="ml-auto flex gap-2">
-              <Button variant="outline" onClick={() => setShowBulk(true)}>Bulk Import</Button>
+              <Button variant="outline" onClick={() => setShowBulk(true)}>
+                Bulk Import
+              </Button>
               <Button onClick={() => setShowInvite(true)}>+ Invite User</Button>
             </div>
           </div>
@@ -143,10 +195,24 @@ export function UserManagementPage() {
               </TableHeader>
               <TableBody>
                 {fetching && (
-                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center py-8 text-muted-foreground"
+                    >
+                      Loading...
+                    </TableCell>
+                  </TableRow>
                 )}
                 {!fetching && users.length === 0 && (
-                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No users found</TableCell></TableRow>
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center py-8 text-muted-foreground"
+                    >
+                      No users found
+                    </TableCell>
+                  </TableRow>
                 )}
                 {users.map((u) => (
                   <UserTableRow
@@ -155,12 +221,18 @@ export function UserManagementPage() {
                     editingRole={editingRole}
                     confirmDeactivate={confirmDeactivate}
                     confirmRoleChange={confirmRoleChange}
-                    onRoleChange={(userId, newRole) => setConfirmRoleChange({ userId, newRole })}
+                    onRoleChange={(userId, newRole) =>
+                      setConfirmRoleChange({ userId, newRole })
+                    }
                     onConfirmRoleChange={() => void handleConfirmRoleChange()}
                     onCancelRoleChange={() => setConfirmRoleChange(null)}
-                    onResetPassword={(userId) => void handleResetPassword(userId)}
+                    onResetPassword={(userId) =>
+                      void handleResetPassword(userId)
+                    }
                     onDeactivate={(userId) => void handleDeactivate(userId)}
-                    onConfirmDeactivate={(userId) => setConfirmDeactivate(userId)}
+                    onConfirmDeactivate={(userId) =>
+                      setConfirmDeactivate(userId)
+                    }
                   />
                 ))}
               </TableBody>
@@ -169,14 +241,43 @@ export function UserManagementPage() {
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>Total: {total} users</span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((prev) => prev - 1)}>Previous</Button>
-              <span className="flex items-center px-2">{page + 1} / {Math.max(1, totalPages)}</span>
-              <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((prev) => prev + 1)}>Next</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 0}
+                onClick={() => setPage((prev) => prev - 1)}
+              >
+                Previous
+              </Button>
+              <span className="flex items-center px-2">
+                {page + 1} / {Math.max(1, totalPages)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((prev) => prev + 1)}
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
-        <InviteUserModal open={showInvite} onClose={() => setShowInvite(false)} tenantId={tenantId} onSuccess={() => { refetch({ requestPolicy: 'network-only' }); }} />
-        <BulkImportModal open={showBulk} onClose={() => setShowBulk(false)} onSuccess={() => { refetch({ requestPolicy: 'network-only' }); }} />
+        <InviteUserModal
+          open={showInvite}
+          onClose={() => setShowInvite(false)}
+          tenantId={tenantId}
+          onSuccess={() => {
+            refetch({ requestPolicy: 'network-only' });
+          }}
+        />
+        <BulkImportModal
+          open={showBulk}
+          onClose={() => setShowBulk(false)}
+          onSuccess={() => {
+            refetch({ requestPolicy: 'network-only' });
+          }}
+        />
       </PageShell>
     </AdminLayout>
   );

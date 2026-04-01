@@ -62,10 +62,7 @@ export default function VisualBottomSheet({
             </Text>
           </>
         ) : (
-          <Text
-            style={styles.noImage}
-            testID="visual-bottom-sheet-no-image"
-          >
+          <Text style={styles.noImage} testID="visual-bottom-sheet-no-image">
             No image assigned to this section
           </Text>
         )}

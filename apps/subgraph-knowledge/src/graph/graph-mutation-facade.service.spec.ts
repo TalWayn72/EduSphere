@@ -75,11 +75,21 @@ describe('GraphMutationFacadeService', () => {
     const created = { id: 'c1', name: 'React' };
     mockCreateConcept.mockResolvedValue(created);
     const result = await facade.createConcept(
-      'React', 'UI lib', ['s1'], T, U, R
+      'React',
+      'UI lib',
+      ['s1'],
+      T,
+      U,
+      R
     );
     expect(result).toBe(created);
     expect(mockCreateConcept).toHaveBeenCalledWith(
-      'React', 'UI lib', ['s1'], T, U, R
+      'React',
+      'UI lib',
+      ['s1'],
+      T,
+      U,
+      R
     );
   });
 
@@ -93,7 +103,11 @@ describe('GraphMutationFacadeService', () => {
     mockUpdateConcept.mockResolvedValue({ id: 'c1', name: 'React 19' });
     await facade.updateConcept('c1', { name: 'React 19' }, T, U, R);
     expect(mockUpdateConcept).toHaveBeenCalledWith(
-      'c1', { name: 'React 19' }, T, U, R
+      'c1',
+      { name: 'React 19' },
+      T,
+      U,
+      R
     );
   });
 
@@ -108,10 +122,24 @@ describe('GraphMutationFacadeService', () => {
   it('linkConcepts delegates with relationship type', async () => {
     mockLinkConcepts.mockResolvedValue({ id: 'link-1' });
     await facade.linkConcepts(
-      'c1', 'c2', 'PREREQUISITE' as never, 0.8, 'requires', T, U, R
+      'c1',
+      'c2',
+      'PREREQUISITE' as never,
+      0.8,
+      'requires',
+      T,
+      U,
+      R
     );
     expect(mockLinkConcepts).toHaveBeenCalledWith(
-      'c1', 'c2', 'PREREQUISITE', 0.8, 'requires', T, U, R
+      'c1',
+      'c2',
+      'PREREQUISITE',
+      0.8,
+      'requires',
+      T,
+      U,
+      R
     );
   });
 
@@ -119,11 +147,21 @@ describe('GraphMutationFacadeService', () => {
   it('generateEmbedding delegates correctly', async () => {
     mockGenerateEmbedding.mockResolvedValue(true);
     const result = await facade.generateEmbedding(
-      'some text', 'concept', 'c1', T, U, R
+      'some text',
+      'concept',
+      'c1',
+      T,
+      U,
+      R
     );
     expect(result).toBe(true);
     expect(mockGenerateEmbedding).toHaveBeenCalledWith(
-      'some text', 'concept', 'c1', T, U, R
+      'some text',
+      'concept',
+      'c1',
+      T,
+      U,
+      R
     );
   });
 
@@ -132,7 +170,11 @@ describe('GraphMutationFacadeService', () => {
     mockCreatePerson.mockResolvedValue({ id: 'p1', name: 'Turing' });
     await facade.createPerson('Turing', 'Mathematician', T, U, R);
     expect(mockCreatePerson).toHaveBeenCalledWith(
-      'Turing', 'Mathematician', T, U, R
+      'Turing',
+      'Mathematician',
+      T,
+      U,
+      R
     );
   });
 
@@ -140,7 +182,11 @@ describe('GraphMutationFacadeService', () => {
     mockCreateTerm.mockResolvedValue({ id: 't1' });
     await facade.createTerm('Ontology', 'Study of being', T, U, R);
     expect(mockCreateTerm).toHaveBeenCalledWith(
-      'Ontology', 'Study of being', T, U, R
+      'Ontology',
+      'Study of being',
+      T,
+      U,
+      R
     );
   });
 
@@ -148,7 +194,12 @@ describe('GraphMutationFacadeService', () => {
     mockCreateSource.mockResolvedValue({ id: 's1' });
     await facade.createSource('Doc', 'FILE_PDF', null, T, U, R);
     expect(mockCreateSource).toHaveBeenCalledWith(
-      'Doc', 'FILE_PDF', null, T, U, R
+      'Doc',
+      'FILE_PDF',
+      null,
+      T,
+      U,
+      R
     );
   });
 
@@ -156,15 +207,19 @@ describe('GraphMutationFacadeService', () => {
     mockCreateTopicCluster.mockResolvedValue({ id: 'tc1' });
     await facade.createTopicCluster('ML Basics', 'Intro', T, U, R);
     expect(mockCreateTopicCluster).toHaveBeenCalledWith(
-      'ML Basics', 'Intro', T, U, R
+      'ML Basics',
+      'Intro',
+      T,
+      U,
+      R
     );
   });
 
   // ── Error propagation ─────────────────────────────────────────────────
   it('propagates errors from sub-services', async () => {
     mockCreateConcept.mockRejectedValue(new Error('DB error'));
-    await expect(
-      facade.createConcept('X', 'Y', [], T, U, R)
-    ).rejects.toThrow('DB error');
+    await expect(facade.createConcept('X', 'Y', [], T, U, R)).rejects.toThrow(
+      'DB error'
+    );
   });
 });

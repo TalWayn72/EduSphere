@@ -90,7 +90,10 @@ describe('AdminAlertsService', () => {
   describe('onModuleDestroy', () => {
     it('unsubscribes all subs, drains connection, and closes DB pools', async () => {
       // Setup: simulate a connected state
-      const sub = { unsubscribe: mockUnsubscribe, [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }) };
+      const sub = {
+        unsubscribe: mockUnsubscribe,
+        [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+      };
       const mockConnection = {
         subscribe: vi.fn().mockReturnValue(sub),
         drain: mockDrain.mockResolvedValue(undefined),
@@ -130,9 +133,16 @@ describe('AdminAlertsService', () => {
       // Access the private method indirectly — we test via the service
       // Since processMessages is private and async iterator-based,
       // we verify the context setup pattern
-      const notifyAdmins = (service as unknown as {
-        notifyAdmins: (t: string, a: string, ti: string, b: string) => Promise<void>;
-      }).notifyAdmins.bind(service);
+      const notifyAdmins = (
+        service as unknown as {
+          notifyAdmins: (
+            t: string,
+            a: string,
+            ti: string,
+            b: string
+          ) => Promise<void>;
+        }
+      ).notifyAdmins.bind(service);
 
       await notifyAdmins('t-1', 'security', 'Alert', 'Body');
 
@@ -145,14 +155,31 @@ describe('AdminAlertsService', () => {
 
     it('sends WhatsApp template to each verified contact', async () => {
       const contacts = [
-        { phoneCountryCode: '+1', phoneNumber: '5551234', verified: true, whatsappConsent: true },
-        { phoneCountryCode: '+44', phoneNumber: '7890000', verified: true, whatsappConsent: true },
+        {
+          phoneCountryCode: '+1',
+          phoneNumber: '5551234',
+          verified: true,
+          whatsappConsent: true,
+        },
+        {
+          phoneCountryCode: '+44',
+          phoneNumber: '7890000',
+          verified: true,
+          whatsappConsent: true,
+        },
       ];
       mockWithTenantContext.mockResolvedValue(contacts);
 
-      const notifyAdmins = (service as unknown as {
-        notifyAdmins: (t: string, a: string, ti: string, b: string) => Promise<void>;
-      }).notifyAdmins.bind(service);
+      const notifyAdmins = (
+        service as unknown as {
+          notifyAdmins: (
+            t: string,
+            a: string,
+            ti: string,
+            b: string
+          ) => Promise<void>;
+        }
+      ).notifyAdmins.bind(service);
 
       await notifyAdmins('t-2', 'billing', 'Overdue', 'Payment needed');
 
@@ -161,33 +188,58 @@ describe('AdminAlertsService', () => {
 
       expect(mockSendTemplate).toHaveBeenCalledTimes(2);
       expect(mockSendTemplate).toHaveBeenCalledWith(
-        '+15551234', 'admin_alert', ['billing', 'Overdue', 'Payment needed']
+        '+15551234',
+        'admin_alert',
+        ['billing', 'Overdue', 'Payment needed']
       );
       expect(mockSendTemplate).toHaveBeenCalledWith(
-        '+447890000', 'admin_alert', ['billing', 'Overdue', 'Payment needed']
+        '+447890000',
+        'admin_alert',
+        ['billing', 'Overdue', 'Payment needed']
       );
     });
 
     it('handles WhatsApp send failure without throwing', async () => {
       mockWithTenantContext.mockResolvedValue([
-        { phoneCountryCode: '+1', phoneNumber: '0000000', verified: true, whatsappConsent: true },
+        {
+          phoneCountryCode: '+1',
+          phoneNumber: '0000000',
+          verified: true,
+          whatsappConsent: true,
+        },
       ]);
       mockSendTemplate.mockRejectedValue(new Error('WhatsApp API error'));
 
-      const notifyAdmins = (service as unknown as {
-        notifyAdmins: (t: string, a: string, ti: string, b: string) => Promise<void>;
-      }).notifyAdmins.bind(service);
+      const notifyAdmins = (
+        service as unknown as {
+          notifyAdmins: (
+            t: string,
+            a: string,
+            ti: string,
+            b: string
+          ) => Promise<void>;
+        }
+      ).notifyAdmins.bind(service);
 
       // Should not throw
-      await expect(notifyAdmins('t-3', 'error', 'Err', 'Details')).resolves.toBeUndefined();
+      await expect(
+        notifyAdmins('t-3', 'error', 'Err', 'Details')
+      ).resolves.toBeUndefined();
     });
 
     it('does nothing when no contacts found', async () => {
       mockWithTenantContext.mockResolvedValue([]);
 
-      const notifyAdmins = (service as unknown as {
-        notifyAdmins: (t: string, a: string, ti: string, b: string) => Promise<void>;
-      }).notifyAdmins.bind(service);
+      const notifyAdmins = (
+        service as unknown as {
+          notifyAdmins: (
+            t: string,
+            a: string,
+            ti: string,
+            b: string
+          ) => Promise<void>;
+        }
+      ).notifyAdmins.bind(service);
 
       await notifyAdmins('t-4', 'alert', 'Test', 'Body');
       expect(mockSendTemplate).not.toHaveBeenCalled();

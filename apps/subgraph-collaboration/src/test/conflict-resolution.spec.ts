@@ -43,9 +43,19 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((col, val) => ({ col, val, op: 'eq' })),
   and: vi.fn((...conditions: unknown[]) => ({ conditions, op: 'and' })),
   desc: vi.fn((col: string) => ({ col, order: 'desc' })),
-  inArray: vi.fn((col: string, vals: string[]) => ({ col, vals, op: 'inArray' })),
+  inArray: vi.fn((col: string, vals: string[]) => ({
+    col,
+    vals,
+    op: 'inArray',
+  })),
   sql: vi.fn(() => ({ raw: true })),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, callback: (tx: typeof mockTx) => unknown) => callback(mockTx)),
+  withTenantContext: vi.fn(
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      callback: (tx: typeof mockTx) => unknown
+    ) => callback(mockTx)
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -85,7 +95,9 @@ const MOCK_DISCUSSION = {
 
 function setupSelectChain(result: unknown[]) {
   const limitFn = vi.fn(() => {
-    const p = Promise.resolve(result) as Promise<unknown[]> & { offset: ReturnType<typeof vi.fn> };
+    const p = Promise.resolve(result) as Promise<unknown[]> & {
+      offset: ReturnType<typeof vi.fn>;
+    };
     p.offset = vi.fn(() => Promise.resolve(result));
     return p;
   });
@@ -174,7 +186,10 @@ describe('Conflict Resolution — concurrent message edits', () => {
 
     const result = await service.addMessage(
       'disc-1',
-      { content: '<script>alert("xss")</script>', messageType: 'TEXT' as const },
+      {
+        content: '<script>alert("xss")</script>',
+        messageType: 'TEXT' as const,
+      },
       USER_A
     );
     // The service strips HTML tags
@@ -224,13 +239,15 @@ describe('Conflict Resolution — concurrent message edits', () => {
       };
     });
     mockSelect.mockReturnValue({ from: mockFrom });
-    setupInsertChain([{
-      ...parentMsg,
-      id: 'reply-a',
-      user_id: 'user-a',
-      content: 'Reply from A',
-      parent_message_id: 'parent-1',
-    }]);
+    setupInsertChain([
+      {
+        ...parentMsg,
+        id: 'reply-a',
+        user_id: 'user-a',
+        content: 'Reply from A',
+        parent_message_id: 'parent-1',
+      },
+    ]);
 
     const replyA = await service.addMessage(
       'disc-1',
@@ -260,13 +277,15 @@ describe('Conflict Resolution — concurrent message edits', () => {
       };
     });
     mockSelect.mockReturnValue({ from: mockFrom });
-    setupInsertChain([{
-      ...parentMsg,
-      id: 'reply-b',
-      user_id: 'user-b',
-      content: 'Reply from B',
-      parent_message_id: 'parent-1',
-    }]);
+    setupInsertChain([
+      {
+        ...parentMsg,
+        id: 'reply-b',
+        user_id: 'user-b',
+        content: 'Reply from B',
+        parent_message_id: 'parent-1',
+      },
+    ]);
 
     const replyB = await service.addMessage(
       'disc-1',

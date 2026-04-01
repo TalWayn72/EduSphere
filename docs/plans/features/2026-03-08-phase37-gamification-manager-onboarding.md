@@ -13,6 +13,7 @@
 ## Context
 
 Phase 36 is complete at commit `09b8690`. Post-session audit surfaced 10 remaining items:
+
 - **Gamification**: XP foundation shipped (Phase 36), but streaks/challenges/team leaderboard + GamificationPage web + GamificationScreen mobile are missing
 - **Manager Dashboard**: New role (MANAGER) + team analytics feature, 0% done
 - **Onboarding flow**: Critical UX gap — new users land on Dashboard with no guidance, 0% done
@@ -27,18 +28,18 @@ Phase 36 is complete at commit `09b8690`. Post-session audit surfaced 10 remaini
 
 ## Open Items Inventory
 
-| # | Severity | Item | Phase |
-|---|----------|------|-------|
-| P37-1 | 🔴 | Gamification: streaks + challenges + leaderboard + GamificationPage + GamificationScreen | 37.1 |
-| P37-2 | 🔴 | Manager Dashboard: team_members DB + ManagerDashboardService + ManagerDashboardPage | 37.2 |
-| P37-3 | 🔴 | Onboarding flow: student 5-step + instructor 4-step + mobile 3-step + DashboardPage banner | 37.3 |
-| P37-4 | 🟡 | Marketplace SDL gap: add courseListings to supergraph + unpause MarketplacePage query | 37.A |
-| P37-5 | 🟡 | Redis rate limiting: replace in-memory Map in gateway with ioredis sliding window | 37.A |
-| P37-6 | 🟡 | OWASP ZAP DAST: `.github/workflows/dast.yml` CI workflow | 37.A |
-| P37-7 | 🟡 | Visual regression baselines: run `--update-snapshots` for 35 failing specs | 37.A |
-| P37-8 | ⚪ | API_CONTRACTS_GRAPHQL_FEDERATION.md: add Section 24 (Phase 36 types) | 37.A |
-| P37-9 | ⚪ | README.md: update stale test counts | 37.A |
-| P37-10 | ⚪ | OPEN_ISSUES.md: Phase 37 entry + Phase 36 final status | 37.C |
+| #      | Severity | Item                                                                                       | Phase |
+| ------ | -------- | ------------------------------------------------------------------------------------------ | ----- |
+| P37-1  | 🔴       | Gamification: streaks + challenges + leaderboard + GamificationPage + GamificationScreen   | 37.1  |
+| P37-2  | 🔴       | Manager Dashboard: team_members DB + ManagerDashboardService + ManagerDashboardPage        | 37.2  |
+| P37-3  | 🔴       | Onboarding flow: student 5-step + instructor 4-step + mobile 3-step + DashboardPage banner | 37.3  |
+| P37-4  | 🟡       | Marketplace SDL gap: add courseListings to supergraph + unpause MarketplacePage query      | 37.A  |
+| P37-5  | 🟡       | Redis rate limiting: replace in-memory Map in gateway with ioredis sliding window          | 37.A  |
+| P37-6  | 🟡       | OWASP ZAP DAST: `.github/workflows/dast.yml` CI workflow                                   | 37.A  |
+| P37-7  | 🟡       | Visual regression baselines: run `--update-snapshots` for 35 failing specs                 | 37.A  |
+| P37-8  | ⚪       | API_CONTRACTS_GRAPHQL_FEDERATION.md: add Section 24 (Phase 36 types)                       | 37.A  |
+| P37-9  | ⚪       | README.md: update stale test counts                                                        | 37.A  |
+| P37-10 | ⚪       | OPEN_ISSUES.md: Phase 37 entry + Phase 36 final status                                     | 37.C  |
 
 ---
 
@@ -69,28 +70,34 @@ Sprint C — Sequential QA gate
 
 **Modify:** `API_CONTRACTS_GRAPHQL_FEDERATION.md`
 Add Section 24 at end of file:
+
 ```markdown
 ## Section 24 — Phase 36: AtRisk, Lesson Pipeline, XP (March 2026)
 
 ### New Query: listAtRiskLearners
+
 Returns learners with progress < threshold AND last_activity_at < 14 days ago.
 Auth: @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
 ### New Query: lessonPipeline / myCoursePipelines
+
 Returns CourseLessonPlan with ordered CourseLessonStep[]. Auth: @authenticated
 
 ### New Types
+
 - AtRiskLearner: userId, displayName, courseId, courseTitle, daysSinceActive, progressPct
 - CourseLessonPlan: id, courseId, title, status (DRAFT|PUBLISHED|ARCHIVED), steps
 - CourseLessonStep: id, stepType (VIDEO|QUIZ|DISCUSSION|AI_CHAT|SUMMARY), stepOrder, config
 
 ### UserStats extensions (Phase 36)
+
 UserStats now includes: totalXp: Int!, level: Int!
 XP table: LESSON_COMPLETED=10, QUIZ_PASSED=25, STREAK_BONUS=5, COURSE_COMPLETED=100
 Level formula: max(1, floor(sqrt(totalXp/100))+1)
 ```
 
 **Modify:** `README.md`
+
 - Update test count section — replace stale numbers with current accurate counts
 - Current: ~664 core, ~544 knowledge, ~428 db, ~218 mobile, ~304 i18n, ~928 security, ~88 contract = ~3174+ total
 - Update Phase status table: Phase 36 ✅ Complete, Phase 37 🟡 In Progress
@@ -100,11 +107,12 @@ Level formula: max(1, floor(sqrt(totalXp/100))+1)
 ### Agent-2: DevOps — OWASP ZAP + Visual Baselines
 
 **New file:** `.github/workflows/dast.yml`
+
 ```yaml
 name: DAST — OWASP ZAP Baseline Scan
 on:
   schedule:
-    - cron: '0 2 * * 0'   # Weekly Sunday 02:00 UTC
+    - cron: '0 2 * * 0' # Weekly Sunday 02:00 UTC
   workflow_dispatch:
   push:
     branches: [main]
@@ -172,6 +180,7 @@ jobs:
 ```
 
 **New file:** `.zap/rules.tsv`
+
 ```tsv
 10021	IGNORE	(X-Content-Type-Options Header Missing) — set at gateway level
 10038	IGNORE	(Content Security Policy) — managed by nginx in production
@@ -191,6 +200,7 @@ This updates the 35 stale baseline PNGs. Commit updated baselines.
 **Modify:** `apps/gateway/package.json` — add `"ioredis": "^5.4.0"`
 
 **Modify:** `apps/gateway/src/middleware/rate-limit.middleware.ts`
+
 ```typescript
 import Redis from 'ioredis';
 import { Injectable, NestMiddleware, OnModuleDestroy } from '@nestjs/common';
@@ -204,14 +214,23 @@ export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
   private readonly logger = new Logger(RateLimitMiddleware.name);
   private redis: Redis | null = null;
   // Fallback in-memory store (single-process graceful degradation)
-  private readonly fallback = new Map<string, { count: number; reset: number }>();
+  private readonly fallback = new Map<
+    string,
+    { count: number; reset: number }
+  >();
 
   constructor() {
     const redisUrl = process.env.REDIS_RATE_LIMIT_URL || process.env.REDIS_URL;
     if (redisUrl) {
-      this.redis = new Redis(redisUrl, { lazyConnect: true, enableOfflineQueue: false });
+      this.redis = new Redis(redisUrl, {
+        lazyConnect: true,
+        enableOfflineQueue: false,
+      });
       this.redis.on('error', (err) => {
-        this.logger.warn({ err: String(err) }, '[RateLimitMiddleware] Redis error — falling back to in-memory');
+        this.logger.warn(
+          { err: String(err) },
+          '[RateLimitMiddleware] Redis error — falling back to in-memory'
+        );
         this.redis = null;
       });
     }
@@ -227,7 +246,9 @@ export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
       : this.checkFallback(key);
 
     if (!allowed) {
-      (res as any).status(429).json({ error: 'Too Many Requests', retryAfter: WINDOW_MS / 1000 });
+      (res as any)
+        .status(429)
+        .json({ error: 'Too Many Requests', retryAfter: WINDOW_MS / 1000 });
       return;
     }
     next();
@@ -265,6 +286,7 @@ export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
 ```
 
 **Modify:** `apps/gateway/.env.example` — add:
+
 ```
 # Rate Limiting (optional — falls back to in-memory if not set)
 REDIS_RATE_LIMIT_URL=redis://localhost:6379
@@ -273,11 +295,13 @@ REDIS_RATE_LIMIT_URL=redis://localhost:6379
 **P37-4: Marketplace SDL fix**
 
 **Modify:** `apps/gateway/supergraph.graphql` — add to Query type:
+
 ```graphql
 courseListings(tenantId: ID!, limit: Int, offset: Int, filters: CourseListingFiltersInput): CourseListingConnection! @join__field(graph: CONTENT) @authenticated
 ```
 
 Add new types:
+
 ```graphql
 type CourseListingConnection @join__type(graph: CONTENT) {
   edges: [CourseListingEdge!]!
@@ -310,12 +334,19 @@ input CourseListingFiltersInput {
 ```
 
 **Modify:** `apps/web/src/pages/MarketplacePage.tsx`
+
 - Remove `pause: true` hack from `useQuery` call
 - Add proper `mounted` guard pattern (consistent with Iron Rule):
   ```typescript
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  useQuery({ query: COURSE_LISTINGS_QUERY, pause: !mounted, variables: { tenantId, limit: 20, filters } });
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  useQuery({
+    query: COURSE_LISTINGS_QUERY,
+    pause: !mounted,
+    variables: { tenantId, limit: 20, filters },
+  });
   ```
 
 ---
@@ -325,6 +356,7 @@ input CourseListingFiltersInput {
 #### Database
 
 **New file:** `packages/db/src/schema/streaks-challenges.ts`
+
 ```typescript
 // user_streaks: id, user_id, tenant_id, current_streak int, longest_streak int, last_activity_date date, updated_at
 // challenges: id, tenant_id, title, description, target_type enum('LESSON_COUNT','XP_EARNED','QUIZ_COUNT','DISCUSSION_COUNT'), target_value int, xp_reward int, start_date date, end_date date, is_active bool, created_at
@@ -332,6 +364,7 @@ input CourseListingFiltersInput {
 ```
 
 **New file:** `packages/db/src/migrations/0022_user_streaks_challenges.sql`
+
 - RLS: `user_id::text = current_setting('app.current_user_id', TRUE) OR tenant_id::text = current_setting('app.current_tenant', TRUE)`
 - Index: `(user_id, tenant_id)` on `user_streaks`
 - Index: `(tenant_id, is_active)` on `challenges`
@@ -340,6 +373,7 @@ input CourseListingFiltersInput {
 #### Backend
 
 **New file:** `apps/subgraph-core/src/gamification/streak.service.ts`
+
 - `updateStreak(userId, tenantId)` — called on NATS EDUSPHERE.lesson.completed/quiz.passed events
 - Logic: if `last_activity_date = yesterday` → increment streak; if `today` → no-op; else reset to 1
 - If streak milestone (7, 30, 100 days) → `XpService.awardXP(userId, tenantId, STREAK_BONUS, 5)`
@@ -347,12 +381,14 @@ input CourseListingFiltersInput {
 - `OnModuleDestroy` + `closeAllPools()`
 
 **New file:** `apps/subgraph-core/src/gamification/challenges.service.ts`
+
 - `getActiveChallenges(tenantId)` — all challenges where is_active=true and end_date >= today
 - `incrementProgress(userId, tenantId, eventType, amount)` — upserts user_challenge_progress for matching challenges; if progress.current_value >= challenge.target_value → marks completed + awards XP
 - `getUserChallenges(userId, tenantId)` → challenges with user's progress
 - `OnModuleDestroy` + `closeAllPools()`
 
 **New file:** `apps/subgraph-core/src/gamification/leaderboard.service.ts`
+
 - `getLeaderboard(tenantId, limit)` → top-N users sorted by `user_xp_totals.total_xp` DESC
 - Returns `{ rank, userId, displayName, totalXp, level, avatarUrl }`
 - Cache: in-memory Map<tenantId, { data, expiresAt }> with 1-hour TTL
@@ -361,10 +397,12 @@ input CourseListingFiltersInput {
 - `OnModuleDestroy`: `clearInterval(this.cleanupHandle); this.cache.clear(); closeAllPools()`
 
 **New file:** `apps/subgraph-core/src/gamification/gamification.module.ts`
+
 - Provides: StreakService, ChallengesService, LeaderboardService, XpService (import from existing)
 - Exports: all 4 services
 
 **Modify:** `apps/subgraph-core/src/user/user.graphql` — add:
+
 ```graphql
 type GamificationStats {
   currentStreak: Int!
@@ -397,18 +435,21 @@ extend type Query {
 ```
 
 **Modify:** `apps/subgraph-core/src/notifications/nats-notification.bridge.ts`
+
 - Subscribe to `EDUSPHERE.lesson.completed` → call `StreakService.updateStreak()` + `ChallengesService.incrementProgress(userId, tenantId, LESSON_COUNT, 1)`
 - Subscribe to `EDUSPHERE.quiz.passed` → call `ChallengesService.incrementProgress(userId, tenantId, QUIZ_COUNT, 1)`
 
 #### Frontend
 
 **New file:** `apps/web/src/lib/graphql/gamification.queries.ts`
+
 ```typescript
 // MY_GAMIFICATION_STATS_QUERY — includes streak, activeChallenges, leaderboard top-10
 // TENANT_LEADERBOARD_QUERY
 ```
 
 **New file:** `apps/web/src/pages/GamificationPage.tsx`
+
 - Route: `/gamification`
 - 3 tabs (shadcn/ui Tabs):
   1. **Progress** — XP progress bar toward next level, current streak flame icon, longest streak, recent XP events (last 5)
@@ -420,6 +461,7 @@ extend type Query {
 **Modify:** `apps/web/src/App.tsx` — add route `/gamification` → `<GamificationPage />`
 
 **Modify:** `apps/web/src/components/AppSidebar.tsx`
+
 - Add Gamification nav item (Trophy icon) between Dashboard and Explore
 
 #### Tests
@@ -438,12 +480,14 @@ extend type Query {
 #### Database
 
 **New file:** `packages/db/src/schema/team-members.ts`
+
 ```typescript
 // team_members: id, manager_id uuid, member_id uuid, tenant_id uuid, created_at
 // Unique constraint: (manager_id, member_id, tenant_id)
 ```
 
 **New file:** `packages/db/src/migrations/0023_team_members.sql`
+
 - RLS: `tenant_id::text = current_setting('app.current_tenant', TRUE)`
 - Index: `(manager_id, tenant_id)` for team lookups
 - Note: MANAGER role is a Keycloak role — no DB enum change needed (role stored in JWT)
@@ -451,6 +495,7 @@ extend type Query {
 #### Backend
 
 **New file:** `apps/subgraph-core/src/manager/manager-dashboard.service.ts`
+
 ```typescript
 // getTeamOverview(managerId, tenantId):
 //   - member count
@@ -464,10 +509,12 @@ extend type Query {
 // addTeamMember(managerId, memberId, tenantId)
 // removeTeamMember(managerId, memberId, tenantId)
 ```
+
 - `withTenantContext()` on all queries (SI-9)
 - `OnModuleDestroy` + `closeAllPools()`
 
 **New file:** `apps/subgraph-core/src/manager/manager.graphql`
+
 ```graphql
 type TeamOverview {
   memberCount: Int!
@@ -487,12 +534,20 @@ type TeamMemberProgress {
   isAtRisk: Boolean!
 }
 extend type Query {
-  myTeamOverview: TeamOverview! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
-  myTeamMemberProgress: [TeamMemberProgress!]! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  myTeamOverview: TeamOverview!
+    @authenticated
+    @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  myTeamMemberProgress: [TeamMemberProgress!]!
+    @authenticated
+    @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
 }
 extend type Mutation {
-  addTeamMember(memberId: ID!): Boolean! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
-  removeTeamMember(memberId: ID!): Boolean! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  addTeamMember(memberId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  removeTeamMember(memberId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
 }
 ```
 
@@ -503,6 +558,7 @@ extend type Mutation {
 **New file:** `apps/web/src/lib/graphql/manager.queries.ts`
 
 **New file:** `apps/web/src/pages/ManagerDashboardPage.tsx`
+
 - Route: `/manager` — redirect non-MANAGER/ORG_ADMIN/SUPER_ADMIN users to `/`
 - Top row: 4 stat cards (Members, Avg Completion, At-Risk, Avg XP)
 - Bottom: DataTable of team members with sortable columns (completion%, XP, last active)
@@ -514,9 +570,11 @@ extend type Mutation {
 **Modify:** `apps/web/src/components/AppSidebar.tsx` — show Manager Dashboard link for MANAGER/ORG_ADMIN/SUPER_ADMIN
 
 #### Supergraph Update
+
 **Modify:** `apps/gateway/supergraph.graphql` — add TeamOverview, TeamMemberProgress types + queries/mutations
 
 #### Tests
+
 **New:** `apps/subgraph-core/src/manager/manager-dashboard.service.spec.ts`
 **New:** `apps/web/src/pages/ManagerDashboardPage.test.tsx` — STUDENT redirected, MANAGER sees team data
 
@@ -525,6 +583,7 @@ extend type Mutation {
 ### Agent-6 [T+10]: Mobile Gaps
 
 **New file:** `apps/mobile/src/screens/GamificationScreen.tsx`
+
 - 3-tab layout (React Native Tab View or simple state)
 - Tab 1: XP progress bar + streak display
 - Tab 2: Challenges list (FlatList with progress bars)
@@ -532,12 +591,14 @@ extend type Mutation {
 - Uses `useQuery` via urql mobile client
 - Mounted guard: `useFocusEffect` (React Navigation) to pause query when screen not focused
 
-**Remove MOCK_* from mobile screens:**
+**Remove MOCK\_\* from mobile screens:**
+
 - `apps/mobile/src/screens/DashboardScreen.tsx` — replace `MOCK_STATS` with `useQuery(MY_STATS_QUERY)`
 - `apps/mobile/src/screens/CoursesScreen.tsx` — replace `MOCK_RECENT_COURSES` with `useQuery(MY_ENROLLMENTS_QUERY)`
 - `apps/mobile/src/screens/KnowledgeGraphScreen.tsx` — replace `MOCK_NODES` with `useQuery(MY_KNOWLEDGE_GRAPH_QUERY)`
 
 **Add missing mobile tests (pure logic — no @testing-library/react-native):**
+
 - `apps/mobile/src/screens/__tests__/DiscussionsScreen.test.ts` — thread format logic
 - `apps/mobile/src/screens/__tests__/KnowledgeGraphScreen.test.ts` — graph data transformation
 - `apps/mobile/src/screens/__tests__/ProfileScreen.test.ts` — profile data formatting
@@ -545,6 +606,7 @@ extend type Mutation {
 - `apps/mobile/src/screens/__tests__/GamificationScreen.test.ts` — XP level calculation
 
 **Add mobile navigation:**
+
 - `apps/mobile/src/navigation/MainTabNavigator.tsx` — add Gamification tab (Trophy icon)
 
 ---
@@ -554,17 +616,20 @@ extend type Mutation {
 #### Database
 
 **New file:** `packages/db/src/schema/onboarding.ts`
+
 ```typescript
 // onboarding_state: user_id uuid PK, tenant_id uuid, role text, current_step int (1-5), completed bool, skipped bool, data jsonb (interests, selected_course_id, etc.), created_at, updated_at
 ```
 
 **New file:** `packages/db/src/migrations/0024_onboarding_state.sql`
+
 - RLS: `user_id::text = current_setting('app.current_user_id', TRUE)`
 - No cross-user reads — each user sees only their own state
 
 #### Backend
 
 **New file:** `apps/subgraph-core/src/onboarding/onboarding.service.ts`
+
 ```typescript
 // getState(userId, tenantId): OnboardingState
 // updateStep(userId, tenantId, step, data): OnboardingState
@@ -572,10 +637,12 @@ extend type Mutation {
 // skipOnboarding(userId, tenantId): OnboardingState
 // isOnboardingComplete(userId, tenantId): boolean
 ```
+
 - `withTenantContext()` (SI-9), `OnModuleDestroy` + `closeAllPools()`
 - Iron rule: validate `userId` from JWT context, NOT from GraphQL args
 
 **New file:** `apps/subgraph-core/src/onboarding/onboarding.graphql`
+
 ```graphql
 type OnboardingState {
   userId: ID!
@@ -594,7 +661,8 @@ extend type Query {
   myOnboardingState: OnboardingState @authenticated
 }
 extend type Mutation {
-  updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @authenticated
+  updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState!
+    @authenticated
   completeOnboarding: OnboardingState! @authenticated
   skipOnboarding: OnboardingState! @authenticated
 }
@@ -605,11 +673,13 @@ extend type Mutation {
 #### Frontend — Student Path
 
 **New file:** `apps/web/src/pages/OnboardingPage.tsx`
+
 - Detects role from JWT → renders `StudentOnboardingSteps` or `InstructorOnboardingSteps`
 - Persists step progress via `updateOnboardingStep` mutation on each "Next"
 - "Skip for now" link → `skipOnboarding` mutation → redirect to Dashboard
 
 **New file:** `apps/web/src/components/onboarding/StudentOnboardingSteps.tsx`
+
 - Step 1: Profile photo + display name + timezone
 - Step 2: Interest topics (checkbox grid: 12 topic categories from knowledge graph)
 - Step 3: Skill self-assessment (5 sliders: Beginner→Expert per selected topic)
@@ -625,6 +695,7 @@ extend type Mutation {
 #### Frontend — Instructor Path
 
 **New file:** `apps/web/src/components/onboarding/InstructorOnboardingSteps.tsx`
+
 - Step 1: Profile + bio + subject expertise
 - Step 2: Create first course (title + description + cover image upload)
 - Step 3: Add first lesson (title + select content type: VIDEO/QUIZ/DISCUSSION)
@@ -633,6 +704,7 @@ extend type Mutation {
 #### DashboardPage Banner
 
 **Modify:** `apps/web/src/pages/DashboardPage.tsx`
+
 - Add `useQuery(MY_ONBOARDING_STATE_QUERY)` with mounted guard
 - If `!state.completed && !state.skipped` → show sticky banner at top:
   ```
@@ -644,6 +716,7 @@ extend type Mutation {
 #### Mobile Onboarding
 
 **New file:** `apps/mobile/src/screens/OnboardingScreen.tsx`
+
 - 3-step simplified wizard: (1) Profile photo + name, (2) Interest topics (3 max), (3) Success + "Start learning"
 - Uses same backend mutations
 - Shown on first launch via AsyncStorage flag check
@@ -651,6 +724,7 @@ extend type Mutation {
 **Modify:** `apps/mobile/src/navigation/AppNavigator.tsx` — add OnboardingScreen, show before MainTabNavigator if not onboarded
 
 #### Supergraph Update
+
 **Modify:** `apps/gateway/supergraph.graphql` — add GamificationStats, UserChallenge, LeaderboardEntry, OnboardingState types + all queries/mutations from Agents 4+7
 
 ---
@@ -661,24 +735,27 @@ extend type Mutation {
 
 **New E2E specs:**
 
-| File | Assertions |
-|------|-----------|
-| `apps/web/e2e/gamification.spec.ts` | Login as student → /gamification → streak visible, challenges load, leaderboard row visible; `toHaveScreenshot` |
-| `apps/web/e2e/manager-dashboard.spec.ts` | Login as org.admin → /manager → team table visible; STUDENT gets redirect; `toHaveScreenshot` |
-| `apps/web/e2e/onboarding-student.spec.ts` | Fresh login → DashboardPage shows banner → /onboarding → complete all 5 steps → banner gone; `toHaveScreenshot` |
-| `apps/web/e2e/onboarding-instructor.spec.ts` | Instructor login → /onboarding → create course step → publish; `toHaveScreenshot` |
-| `apps/web/e2e/marketplace.spec.ts` | Student → /marketplace → real listings visible (not paused query); filter works; `toHaveScreenshot` |
+| File                                         | Assertions                                                                                                      |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `apps/web/e2e/gamification.spec.ts`          | Login as student → /gamification → streak visible, challenges load, leaderboard row visible; `toHaveScreenshot` |
+| `apps/web/e2e/manager-dashboard.spec.ts`     | Login as org.admin → /manager → team table visible; STUDENT gets redirect; `toHaveScreenshot`                   |
+| `apps/web/e2e/onboarding-student.spec.ts`    | Fresh login → DashboardPage shows banner → /onboarding → complete all 5 steps → banner gone; `toHaveScreenshot` |
+| `apps/web/e2e/onboarding-instructor.spec.ts` | Instructor login → /onboarding → create course step → publish; `toHaveScreenshot`                               |
+| `apps/web/e2e/marketplace.spec.ts`           | Student → /marketplace → real listings visible (not paused query); filter works; `toHaveScreenshot`             |
 
 **Security test extensions:**
+
 - `tests/security/graphql-authorization.spec.ts`:
   - `myTeamOverview` — assert STUDENT gets AuthorizationError
   - `addTeamMember` — assert STUDENT gets AuthorizationError
   - `skipOnboarding` — assert unauthenticated gets AuthenticationError
 
 **Contract tests:**
+
 - After supergraph updates, run `pnpm turbo test --filter=@edusphere/gateway` — verify 88+ contract tests pass with new types
 
 **OPEN_ISSUES.md update (P37-10):**
+
 - Phase 36 entry → ✅ Complete (all items resolved in Session 30-31)
 - Phase 37 entry → 🟡 In Progress → after all tests pass: ✅ Complete
 
@@ -686,53 +763,56 @@ extend type Mutation {
 
 ## Database Migration Summary
 
-| Migration | File | Tables |
-|-----------|------|--------|
-| 0022 | `0022_user_streaks_challenges.sql` | user_streaks, challenges, user_challenge_progress |
-| 0023 | `0023_team_members.sql` | team_members |
-| 0024 | `0024_onboarding_state.sql` | onboarding_state |
+| Migration | File                               | Tables                                            |
+| --------- | ---------------------------------- | ------------------------------------------------- |
+| 0022      | `0022_user_streaks_challenges.sql` | user_streaks, challenges, user_challenge_progress |
+| 0023      | `0023_team_members.sql`            | team_members                                      |
+| 0024      | `0024_onboarding_state.sql`        | onboarding_state                                  |
 
 ---
 
 ## Memory Safety Checklist
 
-| New Service | OnModuleDestroy | closeAllPools | Special |
-|-------------|----------------|---------------|---------|
-| streak.service.ts | ✓ | ✓ | — |
-| challenges.service.ts | ✓ | ✓ | — |
-| leaderboard.service.ts | ✓ | ✓ | clearInterval (cache refresh) + cache.clear() |
-| manager-dashboard.service.ts | ✓ | ✓ | — |
-| onboarding.service.ts | ✓ | ✓ | — |
-| rate-limit.middleware.ts | ✓ | N/A | redis.disconnect() + fallback.clear() |
+| New Service                  | OnModuleDestroy | closeAllPools | Special                                       |
+| ---------------------------- | --------------- | ------------- | --------------------------------------------- |
+| streak.service.ts            | ✓               | ✓             | —                                             |
+| challenges.service.ts        | ✓               | ✓             | —                                             |
+| leaderboard.service.ts       | ✓               | ✓             | clearInterval (cache refresh) + cache.clear() |
+| manager-dashboard.service.ts | ✓               | ✓             | —                                             |
+| onboarding.service.ts        | ✓               | ✓             | —                                             |
+| rate-limit.middleware.ts     | ✓               | N/A           | redis.disconnect() + fallback.clear()         |
 
 ---
 
 ## Security Invariants
 
-| Phase | Invariant | Implementation |
-|-------|-----------|----------------|
-| Manager Dashboard | SI-9 tenant isolation | `withTenantContext()` on all team queries |
-| Manager Dashboard | Role gate | `@requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])` on all mutations |
-| Onboarding | User isolation | validate `userId` from JWT context (not GraphQL args) |
-| Onboarding | RLS | `user_id = current_setting('app.current_user_id')` |
-| Gamification | Public leaderboard | displayName only — no email/PII in leaderboard entries (GDPR) |
-| Redis rate limit | Key privacy | use hash of tenantId, not raw value, as Redis key segment |
+| Phase             | Invariant             | Implementation                                                             |
+| ----------------- | --------------------- | -------------------------------------------------------------------------- |
+| Manager Dashboard | SI-9 tenant isolation | `withTenantContext()` on all team queries                                  |
+| Manager Dashboard | Role gate             | `@requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])` on all mutations |
+| Onboarding        | User isolation        | validate `userId` from JWT context (not GraphQL args)                      |
+| Onboarding        | RLS                   | `user_id = current_setting('app.current_user_id')`                         |
+| Gamification      | Public leaderboard    | displayName only — no email/PII in leaderboard entries (GDPR)              |
+| Redis rate limit  | Key privacy           | use hash of tenantId, not raw value, as Redis key segment                  |
 
 ---
 
 ## Supergraph Changes (apps/gateway/supergraph.graphql)
 
 New types to add in Sprint A+B:
+
 - `CourseListingConnection`, `CourseListingEdge`, `CourseListing`, `CourseListingFiltersInput`
 - `GamificationStats`, `UserChallenge`, `LeaderboardEntry`
 - `TeamOverview`, `TeamMemberProgress`
 - `OnboardingState`, `UpdateOnboardingStepInput`
 
 New queries:
+
 - `courseListings`, `myGamificationStats`, `tenantLeaderboard`
 - `myTeamOverview`, `myTeamMemberProgress`, `myOnboardingState`
 
 New mutations:
+
 - `addTeamMember`, `removeTeamMember`
 - `updateOnboardingStep`, `completeOnboarding`, `skipOnboarding`
 
@@ -755,6 +835,7 @@ Sprint C → Agent-9 [QA] — sequential, after Sprint A+B complete
 ## Verification Steps
 
 ### After Sprint A
+
 ```bash
 pnpm --filter @edusphere/gateway dev  # supergraph composes with new types
 curl -X POST http://localhost:4000/graphql \
@@ -765,6 +846,7 @@ grep -r "pause: true" apps/web/src/pages/MarketplacePage.tsx  # → 0 results
 ```
 
 ### After Sprint B (Gamification)
+
 ```bash
 # mcp__postgres__pg_execute_query:
 #   SELECT tablename FROM pg_tables WHERE tablename IN ('user_streaks','challenges','user_challenge_progress')
@@ -773,6 +855,7 @@ grep -r "pause: true" apps/web/src/pages/MarketplacePage.tsx  # → 0 results
 ```
 
 ### After Sprint B (Onboarding)
+
 ```bash
 # mcp__postgres__pg_execute_query:
 #   SELECT tablename FROM pg_tables WHERE tablename IN ('onboarding_state')
@@ -781,6 +864,7 @@ grep -r "pause: true" apps/web/src/pages/MarketplacePage.tsx  # → 0 results
 ```
 
 ### After Sprint C (Full QA Gate)
+
 ```bash
 pnpm turbo test               # all pass, 0 failures
 pnpm turbo typecheck          # 0 TypeScript errors

@@ -5,13 +5,8 @@ import { AIOverrideRequestButton } from './AIOverrideRequestButton';
 
 // Mock Radix Dialog (portal issues in jsdom)
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({
-    open,
-    children,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-  }) => (open ? <div data-testid="dialog-root">{children}</div> : null),
+  Dialog: ({ open, children }: { open: boolean; children: React.ReactNode }) =>
+    open ? <div data-testid="dialog-root">{children}</div> : null,
   DialogContent: ({
     children,
     ...props
@@ -73,26 +68,32 @@ describe('AIOverrideRequestButton', () => {
   it('opens dialog when button is clicked', () => {
     render(<AIOverrideRequestButton assessmentId="assess-1" />);
     fireEvent.click(
-      screen.getByRole('button', { name: /request human review of this ai assessment/i })
+      screen.getByRole('button', {
+        name: /request human review of this ai assessment/i,
+      })
     );
     expect(screen.getByTestId('dialog-root')).toBeDefined();
-    expect(screen.getByRole('heading', { name: /request human review/i })).toBeDefined();
+    expect(
+      screen.getByRole('heading', { name: /request human review/i })
+    ).toBeDefined();
   });
 
   it('dialog states user right to human review', () => {
     render(<AIOverrideRequestButton assessmentId="assess-1" />);
     fireEvent.click(
-      screen.getByRole('button', { name: /request human review of this ai assessment/i })
+      screen.getByRole('button', {
+        name: /request human review of this ai assessment/i,
+      })
     );
-    expect(
-      screen.getByText(/right to request a human review/i)
-    ).toBeDefined();
+    expect(screen.getByText(/right to request a human review/i)).toBeDefined();
   });
 
   it('closes dialog when Cancel button is clicked', () => {
     render(<AIOverrideRequestButton assessmentId="assess-1" />);
     fireEvent.click(
-      screen.getByRole('button', { name: /request human review of this ai assessment/i })
+      screen.getByRole('button', {
+        name: /request human review of this ai assessment/i,
+      })
     );
     expect(screen.getByTestId('dialog-root')).toBeDefined();
     // The Cancel button inside the mocked dialog footer uses aria-label="Close dialog"

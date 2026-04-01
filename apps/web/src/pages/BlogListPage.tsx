@@ -67,7 +67,9 @@ export function BlogListPage() {
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 mt-auto pt-4 border-t border-gray-100 dark:border-slate-700">
                     <span>{post.author}</span>
-                    <span>{t('minRead', { count: post.readingTimeMinutes })}</span>
+                    <span>
+                      {t('minRead', { count: post.readingTimeMinutes })}
+                    </span>
                     <span>{formatDate(post.datePublished)}</span>
                   </div>
                   <Link

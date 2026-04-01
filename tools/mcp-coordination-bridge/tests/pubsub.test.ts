@@ -47,7 +47,9 @@ describe('subscribe', () => {
   it('filters by timestamp with since parameter', () => {
     // Insert first event with an explicit past timestamp for deterministic test
     const pastTs = Date.now() / 1000 - 60;
-    db.prepare('INSERT INTO events (channel, agent_id, payload, ts) VALUES (?, ?, ?, ?)').run('ch', 'a1', 'first', pastTs);
+    db.prepare(
+      'INSERT INTO events (channel, agent_id, payload, ts) VALUES (?, ?, ?, ?)'
+    ).run('ch', 'a1', 'first', pastTs);
     publish('ch', 'a1', 'second');
     const newEvents = subscribe('ch', pastTs);
     expect(newEvents).toHaveLength(1);

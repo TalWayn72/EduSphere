@@ -40,16 +40,25 @@ test.describe('Visual Regression — Dark Mode Landing @visual-dark', () => {
 
   test('landing — full page dark', async ({ page }) => {
     await goToDark(page, '/');
-    await expect(page).toHaveScreenshot('dark-public-landing-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-public-landing-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('landing — header dark', async ({ page }) => {
     await goToDark(page, '/');
     const header = page.locator('header').or(page.locator('nav')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-public-landing-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-public-landing-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-landing-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-landing-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -57,9 +66,15 @@ test.describe('Visual Regression — Dark Mode Landing @visual-dark', () => {
     await goToDark(page, '/');
     const main = page.locator('main').or(page.locator('[role="main"]')).first();
     if (await main.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(main).toHaveScreenshot('dark-public-landing-main.png', ELEMENT_OPTS);
+      await expect(main).toHaveScreenshot(
+        'dark-public-landing-main.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-landing-main.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-landing-main.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -67,9 +82,15 @@ test.describe('Visual Regression — Dark Mode Landing @visual-dark', () => {
     await goToDark(page, '/');
     const hero = page.locator('section').first();
     if (await hero.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(hero).toHaveScreenshot('dark-public-landing-hero.png', ELEMENT_OPTS);
+      await expect(hero).toHaveScreenshot(
+        'dark-public-landing-hero.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-landing-hero.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-landing-hero.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -77,9 +98,15 @@ test.describe('Visual Regression — Dark Mode Landing @visual-dark', () => {
     await goToDark(page, '/');
     const footer = page.locator('footer').first();
     if (await footer.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(footer).toHaveScreenshot('dark-public-landing-footer.png', ELEMENT_OPTS);
+      await expect(footer).toHaveScreenshot(
+        'dark-public-landing-footer.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-landing-footer.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-landing-footer.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });
@@ -96,16 +123,25 @@ test.describe('Visual Regression — Dark Mode Login @visual-dark', () => {
 
   test('login — full page dark', async ({ page }) => {
     await goToDark(page, '/login');
-    await expect(page).toHaveScreenshot('dark-public-login-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-public-login-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('login — header dark', async ({ page }) => {
     await goToDark(page, '/login');
     const header = page.locator('header').or(page.locator('nav')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-public-login-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-public-login-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-login-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-login-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -113,29 +149,53 @@ test.describe('Visual Regression — Dark Mode Login @visual-dark', () => {
     await goToDark(page, '/login');
     const form = page.locator('form').or(page.locator('main')).first();
     if (await form.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(form).toHaveScreenshot('dark-public-login-form.png', ELEMENT_OPTS);
+      await expect(form).toHaveScreenshot(
+        'dark-public-login-form.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-login-form.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-login-form.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
   test('login — submit button dark', async ({ page }) => {
     await goToDark(page, '/login');
-    const btn = page.locator('button[type="submit"]').or(page.locator('button')).first();
+    const btn = page
+      .locator('button[type="submit"]')
+      .or(page.locator('button'))
+      .first();
     if (await btn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(btn).toHaveScreenshot('dark-public-login-button.png', ELEMENT_OPTS);
+      await expect(btn).toHaveScreenshot(
+        'dark-public-login-button.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-login-button.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-login-button.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
   test('login — branding dark', async ({ page }) => {
     await goToDark(page, '/login');
-    const branding = page.locator('.logo').or(page.locator('img[alt*="logo"]')).first();
+    const branding = page
+      .locator('.logo')
+      .or(page.locator('img[alt*="logo"]'))
+      .first();
     if (await branding.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(branding).toHaveScreenshot('dark-public-login-branding.png', ELEMENT_OPTS);
+      await expect(branding).toHaveScreenshot(
+        'dark-public-login-branding.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-login-branding.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-login-branding.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });
@@ -152,16 +212,25 @@ test.describe('Visual Regression — Dark Mode About @visual-dark', () => {
 
   test('about — full page dark', async ({ page }) => {
     await goToDark(page, '/about');
-    await expect(page).toHaveScreenshot('dark-public-about-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-public-about-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('about — header dark', async ({ page }) => {
     await goToDark(page, '/about');
     const header = page.locator('header').or(page.locator('nav')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-public-about-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-public-about-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-about-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-about-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -169,19 +238,34 @@ test.describe('Visual Regression — Dark Mode About @visual-dark', () => {
     await goToDark(page, '/about');
     const main = page.locator('main').or(page.locator('[role="main"]')).first();
     if (await main.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(main).toHaveScreenshot('dark-public-about-main.png', ELEMENT_OPTS);
+      await expect(main).toHaveScreenshot(
+        'dark-public-about-main.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-about-main.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-about-main.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
   test('about — team section dark', async ({ page }) => {
     await goToDark(page, '/about');
-    const team = page.locator('section:nth-of-type(2)').or(page.locator('section')).first();
+    const team = page
+      .locator('section:nth-of-type(2)')
+      .or(page.locator('section'))
+      .first();
     if (await team.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(team).toHaveScreenshot('dark-public-about-team.png', ELEMENT_OPTS);
+      await expect(team).toHaveScreenshot(
+        'dark-public-about-team.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-about-team.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-about-team.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -189,9 +273,15 @@ test.describe('Visual Regression — Dark Mode About @visual-dark', () => {
     await goToDark(page, '/about');
     const footer = page.locator('footer').first();
     if (await footer.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(footer).toHaveScreenshot('dark-public-about-footer.png', ELEMENT_OPTS);
+      await expect(footer).toHaveScreenshot(
+        'dark-public-about-footer.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-public-about-footer.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-public-about-footer.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });

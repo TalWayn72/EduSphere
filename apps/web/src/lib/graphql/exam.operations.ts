@@ -3,8 +3,18 @@ import { gql } from 'urql';
 // ── Item Bank Queries ────────────────────────────────────────────────────────
 
 export const EXAM_ITEM_BANK_QUERY = gql`
-  query ExamItemBank($courseId: ID!, $filters: ExamItemFilterInput, $first: Int, $after: String) {
-    examItemBank(courseId: $courseId, filters: $filters, first: $first, after: $after) {
+  query ExamItemBank(
+    $courseId: ID!
+    $filters: ExamItemFilterInput
+    $first: Int
+    $after: String
+  ) {
+    examItemBank(
+      courseId: $courseId
+      filters: $filters
+      first: $first
+      after: $after
+    ) {
       edges {
         node {
           id

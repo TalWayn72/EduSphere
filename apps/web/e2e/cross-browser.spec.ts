@@ -77,8 +77,11 @@ test.describe('Cross-Browser Smoke Tests', () => {
               edges: [
                 {
                   node: {
-                    id: 'c1', title: 'Test Course', description: 'A test course',
-                    status: 'PUBLISHED', thumbnailUrl: null,
+                    id: 'c1',
+                    title: 'Test Course',
+                    description: 'A test course',
+                    status: 'PUBLISHED',
+                    thumbnailUrl: null,
                   },
                   cursor: 'c1',
                 },
@@ -91,7 +94,9 @@ test.describe('Cross-Browser Smoke Tests', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/learn/courses`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/learn/courses`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('networkidle');
 
     // Page should render without errors
@@ -141,7 +146,9 @@ test.describe('Cross-Browser Smoke Tests', () => {
     expect(bodyText).not.toContain('Unexpected token');
   });
 
-  test('page navigation does not break on browser back/forward', async ({ page }) => {
+  test('page navigation does not break on browser back/forward', async ({
+    page,
+  }) => {
     await login(page);
 
     await routeGraphQL(page, () => null);
@@ -163,7 +170,9 @@ test.describe('Cross-Browser Smoke Tests', () => {
     expect(bodyText).toBeTruthy();
   });
 
-  test('responsive layout does not overflow on narrow viewport', async ({ page }) => {
+  test('responsive layout does not overflow on narrow viewport', async ({
+    page,
+  }) => {
     await login(page);
 
     await routeGraphQL(page, () => null);
@@ -175,11 +184,17 @@ test.describe('Cross-Browser Smoke Tests', () => {
 
     // Check no horizontal scrollbar
     const hasHorizontalScroll = await page.evaluate(() => {
-      return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+      return (
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
+      );
     });
     // Allow small overflow (scrollbar width) but not major overflow
     const scrollDiff = await page.evaluate(() => {
-      return document.documentElement.scrollWidth - document.documentElement.clientWidth;
+      return (
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+      );
     });
     expect(scrollDiff).toBeLessThan(20);
   });

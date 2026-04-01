@@ -40,16 +40,25 @@ test.describe('Visual Regression — Dark Mode Knowledge Graph @visual-dark', ()
 
   test('knowledge graph — full page dark', async ({ page }) => {
     await goToDark(page, '/knowledge-graph');
-    await expect(page).toHaveScreenshot('dark-dashboard-knowledge-full.png', LOOSE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-dashboard-knowledge-full.png',
+      LOOSE_OPTS
+    );
   });
 
   test('knowledge graph — header dark', async ({ page }) => {
     await goToDark(page, '/knowledge-graph');
     const header = page.locator('header').or(page.locator('nav')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-dashboard-knowledge-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-dashboard-knowledge-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-knowledge-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-knowledge-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -57,19 +66,34 @@ test.describe('Visual Regression — Dark Mode Knowledge Graph @visual-dark', ()
     await goToDark(page, '/knowledge-graph');
     const canvas = page.locator('canvas').or(page.locator('main')).first();
     if (await canvas.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(canvas).toHaveScreenshot('dark-dashboard-knowledge-canvas.png', LOOSE_OPTS);
+      await expect(canvas).toHaveScreenshot(
+        'dark-dashboard-knowledge-canvas.png',
+        LOOSE_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-knowledge-canvas.png', LOOSE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-knowledge-canvas.png',
+        LOOSE_OPTS
+      );
     }
   });
 
   test('knowledge graph — toolbar dark', async ({ page }) => {
     await goToDark(page, '/knowledge-graph');
-    const toolbar = page.locator('[role="toolbar"]').or(page.locator('.toolbar')).first();
+    const toolbar = page
+      .locator('[role="toolbar"]')
+      .or(page.locator('.toolbar'))
+      .first();
     if (await toolbar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(toolbar).toHaveScreenshot('dark-dashboard-knowledge-toolbar.png', ELEMENT_OPTS);
+      await expect(toolbar).toHaveScreenshot(
+        'dark-dashboard-knowledge-toolbar.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-knowledge-toolbar.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-knowledge-toolbar.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -77,9 +101,15 @@ test.describe('Visual Regression — Dark Mode Knowledge Graph @visual-dark', ()
     await goToDark(page, '/knowledge-graph');
     const panel = page.locator('aside').or(page.locator('.panel')).first();
     if (await panel.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(panel).toHaveScreenshot('dark-dashboard-knowledge-panel.png', ELEMENT_OPTS);
+      await expect(panel).toHaveScreenshot(
+        'dark-dashboard-knowledge-panel.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-knowledge-panel.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-knowledge-panel.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });
@@ -96,16 +126,25 @@ test.describe('Visual Regression — Dark Mode Notifications @visual-dark', () =
 
   test('notifications — full page dark', async ({ page }) => {
     await goToDark(page, '/notifications');
-    await expect(page).toHaveScreenshot('dark-dashboard-notifications-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-dashboard-notifications-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('notifications — header dark', async ({ page }) => {
     await goToDark(page, '/notifications');
     const header = page.locator('header').or(page.locator('nav')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-dashboard-notifications-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-dashboard-notifications-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-notifications-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-notifications-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -113,19 +152,34 @@ test.describe('Visual Regression — Dark Mode Notifications @visual-dark', () =
     await goToDark(page, '/notifications');
     const list = page.locator('[role="list"]').or(page.locator('main')).first();
     if (await list.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(list).toHaveScreenshot('dark-dashboard-notifications-list.png', ELEMENT_OPTS);
+      await expect(list).toHaveScreenshot(
+        'dark-dashboard-notifications-list.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-notifications-list.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-notifications-list.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
   test('notifications — filter tabs dark', async ({ page }) => {
     await goToDark(page, '/notifications');
-    const tabs = page.locator('[role="tablist"]').or(page.locator('.tabs')).first();
+    const tabs = page
+      .locator('[role="tablist"]')
+      .or(page.locator('.tabs'))
+      .first();
     if (await tabs.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(tabs).toHaveScreenshot('dark-dashboard-notifications-tabs.png', ELEMENT_OPTS);
+      await expect(tabs).toHaveScreenshot(
+        'dark-dashboard-notifications-tabs.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-notifications-tabs.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-notifications-tabs.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -133,9 +187,15 @@ test.describe('Visual Regression — Dark Mode Notifications @visual-dark', () =
     await goToDark(page, '/notifications');
     const actions = page.locator('button').first();
     if (await actions.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(actions).toHaveScreenshot('dark-dashboard-notifications-actions.png', ELEMENT_OPTS);
+      await expect(actions).toHaveScreenshot(
+        'dark-dashboard-notifications-actions.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-notifications-actions.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-notifications-actions.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });
@@ -152,16 +212,25 @@ test.describe('Visual Regression — Dark Mode Calendar @visual-dark', () => {
 
   test('calendar — full page dark', async ({ page }) => {
     await goToDark(page, '/calendar');
-    await expect(page).toHaveScreenshot('dark-dashboard-calendar-full.png', LOOSE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-dashboard-calendar-full.png',
+      LOOSE_OPTS
+    );
   });
 
   test('calendar — header dark', async ({ page }) => {
     await goToDark(page, '/calendar');
     const header = page.locator('header').or(page.locator('nav')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-dashboard-calendar-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-dashboard-calendar-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-calendar-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-calendar-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -169,19 +238,34 @@ test.describe('Visual Regression — Dark Mode Calendar @visual-dark', () => {
     await goToDark(page, '/calendar');
     const grid = page.locator('table').or(page.locator('main')).first();
     if (await grid.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(grid).toHaveScreenshot('dark-dashboard-calendar-grid.png', LOOSE_OPTS);
+      await expect(grid).toHaveScreenshot(
+        'dark-dashboard-calendar-grid.png',
+        LOOSE_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-calendar-grid.png', LOOSE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-calendar-grid.png',
+        LOOSE_OPTS
+      );
     }
   });
 
   test('calendar — navigation controls dark', async ({ page }) => {
     await goToDark(page, '/calendar');
-    const nav = page.locator('[role="toolbar"]').or(page.locator('.calendar-navigation')).first();
+    const nav = page
+      .locator('[role="toolbar"]')
+      .or(page.locator('.calendar-navigation'))
+      .first();
     if (await nav.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(nav).toHaveScreenshot('dark-dashboard-calendar-nav.png', ELEMENT_OPTS);
+      await expect(nav).toHaveScreenshot(
+        'dark-dashboard-calendar-nav.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-calendar-nav.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-calendar-nav.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -189,9 +273,15 @@ test.describe('Visual Regression — Dark Mode Calendar @visual-dark', () => {
     await goToDark(page, '/calendar');
     const sidebar = page.locator('aside').or(page.locator('.sidebar')).first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sidebar).toHaveScreenshot('dark-dashboard-calendar-sidebar.png', ELEMENT_OPTS);
+      await expect(sidebar).toHaveScreenshot(
+        'dark-dashboard-calendar-sidebar.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-dashboard-calendar-sidebar.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-dashboard-calendar-sidebar.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });

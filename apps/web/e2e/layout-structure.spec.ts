@@ -40,7 +40,9 @@ const PUBLIC_PAGES = [
 test.describe('Layout Structure — Navigation', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — has nav element`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       const nav = page.getByTestId('public-nav');
       await expect(nav).toBeVisible({ timeout: 10_000 });
     });
@@ -52,7 +54,9 @@ test.describe('Layout Structure — Navigation', () => {
 test.describe('Layout Structure — Main Content', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — has main element`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       const main = page.locator('main#main-content');
       await expect(main).toBeVisible({ timeout: 10_000 });
     });
@@ -64,7 +68,9 @@ test.describe('Layout Structure — Main Content', () => {
 test.describe('Layout Structure — Single H1', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — has exactly one h1`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       const h1 = page.locator('h1');
       await expect(h1.first()).toBeVisible({ timeout: 10_000 });
       await expect(h1).toHaveCount(1);
@@ -77,7 +83,9 @@ test.describe('Layout Structure — Single H1', () => {
 test.describe('Layout Structure — Footer', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — has footer`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       const footer = page.getByTestId('landing-footer');
       if (pg.name === 'login') {
         // Login page uses showFooter={false}
@@ -94,7 +102,9 @@ test.describe('Layout Structure — Footer', () => {
 test.describe('Layout Structure — Logo', () => {
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — has logo`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       const logo = page.getByTestId('logo');
       await expect(logo).toBeVisible({ timeout: 10_000 });
     });

@@ -43,9 +43,19 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((col, val) => ({ col, val, op: 'eq' })),
   and: vi.fn((...conditions: unknown[]) => ({ conditions, op: 'and' })),
   desc: vi.fn((col: string) => ({ col, order: 'desc' })),
-  inArray: vi.fn((col: string, vals: string[]) => ({ col, vals, op: 'inArray' })),
+  inArray: vi.fn((col: string, vals: string[]) => ({
+    col,
+    vals,
+    op: 'inArray',
+  })),
   sql: vi.fn(() => ({ raw: true })),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, callback: (tx: typeof mockTx) => unknown) => callback(mockTx)),
+  withTenantContext: vi.fn(
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      callback: (tx: typeof mockTx) => unknown
+    ) => callback(mockTx)
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -77,7 +87,9 @@ const MOCK_DISCUSSION = {
 
 function setupSelectChain(result: unknown[]) {
   const limitFn = vi.fn(() => {
-    const p = Promise.resolve(result) as Promise<unknown[]> & { offset: ReturnType<typeof vi.fn> };
+    const p = Promise.resolve(result) as Promise<unknown[]> & {
+      offset: ReturnType<typeof vi.fn>;
+    };
     p.offset = vi.fn(() => Promise.resolve(result));
     return p;
   });

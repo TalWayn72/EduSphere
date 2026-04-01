@@ -57,7 +57,9 @@ export function AdminDashboardPage() {
   const { t } = useTranslation('admin');
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [result] = useQuery<{ adminOverview: AdminOverviewData }>({
     query: ADMIN_OVERVIEW_QUERY,
     pause: !mounted,
@@ -119,49 +121,47 @@ export function AdminDashboardPage() {
           title={t('dashboard.title')}
           description={t('dashboard.description')}
         />
-      {fetching && (
-        <LoadingSpinner containerHeight="py-16" />
-      )}
+        {fetching && <LoadingSpinner containerHeight="py-16" />}
 
-      {error && (
-        <Card>
-          <CardContent className="py-8 text-center text-destructive text-sm">
-            {t('dashboard.loadError')}
-          </CardContent>
-        </Card>
-      )}
+        {error && (
+          <Card>
+            <CardContent className="py-8 text-center text-destructive text-sm">
+              {t('dashboard.loadError')}
+            </CardContent>
+          </Card>
+        )}
 
-      {data && <AdminStatCards overview={data.adminOverview} />}
+        {data && <AdminStatCards overview={data.adminOverview} />}
 
-      {/* Quick Links */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">
-          {t('dashboard.adminTools')}
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
-          {quickLinks.map(({ to, icon: Icon, label, desc }) => (
-            <Link key={to} to={to}>
-              <Card className="hover:border-primary/40 transition-colors cursor-pointer">
-                <CardContent className="flex items-start gap-3 py-4">
-                  <Icon className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <div>
-                    <p className="font-medium text-sm">{label}</p>
-                    <p className="text-xs text-muted-foreground">{desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        {/* Quick Links */}
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">
+            {t('dashboard.adminTools')}
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            {quickLinks.map(({ to, icon: Icon, label, desc }) => (
+              <Link key={to} to={to}>
+                <Card className="hover:border-primary/40 transition-colors cursor-pointer">
+                  <CardContent className="flex items-start gap-3 py-4">
+                    <Icon className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-sm">{label}</p>
+                      <p className="text-xs text-muted-foreground">{desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Recent Activity */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">
-          {t('dashboard.recentActivity')}
-        </h2>
-        <AdminActivityFeed loading={fetching} />
-      </div>
+        {/* Recent Activity */}
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">
+            {t('dashboard.recentActivity')}
+          </h2>
+          <AdminActivityFeed loading={fetching} />
+        </div>
       </PageShell>
     </AdminLayout>
   );

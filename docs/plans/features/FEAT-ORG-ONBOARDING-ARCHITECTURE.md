@@ -31,18 +31,18 @@ This feature enables organizations to self-service onboard onto EduSphere, recei
 
 ### Existing Infrastructure Leveraged
 
-| Component | Existing | Extension Needed |
-|-----------|----------|-----------------|
-| `tenants` table | `id`, `name`, `slug`, `plan`, `settings`, `portalConfig` | Add `trial_ends_at`, `provisioning_status`, `idempotency_key` |
-| `tenantBranding` table | Full branding fields (logo, colors, fonts, CSS) | None — already complete |
-| `tenantDomains` table | `domain`, `domainType`, `verified`, `sslProvisioned` | None — already complete |
-| `tenantThemes` table | `primitives` jsonb, `isActive` | None — already complete |
-| `onboardingState` table | Per-user onboarding wizard state | Extend for org-level checklist |
-| `ThemeContext` (frontend) | `setTenantTheme()`, `previewThemeChanges()` | Add subdomain-based auto-load |
-| RLS via `withTenantContext()` | Full RLS with `SET LOCAL` + Prometheus metrics | None — reuse as-is |
-| NATS events | 25+ event subjects with type guards | Add `org.*` event domain |
-| Gateway rate limiting | Per-tenant sliding window + premium tiers | Add API key rate limiting |
-| Keycloak JWT auth | Gateway JWT verification + role extraction | Add group-based org routing |
+| Component                     | Existing                                                 | Extension Needed                                              |
+| ----------------------------- | -------------------------------------------------------- | ------------------------------------------------------------- |
+| `tenants` table               | `id`, `name`, `slug`, `plan`, `settings`, `portalConfig` | Add `trial_ends_at`, `provisioning_status`, `idempotency_key` |
+| `tenantBranding` table        | Full branding fields (logo, colors, fonts, CSS)          | None — already complete                                       |
+| `tenantDomains` table         | `domain`, `domainType`, `verified`, `sslProvisioned`     | None — already complete                                       |
+| `tenantThemes` table          | `primitives` jsonb, `isActive`                           | None — already complete                                       |
+| `onboardingState` table       | Per-user onboarding wizard state                         | Extend for org-level checklist                                |
+| `ThemeContext` (frontend)     | `setTenantTheme()`, `previewThemeChanges()`              | Add subdomain-based auto-load                                 |
+| RLS via `withTenantContext()` | Full RLS with `SET LOCAL` + Prometheus metrics           | None — reuse as-is                                            |
+| NATS events                   | 25+ event subjects with type guards                      | Add `org.*` event domain                                      |
+| Gateway rate limiting         | Per-tenant sliding window + premium tiers                | Add API key rate limiting                                     |
+| Keycloak JWT auth             | Gateway JWT verification + role extraction               | Add group-based org routing                                   |
 
 ---
 
@@ -128,6 +128,7 @@ Idempotent: ON CONFLICT (tenant_id) DO NOTHING
 ```
 
 Default checklist steps:
+
 1. `BRANDING_CONFIGURED` — Upload logo, set colors
 2. `FIRST_USER_INVITED` — Invite at least one team member
 3. `FIRST_COURSE_CREATED` — Create or license a course
@@ -167,6 +168,7 @@ Step 2 fail → DELETE FROM tenants WHERE id = $id AND provisioning_status = 'PR
 ```
 
 The tenant record's `provisioning_status` transitions:
+
 - `PROVISIONING` → `ACTIVE` (success)
 - `PROVISIONING` → `FAILED` (all retries exhausted, compensations complete)
 - `FAILED` → `PROVISIONING` (manual retry triggered by admin)
@@ -194,7 +196,11 @@ The `ProvisioningStateMachine` stores step completion status in a `provisioning_
   "step2_tenant_created": true,
   "step3_keycloak_group": { "groupId": "abc-123", "completed": true },
   "step4_admin_user": { "userId": "def-456", "completed": true },
-  "step5_minio_bucket": { "completed": false, "error": "connection timeout", "retries": 2 },
+  "step5_minio_bucket": {
+    "completed": false,
+    "error": "connection timeout",
+    "retries": 2
+  },
   "step6_checklist": { "completed": false },
   "step7_nats_event": { "completed": false },
   "step8_welcome_email": { "completed": false }
@@ -306,6 +312,7 @@ The `tenantDomains` table already supports custom domains (`domainType: 'CUSTOM'
 ### 4.1 Single Realm Architecture
 
 All organizations share a single Keycloak realm `edusphere`. Organization isolation is achieved via **Keycloak groups**, not separate realms. This is critical for:
+
 - Shared user pool (users can belong to multiple orgs)
 - Single JWKS endpoint for the gateway
 - Simplified Keycloak administration
@@ -389,14 +396,14 @@ Organizations on PROFESSIONAL/ENTERPRISE plans can configure their own Identity 
 
 A new `KeycloakAdminService` in `subgraph-core` wraps the Keycloak Admin REST API:
 
-| Method | Keycloak Endpoint | Purpose |
-|--------|-------------------|---------|
-| `createGroup(slug)` | `POST /groups` | Create org group |
-| `deleteGroup(groupId)` | `DELETE /groups/{id}` | Rollback org group |
-| `createUser(email, groups)` | `POST /users` | Create org member |
-| `assignRole(userId, role)` | `POST /users/{id}/role-mappings/realm` | Set org role |
-| `configureIdP(slug, config)` | `POST /identity-provider/instances` | SSO setup |
-| `listGroupMembers(groupId)` | `GET /groups/{id}/members` | List org users |
+| Method                       | Keycloak Endpoint                      | Purpose            |
+| ---------------------------- | -------------------------------------- | ------------------ |
+| `createGroup(slug)`          | `POST /groups`                         | Create org group   |
+| `deleteGroup(groupId)`       | `DELETE /groups/{id}`                  | Rollback org group |
+| `createUser(email, groups)`  | `POST /users`                          | Create org member  |
+| `assignRole(userId, role)`   | `POST /users/{id}/role-mappings/realm` | Set org role       |
+| `configureIdP(slug, config)` | `POST /identity-provider/instances`    | SSO setup          |
+| `listGroupMembers(groupId)`  | `GET /groups/{id}/members`             | List org users     |
 
 Authentication: Service account with `realm-management` client role (client credentials grant).
 
@@ -483,14 +490,14 @@ When a learner from Org B accesses a course published by Org A:
 
 ### 5.4 Federation Split
 
-| Operation | Subgraph | Rationale |
-|-----------|----------|-----------|
-| `marketplaceListings` query | `subgraph-content` | Course data lives in content |
-| `marketplaceListing(id)` query | `subgraph-content` | Single listing detail |
-| `publishToMarketplace` mutation | `subgraph-content` | Course owner action |
-| `licenseCourse` mutation | `subgraph-core` | Licensing is a tenant/billing concern |
-| `courseLicenses` query | `subgraph-core` | License management by org admin |
-| `revokeCourseLicense` mutation | `subgraph-core` | Admin action |
+| Operation                       | Subgraph           | Rationale                             |
+| ------------------------------- | ------------------ | ------------------------------------- |
+| `marketplaceListings` query     | `subgraph-content` | Course data lives in content          |
+| `marketplaceListing(id)` query  | `subgraph-content` | Single listing detail                 |
+| `publishToMarketplace` mutation | `subgraph-content` | Course owner action                   |
+| `licenseCourse` mutation        | `subgraph-core`    | Licensing is a tenant/billing concern |
+| `courseLicenses` query          | `subgraph-core`    | License management by org admin       |
+| `revokeCourseLicense` mutation  | `subgraph-core`    | Admin action                          |
 
 ---
 
@@ -639,14 +646,14 @@ CREATE INDEX idx_webhook_deliveries_status ON webhook_deliveries(status, next_re
 
 ### 6.7 Webhook Events
 
-| Event | NATS Subject | Payload |
-|-------|-------------|---------|
-| `course.completed` | `EDUSPHERE.course.completed` | `CourseCompletedPayload` |
-| `course.enrolled` | `EDUSPHERE.course.enrolled` | `CourseEnrolledPayload` |
-| `badge.issued` | `EDUSPHERE.badge.issued` | `BadgeIssuedPayload` |
-| `user.invited` | `EDUSPHERE.org.user.invited` | `UserInvitedPayload` |
-| `user.joined` | `EDUSPHERE.org.user.joined` | `UserJoinedPayload` |
-| `org.provisioned` | `EDUSPHERE.org.provisioned` | `OrgProvisionedPayload` |
+| Event               | NATS Subject                      | Payload                   |
+| ------------------- | --------------------------------- | ------------------------- |
+| `course.completed`  | `EDUSPHERE.course.completed`      | `CourseCompletedPayload`  |
+| `course.enrolled`   | `EDUSPHERE.course.enrolled`       | `CourseEnrolledPayload`   |
+| `badge.issued`      | `EDUSPHERE.badge.issued`          | `BadgeIssuedPayload`      |
+| `user.invited`      | `EDUSPHERE.org.user.invited`      | `UserInvitedPayload`      |
+| `user.joined`       | `EDUSPHERE.org.user.joined`       | `UserJoinedPayload`       |
+| `org.provisioned`   | `EDUSPHERE.org.provisioned`       | `OrgProvisionedPayload`   |
 | `license.activated` | `EDUSPHERE.org.license.activated` | `LicenseActivatedPayload` |
 
 ---
@@ -656,6 +663,7 @@ CREATE INDEX idx_webhook_deliveries_status ON webhook_deliveries(status, next_re
 ### 7.1 Existing Infrastructure
 
 The gamification system already has full tenant isolation:
+
 - `badges` table: `tenantId` column (null = platform-wide)
 - `userBadges` table: `tenantId` + RLS policy
 - `userPoints` table: `tenantId` + RLS policy
@@ -716,6 +724,7 @@ The `GamificationService` reads `gamification_config` for the current tenant whe
 ### 8.1 Existing Infrastructure
 
 The `tenantAnalyticsSnapshots` table already captures daily/weekly/monthly aggregates:
+
 - `activeLearners`, `completions`, `avgCompletionRate`, `totalLearningMinutes`, `newEnrollments`
 - RLS policy on `tenant_id`
 - Unique index on `(tenant_id, snapshot_date, snapshot_type)`
@@ -752,13 +761,13 @@ CREATE UNIQUE INDEX idx_dept_analytics_unique
 
 The `orgAnalytics` query returns live-computed KPIs by running aggregate queries against enrollment/completion tables:
 
-| KPI | Query Source | Computation |
-|-----|-------------|-------------|
-| Active Learners (today) | `user_courses` | `COUNT(DISTINCT user_id) WHERE last_accessed_at > NOW() - INTERVAL '24h'` |
-| Course Completion Rate | `user_courses` | `COUNT(completed) / COUNT(*)` |
-| Avg. Time to Complete | `user_courses` | `AVG(completed_at - enrolled_at)` |
-| Top Courses | `user_courses` | `GROUP BY course_id ORDER BY COUNT(*) DESC LIMIT 10` |
-| Learning Hours (week) | `user_progress` | `SUM(time_spent_seconds) / 3600` |
+| KPI                     | Query Source    | Computation                                                               |
+| ----------------------- | --------------- | ------------------------------------------------------------------------- |
+| Active Learners (today) | `user_courses`  | `COUNT(DISTINCT user_id) WHERE last_accessed_at > NOW() - INTERVAL '24h'` |
+| Course Completion Rate  | `user_courses`  | `COUNT(completed) / COUNT(*)`                                             |
+| Avg. Time to Complete   | `user_courses`  | `AVG(completed_at - enrolled_at)`                                         |
+| Top Courses             | `user_courses`  | `GROUP BY course_id ORDER BY COUNT(*) DESC LIMIT 10`                      |
+| Learning Hours (week)   | `user_progress` | `SUM(time_spent_seconds) / 3600`                                          |
 
 These are scoped by `withTenantContext()` automatically via RLS.
 
@@ -811,6 +820,7 @@ At runtime, the mobile app mirrors the web's `ThemeContext`:
 ### 9.3 OTA Updates for Branding
 
 When an org updates their branding (colors, logo), the change propagates:
+
 - **Web**: Immediate (next page load fetches new branding)
 - **Mobile**: Expo Updates OTA (no app store submission required)
   - NATS event `EDUSPHERE.org.branding.updated` triggers OTA manifest update
@@ -923,7 +933,7 @@ type ApiKey {
 
 type ApiKeyCreated {
   apiKey: ApiKey!
-  plainTextKey: String!  # Shown ONCE at creation
+  plainTextKey: String! # Shown ONCE at creation
 }
 
 # ─── Webhooks ──────────────────────────────────────────────────
@@ -1007,24 +1017,40 @@ enum LeaderboardScope {
 type Query {
   # Org management (ORG_ADMIN, SUPER_ADMIN)
   myOrganization: Organization! @authenticated
-  orgMembers(limit: Int = 20, offset: Int = 0): [OrgMember!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  orgInvitations(status: InvitationStatus): [OrgInvitation!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  orgMembers(limit: Int = 20, offset: Int = 0): [OrgMember!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  orgInvitations(status: InvitationStatus): [OrgInvitation!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # API keys (ORG_ADMIN, SUPER_ADMIN)
-  apiKeys: [ApiKey!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  apiKeys: [ApiKey!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Webhooks (ORG_ADMIN, SUPER_ADMIN)
-  webhooks: [Webhook!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  webhookDeliveries(webhookId: ID!, limit: Int = 20): [WebhookDelivery!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  webhooks: [Webhook!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  webhookDeliveries(webhookId: ID!, limit: Int = 20): [WebhookDelivery!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Licensing (ORG_ADMIN, SUPER_ADMIN)
-  courseLicenses: [CourseLicense!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  courseLicenses: [CourseLicense!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Gamification config (ORG_ADMIN)
-  gamificationConfig: GamificationConfig! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  gamificationConfig: GamificationConfig!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Analytics (ORG_ADMIN, INSTRUCTOR)
-  orgAnalytics(dateRange: DateRangeInput!): OrgAnalytics! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR, SUPER_ADMIN])
+  orgAnalytics(dateRange: DateRangeInput!): OrgAnalytics!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR, SUPER_ADMIN])
 }
 ```
 
@@ -1038,33 +1064,63 @@ type Mutation {
   createOrganization(input: CreateOrganizationInput!): Organization!
 
   # Invitations (ORG_ADMIN)
-  inviteUser(input: InviteUserInput!): OrgInvitation! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  inviteUser(input: InviteUserInput!): OrgInvitation!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   acceptInvitation(token: String!): OrgMember!
-  revokeInvitation(id: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  revokeInvitation(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Member management (ORG_ADMIN)
-  updateMemberRole(userId: ID!, role: UserRole!): OrgMember! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  removeMember(userId: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  updateMemberRole(userId: ID!, role: UserRole!): OrgMember!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  removeMember(userId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # API keys (ORG_ADMIN)
-  createApiKey(input: CreateApiKeyInput!): ApiKeyCreated! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  revokeApiKey(id: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  createApiKey(input: CreateApiKeyInput!): ApiKeyCreated!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  revokeApiKey(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Webhooks (ORG_ADMIN)
-  createWebhook(input: CreateWebhookInput!): Webhook! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  updateWebhook(id: ID!, input: UpdateWebhookInput!): Webhook! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  deleteWebhook(id: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  testWebhook(id: ID!): WebhookDelivery! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  createWebhook(input: CreateWebhookInput!): Webhook!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  updateWebhook(id: ID!, input: UpdateWebhookInput!): Webhook!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  deleteWebhook(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  testWebhook(id: ID!): WebhookDelivery!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Licensing (ORG_ADMIN)
-  licenseCourse(input: LicenseCourseInput!): CourseLicense! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  revokeCourseLicense(id: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  licenseCourse(input: LicenseCourseInput!): CourseLicense!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  revokeCourseLicense(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Gamification config (ORG_ADMIN)
-  updateGamificationConfig(input: UpdateGamificationConfigInput!): GamificationConfig! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  updateGamificationConfig(
+    input: UpdateGamificationConfigInput!
+  ): GamificationConfig!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   # Analytics export (ORG_ADMIN)
-  exportAnalytics(input: ExportAnalyticsInput!): ExportResult! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  exportAnalytics(input: ExportAnalyticsInput!): ExportResult!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 ```
 
@@ -1106,10 +1162,12 @@ type Query {
 
 type Mutation {
   publishToMarketplace(input: PublishToMarketplaceInput!): MarketplaceListing!
-    @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR, SUPER_ADMIN])
 
   unpublishFromMarketplace(listingId: ID!): Boolean!
-    @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR, SUPER_ADMIN])
 }
 ```
 
@@ -1247,6 +1305,7 @@ Migration 0043: department_analytics_snapshots table
 ### 11.2 Rollback Strategy
 
 Each migration has a corresponding `_down.rollback` file:
+
 - Drop tables in reverse order
 - Remove added columns from `tenants` table
 - Preserve existing data in `tenants`, `tenantBranding`, `tenantDomains` tables
@@ -1254,6 +1313,7 @@ Each migration has a corresponding `_down.rollback` file:
 ### 11.3 RLS Policies
 
 All new tables follow the established pattern:
+
 - `ENABLE ROW LEVEL SECURITY` on every tenant-scoped table
 - `USING (tenant_id::text = current_setting('app.current_tenant', TRUE))` for read isolation
 - `WITH CHECK (tenant_id::text = current_setting('app.current_tenant', TRUE))` for write isolation
@@ -1265,49 +1325,49 @@ All new tables follow the established pattern:
 
 ### 12.1 Provisioning Security
 
-| Threat | Mitigation |
-|--------|-----------|
-| Slug enumeration | Rate limit `createOrganization` mutation (5/hr per IP) |
-| Admin email spoofing | Email verification required before org activation |
-| Provisioning DoS | Idempotency key prevents duplicate provisioning |
-| Partial provisioning leak | Compensating saga cleans up all resources on failure |
+| Threat                    | Mitigation                                             |
+| ------------------------- | ------------------------------------------------------ |
+| Slug enumeration          | Rate limit `createOrganization` mutation (5/hr per IP) |
+| Admin email spoofing      | Email verification required before org activation      |
+| Provisioning DoS          | Idempotency key prevents duplicate provisioning        |
+| Partial provisioning leak | Compensating saga cleans up all resources on failure   |
 
 ### 12.2 API Key Security
 
-| Threat | Mitigation |
-|--------|-----------|
-| Key leakage | Plaintext shown once; stored as bcrypt hash |
-| Brute force | Key prefix lookup + bcrypt comparison = slow by design |
-| Scope escalation | Scopes validated per-request against operation |
-| Stolen key | Revocation via `revokeApiKey` mutation; `last_used_at` for auditing |
-| Key in logs | Key prefix logged, never full key |
+| Threat           | Mitigation                                                          |
+| ---------------- | ------------------------------------------------------------------- |
+| Key leakage      | Plaintext shown once; stored as bcrypt hash                         |
+| Brute force      | Key prefix lookup + bcrypt comparison = slow by design              |
+| Scope escalation | Scopes validated per-request against operation                      |
+| Stolen key       | Revocation via `revokeApiKey` mutation; `last_used_at` for auditing |
+| Key in logs      | Key prefix logged, never full key                                   |
 
 ### 12.3 Webhook Security
 
-| Threat | Mitigation |
-|--------|-----------|
+| Threat               | Mitigation                                                               |
+| -------------------- | ------------------------------------------------------------------------ |
 | SSRF via webhook URL | URL validation: no private IPs (10.x, 172.16-31.x, 192.168.x, localhost) |
-| Replay attack | Timestamp in signature + delivery ID for deduplication |
-| Secret leakage | HMAC secret stored encrypted; never returned in API responses |
-| Denial of service | Max 10 webhooks per org; auto-disable after 10 consecutive failures |
+| Replay attack        | Timestamp in signature + delivery ID for deduplication                   |
+| Secret leakage       | HMAC secret stored encrypted; never returned in API responses            |
+| Denial of service    | Max 10 webhooks per org; auto-disable after 10 consecutive failures      |
 
 ### 12.4 Marketplace Security
 
-| Threat | Mitigation |
-|--------|-----------|
-| Unlicensed content access | RLS + resolver-level license check before serving content |
-| License seat overflow | Atomic `UPDATE ... SET used_seats = used_seats + 1 WHERE used_seats < max_seats` |
-| Cross-tenant data leak | RLS on `course_licenses` with dual-tenant policy (licensee OR licensor) |
+| Threat                    | Mitigation                                                                       |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| Unlicensed content access | RLS + resolver-level license check before serving content                        |
+| License seat overflow     | Atomic `UPDATE ... SET used_seats = used_seats + 1 WHERE used_seats < max_seats` |
+| Cross-tenant data leak    | RLS on `course_licenses` with dual-tenant policy (licensee OR licensor)          |
 
 ### 12.5 SI Compliance Checklist
 
-| SI Rule | Status | Notes |
-|---------|--------|-------|
-| SI-1: RLS variable name | Compliant | All new tables use `current_setting('app.current_user_id', TRUE)` |
-| SI-3: PII encryption | Required | `adminEmail` in invitations must use `encryptField()` |
-| SI-8: DB access | Compliant | All queries via Drizzle ORM + `withTenantContext()` |
-| SI-9: Cross-tenant query | Compliant | `withTenantContext()` wraps all queries |
-| SI-10: LLM consent | N/A | No AI features in this module |
+| SI Rule                  | Status    | Notes                                                             |
+| ------------------------ | --------- | ----------------------------------------------------------------- |
+| SI-1: RLS variable name  | Compliant | All new tables use `current_setting('app.current_user_id', TRUE)` |
+| SI-3: PII encryption     | Required  | `adminEmail` in invitations must use `encryptField()`             |
+| SI-8: DB access          | Compliant | All queries via Drizzle ORM + `withTenantContext()`               |
+| SI-9: Cross-tenant query | Compliant | `withTenantContext()` wraps all queries                           |
+| SI-10: LLM consent       | N/A       | No AI features in this module                                     |
 
 ---
 
@@ -1567,16 +1627,16 @@ graph TD
 
 ## Appendix A: NATS Event Subjects (New)
 
-| Subject | Payload Type | Publisher | Consumer |
-|---------|-------------|-----------|----------|
-| `EDUSPHERE.org.provisioned` | `OrgProvisionedPayload` | OrgProvisioningService | WebhookDispatcher, Analytics |
-| `EDUSPHERE.org.user.invited` | `UserInvitedPayload` | OrgInvitationService | NotificationService, WebhookDispatcher |
-| `EDUSPHERE.org.user.joined` | `UserJoinedPayload` | OrgInvitationService | NotificationService, WebhookDispatcher, Analytics |
-| `EDUSPHERE.org.branding.updated` | `BrandingUpdatedPayload` | TenantBrandingService | Mobile OTA, CDN Cache Invalidation |
-| `EDUSPHERE.org.license.activated` | `LicenseActivatedPayload` | CourseLicenseService | WebhookDispatcher, Analytics |
-| `EDUSPHERE.org.license.expired` | `LicenseExpiredPayload` | LicenseExpiryJob (cron) | WebhookDispatcher, NotificationService |
-| `EDUSPHERE.org.webhook.disabled` | `WebhookDisabledPayload` | WebhookDispatcherService | AdminAlertService |
-| `EDUSPHERE.org.trial.expiring` | `TrialExpiringPayload` | TrialMonitorJob (cron) | NotificationService |
+| Subject                           | Payload Type              | Publisher                | Consumer                                          |
+| --------------------------------- | ------------------------- | ------------------------ | ------------------------------------------------- |
+| `EDUSPHERE.org.provisioned`       | `OrgProvisionedPayload`   | OrgProvisioningService   | WebhookDispatcher, Analytics                      |
+| `EDUSPHERE.org.user.invited`      | `UserInvitedPayload`      | OrgInvitationService     | NotificationService, WebhookDispatcher            |
+| `EDUSPHERE.org.user.joined`       | `UserJoinedPayload`       | OrgInvitationService     | NotificationService, WebhookDispatcher, Analytics |
+| `EDUSPHERE.org.branding.updated`  | `BrandingUpdatedPayload`  | TenantBrandingService    | Mobile OTA, CDN Cache Invalidation                |
+| `EDUSPHERE.org.license.activated` | `LicenseActivatedPayload` | CourseLicenseService     | WebhookDispatcher, Analytics                      |
+| `EDUSPHERE.org.license.expired`   | `LicenseExpiredPayload`   | LicenseExpiryJob (cron)  | WebhookDispatcher, NotificationService            |
+| `EDUSPHERE.org.webhook.disabled`  | `WebhookDisabledPayload`  | WebhookDispatcherService | AdminAlertService                                 |
+| `EDUSPHERE.org.trial.expiring`    | `TrialExpiringPayload`    | TrialMonitorJob (cron)   | NotificationService                               |
 
 ## Appendix B: File Structure (New Files)
 
@@ -1677,20 +1737,20 @@ apps/web/e2e/
 
 ## Appendix C: Implementation Phases
 
-| Phase | Scope | Dependencies |
-|-------|-------|-------------|
-| 1 | DB schema + migrations (tables, RLS, indexes) | None |
-| 2 | Keycloak Admin Service | Phase 1 |
-| 3 | Provisioning Pipeline Service | Phase 1, 2 |
-| 4 | Org GraphQL schema + resolvers (CRUD) | Phase 1, 3 |
-| 5 | Invitation system (backend + Keycloak) | Phase 2, 4 |
-| 6 | Subdomain routing (Nginx + Gateway plugin) | Phase 4 |
-| 7 | API Key management (backend) | Phase 1, 4 |
-| 8 | Webhook system (backend + dispatcher) | Phase 1, 4 |
-| 9 | Marketplace + Licensing (backend) | Phase 1, 4 |
-| 10 | Gamification config (backend) | Phase 1, 4 |
-| 11 | Analytics extensions (backend) | Phase 1, 4 |
-| 12 | Frontend: Onboarding wizard + Settings pages | Phase 4, 6 |
-| 13 | Frontend: Members, API Keys, Webhooks pages | Phase 5, 7, 8 |
-| 14 | Mobile: White-label + OTA branding | Phase 6, 12 |
-| 15 | E2E tests + Security audit + Load testing | Phase 1-14 |
+| Phase | Scope                                         | Dependencies  |
+| ----- | --------------------------------------------- | ------------- |
+| 1     | DB schema + migrations (tables, RLS, indexes) | None          |
+| 2     | Keycloak Admin Service                        | Phase 1       |
+| 3     | Provisioning Pipeline Service                 | Phase 1, 2    |
+| 4     | Org GraphQL schema + resolvers (CRUD)         | Phase 1, 3    |
+| 5     | Invitation system (backend + Keycloak)        | Phase 2, 4    |
+| 6     | Subdomain routing (Nginx + Gateway plugin)    | Phase 4       |
+| 7     | API Key management (backend)                  | Phase 1, 4    |
+| 8     | Webhook system (backend + dispatcher)         | Phase 1, 4    |
+| 9     | Marketplace + Licensing (backend)             | Phase 1, 4    |
+| 10    | Gamification config (backend)                 | Phase 1, 4    |
+| 11    | Analytics extensions (backend)                | Phase 1, 4    |
+| 12    | Frontend: Onboarding wizard + Settings pages  | Phase 4, 6    |
+| 13    | Frontend: Members, API Keys, Webhooks pages   | Phase 5, 7, 8 |
+| 14    | Mobile: White-label + OTA branding            | Phase 6, 12   |
+| 15    | E2E tests + Security audit + Load testing     | Phase 1-14    |

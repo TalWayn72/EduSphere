@@ -124,7 +124,9 @@ export const LiveSessionsScreen: React.FC = () => {
           renderItem={({ item }) => (
             <View style={styles.card} testID={`session-card-${item.id}`}>
               <Text style={styles.cardTitle}>{item.meetingName}</Text>
-              <Text style={styles.cardDate}>{formatDate(item.scheduledAt)}</Text>
+              <Text style={styles.cardDate}>
+                {formatDate(item.scheduledAt)}
+              </Text>
               <View style={styles.cardFooter}>
                 <Text style={styles.cardStatus}>{item.status}</Text>
                 {item.recordingUrl ? (

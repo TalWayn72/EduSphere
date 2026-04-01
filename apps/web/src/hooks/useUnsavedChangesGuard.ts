@@ -14,7 +14,10 @@
 import { useEffect } from 'react';
 import { useBlocker } from 'react-router-dom';
 
-export function useUnsavedChangesGuard(isDirty: boolean, componentName: string) {
+export function useUnsavedChangesGuard(
+  isDirty: boolean,
+  componentName: string
+) {
   const blocker = useBlocker(isDirty);
 
   // Block browser tab close / page refresh while dirty
@@ -30,10 +33,10 @@ export function useUnsavedChangesGuard(isDirty: boolean, componentName: string) 
   // Log when navigation is blocked so the bug is observable if it recurs in production
   useEffect(() => {
     if (blocker.state === 'blocked' && import.meta.env.DEV) {
-// eslint-disable-next-line no-console -- DEV-only navigation block trace
+      // eslint-disable-next-line no-console -- DEV-only navigation block trace
       console.debug(
         `[${componentName}] Navigation blocked — user has unsaved changes. ` +
-          'Show UnsavedChangesDialog and let user confirm.',
+          'Show UnsavedChangesDialog and let user confirm.'
       );
     }
   }, [blocker.state, componentName]);

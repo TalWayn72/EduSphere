@@ -35,7 +35,9 @@ test.describe('BUG-072: APQ courses regression', () => {
     await page.goto('/courses', { waitUntil: 'domcontentloaded' });
 
     // Wait for heading "Courses" to confirm page loaded
-    await expect(page.locator('h1')).toContainText('Courses', { timeout: 8_000 });
+    await expect(page.locator('h1')).toContainText('Courses', {
+      timeout: 8_000,
+    });
 
     // At least one h3 course title should be visible
     const h3 = page.locator('h3');
@@ -43,7 +45,9 @@ test.describe('BUG-072: APQ courses regression', () => {
     expect(await h3.count()).toBeGreaterThanOrEqual(1);
   });
 
-  test('no APQ/technical error strings visible on /courses', async ({ page }) => {
+  test('no APQ/technical error strings visible on /courses', async ({
+    page,
+  }) => {
     await page.goto('/courses', { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle').catch(() => {});
 
@@ -62,12 +66,16 @@ test.describe('BUG-072: OfflineBanner negative case', () => {
     await devAuth(page);
 
     // Set up route interception BEFORE navigation
-    await page.route('**/graphql', (route) => route.abort('internetdisconnected'));
+    await page.route('**/graphql', (route) =>
+      route.abort('internetdisconnected')
+    );
 
     await page.goto('/courses', { waitUntil: 'domcontentloaded' });
 
     // OfflineBanner SHOULD appear when GraphQL is truly unreachable
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // No raw technical strings in banner
     const bannerText = await page.getByTestId('offline-banner').textContent();

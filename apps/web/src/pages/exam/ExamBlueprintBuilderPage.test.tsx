@@ -23,7 +23,10 @@ vi.mock('react-hook-form', async () => {
     ...actual,
     useForm: () => ({
       register: vi.fn(() => ({})),
-      handleSubmit: vi.fn((cb: () => void) => (e: Event) => { e?.preventDefault?.(); cb(); }),
+      handleSubmit: vi.fn((cb: () => void) => (e: Event) => {
+        e?.preventDefault?.();
+        cb();
+      }),
       watch: vi.fn(),
       formState: { errors: {}, isValid: true },
       control: {},
@@ -39,11 +42,15 @@ vi.mock('@hookform/resolvers/zod', () => ({
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -76,7 +83,11 @@ import { ExamBlueprintBuilderPage } from './ExamBlueprintBuilderPage';
 
 describe('ExamBlueprintBuilderPage', () => {
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><ExamBlueprintBuilderPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <ExamBlueprintBuilderPage />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

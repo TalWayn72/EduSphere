@@ -8,14 +8,7 @@ import { AnalyticsExportController } from './analytics-export.controller';
 @Module({
   imports: [ScheduleModule.forRoot()],
   controllers: [AnalyticsExportController],
-  providers: [
-    OrgAnalyticsService,
-    AtRiskLearnerService,
-    AnalyticsSnapshotCron,
-  ],
-  exports: [
-    OrgAnalyticsService,
-    AtRiskLearnerService,
-  ],
+  providers: [OrgAnalyticsService, AtRiskLearnerService, AnalyticsSnapshotCron],
+  exports: [OrgAnalyticsService, AtRiskLearnerService],
 })
 export class OrgAnalyticsModule {}

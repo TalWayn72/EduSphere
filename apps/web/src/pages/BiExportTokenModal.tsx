@@ -33,7 +33,9 @@ export function BiExportTokenModal({
         className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-semibold">{t('biExport.generateModalTitle')}</h2>
+        <h2 className="text-lg font-semibold">
+          {t('biExport.generateModalTitle')}
+        </h2>
         {generatedToken ? (
           <div className="space-y-3">
             <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm dark:bg-amber-950 dark:border-amber-700">
@@ -45,10 +47,7 @@ export function BiExportTokenModal({
             <div className="p-3 bg-muted rounded-md font-mono text-xs break-all select-all">
               {generatedToken}
             </div>
-            <Button
-              className="w-full"
-              onClick={onClose}
-            >
+            <Button className="w-full" onClick={onClose}>
               {t('biExport.done')}
             </Button>
           </div>
@@ -66,11 +65,7 @@ export function BiExportTokenModal({
               />
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={onClose}
-              >
+              <Button variant="outline" className="flex-1" onClick={onClose}>
                 {t('biExport.cancel')}
               </Button>
               <Button

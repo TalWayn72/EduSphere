@@ -24,7 +24,9 @@ const IMPORT_URL = `${BASE_URL}/courses/00000000-0000-0000-0000-000000000001/imp
 // ─── Suite 1: Role gate ────────────────────────────────────────────────────────
 
 test.describe('Content Import — Role gate', () => {
-  test('STUDENT cannot access import page — redirected to /dashboard', async ({ page }) => {
+  test('STUDENT cannot access import page — redirected to /dashboard', async ({
+    page,
+  }) => {
     // The page requires login — in DEV_MODE the auto-auth is STUDENT role
     // If VITE_DEV_MODE=true, auto-auth is set to first available user (student)
     // Role gate in ContentImportPage.tsx redirects to /dashboard for STUDENT
@@ -60,23 +62,29 @@ test.describe('Content Import — Page structure (DEV_MODE)', () => {
 
   test('Import source selector shows 3 options', async ({ page }) => {
     // 3 source cards: YouTube, Website, Folder
-    await expect(page.getByText('YouTube Playlist')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('YouTube Playlist')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText('Website / Blog')).toBeVisible();
     await expect(page.getByText('Upload Folder / ZIP')).toBeVisible();
   });
 
-  test('clicking YouTube source reveals playlist URL input', async ({ page }) => {
+  test('clicking YouTube source reveals playlist URL input', async ({
+    page,
+  }) => {
     await page.getByText('YouTube Playlist').click();
-    await expect(
-      page.getByPlaceholder(/youtube.com\/playlist/i)
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByPlaceholder(/youtube.com\/playlist/i)).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
-  test('clicking Website source reveals website URL input', async ({ page }) => {
+  test('clicking Website source reveals website URL input', async ({
+    page,
+  }) => {
     await page.getByText('Website / Blog').click();
-    await expect(
-      page.getByPlaceholder(/your-course-site.com/i)
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByPlaceholder(/your-course-site.com/i)).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('clicking Folder source reveals FolderUploadZone', async ({ page }) => {
@@ -107,7 +115,7 @@ test.describe('Content Import — YouTube flow (mocked API)', () => {
   }) => {
     // Intercept the GraphQL importFromYoutube mutation
     await page.route('**/graphql', async (route) => {
-      const body = await route.request().postDataJSON() as { query?: string };
+      const body = (await route.request().postDataJSON()) as { query?: string };
       if (body?.query?.includes('importFromYoutube')) {
         await route.fulfill({
           status: 200,
@@ -131,9 +139,9 @@ test.describe('Content Import — YouTube flow (mocked API)', () => {
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
 
     await page.getByText('YouTube Playlist').click();
-    await page.getByPlaceholder(/youtube.com\/playlist/i).fill(
-      'https://www.youtube.com/playlist?list=PLtest123'
-    );
+    await page
+      .getByPlaceholder(/youtube.com\/playlist/i)
+      .fill('https://www.youtube.com/playlist?list=PLtest123');
     await page.getByRole('button', { name: /start import/i }).click();
 
     // Progress panel should appear
@@ -141,9 +149,11 @@ test.describe('Content Import — YouTube flow (mocked API)', () => {
     await expect(page.getByText(/5 lessons/i)).toBeVisible({ timeout: 5_000 });
   });
 
-  test('YouTube API quota error shows user-friendly message', async ({ page }) => {
+  test('YouTube API quota error shows user-friendly message', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
-      const body = await route.request().postDataJSON() as { query?: string };
+      const body = (await route.request().postDataJSON()) as { query?: string };
       if (body?.query?.includes('importFromYoutube')) {
         await route.fulfill({
           status: 200,
@@ -159,9 +169,9 @@ test.describe('Content Import — YouTube flow (mocked API)', () => {
 
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
     await page.getByText('YouTube Playlist').click();
-    await page.getByPlaceholder(/youtube.com\/playlist/i).fill(
-      'https://www.youtube.com/playlist?list=PLtest'
-    );
+    await page
+      .getByPlaceholder(/youtube.com\/playlist/i)
+      .fill('https://www.youtube.com/playlist?list=PLtest');
     await page.getByRole('button', { name: /start import/i }).click();
 
     // Error must NOT expose raw technical strings
@@ -190,7 +200,9 @@ test.describe('Content Import — @visual', () => {
     });
   });
 
-  test('visual regression — import page with YouTube source selected', async ({ page }) => {
+  test('visual regression — import page with YouTube source selected', async ({
+    page,
+  }) => {
     await page.goto(IMPORT_URL, { waitUntil: 'domcontentloaded' });
     await page.getByText('YouTube Playlist').click();
     await page.waitForLoadState('domcontentloaded');

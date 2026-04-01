@@ -54,10 +54,10 @@ import { MergeConceptsService } from './merge-concepts.service';
     // ── Layer 2: CypherService facade (depends on all domain Cypher services above)
     CypherService,
     // ── Layer 3: Application sub-services (depend on domain Cypher services)
-    GraphConceptService,       // → CypherConceptService
-    GraphConceptLinkService,   // → CypherConceptRelationService
-    GraphSearchService,        // → CypherConceptService + EmbeddingService
-    GraphPersonTermService,    // → CypherPersonService, CypherTermService
+    GraphConceptService, // → CypherConceptService
+    GraphConceptLinkService, // → CypherConceptRelationService
+    GraphSearchService, // → CypherConceptService + EmbeddingService
+    GraphPersonTermService, // → CypherPersonService, CypherTermService
     GraphSourceClusterService, // → CypherSourceService, CypherTopicClusterService, CypherLearningPathService
     // ── Layer 4: Facade (depends on all Layer 3 services)
     GraphQueryFacadeService,

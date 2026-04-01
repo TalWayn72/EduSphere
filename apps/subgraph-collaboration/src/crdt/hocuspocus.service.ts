@@ -118,7 +118,9 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
       });
     }
     await closeAllPools();
-    this.logger.log('[HocuspocusService] onModuleDestroy: server destroyed, DB pools closed');
+    this.logger.log(
+      '[HocuspocusService] onModuleDestroy: server destroyed, DB pools closed'
+    );
   }
 
   private async loadDocument(data: onLoadDocumentPayload): Promise<Y.Doc> {

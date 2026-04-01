@@ -211,7 +211,9 @@ export function CollaborativeEditorToolbar({
           ) : status === 'connecting' ? (
             <>
               <Wifi className="h-3 w-3 text-yellow-500 animate-pulse dark:text-yellow-400" />
-              <span className="text-yellow-600 dark:text-yellow-400">Connecting</span>
+              <span className="text-yellow-600 dark:text-yellow-400">
+                Connecting
+              </span>
             </>
           ) : (
             <>

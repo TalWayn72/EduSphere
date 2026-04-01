@@ -162,17 +162,27 @@ export class TopicClusterKMeansService implements OnModuleDestroy {
   ): Promise<unknown[]> {
     const embeddingRows = await this.fetchEmbeddingRows(tenantId);
     if (embeddingRows.length === 0) {
-      this.logger.warn(`[TopicClusterKMeans] No concept embeddings for tenant ${tenantId}`);
+      this.logger.warn(
+        `[TopicClusterKMeans] No concept embeddings for tenant ${tenantId}`
+      );
       return [];
     }
 
     const allIds = embeddingRows.map((r) => r.concept_id);
-    const courseConceptIds = await this.filterConceptsByCourse(allIds, courseId, tenantId);
+    const courseConceptIds = await this.filterConceptsByCourse(
+      allIds,
+      courseId,
+      tenantId
+    );
     const courseSet = new Set(courseConceptIds);
-    const filteredRows = embeddingRows.filter((r) => courseSet.has(r.concept_id));
+    const filteredRows = embeddingRows.filter((r) =>
+      courseSet.has(r.concept_id)
+    );
 
     if (filteredRows.length === 0) {
-      this.logger.warn(`[TopicClusterKMeans] No concepts for course ${courseId}, tenant ${tenantId}`);
+      this.logger.warn(
+        `[TopicClusterKMeans] No concepts for course ${courseId}, tenant ${tenantId}`
+      );
       return [];
     }
 
@@ -192,7 +202,9 @@ export class TopicClusterKMeansService implements OnModuleDestroy {
       .filter((c) => c.embedding.length > 0);
 
     if (concepts.length === 0) {
-      this.logger.warn(`[TopicClusterKMeans] All embeddings were empty for course ${courseId}`);
+      this.logger.warn(
+        `[TopicClusterKMeans] All embeddings were empty for course ${courseId}`
+      );
       return [];
     }
 

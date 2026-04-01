@@ -132,5 +132,7 @@ export async function seedEmbeddings(): Promise<void> {
     inserted++;
   }
 
-  console.log(`✅ Seeded ${inserted} concept embeddings (${EMBEDDING_DIM}-dim)`);
+  console.log(
+    `✅ Seeded ${inserted} concept embeddings (${EMBEDDING_DIM}-dim)`
+  );
 }

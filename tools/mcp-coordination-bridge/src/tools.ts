@@ -34,7 +34,10 @@ export const TOOLS: Tool[] = [
       properties: {
         path: { type: 'string', description: 'File path to lock' },
         agent_id: { type: 'string', description: 'Requesting agent ID' },
-        ttl_ms: { type: 'number', description: 'Lock TTL in ms (default 300000)' },
+        ttl_ms: {
+          type: 'number',
+          description: 'Lock TTL in ms (default 300000)',
+        },
       },
       required: ['path', 'agent_id'],
     },
@@ -127,7 +130,10 @@ export const TOOLS: Tool[] = [
       type: 'object' as const,
       properties: {
         agent_id: { type: 'string', description: 'Filter by agent (optional)' },
-        since: { type: 'number', description: 'Unix timestamp filter (optional)' },
+        since: {
+          type: 'number',
+          description: 'Unix timestamp filter (optional)',
+        },
       },
     },
   },
@@ -162,7 +168,10 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        division: { type: 'string', description: 'Filter by division (optional)' },
+        division: {
+          type: 'string',
+          description: 'Filter by division (optional)',
+        },
       },
     },
   },

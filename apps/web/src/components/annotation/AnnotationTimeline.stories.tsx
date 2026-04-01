@@ -4,10 +4,34 @@ import React from 'react';
 import { AnnotationTimeline } from './AnnotationTimeline';
 
 const SAMPLE_ANNOTATIONS = [
-  { id: '1', timestamp: 15, text: 'Introduction', color: '#8b5cf6', layer: 'personal' as const },
-  { id: '2', timestamp: 45, text: 'Key concept', color: '#3b82f6', layer: 'shared' as const },
-  { id: '3', timestamp: 120, text: 'Example code', color: '#22c55e', layer: 'instructor' as const },
-  { id: '4', timestamp: 200, text: 'Summary', color: '#f97316', layer: 'ai' as const },
+  {
+    id: '1',
+    timestamp: 15,
+    text: 'Introduction',
+    color: '#8b5cf6',
+    layer: 'personal' as const,
+  },
+  {
+    id: '2',
+    timestamp: 45,
+    text: 'Key concept',
+    color: '#3b82f6',
+    layer: 'shared' as const,
+  },
+  {
+    id: '3',
+    timestamp: 120,
+    text: 'Example code',
+    color: '#22c55e',
+    layer: 'instructor' as const,
+  },
+  {
+    id: '4',
+    timestamp: 200,
+    text: 'Summary',
+    color: '#f97316',
+    layer: 'ai' as const,
+  },
 ];
 
 const meta: Meta<typeof AnnotationTimeline> = {

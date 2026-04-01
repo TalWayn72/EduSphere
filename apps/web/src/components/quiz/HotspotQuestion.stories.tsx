@@ -5,7 +5,8 @@ import type { Hotspot } from '@/types/quiz';
 
 const sampleItem: Hotspot = {
   type: 'HOTSPOT',
-  question: 'Click on the regions that represent the frontal lobe of the brain:',
+  question:
+    'Click on the regions that represent the frontal lobe of the brain:',
   imageUrl: 'https://placehold.co/600x400/e2e8f0/64748b?text=Brain+Diagram',
   hotspots: [
     { id: 'h1', x: 25, y: 30, radius: 8, label: 'Frontal Lobe' },
@@ -18,7 +19,14 @@ const sampleItem: Hotspot = {
 
 function Wrapper({ disabled }: { disabled?: boolean }) {
   const [value, setValue] = useState<string[]>([]);
-  return <HotspotQuestion item={sampleItem} value={value} onChange={setValue} disabled={disabled} />;
+  return (
+    <HotspotQuestion
+      item={sampleItem}
+      value={value}
+      onChange={setValue}
+      disabled={disabled}
+    />
+  );
 }
 
 const meta: Meta<typeof HotspotQuestion> = {
@@ -35,7 +43,11 @@ export const Default: Story = {
 
 export const WithSelection: Story = {
   render: () => (
-    <HotspotQuestion item={sampleItem} value={['h1', 'h3']} onChange={() => {}} />
+    <HotspotQuestion
+      item={sampleItem}
+      value={['h1', 'h3']}
+      onChange={() => {}}
+    />
   ),
 };
 

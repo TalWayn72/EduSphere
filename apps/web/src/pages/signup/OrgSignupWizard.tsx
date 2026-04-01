@@ -99,7 +99,7 @@ export function OrgSignupWizard() {
         navigate('/login');
       }
     },
-    [executeMutation, navigate],
+    [executeMutation, navigate]
   );
 
   const isLastStep = step === STEPS.length - 1;
@@ -150,7 +150,10 @@ export function OrgSignupWizard() {
                     </Button>
 
                     {isLastStep ? (
-                      <Button type="submit" disabled={methods.formState.isSubmitting}>
+                      <Button
+                        type="submit"
+                        disabled={methods.formState.isSubmitting}
+                      >
                         {methods.formState.isSubmitting
                           ? t('wizard.creating')
                           : t('wizard.create')}

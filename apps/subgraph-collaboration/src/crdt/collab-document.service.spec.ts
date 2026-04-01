@@ -77,9 +77,9 @@ describe('CollabDocumentService', () => {
   it('throws NotFoundException when document not found', async () => {
     mockLimit.mockResolvedValueOnce([]);
 
-    await expect(
-      service.compactDocument('nonexistent')
-    ).rejects.toThrow('Document nonexistent not found');
+    await expect(service.compactDocument('nonexistent')).rejects.toThrow(
+      'Document nonexistent not found'
+    );
   });
 
   it('compacts document and returns result', async () => {

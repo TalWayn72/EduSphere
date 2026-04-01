@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -88,7 +94,9 @@ export class StructuredNotesWorkflow {
     );
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Create structured sections from:\nSummary: ${state.summary}\nKey points: ${state.keyPoints.slice(0, 10).join('\n')}`,
       schema: z.object({ sections: z.array(NotesSectionSchema).max(20) }),

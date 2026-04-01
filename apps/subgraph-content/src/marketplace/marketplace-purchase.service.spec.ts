@@ -66,7 +66,7 @@ describe('MarketplacePurchaseService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       await expect(
-        service.purchaseCourse(mockDb, 'c1', 'u1', 't1', 'e@e.com', 'User'),
+        service.purchaseCourse(mockDb, 'c1', 'u1', 't1', 'e@e.com', 'User')
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -80,7 +80,7 @@ describe('MarketplacePurchaseService', () => {
         .mockReturnValueOnce({ from: chain2.from });
 
       await expect(
-        service.purchaseCourse(mockDb, 'c1', 'u1', 't1', 'e@e.com', 'User'),
+        service.purchaseCourse(mockDb, 'c1', 'u1', 't1', 'e@e.com', 'User')
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -88,10 +88,15 @@ describe('MarketplacePurchaseService', () => {
       // No existing purchase
       const chain1 = makeSelectChain([]);
       // Listing found
-      const chain2 = makeSelectChain([{
-        courseId: 'c1', tenantId: 't1', isPublished: true,
-        priceCents: 4999, currency: 'usd',
-      }]);
+      const chain2 = makeSelectChain([
+        {
+          courseId: 'c1',
+          tenantId: 't1',
+          isPublished: true,
+          priceCents: 4999,
+          currency: 'usd',
+        },
+      ]);
       // Existing stripe customer
       const chain3 = makeSelectChain([{ stripeCustomerId: 'cus_123' }]);
       mockTx.select
@@ -108,7 +113,12 @@ describe('MarketplacePurchaseService', () => {
       mockTx.insert.mockReturnValue({ values: mockValues });
 
       const result = await service.purchaseCourse(
-        mockDb, 'c1', 'u1', 't1', 'e@e.com', 'User',
+        mockDb,
+        'c1',
+        'u1',
+        't1',
+        'e@e.com',
+        'User'
       );
       expect(result.clientSecret).toBe('secret_abc');
       expect(result.paymentIntentId).toBe('pi_123');
@@ -116,10 +126,15 @@ describe('MarketplacePurchaseService', () => {
 
     it('creates new Stripe customer when none exists', async () => {
       const chain1 = makeSelectChain([]);
-      const chain2 = makeSelectChain([{
-        courseId: 'c1', priceCents: 999, currency: 'usd',
-        tenantId: 't1', isPublished: true,
-      }]);
+      const chain2 = makeSelectChain([
+        {
+          courseId: 'c1',
+          priceCents: 999,
+          currency: 'usd',
+          tenantId: 't1',
+          isPublished: true,
+        },
+      ]);
       // No existing customer
       const chain3 = makeSelectChain([]);
       mockTx.select
@@ -129,17 +144,24 @@ describe('MarketplacePurchaseService', () => {
 
       mockStripeClient.createCustomer.mockResolvedValue({ id: 'cus_new' });
       mockStripeClient.createPaymentIntent.mockResolvedValue({
-        id: 'pi_456', client_secret: 'sec_xyz',
+        id: 'pi_456',
+        client_secret: 'sec_xyz',
       });
 
       const mockValues = vi.fn().mockResolvedValue(undefined);
       mockTx.insert.mockReturnValue({ values: mockValues });
 
       const result = await service.purchaseCourse(
-        mockDb, 'c1', 'u1', 't1', 'e@e.com', 'User',
+        mockDb,
+        'c1',
+        'u1',
+        't1',
+        'e@e.com',
+        'User'
       );
       expect(mockStripeClient.createCustomer).toHaveBeenCalledWith(
-        'e@e.com', 'User',
+        'e@e.com',
+        'User'
       );
       expect(result.paymentIntentId).toBe('pi_456');
     });
@@ -155,9 +177,14 @@ describe('MarketplacePurchaseService', () => {
       mockTx.update.mockReturnValue({ set: mockSet });
 
       // For publishEnrollmentEvent internal select
-      const chain = makeSelectChain([{
-        id: 'pur1', courseId: 'c1', userId: 'u1', tenantId: 't1',
-      }]);
+      const chain = makeSelectChain([
+        {
+          id: 'pur1',
+          courseId: 'c1',
+          userId: 'u1',
+          tenantId: 't1',
+        },
+      ]);
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const mockNc = { publish: vi.fn() };
@@ -165,9 +192,12 @@ describe('MarketplacePurchaseService', () => {
 
       await service.processWebhook(
         mockDb,
-        { type: 'payment_intent.succeeded', data: { object: { id: 'pi_1' } } } as any,
+        {
+          type: 'payment_intent.succeeded',
+          data: { object: { id: 'pi_1' } },
+        } as any,
         't1',
-        getNats,
+        getNats
       );
       expect(mockTx.update).toHaveBeenCalled();
     });
@@ -180,9 +210,12 @@ describe('MarketplacePurchaseService', () => {
 
       await service.processWebhook(
         mockDb,
-        { type: 'payment_intent.payment_failed', data: { object: { id: 'pi_2' } } } as any,
+        {
+          type: 'payment_intent.payment_failed',
+          data: { object: { id: 'pi_2' } },
+        } as any,
         't1',
-        getNats,
+        getNats
       );
       expect(mockTx.update).toHaveBeenCalled();
     });
@@ -192,7 +225,7 @@ describe('MarketplacePurchaseService', () => {
         mockDb,
         { type: 'charge.refunded', data: { object: {} } } as any,
         't1',
-        getNats,
+        getNats
       );
       expect(mockTx.update).not.toHaveBeenCalled();
     });

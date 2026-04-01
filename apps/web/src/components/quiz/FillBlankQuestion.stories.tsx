@@ -5,7 +5,8 @@ import type { FillBlank } from '@/types/quiz';
 
 const blankItem: FillBlank = {
   type: 'FILL_BLANK',
-  question: 'The capital of France is {{blank}} and it is known as the City of Light.',
+  question:
+    'The capital of France is {{blank}} and it is known as the City of Light.',
   correctAnswer: 'Paris',
   useSemanticMatching: false,
   similarityThreshold: 0.8,
@@ -29,7 +30,14 @@ const semanticItem: FillBlank = {
 
 function Wrapper({ item, disabled }: { item: FillBlank; disabled?: boolean }) {
   const [value, setValue] = useState('');
-  return <FillBlankQuestion item={item} value={value} onChange={setValue} disabled={disabled} />;
+  return (
+    <FillBlankQuestion
+      item={item}
+      value={value}
+      onChange={setValue}
+      disabled={disabled}
+    />
+  );
 }
 
 const meta: Meta<typeof FillBlankQuestion> = {
@@ -57,5 +65,7 @@ export const Disabled: Story = {
 };
 
 export const PreFilled: Story = {
-  render: () => <FillBlankQuestion item={blankItem} value="Paris" onChange={() => {}} />,
+  render: () => (
+    <FillBlankQuestion item={blankItem} value="Paris" onChange={() => {}} />
+  ),
 };

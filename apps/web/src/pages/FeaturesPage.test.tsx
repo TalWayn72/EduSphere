@@ -6,7 +6,9 @@ import React from 'react';
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('react-helmet-async', () => ({
@@ -27,12 +29,22 @@ vi.mock('@/lib/safe-json-ld', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => {
+  Button: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => {
     // Handle asChild by rendering the child directly
     if (props.asChild && React.isValidElement(children)) {
       return children;
     }
-    return <button {...props as React.ButtonHTMLAttributes<HTMLButtonElement>}>{children}</button>;
+    return (
+      <button {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
+        {children}
+      </button>
+    );
   },
 }));
 
@@ -54,12 +66,16 @@ describe('FeaturesPage', () => {
   it('renders page heading', () => {
     renderPage();
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.getByText('Everything You Need to Learn Smarter')).toBeInTheDocument();
+    expect(
+      screen.getByText('Everything You Need to Learn Smarter')
+    ).toBeInTheDocument();
   });
 
   it('renders header description', () => {
     renderPage();
-    expect(screen.getByText(/AI tutoring, knowledge graphs, gamification/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/AI tutoring, knowledge graphs, gamification/i)
+    ).toBeInTheDocument();
   });
 
   it('renders Get Started Free link', () => {
@@ -89,31 +105,41 @@ describe('FeaturesPage', () => {
   it('renders Gamification feature section', () => {
     renderPage();
     expect(screen.getByText('Gamification')).toBeInTheDocument();
-    expect(screen.getByText('Learning that keeps you coming back')).toBeInTheDocument();
+    expect(
+      screen.getByText('Learning that keeps you coming back')
+    ).toBeInTheDocument();
   });
 
   it('renders Enterprise Grade feature section', () => {
     renderPage();
     expect(screen.getByText('Enterprise Grade')).toBeInTheDocument();
-    expect(screen.getByText('Built for scale and compliance')).toBeInTheDocument();
+    expect(
+      screen.getByText('Built for scale and compliance')
+    ).toBeInTheDocument();
   });
 
   it('renders Multi-Language feature section', () => {
     renderPage();
     expect(screen.getByText('Multi-Language')).toBeInTheDocument();
-    expect(screen.getByText('50+ languages with full RTL support')).toBeInTheDocument();
+    expect(
+      screen.getByText('50+ languages with full RTL support')
+    ).toBeInTheDocument();
   });
 
   it('renders Live Sessions feature section', () => {
     renderPage();
     expect(screen.getByText('Live Sessions')).toBeInTheDocument();
-    expect(screen.getByText('Real-time collaborative learning')).toBeInTheDocument();
+    expect(
+      screen.getByText('Real-time collaborative learning')
+    ).toBeInTheDocument();
   });
 
   // --- Feature content ---
   it('renders benefits for AI Tutoring', () => {
     renderPage();
-    expect(screen.getByText(/Adapts to your learning pace/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Adapts to your learning pace/)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Socratic questioning/)).toBeInTheDocument();
   });
 
@@ -151,7 +177,9 @@ describe('FeaturesPage', () => {
   // --- CTA section ---
   it('renders CTA section', () => {
     renderPage();
-    expect(screen.getByText('Ready to Transform Learning?')).toBeInTheDocument();
+    expect(
+      screen.getByText('Ready to Transform Learning?')
+    ).toBeInTheDocument();
   });
 
   it('CTA has no credit card text', () => {
@@ -190,7 +218,9 @@ describe('FeaturesPage', () => {
         <FeaturesPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('Everything You Need to Learn Smarter')).toBeInTheDocument();
+    expect(
+      screen.getByText('Everything You Need to Learn Smarter')
+    ).toBeInTheDocument();
   });
 
   it('renders multiple heading levels (h1, h2, h3)', () => {

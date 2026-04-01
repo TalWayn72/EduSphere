@@ -11,12 +11,18 @@ vi.mock('@/lib/auth', () => ({ DEV_MODE: true }));
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -64,16 +70,29 @@ const baseProps = {
 describe('GraphSidebar', () => {
   it('renders without crash when no node selected', () => {
     const { container } = render(
-      <MemoryRouter><GraphSidebar {...baseProps} /></MemoryRouter>
+      <MemoryRouter>
+        <GraphSidebar {...baseProps} />
+      </MemoryRouter>
     );
     expect(container).toBeTruthy();
   });
 
   it('renders without crash with selected node', () => {
-    const node = { id: 'n-1', label: 'Concept A', type: 'CONCEPT' as const, x: 0, y: 0 };
+    const node = {
+      id: 'n-1',
+      label: 'Concept A',
+      type: 'CONCEPT' as const,
+      x: 0,
+      y: 0,
+    };
     const { container } = render(
       <MemoryRouter>
-        <GraphSidebar {...baseProps} selectedNode={node} effectiveSelectedId="n-1" selectedNodeName="Concept A" />
+        <GraphSidebar
+          {...baseProps}
+          selectedNode={node}
+          effectiveSelectedId="n-1"
+          selectedNodeName="Concept A"
+        />
       </MemoryRouter>
     );
     expect(container).toBeTruthy();

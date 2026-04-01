@@ -35,7 +35,11 @@ vi.mock('react-i18next', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockUseQuery.mockReturnValue({ data: undefined, loading: false, error: undefined });
+  mockUseQuery.mockReturnValue({
+    data: undefined,
+    loading: false,
+    error: undefined,
+  });
 });
 
 describe('HomeScreen — welcome message', () => {
@@ -58,7 +62,11 @@ describe('HomeScreen — welcome message', () => {
 
 describe('HomeScreen — Apollo query states', () => {
   it('loading state: data is undefined', () => {
-    mockUseQuery.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
     const result = mockUseQuery();
     expect(result.loading).toBe(true);
     expect(result.data).toBeUndefined();
@@ -66,7 +74,10 @@ describe('HomeScreen — Apollo query states', () => {
 
   it('success state: me + myCourses present', () => {
     mockUseQuery.mockReturnValue({
-      data: { me: MOCK_USER, myCourses: { edges: MOCK_RECENT_COURSES.map(c => ({ node: c })) } },
+      data: {
+        me: MOCK_USER,
+        myCourses: { edges: MOCK_RECENT_COURSES.map((c) => ({ node: c })) },
+      },
       loading: false,
       error: undefined,
     });
@@ -76,7 +87,11 @@ describe('HomeScreen — Apollo query states', () => {
   });
 
   it('error state: shows error, data is undefined', () => {
-    mockUseQuery.mockReturnValue({ data: undefined, loading: false, error: new Error('Network') });
+    mockUseQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error('Network'),
+    });
     const result = mockUseQuery();
     expect(result.error).toBeDefined();
   });
@@ -97,10 +112,10 @@ describe('HomeScreen — stat card value computation', () => {
   });
 
   it('stat colors match design tokens', () => {
-    expect(COLORS.primary).toBe('#6366F1');   // activeCourses
-    expect(COLORS.warning).toBe('#F59E0B');   // streak
-    expect(COLORS.success).toBe('#10B981');   // study time
-    expect(COLORS.accent).toBe('#8B5CF6');    // concepts
+    expect(COLORS.primary).toBe('#6366F1'); // activeCourses
+    expect(COLORS.warning).toBe('#F59E0B'); // streak
+    expect(COLORS.success).toBe('#10B981'); // study time
+    expect(COLORS.accent).toBe('#8B5CF6'); // concepts
   });
 });
 
@@ -112,7 +127,11 @@ describe('HomeScreen — resolveStats integration', () => {
   });
 
   it('real API stats override mock when available', () => {
-    const api = { coursesEnrolled: 10, conceptsMastered: 200, totalLearningMinutes: 1200 };
+    const api = {
+      coursesEnrolled: 10,
+      conceptsMastered: 200,
+      totalLearningMinutes: 1200,
+    };
     const stats = resolveStats(false, api, MOCK_STATS);
     expect(stats.activeCourses).toBe(10);
     expect(stats.conceptsMastered).toBe(200);
@@ -123,6 +142,8 @@ describe('HomeScreen — navigation', () => {
   it('course card navigates to CourseDetail with courseId', () => {
     const courseId = MOCK_RECENT_COURSES[0].id;
     mockNavigate('CourseDetail', { courseId });
-    expect(mockNavigate).toHaveBeenCalledWith('CourseDetail', { courseId: 'course-1' });
+    expect(mockNavigate).toHaveBeenCalledWith('CourseDetail', {
+      courseId: 'course-1',
+    });
   });
 });

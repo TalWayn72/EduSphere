@@ -53,7 +53,9 @@ export class ConceptExtractor {
       const truncatedText = text.slice(0, 8000); // Stay within token budget
 
       const { object } = await generateObject({
-        model: model as unknown as Parameters<typeof generateObject>[0]['model'],
+        model: model as unknown as Parameters<
+          typeof generateObject
+        >[0]['model'],
         schema: ExtractedConceptSchema,
         system: SYSTEM_PROMPT,
         prompt: `Course ID: ${courseId}\n\nTranscript:\n${truncatedText}`,

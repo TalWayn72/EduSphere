@@ -36,7 +36,9 @@ export function InvestorDeckPage() {
   const navigate = useNavigate();
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery<{ platformLiveStats: PlatformStats }>({
     query: PLATFORM_LIVE_STATS_QUERY,
@@ -48,26 +50,42 @@ export function InvestorDeckPage() {
 
   if (role !== 'SUPER_ADMIN') {
     return (
-      <div data-testid="investor-deck-page" className="min-h-screen flex items-center justify-center bg-background">
+      <div
+        data-testid="investor-deck-page"
+        className="min-h-screen flex items-center justify-center bg-background"
+      >
         <div data-testid="access-denied" className="text-center space-y-4">
           <p className="text-4xl">&#128274;</p>
           <h1 className="text-2xl font-bold">Access Denied</h1>
-          <p className="text-muted-foreground">This page is restricted to SUPER_ADMIN users only.</p>
-          <Button onClick={() => navigate('/dashboard')}>Return to Dashboard</Button>
+          <p className="text-muted-foreground">
+            This page is restricted to SUPER_ADMIN users only.
+          </p>
+          <Button onClick={() => navigate('/dashboard')}>
+            Return to Dashboard
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div data-testid="investor-deck-page" className="min-h-screen bg-background">
+    <div
+      data-testid="investor-deck-page"
+      className="min-h-screen bg-background"
+    >
       <PageShell size="md" className="py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">EduSphere — Investor Deck</h1>
-            <p className="text-muted-foreground mt-1 text-sm">Confidential — Internal Use Only</p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Confidential — Internal Use Only
+            </p>
           </div>
-          <Button data-testid="export-deck-pdf-btn" variant="outline" onClick={() => window.print()}>
+          <Button
+            data-testid="export-deck-pdf-btn"
+            variant="outline"
+            onClick={() => window.print()}
+          >
             Export PDF
           </Button>
         </div>

@@ -24,7 +24,10 @@ export interface CohortInsightsWidgetProps {
   courseId: string;
 }
 
-export function CohortInsightsWidget({ conceptId, courseId }: CohortInsightsWidgetProps) {
+export function CohortInsightsWidget({
+  conceptId,
+  courseId,
+}: CohortInsightsWidgetProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

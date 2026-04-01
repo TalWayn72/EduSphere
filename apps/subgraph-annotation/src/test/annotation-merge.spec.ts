@@ -38,7 +38,10 @@ vi.mock('@edusphere/db', () => ({
     vi.fn((str: TemplateStringsArray) => str),
     { placeholder: vi.fn() }
   ),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) => cb(mockTx)),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) =>
+      cb(mockTx)
+  ),
   closeAllPools: vi.fn(),
 }));
 
@@ -136,9 +139,9 @@ describe('Annotation Merge — promote workflow', () => {
   });
 
   it('student cannot promote (reject — unauthorized to merge own annotation)', async () => {
-    await expect(
-      service.promote('ann-merge-1', studentAuth)
-    ).rejects.toThrow('Only instructors can promote annotations');
+    await expect(service.promote('ann-merge-1', studentAuth)).rejects.toThrow(
+      'Only instructors can promote annotations'
+    );
   });
 
   it('promote throws when annotation not found (merge request for nonexistent)', async () => {

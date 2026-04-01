@@ -14,7 +14,8 @@ import { render, screen } from '@testing-library/react';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
-      if (key === 'orgOnboarding.trialDaysRemaining') return `${opts?.days} days remaining`;
+      if (key === 'orgOnboarding.trialDaysRemaining')
+        return `${opts?.days} days remaining`;
       if (key === 'orgOnboarding.trialExpired') return 'Trial expired';
       return key;
     },
@@ -49,7 +50,6 @@ describe('TrialBanner', () => {
   });
 
   it('renders nothing when subscription is active', () => {
-
     vi.mocked(useSubscription).mockReturnValue({
       status: 'active',
       daysRemaining: 0,
@@ -61,7 +61,6 @@ describe('TrialBanner', () => {
   });
 
   it('shows green urgency when > 30 days remain', () => {
-
     vi.mocked(useSubscription).mockReturnValue({
       status: 'trialing',
       daysRemaining: 60,
@@ -74,7 +73,6 @@ describe('TrialBanner', () => {
   });
 
   it('shows yellow urgency when 7-30 days remain', () => {
-
     vi.mocked(useSubscription).mockReturnValue({
       status: 'trialing',
       daysRemaining: 15,
@@ -87,7 +85,6 @@ describe('TrialBanner', () => {
   });
 
   it('shows orange urgency when 2-7 days remain', () => {
-
     vi.mocked(useSubscription).mockReturnValue({
       status: 'trialing',
       daysRemaining: 5,
@@ -100,7 +97,6 @@ describe('TrialBanner', () => {
   });
 
   it('shows red urgency when ≤ 2 days remain', () => {
-
     vi.mocked(useSubscription).mockReturnValue({
       status: 'trialing',
       daysRemaining: 1,
@@ -113,7 +109,6 @@ describe('TrialBanner', () => {
   });
 
   it('shows expired message when days = 0', () => {
-
     vi.mocked(useSubscription).mockReturnValue({
       status: 'past_due',
       daysRemaining: 0,

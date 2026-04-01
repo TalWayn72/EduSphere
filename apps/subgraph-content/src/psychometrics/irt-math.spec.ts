@@ -63,7 +63,7 @@ describe('irt-math', () => {
         { a: 1, b: 0, c: 0.2 },
       ];
       expect(computeTestInformation(items2, 0)).toBeGreaterThan(
-        computeTestInformation(items1, 0),
+        computeTestInformation(items1, 0)
       );
     });
 
@@ -83,8 +83,12 @@ describe('irt-math', () => {
         { userId: 'u6', isCorrect: false },
       ];
       const thetas = new Map([
-        ['u1', 1.5], ['u2', 1.0], ['u3', -1.0],
-        ['u4', -1.5], ['u5', 0.5], ['u6', -0.5],
+        ['u1', 1.5],
+        ['u2', 1.0],
+        ['u3', -1.0],
+        ['u4', -1.5],
+        ['u5', 0.5],
+        ['u6', -0.5],
       ]);
       const result = runEM(responses, thetas);
       expect(result.a).toBeGreaterThanOrEqual(0.2);
@@ -130,7 +134,9 @@ describe('irt-math', () => {
       const mkResponses = (correctCount: number) =>
         Array.from({ length: 10 }, (_, i) => ({
           isCorrect: i < correctCount,
-          irtA: 1, irtB: 0, irtC: 0.1,
+          irtA: 1,
+          irtB: 0,
+          irtC: 0.1,
         }));
       const low = estimateAbilityMLE(mkResponses(2));
       const high = estimateAbilityMLE(mkResponses(8));

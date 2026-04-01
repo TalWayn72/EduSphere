@@ -18,7 +18,9 @@ describe('useBrowserLockdown', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     // Mock requestFullscreen
-    document.documentElement.requestFullscreen = vi.fn().mockResolvedValue(undefined);
+    document.documentElement.requestFullscreen = vi
+      .fn()
+      .mockResolvedValue(undefined);
     document.exitFullscreen = vi.fn().mockResolvedValue(undefined);
   });
 
@@ -42,14 +44,22 @@ describe('useBrowserLockdown', () => {
     renderHook(() => useBrowserLockdown({ enabled: true, onViolation }));
 
     // Simulate hidden
-    Object.defineProperty(document, 'hidden', { value: true, writable: true, configurable: true });
+    Object.defineProperty(document, 'hidden', {
+      value: true,
+      writable: true,
+      configurable: true,
+    });
     act(() => {
       document.dispatchEvent(new Event('visibilitychange'));
     });
     expect(onViolation).toHaveBeenCalledWith('TAB_SWITCH');
 
     // Reset
-    Object.defineProperty(document, 'hidden', { value: false, writable: true, configurable: true });
+    Object.defineProperty(document, 'hidden', {
+      value: false,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('reports TAB_SWITCH on blur', () => {
@@ -100,7 +110,11 @@ describe('useBrowserLockdown', () => {
     renderHook(() => useBrowserLockdown({ enabled: true, onViolation }));
 
     act(() => {
-      const e = new KeyboardEvent('keydown', { key: 'c', ctrlKey: true, cancelable: true });
+      const e = new KeyboardEvent('keydown', {
+        key: 'c',
+        ctrlKey: true,
+        cancelable: true,
+      });
       document.dispatchEvent(e);
     });
     expect(onViolation).toHaveBeenCalledWith('KEYBOARD_SHORTCUT');
@@ -120,12 +134,20 @@ describe('useBrowserLockdown', () => {
   it('cleans up event listeners on unmount (MEMORY SAFETY)', () => {
     const removeSpy = vi.spyOn(document, 'removeEventListener');
     const onViolation = vi.fn();
-    const { unmount } = renderHook(() => useBrowserLockdown({ enabled: true, onViolation }));
+    const { unmount } = renderHook(() =>
+      useBrowserLockdown({ enabled: true, onViolation })
+    );
 
     unmount();
     // Should have removed: fullscreenchange, visibilitychange, copy, paste, cut, contextmenu, keydown
-    expect(removeSpy).toHaveBeenCalledWith('fullscreenchange', expect.any(Function));
-    expect(removeSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith(
+      'fullscreenchange',
+      expect.any(Function)
+    );
+    expect(removeSpy).toHaveBeenCalledWith(
+      'visibilitychange',
+      expect.any(Function)
+    );
     expect(removeSpy).toHaveBeenCalledWith('contextmenu', expect.any(Function));
     removeSpy.mockRestore();
   });
@@ -133,7 +155,9 @@ describe('useBrowserLockdown', () => {
   it('cleans up devtools check interval on unmount (MEMORY SAFETY)', () => {
     const clearSpy = vi.spyOn(globalThis, 'clearInterval');
     const onViolation = vi.fn();
-    const { unmount } = renderHook(() => useBrowserLockdown({ enabled: true, onViolation }));
+    const { unmount } = renderHook(() =>
+      useBrowserLockdown({ enabled: true, onViolation })
+    );
 
     unmount();
     expect(clearSpy).toHaveBeenCalled();
@@ -141,7 +165,9 @@ describe('useBrowserLockdown', () => {
   });
 
   it('returns isFullscreen state', () => {
-    const { result } = renderHook(() => useBrowserLockdown({ enabled: true, onViolation: vi.fn() }));
+    const { result } = renderHook(() =>
+      useBrowserLockdown({ enabled: true, onViolation: vi.fn() })
+    );
     expect(result.current.isFullscreen).toBe(false);
   });
 });

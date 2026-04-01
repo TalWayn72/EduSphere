@@ -34,9 +34,14 @@ export function MatchPanel({
               <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold">{t('humanChavruta')}</h2>
             </div>
-            <p className="text-sm text-muted-foreground">{t('humanChavrutaDescription')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('humanChavrutaDescription')}
+            </p>
             {matchState === 'idle' || matchMode !== 'human' ? (
-              <Button className="w-full" onClick={() => onStartMatching('human')}>
+              <Button
+                className="w-full"
+                onClick={() => onStartMatching('human')}
+              >
                 {t('findPartner')}
               </Button>
             ) : matchState === 'searching' ? (
@@ -62,13 +67,19 @@ export function MatchPanel({
               <Bot className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               <h2 className="font-semibold">{t('aiChavruta')}</h2>
             </div>
-            <p className="text-sm text-muted-foreground">{t('aiChavrutaDescription')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('aiChavrutaDescription')}
+            </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <div className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-600" />
               <span>{t('alwaysAvailable')}</span>
             </div>
             {matchState === 'idle' || matchMode !== 'ai' ? (
-              <Button className="w-full" variant="outline" onClick={() => onStartMatching('ai')}>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => onStartMatching('ai')}
+              >
                 {t('startAiChavruta')}
               </Button>
             ) : matchState === 'searching' ? (

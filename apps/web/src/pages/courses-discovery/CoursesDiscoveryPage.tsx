@@ -131,7 +131,11 @@ export function CoursesDiscoveryPage() {
             ? t('loadingCourses')
             : filtered.length === 0 && !error
               ? t('noCoursesMatchFilters')
-              : t('showingOfCount', { showing: Math.min(visible.length, filtered.length), total: filtered.length, plural: filtered.length !== 1 ? 's' : '' })}
+              : t('showingOfCount', {
+                  showing: Math.min(visible.length, filtered.length),
+                  total: filtered.length,
+                  plural: filtered.length !== 1 ? 's' : '',
+                })}
         </p>
 
         {/* Courses grid / list */}
@@ -148,15 +152,11 @@ export function CoursesDiscoveryPage() {
           aria-label="Course listing"
         >
           {fetching
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
+            ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
             : error
               ? [<ErrorBanner key="error" />]
               : visible.length === 0
-                ? [
-                    <EmptyState key="empty" query={debouncedSearch} />,
-                  ]
+                ? [<EmptyState key="empty" query={debouncedSearch} />]
                 : visible.map((course) => (
                     <CourseCard
                       key={course.id}

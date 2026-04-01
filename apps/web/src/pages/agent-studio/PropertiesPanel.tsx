@@ -26,7 +26,10 @@ export function PropertiesPanel({
   onDelete,
 }: PropertiesPanelProps) {
   return (
-    <Card className="w-48 flex-shrink-0 p-3 overflow-y-auto" data-testid="properties-panel">
+    <Card
+      className="w-48 flex-shrink-0 p-3 overflow-y-auto"
+      data-testid="properties-panel"
+    >
       <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
         Properties
       </p>
@@ -34,7 +37,12 @@ export function PropertiesPanel({
         <div className="space-y-3">
           <div>
             <label className="text-[10px] text-muted-foreground">Type</label>
-            <p className={cn('text-xs font-semibold mt-0.5', NODE_META[selectedNode.type].color)}>
+            <p
+              className={cn(
+                'text-xs font-semibold mt-0.5',
+                NODE_META[selectedNode.type].color
+              )}
+            >
               {NODE_META[selectedNode.type].label}
             </p>
           </div>

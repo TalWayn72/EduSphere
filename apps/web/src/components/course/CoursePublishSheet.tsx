@@ -16,12 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  CheckCircle2,
-  XCircle,
-  Loader2,
-  Send,
-} from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, Send } from 'lucide-react';
 import {
   COURSE_READINESS_QUERY,
   PUBLISH_COURSE_MUTATION,
@@ -105,7 +100,11 @@ export const CoursePublishSheet: React.FC<Props> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-3 py-4" role="list" aria-label="readiness checks">
+          <div
+            className="flex flex-col gap-3 py-4"
+            role="list"
+            aria-label="readiness checks"
+          >
             {isLoading && (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -170,8 +169,7 @@ export const CoursePublishSheet: React.FC<Props> = ({
           <DialogHeader>
             <DialogTitle>אישור פרסום</DialogTitle>
             <DialogDescription>
-              האם אתה בטוח שברצונך לפרסם את הקורס? הקורס יהיה נגיש לכל
-              המשתמשים.
+              האם אתה בטוח שברצונך לפרסם את הקורס? הקורס יהיה נגיש לכל המשתמשים.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

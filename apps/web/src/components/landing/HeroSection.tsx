@@ -54,11 +54,15 @@ export function HeroSection() {
       {/* Layer 4 — content */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center w-full">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1.5 text-sm font-medium text-indigo-100 mb-8 dark:bg-indigo-400/20 dark:border-indigo-500/30 dark:text-indigo-300">
-          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse dark:bg-indigo-500" aria-hidden="true" />
+          <span
+            className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse dark:bg-indigo-500"
+            aria-hidden="true"
+          />
           {t('landing.hero.badge')}
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-          {t('landing.hero.title')}<br className="hidden sm:block" /> {t('landing.hero.titleBreak')}
+          {t('landing.hero.title')}
+          <br className="hidden sm:block" /> {t('landing.hero.titleBreak')}
         </h1>
         <p className="text-lg sm:text-xl text-indigo-100 mb-4 max-w-3xl mx-auto leading-relaxed dark:text-indigo-300">
           {t('landing.hero.subtitle')}

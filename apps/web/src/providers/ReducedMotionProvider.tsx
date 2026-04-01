@@ -8,13 +8,18 @@ const ReducedMotionContext = createContext<ReducedMotionContextValue>({
   prefersReducedMotion: false,
 });
 
-export function ReducedMotionProvider({ children }: { children: React.ReactNode }) {
+export function ReducedMotionProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    const handler = (e: MediaQueryListEvent) =>
+      setPrefersReducedMotion(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);

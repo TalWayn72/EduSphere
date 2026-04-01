@@ -91,7 +91,9 @@ describe('InviteUserModal', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /invite/i }));
     await waitFor(() =>
-      expect(screen.getByText('Failed to create user. Please try again.')).toBeInTheDocument()
+      expect(
+        screen.getByText('Failed to create user. Please try again.')
+      ).toBeInTheDocument()
     );
   });
 

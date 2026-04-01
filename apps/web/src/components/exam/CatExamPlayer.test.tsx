@@ -17,22 +17,30 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // ── Mocks ───────────────────────────────────────────────────────────────────
 
 vi.mock('./CatProgressIndicator', () => ({
-  CatProgressIndicator: vi.fn(() => <div data-testid="cat-progress">Progress</div>),
+  CatProgressIndicator: vi.fn(() => (
+    <div data-testid="cat-progress">Progress</div>
+  )),
 }));
 
 vi.mock('./SecureExamWrapper', () => ({
-  SecureExamWrapper: vi.fn(({ children }: { children: React.ReactNode }) => <div>{children}</div>),
+  SecureExamWrapper: vi.fn(({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  )),
 }));
 
 vi.mock('./CatExamTimer', () => ({
   CatExamTimer: vi.fn(({ onExpired }: { onExpired: () => void }) => (
-    <button data-testid="cat-timer" onClick={onExpired}>Timer</button>
+    <button data-testid="cat-timer" onClick={onExpired}>
+      Timer
+    </button>
   )),
 }));
 
 vi.mock('./CatQuestionCard', () => ({
   CatQuestionCard: vi.fn(({ onSelect }: { onSelect: (id: string) => void }) => (
-    <button data-testid="cat-question" onClick={() => onSelect('opt-1')}>Question</button>
+    <button data-testid="cat-question" onClick={() => onSelect('opt-1')}>
+      Question
+    </button>
   )),
 }));
 
@@ -107,7 +115,7 @@ describe('CatExamPlayer', () => {
   it('shows Submitting... text when submitting', async () => {
     // Mock a slow fetch
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockReturnValue(
-      new Promise(() => {}), // never resolves
+      new Promise(() => {}) // never resolves
     );
     render(<CatExamPlayer {...baseProps} />);
 
@@ -127,13 +135,15 @@ describe('CatExamPlayer', () => {
     // Click the mock timer which triggers onExpired
     fireEvent.click(screen.getByTestId('cat-timer'));
     expect(onComplete).toHaveBeenCalledWith(
-      expect.objectContaining({ reason: 'TIME_EXPIRED', sessionId: 's1' }),
+      expect.objectContaining({ reason: 'TIME_EXPIRED', sessionId: 's1' })
     );
   });
 
   it('returns null after termination', () => {
     const onComplete = vi.fn();
-    const { container } = render(<CatExamPlayer {...baseProps} onComplete={onComplete} />);
+    const { container } = render(
+      <CatExamPlayer {...baseProps} onComplete={onComplete} />
+    );
 
     // Terminate via timer
     fireEvent.click(screen.getByTestId('cat-timer'));
@@ -157,7 +167,12 @@ describe('CatExamPlayer', () => {
   });
 
   it('calls onComplete when CAT terminates', async () => {
-    const result = { sessionId: 's1', theta: 1.5, se: 0.3, reason: 'CONVERGED' };
+    const result = {
+      sessionId: 's1',
+      theta: 1.5,
+      se: 0.3,
+      reason: 'CONVERGED',
+    };
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       json: () => Promise.resolve({ terminated: true, result }),
     });

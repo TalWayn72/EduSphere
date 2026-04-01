@@ -52,22 +52,19 @@ describe('Progress component', () => {
 
   it('indicator translateX is -100% when value=0 (bar empty)', () => {
     const { getByRole } = render(<Progress value={0} />);
-    const indicator = getByRole('progressbar')
-      .firstElementChild as HTMLElement;
+    const indicator = getByRole('progressbar').firstElementChild as HTMLElement;
     expect(indicator.style.transform).toBe('translateX(-100%)');
   });
 
   it('indicator translateX is 0% when value=100 (bar full)', () => {
     const { getByRole } = render(<Progress value={100} />);
-    const indicator = getByRole('progressbar')
-      .firstElementChild as HTMLElement;
+    const indicator = getByRole('progressbar').firstElementChild as HTMLElement;
     expect(indicator.style.transform).toBe('translateX(-0%)');
   });
 
   it('indicator translateX is -50% when value=50', () => {
     const { getByRole } = render(<Progress value={50} />);
-    const indicator = getByRole('progressbar')
-      .firstElementChild as HTMLElement;
+    const indicator = getByRole('progressbar').firstElementChild as HTMLElement;
     expect(indicator.style.transform).toBe('translateX(-50%)');
   });
 

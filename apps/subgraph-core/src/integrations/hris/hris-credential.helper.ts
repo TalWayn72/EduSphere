@@ -5,20 +5,15 @@
  * on retrieval. Credentials are NEVER logged — only masked placeholders.
  */
 import { Logger } from '@nestjs/common';
-import {
-  encryptField,
-  decryptField,
-  deriveTenantKey,
-} from '@edusphere/db';
+import { encryptField, decryptField, deriveTenantKey } from '@edusphere/db';
 import type { HrisConfig } from './hris-adapter.interface.js';
 
 const logger = new Logger('HrisCredentialHelper');
 
 /** Fields on HrisConfig that contain secrets and must be encrypted. */
-const SECRET_FIELDS: ReadonlyArray<keyof Pick<HrisConfig, 'clientId' | 'clientSecret'>> = [
-  'clientId',
-  'clientSecret',
-];
+const SECRET_FIELDS: ReadonlyArray<
+  keyof Pick<HrisConfig, 'clientId' | 'clientSecret'>
+> = ['clientId', 'clientSecret'];
 
 /**
  * Return a copy of the config with clientId/clientSecret encrypted
@@ -39,7 +34,7 @@ export function encryptHrisCredentials(config: HrisConfig): HrisConfig {
 
   logger.log(
     { tenantId: config.tenantId, type: config.type },
-    'HRIS credentials encrypted for storage',
+    'HRIS credentials encrypted for storage'
   );
   return encrypted;
 }
@@ -62,7 +57,7 @@ export function decryptHrisCredentials(config: HrisConfig): HrisConfig {
       } catch {
         logger.error(
           { tenantId: config.tenantId, field },
-          'Failed to decrypt HRIS credential — field may be plaintext or corrupt',
+          'Failed to decrypt HRIS credential — field may be plaintext or corrupt'
         );
       }
     }

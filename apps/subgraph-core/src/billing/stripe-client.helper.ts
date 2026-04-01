@@ -39,9 +39,7 @@ const logger = new Logger('StripeClientHelper');
 export function createStripeClient(): StripeClient | null {
   const key = process.env['STRIPE_SECRET_KEY'];
   if (!key) {
-    logger.warn(
-      '[StripeClientHelper] STRIPE_SECRET_KEY not set — stub mode'
-    );
+    logger.warn('[StripeClientHelper] STRIPE_SECRET_KEY not set — stub mode');
     return null;
   }
 
@@ -52,10 +50,7 @@ export function createStripeClient(): StripeClient | null {
     logger.log('[StripeClientHelper] Stripe SDK initialized');
     return client;
   } catch (err) {
-    logger.error(
-      { err },
-      '[StripeClientHelper] Failed to init Stripe SDK'
-    );
+    logger.error({ err }, '[StripeClientHelper] Failed to init Stripe SDK');
     return null;
   }
 }
@@ -64,10 +59,15 @@ export function mapStripeStatus(
   status: string | null
 ): 'draft' | 'open' | 'paid' | 'void' {
   switch (status) {
-    case 'draft': return 'draft';
-    case 'open': return 'open';
-    case 'paid': return 'paid';
-    case 'void': return 'void';
-    default: return 'draft';
+    case 'draft':
+      return 'draft';
+    case 'open':
+      return 'open';
+    case 'paid':
+      return 'paid';
+    case 'void':
+      return 'void';
+    default:
+      return 'draft';
   }
 }

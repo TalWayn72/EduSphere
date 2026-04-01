@@ -11,7 +11,12 @@ describe('OptimizedImage', () => {
 
   it('renders <picture> with webp source for /uploads/ URLs', () => {
     const { container } = render(
-      <OptimizedImage src="/uploads/test.jpg" alt="test" width={100} height={100} />
+      <OptimizedImage
+        src="/uploads/test.jpg"
+        alt="test"
+        width={100}
+        height={100}
+      />
     );
     expect(container.querySelector('picture')).toBeTruthy();
     expect(container.querySelector('source[type="image/webp"]')).toBeTruthy();
@@ -34,21 +39,27 @@ describe('OptimizedImage', () => {
 
   it('has decoding="async"', () => {
     const { container } = render(<OptimizedImage src="/test.png" alt="test" />);
-    expect(container.querySelector('img')?.getAttribute('decoding')).toBe('async');
+    expect(container.querySelector('img')?.getAttribute('decoding')).toBe(
+      'async'
+    );
   });
 
   it('accepts loading="eager"', () => {
     const { container } = render(
       <OptimizedImage src="/test.png" alt="test" loading="eager" />
     );
-    expect(container.querySelector('img')?.getAttribute('loading')).toBe('eager');
+    expect(container.querySelector('img')?.getAttribute('loading')).toBe(
+      'eager'
+    );
   });
 
   it('applies className to the img element', () => {
     const { container } = render(
       <OptimizedImage src="/test.png" alt="test" className="rounded-lg" />
     );
-    expect(container.querySelector('img')?.classList.contains('rounded-lg')).toBe(true);
+    expect(
+      container.querySelector('img')?.classList.contains('rounded-lg')
+    ).toBe(true);
   });
 
   it('sets width and height on img to prevent CLS', () => {

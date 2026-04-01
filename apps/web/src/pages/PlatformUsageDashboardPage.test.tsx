@@ -70,7 +70,11 @@ function renderPage() {
 describe('PlatformUsageDashboardPage', () => {
   beforeEach(() => {
     vi.mocked(useQuery).mockReturnValue([
-      { data: { platformUsageOverview: MOCK_TENANTS }, fetching: false, error: undefined },
+      {
+        data: { platformUsageOverview: MOCK_TENANTS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
       vi.fn(),
     ] as ReturnType<typeof useQuery>);
@@ -116,7 +120,9 @@ describe('PlatformUsageDashboardPage', () => {
   it('shows yellow status for 80-99% utilization', () => {
     renderPage();
     const rows = screen.getAllByRole('row');
-    const betaRow = rows.find((r) => r.textContent?.includes('Beta University'));
+    const betaRow = rows.find((r) =>
+      r.textContent?.includes('Beta University')
+    );
     expect(betaRow?.textContent).toContain('🟡');
   });
 
@@ -133,7 +139,9 @@ describe('PlatformUsageDashboardPage', () => {
     ] as ReturnType<typeof useQuery>);
 
     renderPage();
-    expect(screen.queryByTestId('platform-usage-table')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('platform-usage-table')
+    ).not.toBeInTheDocument();
   });
 
   it('sorts by utilization % descending', () => {

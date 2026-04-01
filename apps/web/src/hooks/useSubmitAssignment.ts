@@ -55,7 +55,10 @@ export function useSubmitAssignment(
           textContent,
         });
         if (result.error) {
-          console.error('[useSubmitAssignment] Submission failed:', result.error.message);
+          console.error(
+            '[useSubmitAssignment] Submission failed:',
+            result.error.message
+          );
           setError('Failed to submit assignment. Please try again.');
           return null;
         }

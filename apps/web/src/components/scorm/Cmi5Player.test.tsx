@@ -72,15 +72,13 @@ describe('Cmi5Player', () => {
 
   it('calls onTerminated when receiving matching cmi5:terminated message', async () => {
     const onTerminated = vi.fn();
-    render(
-      <Cmi5Player {...defaultProps} onTerminated={onTerminated} />,
-    );
+    render(<Cmi5Player {...defaultProps} onTerminated={onTerminated} />);
 
     await act(async () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: { type: 'cmi5:terminated', sessionId: 'session-123' },
-        }),
+        })
       );
     });
 
@@ -89,15 +87,13 @@ describe('Cmi5Player', () => {
 
   it('does NOT call onTerminated for non-matching sessionId', async () => {
     const onTerminated = vi.fn();
-    render(
-      <Cmi5Player {...defaultProps} onTerminated={onTerminated} />,
-    );
+    render(<Cmi5Player {...defaultProps} onTerminated={onTerminated} />);
 
     await act(async () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: { type: 'cmi5:terminated', sessionId: 'wrong-session' },
-        }),
+        })
       );
     });
 
@@ -106,15 +102,13 @@ describe('Cmi5Player', () => {
 
   it('does NOT call onTerminated for non-cmi5:terminated message type', async () => {
     const onTerminated = vi.fn();
-    render(
-      <Cmi5Player {...defaultProps} onTerminated={onTerminated} />,
-    );
+    render(<Cmi5Player {...defaultProps} onTerminated={onTerminated} />);
 
     await act(async () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: { type: 'other-event', sessionId: 'session-123' },
-        }),
+        })
       );
     });
 
@@ -123,20 +117,14 @@ describe('Cmi5Player', () => {
 
   it('ignores non-object postMessage data', async () => {
     const onTerminated = vi.fn();
-    render(
-      <Cmi5Player {...defaultProps} onTerminated={onTerminated} />,
-    );
+    render(<Cmi5Player {...defaultProps} onTerminated={onTerminated} />);
 
     await act(async () => {
       window.dispatchEvent(
-        new MessageEvent('message', { data: 'string-data' }),
+        new MessageEvent('message', { data: 'string-data' })
       );
-      window.dispatchEvent(
-        new MessageEvent('message', { data: null }),
-      );
-      window.dispatchEvent(
-        new MessageEvent('message', { data: 42 }),
-      );
+      window.dispatchEvent(new MessageEvent('message', { data: null }));
+      window.dispatchEvent(new MessageEvent('message', { data: 42 }));
     });
 
     expect(onTerminated).not.toHaveBeenCalled();
@@ -150,7 +138,7 @@ describe('Cmi5Player', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: { type: 'cmi5:terminated', sessionId: 'session-123' },
-        }),
+        })
       );
     });
     // No assertion needed — just verify no throw

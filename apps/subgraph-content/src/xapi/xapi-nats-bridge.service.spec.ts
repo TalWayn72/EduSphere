@@ -40,15 +40,17 @@ const { mockSubs, mockNatsConnect } = vi.hoisted(() => {
 vi.mock('nats', () => ({
   connect: mockNatsConnect,
   StringCodec: vi.fn().mockReturnValue({
-    decode: vi.fn().mockImplementation((data: Uint8Array) =>
-      Buffer.from(data).toString()
-    ),
+    decode: vi
+      .fn()
+      .mockImplementation((data: Uint8Array) => Buffer.from(data).toString()),
     encode: vi.fn(),
   }),
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
-  buildNatsOptions: vi.fn().mockReturnValue({ servers: 'nats://localhost:4222' }),
+  buildNatsOptions: vi
+    .fn()
+    .mockReturnValue({ servers: 'nats://localhost:4222' }),
 }));
 
 vi.mock('@edusphere/db', () => ({
@@ -90,7 +92,10 @@ describe('natsToXapiStatement (pure function)', () => {
       courseId: 'course-abc',
       courseName: 'Intro to TypeScript',
     };
-    const stmt = natsToXapiStatement('EDUSPHERE.course.completed', payload) as Record<string, unknown>;
+    const stmt = natsToXapiStatement(
+      'EDUSPHERE.course.completed',
+      payload
+    ) as Record<string, unknown>;
     const verb = stmt['verb'] as { id: string };
     expect(verb.id).toContain('completed');
   });
@@ -101,7 +106,10 @@ describe('natsToXapiStatement (pure function)', () => {
       tenantId: 'tenant-1',
       courseId: 'course-xyz',
     };
-    const stmt = natsToXapiStatement('EDUSPHERE.course.enrolled', payload) as Record<string, unknown>;
+    const stmt = natsToXapiStatement(
+      'EDUSPHERE.course.enrolled',
+      payload
+    ) as Record<string, unknown>;
     const verb = stmt['verb'] as { id: string };
     expect(verb.id).toContain('registered');
   });
@@ -111,7 +119,10 @@ describe('natsToXapiStatement (pure function)', () => {
       userId: 'user-3',
       tenantId: 'tenant-1',
     };
-    const stmt = natsToXapiStatement('EDUSPHERE.unknown.event', payload) as Record<string, unknown>;
+    const stmt = natsToXapiStatement(
+      'EDUSPHERE.unknown.event',
+      payload
+    ) as Record<string, unknown>;
     const verb = stmt['verb'] as { id: string };
     expect(verb.id).toContain('launched');
   });
@@ -129,7 +140,10 @@ describe('XapiNatsBridgeService', () => {
     // Build a subscription whose async iterator yields ONE message missing tenantId
     const badPayload = JSON.stringify({ userId: 'user-1' }); // no tenantId
     const encoder = new TextEncoder();
-    const mockMsg = { data: encoder.encode(badPayload), subject: 'EDUSPHERE.course.completed' };
+    const mockMsg = {
+      data: encoder.encode(badPayload),
+      subject: 'EDUSPHERE.course.completed',
+    };
 
     let iterCallCount = 0;
     const mockSubWithMsg = {
@@ -137,7 +151,8 @@ describe('XapiNatsBridgeService', () => {
       [Symbol.asyncIterator]: vi.fn().mockReturnValue({
         next: vi.fn().mockImplementation(() => {
           iterCallCount++;
-          if (iterCallCount === 1) return Promise.resolve({ value: mockMsg, done: false });
+          if (iterCallCount === 1)
+            return Promise.resolve({ value: mockMsg, done: false });
           return Promise.resolve({ done: true });
         }),
       }),
@@ -170,7 +185,9 @@ describe('XapiNatsBridgeService', () => {
 
     // Every subscription returned from nc.subscribe should have been unsubscribed
     const mockNc = await mockNatsConnect.mock.results[0]?.value;
-    const subscribeCallCount: number = (mockNc as { subscribe: ReturnType<typeof vi.fn> }).subscribe.mock.calls.length;
+    const subscribeCallCount: number = (
+      mockNc as { subscribe: ReturnType<typeof vi.fn> }
+    ).subscribe.mock.calls.length;
     // There are 6 subjects, so 6 subscriptions
     expect(subscribeCallCount).toBe(6);
     // Each mockSub that was created should have had unsubscribe called

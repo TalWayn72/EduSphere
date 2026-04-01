@@ -72,7 +72,12 @@ export function MasteryBadge({
         importantForAccessibility="no"
         style={[
           styles.dot,
-          { width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: color },
+          {
+            width: dotSize,
+            height: dotSize,
+            borderRadius: dotSize / 2,
+            backgroundColor: color,
+          },
         ]}
       />
       {/* WCAG 1.4.1 — text label always visible (not screen-reader-only) */}

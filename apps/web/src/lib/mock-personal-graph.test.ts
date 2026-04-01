@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import {
-  mockPersonalNodes,
-  mockPersonalEdges,
+import { mockPersonalNodes, mockPersonalEdges } from './mock-personal-graph';
+import type {
+  PersonalGraphNode,
+  PersonalGraphEdge,
 } from './mock-personal-graph';
-import type { PersonalGraphNode, PersonalGraphEdge } from './mock-personal-graph';
 
 describe('mockPersonalNodes', () => {
   it('is a non-empty array', () => {

@@ -39,7 +39,7 @@ describe('DomainScoreChart', () => {
 
   it('renders green bar for domain above passing threshold', () => {
     const { container } = render(
-      <DomainScoreChart scores={DOMAIN_SCORES} passingPercentage={70} />,
+      <DomainScoreChart scores={DOMAIN_SCORES} passingPercentage={70} />
     );
     const bars = container.querySelectorAll('.rounded-full.transition-all');
     // First bar (80%) should be green, second (50%) should be red
@@ -48,7 +48,9 @@ describe('DomainScoreChart', () => {
   });
 
   it('returns null when scores array is empty', () => {
-    const { container } = render(<DomainScoreChart scores={[]} passingPercentage={70} />);
+    const { container } = render(
+      <DomainScoreChart scores={[]} passingPercentage={70} />
+    );
     expect(container.firstChild).toBeNull();
   });
 });

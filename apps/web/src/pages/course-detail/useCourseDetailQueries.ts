@@ -75,8 +75,9 @@ export function useCourseDetailQueries(courseId: string) {
   const [, unenrollMutation] = useMutation(UNENROLL_COURSE_MUTATION);
   const [{ fetching: isForkingCourse }, forkCourseMutation] =
     useMutation(FORK_COURSE_MUTATION);
-  const [{ fetching: isSavingTitle }, updateCourseMutation] =
-    useMutation(UPDATE_COURSE_MUTATION);
+  const [{ fetching: isSavingTitle }, updateCourseMutation] = useMutation(
+    UPDATE_COURSE_MUTATION
+  );
 
   const [forkError, setForkError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);

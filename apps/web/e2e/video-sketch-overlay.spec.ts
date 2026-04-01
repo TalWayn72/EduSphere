@@ -68,7 +68,11 @@ async function setupGraphQLMocks(page: Page) {
     }
 
     // Annotations query
-    if (q.includes('annotations') || op === 'Annotations' || op === 'GetAnnotations') {
+    if (
+      q.includes('annotations') ||
+      op === 'Annotations' ||
+      op === 'GetAnnotations'
+    ) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -223,7 +227,10 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
 
       // Canvas (hidden initially) — z-index 1 so toolbar (z-index 2) stays above it
       const canvas = document.createElement('canvas');
-      canvas.setAttribute('aria-label', 'Sketch canvas — draw with mouse or touch');
+      canvas.setAttribute(
+        'aria-label',
+        'Sketch canvas — draw with mouse or touch'
+      );
       canvas.style.cssText =
         'position:absolute;inset:0;width:100%;height:100%;display:none;cursor:crosshair;z-index:1';
       container.appendChild(canvas);
@@ -231,7 +238,8 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
       // SVG overlay (shown when not active)
       const svg = document.createElement('div');
       svg.setAttribute('data-testid', 'sketch-svg-overlay');
-      svg.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
+      svg.style.cssText =
+        'position:absolute;inset:0;pointer-events:none;z-index:0';
       container.appendChild(svg);
 
       // Toggle logic
@@ -245,7 +253,8 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
       });
 
       // Cancel logic
-      toolbar.querySelector<HTMLButtonElement>('[data-testid="sketch-cancel-btn"]')!
+      toolbar
+        .querySelector<HTMLButtonElement>('[data-testid="sketch-cancel-btn"]')!
         .addEventListener('click', () => {
           active = false;
           toggleBtn.style.display = '';
@@ -277,7 +286,9 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
     await injectSyntheticOverlay(page);
 
     await expect(
-      page.locator('canvas[aria-label="Sketch canvas — draw with mouse or touch"]')
+      page.locator(
+        'canvas[aria-label="Sketch canvas — draw with mouse or touch"]'
+      )
     ).not.toBeVisible({ timeout: 3_000 });
   });
 
@@ -288,7 +299,9 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
 
     // Canvas should be visible
     await expect(
-      page.locator('canvas[aria-label="Sketch canvas — draw with mouse or touch"]')
+      page.locator(
+        'canvas[aria-label="Sketch canvas — draw with mouse or touch"]'
+      )
     ).toBeVisible({ timeout: 3_000 });
 
     // Toolbar with Save/Cancel should appear
@@ -364,7 +377,9 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
       timeout: 3_000,
     });
     await expect(
-      page.locator('canvas[aria-label="Sketch canvas — draw with mouse or touch"]')
+      page.locator(
+        'canvas[aria-label="Sketch canvas — draw with mouse or touch"]'
+      )
     ).not.toBeVisible({ timeout: 3_000 });
   });
 
@@ -399,7 +414,9 @@ test.describe('VideoSketchOverlay — component-level overlay (synthetic mount)'
     expect(body).not.toContain('Unexpected error');
   });
 
-  test('Save button is visible and enabled in active mode', async ({ page }) => {
+  test('Save button is visible and enabled in active mode', async ({
+    page,
+  }) => {
     await injectSyntheticOverlay(page);
     await page.getByTestId('sketch-toggle-btn').click();
 

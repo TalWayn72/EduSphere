@@ -1,4 +1,9 @@
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate } from 'remotion';
+import {
+  AbsoluteFill,
+  useCurrentFrame,
+  useVideoConfig,
+  interpolate,
+} from 'remotion';
 
 interface Orb {
   x: number;
@@ -18,7 +23,9 @@ const ORBS: Orb[] = [
 function FloatingOrb({ orb, frame }: { orb: Orb; frame: number }) {
   const xOffset = Math.sin(frame * orb.speed * 0.02) * 30;
   const yOffset = Math.cos(frame * orb.speed * 0.015) * 20;
-  const opacity = interpolate(frame, [0, 30], [0, 0.6], { extrapolateRight: 'clamp' });
+  const opacity = interpolate(frame, [0, 30], [0, 0.6], {
+    extrapolateRight: 'clamp',
+  });
 
   return (
     <div

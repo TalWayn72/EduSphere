@@ -29,7 +29,12 @@ const SKILL_TREE_QUERY = gql`
   }
 `;
 
-type MasteryLevel = 'NONE' | 'ATTEMPTED' | 'FAMILIAR' | 'PROFICIENT' | 'MASTERED';
+type MasteryLevel =
+  | 'NONE'
+  | 'ATTEMPTED'
+  | 'FAMILIAR'
+  | 'PROFICIENT'
+  | 'MASTERED';
 
 export interface SkillNode {
   id: string;
@@ -40,26 +45,65 @@ export interface SkillNode {
 }
 
 const MOCK_NODES: SkillNode[] = [
-  { id: 'sn-1', label: 'Critical Thinking', type: 'SKILL', masteryLevel: 'MASTERED', connections: ['sn-2'] },
-  { id: 'sn-2', label: 'Logical Fallacies', type: 'SKILL', masteryLevel: 'PROFICIENT', connections: ['sn-3'] },
-  { id: 'sn-3', label: 'Deductive Reasoning', type: 'SKILL', masteryLevel: 'FAMILIAR', connections: [] },
-  { id: 'sn-4', label: 'Inductive Reasoning', type: 'SKILL', masteryLevel: 'ATTEMPTED', connections: [] },
-  { id: 'sn-5', label: 'Abductive Reasoning', type: 'SKILL', masteryLevel: 'NONE', connections: [] },
+  {
+    id: 'sn-1',
+    label: 'Critical Thinking',
+    type: 'SKILL',
+    masteryLevel: 'MASTERED',
+    connections: ['sn-2'],
+  },
+  {
+    id: 'sn-2',
+    label: 'Logical Fallacies',
+    type: 'SKILL',
+    masteryLevel: 'PROFICIENT',
+    connections: ['sn-3'],
+  },
+  {
+    id: 'sn-3',
+    label: 'Deductive Reasoning',
+    type: 'SKILL',
+    masteryLevel: 'FAMILIAR',
+    connections: [],
+  },
+  {
+    id: 'sn-4',
+    label: 'Inductive Reasoning',
+    type: 'SKILL',
+    masteryLevel: 'ATTEMPTED',
+    connections: [],
+  },
+  {
+    id: 'sn-5',
+    label: 'Abductive Reasoning',
+    type: 'SKILL',
+    masteryLevel: 'NONE',
+    connections: [],
+  },
 ];
 
 export function masteryColor(level: MasteryLevel): string {
   switch (level) {
-    case 'MASTERED': return COLORS.masteryMastered;
-    case 'PROFICIENT': return COLORS.masteryProficient;
-    case 'FAMILIAR': return COLORS.masteryFamiliar;
-    case 'ATTEMPTED': return COLORS.masteryAttempted;
-    default: return COLORS.masteryNone;
+    case 'MASTERED':
+      return COLORS.masteryMastered;
+    case 'PROFICIENT':
+      return COLORS.masteryProficient;
+    case 'FAMILIAR':
+      return COLORS.masteryFamiliar;
+    case 'ATTEMPTED':
+      return COLORS.masteryAttempted;
+    default:
+      return COLORS.masteryNone;
   }
 }
 
 export function masteryPercent(level: MasteryLevel): number {
   const map: Record<MasteryLevel, number> = {
-    NONE: 0, ATTEMPTED: 25, FAMILIAR: 50, PROFICIENT: 75, MASTERED: 100,
+    NONE: 0,
+    ATTEMPTED: 25,
+    FAMILIAR: 50,
+    PROFICIENT: 75,
+    MASTERED: 100,
   };
   return map[level] ?? 0;
 }
@@ -96,7 +140,10 @@ export const SkillTreeScreen: React.FC = () => {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[styles.nodeCard, { borderLeftColor: masteryColor(item.masteryLevel) }]}
+            style={[
+              styles.nodeCard,
+              { borderLeftColor: masteryColor(item.masteryLevel) },
+            ]}
             onPress={() => setSelectedNode(item)}
             testID={`skill-node-${item.id}`}
           >
@@ -104,8 +151,18 @@ export const SkillTreeScreen: React.FC = () => {
               <Text style={styles.nodeLabel}>{item.label}</Text>
               <Text style={styles.nodeType}>{item.type}</Text>
             </View>
-            <View style={[styles.badge, { backgroundColor: masteryColor(item.masteryLevel) + '20' }]}>
-              <Text style={[styles.badgeText, { color: masteryColor(item.masteryLevel) }]}>
+            <View
+              style={[
+                styles.badge,
+                { backgroundColor: masteryColor(item.masteryLevel) + '20' },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.badgeText,
+                  { color: masteryColor(item.masteryLevel) },
+                ]}
+              >
                 {item.masteryLevel}
               </Text>
             </View>
@@ -130,15 +187,21 @@ export const SkillTreeScreen: React.FC = () => {
                       styles.progressFill,
                       {
                         width: `${masteryPercent(selectedNode.masteryLevel)}%`,
-                        backgroundColor: masteryColor(selectedNode.masteryLevel),
+                        backgroundColor: masteryColor(
+                          selectedNode.masteryLevel
+                        ),
                       },
                     ]}
                   />
                 </View>
                 <Text style={styles.masteryLabel}>
-                  {selectedNode.masteryLevel} · {masteryPercent(selectedNode.masteryLevel)}%
+                  {selectedNode.masteryLevel} ·{' '}
+                  {masteryPercent(selectedNode.masteryLevel)}%
                 </Text>
-                <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedNode(null)}>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  onPress={() => setSelectedNode(null)}
+                >
                   <Text style={styles.closeBtnText}>Close</Text>
                 </TouchableOpacity>
               </>
@@ -164,11 +227,23 @@ const styles = StyleSheet.create({
     ...SHADOW.sm,
   },
   nodeInfo: { flex: 1 },
-  nodeLabel: { fontSize: FONT.base, fontWeight: FONT.semibold, color: COLORS.textPrimary },
+  nodeLabel: {
+    fontSize: FONT.base,
+    fontWeight: FONT.semibold,
+    color: COLORS.textPrimary,
+  },
   nodeType: { fontSize: FONT.sm, color: COLORS.textMuted, marginTop: 2 },
-  badge: { borderRadius: RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: SPACING.xs },
+  badge: {
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+  },
   badgeText: { fontSize: FONT.xs, fontWeight: FONT.semibold },
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
   modal: {
     backgroundColor: COLORS.bgCard,
     borderTopLeftRadius: RADIUS.xl,
@@ -176,8 +251,17 @@ const styles = StyleSheet.create({
     padding: SPACING.xxl,
     paddingBottom: 40,
   },
-  modalTitle: { fontSize: FONT.xl, fontWeight: FONT.bold, color: COLORS.textPrimary, marginBottom: SPACING.xs },
-  modalType: { fontSize: FONT.sm, color: COLORS.textSecondary, marginBottom: SPACING.lg },
+  modalTitle: {
+    fontSize: FONT.xl,
+    fontWeight: FONT.bold,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.xs,
+  },
+  modalType: {
+    fontSize: FONT.sm,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.lg,
+  },
   progressTrack: {
     height: 8,
     backgroundColor: COLORS.border,
@@ -186,12 +270,20 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   progressFill: { height: '100%', borderRadius: 4 },
-  masteryLabel: { fontSize: FONT.sm, color: COLORS.textSecondary, marginBottom: SPACING.xl },
+  masteryLabel: {
+    fontSize: FONT.sm,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xl,
+  },
   closeBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     alignItems: 'center',
   },
-  closeBtnText: { color: '#fff', fontWeight: FONT.semibold, fontSize: FONT.base },
+  closeBtnText: {
+    color: '#fff',
+    fontWeight: FONT.semibold,
+    fontSize: FONT.base,
+  },
 });

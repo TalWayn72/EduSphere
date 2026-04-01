@@ -35,7 +35,10 @@ vi.mock('react-router-dom', () => ({
 import { router } from './router';
 
 function getCaptured(): unknown[][] {
-  return ((globalThis as Record<string, unknown>).__routerTestCaptured as unknown[][]) ?? [];
+  return (
+    ((globalThis as Record<string, unknown>)
+      .__routerTestCaptured as unknown[][]) ?? []
+  );
 }
 
 describe('router', () => {
@@ -64,6 +67,8 @@ describe('router', () => {
   });
 
   it('has a navigate function on the router', () => {
-    expect(typeof (router as Record<string, unknown>).navigate).toBe('function');
+    expect(typeof (router as Record<string, unknown>).navigate).toBe(
+      'function'
+    );
   });
 });

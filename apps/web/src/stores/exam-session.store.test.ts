@@ -13,13 +13,23 @@ import type { ExamQuestion } from './exam-session.store';
 const QUESTIONS: ExamQuestion[] = [
   {
     itemId: 'item-1',
-    questionData: { type: 'MULTIPLE_CHOICE', question: 'Q1', options: [], correctOptionIds: [] },
+    questionData: {
+      type: 'MULTIPLE_CHOICE',
+      question: 'Q1',
+      options: [],
+      correctOptionIds: [],
+    },
     domain: 'Math',
     bloomLevel: 'APPLY',
   },
   {
     itemId: 'item-2',
-    questionData: { type: 'MULTIPLE_CHOICE', question: 'Q2', options: [], correctOptionIds: [] },
+    questionData: {
+      type: 'MULTIPLE_CHOICE',
+      question: 'Q2',
+      options: [],
+      correctOptionIds: [],
+    },
     domain: 'Science',
     bloomLevel: 'ANALYZE',
   },

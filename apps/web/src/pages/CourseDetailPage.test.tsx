@@ -17,7 +17,11 @@ vi.mock('react-router-dom', async (importOriginal) => {
     ...actual,
     useParams: vi.fn(() => ({ courseId: 'course-1' })),
     useNavigate: vi.fn(() => mockNavigate),
-    useBlocker: vi.fn(() => ({ state: 'unblocked' as const, proceed: vi.fn(), reset: vi.fn() })),
+    useBlocker: vi.fn(() => ({
+      state: 'unblocked' as const,
+      proceed: vi.fn(),
+      reset: vi.fn(),
+    })),
   };
 });
 
@@ -48,7 +52,9 @@ vi.mock('@/components/SourceManager', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -70,8 +76,19 @@ vi.mock('@/lib/graphql/content.queries', () => ({
 // do not need to wire DELETE_COURSE_MUTATION useMutation. The full delete flow is
 // covered by DeleteCourseDialog.test.tsx and apps/web/e2e/delete-course.spec.ts.
 vi.mock('@/components/course/DeleteCourseButton', () => ({
-  DeleteCourseButton: ({ courseId }: { courseId: string; courseTitle: string; isPublished: boolean; onDeleted: () => void }) => (
-    <button data-testid="delete-course-btn" aria-label="Delete Course" data-course-id={courseId}>
+  DeleteCourseButton: ({
+    courseId,
+  }: {
+    courseId: string;
+    courseTitle: string;
+    isPublished: boolean;
+    onDeleted: () => void;
+  }) => (
+    <button
+      data-testid="delete-course-btn"
+      aria-label="Delete Course"
+      data-course-id={courseId}
+    >
       Delete Course
     </button>
   ),
@@ -321,7 +338,9 @@ describe('CourseDetailPage', () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
       render(<CourseDetailPage />);
       expect(screen.getByTestId('edit-course-btn')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /edit course/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /edit course/i })
+      ).toBeInTheDocument();
     });
 
     it('clicking "Edit Course" enters edit mode and shows title input', async () => {
@@ -331,7 +350,9 @@ describe('CourseDetailPage', () => {
         fireEvent.click(screen.getByTestId('edit-course-btn'));
       });
       expect(screen.getByTestId('course-title-input')).toBeInTheDocument();
-      expect((screen.getByTestId('course-title-input') as HTMLInputElement).value).toBe('Test Course');
+      expect(
+        (screen.getByTestId('course-title-input') as HTMLInputElement).value
+      ).toBe('Test Course');
     });
 
     it('shows "Save Changes" button in edit mode (not "Edit Course")', async () => {
@@ -355,9 +376,12 @@ describe('CourseDetailPage', () => {
 
     it('clicking ביטול exits edit mode without saving', async () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
-      const updateFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      const updateFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
       vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
-        if (mutationDoc === 'UPDATE_COURSE_MUTATION') return [{ fetching: false }, updateFn] as never;
+        if (mutationDoc === 'UPDATE_COURSE_MUTATION')
+          return [{ fetching: false }, updateFn] as never;
         return NOOP_MUTATION;
       });
       render(<CourseDetailPage />);
@@ -368,28 +392,39 @@ describe('CourseDetailPage', () => {
       await act(async () => {
         fireEvent.click(screen.getByTestId('cancel-edit-btn'));
       });
-      expect(screen.queryByTestId('course-title-input')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('course-title-input')
+      ).not.toBeInTheDocument();
       expect(updateFn).not.toHaveBeenCalled();
     });
 
     it('typing in title input and pressing Enter calls UPDATE_COURSE_MUTATION', async () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
-      const updateFn = vi.fn().mockResolvedValue({ data: { updateCourse: { id: 'course-1', title: 'New Title' } }, error: undefined });
+      const updateFn = vi.fn().mockResolvedValue({
+        data: { updateCourse: { id: 'course-1', title: 'New Title' } },
+        error: undefined,
+      });
       vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
-        if (mutationDoc === 'UPDATE_COURSE_MUTATION') return [{ fetching: false }, updateFn] as never;
+        if (mutationDoc === 'UPDATE_COURSE_MUTATION')
+          return [{ fetching: false }, updateFn] as never;
         return NOOP_MUTATION;
       });
       render(<CourseDetailPage />);
       await act(async () => {
         fireEvent.click(screen.getByTestId('edit-course-btn'));
       });
-      const input = screen.getByTestId('course-title-input') as HTMLInputElement;
+      const input = screen.getByTestId(
+        'course-title-input'
+      ) as HTMLInputElement;
       await act(async () => {
         fireEvent.change(input, { target: { value: 'New Title' } });
         fireEvent.keyDown(input, { key: 'Enter' });
       });
       await waitFor(() => {
-        expect(updateFn).toHaveBeenCalledWith({ id: 'course-1', input: { title: 'New Title' } });
+        expect(updateFn).toHaveBeenCalledWith({
+          id: 'course-1',
+          input: { title: 'New Title' },
+        });
       });
     });
 
@@ -403,14 +438,17 @@ describe('CourseDetailPage', () => {
         },
       });
       vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
-        if (mutationDoc === 'UPDATE_COURSE_MUTATION') return [{ fetching: false }, updateFn] as never;
+        if (mutationDoc === 'UPDATE_COURSE_MUTATION')
+          return [{ fetching: false }, updateFn] as never;
         return NOOP_MUTATION;
       });
       render(<CourseDetailPage />);
       await act(async () => {
         fireEvent.click(screen.getByTestId('edit-course-btn'));
       });
-      const input = screen.getByTestId('course-title-input') as HTMLInputElement;
+      const input = screen.getByTestId(
+        'course-title-input'
+      ) as HTMLInputElement;
       await act(async () => {
         fireEvent.change(input, { target: { value: 'Updated Title' } });
         fireEvent.click(screen.getByTestId('save-course-btn'));
@@ -436,7 +474,9 @@ describe('CourseDetailPage', () => {
         reset: vi.fn(),
       } as never);
       render(<CourseDetailPage />);
-      expect(screen.queryByTestId('unsaved-changes-dialog')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('unsaved-changes-dialog')
+      ).not.toBeInTheDocument();
     });
 
     it('unsaved-changes-dialog IS shown when navigation is blocked (editMode=true)', async () => {
@@ -610,7 +650,9 @@ describe('CourseDetailPage', () => {
 
       await waitFor(() => {
         // Toast with error message appears
-        expect(screen.getByText('Enrollment limit reached')).toBeInTheDocument();
+        expect(
+          screen.getByText('Enrollment limit reached')
+        ).toBeInTheDocument();
       });
 
       // Regression guard: button reverts to "Enroll" after failure (BAD = "Unenroll" shown)
@@ -642,7 +684,9 @@ describe('CourseDetailPage', () => {
         reexecuteFn,
       ] as never);
 
-      const enrollFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      const enrollFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
       vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
         if (mutationDoc === 'ENROLL_COURSE_MUTATION')
           return [{ fetching: false }, enrollFn] as never;
@@ -655,12 +699,16 @@ describe('CourseDetailPage', () => {
       });
 
       await waitFor(() => {
-        expect(reexecuteFn).toHaveBeenCalledWith({ requestPolicy: 'network-only' });
+        expect(reexecuteFn).toHaveBeenCalledWith({
+          requestPolicy: 'network-only',
+        });
       });
     });
 
     it('regression guard: Enroll button does NOT revert to "הירשם" after successful enrollment', async () => {
-      const enrollFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      const enrollFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
       vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
         if (mutationDoc === 'ENROLL_COURSE_MUTATION')
           return [{ fetching: false }, enrollFn] as never;
@@ -687,7 +735,9 @@ describe('CourseDetailPage', () => {
       vi.mocked(urql.useQuery).mockReturnValue(
         makeQueryResult({ myEnrollments: [{ courseId: 'course-1' }] })
       );
-      const unenrollFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      const unenrollFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
       vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
         if (mutationDoc === 'UNENROLL_COURSE_MUTATION')
           return [{ fetching: false }, unenrollFn] as never;
@@ -714,17 +764,13 @@ describe('CourseDetailPage', () => {
     it('shows Fork Course button for INSTRUCTOR role', () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
       render(<CourseDetailPage />);
-      expect(
-        screen.getByTestId('fork-course-btn')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('fork-course-btn')).toBeInTheDocument();
     });
 
     it('hides Fork Course button for STUDENT role', () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
       render(<CourseDetailPage />);
-      expect(
-        screen.queryByTestId('fork-course-btn')
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId('fork-course-btn')).not.toBeInTheDocument();
     });
 
     it('shows fork error banner without raw error on mutation failure', async () => {
@@ -793,7 +839,9 @@ describe('CourseDetailPage', () => {
       // but STUDENT is not — this test covers the negative case via role exclusion
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
       render(<CourseDetailPage />);
-      expect(screen.queryByRole('button', { name: /delete course/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /delete course/i })
+      ).not.toBeInTheDocument();
     });
   });
 });

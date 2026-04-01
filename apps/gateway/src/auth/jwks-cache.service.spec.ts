@@ -59,7 +59,9 @@ describe('JwksCacheService', () => {
       // Adding 11th should evict the first
       service.set('https://realm-10.com/jwks', [{ kid: 'k-10' }]);
       expect(service.get('https://realm-0.com/jwks')).toBeNull();
-      expect(service.get('https://realm-10.com/jwks')).toEqual([{ kid: 'k-10' }]);
+      expect(service.get('https://realm-10.com/jwks')).toEqual([
+        { kid: 'k-10' },
+      ]);
     });
 
     it('stores empty keys array', () => {

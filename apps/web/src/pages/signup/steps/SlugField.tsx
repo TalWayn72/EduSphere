@@ -27,7 +27,12 @@ interface SlugFieldProps {
 }
 
 export function SlugField({
-  slug, slugQuery, onChange, onSuggestionPick, error, t,
+  slug,
+  slugQuery,
+  onChange,
+  onSuggestionPick,
+  error,
+  t,
 }: SlugFieldProps) {
   const [{ data: slugData, fetching: checking }] = useQuery({
     query: CHECK_SLUG_QUERY,
@@ -36,7 +41,9 @@ export function SlugField({
   });
 
   const slugAvailable = slugData?.checkSlugAvailability?.available;
-  const suggestions = slugData?.checkSlugAvailability?.suggestions as string[] | undefined;
+  const suggestions = slugData?.checkSlugAvailability?.suggestions as
+    | string[]
+    | undefined;
 
   return (
     <div className="space-y-2">
@@ -63,7 +70,9 @@ export function SlugField({
       )}
       {!checking && slugAvailable === false && (
         <div>
-          <p className="text-destructive text-xs" role="alert">{t('org.slugTaken')}</p>
+          <p className="text-destructive text-xs" role="alert">
+            {t('org.slugTaken')}
+          </p>
           {suggestions && suggestions.length > 0 && (
             <div className="flex gap-2 mt-1 flex-wrap">
               {suggestions.map((s) => (
@@ -81,10 +90,14 @@ export function SlugField({
         </div>
       )}
       {!checking && slugAvailable === true && (
-        <p className="text-xs text-green-600 dark:text-green-400" role="status">{t('org.slugAvailable')}</p>
+        <p className="text-xs text-green-600 dark:text-green-400" role="status">
+          {t('org.slugAvailable')}
+        </p>
       )}
       {error && (
-        <p className="text-destructive text-xs mt-1" role="alert">{error}</p>
+        <p className="text-destructive text-xs mt-1" role="alert">
+          {error}
+        </p>
       )}
     </div>
   );

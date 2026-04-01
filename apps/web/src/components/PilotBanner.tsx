@@ -20,7 +20,8 @@ export function PilotBanner({ daysRemaining }: PilotBannerProps) {
       aria-live="polite"
     >
       <span>
-        🚀 <strong>Pilot Mode</strong> — {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining. Upgrade to continue →
+        🚀 <strong>Pilot Mode</strong> — {daysRemaining} day
+        {daysRemaining !== 1 ? 's' : ''} remaining. Upgrade to continue →
       </span>
       <Link
         to="/pricing"

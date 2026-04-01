@@ -102,9 +102,7 @@ export function OrgSignupWizard() {
               }
               onBlur={handleEmailBlur}
             />
-            {emailTouched && emailError && (
-              <p role="alert">{emailError}</p>
-            )}
+            {emailTouched && emailError && <p role="alert">{emailError}</p>}
           </div>
           <div>
             <label htmlFor="password">{t('orgOnboarding.password')}</label>
@@ -132,7 +130,10 @@ export function OrgSignupWizard() {
                 type="checkbox"
                 checked={formData.tosAgree}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, tosAgree: e.target.checked }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    tosAgree: e.target.checked,
+                  }))
                 }
               />
               {t('orgOnboarding.tosAgree')}
@@ -144,7 +145,10 @@ export function OrgSignupWizard() {
                 type="checkbox"
                 checked={formData.gdprConsent}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, gdprConsent: e.target.checked }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    gdprConsent: e.target.checked,
+                  }))
                 }
               />
               {t('orgOnboarding.gdprConsent')}

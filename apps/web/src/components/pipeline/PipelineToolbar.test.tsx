@@ -5,12 +5,24 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('@/components/PageHeader', () => ({
-  PageHeader: ({ title }: { title: string }) => <div data-testid="page-header">{title}</div>,
+  PageHeader: ({ title }: { title: string }) => (
+    <div data-testid="page-header">{title}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }) => (
-    <button onClick={onClick} disabled={disabled} {...props}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    disabled,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    size?: string;
+  }) => (
+    <button onClick={onClick} disabled={disabled} {...props}>
+      {children}
+    </button>
   ),
 }));
 
@@ -28,13 +40,41 @@ import type { PipelineNode } from '@/lib/lesson-pipeline.store';
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 const NODES: PipelineNode[] = [
-  { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף', enabled: true, order: 0, config: {} },
-  { id: 'n2', moduleType: 'ASR', label: 'ASR', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
+  {
+    id: 'n1',
+    moduleType: 'INGESTION',
+    label: 'Ingestion',
+    labelHe: 'איסוף',
+    enabled: true,
+    order: 0,
+    config: {},
+  },
+  {
+    id: 'n2',
+    moduleType: 'ASR',
+    label: 'ASR',
+    labelHe: 'תמלול',
+    enabled: true,
+    order: 1,
+    config: {},
+  },
 ];
 
 const SERVER_TEMPLATES = [
-  { id: 'tpl-1', name: 'System Template', description: 'A system template', nodes: [{ moduleType: 'ASR' }], isSystem: true },
-  { id: 'tpl-2', name: 'Custom Template', description: null, nodes: [{ moduleType: 'ASR' }, { moduleType: 'INGESTION' }], isSystem: false },
+  {
+    id: 'tpl-1',
+    name: 'System Template',
+    description: 'A system template',
+    nodes: [{ moduleType: 'ASR' }],
+    isSystem: true,
+  },
+  {
+    id: 'tpl-2',
+    name: 'Custom Template',
+    description: null,
+    nodes: [{ moduleType: 'ASR' }, { moduleType: 'INGESTION' }],
+    isSystem: false,
+  },
 ];
 
 function defaultProps() {
@@ -70,7 +110,9 @@ describe('PipelineToolbar', () => {
 
   it('renders page header with title', () => {
     render(<PipelineToolbar {...defaultProps()} />);
-    expect(screen.getByTestId('page-header')).toHaveTextContent('Lesson Pipeline');
+    expect(screen.getByTestId('page-header')).toHaveTextContent(
+      'Lesson Pipeline'
+    );
   });
 
   it('renders template picker', () => {
@@ -176,7 +218,9 @@ describe('PipelineToolbar', () => {
     const props = defaultProps();
     render(<PipelineToolbar {...props} />);
     fireEvent.click(screen.getByTestId('save-as-template-btn'));
-    fireEvent.change(screen.getByTestId('template-name-input'), { target: { value: 'My Template' } });
+    fireEvent.change(screen.getByTestId('template-name-input'), {
+      target: { value: 'My Template' },
+    });
     fireEvent.click(screen.getByTestId('confirm-save-template'));
     await waitFor(() => {
       expect(props.onCreateTemplate).toHaveBeenCalledWith('My Template');
@@ -193,14 +237,18 @@ describe('PipelineToolbar', () => {
   it('selecting template type calls onTemplateChange', () => {
     const props = defaultProps();
     render(<PipelineToolbar {...props} />);
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'THEMATIC' } });
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'THEMATIC' },
+    });
     expect(props.onTemplateChange).toHaveBeenCalledWith('THEMATIC');
   });
 
   it('selecting server template calls onServerTemplate', () => {
     const props = defaultProps();
     render(<PipelineToolbar {...props} />);
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'server:tpl-1' } });
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'server:tpl-1' },
+    });
     expect(props.onServerTemplate).toHaveBeenCalledWith(SERVER_TEMPLATES[0]);
   });
 });

@@ -76,10 +76,7 @@ function resolvePath(
 }
 
 /** Resolve a dot-notation key path, returning any value (arrays, objects, strings). */
-function resolvePathAny(
-  obj: TranslationRecord,
-  keyPath: string
-): unknown {
+function resolvePathAny(obj: TranslationRecord, keyPath: string): unknown {
   const parts = keyPath.split('.');
   let current: unknown = obj;
   for (const part of parts) {
@@ -125,9 +122,14 @@ function makeTFunction(ns: string | string[]) {
   const namespaces = Array.isArray(ns) ? ns : [ns];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (key: string, optionsOrDefault?: string | Record<string, unknown>): any => {
-    const defaultString = typeof optionsOrDefault === 'string' ? optionsOrDefault : undefined;
-    const options = typeof optionsOrDefault === 'object' ? optionsOrDefault : undefined;
+  return (
+    key: string,
+    optionsOrDefault?: string | Record<string, unknown>
+  ): any => {
+    const defaultString =
+      typeof optionsOrDefault === 'string' ? optionsOrDefault : undefined;
+    const options =
+      typeof optionsOrDefault === 'object' ? optionsOrDefault : undefined;
     let resolveKey = key;
     let resolveNs = namespaces;
     const count =
@@ -178,7 +180,10 @@ function makeTFunction(ns: string | string[]) {
       }
     }
 
-    const optDefaultValue = typeof options?.defaultValue === 'string' ? options.defaultValue : undefined;
+    const optDefaultValue =
+      typeof options?.defaultValue === 'string'
+        ? options.defaultValue
+        : undefined;
     return defaultString ?? optDefaultValue ?? resolveKey;
   };
 }

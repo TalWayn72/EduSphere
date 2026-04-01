@@ -26,8 +26,12 @@ export const courses = pgTable('courses', {
   isPublished: boolean('is_published').notNull().default(false),
   estimatedHours: integer('estimated_hours'),
   forkedFromId: uuid('forked_from_id'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const coursesRLS = sql`

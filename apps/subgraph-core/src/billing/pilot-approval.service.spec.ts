@@ -19,8 +19,11 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {
     pilotRequests: {
-      id: 'id', status: 'status', orgName: 'org_name',
-      contactEmail: 'contact_email', tenantId: 'tenant_id',
+      id: 'id',
+      status: 'status',
+      orgName: 'org_name',
+      contactEmail: 'contact_email',
+      tenantId: 'tenant_id',
       created_at: 'created_at',
     },
     tenants: { id: 'id', name: 'name', slug: 'slug', plan: 'plan' },
@@ -30,7 +33,9 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('nats', () => ({ connect: vi.fn().mockResolvedValue(mockNatsConn) }));
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn(() => ({})) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi.fn(() => ({})),
+}));
 
 import { PilotApprovalService } from './pilot-approval.service';
 import type { TenantContext } from '@edusphere/db';
@@ -86,9 +91,18 @@ describe('PilotApprovalService', () => {
     });
 
     it('throws BadRequestException on self-approval', async () => {
-      const selfCtx = { tenantId: 'same-tenant', userId: 'admin-1', userRole: 'SUPER_ADMIN' };
+      const selfCtx = {
+        tenantId: 'same-tenant',
+        userId: 'admin-1',
+        userRole: 'SUPER_ADMIN',
+      };
       setupSelectChain([
-        { id: 'req-1', status: 'pending', orgName: 'Acme', tenantId: 'same-tenant' },
+        {
+          id: 'req-1',
+          status: 'pending',
+          orgName: 'Acme',
+          tenantId: 'same-tenant',
+        },
       ]);
       await expect(
         service.approvePilotRequest('req-1', 'admin-1', selfCtx)
@@ -104,7 +118,14 @@ describe('PilotApprovalService', () => {
             limit: vi.fn().mockImplementation(async () => {
               selectCalls++;
               if (selectCalls === 1) {
-                return [{ id: 'req-1', status: 'pending', orgName: 'Acme Corp', contactEmail: 'a@b.com' }];
+                return [
+                  {
+                    id: 'req-1',
+                    status: 'pending',
+                    orgName: 'Acme Corp',
+                    contactEmail: 'a@b.com',
+                  },
+                ];
               }
               return [{ id: 'plan-1', isActive: true }];
             }),
@@ -113,7 +134,9 @@ describe('PilotApprovalService', () => {
       }));
       mockDb.insert.mockReturnValue({
         values: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([{ id: 'tenant-new', name: 'Acme Corp' }]),
+          returning: vi
+            .fn()
+            .mockResolvedValue([{ id: 'tenant-new', name: 'Acme Corp' }]),
         }),
       });
       mockDb.update.mockReturnValue({
@@ -155,7 +178,9 @@ describe('PilotApprovalService', () => {
       mockDb.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ id: validId, status: 'pending' }]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([{ id: validId, status: 'pending' }]),
           }),
         }),
       });

@@ -5,14 +5,7 @@
  * instructor filters, plus enrollment count aggregation.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  schema,
-  eq,
-  and,
-  ilike,
-  lte,
-  withTenantContext,
-} from '@edusphere/db';
+import { schema, eq, and, ilike, lte, withTenantContext } from '@edusphere/db';
 import type { TenantContext, Database } from '@edusphere/db';
 import { sql } from 'drizzle-orm';
 import type {
@@ -63,7 +56,10 @@ export class MarketplaceSearchService {
     }
     if (filters?.priceMax !== undefined && filters.priceMax !== null) {
       conditions.push(
-        lte(schema.courseListings.priceCents, Math.round(filters.priceMax * 100))
+        lte(
+          schema.courseListings.priceCents,
+          Math.round(filters.priceMax * 100)
+        )
       );
     }
     if (filters?.instructorName) {

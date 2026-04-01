@@ -32,7 +32,7 @@ describe('useProgressStatus', () => {
 
   it('returns the first message key when active', () => {
     const { result } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES, active: true }),
+      useProgressStatus({ messages: MESSAGES, active: true })
     );
     expect(result.current.currentMessage).toBe('msg.one');
     expect(result.current.currentIndex).toBe(0);
@@ -40,7 +40,7 @@ describe('useProgressStatus', () => {
 
   it('cycles to the next message after the interval fires', () => {
     const { result } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES, active: true, interval: 1000 }),
+      useProgressStatus({ messages: MESSAGES, active: true, interval: 1000 })
     );
     expect(result.current.currentIndex).toBe(0);
 
@@ -53,7 +53,7 @@ describe('useProgressStatus', () => {
 
   it('wraps around to the first message after reaching the end', () => {
     const { result } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES, active: true, interval: 1000 }),
+      useProgressStatus({ messages: MESSAGES, active: true, interval: 1000 })
     );
 
     act(() => {
@@ -67,7 +67,7 @@ describe('useProgressStatus', () => {
     const { result, rerender } = renderHook(
       ({ active }: { active: boolean }) =>
         useProgressStatus({ messages: MESSAGES, active, interval: 1000 }),
-      { initialProps: { active: true } },
+      { initialProps: { active: true } }
     );
 
     act(() => {
@@ -82,7 +82,7 @@ describe('useProgressStatus', () => {
 
   it('jumps to phaseIndex immediately when provided', () => {
     const { result } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES, active: true, phaseIndex: 2 }),
+      useProgressStatus({ messages: MESSAGES, active: true, phaseIndex: 2 })
     );
     expect(result.current.currentIndex).toBe(2);
     expect(result.current.currentMessage).toBe('msg.three');
@@ -95,7 +95,7 @@ describe('useProgressStatus', () => {
         active: true,
         interval: 1000,
         phaseIndex: 1,
-      }),
+      })
     );
 
     act(() => {
@@ -108,7 +108,7 @@ describe('useProgressStatus', () => {
 
   it('does not advance the index when active is false', () => {
     const { result } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES, active: false, interval: 1000 }),
+      useProgressStatus({ messages: MESSAGES, active: false, interval: 1000 })
     );
 
     act(() => {
@@ -122,7 +122,7 @@ describe('useProgressStatus', () => {
     const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
 
     const { unmount } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES, active: true, interval: 1000 }),
+      useProgressStatus({ messages: MESSAGES, active: true, interval: 1000 })
     );
 
     unmount();

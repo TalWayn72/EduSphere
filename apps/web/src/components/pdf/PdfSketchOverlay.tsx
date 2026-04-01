@@ -44,17 +44,20 @@ export function PdfSketchOverlay({
   const [currentColor, setCurrentColor] = useState(color || DEFAULT_COLOR);
   const [saving, setSaving] = useState(false);
 
-  const { startDraw, continueDraw, endDraw, clearPaths } =
-    useSketchCanvas({
-      canvasRef,
-      tool: currentTool,
-      color: currentColor,
-      strokeWidth: strokeWidth || DEFAULT_WIDTH,
-    });
+  const { startDraw, continueDraw, endDraw, clearPaths } = useSketchCanvas({
+    canvasRef,
+    tool: currentTool,
+    color: currentColor,
+    strokeWidth: strokeWidth || DEFAULT_WIDTH,
+  });
 
   // Sync external activeTool prop
-  useEffect(() => { setCurrentTool(activeTool); }, [activeTool]);
-  useEffect(() => { setCurrentColor(color); }, [color]);
+  useEffect(() => {
+    setCurrentTool(activeTool);
+  }, [activeTool]);
+  useEffect(() => {
+    setCurrentColor(color);
+  }, [color]);
 
   // Attach native canvas event listeners (skip for text tool)
   useEffect(() => {
@@ -89,7 +92,10 @@ export function PdfSketchOverlay({
       const img = new window.Image();
       img.onload = () => {
         const ctx = canvas.getContext('2d');
-        if (ctx) { ctx.clearRect(0, 0, width, height); ctx.drawImage(img, 0, 0); }
+        if (ctx) {
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0);
+        }
       };
       img.src = saved;
     } else {
@@ -105,7 +111,9 @@ export function PdfSketchOverlay({
   // Cleanup on unmount
   useEffect(() => {
     const sketches = sketchesRef.current;
-    return () => { sketches.clear(); };
+    return () => {
+      sketches.clear();
+    };
   }, []);
 
   const handleSave = useCallback(() => {
@@ -123,7 +131,11 @@ export function PdfSketchOverlay({
   }, [clearPaths, currentPage]);
 
   return (
-    <div data-testid="pdf-sketch-overlay" aria-label="Sketch overlay" className="absolute inset-0">
+    <div
+      data-testid="pdf-sketch-overlay"
+      aria-label="Sketch overlay"
+      className="absolute inset-0"
+    >
       <canvas
         ref={canvasRef}
         width={width}
@@ -133,32 +145,46 @@ export function PdfSketchOverlay({
         aria-label={`Sketch drawing canvas for page ${currentPage}`}
         className={cn(
           'absolute inset-0 w-full h-full',
-          currentTool === 'text' ? 'cursor-text' : 'cursor-crosshair',
+          currentTool === 'text' ? 'cursor-text' : 'cursor-crosshair'
         )}
         style={{ touchAction: 'none' }}
       />
-      <div role="toolbar" aria-label="Sketch tools" data-testid="sketch-tools"
+      <div
+        role="toolbar"
+        aria-label="Sketch tools"
+        data-testid="sketch-tools"
         className="absolute top-2 right-2 flex flex-col items-end gap-1.5"
       >
         <div className="flex items-center gap-0.5 bg-black/70 rounded p-1">
-          {(['freehand', 'eraser', 'rect', 'arrow', 'ellipse', 'text'] as DrawingTool[]).map(
-            (tool) => (
-              <button
-                key={tool}
-                data-testid={`sketch-tool-${tool}`}
-                aria-pressed={currentTool === tool}
-                aria-label={`${tool} tool`}
-                className={cn(
-                  'p-1.5 rounded text-white dark:text-gray-100 text-xs transition-colors',
-                  currentTool === tool ? 'bg-indigo-600' : 'hover:bg-white/20',
-                )}
-                onClick={() => setCurrentTool(tool)}
-              >
-                {tool}
-              </button>
-            ),
-          )}
-          <label htmlFor="sketch-color-picker" className="relative cursor-pointer ml-1" aria-label="Stroke color">
+          {(
+            [
+              'freehand',
+              'eraser',
+              'rect',
+              'arrow',
+              'ellipse',
+              'text',
+            ] as DrawingTool[]
+          ).map((tool) => (
+            <button
+              key={tool}
+              data-testid={`sketch-tool-${tool}`}
+              aria-pressed={currentTool === tool}
+              aria-label={`${tool} tool`}
+              className={cn(
+                'p-1.5 rounded text-white dark:text-gray-100 text-xs transition-colors',
+                currentTool === tool ? 'bg-indigo-600' : 'hover:bg-white/20'
+              )}
+              onClick={() => setCurrentTool(tool)}
+            >
+              {tool}
+            </button>
+          ))}
+          <label
+            htmlFor="sketch-color-picker"
+            className="relative cursor-pointer ml-1"
+            aria-label="Stroke color"
+          >
             <input
               id="sketch-color-picker"
               type="color"
@@ -193,7 +219,9 @@ export function PdfSketchOverlay({
           </button>
         </div>
       </div>
-      <span data-testid="sketch-page-indicator" aria-label={`Sketching on page ${currentPage}`}
+      <span
+        data-testid="sketch-page-indicator"
+        aria-label={`Sketching on page ${currentPage}`}
         className="absolute bottom-2 left-2 text-xs bg-black/60 text-white dark:text-gray-100 rounded px-2 py-0.5"
       >
         Page {currentPage}

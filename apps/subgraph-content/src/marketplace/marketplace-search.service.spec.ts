@@ -90,7 +90,9 @@ describe('MarketplaceSearchService', () => {
   });
 
   it('getListings returns mapped results with price in whole units', async () => {
-    mockWithTenantContext.mockResolvedValueOnce([makeRow({ priceCents: 5000 })]);
+    mockWithTenantContext.mockResolvedValueOnce([
+      makeRow({ priceCents: 5000 }),
+    ]);
 
     const results = await svc.getListings({} as never, TENANT, USER, 'STUDENT');
 
@@ -157,10 +159,9 @@ describe('MarketplaceSearchService', () => {
   it('getListings passes filters with search term', async () => {
     mockWithTenantContext.mockResolvedValueOnce([]);
 
-    await svc.getListings(
-      {} as never, TENANT, USER, 'STUDENT', 20, 0,
-      { search: 'AI' }
-    );
+    await svc.getListings({} as never, TENANT, USER, 'STUDENT', 20, 0, {
+      search: 'AI',
+    });
 
     expect(mockWithTenantContext).toHaveBeenCalledOnce();
   });
@@ -168,10 +169,9 @@ describe('MarketplaceSearchService', () => {
   it('getListings passes filters with priceMax', async () => {
     mockWithTenantContext.mockResolvedValueOnce([]);
 
-    await svc.getListings(
-      {} as never, TENANT, USER, 'STUDENT', 20, 0,
-      { priceMax: 50 }
-    );
+    await svc.getListings({} as never, TENANT, USER, 'STUDENT', 20, 0, {
+      priceMax: 50,
+    });
 
     expect(mockWithTenantContext).toHaveBeenCalledOnce();
   });

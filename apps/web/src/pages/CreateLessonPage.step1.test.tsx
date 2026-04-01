@@ -31,7 +31,9 @@ describe('CreateLessonStep1', () => {
 
   it('renders the title input with i18n placeholder', () => {
     renderStep1();
-    expect(screen.getByPlaceholderText(/Tree of Life lesson/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Tree of Life lesson/i)
+    ).toBeInTheDocument();
   });
 
   it('renders THEMATIC and SEQUENTIAL radio options via i18n', () => {
@@ -42,7 +44,9 @@ describe('CreateLessonStep1', () => {
 
   it('series field is not visible (removed)', () => {
     renderStep1();
-    expect(screen.queryByPlaceholderText(/ספר עץ חיים/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/ספר עץ חיים/i)
+    ).not.toBeInTheDocument();
   });
 
   it('renders lesson date input (type=date)', () => {
@@ -60,7 +64,9 @@ describe('CreateLessonStep1', () => {
 
   it('shows i18n validation error when title is too short (< 3 chars)', async () => {
     renderStep1();
-    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Materials/i })
+    );
     await waitFor(() => {
       expect(
         screen.getByText('Title must contain at least 3 characters')
@@ -74,7 +80,9 @@ describe('CreateLessonStep1', () => {
     fireEvent.change(screen.getByPlaceholderText(/Tree of Life lesson/i), {
       target: { value: 'Test Lesson' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Materials/i })
+    );
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     const callArg = onSubmit.mock.calls[0]![0]! as LessonFormData;
     expect(callArg.title).toBe('Test Lesson');
@@ -90,7 +98,9 @@ describe('CreateLessonStep1', () => {
     fireEvent.change(screen.getByPlaceholderText(/Tree of Life lesson/i), {
       target: { value: 'Test Lesson' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Materials/i })
+    );
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     const callArg = onSubmit.mock.calls[0]![0]! as LessonFormData;
     expect(callArg.type).toBe('SEQUENTIAL');

@@ -7,7 +7,10 @@ export function OAuthCallbackPage() {
   useEffect(() => {
     const code = params.get('code');
     if (code && window.opener) {
-      window.opener.postMessage({ type: 'GOOGLE_OAUTH_CODE', code }, window.location.origin);
+      window.opener.postMessage(
+        { type: 'GOOGLE_OAUTH_CODE', code },
+        window.location.origin
+      );
     }
   }, [params]);
 

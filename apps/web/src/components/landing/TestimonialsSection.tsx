@@ -29,10 +29,16 @@ export function TestimonialsSection() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIAL_KEYS.map((item) => (
-            <Card key={item.key} className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-900 dark:border-slate-600">
+            <Card
+              key={item.key}
+              className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-900 dark:border-slate-600"
+            >
               <CardContent className="pt-7 pb-6">
                 {/* Large indigo quote mark */}
-                <div className="text-5xl leading-none text-indigo-200 font-serif mb-4 select-none dark:text-indigo-300" aria-hidden="true">
+                <div
+                  className="text-5xl leading-none text-indigo-200 font-serif mb-4 select-none dark:text-indigo-300"
+                  aria-hidden="true"
+                >
                   &ldquo;
                 </div>
                 <p className="text-slate-600 leading-relaxed text-sm mb-6 italic dark:text-slate-300">
@@ -46,8 +52,13 @@ export function TestimonialsSection() {
                     {item.initials}
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-900 text-sm dark:text-slate-100">{t(`landing.testimonials.${item.key}.name`)}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">{t(`landing.testimonials.${item.key}.role`)}, {t(`landing.testimonials.${item.key}.org`)}</div>
+                    <div className="font-semibold text-slate-900 text-sm dark:text-slate-100">
+                      {t(`landing.testimonials.${item.key}.name`)}
+                    </div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      {t(`landing.testimonials.${item.key}.role`)},{' '}
+                      {t(`landing.testimonials.${item.key}.org`)}
+                    </div>
                   </div>
                 </div>
               </CardContent>

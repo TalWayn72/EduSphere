@@ -346,7 +346,9 @@ describe('KnowledgeSourceService', () => {
         file_key: 'tenant-abc/course-123/uuid/report.pdf',
       };
       mockInsert.mockImplementation(buildInsert(sourceWithKey));
-      mockUpdate.mockImplementation(buildUpdate({ ...sourceWithKey, status: 'READY' as const }));
+      mockUpdate.mockImplementation(
+        buildUpdate({ ...sourceWithKey, status: 'READY' as const })
+      );
 
       const result = await service.createAndProcess({
         tenantId: TENANT,
@@ -391,7 +393,9 @@ describe('KnowledgeSourceService', () => {
 
     it('does not upload to MinIO when no fileBuffer is provided', async () => {
       mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(buildUpdate({ ...PENDING_SOURCE, status: 'READY' as const }));
+      mockUpdate.mockImplementation(
+        buildUpdate({ ...PENDING_SOURCE, status: 'READY' as const })
+      );
 
       await service.createAndProcess({
         tenantId: TENANT,

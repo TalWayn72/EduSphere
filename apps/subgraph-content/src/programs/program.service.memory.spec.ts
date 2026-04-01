@@ -154,7 +154,9 @@ describe('ProgramEventsHandler — memory safety', () => {
               where: vi
                 .fn()
                 .mockReturnValueOnce(makeWhereResult([enrollment]))
-                .mockReturnValue(makeWhereResult([{ courseId: 'c1' }, { courseId: 'c2' }])),
+                .mockReturnValue(
+                  makeWhereResult([{ courseId: 'c1' }, { courseId: 'c2' }])
+                ),
             }),
           }),
         } as never)

@@ -4,8 +4,19 @@
 import { z } from 'zod';
 
 const RESERVED_SLUGS = [
-  'admin', 'api', 'www', 'mail', 'support', 'app', 'dashboard',
-  'help', 'docs', 'status', 'billing', 'login', 'signup',
+  'admin',
+  'api',
+  'www',
+  'mail',
+  'support',
+  'app',
+  'dashboard',
+  'help',
+  'docs',
+  'status',
+  'billing',
+  'login',
+  'signup',
 ];
 
 export const orgSignupSchema = z.object({
@@ -33,7 +44,7 @@ export const orgSignupSchema = z.object({
     .max(63)
     .regex(
       /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/,
-      'Slug must be lowercase letters, numbers, and hyphens only',
+      'Slug must be lowercase letters, numbers, and hyphens only'
     )
     .refine((s) => !RESERVED_SLUGS.includes(s), {
       message: 'This subdomain is reserved',

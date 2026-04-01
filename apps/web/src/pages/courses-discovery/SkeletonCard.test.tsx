@@ -11,11 +11,16 @@ describe('SkeletonCard', () => {
 
   it('is aria-hidden', () => {
     render(<SkeletonCard />);
-    expect(screen.getByTestId('skeleton-card')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('skeleton-card')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    );
   });
 
   it('has animate-pulse class', () => {
     render(<SkeletonCard />);
-    expect(screen.getByTestId('skeleton-card').className).toContain('animate-pulse');
+    expect(screen.getByTestId('skeleton-card').className).toContain(
+      'animate-pulse'
+    );
   });
 });

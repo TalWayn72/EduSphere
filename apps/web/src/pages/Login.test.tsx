@@ -5,7 +5,9 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Login } from './Login';
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 const mockNavigate = vi.fn();

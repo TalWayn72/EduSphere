@@ -76,7 +76,7 @@ describe('AnalyticsDashboard', () => {
     render(<AnalyticsDashboard />);
     expect(screen.getByText('250')).toBeInTheDocument(); // totalUsers
     expect(screen.getByText('180')).toBeInTheDocument(); // activeUsers
-    expect(screen.getByText('45')).toBeInTheDocument();  // totalCourses
+    expect(screen.getByText('45')).toBeInTheDocument(); // totalCourses
   });
 
   it('renders storage usage in GB', () => {
@@ -100,10 +100,16 @@ describe('AnalyticsDashboard', () => {
   });
 
   it('calls exportCsv when export button clicked', () => {
-
     const mockExport = vi.fn();
     vi.mocked(useOrgAnalytics).mockReturnValue({
-      kpis: { totalUsers: 0, activeUsers: 0, totalCourses: 0, storageGb: 0, completionRate: 0, yauCount: 0 },
+      kpis: {
+        totalUsers: 0,
+        activeUsers: 0,
+        totalCourses: 0,
+        storageGb: 0,
+        completionRate: 0,
+        yauCount: 0,
+      },
       timeSeriesData: [],
       isLoading: false,
       dateRange: { start: new Date(), end: new Date() },
@@ -117,7 +123,6 @@ describe('AnalyticsDashboard', () => {
   });
 
   it('shows loading skeletons while fetching', () => {
-
     vi.mocked(useOrgAnalytics).mockReturnValue({
       kpis: null,
       timeSeriesData: [],
@@ -133,9 +138,15 @@ describe('AnalyticsDashboard', () => {
   });
 
   it('shows "no data" message for new org', () => {
-
     vi.mocked(useOrgAnalytics).mockReturnValue({
-      kpis: { totalUsers: 0, activeUsers: 0, totalCourses: 0, storageGb: 0, completionRate: 0, yauCount: 0 },
+      kpis: {
+        totalUsers: 0,
+        activeUsers: 0,
+        totalCourses: 0,
+        storageGb: 0,
+        completionRate: 0,
+        yauCount: 0,
+      },
       timeSeriesData: [],
       isLoading: false,
       dateRange: { start: new Date(), end: new Date() },

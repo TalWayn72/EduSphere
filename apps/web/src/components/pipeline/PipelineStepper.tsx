@@ -25,10 +25,10 @@ interface Props {
 }
 
 const STATUS_ICON: Record<ModuleStatusValue, string> = {
-  pending: '\u25CB',   // Circle
-  running: '\u23F3',   // Hourglass
-  done: '\u2705',      // Check
-  failed: '\u274C',    // X
+  pending: '\u25CB', // Circle
+  running: '\u23F3', // Hourglass
+  done: '\u2705', // Check
+  failed: '\u274C', // X
 };
 
 const STATUS_ARIA: Record<ModuleStatusValue, string> = {
@@ -72,7 +72,7 @@ export function PipelineStepper({ steps, onRetry, onSkip }: Props) {
             key={step.moduleType}
             className={cn(
               'border rounded-lg transition-colors',
-              STATUS_STYLE[step.status],
+              STATUS_STYLE[step.status]
             )}
             aria-current={isRunning ? 'step' : undefined}
             data-testid={`stepper-step-${step.moduleType}`}
@@ -93,7 +93,7 @@ export function PipelineStepper({ steps, onRetry, onSkip }: Props) {
               <span
                 className={cn(
                   'shrink-0 text-base',
-                  isRunning && 'motion-safe:animate-spin',
+                  isRunning && 'motion-safe:animate-spin'
                 )}
                 aria-hidden="true"
               >
@@ -104,7 +104,10 @@ export function PipelineStepper({ steps, onRetry, onSkip }: Props) {
               <span className="flex-1 font-medium">{label}</span>
 
               {/* Status badge */}
-              <span className="text-xs opacity-75" aria-label={STATUS_ARIA[step.status]}>
+              <span
+                className="text-xs opacity-75"
+                aria-label={STATUS_ARIA[step.status]}
+              >
                 {STATUS_ARIA[step.status]}
               </span>
 
@@ -120,22 +123,37 @@ export function PipelineStepper({ steps, onRetry, onSkip }: Props) {
             {isExpanded && hasDetails && (
               <div className="px-3 pb-3 text-xs space-y-2 border-t mt-1 pt-2">
                 {isFailed && step.errorMessage && (
-                  <p className="text-red-600 whitespace-pre-wrap dark:text-red-400" data-testid="step-error-message">
+                  <p
+                    className="text-red-600 whitespace-pre-wrap dark:text-red-400"
+                    data-testid="step-error-message"
+                  >
                     {step.errorMessage}
                   </p>
                 )}
                 {step.output && (
-                  <p className="text-foreground whitespace-pre-wrap">{step.output}</p>
+                  <p className="text-foreground whitespace-pre-wrap">
+                    {step.output}
+                  </p>
                 )}
                 {isFailed && (
                   <div className="flex gap-2">
                     {onRetry && (
-                      <Button size="sm" variant="outline" onClick={() => onRetry(step.moduleType)} data-testid="step-retry-btn">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onRetry(step.moduleType)}
+                        data-testid="step-retry-btn"
+                      >
                         נסה שוב
                       </Button>
                     )}
                     {onSkip && (
-                      <Button size="sm" variant="ghost" onClick={() => onSkip(step.moduleType)} data-testid="step-skip-btn">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onSkip(step.moduleType)}
+                        data-testid="step-skip-btn"
+                      >
                         דלג
                       </Button>
                     )}

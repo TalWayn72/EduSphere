@@ -43,7 +43,7 @@ let executeEnd: ReturnType<typeof vi.fn>;
 function setupMocks(
   startResult: { data?: unknown; error?: unknown } = {},
   flagResult: { data?: unknown; error?: unknown } = {},
-  endResult: { data?: unknown; error?: unknown } = {},
+  endResult: { data?: unknown; error?: unknown } = {}
 ) {
   executeStart = vi.fn().mockResolvedValue(startResult);
   executeFlag = vi.fn().mockResolvedValue(flagResult);
@@ -56,7 +56,12 @@ function setupMocks(
     callCount++;
     const fns = [executeStart, executeFlag, executeEnd];
     return [
-      { fetching: false, data: undefined, error: undefined, stale: false } as never,
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+      } as never,
       fns[idx]!,
     ];
   });
@@ -100,7 +105,7 @@ describe('useProctoringSession', () => {
 
     setupMocks(
       { data: { startProctoringSession: startSession } },
-      { data: { flagProctoringEvent: flaggedSession } },
+      { data: { flagProctoringEvent: flaggedSession } }
     );
 
     const { result } = renderHook(() => useProctoringSession('assess-1'));
@@ -140,7 +145,7 @@ describe('useProctoringSession', () => {
     setupMocks(
       { data: { startProctoringSession: startSession } },
       {},
-      { data: { endProctoringSession: endedSession } },
+      { data: { endProctoringSession: endedSession } }
     );
 
     const { result } = renderHook(() => useProctoringSession('assess-1'));

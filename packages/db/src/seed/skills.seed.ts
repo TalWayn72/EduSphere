@@ -138,7 +138,8 @@ export const SAMPLE_SKILLS: SeedSkill[] = [
   {
     slug: 'ci-cd-pipelines',
     name: 'CI/CD Pipelines',
-    description: 'GitHub Actions workflows, stages, caching, and deployment gates',
+    description:
+      'GitHub Actions workflows, stages, caching, and deployment gates',
     category: 'DevOps',
     level: 3,
     parentSkillSlug: 'docker-compose',
@@ -155,7 +156,8 @@ export const SAMPLE_SKILLS: SeedSkill[] = [
   {
     slug: 'e2e-testing',
     name: 'End-to-End Testing',
-    description: 'Playwright, browser automation, visual regression, and CI integration',
+    description:
+      'Playwright, browser automation, visual regression, and CI integration',
     category: 'Quality',
     level: 3,
     parentSkillSlug: 'unit-testing',

@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { TemplateService } from './template.service';
 
 interface CreateAgentTemplateInput {
@@ -65,7 +72,10 @@ export class TemplateResolver {
   }
 
   @Mutation('updateAgentTemplate')
-  async updateAgentTemplate(@Args('id') id: string, @Args('input') input: UpdateAgentTemplateInput) {
+  async updateAgentTemplate(
+    @Args('id') id: string,
+    @Args('input') input: UpdateAgentTemplateInput
+  ) {
     return this.templateService.update(id, input);
   }
 

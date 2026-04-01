@@ -63,25 +63,41 @@ describe('ConsentService', () => {
 
   describe('hasConsent', () => {
     it('ESSENTIAL consent is always true without DB check', async () => {
-      const result = await service.hasConsent('user-1', 'tenant-1', 'ESSENTIAL');
+      const result = await service.hasConsent(
+        'user-1',
+        'tenant-1',
+        'ESSENTIAL'
+      );
       expect(result).toBe(true);
     });
 
     it('returns true when consent row exists and given=true', async () => {
-      const result = await service.hasConsent('user-1', 'tenant-1', 'AI_PROCESSING');
+      const result = await service.hasConsent(
+        'user-1',
+        'tenant-1',
+        'AI_PROCESSING'
+      );
       expect(result).toBe(true);
     });
 
     it('returns false when no consent row exists', async () => {
       mockSelectWhere.mockResolvedValueOnce([]);
 
-      const result = await service.hasConsent('user-1', 'tenant-1', 'THIRD_PARTY_LLM');
+      const result = await service.hasConsent(
+        'user-1',
+        'tenant-1',
+        'THIRD_PARTY_LLM'
+      );
       expect(result).toBe(false);
     });
 
     it('returns false for MARKETING when no row exists', async () => {
       mockSelectWhere.mockResolvedValueOnce([]);
-      const result = await service.hasConsent('user-1', 'tenant-1', 'MARKETING');
+      const result = await service.hasConsent(
+        'user-1',
+        'tenant-1',
+        'MARKETING'
+      );
       expect(result).toBe(false);
     });
   });
@@ -264,7 +280,11 @@ describe('ConsentService', () => {
     });
 
     it('hasConsent ESSENTIAL skips withTenantContext (no DB hit)', async () => {
-      const result = await service.hasConsent('user-1', 'tenant-1', 'ESSENTIAL');
+      const result = await service.hasConsent(
+        'user-1',
+        'tenant-1',
+        'ESSENTIAL'
+      );
       expect(result).toBe(true);
       expect(withTenantContext).not.toHaveBeenCalled();
     });

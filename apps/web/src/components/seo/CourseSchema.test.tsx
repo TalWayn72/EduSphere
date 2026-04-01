@@ -8,7 +8,15 @@ import { safeJsonLd } from '@/lib/safe-json-ld';
 describe('CourseSchema', () => {
   it('renders without throwing', () => {
     expect(() =>
-      render(<HelmetProvider><CourseSchema name='Math 101' description='Intro' url='https://test' /></HelmetProvider>),
+      render(
+        <HelmetProvider>
+          <CourseSchema
+            name="Math 101"
+            description="Intro"
+            url="https://test"
+          />
+        </HelmetProvider>
+      )
     ).not.toThrow();
   });
 

@@ -22,7 +22,9 @@ export class RetentionCleanupService implements OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
-    this.logger.log('[RetentionCleanupService] onModuleDestroy: DB pools closed');
+    this.logger.log(
+      '[RetentionCleanupService] onModuleDestroy: DB pools closed'
+    );
   }
 
   async runCleanup(): Promise<RetentionCleanupReport> {

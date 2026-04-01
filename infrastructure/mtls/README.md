@@ -28,11 +28,11 @@ graph TD
 
 ## Environment Strategy
 
-| Environment | mTLS Method | Config |
-|-------------|-------------|--------|
+| Environment     | mTLS Method            | Config                                         |
+| --------------- | ---------------------- | ---------------------------------------------- |
 | **Development** | Plain HTTP (localhost) | `SUBGRAPH_*_URL=http://localhost:400X/graphql` |
-| **Staging** | Self-signed CA certs | `docker-compose.mtls.yml` overlay |
-| **Production** | Linkerd service mesh | Zero-config, automatic cert rotation |
+| **Staging**     | Self-signed CA certs   | `docker-compose.mtls.yml` overlay              |
+| **Production**  | Linkerd service mesh   | Zero-config, automatic cert rotation           |
 
 ## Quick Start — Staging mTLS (Docker Compose)
 
@@ -53,6 +53,7 @@ docker-compose -f docker-compose.dev.yml -f docker-compose.mtls.yml up -d
 ```
 
 The mTLS overlay:
+
 - Mounts CA cert + service certs into each container
 - Sets `MTLS_ENABLED=true` on all services
 - Configures `NODE_EXTRA_CA_CERTS` so Node.js trusts the self-signed CA
@@ -168,13 +169,13 @@ kubectl get pods -n edusphere -o jsonpath='{range .items[*]}{.metadata.name}{"\t
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `MTLS_ENABLED` | Enable HTTPS listener in subgraphs | `false` |
-| `MTLS_CERT_PATH` | Path to service TLS certificate | `/etc/edusphere/tls/tls.crt` |
-| `MTLS_KEY_PATH` | Path to service TLS private key | `/etc/edusphere/tls/tls.key` |
-| `MTLS_CA_PATH` | Path to CA certificate (for client verification) | `/etc/edusphere/tls/ca.crt` |
-| `NODE_EXTRA_CA_CERTS` | Node.js CA bundle (set to `MTLS_CA_PATH`) | unset |
+| Variable              | Description                                      | Default                      |
+| --------------------- | ------------------------------------------------ | ---------------------------- |
+| `MTLS_ENABLED`        | Enable HTTPS listener in subgraphs               | `false`                      |
+| `MTLS_CERT_PATH`      | Path to service TLS certificate                  | `/etc/edusphere/tls/tls.crt` |
+| `MTLS_KEY_PATH`       | Path to service TLS private key                  | `/etc/edusphere/tls/tls.key` |
+| `MTLS_CA_PATH`        | Path to CA certificate (for client verification) | `/etc/edusphere/tls/ca.crt`  |
+| `NODE_EXTRA_CA_CERTS` | Node.js CA bundle (set to `MTLS_CA_PATH`)        | unset                        |
 
 ## Security Notes
 
@@ -185,8 +186,8 @@ kubectl get pods -n edusphere -o jsonpath='{range .items[*]}{.metadata.name}{"\t
 
 ## Compliance
 
-| Standard | Control | Status |
-|----------|---------|--------|
-| SI-6 | Inter-service mTLS | Enforced via Linkerd (prod) / self-signed CA (staging) |
-| ISO 27001 A.13.2 | Network security management | mTLS + NetworkPolicy + ServerAuthorization |
-| OWASP ASVS V9 | Communication security | TLS 1.3 for all inter-service traffic |
+| Standard         | Control                     | Status                                                 |
+| ---------------- | --------------------------- | ------------------------------------------------------ |
+| SI-6             | Inter-service mTLS          | Enforced via Linkerd (prod) / self-signed CA (staging) |
+| ISO 27001 A.13.2 | Network security management | mTLS + NetworkPolicy + ServerAuthorization             |
+| OWASP ASVS V9    | Communication security      | TLS 1.3 for all inter-service traffic                  |

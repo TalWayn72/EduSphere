@@ -24,7 +24,13 @@ describe('social-events type guards', () => {
     });
 
     it('returns true for all verb types', () => {
-      for (const verb of ['COMPLETED', 'ENROLLED', 'ACHIEVED_BADGE', 'DISCUSSED', 'STARTED_LEARNING']) {
+      for (const verb of [
+        'COMPLETED',
+        'ENROLLED',
+        'ACHIEVED_BADGE',
+        'DISCUSSED',
+        'STARTED_LEARNING',
+      ]) {
         expect(isSocialFeedItemEvent({ ...valid, verb })).toBe(true);
       }
     });
@@ -91,7 +97,9 @@ describe('social-events type guards', () => {
     });
 
     it('returns false for non-string values', () => {
-      expect(isPeerReviewAssignedEvent({ ...valid, assignmentId: 0 })).toBe(false);
+      expect(isPeerReviewAssignedEvent({ ...valid, assignmentId: 0 })).toBe(
+        false
+      );
     });
   });
 
@@ -114,9 +122,9 @@ describe('social-events type guards', () => {
     });
 
     it('returns false when reviewCount is not a number', () => {
-      expect(
-        isPeerReviewCompletedEvent({ ...valid, reviewCount: '3' })
-      ).toBe(false);
+      expect(isPeerReviewCompletedEvent({ ...valid, reviewCount: '3' })).toBe(
+        false
+      );
     });
 
     it('returns false when submitterId missing', () => {

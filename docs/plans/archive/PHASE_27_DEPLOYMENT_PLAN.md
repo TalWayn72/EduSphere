@@ -9,16 +9,16 @@
 
 ## Phase 27 Deliverables Summary
 
-| # | Deliverable | Status |
-|---|-------------|--------|
-| T1.1 | Route fix: `/explore`, `/discover`, `/courses/discover` → CoursesDiscoveryPage | Done |
-| T1.2 | LiveSessionsPage + LiveSessionDetailPage + `/sessions` routes | Done |
-| T1.3 | Course Discovery (complete from Session 25) | Done |
-| T2.2 | Offline support: useOfflineStatus + useOfflineQueue + OfflineBanner | Done |
-| T2.3 | KnowledgeGraph courseId context + AdminActivityFeed (memory-safe) | Done |
-| BUG-054 | Progress bar indicatorClassName fix + regression tests | Done |
-| INFRA | skill-tree.service.ts TypeScript cast fix (2 errors) | Done |
-| INFRA | ProfileScreen.tsx unused RADIUS import lint fix | Done |
+| #       | Deliverable                                                                    | Status |
+| ------- | ------------------------------------------------------------------------------ | ------ |
+| T1.1    | Route fix: `/explore`, `/discover`, `/courses/discover` → CoursesDiscoveryPage | Done   |
+| T1.2    | LiveSessionsPage + LiveSessionDetailPage + `/sessions` routes                  | Done   |
+| T1.3    | Course Discovery (complete from Session 25)                                    | Done   |
+| T2.2    | Offline support: useOfflineStatus + useOfflineQueue + OfflineBanner            | Done   |
+| T2.3    | KnowledgeGraph courseId context + AdminActivityFeed (memory-safe)              | Done   |
+| BUG-054 | Progress bar indicatorClassName fix + regression tests                         | Done   |
+| INFRA   | skill-tree.service.ts TypeScript cast fix (2 errors)                           | Done   |
+| INFRA   | ProfileScreen.tsx unused RADIUS import lint fix                                | Done   |
 
 ---
 
@@ -57,13 +57,13 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 ## CI/CD Pipeline (auto-triggered on push)
 
-| Workflow | Trigger | Checks |
-|----------|---------|--------|
-| `ci.yml` | Push to master | lint + typecheck + unit tests |
-| `test.yml` | Push to master | Full suite (unit + integration + E2E + Docker services) |
-| `federation.yml` | Push to master | Supergraph composition + breaking change detection |
+| Workflow           | Trigger        | Checks                                                  |
+| ------------------ | -------------- | ------------------------------------------------------- |
+| `ci.yml`           | Push to master | lint + typecheck + unit tests                           |
+| `test.yml`         | Push to master | Full suite (unit + integration + E2E + Docker services) |
+| `federation.yml`   | Push to master | Supergraph composition + breaking change detection      |
 | `docker-build.yml` | Push to master | Multi-stage Docker builds for all services + Trivy scan |
-| `cd.yml` | Push to master | K8s/Helm deployment pipeline |
+| `cd.yml`           | Push to master | K8s/Helm deployment pipeline                            |
 
 ---
 
@@ -84,25 +84,27 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 ### 5-User Authentication
 
-| User | Role | Password |
-|------|------|----------|
+| User                      | Role        | Password       |
+| ------------------------- | ----------- | -------------- |
 | super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
-| instructor@example.com | INSTRUCTOR | Instructor123! |
-| org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
-| researcher@example.com | RESEARCHER | Researcher123! |
-| student@example.com | STUDENT | Student123! |
+| instructor@example.com    | INSTRUCTOR  | Instructor123! |
+| org.admin@example.com     | ORG_ADMIN   | OrgAdmin123!   |
+| researcher@example.com    | RESEARCHER  | Researcher123! |
+| student@example.com       | STUDENT     | Student123!    |
 
 ---
 
 ## Rollback Plan
 
 ### Immediate Rollback (if CI fails)
+
 ```bash
 git revert HEAD
 git push origin master
 ```
 
 ### Database Rollback
+
 - Phase 27 adds no new migrations applied to production DB
 - No DB rollback required
 
@@ -111,43 +113,45 @@ git push origin master
 ## Files Changed by Phase 27
 
 ### New Files
-| File | Description |
-|------|-------------|
-| `apps/web/src/pages/LiveSessionsPage.tsx` | List/filter/create live sessions |
-| `apps/web/src/pages/LiveSessionDetailPage.tsx` | Session detail + live chat sidebar |
-| `apps/web/src/hooks/useOfflineStatus.ts` | navigator.onLine + event listeners |
-| `apps/web/src/hooks/useOfflineQueue.ts` | Queue offline mutations, replay on reconnect |
-| `apps/web/src/components/OfflineBanner.tsx` | Sticky banner shown when offline |
-| `apps/web/src/components/AdminActivityFeed.tsx` | Admin activity feed (memory-safe intervals) |
-| `apps/web/src/pages/SkillTreePage.tsx` | Skill tree page wrapper |
-| `apps/web/src/services/OfflineLessonCache.ts` | IndexedDB lesson cache service |
-| `apps/subgraph-knowledge/src/graph/skill-tree.resolver.ts` | GraphQL resolver for skill tree |
-| `apps/subgraph-knowledge/src/graph/skill-tree.service.ts` | Business logic for skill tree |
+
+| File                                                       | Description                                  |
+| ---------------------------------------------------------- | -------------------------------------------- |
+| `apps/web/src/pages/LiveSessionsPage.tsx`                  | List/filter/create live sessions             |
+| `apps/web/src/pages/LiveSessionDetailPage.tsx`             | Session detail + live chat sidebar           |
+| `apps/web/src/hooks/useOfflineStatus.ts`                   | navigator.onLine + event listeners           |
+| `apps/web/src/hooks/useOfflineQueue.ts`                    | Queue offline mutations, replay on reconnect |
+| `apps/web/src/components/OfflineBanner.tsx`                | Sticky banner shown when offline             |
+| `apps/web/src/components/AdminActivityFeed.tsx`            | Admin activity feed (memory-safe intervals)  |
+| `apps/web/src/pages/SkillTreePage.tsx`                     | Skill tree page wrapper                      |
+| `apps/web/src/services/OfflineLessonCache.ts`              | IndexedDB lesson cache service               |
+| `apps/subgraph-knowledge/src/graph/skill-tree.resolver.ts` | GraphQL resolver for skill tree              |
+| `apps/subgraph-knowledge/src/graph/skill-tree.service.ts`  | Business logic for skill tree                |
 
 ### Modified Files
-| File | Change |
-|------|--------|
-| `apps/web/src/lib/router.tsx` | +/sessions, /sessions/:id, /explore, /discover routes |
-| `apps/web/src/lib/graphql/live-session.queries.ts` | Updated GraphQL queries/mutations |
-| `apps/web/src/lib/graphql/knowledge.queries.ts` | courseId parameter support |
-| `apps/web/src/pages/AdminDashboardPage.tsx` | +AdminActivityFeed integration |
-| `apps/web/src/components/Layout.tsx` | OfflineBanner integration |
-| `packages/i18n/src/locales/en/collaboration.json` | +sessions live keys |
-| `packages/i18n/src/locales/en/offline.json` | +offline mode keys |
-| `packages/i18n/src/locales/he/collaboration.json` | Hebrew translations (complete) |
-| `packages/i18n/src/locales/he/offline.json` | Hebrew translations (complete) |
+
+| File                                               | Change                                                |
+| -------------------------------------------------- | ----------------------------------------------------- |
+| `apps/web/src/lib/router.tsx`                      | +/sessions, /sessions/:id, /explore, /discover routes |
+| `apps/web/src/lib/graphql/live-session.queries.ts` | Updated GraphQL queries/mutations                     |
+| `apps/web/src/lib/graphql/knowledge.queries.ts`    | courseId parameter support                            |
+| `apps/web/src/pages/AdminDashboardPage.tsx`        | +AdminActivityFeed integration                        |
+| `apps/web/src/components/Layout.tsx`               | OfflineBanner integration                             |
+| `packages/i18n/src/locales/en/collaboration.json`  | +sessions live keys                                   |
+| `packages/i18n/src/locales/en/offline.json`        | +offline mode keys                                    |
+| `packages/i18n/src/locales/he/collaboration.json`  | Hebrew translations (complete)                        |
+| `packages/i18n/src/locales/he/offline.json`        | Hebrew translations (complete)                        |
 
 ---
 
 ## Quality Gate Results (Phase 27)
 
-| Check | Result | Details |
-|-------|--------|---------|
-| TypeScript typecheck | 0 errors | Confirmed via ts-diagnostics MCP |
-| ESLint (Phase 27 files) | 0 errors/warnings | All 6 target files clean |
-| Security tests | 819/819 | 32 spec files, 0 failures |
-| i18n completeness | All keys present | EN/HE offline.json + collaboration.json fully in sync |
+| Check                   | Result            | Details                                               |
+| ----------------------- | ----------------- | ----------------------------------------------------- |
+| TypeScript typecheck    | 0 errors          | Confirmed via ts-diagnostics MCP                      |
+| ESLint (Phase 27 files) | 0 errors/warnings | All 6 target files clean                              |
+| Security tests          | 819/819           | 32 spec files, 0 failures                             |
+| i18n completeness       | All keys present  | EN/HE offline.json + collaboration.json fully in sync |
 
 ---
 
-*Generated by DevOps & Release Division (Division 11) — Phase 27 — 06 Mar 2026*
+_Generated by DevOps & Release Division (Division 11) — Phase 27 — 06 Mar 2026_

@@ -27,7 +27,9 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
 
   test('instructor can navigate to course creation page', async ({ page }) => {
     await login(page);
-    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Should see the course creation form OR be redirected to courses list
@@ -35,14 +37,16 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     expect(url).toMatch(/\/(courses|create|new)/);
   });
 
-  test('sidebar nav items show translated text (not raw i18n keys)', async ({ page }) => {
+  test('sidebar nav items show translated text (not raw i18n keys)', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
-    const sidebarText = await sidebar.textContent() ?? '';
+    const sidebarText = (await sidebar.textContent()) ?? '';
 
     // These raw i18n key names must NEVER appear in the sidebar — they indicate
     // a missing translation entry in nav.json (BUG-001 regression guard).
@@ -57,7 +61,10 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
       'cohortInsights',
     ];
     for (const key of RAW_KEYS) {
-      expect(sidebarText, `Raw i18n key "${key}" must not appear in sidebar`).not.toContain(key);
+      expect(
+        sidebarText,
+        `Raw i18n key "${key}" must not appear in sidebar`
+      ).not.toContain(key);
     }
   });
 
@@ -75,16 +82,26 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     const imgVisible = await logoImg.isVisible().catch(() => false);
     const fallbackVisible = await logoFallback.isVisible().catch(() => false);
 
-    expect(imgVisible || fallbackVisible, 'Logo image or fallback element must be visible').toBe(true);
+    expect(
+      imgVisible || fallbackVisible,
+      'Logo image or fallback element must be visible'
+    ).toBe(true);
 
     // If the <img> IS visible it must not be broken (naturalWidth === 0 means HTTP 404)
     if (imgVisible) {
-      const naturalWidth = await logoImg.evaluate((el) => (el as HTMLImageElement).naturalWidth);
-      expect(naturalWidth, 'Logo image naturalWidth must be > 0 (not a broken image)').toBeGreaterThan(0);
+      const naturalWidth = await logoImg.evaluate(
+        (el) => (el as HTMLImageElement).naturalWidth
+      );
+      expect(
+        naturalWidth,
+        'Logo image naturalWidth must be > 0 (not a broken image)'
+      ).toBeGreaterThan(0);
     }
   });
 
-  test('main content does not overlap sidebar (layout offset correct)', async ({ page }) => {
+  test('main content does not overlap sidebar (layout offset correct)', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -100,12 +117,14 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
       const mainLeft = Math.round(mainBox.x);
       expect(
         mainLeft,
-        `Main content left edge (${mainLeft}px) must not overlap sidebar right edge (${sidebarRight}px)`,
+        `Main content left edge (${mainLeft}px) must not overlap sidebar right edge (${sidebarRight}px)`
       ).toBeGreaterThanOrEqual(sidebarRight - 5); // 5px tolerance for sub-pixel rounding
     }
   });
 
-  test('certificates page shows no raw GraphQL error strings', async ({ page }) => {
+  test('certificates page shows no raw GraphQL error strings', async ({
+    page,
+  }) => {
     // Simulate a backend error on the MyCertificates query
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
@@ -128,7 +147,9 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
@@ -141,7 +162,9 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     expect(bodyText).not.toContain('Network request failed');
   });
 
-  test('SRS review page shows no raw GraphQL error strings', async ({ page }) => {
+  test('SRS review page shows no raw GraphQL error strings', async ({
+    page,
+  }) => {
     // Simulate a backend error on the DueReviews query
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
@@ -164,7 +187,9 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
@@ -178,13 +203,15 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     const errorState = page.locator('[data-testid="error-state"]');
     const errorVisible = await errorState.isVisible().catch(() => false);
     if (errorVisible) {
-      const errorText = await errorState.textContent() ?? '';
+      const errorText = (await errorState.textContent()) ?? '';
       expect(errorText).not.toContain('[GraphQL]');
       expect(errorText).not.toContain('Unexpected error.');
     }
   });
 
-  test('language settings page is accessible and has a language selector', async ({ page }) => {
+  test('language settings page is accessible and has a language selector', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -195,14 +222,19 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
     // A language selector of some form must be present
     const langSelector = page
       .locator(
-        '[data-testid="language-selector"], select[id*="lang"], button[id*="lang"], [role="combobox"]',
+        '[data-testid="language-selector"], select[id*="lang"], button[id*="lang"], [role="combobox"]'
       )
       .first();
     const selectorVisible = await langSelector.isVisible().catch(() => false);
-    expect(selectorVisible, 'Language selector must be present on settings page').toBe(true);
+    expect(
+      selectorVisible,
+      'Language selector must be present on settings page'
+    ).toBe(true);
   });
 
-  test('full navigation tour — all major pages load without crashing', async ({ page }) => {
+  test('full navigation tour — all major pages load without crashing', async ({
+    page,
+  }) => {
     await login(page);
 
     const routes = [
@@ -224,17 +256,17 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
       // JavaScript runtime errors must not leak as text into the DOM
       expect(
         content,
-        `Route ${route}: "[object Object]" must not appear in page HTML`,
+        `Route ${route}: "[object Object]" must not appear in page HTML`
       ).not.toContain('[object Object]');
       expect(
         content,
-        `Route ${route}: "Cannot read properties of undefined" must not appear in page HTML`,
+        `Route ${route}: "Cannot read properties of undefined" must not appear in page HTML`
       ).not.toContain('Cannot read properties of undefined');
 
       // The authenticated layout sidebar must always be present
       await expect(
         page.locator('[data-testid="app-sidebar"]'),
-        `Route ${route}: app-sidebar must be visible`,
+        `Route ${route}: app-sidebar must be visible`
       ).toBeVisible();
     }
   });
@@ -245,16 +277,22 @@ test.describe('Course Lifecycle — DEV_MODE guards', () => {
 test.describe('Course Lifecycle — Live backend', () => {
   test.skip(IS_DEV_MODE, 'Set VITE_DEV_MODE=false to run live-backend tests');
 
-  test('instructor can navigate to course creation page (Keycloak auth)', async ({ page }) => {
+  test('instructor can navigate to course creation page (Keycloak auth)', async ({
+    page,
+  }) => {
     await loginViaKeycloak(page, TEST_USERS.instructor);
-    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/courses/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const url = page.url();
     expect(url).toMatch(/\/(courses|create|new)/);
   });
 
-  test('student can view courses discovery page (Keycloak auth)', async ({ page }) => {
+  test('student can view courses discovery page (Keycloak auth)', async ({
+    page,
+  }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -265,7 +303,9 @@ test.describe('Course Lifecycle — Live backend', () => {
     });
   });
 
-  test('student dashboard loads and shows sidebar with translated nav items', async ({ page }) => {
+  test('student dashboard loads and shows sidebar with translated nav items', async ({
+    page,
+  }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -273,7 +313,7 @@ test.describe('Course Lifecycle — Live backend', () => {
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
 
-    const sidebarText = await sidebar.textContent() ?? '';
+    const sidebarText = (await sidebar.textContent()) ?? '';
     const RAW_KEYS = [
       'skillPaths',
       'socialFeed',
@@ -285,7 +325,10 @@ test.describe('Course Lifecycle — Live backend', () => {
       'cohortInsights',
     ];
     for (const key of RAW_KEYS) {
-      expect(sidebarText, `Raw key "${key}" must not appear in sidebar`).not.toContain(key);
+      expect(
+        sidebarText,
+        `Raw key "${key}" must not appear in sidebar`
+      ).not.toContain(key);
     }
   });
 });

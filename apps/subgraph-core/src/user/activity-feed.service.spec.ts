@@ -34,7 +34,8 @@ describe('ActivityFeedService', () => {
   it('returns ActivityFeedItemDto[] sorted by occurredAt DESC', async () => {
     mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
       const mockTx = {
-        execute: vi.fn()
+        execute: vi
+          .fn()
           .mockResolvedValueOnce({
             rows: [
               {
@@ -108,7 +109,8 @@ describe('ActivityFeedService', () => {
   it('returns descriptions with title fallbacks when title is null', async () => {
     mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
       const mockTx = {
-        execute: vi.fn()
+        execute: vi
+          .fn()
           .mockResolvedValueOnce({
             rows: [
               {

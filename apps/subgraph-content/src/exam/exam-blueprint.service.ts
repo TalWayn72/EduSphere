@@ -159,7 +159,12 @@ export class ExamBlueprintService implements OnModuleDestroy {
     tenantId: string,
     userId: string
   ): Promise<ExamBlueprint> {
-    const blueprint = await this.getBlueprint(id, tenantId, userId, 'INSTRUCTOR');
+    const blueprint = await this.getBlueprint(
+      id,
+      tenantId,
+      userId,
+      'INSTRUCTOR'
+    );
     const itemCount = await this.itemService.getItemCount(
       blueprint.courseId,
       tenantId,
@@ -172,12 +177,7 @@ export class ExamBlueprintService implements OnModuleDestroy {
       );
     }
 
-    return this.updateBlueprint(
-      id,
-      { status: 'ACTIVE' },
-      tenantId,
-      userId
-    );
+    return this.updateBlueprint(id, { status: 'ACTIVE' }, tenantId, userId);
   }
 
   async archiveBlueprint(
@@ -185,12 +185,7 @@ export class ExamBlueprintService implements OnModuleDestroy {
     tenantId: string,
     userId: string
   ): Promise<ExamBlueprint> {
-    return this.updateBlueprint(
-      id,
-      { status: 'ARCHIVED' },
-      tenantId,
-      userId
-    );
+    return this.updateBlueprint(id, { status: 'ARCHIVED' }, tenantId, userId);
   }
 
   private buildCtx(

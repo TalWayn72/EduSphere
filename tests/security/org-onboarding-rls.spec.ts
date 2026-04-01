@@ -37,9 +37,7 @@ describe('RLS: org_invitations table', () => {
   const MIGRATION_FILE = '0038_org_invitations.sql';
 
   it('org-invitations schema file exists', () => {
-    expect(
-      existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))
-    ).toBe(true);
+    expect(existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))).toBe(true);
   });
 
   it('org_invitations table has tenant_id column', () => {
@@ -74,7 +72,9 @@ describe('RLS: org_invitations table', () => {
     if (!migration) return;
     expect(migration).toContain('app.current_tenant');
     // Must NOT use bare app.current_user (without _id suffix) — SI-1 violation
-    expect(migration).not.toMatch(/current_setting\s*\(\s*'app\.current_user'\s*,/);
+    expect(migration).not.toMatch(
+      /current_setting\s*\(\s*'app\.current_user'\s*,/
+    );
   });
 
   it('org_invitations RLS does NOT use app.current_user without _id (SI-1 guard)', () => {
@@ -106,9 +106,7 @@ describe('RLS: org_onboarding_checklist table', () => {
   const MIGRATION_FILE = '0036_org_onboarding_checklist.sql';
 
   it('org-onboarding-checklist schema file exists', () => {
-    expect(
-      existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))
-    ).toBe(true);
+    expect(existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))).toBe(true);
   });
 
   it('org_onboarding_checklist has tenant_id column', () => {
@@ -140,7 +138,9 @@ describe('RLS: org_onboarding_checklist table', () => {
 
   it('org_onboarding_checklist schema is exported from schema index', () => {
     const indexContent = read('packages/db/src/schema/index.ts');
-    expect(indexContent).toMatch(/onboarding-checklist|orgOnboardingChecklist|org-onboarding-checklist/);
+    expect(indexContent).toMatch(
+      /onboarding-checklist|orgOnboardingChecklist|org-onboarding-checklist/
+    );
   });
 });
 
@@ -159,14 +159,12 @@ describe('RLS: course_licenses table (dual-tenant policy)', () => {
   });
 
   it('course_licenses has tenant_id (licensee)', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
     expect(content).toContain('tenant_id');
   });
 
   it('course_licenses has licensor_tenant_id (content owner)', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
     expect(content).toMatch(/licensor_tenant_id|licensorTenantId/);
   });
 
@@ -180,25 +178,24 @@ describe('RLS: course_licenses table (dual-tenant policy)', () => {
     const migration = read(`packages/db/src/migrations/${MIGRATION_FILE}`);
     if (!migration) return;
     // The policy must use OR to allow both tenants access
-    expect(migration).toMatch(/tenant_id.*OR.*licensor_tenant_id|licensor_tenant_id.*OR.*tenant_id/s);
+    expect(migration).toMatch(
+      /tenant_id.*OR.*licensor_tenant_id|licensor_tenant_id.*OR.*tenant_id/s
+    );
     expect(migration).toContain('app.current_tenant');
   });
 
   it('course_licenses has status column (ACTIVE/EXPIRED/REVOKED)', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
     expect(content).toMatch(/status|ACTIVE|EXPIRED|REVOKED/);
   });
 
   it('course_licenses has license_type column', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
     expect(content).toMatch(/license_type|licenseType|UNLIMITED|PER_SEAT/);
   });
 
   it('course_licenses has max_seats and used_seats for per-seat licensing', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('marketplace.ts');
     expect(content).toMatch(/max_seats|maxSeats/);
     expect(content).toMatch(/used_seats|usedSeats/);
   });
@@ -211,9 +208,7 @@ describe('RLS: api_keys table', () => {
   const MIGRATION_FILE = '0039_api_keys.sql';
 
   it('api-keys schema file exists', () => {
-    expect(
-      existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))
-    ).toBe(true);
+    expect(existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))).toBe(true);
   });
 
   it('api_keys has tenant_id for tenant isolation', () => {
@@ -286,9 +281,7 @@ describe('RLS: webhooks table', () => {
   const SCHEMA_FILE = 'webhook-endpoints.ts';
 
   it('webhooks schema file exists', () => {
-    expect(
-      existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))
-    ).toBe(true);
+    expect(existsSync(resolve(SCHEMA_DIR, SCHEMA_FILE))).toBe(true);
   });
 
   it('webhooks has tenant_id for tenant isolation', () => {
@@ -384,22 +377,19 @@ describe('RLS: gamification_config table', () => {
   });
 
   it('gamification_config has tenant_id with UNIQUE constraint (1:1)', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('gamification.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('gamification.ts');
     expect(content).toContain('tenant_id');
     // Must be unique — one config per tenant
     expect(content).toMatch(/unique|UNIQUE/i);
   });
 
   it('gamification_config has enabled boolean', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('gamification.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('gamification.ts');
     expect(content).toMatch(/enabled/);
   });
 
   it('gamification_config has xp_rules JSONB for customizable XP values', () => {
-    const content =
-      readSchema(SCHEMA_FILE) || readSchema('gamification.ts');
+    const content = readSchema(SCHEMA_FILE) || readSchema('gamification.ts');
     expect(content).toMatch(/xp_rules|xpRules|jsonb/i);
   });
 
@@ -475,7 +465,9 @@ describe('SI-8: Org onboarding services use Drizzle ORM (not raw SQL)', () => {
 
     it(`${fileName}: uses Drizzle db/tx operations`, () => {
       // Services use tx.execute(sql`...`) via Drizzle's sql template tag — valid Drizzle ORM usage
-      expect(content).toMatch(/db\.(select|insert|update|delete|execute)|tx\.execute\(sql/);
+      expect(content).toMatch(
+        /db\.(select|insert|update|delete|execute)|tx\.execute\(sql/
+      );
     });
   });
 });
@@ -483,7 +475,8 @@ describe('SI-8: Org onboarding services use Drizzle ORM (not raw SQL)', () => {
 // ─── SI-9: All resolvers use authContext (JWT) not args for tenant/user ────
 
 describe('SI-9: Org onboarding resolvers use JWT context (not args) for tenant ID', () => {
-  const RESOLVER_PATH = 'apps/subgraph-core/src/tenant/org-onboarding.resolver.ts';
+  const RESOLVER_PATH =
+    'apps/subgraph-core/src/tenant/org-onboarding.resolver.ts';
   const HELPER_PATH = 'apps/subgraph-core/src/tenant/org-onboarding.helpers.ts';
   const resolverContent = read(RESOLVER_PATH);
   const helperContent = read(HELPER_PATH);
@@ -491,12 +484,16 @@ describe('SI-9: Org onboarding resolvers use JWT context (not args) for tenant I
   const combined = resolverContent + '\n' + helperContent;
 
   it(`org-onboarding.resolver.ts: extracts tenantId from authContext (JWT), not @Args`, () => {
-    expect(combined).toMatch(/authContext\.tenantId|ctx\.authContext|auth\.tenantId/);
+    expect(combined).toMatch(
+      /authContext\.tenantId|ctx\.authContext|auth\.tenantId/
+    );
     // Must NOT accept tenantId as a GraphQL argument (would allow tenant spoofing)
     expect(resolverContent).not.toMatch(/@Args\([^)]*tenantId/);
   });
 
   it(`org-onboarding.resolver.ts: extracts userId from authContext (JWT)`, () => {
-    expect(combined).toMatch(/authContext\.userId|ctx\.authContext|auth\.userId/);
+    expect(combined).toMatch(
+      /authContext\.userId|ctx\.authContext|auth\.userId/
+    );
   });
 });

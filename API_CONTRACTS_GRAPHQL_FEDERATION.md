@@ -119,14 +119,14 @@ graph TD
 
 ## 2. Subgraph Decomposition Map
 
-| Subgraph          | Port | Owned Entities                                                                                     | Extended Entities                               | Domain                                 |
-| ----------------- | ---- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------- |
-| **Core**          | 4001 | `Tenant`, `User`, `Organization`, `OrgInvitation`, `ApiKey`, `Webhook`, `CourseLicense`, `GamificationConfig` | —                                               | Identity, tenancy, auth, org onboarding, API keys, webhooks |
+| Subgraph          | Port | Owned Entities                                                                                                                                      | Extended Entities                               | Domain                                                                   |
+| ----------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------ |
+| **Core**          | 4001 | `Tenant`, `User`, `Organization`, `OrgInvitation`, `ApiKey`, `Webhook`, `CourseLicense`, `GamificationConfig`                                       | —                                               | Identity, tenancy, auth, org onboarding, API keys, webhooks              |
 | **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`, `ExamItem`, `ExamBlueprint`, `ExamSession`, `ExamResult`, `MarketplaceListing` | `User` (createdCourses), `Tenant`               | Courses, media pipeline, transcription, certification exams, marketplace |
-| **Annotation**    | 4003 | `Annotation`                                                                                       | `User`, `MediaAsset`                            | Markings, sketches, spatial comments   |
-| **Collaboration** | 4004 | `CollabDocument`, `CollabSession`                                                                  | `User`, `Annotation`                            | CRDT persistence, real-time presence   |
-| **Agent**         | 4005 | `AgentDefinition`, `AgentExecution`                                                                | `User`, `Annotation`, `Course`                  | AI agents, templates, executions       |
-| **Knowledge**     | 4006 | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult` | `MediaAsset`, `TranscriptSegment`, `Annotation` | Knowledge graph, embeddings, search    |
+| **Annotation**    | 4003 | `Annotation`                                                                                                                                        | `User`, `MediaAsset`                            | Markings, sketches, spatial comments                                     |
+| **Collaboration** | 4004 | `CollabDocument`, `CollabSession`                                                                                                                   | `User`, `Annotation`                            | CRDT persistence, real-time presence                                     |
+| **Agent**         | 4005 | `AgentDefinition`, `AgentExecution`                                                                                                                 | `User`, `Annotation`, `Course`                  | AI agents, templates, executions                                         |
+| **Knowledge**     | 4006 | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult`                                                  | `MediaAsset`, `TranscriptSegment`, `Annotation` | Knowledge graph, embeddings, search                                      |
 
 ### Entity Ownership Rules
 
@@ -1100,7 +1100,10 @@ type UserEdge {
 # ─── File: apps/subgraph-core/src/tenant/org-onboarding.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Organization Provisioning
@@ -1395,34 +1398,55 @@ input LicenseCourseInput {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type Query {
-  """Current user's organization with onboarding checklist"""
+  """
+  Current user's organization with onboarding checklist
+  """
   myOrganization: Organization! @authenticated
 
-  """List organization members with pagination"""
+  """
+  List organization members with pagination
+  """
   orgMembers(limit: Int = 20, offset: Int = 0): [OrgMember!]! @authenticated
 
-  """List invitations, optionally filtered by status"""
+  """
+  List invitations, optionally filtered by status
+  """
   orgInvitations(status: InvitationStatus): [OrgInvitation!]! @authenticated
 
-  """Current trial/grace period status"""
+  """
+  Current trial/grace period status
+  """
   trialStatus: TrialStatus! @authenticated
 
-  """List all API keys for the current organization"""
+  """
+  List all API keys for the current organization
+  """
   apiKeys: [ApiKey!]! @authenticated
 
-  """List all webhooks for the current organization"""
+  """
+  List all webhooks for the current organization
+  """
   webhooks: [Webhook!]! @authenticated
 
-  """List delivery attempts for a specific webhook"""
-  webhookDeliveries(webhookId: ID!, limit: Int = 20): [WebhookDelivery!]! @authenticated
+  """
+  List delivery attempts for a specific webhook
+  """
+  webhookDeliveries(webhookId: ID!, limit: Int = 20): [WebhookDelivery!]!
+    @authenticated
 
-  """List all course licenses for the current organization"""
+  """
+  List all course licenses for the current organization
+  """
   courseLicenses: [CourseLicense!]! @authenticated
 
-  """Per-org gamification settings"""
+  """
+  Per-org gamification settings
+  """
   gamificationConfig: GamificationConfig! @authenticated
 
-  """Organization analytics for a date range"""
+  """
+  Organization analytics for a date range
+  """
   orgAnalytics(dateRange: DateRangeInput!): OrgAnalytics! @authenticated
 }
 
@@ -1431,52 +1455,86 @@ extend type Query {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type Mutation {
-  """Self-service organization provisioning (public — no auth required)"""
+  """
+  Self-service organization provisioning (public — no auth required)
+  """
   createOrganization(input: CreateOrganizationInput!): Organization!
 
-  """Invite a user to the organization"""
+  """
+  Invite a user to the organization
+  """
   inviteUser(input: InviteUserInput!): OrgInvitation! @authenticated
 
-  """Accept an invitation via email token (public)"""
+  """
+  Accept an invitation via email token (public)
+  """
   acceptInvitation(token: String!): OrgMember!
 
-  """Revoke a pending invitation"""
+  """
+  Revoke a pending invitation
+  """
   revokeInvitation(id: ID!): Boolean! @authenticated
 
-  """Update a member's role"""
+  """
+  Update a member's role
+  """
   updateMemberRole(userId: ID!, role: String!): OrgMember! @authenticated
 
-  """Remove a member from the organization"""
+  """
+  Remove a member from the organization
+  """
   removeMember(userId: ID!): Boolean! @authenticated
 
-  """Create a new API key (plainTextKey returned once)"""
+  """
+  Create a new API key (plainTextKey returned once)
+  """
   createApiKey(input: CreateApiKeyInput!): ApiKeyCreated! @authenticated
 
-  """Revoke an existing API key"""
+  """
+  Revoke an existing API key
+  """
   revokeApiKey(id: ID!): Boolean! @authenticated
 
-  """Register a webhook endpoint"""
+  """
+  Register a webhook endpoint
+  """
   createWebhook(input: CreateWebhookInput!): Webhook! @authenticated
 
-  """Update webhook URL, events, or active status"""
+  """
+  Update webhook URL, events, or active status
+  """
   updateWebhook(id: ID!, input: UpdateWebhookInput!): Webhook! @authenticated
 
-  """Delete a webhook endpoint"""
+  """
+  Delete a webhook endpoint
+  """
   deleteWebhook(id: ID!): Boolean! @authenticated
 
-  """Send a test event to a webhook"""
+  """
+  Send a test event to a webhook
+  """
   testWebhook(id: ID!): WebhookDelivery! @authenticated
 
-  """License a marketplace course for the organization"""
+  """
+  License a marketplace course for the organization
+  """
   licenseCourse(input: LicenseCourseInput!): CourseLicense! @authenticated
 
-  """Revoke a course license"""
+  """
+  Revoke a course license
+  """
   revokeCourseLicense(id: ID!): Boolean! @authenticated
 
-  """Update per-org gamification configuration"""
-  updateGamificationConfig(input: UpdateGamificationConfigInput!): GamificationConfig! @authenticated
+  """
+  Update per-org gamification configuration
+  """
+  updateGamificationConfig(
+    input: UpdateGamificationConfigInput!
+  ): GamificationConfig! @authenticated
 
-  """Export analytics data as CSV or PDF"""
+  """
+  Export analytics data as CSV or PDF
+  """
   exportAnalytics(input: ExportAnalyticsInput!): ExportResult! @authenticated
 }
 ```
@@ -2633,101 +2691,165 @@ input UpdateExamBlueprintInput {
 # ─── Exam Queries ───
 
 extend type Query {
-  """Item bank with filtering and pagination (instructor+ only)"""
+  """
+  Item bank with filtering and pagination (instructor+ only)
+  """
   examItemBank(
     courseId: ID!
     filters: ExamItemFilterInput
     first: Int
     after: String
-  ): ExamItemConnection! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  ): ExamItemConnection!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """All blueprints for a course"""
+  """
+  All blueprints for a course
+  """
   examBlueprints(courseId: ID!): [ExamBlueprint!]! @authenticated
 
-  """Single blueprint by ID"""
+  """
+  Single blueprint by ID
+  """
   examBlueprint(id: ID!): ExamBlueprint @authenticated
 
-  """Current user's exam sessions for a blueprint"""
+  """
+  Current user's exam sessions for a blueprint
+  """
   myExamSessions(blueprintId: ID!): [ExamSession!]! @authenticated
 
-  """Single exam session by ID"""
+  """
+  Single exam session by ID
+  """
   examSession(id: ID!): ExamSession! @authenticated
 
-  """Exam result for a session"""
+  """
+  Exam result for a session
+  """
   examResult(sessionId: ID!): ExamResult @authenticated
 
-  """Current user's exam results, optionally filtered by course"""
+  """
+  Current user's exam results, optionally filtered by course
+  """
   myExamResults(courseId: ID): [ExamResult!]! @authenticated
 
-  """Item-level statistics (instructor+ only)"""
+  """
+  Item-level statistics (instructor+ only)
+  """
   examItemStatistics(itemId: ID!): ExamItemStatistics
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Blueprint-level analytics (instructor+ only)"""
+  """
+  Blueprint-level analytics (instructor+ only)
+  """
   examBlueprintAnalytics(blueprintId: ID!): BlueprintAnalytics!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Psychometric reliability report (instructor+ only)"""
+  """
+  Psychometric reliability report (instructor+ only)
+  """
   examReliabilityReport(blueprintId: ID!): ExamReliabilityReport!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 
 # ─── Exam Mutations ───
 
 extend type Mutation {
-  """Create a new exam item in the item bank"""
+  """
+  Create a new exam item in the item bank
+  """
   createExamItem(input: CreateExamItemInput!): ExamItem!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Update an existing exam item"""
+  """
+  Update an existing exam item
+  """
   updateExamItem(id: ID!, input: UpdateExamItemInput!): ExamItem!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Retire an exam item (soft delete from active pool)"""
+  """
+  Retire an exam item (soft delete from active pool)
+  """
   retireExamItem(id: ID!): ExamItem!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """AI-generate exam items with bloom/domain targeting"""
+  """
+  AI-generate exam items with bloom/domain targeting
+  """
   generateExamItems(input: GenerateExamItemsInput!): ExamItemGenerationResult!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Create a new exam blueprint"""
+  """
+  Create a new exam blueprint
+  """
   createExamBlueprint(input: CreateExamBlueprintInput!): ExamBlueprint!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Update an existing blueprint"""
-  updateExamBlueprint(id: ID!, input: UpdateExamBlueprintInput!): ExamBlueprint!
-    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """
+  Update an existing blueprint
+  """
+  updateExamBlueprint(
+    id: ID!
+    input: UpdateExamBlueprintInput!
+  ): ExamBlueprint!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """Start a new exam session (assembles exam from blueprint)"""
+  """
+  Start a new exam session (assembles exam from blueprint)
+  """
   startExamSession(blueprintId: ID!): ExamSession! @authenticated
 
-  """Submit an answer for a single question"""
+  """
+  Submit an answer for a single question
+  """
   submitExamAnswer(sessionId: ID!, itemId: ID!, answer: JSON!): Boolean!
     @authenticated
 
-  """Flag a question for review"""
+  """
+  Flag a question for review
+  """
   flagExamQuestion(sessionId: ID!, itemId: ID!): Boolean! @authenticated
 
-  """Submit the entire exam for grading"""
+  """
+  Submit the entire exam for grading
+  """
   submitExam(sessionId: ID!): ExamResult! @authenticated
 
-  """Void an exam session (admin override for security violations)"""
+  """
+  Void an exam session (admin override for security violations)
+  """
   voidExamSession(sessionId: ID!): Boolean!
-    @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
-  """Run IRT 3PL calibration on all items for a blueprint (SUPER_ADMIN only)"""
+  """
+  Run IRT 3PL calibration on all items for a blueprint (SUPER_ADMIN only)
+  """
   calibrateExamItems(blueprintId: ID!): Boolean!
-    @authenticated @requiresRole(roles: [SUPER_ADMIN])
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
 }
 
 # ─── Exam Subscriptions ───
 
 extend type Subscription {
-  """Real-time exam timer countdown"""
+  """
+  Real-time exam timer countdown
+  """
   examTimeUpdate(sessionId: ID!): ExamTimeEvent!
 
-  """Exam session status changes (e.g., TIMED_OUT, VOIDED)"""
+  """
+  Exam session status changes (e.g., TIMED_OUT, VOIDED)
+  """
   examSessionStatusChanged(sessionId: ID!): ExamSession!
 }
 ```
@@ -2741,7 +2863,10 @@ extend type Subscription {
 # ─── File: apps/subgraph-content/src/marketplace/marketplace-org.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Marketplace Listing (Org-to-Org)
@@ -2789,7 +2914,9 @@ input PublishToMarketplaceInput {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type Query {
-  """Browse marketplace listings with optional filters"""
+  """
+  Browse marketplace listings with optional filters
+  """
   marketplaceListings(
     category: String
     pricingModel: PricingModel
@@ -2798,7 +2925,9 @@ extend type Query {
     offset: Int = 0
   ): [MarketplaceListing!]!
 
-  """Get a single marketplace listing by ID"""
+  """
+  Get a single marketplace listing by ID
+  """
   marketplaceListing(id: ID!): MarketplaceListing
 }
 
@@ -2807,10 +2936,15 @@ extend type Query {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type Mutation {
-  """Publish a course to the cross-org marketplace"""
-  publishToMarketplace(input: PublishToMarketplaceInput!): MarketplaceListing! @authenticated
+  """
+  Publish a course to the cross-org marketplace
+  """
+  publishToMarketplace(input: PublishToMarketplaceInput!): MarketplaceListing!
+    @authenticated
 
-  """Remove a course from the marketplace"""
+  """
+  Remove a course from the marketplace
+  """
   unpublishFromMarketplace(listingId: ID!): Boolean! @authenticated
 }
 ```
@@ -3830,20 +3964,20 @@ type AgentExecutionEdge {
 
 ### 11.X.1 Mutations
 
-| Mutation | Auth | Role | Input | Returns |
-|----------|------|------|-------|---------|
-| `startLiveSession(input: StartLiveSessionInput!)` | @authenticated | INSTRUCTOR | title, scheduledAt, attendeePasswordEnc? | LiveSession! |
-| `endLiveSession(sessionId: ID!)` | @authenticated | INSTRUCTOR | sessionId | LiveSession! |
-| `joinLiveSession(sessionId: ID!)` | @authenticated | any | sessionId | JoinSessionResult! |
-| `cancelLiveSession(sessionId: ID!)` | @authenticated | INSTRUCTOR | sessionId | LiveSession! |
+| Mutation                                          | Auth           | Role       | Input                                    | Returns            |
+| ------------------------------------------------- | -------------- | ---------- | ---------------------------------------- | ------------------ |
+| `startLiveSession(input: StartLiveSessionInput!)` | @authenticated | INSTRUCTOR | title, scheduledAt, attendeePasswordEnc? | LiveSession!       |
+| `endLiveSession(sessionId: ID!)`                  | @authenticated | INSTRUCTOR | sessionId                                | LiveSession!       |
+| `joinLiveSession(sessionId: ID!)`                 | @authenticated | any        | sessionId                                | JoinSessionResult! |
+| `cancelLiveSession(sessionId: ID!)`               | @authenticated | INSTRUCTOR | sessionId                                | LiveSession!       |
 
 ### 11.X.2 Queries
 
-| Query | Auth | Role | Returns |
-|-------|------|------|---------|
-| `liveSessions(status: LiveSessionStatus, first: Int, after: String)` | @authenticated | any | LiveSessionConnection! |
-| `liveSession(id: ID!)` | @authenticated | any | LiveSession |
-| `sessionAttendees(sessionId: ID!, first: Int, after: String)` | @authenticated | INSTRUCTOR | SessionAttendeeConnection! |
+| Query                                                                | Auth           | Role       | Returns                    |
+| -------------------------------------------------------------------- | -------------- | ---------- | -------------------------- |
+| `liveSessions(status: LiveSessionStatus, first: Int, after: String)` | @authenticated | any        | LiveSessionConnection!     |
+| `liveSession(id: ID!)`                                               | @authenticated | any        | LiveSession                |
+| `sessionAttendees(sessionId: ID!, first: Int, after: String)`        | @authenticated | INSTRUCTOR | SessionAttendeeConnection! |
 
 ### 11.X.3 Types
 
@@ -4365,15 +4499,25 @@ type ReindexResult {
 Aggregate embedding statistics for the admin dashboard (Phase 71).
 """
 type EmbeddingStatistics {
-  """Total number of embeddings across all tables"""
+  """
+  Total number of embeddings across all tables
+  """
   totalEmbeddings: Int!
-  """Percentage of knowledge sources that have embeddings (0-100)"""
+  """
+  Percentage of knowledge sources that have embeddings (0-100)
+  """
   coveragePercentage: Float!
-  """Average embedding dimension (should be 768)"""
+  """
+  Average embedding dimension (should be 768)
+  """
   averageDimensions: Int!
-  """Number of HNSW indexes active"""
+  """
+  Number of HNSW indexes active
+  """
   activeIndexCount: Int!
-  """Timestamp of last embedding generation"""
+  """
+  Timestamp of last embedding generation
+  """
   lastEmbeddingAt: DateTime
 }
 
@@ -4383,13 +4527,21 @@ Per-course embedding coverage metrics.
 type CourseEmbeddingCoverage {
   courseId: UUID!
   courseTitle: String!
-  """Total knowledge sources in this course"""
+  """
+  Total knowledge sources in this course
+  """
   totalSources: Int!
-  """Sources with at least one embedding"""
+  """
+  Sources with at least one embedding
+  """
   indexedSources: Int!
-  """Coverage ratio (0-1)"""
+  """
+  Coverage ratio (0-1)
+  """
   coverageRatio: Float!
-  """Total embeddings for this course"""
+  """
+  Total embeddings for this course
+  """
   embeddingCount: Int!
 }
 
@@ -4409,15 +4561,25 @@ Single entry in the embedding activity log.
 """
 type EmbeddingActivityEntry {
   id: UUID!
-  """Operation type: GENERATE, REINDEX, DELETE, FAILED"""
+  """
+  Operation type: GENERATE, REINDEX, DELETE, FAILED
+  """
   operation: EmbeddingOperation!
-  """Source type that triggered the operation"""
+  """
+  Source type that triggered the operation
+  """
   sourceType: String
-  """Number of embeddings affected"""
+  """
+  Number of embeddings affected
+  """
   embeddingCount: Int!
-  """Duration in milliseconds"""
+  """
+  Duration in milliseconds
+  """
   durationMs: Int
-  """Error message if operation failed"""
+  """
+  Error message if operation failed
+  """
   errorMessage: String
   createdAt: DateTime!
 }
@@ -4430,11 +4592,17 @@ enum EmbeddingOperation {
 }
 
 input EmbeddingActivityFilterInput {
-  """Filter by operation type"""
+  """
+  Filter by operation type
+  """
   operation: EmbeddingOperation
-  """Filter by date range start"""
+  """
+  Filter by date range start
+  """
   since: DateTime
-  """Filter by date range end"""
+  """
+  Filter by date range end
+  """
   until: DateTime
 }
 
@@ -4453,9 +4621,13 @@ type EmbeddingActivityLogEdge {
 HNSW index health metrics per embedding table.
 """
 type EmbeddingHealthCheck {
-  """Overall health status"""
+  """
+  Overall health status
+  """
   status: HealthStatus!
-  """Per-table index metrics"""
+  """
+  Per-table index metrics
+  """
   indexes: [HnswIndexHealth!]!
 }
 
@@ -4466,17 +4638,29 @@ enum HealthStatus {
 }
 
 type HnswIndexHealth {
-  """Table name (e.g., content_embeddings)"""
+  """
+  Table name (e.g., content_embeddings)
+  """
   tableName: String!
-  """Index name"""
+  """
+  Index name
+  """
   indexName: String!
-  """Whether the HNSW index exists"""
+  """
+  Whether the HNSW index exists
+  """
   exists: Boolean!
-  """Estimated number of rows indexed"""
+  """
+  Estimated number of rows indexed
+  """
   rowCount: Int!
-  """Index size in bytes"""
+  """
+  Index size in bytes
+  """
   sizeBytes: BigInt!
-  """Estimated recall percentage at current ef_search setting"""
+  """
+  Estimated recall percentage at current ef_search setting
+  """
   estimatedRecall: Float
 }
 
@@ -5995,66 +6179,66 @@ hive schema:check \
 | Knowledge     | `source(id)`                                    | ✅     |
 | Knowledge     | `sources(type, search, pagination)`             | ✅     |
 | Knowledge     | `embeddingStatistics`                           | ✅     |
-| Knowledge     | `courseEmbeddingCoverage(pagination)`            | ✅     |
+| Knowledge     | `courseEmbeddingCoverage(pagination)`           | ✅     |
 | Knowledge     | `embeddingActivityLog(filter, pagination)`      | ✅     |
 | Knowledge     | `embeddingHealthCheck`                          | ✅     |
 
 ### Mutations (44 total)
 
-| Subgraph      | Mutation                 | Required Scope        |
-| ------------- | ------------------------ | --------------------- |
-| Core          | `updateMyProfile`        | authenticated         |
-| Core          | `updateUserRole`         | `org:users`           |
-| Core          | `deactivateUser`         | `org:users`           |
-| Core          | `reactivateUser`         | `org:users`           |
-| Core          | `updateTenantSettings`   | `org:manage`          |
-| Content       | `createCourse`           | `course:write`        |
-| Content       | `updateCourse`           | `course:write`        |
-| Content       | `deleteCourse`           | `course:write`        |
-| Content       | `toggleCoursePublished`  | `course:write`        |
-| Content       | `forkCourse`             | `course:write`        |
-| Content       | `createModule`           | `course:write`        |
-| Content       | `updateModule`           | `course:write`        |
-| Content       | `deleteModule`           | `course:write`        |
-| Content       | `reorderModules`         | `course:write`        |
-| Content       | `initiateMediaUpload`    | `media:upload`        |
-| Content       | `completeMediaUpload`    | `media:upload`        |
-| Content       | `updateMediaAsset`       | `course:write`        |
-| Content       | `deleteMediaAsset`       | `course:write`        |
-| Content       | `retriggerTranscription` | `course:write`        |
-| Annotation    | `createAnnotation`       | authenticated         |
-| Annotation    | `updateAnnotation`       | authenticated (owner) |
-| Annotation    | `deleteAnnotation`       | authenticated (owner) |
-| Annotation    | `toggleAnnotationPin`    | `annotation:write`    |
-| Annotation    | `resolveAnnotation`      | authenticated         |
-| Annotation    | `moveAnnotationsToLayer` | `annotation:write`    |
-| Collaboration | `createCollabDocument`   | authenticated         |
-| Collaboration | `compactCollabDocument`  | `org:manage`          |
-| Agent         | `createAgentDefinition`  | `agent:write`         |
-| Agent         | `updateAgentDefinition`  | `agent:write` (owner) |
-| Agent         | `deleteAgentDefinition`  | `agent:write` (owner) |
-| Agent         | `executeAgent`           | `agent:execute`       |
-| Agent         | `cancelAgentExecution`   | authenticated         |
-| Knowledge     | `createConcept`          | `knowledge:write`     |
-| Knowledge     | `updateConcept`          | `knowledge:write`     |
-| Knowledge     | `deleteConcept`          | `knowledge:write`     |
-| Knowledge     | `createRelation`         | `knowledge:write`     |
-| Knowledge     | `deleteRelation`         | `knowledge:write`     |
-| Knowledge     | `createContradiction`    | `knowledge:write`     |
-| Knowledge     | `reindexAssetEmbeddings` | `knowledge:write`     |
-| Knowledge     | `reindexCourseEmbeddings` | `knowledge:write`    |
-| Knowledge     | `reviewInferredRelation` | `knowledge:write`     |
-| Knowledge     | `createPerson`           | `knowledge:write`     |
-| Knowledge     | `updatePerson`           | `knowledge:write`     |
-| Knowledge     | `deletePerson`           | `knowledge:write`     |
-| Knowledge     | `createTerm`             | `knowledge:write`     |
-| Knowledge     | `updateTerm`             | `knowledge:write`     |
-| Knowledge     | `deleteTerm`             | `knowledge:write`     |
-| Knowledge     | `createSource`           | `knowledge:write`     |
-| Knowledge     | `updateSource`           | `knowledge:write`     |
-| Knowledge     | `deleteSource`           | `knowledge:write`     |
-| Knowledge     | `linkAuthorToSource`     | `knowledge:write`     |
-| Knowledge     | `linkSourceToConcept`    | `knowledge:write`     |
+| Subgraph      | Mutation                  | Required Scope        |
+| ------------- | ------------------------- | --------------------- |
+| Core          | `updateMyProfile`         | authenticated         |
+| Core          | `updateUserRole`          | `org:users`           |
+| Core          | `deactivateUser`          | `org:users`           |
+| Core          | `reactivateUser`          | `org:users`           |
+| Core          | `updateTenantSettings`    | `org:manage`          |
+| Content       | `createCourse`            | `course:write`        |
+| Content       | `updateCourse`            | `course:write`        |
+| Content       | `deleteCourse`            | `course:write`        |
+| Content       | `toggleCoursePublished`   | `course:write`        |
+| Content       | `forkCourse`              | `course:write`        |
+| Content       | `createModule`            | `course:write`        |
+| Content       | `updateModule`            | `course:write`        |
+| Content       | `deleteModule`            | `course:write`        |
+| Content       | `reorderModules`          | `course:write`        |
+| Content       | `initiateMediaUpload`     | `media:upload`        |
+| Content       | `completeMediaUpload`     | `media:upload`        |
+| Content       | `updateMediaAsset`        | `course:write`        |
+| Content       | `deleteMediaAsset`        | `course:write`        |
+| Content       | `retriggerTranscription`  | `course:write`        |
+| Annotation    | `createAnnotation`        | authenticated         |
+| Annotation    | `updateAnnotation`        | authenticated (owner) |
+| Annotation    | `deleteAnnotation`        | authenticated (owner) |
+| Annotation    | `toggleAnnotationPin`     | `annotation:write`    |
+| Annotation    | `resolveAnnotation`       | authenticated         |
+| Annotation    | `moveAnnotationsToLayer`  | `annotation:write`    |
+| Collaboration | `createCollabDocument`    | authenticated         |
+| Collaboration | `compactCollabDocument`   | `org:manage`          |
+| Agent         | `createAgentDefinition`   | `agent:write`         |
+| Agent         | `updateAgentDefinition`   | `agent:write` (owner) |
+| Agent         | `deleteAgentDefinition`   | `agent:write` (owner) |
+| Agent         | `executeAgent`            | `agent:execute`       |
+| Agent         | `cancelAgentExecution`    | authenticated         |
+| Knowledge     | `createConcept`           | `knowledge:write`     |
+| Knowledge     | `updateConcept`           | `knowledge:write`     |
+| Knowledge     | `deleteConcept`           | `knowledge:write`     |
+| Knowledge     | `createRelation`          | `knowledge:write`     |
+| Knowledge     | `deleteRelation`          | `knowledge:write`     |
+| Knowledge     | `createContradiction`     | `knowledge:write`     |
+| Knowledge     | `reindexAssetEmbeddings`  | `knowledge:write`     |
+| Knowledge     | `reindexCourseEmbeddings` | `knowledge:write`     |
+| Knowledge     | `reviewInferredRelation`  | `knowledge:write`     |
+| Knowledge     | `createPerson`            | `knowledge:write`     |
+| Knowledge     | `updatePerson`            | `knowledge:write`     |
+| Knowledge     | `deletePerson`            | `knowledge:write`     |
+| Knowledge     | `createTerm`              | `knowledge:write`     |
+| Knowledge     | `updateTerm`              | `knowledge:write`     |
+| Knowledge     | `deleteTerm`              | `knowledge:write`     |
+| Knowledge     | `createSource`            | `knowledge:write`     |
+| Knowledge     | `updateSource`            | `knowledge:write`     |
+| Knowledge     | `deleteSource`            | `knowledge:write`     |
+| Knowledge     | `linkAuthorToSource`      | `knowledge:write`     |
+| Knowledge     | `linkSourceToConcept`     | `knowledge:write`     |
 
 ### Subscriptions (7 total)
 
@@ -6344,11 +6528,11 @@ type SkillTree {
 }
 
 enum MasteryLevel {
-  NONE        # No exposure yet
-  ATTEMPTED   # Tried but not yet familiar
-  FAMILIAR    # Basic understanding
-  PROFICIENT  # Can apply the skill
-  MASTERED    # Expert-level command
+  NONE # No exposure yet
+  ATTEMPTED # Tried but not yet familiar
+  FAMILIAR # Basic understanding
+  PROFICIENT # Can apply the skill
+  MASTERED # Expert-level command
 }
 ```
 
@@ -6356,7 +6540,7 @@ enum MasteryLevel {
 
 ```graphql
 type Query {
-  skillTree(courseId: ID!): SkillTree!  @authenticated
+  skillTree(courseId: ID!): SkillTree! @authenticated
 }
 ```
 
@@ -6364,10 +6548,8 @@ type Query {
 
 ```graphql
 type Mutation {
-  updateMasteryLevel(
-    nodeId: ID!
-    level: MasteryLevel!
-  ): SkillTreeNode!  @authenticated
+  updateMasteryLevel(nodeId: ID!, level: MasteryLevel!): SkillTreeNode!
+    @authenticated
 }
 ```
 
@@ -6390,8 +6572,8 @@ type LiveSession {
   startedAt: DateTime
   endedAt: DateTime
   recordingUrl: String
-  attendeePasswordEnc: String!   # AES-256-GCM encrypted (SI-3)
-  moderatorPasswordEnc: String!  # AES-256-GCM encrypted (SI-3)
+  attendeePasswordEnc: String! # AES-256-GCM encrypted (SI-3)
+  moderatorPasswordEnc: String! # AES-256-GCM encrypted (SI-3)
   status: LiveSessionStatus!
   createdAt: DateTime!
 }
@@ -6424,9 +6606,9 @@ type Query {
     status: LiveSessionStatus
     first: Int
     after: String
-  ): LiveSessionConnection!  @authenticated
+  ): LiveSessionConnection! @authenticated
 
-  liveSession(id: ID!): LiveSession  @authenticated
+  liveSession(id: ID!): LiveSession @authenticated
 }
 ```
 
@@ -6446,8 +6628,7 @@ type Mutation {
     @authenticated
     @requiresScopes(scopes: ["session:write"])
 
-  joinLiveSession(id: ID!, password: String!): LiveSession!
-    @authenticated
+  joinLiveSession(id: ID!, password: String!): LiveSession! @authenticated
 
   cancelLiveSession(id: ID!): LiveSession!
     @authenticated
@@ -6458,8 +6639,8 @@ input CreateLiveSessionInput {
   meetingName: String!
   scheduledAt: DateTime!
   contentItemId: ID!
-  attendeePassword: String!    # Stored encrypted as attendeePasswordEnc
-  moderatorPassword: String!   # Stored encrypted as moderatorPasswordEnc
+  attendeePassword: String! # Stored encrypted as attendeePasswordEnc
+  moderatorPassword: String! # Stored encrypted as moderatorPasswordEnc
 }
 ```
 
@@ -6467,19 +6648,19 @@ input CreateLiveSessionInput {
 
 ```graphql
 type Subscription {
-  liveSessionUpdated(sessionId: ID!): LiveSession!  @authenticated
-  liveSessionAttendeeJoined(sessionId: ID!): LiveSessionAttendee!  @authenticated
+  liveSessionUpdated(sessionId: ID!): LiveSession! @authenticated
+  liveSessionAttendeeJoined(sessionId: ID!): LiveSessionAttendee! @authenticated
 }
 ```
 
 #### NATS Events
 
-| Event | Subject | Payload |
-|-------|---------|---------|
-| Session created | `edusphere.session.created` | `{ sessionId, tenantId, instructorId }` |
-| Session started | `edusphere.session.started` | `{ sessionId, tenantId, startedAt }` |
-| Attendee joined | `edusphere.session.attendee.joined` | `{ sessionId, userId, tenantId }` |
-| Session ended | `edusphere.session.ended` | `{ sessionId, tenantId, endedAt }` |
+| Event           | Subject                             | Payload                                 |
+| --------------- | ----------------------------------- | --------------------------------------- |
+| Session created | `edusphere.session.created`         | `{ sessionId, tenantId, instructorId }` |
+| Session started | `edusphere.session.started`         | `{ sessionId, tenantId, startedAt }`    |
+| Attendee joined | `edusphere.session.attendee.joined` | `{ sessionId, userId, tenantId }`       |
+| Session ended   | `edusphere.session.ended`           | `{ sessionId, tenantId, endedAt }`      |
 
 ---
 
@@ -6492,10 +6673,10 @@ type Query {
   # Updated signature (courseId added in Phase 27)
   knowledgeGraph(
     query: String
-    courseId: ID           # NEW: filter graph to course context
+    courseId: ID # NEW: filter graph to course context
     limit: Int
     depth: Int
-  ): KnowledgeGraphResult!  @authenticated
+  ): KnowledgeGraphResult! @authenticated
 }
 ```
 
@@ -6527,8 +6708,8 @@ type Query {
 
 ---
 
-*All types above follow the Relay Cursor Connection spec (PageInfo, edges, nodes).*
-*All mutations require `@authenticated`. Sensitive mutations additionally require `@requiresScopes`.*
+_All types above follow the Relay Cursor Connection spec (PageInfo, edges, nodes)._
+_All mutations require `@authenticated`. Sensitive mutations additionally require `@requiresScopes`._
 
 ---
 
@@ -6549,8 +6730,7 @@ type Mutation {
     @authenticated
     @requiresScopes(scopes: ["session:write"])
 
-  joinLiveSession(id: ID!, password: String!): LiveSession!
-    @authenticated
+  joinLiveSession(id: ID!, password: String!): LiveSession! @authenticated
 
   cancelLiveSession(id: ID!): LiveSession!
     @authenticated
@@ -6562,7 +6742,7 @@ enum LiveSessionStatus {
   SCHEDULED
   LIVE
   ENDED
-  CANCELLED   # Added Phase 28
+  CANCELLED # Added Phase 28
 }
 ```
 
@@ -6578,7 +6758,7 @@ type CheckoutSession {
   clientSecret: String!
   courseId: ID!
   userId: ID!
-  amount: Int!          # In cents
+  amount: Int! # In cents
   currency: String!
   status: CheckoutStatus!
   createdAt: DateTime!
@@ -6592,10 +6772,7 @@ enum CheckoutStatus {
 }
 
 type Mutation {
-  createCheckoutSession(
-    courseId: ID!
-    returnUrl: String!
-  ): CheckoutSession!
+  createCheckoutSession(courseId: ID!, returnUrl: String!): CheckoutSession!
     @authenticated
 }
 ```
@@ -6613,7 +6790,7 @@ type AnnotationMergeRequest {
   id: ID!
   sourceAnnotationId: ID!
   proposedBy: User!
-  justification: String!     # Max 500 chars
+  justification: String! # Max 500 chars
   status: MergeRequestStatus!
   reviewedBy: User
   reviewedAt: DateTime
@@ -6631,8 +6808,7 @@ type Mutation {
   proposeMergeRequest(
     annotationId: ID!
     justification: String!
-  ): AnnotationMergeRequest!
-    @authenticated
+  ): AnnotationMergeRequest! @authenticated
 
   reviewMergeRequest(
     id: ID!
@@ -6658,19 +6834,20 @@ type Query {
 
 ```graphql
 type SubtitleTrack {
-  language: String!       # BCP-47 code (e.g. "en", "he", "fr")
-  label: String!          # Display name (e.g. "English", "Hebrew")
-  vttUrl: String!         # Presigned MinIO URL to .vtt file
+  language: String! # BCP-47 code (e.g. "en", "he", "fr")
+  label: String! # Display name (e.g. "English", "Hebrew")
+  vttUrl: String! # Presigned MinIO URL to .vtt file
 }
 
 # Added to MediaAsset type (Phase 32)
 type MediaAsset {
   # ... existing fields ...
-  subtitleTracks: [SubtitleTrack!]!   # Empty array if translation disabled
+  subtitleTracks: [SubtitleTrack!]! # Empty array if translation disabled
 }
 ```
 
 **Configuration:**
+
 - `TRANSLATION_TARGETS`: comma-separated BCP-47 codes (empty = disabled)
 - `LIBRE_TRANSLATE_URL`: LibreTranslate instance URL
 - Translation runs non-blocking after transcription completes (Step 8 of pipeline)
@@ -6688,7 +6865,7 @@ type ProctoringSession {
   userId: ID!
   status: ProctoringStatus!
   flags: [ProctoringFlag!]!
-  recordingKey: String         # MinIO key for session recording
+  recordingKey: String # MinIO key for session recording
   startedAt: DateTime!
   endedAt: DateTime
   tenantId: ID!
@@ -6716,22 +6893,19 @@ enum ProctoringStatus {
 }
 
 type Mutation {
-  startProctoringSession(assessmentId: ID!): ProctoringSession!
-    @authenticated
+  startProctoringSession(assessmentId: ID!): ProctoringSession! @authenticated
 
   flagProctoringEvent(
     sessionId: ID!
     type: ProctoringFlagType!
     metadata: JSON
-  ): ProctoringFlag!
-    @authenticated
+  ): ProctoringFlag! @authenticated
 
-  endProctoringSession(sessionId: ID!): ProctoringSession!
-    @authenticated
+  endProctoringSession(sessionId: ID!): ProctoringSession! @authenticated
 }
 
 type Query {
-  proctoringSession(id: ID!): ProctoringSession  @authenticated
+  proctoringSession(id: ID!): ProctoringSession @authenticated
   proctoringReport(assessmentId: ID!): [ProctoringSession!]!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
@@ -6747,15 +6921,15 @@ type Query {
 
 ```graphql
 type Model3DInfo {
-  format: String!             # gltf | glb | obj | fbx
+  format: String! # gltf | glb | obj | fbx
   polyCount: Int
   animations: [ModelAnimation!]!
-  viewerUrl: String!          # Presigned MinIO URL
+  viewerUrl: String! # Presigned MinIO URL
 }
 
 type ModelAnimation {
   name: String!
-  duration: Float!            # Seconds
+  duration: Float! # Seconds
 }
 
 # AssetType enum updated — MODEL_3D added in Phase 34
@@ -6764,25 +6938,23 @@ enum AssetType {
   AUDIO
   DOCUMENT
   IMAGE
-  MODEL_3D    # Added Phase 34
+  MODEL_3D # Added Phase 34
 }
 
 # Added to MediaAsset type (Phase 34)
 type MediaAsset {
   # ... existing fields ...
-  model3d: Model3DInfo        # Null unless assetType = MODEL_3D
+  model3d: Model3DInfo # Null unless assetType = MODEL_3D
 }
 
 type Mutation {
-  uploadModel3D(
-    input: UploadModel3DInput!
-  ): MediaAssetUploadResponse!
+  uploadModel3D(input: UploadModel3DInput!): MediaAssetUploadResponse!
     @authenticated
     @requiresScopes(scopes: ["content:write"])
 }
 
 input UploadModel3DInput {
-  filename: String!           # Must end in .gltf/.glb/.obj/.fbx
+  filename: String! # Must end in .gltf/.glb/.obj/.fbx
   contentItemId: ID!
   mimeType: String
 }
@@ -6794,10 +6966,10 @@ input UploadModel3DInput {
 
 ---
 
-*Sections 22.1–22.6 reflect commit range `3229051..1e3314b` (2026-03-06).*
-*All types follow Relay Cursor Connection spec where applicable.*
-*All mutations require `@authenticated`. Sensitive mutations additionally use `@requiresScopes` or `@requiresRole`.*
-*PII fields (passwords) stored AES-256-GCM encrypted per Security Invariant SI-3.*
+_Sections 22.1–22.6 reflect commit range `3229051..1e3314b` (2026-03-06)._
+_All types follow Relay Cursor Connection spec where applicable._
+_All mutations require `@authenticated`. Sensitive mutations additionally use `@requiresScopes` or `@requiresRole`._
+_PII fields (passwords) stored AES-256-GCM encrypted per Security Invariant SI-3._
 
 ---
 
@@ -6813,76 +6985,76 @@ input UploadModel3DInput {
 ```graphql
 # Scan status for uploaded visual assets (ClamAV inline scan)
 enum ScanStatus {
-  PENDING    # Upload received, scan not yet started
-  SCANNING   # ClamAV scan in progress
-  CLEAN      # Scan passed — asset usable
-  INFECTED   # Malware detected — asset rejected
-  ERROR      # Scanner unavailable (graceful fallback path)
+  PENDING # Upload received, scan not yet started
+  SCANNING # ClamAV scan in progress
+  CLEAN # Scan passed — asset usable
+  INFECTED # Malware detected — asset rejected
+  ERROR # Scanner unavailable (graceful fallback path)
 }
 
 # Metadata for image dimensions and accessibility
 type VisualAssetMetadata {
-  width:   Int!
-  height:  Int!
+  width: Int!
+  height: Int!
   altText: String
 }
 
 # An uploaded image associated with a course, stored in MinIO (WebP-optimised)
 type VisualAsset {
-  id:          ID!
-  courseId:    ID!
-  tenantId:    ID!
-  filename:    String!
-  mimeType:    String!
-  sizeBytes:   Int!
-  url:         String!          # Presigned MinIO URL
-  scanStatus:  ScanStatus!
-  metadata:    VisualAssetMetadata
-  createdAt:   DateTime!
-  updatedAt:   DateTime!
+  id: ID!
+  courseId: ID!
+  tenantId: ID!
+  filename: String!
+  mimeType: String!
+  sizeBytes: Int!
+  url: String! # Presigned MinIO URL
+  scanStatus: ScanStatus!
+  metadata: VisualAssetMetadata
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 # A text anchor within a document that may be linked to a VisualAsset
 type VisualAnchor {
-  id:           ID!
-  assetId:      ID!
-  tenantId:     ID!
-  textPassage:  String!         # The selected text this anchor is bound to
-  position:     Int!            # Character offset in the document
-  visualAsset:  VisualAsset     # Null until an image is assigned
-  createdAt:    DateTime!
-  updatedAt:    DateTime!
+  id: ID!
+  assetId: ID!
+  tenantId: ID!
+  textPassage: String! # The selected text this anchor is bound to
+  position: Int! # Character offset in the document
+  visualAsset: VisualAsset # Null until an image is assigned
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 # A point-in-time snapshot of all anchors for a given asset
 type DocumentVersion {
-  id:          ID!
-  assetId:     ID!
-  tenantId:    ID!
-  summary:     String
-  anchorsJson: String!          # JSON snapshot of VisualAnchor[] at version time
-  createdAt:   DateTime!
+  id: ID!
+  assetId: ID!
+  tenantId: ID!
+  summary: String
+  anchorsJson: String! # JSON snapshot of VisualAnchor[] at version time
+  createdAt: DateTime!
 }
 
 # Result of a syncAnchors operation (detects broken anchors via simhash diff)
 type SyncResult {
-  assetId:        ID!
-  synced:         Int!          # Number of anchors successfully re-matched
-  broken:         Int!          # Anchors whose text passage no longer exists
+  assetId: ID!
+  synced: Int! # Number of anchors successfully re-matched
+  broken: Int! # Anchors whose text passage no longer exists
   brokenAnchorIds: [ID!]!
 }
 
 # Input types
 input CreateVisualAnchorInput {
-  assetId:      ID!
-  textPassage:  String!
-  position:     Int!
-  visualAssetId: ID             # Optional — assign image at creation time
+  assetId: ID!
+  textPassage: String!
+  position: Int!
+  visualAssetId: ID # Optional — assign image at creation time
 }
 
 input UpdateVisualAnchorInput {
-  textPassage:  String
-  position:     Int
+  textPassage: String
+  position: Int
   visualAssetId: ID
 }
 ```
@@ -6921,9 +7093,7 @@ type Query {
 ```graphql
 type Mutation {
   # Confirm a presigned upload completed — triggers ClamAV scan + WebP optimisation
-  confirmVisualAssetUpload(
-    assetId: ID!
-  ): VisualAsset!
+  confirmVisualAssetUpload(assetId: ID!): VisualAsset!
     @authenticated
     @requiresScopes(scopes: ["content:write"])
 
@@ -6971,8 +7141,7 @@ type Mutation {
 ```graphql
 type Subscription {
   # Real-time notification when an anchor is deleted — use to remove stale UI state
-  anchorDeleted(assetId: ID!): ID!
-    @authenticated
+  anchorDeleted(assetId: ID!): ID! @authenticated
 }
 ```
 
@@ -6980,10 +7149,10 @@ type Subscription {
 
 ### 23.5 NATS Events
 
-| Subject                              | Payload                                          | Publisher             |
-| ------------------------------------ | ------------------------------------------------ | --------------------- |
-| `EDUSPHERE.visual.anchor.deleted`    | `{ anchorId, assetId, tenantId }`                | subgraph-content      |
-| `EDUSPHERE.visual.anchor.created`    | `{ anchorId, assetId, tenantId }`                | subgraph-content      |
+| Subject                           | Payload                           | Publisher        |
+| --------------------------------- | --------------------------------- | ---------------- |
+| `EDUSPHERE.visual.anchor.deleted` | `{ anchorId, assetId, tenantId }` | subgraph-content |
+| `EDUSPHERE.visual.anchor.created` | `{ anchorId, assetId, tenantId }` | subgraph-content |
 
 Both subjects use the existing `EDUSPHERE` NATS stream. Stream retention rules (max_age + max_bytes) apply per the Memory Safety infrastructure rules.
 
@@ -6998,23 +7167,27 @@ Both subjects use the existing `EDUSPHERE` NATS stream. Stream retention rules (
 
 ---
 
-*Section 23 reflects commit range for Phase 29 Visual Anchoring (2026-03-08).*
-*All mutations require `@authenticated`. Scope and role guards as specified per resolver above.*
+_Section 23 reflects commit range for Phase 29 Visual Anchoring (2026-03-08)._
+_All mutations require `@authenticated`. Scope and role guards as specified per resolver above._
 
 ---
 
 ## Section 24 — Phase 36: AtRisk Analytics, Lesson Pipeline, XP Gamification (March 2026)
 
 ### New Query: listAtRiskLearners
+
 Returns learners with course progress below threshold AND no activity in the last 14 days.
+
 - **Auth:** `@authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])`
 - **Returns:** `[AtRiskLearner!]!`
 
 ### New Queries: lessonPipeline / myCoursePipelines
+
 - `lessonPipeline(id: ID!): CourseLessonPlan` — fetch single pipeline by ID. Auth: `@authenticated`
 - `myCoursePipelines(courseId: ID!): [CourseLessonPlan!]!` — all pipelines for a course. Auth: `@authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])`
 
 ### New Mutations: Lesson Pipeline Builder
+
 - `createLessonPipeline(input: CreateLessonPlanInput!): CourseLessonPlan!`
 - `addLessonStep(input: AddLessonStepInput!): CourseLessonPlan!`
 - `reorderLessonSteps(pipelineId: ID!, stepIds: [ID!]!): CourseLessonPlan!`
@@ -7024,10 +7197,11 @@ Returns learners with course progress below threshold AND no activity in the las
 ### New Types (Phase 36)
 
 #### AtRiskLearner
+
 ```graphql
 type AtRiskLearner {
   userId: ID!
-  displayName: String!       # GDPR: no raw email
+  displayName: String! # GDPR: no raw email
   courseId: ID!
   courseTitle: String!
   daysSinceActive: Int!
@@ -7036,12 +7210,13 @@ type AtRiskLearner {
 ```
 
 #### CourseLessonPlan
+
 ```graphql
 type CourseLessonPlan {
   id: ID!
   courseId: ID!
   title: String!
-  status: LessonPlanStatus!  # DRAFT | PUBLISHED | ARCHIVED
+  status: LessonPlanStatus! # DRAFT | PUBLISHED | ARCHIVED
   steps: [CourseLessonStep!]!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -7049,17 +7224,29 @@ type CourseLessonPlan {
 
 type CourseLessonStep {
   id: ID!
-  stepType: LessonStepType!  # VIDEO | QUIZ | DISCUSSION | AI_CHAT | SUMMARY
+  stepType: LessonStepType! # VIDEO | QUIZ | DISCUSSION | AI_CHAT | SUMMARY
   stepOrder: Int!
   config: JSON!
 }
 
-enum LessonPlanStatus { DRAFT PUBLISHED ARCHIVED }
-enum LessonStepType { VIDEO QUIZ DISCUSSION AI_CHAT SUMMARY }
+enum LessonPlanStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+enum LessonStepType {
+  VIDEO
+  QUIZ
+  DISCUSSION
+  AI_CHAT
+  SUMMARY
+}
 ```
 
 ### UserStats XP Extensions (Phase 36)
+
 `UserStats` type now includes two additional fields:
+
 ```graphql
 totalXp: Int!   # cumulative XP earned by user
 level: Int!     # computed: max(1, floor(sqrt(totalXp/100))+1)
@@ -7074,6 +7261,7 @@ level: Int!     # computed: max(1, floor(sqrt(totalXp/100))+1)
 | COURSE_COMPLETED | 100 |
 
 **Level Formula:** `level = max(1, floor(sqrt(totalXp / 100)) + 1)`
+
 - Level 1: 0–99 XP
 - Level 2: 100–399 XP
 - Level 5: 1600–2499 XP
@@ -7086,26 +7274,32 @@ level: Int!     # computed: max(1, floor(sqrt(totalXp/100))+1)
 ### Phase 37 — New Types Added
 
 #### GamificationStats (subgraph-core)
+
 - `currentStreak: Int!`, `longestStreak: Int!`, `activeChallenges: [UserChallenge!]!`, `leaderboardRank: Int`, `leaderboard: [LeaderboardEntry!]!`
 - Query: `myGamificationStats: GamificationStats! @authenticated`
 
 #### UserChallenge
+
 - `challengeId: ID!`, `title: String!`, `description: String!`, `targetValue: Int!`, `currentValue: Int!`, `xpReward: Int!`, `completed: Boolean!`, `endDate: DateTime!`
 
 #### LeaderboardEntry
+
 - `rank: Int!`, `userId: ID!`, `displayName: String!` (no email — GDPR), `totalXp: Int!`, `level: Int!`
 - Query: `tenantLeaderboard(limit: Int): [LeaderboardEntry!]! @authenticated`
 
 #### TeamOverview (Manager Dashboard, subgraph-core)
+
 - `memberCount: Int!`, `avgCompletionPct: Float!`, `avgXpThisWeek: Float!`, `atRiskCount: Int!`, `topCourseTitle: String`
 - Query: `myTeamOverview: TeamOverview! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])`
 
 #### TeamMemberProgress
+
 - `userId: ID!`, `displayName: String!`, `coursesEnrolled: Int!`, `avgCompletionPct: Float!`, `totalXp: Int!`, `level: Int!`, `lastActiveAt: DateTime`, `isAtRisk: Boolean!`
 - Query: `myTeamMemberProgress: [TeamMemberProgress!]! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])`
 - Mutations: `addTeamMember(memberId: ID!): Boolean!`, `removeTeamMember(memberId: ID!): Boolean!`
 
 #### OnboardingState (subgraph-core)
+
 - `userId: ID!`, `currentStep: Int!`, `totalSteps: Int!`, `completed: Boolean!`, `skipped: Boolean!`, `role: String!`, `data: JSON`
 - Query: `myOnboardingState: OnboardingState @authenticated`
 - Mutations: `updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @authenticated`, `completeOnboarding: OnboardingState! @authenticated`, `skipOnboarding: OnboardingState! @authenticated`
@@ -7113,15 +7307,18 @@ level: Int!     # computed: max(1, floor(sqrt(totalXp/100))+1)
 ### Phase 38 — Certificate Download URL
 
 #### New Query: certificateDownloadUrl(certId: ID!): String! @authenticated
+
 - Returns a 15-minute presigned MinIO URL for secure PDF certificate download
 - Security: server validates `cert.user_id = jwt.userId` — users cannot download other users' certificates
 - Error: `NotFoundException` if cert not found or belongs to different user
 - Error: `BadRequestException('PDF not yet generated')` if `pdfUrl` is null
 
 ### Phase 38 — Updated: CourseListing type
+
 Previous `CourseListing` returned only DB columns (`priceCents`, `currency`, `isPublished`, `revenueSplitPercent`).
 
 Updated `CourseListing` now returns joined data:
+
 - `id: ID!`, `courseId: ID!`
 - `title: String!` — from `courses.title` JOIN
 - `description: String` — from `courses.description` JOIN
@@ -7136,24 +7333,26 @@ Updated `CourseListing` now returns joined data:
 - `priceCents: Int!`, `isPublished: Boolean!`, `revenueSplitPercent: Int!`
 
 ### Phase 38 — New Input: CourseListingFiltersInput
+
 ```graphql
 input CourseListingFiltersInput {
-  tags: [String!]       # reserved for Phase 39
-  priceMax: Float       # applied as lte(priceCents, priceMax * 100)
+  tags: [String!] # reserved for Phase 39
+  priceMax: Float # applied as lte(priceCents, priceMax * 100)
   instructorName: String # applied as ilike on COALESCE(firstName || lastName, username)
-  search: String        # applied as ilike on courses.title
+  search: String # applied as ilike on courses.title
 }
 ```
+
 All filters are optional. Drizzle parameterized queries (never raw SQL). Tenant isolation enforced via withTenantContext (SI-9).
 
 ### Known Gaps / Future Work (Phase 39+)
 
-| Gap | Tracked In | Priority |
-|-----|-----------|----------|
-| `tags` field always returns `[]` | OPEN_ISSUES P38-OG1 | Phase 39+ |
-| `rating` field always returns `null` | OPEN_ISSUES P38-OG2 | Phase 39+ |
+| Gap                                     | Tracked In          | Priority  |
+| --------------------------------------- | ------------------- | --------- |
+| `tags` field always returns `[]`        | OPEN_ISSUES P38-OG1 | Phase 39+ |
+| `rating` field always returns `null`    | OPEN_ISSUES P38-OG2 | Phase 39+ |
 | `totalLessons` field always returns `0` | OPEN_ISSUES P38-OG3 | Phase 39+ |
-| `instructorName` filter on COALESCE | OPEN_ISSUES P38-OG4 | Phase 39+ |
+| `instructorName` filter on COALESCE     | OPEN_ISSUES P38-OG4 | Phase 39+ |
 
 ---
 
@@ -7162,38 +7361,42 @@ All filters are optional. Drizzle parameterized queries (never raw SQL). Tenant 
 ### New GraphQL Fields (subgraph-content → gateway)
 
 #### Queries
-| Field | Return Type | Auth | Description |
-|-------|-------------|------|-------------|
-| `xapiStatementCount(since: String)` | `Int!` | ORG_ADMIN / SUPER_ADMIN | Count xAPI statements, optionally filtered by date |
+
+| Field                               | Return Type | Auth                    | Description                                        |
+| ----------------------------------- | ----------- | ----------------------- | -------------------------------------------------- |
+| `xapiStatementCount(since: String)` | `Int!`      | ORG_ADMIN / SUPER_ADMIN | Count xAPI statements, optionally filtered by date |
 
 #### Mutations
-| Field | Return Type | Auth | Description |
-|-------|-------------|------|-------------|
-| `importFromDrive(input: DriveImportInput!)` | `ImportJob!` | INSTRUCTOR+ | Import files from a Google Drive folder |
-| `clearXapiStatements(olderThanDays: Int!)` | `Int!` | SUPER_ADMIN | Delete statements older than N days, returns deleted count |
+
+| Field                                       | Return Type  | Auth        | Description                                                |
+| ------------------------------------------- | ------------ | ----------- | ---------------------------------------------------------- |
+| `importFromDrive(input: DriveImportInput!)` | `ImportJob!` | INSTRUCTOR+ | Import files from a Google Drive folder                    |
+| `clearXapiStatements(olderThanDays: Int!)`  | `Int!`       | SUPER_ADMIN | Delete statements older than N days, returns deleted count |
 
 #### Input Types
+
 ```graphql
 input DriveImportInput {
-  folderId:    String!   # Drive folder ID or full URL
-  courseId:    ID!
-  moduleId:    ID!
-  accessToken: String!   # Short-lived OAuth token, never stored
+  folderId: String! # Drive folder ID or full URL
+  courseId: ID!
+  moduleId: ID!
+  accessToken: String! # Short-lived OAuth token, never stored
 }
 ```
 
 ### NATS→xAPI Verb Mappings
 
-| NATS Subject | xAPI Verb | ADL URI |
-|---|---|---|
-| `EDUSPHERE.course.completed` | completed | `http://adlnet.gov/expapi/verbs/completed` |
-| `EDUSPHERE.course.enrolled` | registered | `http://adlnet.gov/expapi/verbs/registered` |
-| `EDUSPHERE.sessions.ended` | attended | `http://adlnet.gov/expapi/verbs/attended` |
-| `EDUSPHERE.sessions.participant.joined` | launched | `http://adlnet.gov/expapi/verbs/launched` |
-| `EDUSPHERE.submission.created` | attempted | `http://adlnet.gov/expapi/verbs/attempted` |
-| `EDUSPHERE.poll.voted` | responded | `http://adlnet.gov/expapi/verbs/responded` |
+| NATS Subject                            | xAPI Verb  | ADL URI                                     |
+| --------------------------------------- | ---------- | ------------------------------------------- |
+| `EDUSPHERE.course.completed`            | completed  | `http://adlnet.gov/expapi/verbs/completed`  |
+| `EDUSPHERE.course.enrolled`             | registered | `http://adlnet.gov/expapi/verbs/registered` |
+| `EDUSPHERE.sessions.ended`              | attended   | `http://adlnet.gov/expapi/verbs/attended`   |
+| `EDUSPHERE.sessions.participant.joined` | launched   | `http://adlnet.gov/expapi/verbs/launched`   |
+| `EDUSPHERE.submission.created`          | attempted  | `http://adlnet.gov/expapi/verbs/attempted`  |
+| `EDUSPHERE.poll.voted`                  | responded  | `http://adlnet.gov/expapi/verbs/responded`  |
 
 ### Mobile Offline Queue Architecture
+
 - `XapiOfflineQueue` uses `expo-sqlite` (`openDatabaseSync`) — no network dependency
 - Max 500 rows enforced via `evictOldStatements()` after every `enqueueStatement()`
 - `useXapiTracking` hook exposes `track(verb, activityId, name)` + `flush()` (called explicitly)
@@ -7212,9 +7415,9 @@ type CourseReadiness {
 }
 
 type ReadinessCheck {
-  name: String!          # e.g. "has_published_lessons", "has_description", "has_thumbnail", "has_modules", "has_learning_objectives"
+  name: String! # e.g. "has_published_lessons", "has_description", "has_thumbnail", "has_modules", "has_learning_objectives"
   passed: Boolean!
-  message: String        # human-readable explanation if failed
+  message: String # human-readable explanation if failed
 }
 ```
 
@@ -7222,7 +7425,9 @@ type ReadinessCheck {
 
 ```graphql
 extend type Query {
-  courseReadiness(courseId: ID!): CourseReadiness! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  courseReadiness(courseId: ID!): CourseReadiness!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 ```
 
@@ -7231,9 +7436,12 @@ Returns a structured readiness report with 5 validation checks. Used by the `pub
 ### New Scope: course:publish
 
 Added `course:publish` scope to `publishCourse` mutation:
+
 ```graphql
 extend type Mutation {
-  publishCourse(courseId: ID!): Course! @authenticated @requiresScopes(scopes: ["course:publish"])
+  publishCourse(courseId: ID!): Course!
+    @authenticated
+    @requiresScopes(scopes: ["course:publish"])
 }
 ```
 
@@ -7241,13 +7449,15 @@ extend type Mutation {
 
 ```graphql
 extend type Query {
-  lessonPipelineRuns(lessonId: ID!, limit: Int = 10): [PipelineRun!]! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  lessonPipelineRuns(lessonId: ID!, limit: Int = 10): [PipelineRun!]!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 
 type PipelineRun {
   id: ID!
   lessonId: ID!
-  status: PipelineRunStatus!     # RUNNING | COMPLETED | FAILED | CANCELLED
+  status: PipelineRunStatus! # RUNNING | COMPLETED | FAILED | CANCELLED
   modules: [PipelineModuleRun!]!
   startedAt: DateTime!
   completedAt: DateTime
@@ -7255,23 +7465,36 @@ type PipelineRun {
 }
 
 type PipelineModuleRun {
-  moduleType: String!            # e.g. TRANSCRIPTION, NER_SOURCE_LINKING, QUIZ_GEN, PUBLISH_SHARE
-  status: PipelineModuleStatus!  # PENDING | RUNNING | COMPLETED | FAILED | RETRYING
+  moduleType: String! # e.g. TRANSCRIPTION, NER_SOURCE_LINKING, QUIZ_GEN, PUBLISH_SHARE
+  status: PipelineModuleStatus! # PENDING | RUNNING | COMPLETED | FAILED | RETRYING
   startedAt: DateTime
   completedAt: DateTime
-  error: String                  # error message if FAILED
+  error: String # error message if FAILED
   retryCount: Int!
 }
 
-enum PipelineRunStatus { RUNNING COMPLETED FAILED CANCELLED }
-enum PipelineModuleStatus { PENDING RUNNING COMPLETED FAILED RETRYING }
+enum PipelineRunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+enum PipelineModuleStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  RETRYING
+}
 ```
 
 ### New Mutation: retryPipelineModule
 
 ```graphql
 extend type Mutation {
-  retryPipelineModule(runId: ID!, moduleType: String!): PipelineRun! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  retryPipelineModule(runId: ID!, moduleType: String!): PipelineRun!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 ```
 
@@ -7281,7 +7504,9 @@ Retries a single failed module within a pipeline run. Uses exponential backoff (
 
 ```graphql
 extend type Mutation {
-  restoreRun(runId: ID!): PipelineRun! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  restoreRun(runId: ID!): PipelineRun!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 ```
 
@@ -7299,7 +7524,7 @@ type PipelineProgressEvent {
   lessonId: ID!
   moduleType: String!
   status: PipelineModuleStatus!
-  progressPct: Float             # 0.0 - 1.0 for in-progress modules
+  progressPct: Float # 0.0 - 1.0 for in-progress modules
   error: String
   timestamp: DateTime!
 }
@@ -7334,7 +7559,9 @@ type PipelineTemplateModule {
 
 ```graphql
 extend type Query {
-  pipelineTemplates(courseId: ID): [LessonPipelineTemplate!]! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  pipelineTemplates(courseId: ID): [LessonPipelineTemplate!]!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 ```
 
@@ -7344,9 +7571,20 @@ Returns all pipeline templates for the current tenant. Optional `courseId` filte
 
 ```graphql
 extend type Mutation {
-  createPipelineTemplate(input: CreatePipelineTemplateInput!): LessonPipelineTemplate! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
-  updatePipelineTemplate(id: ID!, input: UpdatePipelineTemplateInput!): LessonPipelineTemplate! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
-  deletePipelineTemplate(id: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  createPipelineTemplate(
+    input: CreatePipelineTemplateInput!
+  ): LessonPipelineTemplate!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  updatePipelineTemplate(
+    id: ID!
+    input: UpdatePipelineTemplateInput!
+  ): LessonPipelineTemplate!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  deletePipelineTemplate(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 
 input CreatePipelineTemplateInput {
@@ -7371,13 +7609,13 @@ input PipelineTemplateModuleInput {
 
 ### NATS Subjects (Phase 65)
 
-| Subject | Publisher | Consumer | Payload |
-|---------|-----------|----------|---------|
-| `EDUSPHERE.pipeline.progress.<lessonId>` | Pipeline Orchestrator | Gateway (PubSub bridge) | `PipelineProgressEvent` |
-| `EDUSPHERE.pipeline.ner.completed` | Pipeline Orchestrator | subgraph-knowledge `LessonNERConsumer` | `{ tenantId, lessonId, entities: NerEntity[] }` |
-| `EDUSPHERE.lesson.published` | `LessonPublishService` | (downstream consumers) | `{ tenantId, lessonId, runId }` |
+| Subject                                  | Publisher              | Consumer                               | Payload                                         |
+| ---------------------------------------- | ---------------------- | -------------------------------------- | ----------------------------------------------- |
+| `EDUSPHERE.pipeline.progress.<lessonId>` | Pipeline Orchestrator  | Gateway (PubSub bridge)                | `PipelineProgressEvent`                         |
+| `EDUSPHERE.pipeline.ner.completed`       | Pipeline Orchestrator  | subgraph-knowledge `LessonNERConsumer` | `{ tenantId, lessonId, entities: NerEntity[] }` |
+| `EDUSPHERE.lesson.published`             | `LessonPublishService` | (downstream consumers)                 | `{ tenantId, lessonId, runId }`                 |
 
 ---
 
-*Section 30 reflects Phase 65 Lesson Pipeline Production Hardening (2026-03-17).*
-*All mutations require `@authenticated`. Scope and role guards as specified per resolver above.*
+_Section 30 reflects Phase 65 Lesson Pipeline Production Hardening (2026-03-17)._
+_All mutations require `@authenticated`. Scope and role guards as specified per resolver above._

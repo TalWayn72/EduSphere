@@ -43,7 +43,7 @@ export function AnimatedCounter({
         requestAnimationFrame(tick);
         observer.disconnect();
       },
-      { threshold: 0.5 },
+      { threshold: 0.5 }
     );
 
     observer.observe(el);
@@ -54,7 +54,9 @@ export function AnimatedCounter({
 
   return (
     <span ref={ref}>
-      {prefix}{formatted}{suffix}
+      {prefix}
+      {formatted}
+      {suffix}
     </span>
   );
 }

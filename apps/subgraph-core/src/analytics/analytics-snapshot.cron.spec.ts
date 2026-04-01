@@ -43,23 +43,22 @@ describe('AnalyticsSnapshotCron', () => {
     mockValues.mockReturnValue({ onConflictDoUpdate: mockOnConflict });
     mockOnConflict.mockResolvedValue(undefined);
     mockExecute.mockResolvedValue({
-      rows: [{
-        active_learners: '5',
-        completions: '2',
-        new_enrollments: '3',
-        total_minutes: '7200',
-        avg_completion_rate: '45.5',
-      }],
+      rows: [
+        {
+          active_learners: '5',
+          completions: '2',
+          new_enrollments: '3',
+          total_minutes: '7200',
+          avg_completion_rate: '45.5',
+        },
+      ],
     });
 
     cron = new AnalyticsSnapshotCron();
   });
 
   it('should iterate all tenants on daily snapshot', async () => {
-    mockFrom.mockResolvedValue([
-      { id: 'tenant-1' },
-      { id: 'tenant-2' },
-    ]);
+    mockFrom.mockResolvedValue([{ id: 'tenant-1' }, { id: 'tenant-2' }]);
 
     await cron.runDailySnapshot();
 

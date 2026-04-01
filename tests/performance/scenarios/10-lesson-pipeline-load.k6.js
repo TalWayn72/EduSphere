@@ -45,7 +45,9 @@ const GATEWAY_URL = __ENV.GATEWAY_URL || 'http://localhost:4000/graphql';
 const JWT_TOKEN = __ENV.TEST_JWT || '';
 
 // Pre-seeded lesson IDs in the test database (set via env or use fallbacks)
-const LESSON_IDS = (__ENV.TEST_LESSON_IDS || 'lesson-1,lesson-2,lesson-3').split(',');
+const LESSON_IDS = (
+  __ENV.TEST_LESSON_IDS || 'lesson-1,lesson-2,lesson-3'
+).split(',');
 
 const HEADERS = {
   'Content-Type': 'application/json',

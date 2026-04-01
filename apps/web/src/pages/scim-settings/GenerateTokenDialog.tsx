@@ -36,9 +36,12 @@ export function GenerateTokenDialog({
   onDone,
 }: GenerateTokenDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen && !generatedToken) onOpenChange(false);
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen && !generatedToken) onOpenChange(false);
+      }}
+    >
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Generate SCIM Token</DialogTitle>
@@ -64,7 +67,10 @@ export function GenerateTokenDialog({
         ) : (
           <div className="space-y-3">
             <div>
-              <label htmlFor="scim-token-description" className="text-sm font-medium block mb-1">
+              <label
+                htmlFor="scim-token-description"
+                className="text-sm font-medium block mb-1"
+              >
                 Description
               </label>
               <input
@@ -76,7 +82,10 @@ export function GenerateTokenDialog({
               />
             </div>
             <div>
-              <label htmlFor="scim-token-expires" className="text-sm font-medium block mb-1">
+              <label
+                htmlFor="scim-token-expires"
+                className="text-sm font-medium block mb-1"
+              >
                 Expires in days (optional)
               </label>
               <input
@@ -90,10 +99,18 @@ export function GenerateTokenDialog({
               />
             </div>
             <DialogFooter className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
-              <Button className="flex-1" disabled={!description.trim()} onClick={() => void onGenerate()}>
+              <Button
+                className="flex-1"
+                disabled={!description.trim()}
+                onClick={() => void onGenerate()}
+              >
                 Generate
               </Button>
             </DialogFooter>

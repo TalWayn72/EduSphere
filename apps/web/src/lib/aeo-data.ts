@@ -113,9 +113,10 @@ export interface GlossaryTerm {
 export const GLOSSARY_TERMS: GlossaryTerm[] = [
   {
     term: 'Knowledge Graph',
-    shortDef: 'A semantic network representing entities and their relationships as nodes and edges.',
+    shortDef:
+      'A semantic network representing entities and their relationships as nodes and edges.',
     fullDef:
-      "A knowledge graph is a structured data model that represents real-world concepts (entities) and the relationships between them as a directed graph. In EduSphere, the knowledge graph maps educational concepts, their prerequisites, and connections to course content. It is powered by Apache AGE (a PostgreSQL graph extension using Cypher query language) and enables AI-powered concept recommendations based on learning history.",
+      'A knowledge graph is a structured data model that represents real-world concepts (entities) and the relationships between them as a directed graph. In EduSphere, the knowledge graph maps educational concepts, their prerequisites, and connections to course content. It is powered by Apache AGE (a PostgreSQL graph extension using Cypher query language) and enables AI-powered concept recommendations based on learning history.',
     category: 'AI & Technology',
   },
   {
@@ -131,7 +132,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     shortDef:
       'A traditional Jewish learning practice where two partners learn together through dialogue and debate.',
     fullDef:
-      "Chavruta (Hebrew: חַבְרוּתָא, \"friendship\" or \"partnership\") is a centuries-old Jewish pedagogical method where two learners study a text together, questioning each other's interpretations and challenging assumptions through Socratic dialogue. EduSphere's AI Chavruta tutor adapts this method digitally: the AI acts as a learning partner that debates, challenges reasoning, and builds concept connections in the learner's personal knowledge graph.",
+      'Chavruta (Hebrew: חַבְרוּתָא, "friendship" or "partnership") is a centuries-old Jewish pedagogical method where two learners study a text together, questioning each other\'s interpretations and challenging assumptions through Socratic dialogue. EduSphere\'s AI Chavruta tutor adapts this method digitally: the AI acts as a learning partner that debates, challenges reasoning, and builds concept connections in the learner\'s personal knowledge graph.',
     category: 'Pedagogy',
   },
   {
@@ -147,12 +148,13 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     shortDef:
       'An instructional approach where learners must demonstrate competence before advancing to new material.',
     fullDef:
-      "Mastery learning is an instructional strategy developed by Benjamin Bloom in which all learners are expected to achieve high levels of learning (mastery) for a given topic before moving to the next. Unlike time-based progression, mastery learning is competency-based. EduSphere implements a 5-level mastery progression (Novice → Beginner → Intermediate → Advanced → Expert) tracked through quiz scores, project submissions, and AI-assessed explanations.",
+      'Mastery learning is an instructional strategy developed by Benjamin Bloom in which all learners are expected to achieve high levels of learning (mastery) for a given topic before moving to the next. Unlike time-based progression, mastery learning is competency-based. EduSphere implements a 5-level mastery progression (Novice → Beginner → Intermediate → Advanced → Expert) tracked through quiz scores, project submissions, and AI-assessed explanations.',
     category: 'Pedagogy',
   },
   {
     term: 'SCORM',
-    shortDef: 'Sharable Content Object Reference Model — the global e-learning interoperability standard.',
+    shortDef:
+      'Sharable Content Object Reference Model — the global e-learning interoperability standard.',
     fullDef:
       'SCORM (Sharable Content Object Reference Model) is a set of technical standards for e-learning software products that enables content interoperability between different LMS platforms. SCORM packages contain learning content (HTML, JavaScript, media) with a manifest file defining structure and sequencing. EduSphere supports SCORM 1.2 and SCORM 2004 (versions 3 and 4), tracking completion status, score, and progress data according to the specification.',
     category: 'Standards',
@@ -167,9 +169,10 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     term: 'LTI (Learning Tools Interoperability)',
-    shortDef: 'A standard for securely integrating external learning tools with LMS platforms.',
+    shortDef:
+      'A standard for securely integrating external learning tools with LMS platforms.',
     fullDef:
-      "Learning Tools Interoperability (LTI) is an IMS Global standard that enables external learning tools to integrate seamlessly with LMS platforms. LTI 1.3 uses OAuth 2.0 and JSON Web Tokens (JWT) for secure authentication. EduSphere implements LTI 1.3 as both a Tool Provider (allowing other LMS platforms to launch EduSphere content) and a Tool Consumer (allowing external tools to be embedded within EduSphere courses).",
+      'Learning Tools Interoperability (LTI) is an IMS Global standard that enables external learning tools to integrate seamlessly with LMS platforms. LTI 1.3 uses OAuth 2.0 and JSON Web Tokens (JWT) for secure authentication. EduSphere implements LTI 1.3 as both a Tool Provider (allowing other LMS platforms to launch EduSphere content) and a Tool Consumer (allowing external tools to be embedded within EduSphere courses).',
     category: 'Standards',
   },
   {
@@ -190,14 +193,16 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     term: 'OpenBadges',
-    shortDef: 'A digital credential standard for verifiable, portable achievement badges.',
+    shortDef:
+      'A digital credential standard for verifiable, portable achievement badges.',
     fullDef:
       "OpenBadges (IMS Global) is a specification for digital badges that contain verifiable metadata about achievements: who earned it, who issued it, what criteria were met, and when. EduSphere issues OpenBadges 3.0-compliant digital badges upon course completion and skill mastery. Badges can be displayed on LinkedIn, personal portfolios, and digital wallets. EduSphere's BadgeVerifier page allows anyone to verify badge authenticity.",
     category: 'Standards',
   },
   {
     term: 'pgvector',
-    shortDef: 'A PostgreSQL extension enabling vector similarity search for AI embeddings.',
+    shortDef:
+      'A PostgreSQL extension enabling vector similarity search for AI embeddings.',
     fullDef:
       'pgvector is an open-source PostgreSQL extension that adds vector data types and similarity search capabilities. It enables storing and querying high-dimensional embedding vectors (typically 768-1536 dimensions) directly in PostgreSQL using HNSW (Hierarchical Navigable Small World) indexes. EduSphere uses pgvector with 768-dimensional nomic-embed-text embeddings for semantic search across course content, enabling "similar concepts" recommendations and AI-powered content retrieval.',
     category: 'AI & Technology',
@@ -207,7 +212,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     shortDef:
       'An AI technique combining knowledge retrieval with LLM generation for accurate, grounded responses.',
     fullDef:
-      "Retrieval-Augmented Generation (RAG) is an AI framework that enhances large language model (LLM) responses by first retrieving relevant information from a knowledge base, then using that retrieved context to generate accurate, grounded answers. EduSphere implements HybridRAG — combining pgvector semantic search with Apache AGE graph traversal — before querying the LLM. This enables the AI tutor to reference specific course materials rather than relying solely on LLM training data.",
+      'Retrieval-Augmented Generation (RAG) is an AI framework that enhances large language model (LLM) responses by first retrieving relevant information from a knowledge base, then using that retrieved context to generate accurate, grounded answers. EduSphere implements HybridRAG — combining pgvector semantic search with Apache AGE graph traversal — before querying the LLM. This enables the AI tutor to reference specific course materials rather than relying solely on LLM training data.',
     category: 'AI & Technology',
   },
   {
@@ -223,7 +228,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     shortDef:
       'A database feature that restricts which rows users can access based on their identity.',
     fullDef:
-      "Row-Level Security (RLS) is a PostgreSQL feature that allows defining policies controlling which rows are visible or modifiable for each database user or role. In EduSphere, every table has RLS policies that automatically filter queries based on the current tenant ID (set via JWT). This means even if application code accidentally queries without a tenant filter, the database enforces isolation at the row level — preventing cross-tenant data leakage.",
+      'Row-Level Security (RLS) is a PostgreSQL feature that allows defining policies controlling which rows are visible or modifiable for each database user or role. In EduSphere, every table has RLS policies that automatically filter queries based on the current tenant ID (set via JWT). This means even if application code accidentally queries without a tenant filter, the database enforces isolation at the row level — preventing cross-tenant data leakage.',
     category: 'Technical',
   },
   {
@@ -247,7 +252,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     shortDef:
       'A curated sequence of learning activities designed to achieve a specific educational goal.',
     fullDef:
-      "A learning path is a structured progression of courses, lessons, assessments, and practice activities organized to take a learner from a defined starting point to a target competency. In EduSphere, learning paths can be AI-generated based on skill assessments, manually curated by instructors, or derived from the knowledge graph by finding the optimal concept sequence. Learning paths adapt dynamically as learners demonstrate mastery or struggle with specific concepts.",
+      'A learning path is a structured progression of courses, lessons, assessments, and practice activities organized to take a learner from a defined starting point to a target competency. In EduSphere, learning paths can be AI-generated based on skill assessments, manually curated by instructors, or derived from the knowledge graph by finding the optimal concept sequence. Learning paths adapt dynamically as learners demonstrate mastery or struggle with specific concepts.',
     category: 'Pedagogy',
   },
   {

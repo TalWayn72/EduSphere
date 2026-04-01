@@ -37,7 +37,9 @@ test.describe('SrsReviewPage — DEV_MODE guard', () => {
       }
     });
     await login(page);
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
   });
 
@@ -128,7 +130,9 @@ test.describe('SrsReviewPage — Flashcard render (mocked)', () => {
       }
     });
     await login(page);
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
   });
 
@@ -170,7 +174,9 @@ test.describe('SrsReviewPage — Live backend', () => {
   });
 
   test('srs review page loads for authenticated student', async ({ page }) => {
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const hasFlashcard = await page

@@ -7,14 +7,28 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children }: { children: React.ReactNode }) => <span data-testid="badge">{children}</span>,
+  Badge: ({ children }: { children: React.ReactNode }) => (
+    <span data-testid="badge">{children}</span>
+  ),
 }));
 
 import { ContentItemList } from './ContentItemList';
 
 const items = [
-  { id: 'ci-1', title: 'Intro Video', contentType: 'VIDEO', duration: 300, orderIndex: 1 },
-  { id: 'ci-2', title: 'Reading', contentType: 'MARKDOWN', duration: null, orderIndex: 0 },
+  {
+    id: 'ci-1',
+    title: 'Intro Video',
+    contentType: 'VIDEO',
+    duration: 300,
+    orderIndex: 1,
+  },
+  {
+    id: 'ci-2',
+    title: 'Reading',
+    contentType: 'MARKDOWN',
+    duration: null,
+    orderIndex: 0,
+  },
 ];
 
 describe('ContentItemList', () => {

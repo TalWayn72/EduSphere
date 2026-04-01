@@ -22,7 +22,12 @@ import {
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import { sql } from 'drizzle-orm';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 
 const PURCHASED_SUBJECT = 'EDUSPHERE.marketplace.purchased';
@@ -108,10 +113,7 @@ export class CourseCopyService implements OnModuleInit, OnModuleDestroy {
       this.db,
       sourceCtx,
       async (tx) =>
-        tx
-          .select()
-          .from(schema.courses)
-          .where(eq(schema.courses.id, courseId))
+        tx.select().from(schema.courses).where(eq(schema.courses.id, courseId))
     );
 
     if (!sourceCourse) {

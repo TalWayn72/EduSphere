@@ -14,12 +14,18 @@ describe('gradeExamItem', () => {
     });
 
     it('multiple correct options all selected scores true', () => {
-      const qd = { type: 'MULTIPLE_CHOICE', correctOptionIds: ['opt-a', 'opt-c'] };
+      const qd = {
+        type: 'MULTIPLE_CHOICE',
+        correctOptionIds: ['opt-a', 'opt-c'],
+      };
       expect(gradeExamItem(qd, ['opt-c', 'opt-a'])).toBe(true);
     });
 
     it('partial selection of multi-correct scores false', () => {
-      const qd = { type: 'MULTIPLE_CHOICE', correctOptionIds: ['opt-a', 'opt-c'] };
+      const qd = {
+        type: 'MULTIPLE_CHOICE',
+        correctOptionIds: ['opt-a', 'opt-c'],
+      };
       expect(gradeExamItem(qd, ['opt-a'])).toBe(false);
     });
 
@@ -31,12 +37,18 @@ describe('gradeExamItem', () => {
 
   describe('DRAG_ORDER', () => {
     it('correct order scores true', () => {
-      const qd = { type: 'DRAG_ORDER', correctOrder: ['step-1', 'step-2', 'step-3'] };
+      const qd = {
+        type: 'DRAG_ORDER',
+        correctOrder: ['step-1', 'step-2', 'step-3'],
+      };
       expect(gradeExamItem(qd, ['step-1', 'step-2', 'step-3'])).toBe(true);
     });
 
     it('wrong order scores false', () => {
-      const qd = { type: 'DRAG_ORDER', correctOrder: ['step-1', 'step-2', 'step-3'] };
+      const qd = {
+        type: 'DRAG_ORDER',
+        correctOrder: ['step-1', 'step-2', 'step-3'],
+      };
       expect(gradeExamItem(qd, ['step-3', 'step-1', 'step-2'])).toBe(false);
     });
 
@@ -91,7 +103,10 @@ describe('gradeExamItem', () => {
     });
 
     it('non-array answer scores false', () => {
-      const qd = { type: 'MATCHING', correctPairs: [{ leftId: 'l1', rightId: 'r1' }] };
+      const qd = {
+        type: 'MATCHING',
+        correctPairs: [{ leftId: 'l1', rightId: 'r1' }],
+      };
       expect(gradeExamItem(qd, 'wrong')).toBe(false);
     });
   });

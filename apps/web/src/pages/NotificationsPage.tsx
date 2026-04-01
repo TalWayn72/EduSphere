@@ -67,7 +67,12 @@ export function NotificationsPage() {
   const user = getCurrentUser();
   const { notifications, markAsRead } = useNotifications(user?.id ?? '');
   const [filter, setFilter] = useState<FilterKey>('ALL');
-  const { isEnabled: pushEnabled, isLoading: pushLoading, enable: enablePush, disable: disablePush } = usePushNotifications();
+  const {
+    isEnabled: pushEnabled,
+    isLoading: pushLoading,
+    enable: enablePush,
+    disable: disablePush,
+  } = usePushNotifications();
 
   const unreadCount = notifications.filter((n) => !n.readAt).length;
 

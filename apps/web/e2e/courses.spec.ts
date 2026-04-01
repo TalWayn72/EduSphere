@@ -101,7 +101,10 @@ test.describe('Course List — offline/network error banner (BUG-039)', () => {
   test('shows clean offline banner when GraphQL is blocked — no raw urql strings', async ({
     page,
   }) => {
-    test.skip(!REAL_BACKEND, 'Requires VITE_DEV_MODE=false (real GraphQL backend)');
+    test.skip(
+      !REAL_BACKEND,
+      'Requires VITE_DEV_MODE=false (real GraphQL backend)'
+    );
 
     await login(page);
 
@@ -135,7 +138,10 @@ test.describe('Course List — offline/network error banner (BUG-039)', () => {
   });
 
   test('offline banner disappears after successful retry', async ({ page }) => {
-    test.skip(!REAL_BACKEND, 'Requires VITE_DEV_MODE=false (real GraphQL backend)');
+    test.skip(
+      !REAL_BACKEND,
+      'Requires VITE_DEV_MODE=false (real GraphQL backend)'
+    );
 
     await login(page);
 
@@ -169,7 +175,10 @@ test.describe('Course List — offline/network error banner (BUG-039)', () => {
     // This test verifies the retry button is clickable without throwing.
     await page.waitForLoadState('networkidle').catch(() => {});
     // Banner should either hide (real backend) or remain clean (dev mode)
-    const finalBannerText = await page.getByTestId('offline-banner').textContent().catch(() => null);
+    const finalBannerText = await page
+      .getByTestId('offline-banner')
+      .textContent()
+      .catch(() => null);
     if (finalBannerText !== null) {
       expect(finalBannerText).not.toContain('[GraphQL]');
       expect(finalBannerText).not.toContain('[Network]');

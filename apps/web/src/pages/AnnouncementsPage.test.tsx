@@ -24,9 +24,7 @@ vi.mock('urql', () => ({
 
 vi.mock('@/components/admin/AdminLayout', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  AdminLayout: ({ children }: any) => (
-    <div>{children}</div>
-  ),
+  AdminLayout: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock('@/components/PageHeader', () => ({

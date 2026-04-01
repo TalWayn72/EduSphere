@@ -26,13 +26,15 @@ const ItemArraySchema = z.object({
   items: z.array(
     z.object({
       question: z.string(),
-      options: z.array(
-        z.object({
-          text: z.string(),
-          isCorrect: z.boolean(),
-          explanation: z.string().optional(),
-        })
-      ).length(4),
+      options: z
+        .array(
+          z.object({
+            text: z.string(),
+            isCorrect: z.boolean(),
+            explanation: z.string().optional(),
+          })
+        )
+        .length(4),
       bloomLevel: z.string(),
       domainTag: z.string(),
       difficulty: z.string(),
@@ -64,9 +66,10 @@ Chain-of-thought: First identify key concepts, then determine common misconcepti
 }
 
 function buildUserPrompt(state: CertExamGenState, count: number): string {
-  const concepts = state.knowledgeGraphConcepts.length > 0
-    ? `\nKey concepts: ${state.knowledgeGraphConcepts.slice(0, 15).join(', ')}`
-    : '';
+  const concepts =
+    state.knowledgeGraphConcepts.length > 0
+      ? `\nKey concepts: ${state.knowledgeGraphConcepts.slice(0, 15).join(', ')}`
+      : '';
 
   return `Generate ${count} certification exam questions.
 
@@ -82,9 +85,14 @@ For each item provide: question, 4 options (exactly 1 correct), bloomLevel, doma
 }
 
 export function generateItemsNode(model: LanguageModel) {
-  return async (state: CertExamGenState): Promise<Partial<CertExamGenState>> => {
+  return async (
+    state: CertExamGenState
+  ): Promise<Partial<CertExamGenState>> => {
     const requestCount = Math.ceil(state.targetCount * OVERGENERATE_FACTOR);
-    const systemPrompt = buildSystemPrompt(state.targetBloomLevels, state.locale);
+    const systemPrompt = buildSystemPrompt(
+      state.targetBloomLevels,
+      state.locale
+    );
     const userPrompt = buildUserPrompt(state, requestCount);
 
     const { object } = await generateObject({

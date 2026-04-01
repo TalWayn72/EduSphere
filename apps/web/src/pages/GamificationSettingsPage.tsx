@@ -66,7 +66,9 @@ export function GamificationSettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [result, refetch] = useQuery<AdminBadgesResult>({
     query: ADMIN_BADGES_QUERY,
     pause: !mounted,
@@ -108,143 +110,148 @@ export function GamificationSettingsPage() {
         <PageHeader
           title="Gamification Settings"
           description="Configure badges, points, and leaderboards"
-          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Gamification Settings' }]}
+          breadcrumbs={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Gamification Settings' },
+          ]}
         />
-      <div className="space-y-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Badge Management</CardTitle>
-            <Button size="sm" onClick={() => setShowCreate((v) => !v)}>
-              {showCreate ? 'Cancel' : 'Create Badge'}
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {showCreate && (
-              <BadgeFormFields
-                value={createForm}
-                onChange={setCreateForm}
-                onSave={() => void handleCreate()}
-                onCancel={() => {
-                  setShowCreate(false);
-                  setCreateForm(EMPTY_FORM);
-                }}
-                saveLabel="Create"
-              />
-            )}
-            {result.fetching && (
-              <p className="text-sm text-muted-foreground">Loading badges...</p>
-            )}
-            {badges.length === 0 && !result.fetching && (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No badges defined yet.
-              </p>
-            )}
-            {badges.map((b) => (
-              <div key={b.id}>
-                {editId === b.id ? (
-                  <BadgeFormFields
-                    value={editForm}
-                    onChange={setEditForm}
-                    onSave={() => void handleUpdate()}
-                    onCancel={() => setEditId(null)}
-                    saveLabel="Update"
-                  />
-                ) : (
-                  <div className="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-muted/30">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{b.iconEmoji}</span>
-                      <div>
-                        <p className="font-medium text-sm">{b.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {b.description}
-                        </p>
-                      </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {b.category}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {b.pointsReward} pts
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {b.conditionType} &ge; {b.conditionValue}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditId(b.id);
-                          setEditForm({
-                            name: b.name,
-                            description: b.description,
-                            iconEmoji: b.iconEmoji,
-                            category: b.category,
-                            pointsReward: b.pointsReward,
-                            conditionType: b.conditionType,
-                            conditionValue: b.conditionValue,
-                          });
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      {deleteConfirm === b.id ? (
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => void handleDelete(b.id)}
-                          >
-                            Confirm
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setDeleteConfirm(null)}
-                          >
-                            Cancel
-                          </Button>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Badge Management</CardTitle>
+              <Button size="sm" onClick={() => setShowCreate((v) => !v)}>
+                {showCreate ? 'Cancel' : 'Create Badge'}
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {showCreate && (
+                <BadgeFormFields
+                  value={createForm}
+                  onChange={setCreateForm}
+                  onSave={() => void handleCreate()}
+                  onCancel={() => {
+                    setShowCreate(false);
+                    setCreateForm(EMPTY_FORM);
+                  }}
+                  saveLabel="Create"
+                />
+              )}
+              {result.fetching && (
+                <p className="text-sm text-muted-foreground">
+                  Loading badges...
+                </p>
+              )}
+              {badges.length === 0 && !result.fetching && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No badges defined yet.
+                </p>
+              )}
+              {badges.map((b) => (
+                <div key={b.id}>
+                  {editId === b.id ? (
+                    <BadgeFormFields
+                      value={editForm}
+                      onChange={setEditForm}
+                      onSave={() => void handleUpdate()}
+                      onCancel={() => setEditId(null)}
+                      saveLabel="Update"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-muted/30">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{b.iconEmoji}</span>
+                        <div>
+                          <p className="font-medium text-sm">{b.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {b.description}
+                          </p>
                         </div>
-                      ) : (
+                        <Badge variant="secondary" className="text-xs">
+                          {b.category}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {b.pointsReward} pts
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {b.conditionType} &ge; {b.conditionValue}
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => setDeleteConfirm(b.id)}
+                          onClick={() => {
+                            setEditId(b.id);
+                            setEditForm({
+                              name: b.name,
+                              description: b.description,
+                              iconEmoji: b.iconEmoji,
+                              category: b.category,
+                              pointsReward: b.pointsReward,
+                              conditionType: b.conditionType,
+                              conditionValue: b.conditionValue,
+                            });
+                          }}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
-                      )}
+                        {deleteConfirm === b.id ? (
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => void handleDelete(b.id)}
+                            >
+                              Confirm
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setDeleteConfirm(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setDeleteConfirm(b.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Points Reference</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {POINT_REFERENCE.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-lg border p-4 text-center"
-                >
-                  <p className="text-2xl font-bold text-primary">
-                    {item.points}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {item.label}
-                  </p>
+                  )}
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Points Reference</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {POINT_REFERENCE.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-lg border p-4 text-center"
+                  >
+                    <p className="text-2xl font-bold text-primary">
+                      {item.points}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {item.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </PageShell>
     </AdminLayout>
   );

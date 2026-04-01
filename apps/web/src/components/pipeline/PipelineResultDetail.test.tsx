@@ -13,38 +13,94 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 let onOpenChangeHandler: ((v: boolean) => void) | undefined;
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open, onOpenChange }: { children: React.ReactNode; open: boolean; onOpenChange?: (v: boolean) => void }) => {
+  Dialog: ({
+    children,
+    open,
+    onOpenChange,
+  }: {
+    children: React.ReactNode;
+    open: boolean;
+    onOpenChange?: (v: boolean) => void;
+  }) => {
     onOpenChangeHandler = onOpenChange;
     return open ? <div data-testid="mock-dialog">{children}</div> : null;
   },
-  DialogContent: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <div {...props}>{children}</div>
+  DialogContent: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <h2 {...props}>{children}</h2>
-  ),
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  DialogTitle: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <h2 {...props}>{children}</h2>,
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
 }));
 
 vi.mock('@/components/ui/tabs', () => ({
-  Tabs: ({ children, defaultValue, ...props }: { children: React.ReactNode; defaultValue: string; [k: string]: unknown }) => (
-    <div data-testid="tabs" data-default={defaultValue} {...props}>{children}</div>
+  Tabs: ({
+    children,
+    defaultValue,
+    ...props
+  }: {
+    children: React.ReactNode;
+    defaultValue: string;
+    [k: string]: unknown;
+  }) => (
+    <div data-testid="tabs" data-default={defaultValue} {...props}>
+      {children}
+    </div>
   ),
-  TabsList: ({ children }: { children: React.ReactNode }) => <div data-testid="tabs-list">{children}</div>,
-  TabsTrigger: ({ children, value, ...props }: { children: React.ReactNode; value: string; [k: string]: unknown }) => (
-    <button data-tab-value={value} {...props}>{children}</button>
+  TabsList: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tabs-list">{children}</div>
   ),
-  TabsContent: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-testid={`tab-content-${value}`}>{children}</div>
+  TabsTrigger: ({
+    children,
+    value,
+    ...props
+  }: {
+    children: React.ReactNode;
+    value: string;
+    [k: string]: unknown;
+  }) => (
+    <button data-tab-value={value} {...props}>
+      {children}
+    </button>
   ),
+  TabsContent: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => <div data-testid={`tab-content-${value}`}>{children}</div>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }) => (
-    <button onClick={onClick} {...props}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    size?: string;
+  }) => (
+    <button onClick={onClick} {...props}>
+      {children}
+    </button>
   ),
 }));
 
@@ -99,9 +155,7 @@ describe('PipelineResultDetail', () => {
   });
 
   it('renders 4 tabs when result has diagram and QA score', () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     expect(screen.getByTestId('tab-summary')).toBeInTheDocument();
     expect(screen.getByTestId('tab-diagram')).toBeInTheDocument();
@@ -111,7 +165,10 @@ describe('PipelineResultDetail', () => {
 
   it('hides diagram tab when no mermaidSvg', () => {
     render(
-      <PipelineResultDetail result={RESULT_NO_DIAGRAM_NO_QA} {...defaultProps} />
+      <PipelineResultDetail
+        result={RESULT_NO_DIAGRAM_NO_QA}
+        {...defaultProps}
+      />
     );
 
     expect(screen.getByTestId('tab-summary')).toBeInTheDocument();
@@ -121,17 +178,15 @@ describe('PipelineResultDetail', () => {
   });
 
   it('shows module name as dialog title', () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
-    expect(screen.getByTestId('result-detail-title')).toHaveTextContent('SUMMARIZATION');
+    expect(screen.getByTestId('result-detail-title')).toHaveTextContent(
+      'SUMMARIZATION'
+    );
   });
 
   it('copy-to-clipboard button works on summary tab', async () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const copyBtn = screen.getByTestId('copy-summary-btn');
     await act(async () => {
@@ -144,9 +199,7 @@ describe('PipelineResultDetail', () => {
   });
 
   it('copy button text changes to "הועתק!" after click', async () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const copyBtn = screen.getByTestId('copy-summary-btn');
     expect(copyBtn).toHaveTextContent('העתק');
@@ -159,9 +212,7 @@ describe('PipelineResultDetail', () => {
   });
 
   it('QA score renders donut SVG', () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const donut = screen.getByTestId('qa-score-donut');
     expect(donut).toBeInTheDocument();
@@ -172,18 +223,14 @@ describe('PipelineResultDetail', () => {
   });
 
   it('QA score donut uses green color for score >= 80', () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const scoreText = screen.getByText('85%');
     expect(scoreText.style.color).toBe('rgb(34, 197, 94)'); // #22c55e
   });
 
   it('Raw JSON tab shows formatted output', () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const rawJson = screen.getByTestId('raw-json');
     expect(rawJson).toBeInTheDocument();
@@ -193,9 +240,7 @@ describe('PipelineResultDetail', () => {
   });
 
   it('copy JSON button copies raw JSON', async () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const copyJsonBtn = screen.getByTestId('copy-json-btn');
     await act(async () => {
@@ -210,7 +255,11 @@ describe('PipelineResultDetail', () => {
   it('dialog close triggers onClose callback', () => {
     const onClose = vi.fn();
     render(
-      <PipelineResultDetail result={FULL_RESULT} open={true} onClose={onClose} />
+      <PipelineResultDetail
+        result={FULL_RESULT}
+        open={true}
+        onClose={onClose}
+      />
     );
 
     // Simulate dialog close via onOpenChange(false)
@@ -224,7 +273,12 @@ describe('PipelineResultDetail', () => {
 
   it('shows loading skeleton when isLoading', () => {
     render(
-      <PipelineResultDetail result={null} open={true} onClose={vi.fn()} isLoading={true} />
+      <PipelineResultDetail
+        result={null}
+        open={true}
+        onClose={vi.fn()}
+        isLoading={true}
+      />
     );
 
     expect(screen.getByTestId('result-detail-skeleton')).toBeInTheDocument();
@@ -233,7 +287,11 @@ describe('PipelineResultDetail', () => {
 
   it('does not render when open is false', () => {
     render(
-      <PipelineResultDetail result={FULL_RESULT} open={false} onClose={vi.fn()} />
+      <PipelineResultDetail
+        result={FULL_RESULT}
+        open={false}
+        onClose={vi.fn()}
+      />
     );
 
     expect(screen.queryByTestId('mock-dialog')).not.toBeInTheDocument();
@@ -244,7 +302,9 @@ describe('PipelineResultDetail', () => {
       <PipelineResultDetail result={null} open={true} onClose={vi.fn()} />
     );
 
-    expect(screen.getByTestId('result-detail-title')).toHaveTextContent('תוצאת מודול');
+    expect(screen.getByTestId('result-detail-title')).toHaveTextContent(
+      'תוצאת מודול'
+    );
   });
 
   it('summary tab shows "אין סיכום זמין" when no summary data', () => {
@@ -252,17 +312,15 @@ describe('PipelineResultDetail', () => {
       ...FULL_RESULT,
       outputData: {},
     };
-    render(
-      <PipelineResultDetail result={emptyResult} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={emptyResult} {...defaultProps} />);
 
-    expect(screen.getByTestId('summary-content')).toHaveTextContent('אין סיכום זמין');
+    expect(screen.getByTestId('summary-content')).toHaveTextContent(
+      'אין סיכום זמין'
+    );
   });
 
   it('diagram tab renders SVG via dangerouslySetInnerHTML', () => {
-    render(
-      <PipelineResultDetail result={FULL_RESULT} {...defaultProps} />
-    );
+    render(<PipelineResultDetail result={FULL_RESULT} {...defaultProps} />);
 
     const diagramContainer = screen.getByTestId('diagram-container');
     expect(diagramContainer.innerHTML).toContain('<svg>');

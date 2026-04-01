@@ -32,7 +32,7 @@ export function EmptyState({
     <div
       className={cn(
         'flex flex-col items-center justify-center gap-4 py-16 text-center',
-        className,
+        className
       )}
       data-testid="empty-state"
     >

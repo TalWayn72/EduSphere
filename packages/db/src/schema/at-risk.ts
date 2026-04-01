@@ -30,9 +30,13 @@ export const atRiskFlags = pgTable('at_risk_flags', {
   /** JSONB bag of boolean risk factors */
   riskFactors: jsonb('risk_factors').notNull(),
   status: atRiskStatusEnum('status').notNull().default('active'),
-  flaggedAt: timestamp('flagged_at', { withTimezone: true }).notNull().defaultNow(),
+  flaggedAt: timestamp('flagged_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   resolvedAt: timestamp('resolved_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 /** Unique constraint: only one active flag per (learner, course) pair */

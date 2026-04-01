@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createHash } from 'crypto';
 
-function sha256(v: string) { return createHash('sha256').update(v).digest('hex'); }
+function sha256(v: string) {
+  return createHash('sha256').update(v).digest('hex');
+}
 
 const mockDb = {
   select: vi.fn().mockReturnThis(),
@@ -13,7 +15,9 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: vi.fn(),
-  schema: { partners: { id: 'id', status: 'status', apiKeyHash: 'api_key_hash' } },
+  schema: {
+    partners: { id: 'id', status: 'status', apiKeyHash: 'api_key_hash' },
+  },
   eq: vi.fn((a: unknown, b: unknown) => [a, b]),
 }));
 
@@ -43,7 +47,9 @@ describe('PartnerApiMiddleware', () => {
     const res = mockRes();
     await middleware.use(mockReq(), res as never, vi.fn());
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'PARTNER_AUTH_FAILED' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'PARTNER_AUTH_FAILED' })
+    );
   });
 
   it('rejects non-Bearer scheme with 401', async () => {
@@ -62,7 +68,9 @@ describe('PartnerApiMiddleware', () => {
   it('rejects suspended partner with 401', async () => {
     const rawKey = 'valid-key';
     const hash = sha256(rawKey);
-    mockDb.limit.mockResolvedValue([{ id: 'p1', status: 'suspended', apiKeyHash: hash }]);
+    mockDb.limit.mockResolvedValue([
+      { id: 'p1', status: 'suspended', apiKeyHash: hash },
+    ]);
     const res = mockRes();
     await middleware.use(mockReq(`Bearer ${rawKey}`), res as never, vi.fn());
     expect(res.status).toHaveBeenCalledWith(401);
@@ -71,7 +79,9 @@ describe('PartnerApiMiddleware', () => {
   it('calls next() and attaches partner context for valid active key', async () => {
     const rawKey = 'valid-key';
     const hash = sha256(rawKey);
-    mockDb.limit.mockResolvedValue([{ id: 'p1', status: 'active', apiKeyHash: hash }]);
+    mockDb.limit.mockResolvedValue([
+      { id: 'p1', status: 'active', apiKeyHash: hash },
+    ]);
     const next = vi.fn();
     const req = mockReq(`Bearer ${rawKey}`);
     const res = mockRes();
@@ -83,7 +93,9 @@ describe('PartnerApiMiddleware', () => {
   it('uses timing-safe comparison (hash comparison is consistent)', async () => {
     const rawKey = 'test-key';
     const hash = sha256(rawKey);
-    mockDb.limit.mockResolvedValue([{ id: 'p1', status: 'active', apiKeyHash: hash }]);
+    mockDb.limit.mockResolvedValue([
+      { id: 'p1', status: 'active', apiKeyHash: hash },
+    ]);
     const next = vi.fn();
     await middleware.use(mockReq(`Bearer ${rawKey}`), mockRes() as never, next);
     expect(next).toHaveBeenCalled();

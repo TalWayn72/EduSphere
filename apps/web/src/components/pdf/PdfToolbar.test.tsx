@@ -45,12 +45,16 @@ describe('PdfToolbar', () => {
 
   it('disables Previous page button on first page', () => {
     render(<PdfToolbar {...defaultProps} pageNum={1} />);
-    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Previous page' })
+    ).toBeDisabled();
   });
 
   it('enables Previous page button when not on first page', () => {
     render(<PdfToolbar {...defaultProps} pageNum={5} />);
-    expect(screen.getByRole('button', { name: 'Previous page' })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Previous page' })
+    ).not.toBeDisabled();
   });
 
   it('disables Next page button on last page', () => {
@@ -60,19 +64,25 @@ describe('PdfToolbar', () => {
 
   it('enables Next page button when not on last page', () => {
     render(<PdfToolbar {...defaultProps} pageNum={5} totalPages={10} />);
-    expect(screen.getByRole('button', { name: 'Next page' })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Next page' })
+    ).not.toBeDisabled();
   });
 
   it('calls onPrevPage when Previous page is clicked', () => {
     const onPrevPage = vi.fn();
-    render(<PdfToolbar {...defaultProps} pageNum={5} onPrevPage={onPrevPage} />);
+    render(
+      <PdfToolbar {...defaultProps} pageNum={5} onPrevPage={onPrevPage} />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
     expect(onPrevPage).toHaveBeenCalledTimes(1);
   });
 
   it('calls onNextPage when Next page is clicked', () => {
     const onNextPage = vi.fn();
-    render(<PdfToolbar {...defaultProps} pageNum={5} onNextPage={onNextPage} />);
+    render(
+      <PdfToolbar {...defaultProps} pageNum={5} onNextPage={onNextPage} />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
     expect(onNextPage).toHaveBeenCalledTimes(1);
   });
@@ -84,7 +94,9 @@ describe('PdfToolbar', () => {
 
   it('renders Zoom out button with aria-label', () => {
     render(<PdfToolbar {...defaultProps} />);
-    expect(screen.getByRole('button', { name: 'Zoom out' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Zoom out' })
+    ).toBeInTheDocument();
   });
 
   it('calls onZoomIn when Zoom in is clicked', () => {
@@ -118,12 +130,16 @@ describe('PdfToolbar', () => {
 
   it('renders Fit width button with aria-label', () => {
     render(<PdfToolbar {...defaultProps} />);
-    expect(screen.getByRole('button', { name: 'Fit width' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Fit width' })
+    ).toBeInTheDocument();
   });
 
   it('renders Fit page button with aria-label', () => {
     render(<PdfToolbar {...defaultProps} />);
-    expect(screen.getByRole('button', { name: 'Fit page' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Fit page' })
+    ).toBeInTheDocument();
   });
 
   it('calls onFitWidth when Fit width is clicked', () => {
@@ -208,27 +224,51 @@ describe('PdfToolbar — Accessibility', () => {
 
   it('fit-width button has aria-pressed reflecting zoom mode', () => {
     render(<PdfToolbar {...defaultProps} zoomMode="fit-width" />);
-    expect(screen.getByRole('button', { name: 'Fit width' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Fit page' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Fit width' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByRole('button', { name: 'Fit page' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('fit-page button has aria-pressed reflecting zoom mode', () => {
     render(<PdfToolbar {...defaultProps} zoomMode="fit-page" />);
-    expect(screen.getByRole('button', { name: 'Fit page' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Fit width' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Fit page' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByRole('button', { name: 'Fit width' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('neither fit button pressed when zoomMode is custom', () => {
     render(<PdfToolbar {...defaultProps} zoomMode="custom" />);
-    expect(screen.getByRole('button', { name: 'Fit width' })).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByRole('button', { name: 'Fit page' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Fit width' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+    expect(screen.getByRole('button', { name: 'Fit page' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('all navigation buttons have accessible labels', () => {
     render(<PdfToolbar {...defaultProps} />);
-    expect(screen.getByRole('button', { name: 'Previous page' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Next page' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Previous page' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Next page' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Zoom in' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Zoom out' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Zoom out' })
+    ).toBeInTheDocument();
   });
 });

@@ -39,9 +39,7 @@ function makeFakeModel() {
 
 function makeInvokeResult(overrides: Record<string, unknown> = {}) {
   return {
-    finalItems: [
-      { question: 'What is X?', options: ['A', 'B'], correct: 'A' },
-    ],
+    finalItems: [{ question: 'What is X?', options: ['A', 'B'], correct: 'A' }],
     errors: [],
     ...overrides,
   };
@@ -68,10 +66,7 @@ describe('runCertExamGenerator', () => {
       makeFakeModel()
     );
 
-    expect(mockCreateWorkflow).toHaveBeenCalledWith(
-      makeFakeModel(),
-      undefined
-    );
+    expect(mockCreateWorkflow).toHaveBeenCalledWith(makeFakeModel(), undefined);
     expect(result.items).toEqual(items);
     expect(result.errors).toEqual([]);
   });
@@ -92,10 +87,7 @@ describe('runCertExamGenerator', () => {
       searchFn
     );
 
-    expect(mockCreateWorkflow).toHaveBeenCalledWith(
-      makeFakeModel(),
-      searchFn
-    );
+    expect(mockCreateWorkflow).toHaveBeenCalledWith(makeFakeModel(), searchFn);
   });
 
   it('passes correct thread_id in configurable', async () => {

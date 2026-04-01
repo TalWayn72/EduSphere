@@ -108,7 +108,10 @@ export function AssessmentForm({
   }
 
   const showProctoring =
-    proctoringEnabled && assessmentId && raterRole !== 'MANAGER' && raterRole !== 'SELF';
+    proctoringEnabled &&
+    assessmentId &&
+    raterRole !== 'MANAGER' &&
+    raterRole !== 'SELF';
 
   if (submitted) {
     return (
@@ -130,43 +133,47 @@ export function AssessmentForm({
         </div>
       )}
       <Card>
-      <CardHeader>
-        <CardTitle>Submit Your Feedback</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Role: {raterRole.replace('_', ' ')}
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {criteria.map((c) => (
-          <StarRating
-            key={c.id}
-            criteriaId={c.id}
-            label={c.label}
-            value={scores[c.id] ?? 0}
-            onChange={handleScoreChange}
-          />
-        ))}
-        <div className="space-y-1">
-          <label className="text-sm font-medium">
-            Additional Comments (optional)
-          </label>
-          <Textarea
-            value={narrative}
-            onChange={(e) => setNarrative(e.target.value)}
-            placeholder="Share any additional observations..."
-            rows={3}
-          />
-        </div>
-        {error && <p className="text-sm text-destructive">{t('saveFailed')}</p>}
-        <Button
-          onClick={() => void handleSubmit()}
-          disabled={fetching || !allRated}
-          className="w-full"
-        >
-          {fetching ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-          Submit Feedback
-        </Button>
-      </CardContent>
+        <CardHeader>
+          <CardTitle>Submit Your Feedback</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Role: {raterRole.replace('_', ' ')}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {criteria.map((c) => (
+            <StarRating
+              key={c.id}
+              criteriaId={c.id}
+              label={c.label}
+              value={scores[c.id] ?? 0}
+              onChange={handleScoreChange}
+            />
+          ))}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">
+              Additional Comments (optional)
+            </label>
+            <Textarea
+              value={narrative}
+              onChange={(e) => setNarrative(e.target.value)}
+              placeholder="Share any additional observations..."
+              rows={3}
+            />
+          </div>
+          {error && (
+            <p className="text-sm text-destructive">{t('saveFailed')}</p>
+          )}
+          <Button
+            onClick={() => void handleSubmit()}
+            disabled={fetching || !allRated}
+            className="w-full"
+          >
+            {fetching ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : null}
+            Submit Feedback
+          </Button>
+        </CardContent>
       </Card>
     </>
   );

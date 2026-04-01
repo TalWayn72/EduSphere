@@ -30,7 +30,15 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 
 // Mock LearnerDetailPanel
 vi.mock('./LearnerDetailPanel', () => ({
-  LearnerDetailPanel: ({ open, userId, onClose }: { open: boolean; userId: string | null; onClose: () => void }) =>
+  LearnerDetailPanel: ({
+    open,
+    userId,
+    onClose,
+  }: {
+    open: boolean;
+    userId: string | null;
+    onClose: () => void;
+  }) =>
     open ? (
       <div data-testid="learner-detail-panel">
         Detail for {userId}
@@ -90,9 +98,21 @@ function setupMocks(
     callCount++;
     // Odd calls = analytics query, even calls = at-risk query
     if (callCount % 2 === 1) {
-      return [{ data: analyticsData ? { orgAnalytics: analyticsData } : null, fetching }, reexecute];
+      return [
+        {
+          data: analyticsData ? { orgAnalytics: analyticsData } : null,
+          fetching,
+        },
+        reexecute,
+      ];
     }
-    return [{ data: atRiskData !== null ? { orgAtRiskLearners: atRiskData } : null, fetching }, reexecute];
+    return [
+      {
+        data: atRiskData !== null ? { orgAtRiskLearners: atRiskData } : null,
+        fetching,
+      },
+      reexecute,
+    ];
   });
 }
 

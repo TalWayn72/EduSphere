@@ -1,10 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parseFrontmatter, generateDocId, isoTimestamp, mapTypeToCollection } from '../src/embeddings.js';
+import {
+  parseFrontmatter,
+  generateDocId,
+  isoTimestamp,
+  mapTypeToCollection,
+} from '../src/embeddings.js';
 
 // --- parseFrontmatter ---
 describe('parseFrontmatter', () => {
   it('parses standard YAML frontmatter from markdown', () => {
-    const md = '---\nname: Test Doc\ndescription: A test\ntype: project\n---\nBody content here';
+    const md =
+      '---\nname: Test Doc\ndescription: A test\ntype: project\n---\nBody content here';
     const result = parseFrontmatter(md);
     expect(result.frontmatter['name']).toBe('Test Doc');
     expect(result.frontmatter['description']).toBe('A test');
@@ -36,7 +42,9 @@ describe('parseFrontmatter', () => {
 describe('generateDocId', () => {
   it('returns a valid UUID v4 string', () => {
     const id = generateDocId();
-    expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    );
   });
 
   it('generates unique IDs on each call', () => {

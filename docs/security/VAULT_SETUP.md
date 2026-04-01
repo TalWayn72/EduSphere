@@ -3,6 +3,7 @@
 ## Overview
 
 Vault manages secrets for production EduSphere deployments. It provides:
+
 - Centralized secret storage with audit logging
 - Per-tenant encryption key isolation
 - Secret rotation without application restarts
@@ -48,14 +49,14 @@ vault kv put secret/edusphere/tenant/00000000-0000-0000-0000-000000000001/enc-ke
 
 ## Secret Paths Reference
 
-| Path                                          | Contents                                     |
-| --------------------------------------------- | -------------------------------------------- |
-| `secret/edusphere/db`                         | `DATABASE_URL`                               |
-| `secret/edusphere/keycloak`                   | `KEYCLOAK_CLIENT_SECRET`, `KEYCLOAK_URL`     |
-| `secret/edusphere/nats`                       | `NATS_URL`, `NATS_TLS_CERT`                  |
-| `secret/edusphere/minio`                      | `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`       |
-| `secret/edusphere/tenant/{tenantId}/enc-key`  | Per-tenant PII field encryption key          |
-| `secret/edusphere/ai`                         | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`        |
+| Path                                         | Contents                                 |
+| -------------------------------------------- | ---------------------------------------- |
+| `secret/edusphere/db`                        | `DATABASE_URL`                           |
+| `secret/edusphere/keycloak`                  | `KEYCLOAK_CLIENT_SECRET`, `KEYCLOAK_URL` |
+| `secret/edusphere/nats`                      | `NATS_URL`, `NATS_TLS_CERT`              |
+| `secret/edusphere/minio`                     | `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`   |
+| `secret/edusphere/tenant/{tenantId}/enc-key` | Per-tenant PII field encryption key      |
+| `secret/edusphere/ai`                        | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`    |
 
 ## Application Integration (Production)
 
@@ -79,7 +80,7 @@ export async function vaultLoader(addr: string, token: string) {
 ConfigModule.forRoot({
   load: [() => vaultLoader(process.env.VAULT_ADDR!, process.env.VAULT_TOKEN!)],
   isGlobal: true,
-})
+});
 ```
 
 ## Secret Rotation (Zero Downtime)
@@ -137,6 +138,7 @@ Vault in production must be configured with TLS. Never use dev mode
 (`VAULT_DEV_ROOT_TOKEN_ID`) in production environments.
 
 Add to Vault server config (`vault.hcl`):
+
 ```hcl
 listener "tcp" {
   address     = "0.0.0.0:8200"

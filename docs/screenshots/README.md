@@ -10,6 +10,7 @@ All project screenshots are stored here. They are captured during development se
 ## Contents by Feature
 
 ### Authentication
+
 - `scan-login.png`, `scan-login-devmode.png`, `scan-login-initial.png`, `scan-login-keycloak-mode.png`
 - `scan-kc-user1-filled.png`, `scan-test-user1-kc-error.png`, `scan-test-user1-kc-filled.png`
 - `scan-test-user2-kc-filled.png`
@@ -17,23 +18,29 @@ All project screenshots are stored here. They are captured during development se
 - `step4-after-1sec-still-login.png`, `step5-protected-route-redirected-to-login.png`
 
 ### Dashboard
+
 - `scan-dashboard.png`, `scan-dashboard-new.png`, `scan-dashboard-verify.png`
 
 ### Courses
+
 - `scan-courses.png`, `scan-courses-after-fix.png`, `scan-courses-fix.png`, `scan-courses-new.png`
 - `scan-courses-bug039-gateway-up.png`, `scan-courses-bug039-offline-banner.png`
 
 ### Knowledge Graph
+
 - `scan-graph.png`
 
 ### Admin
+
 - `scan-admin.png`, `scan-admin-compliance.png`, `scan-admin-hebrew-final.png`
 - `scan-admin-lti.png`, `scan-admin-scim.png`, `scan-super-admin.png`, `scan-super-admin-panel.png`
 
 ### Navigation / Layout
+
 - `scan-root.png`, `scan-nav-he-check.png`, `scan-nav-he-fixed.png`, `scan-nav-he-fixed-wide.png`
 
 ### Features
+
 - `scan-agents.png`, `scan-verify-agents.png`
 - `scan-annotations.png`
 - `scan-collaboration.png`, `scan-verify-collaboration.png`
@@ -46,10 +53,12 @@ All project screenshots are stored here. They are captured during development se
 - `scan-verify-scim-modal.png`
 
 ### Test Users
+
 - `scan-test-instructor.png`, `scan-test-org-admin.png`, `scan-test-org-admin-adminpage.png`
 - `scan-test-researcher.png`, `scan-test-student.png`, `scan-test-user1-step1-login.png`
 
 ### Live Sessions
+
 - `live-sessions-route-verification.png`
 
 ## Rule

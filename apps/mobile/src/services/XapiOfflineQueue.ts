@@ -23,17 +23,19 @@ export function initXapiQueue(): void {
 
 export function enqueueStatement(tenantId: string, stmt: object): void {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  db.runSync(
-    'INSERT INTO xapi_queue VALUES (?, ?, ?, ?)',
-    [id, tenantId, JSON.stringify(stmt), Date.now()],
-  );
+  db.runSync('INSERT INTO xapi_queue VALUES (?, ?, ?, ?)', [
+    id,
+    tenantId,
+    JSON.stringify(stmt),
+    Date.now(),
+  ]);
   evictOldStatements();
 }
 
 export function getPendingStatements(limit = 50): QueuedStatement[] {
   return db.getAllSync<QueuedStatement>(
     'SELECT * FROM xapi_queue ORDER BY created_at ASC LIMIT ?',
-    [limit],
+    [limit]
   );
 }
 
@@ -54,6 +56,8 @@ export function evictOldStatements(): void {
 }
 
 export function getQueueSize(): number {
-  const result = db.getFirstSync<{ count: number }>('SELECT COUNT(*) as count FROM xapi_queue');
+  const result = db.getFirstSync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM xapi_queue'
+  );
   return result?.count ?? 0;
 }

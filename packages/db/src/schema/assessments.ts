@@ -40,7 +40,9 @@ export const assessmentCampaigns = pgTable(
     dueDate: timestamp('due_date', { withTimezone: true }),
     status: assessmentStatusEnum('status').notNull().default('DRAFT'),
     createdBy: uuid('created_by').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => ({
     tenantIdx: index('assessment_campaigns_tenant_idx').on(t.tenantId),
@@ -69,7 +71,9 @@ export const assessmentResponses = pgTable(
     raterRole: raterRoleEnum('rater_role').notNull(),
     criteriaScores: jsonb('criteria_scores').notNull(),
     narrative: text('narrative'),
-    submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().defaultNow(),
+    submittedAt: timestamp('submitted_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => ({
     campaignIdx: index('assessment_responses_campaign_idx').on(t.campaignId),
@@ -99,5 +103,7 @@ export const assessmentResults = pgTable('assessment_results', {
   tenantId: uuid('tenant_id').notNull(),
   aggregatedScores: jsonb('aggregated_scores').notNull(),
   summary: text('summary'),
-  generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
+  generatedAt: timestamp('generated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });

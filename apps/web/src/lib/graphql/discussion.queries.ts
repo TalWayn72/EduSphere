@@ -6,8 +6,8 @@ export const MY_DISCUSSIONS_QUERY = gql`
       id
       title
       courseId
-      participantsCount
-      messagesCount
+      participantCount
+      messageCount
       createdAt
     }
   }
@@ -19,8 +19,8 @@ export const DISCUSSION_QUERY = gql`
       id
       title
       courseId
-      participantsCount
-      messagesCount
+      participantCount
+      messageCount
       createdAt
     }
   }
@@ -28,7 +28,11 @@ export const DISCUSSION_QUERY = gql`
 
 export const DISCUSSION_MESSAGES_QUERY = gql`
   query DiscussionMessages($discussionId: ID!, $limit: Int, $offset: Int) {
-    discussionMessages(discussionId: $discussionId, limit: $limit, offset: $offset) {
+    discussionMessages(
+      discussionId: $discussionId
+      limit: $limit
+      offset: $offset
+    ) {
       id
       userId
       content

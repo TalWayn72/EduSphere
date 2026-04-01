@@ -74,7 +74,14 @@ describe('WebhooksPage', () => {
 
   it('renders webhook rows when data is present', () => {
     setupMocks([
-      { id: 'wh1', url: 'https://api.test/hook', events: ['user.created'], active: true, secret: 'x', createdAt: '2026-01-01' },
+      {
+        id: 'wh1',
+        url: 'https://api.test/hook',
+        events: ['user.created'],
+        active: true,
+        secret: 'x',
+        createdAt: '2026-01-01',
+      },
     ]);
     render(<WebhooksPage />);
     expect(screen.getByText('https://api.test/hook')).toBeInTheDocument();

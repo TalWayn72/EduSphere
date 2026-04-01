@@ -111,154 +111,179 @@ export function CompliancePage() {
     <PublicLayout>
       <div>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-          <PageHeader title="Compliance & Certifications" description="Industry standards, security certifications, and regulatory compliance." />
+          <PageHeader
+            title="Compliance & Certifications"
+            description="Industry standards, security certifications, and regulatory compliance."
+          />
         </div>
         {/* Navigation pills */}
-      <nav className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 py-3" aria-label="Compliance sections">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-2">
-          {SECTIONS.map((s) => (
+        <nav
+          className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 py-3"
+          aria-label="Compliance sections"
+        >
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-2">
+            {SECTIONS.map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById(s.id)
+                    ?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+              >
+                {s.title.split(' ')[0]}
+              </a>
+            ))}
             <a
-              key={s.id}
-              href={`#${s.id}`}
-              onClick={(e) => { e.preventDefault(); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' }); }}
-              className="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+              href="#downloads"
+              onClick={(e) => {
+                e.preventDefault();
+                document
+                  .getElementById('downloads')
+                  ?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-3 py-1.5 rounded-full text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 hover:text-indigo-800 transition-colors"
             >
-              {s.title.split(' ')[0]}
+              Downloads
             </a>
-          ))}
-          <a
-            href="#downloads"
-            onClick={(e) => { e.preventDefault(); document.getElementById('downloads')?.scrollIntoView({ behavior: 'smooth' }); }}
-            className="px-3 py-1.5 rounded-full text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 hover:text-indigo-800 transition-colors"
-          >
-            Downloads
-          </a>
-        </div>
-      </nav>
+          </div>
+        </nav>
 
-      {/* Sections */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
-        {SECTIONS.map((section) => {
-          const Icon = section.icon;
-          return (
-            <section
-              key={section.id}
-              id={section.id}
-              className="scroll-mt-20"
-              aria-labelledby={`${section.id}-heading`}
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0">
-                  <Icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                </div>
-                <div>
-                  <h2
-                    id={`${section.id}-heading`}
-                    className="text-2xl font-bold text-gray-900 dark:text-white"
-                  >
-                    {section.title}
-                  </h2>
-                  <p className="mt-2 text-gray-600 dark:text-slate-300 leading-relaxed">
-                    {section.description}
-                  </p>
-                </div>
-              </div>
-              <ul className="ml-16 space-y-2">
-                {section.items.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-gray-700 dark:text-white"
-                  >
-                    <ShieldCheck
-                      className="h-4 w-4 text-green-500 mt-1 flex-shrink-0 dark:text-green-400"
+        {/* Sections */}
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+          {SECTIONS.map((section) => {
+            const Icon = section.icon;
+            return (
+              <section
+                key={section.id}
+                id={section.id}
+                className="scroll-mt-20"
+                aria-labelledby={`${section.id}-heading`}
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0">
+                    <Icon
+                      className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
                       aria-hidden="true"
                     />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })}
+                  </div>
+                  <div>
+                    <h2
+                      id={`${section.id}-heading`}
+                      className="text-2xl font-bold text-gray-900 dark:text-white"
+                    >
+                      {section.title}
+                    </h2>
+                    <p className="mt-2 text-gray-600 dark:text-slate-300 leading-relaxed">
+                      {section.description}
+                    </p>
+                  </div>
+                </div>
+                <ul className="ml-16 space-y-2">
+                  {section.items.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-2 text-gray-700 dark:text-white"
+                    >
+                      <ShieldCheck
+                        className="h-4 w-4 text-green-500 mt-1 flex-shrink-0 dark:text-green-400"
+                        aria-hidden="true"
+                      />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
 
-        {/* Download Documents */}
-        <section
-          id="downloads"
-          className="scroll-mt-20 py-12 border-t border-gray-200 dark:border-slate-700"
-          aria-labelledby="downloads-heading"
-        >
-          <h2
-            id="downloads-heading"
-            className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
+          {/* Download Documents */}
+          <section
+            id="downloads"
+            className="scroll-mt-20 py-12 border-t border-gray-200 dark:border-slate-700"
+            aria-labelledby="downloads-heading"
           >
-            Download Compliance Documents
-          </h2>
-          <p className="text-gray-600 dark:text-slate-300 mb-6">
-            Share these with your procurement or IT security team.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a
-              href="/compliance/EduSphere-VPAT-2.5.html"
-              download="EduSphere-VPAT-2.5.html"
-              className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
+            <h2
+              id="downloads-heading"
+              className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
             >
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                <Download className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-              </div>
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white block">
-                  VPAT 2.5 (Section 508)
-                </span>
-                <span className="text-sm text-gray-500 dark:text-slate-400">
-                  Voluntary Product Accessibility Template — WCAG 2.2 AA
-                </span>
-              </div>
-            </a>
-            <a
-              href="/compliance/EduSphere-HECVAT-Lite-2026.html"
-              download="EduSphere-HECVAT-Lite-2026.html"
-              className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
-            >
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                <Download className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-              </div>
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white block">
-                  HECVAT Lite
-                </span>
-                <span className="text-sm text-gray-500 dark:text-slate-400">
-                  Higher Education Vendor Assessment — Security &amp; Data
-                </span>
-              </div>
-            </a>
-          </div>
-        </section>
+              Download Compliance Documents
+            </h2>
+            <p className="text-gray-600 dark:text-slate-300 mb-6">
+              Share these with your procurement or IT security team.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <a
+                href="/compliance/EduSphere-VPAT-2.5.html"
+                download="EduSphere-VPAT-2.5.html"
+                className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
+              >
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                  <Download
+                    className="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white block">
+                    VPAT 2.5 (Section 508)
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
+                    Voluntary Product Accessibility Template — WCAG 2.2 AA
+                  </span>
+                </div>
+              </a>
+              <a
+                href="/compliance/EduSphere-HECVAT-Lite-2026.html"
+                download="EduSphere-HECVAT-Lite-2026.html"
+                className="flex items-center gap-4 p-5 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-colors group"
+              >
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                  <Download
+                    className="h-5 w-5 text-indigo-600 dark:text-indigo-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white block">
+                    HECVAT Lite
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
+                    Higher Education Vendor Assessment — Security &amp; Data
+                  </span>
+                </div>
+              </a>
+            </div>
+          </section>
 
-        {/* CTA */}
-        <div className="text-center py-12 border-t border-gray-200 dark:border-slate-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Ready to learn more?
-          </h2>
-          <p className="text-gray-600 dark:text-slate-300 mb-6">
-            Contact our team for a detailed security review or to request our SOC
-            2 report.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              to="/contact"
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium dark:bg-indigo-500 dark:text-white"
-            >
-              Contact Sales
-            </Link>
-            <Link
-              to="/pilot"
-              className="px-6 py-3 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors font-medium"
-            >
-              Start Free Pilot
-            </Link>
+          {/* CTA */}
+          <div className="text-center py-12 border-t border-gray-200 dark:border-slate-700">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Ready to learn more?
+            </h2>
+            <p className="text-gray-600 dark:text-slate-300 mb-6">
+              Contact our team for a detailed security review or to request our
+              SOC 2 report.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link
+                to="/contact"
+                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium dark:bg-indigo-500 dark:text-white"
+              >
+                Contact Sales
+              </Link>
+              <Link
+                to="/pilot"
+                className="px-6 py-3 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors font-medium"
+              >
+                Start Free Pilot
+              </Link>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
       </div>
     </PublicLayout>
   );

@@ -39,7 +39,12 @@ export const WithLabel: Story = {
 export const SettingsGroup: Story = {
   render: () => (
     <div className="space-y-4 w-72">
-      {['Dark mode', 'Email notifications', 'Push notifications', 'Auto-save'].map((label) => (
+      {[
+        'Dark mode',
+        'Email notifications',
+        'Push notifications',
+        'Auto-save',
+      ].map((label) => (
         <div key={label} className="flex items-center justify-between">
           <Label>{label}</Label>
           <Switch />

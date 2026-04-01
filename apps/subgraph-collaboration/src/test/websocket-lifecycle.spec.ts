@@ -46,9 +46,19 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((col, val) => ({ col, val, op: 'eq' })),
   and: vi.fn((...conditions: unknown[]) => ({ conditions, op: 'and' })),
   desc: vi.fn((col: string) => ({ col, order: 'desc' })),
-  inArray: vi.fn((col: string, vals: string[]) => ({ col, vals, op: 'inArray' })),
+  inArray: vi.fn((col: string, vals: string[]) => ({
+    col,
+    vals,
+    op: 'inArray',
+  })),
   sql: vi.fn(() => ({ raw: true })),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, callback: (tx: typeof mockTx) => unknown) => callback(mockTx)),
+  withTenantContext: vi.fn(
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      callback: (tx: typeof mockTx) => unknown
+    ) => callback(mockTx)
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -103,7 +113,9 @@ function setupSelectChainMulti(results: unknown[][]) {
     const result = results[callCount] ?? results[results.length - 1];
     callCount++;
     const limitFn = vi.fn(() => {
-      const p = Promise.resolve(result) as Promise<unknown[]> & { offset: ReturnType<typeof vi.fn> };
+      const p = Promise.resolve(result) as Promise<unknown[]> & {
+        offset: ReturnType<typeof vi.fn>;
+      };
       p.offset = vi.fn(() => Promise.resolve(result));
       return p;
     });
@@ -154,7 +166,9 @@ describe('WebSocket Lifecycle — participant join/leave/reconnect', () => {
   it('multiple participants are tracked independently', async () => {
     // Both users join — each call: findDiscussion + check existing
     setupSelectChainMulti([[MOCK_DISCUSSION], []]);
-    const mockPV1 = vi.fn().mockResolvedValue([{ discussion_id: 'disc-1', user_id: 'user-2' }]);
+    const mockPV1 = vi
+      .fn()
+      .mockResolvedValue([{ discussion_id: 'disc-1', user_id: 'user-2' }]);
     mockInsert.mockReturnValue({ values: mockPV1 });
 
     const r1 = await service.joinDiscussion('disc-1', MOCK_AUTH_USER2);
@@ -162,7 +176,9 @@ describe('WebSocket Lifecycle — participant join/leave/reconnect', () => {
 
     vi.clearAllMocks();
     setupSelectChainMulti([[MOCK_DISCUSSION], []]);
-    const mockPV2 = vi.fn().mockResolvedValue([{ discussion_id: 'disc-1', user_id: 'user-3' }]);
+    const mockPV2 = vi
+      .fn()
+      .mockResolvedValue([{ discussion_id: 'disc-1', user_id: 'user-3' }]);
     mockInsert.mockReturnValue({ values: mockPV2 });
 
     const r2 = await service.joinDiscussion('disc-1', MOCK_AUTH_USER3);

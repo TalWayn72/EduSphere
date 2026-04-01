@@ -62,7 +62,10 @@ export function CreateLessonPage() {
   const handleCreateLesson = async () => {
     if (!courseId || !user) {
       setError('שגיאת אימות: יש להתחבר מחדש כדי ליצור שיעור');
-      console.error('[CreateLessonPage] createLesson blocked: missing courseId or user', { courseId, hasUser: Boolean(user) });
+      console.error(
+        '[CreateLessonPage] createLesson blocked: missing courseId or user',
+        { courseId, hasUser: Boolean(user) }
+      );
       return;
     }
     const { data, error: mutError } = await createLesson({
@@ -83,7 +86,11 @@ export function CreateLessonPage() {
       const msg = isNetworkErr
         ? 'שגיאת רשת: לא ניתן להתחבר לשרת. נסה שוב.'
         : rawMsg;
-      console.error('[CreateLessonPage] createLesson failed:', rawMsg, mutError);
+      console.error(
+        '[CreateLessonPage] createLesson failed:',
+        rawMsg,
+        mutError
+      );
       setError(msg);
       return;
     }
@@ -184,7 +191,9 @@ export function CreateLessonPage() {
                 data-testid="create-lesson-error"
                 role="alert"
               >
-                <p className="text-red-700 text-sm dark:text-red-300">{error}</p>
+                <p className="text-red-700 text-sm dark:text-red-300">
+                  {error}
+                </p>
                 <button
                   type="button"
                   className="text-red-600 text-xs underline mt-1 dark:text-red-400"

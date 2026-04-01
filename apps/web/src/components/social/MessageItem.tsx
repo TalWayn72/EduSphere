@@ -57,11 +57,15 @@ export default function MessageItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           {displayName && (
-            <span className="text-sm font-medium text-foreground">{displayName}</span>
+            <span className="text-sm font-medium text-foreground">
+              {displayName}
+            </span>
           )}
           <span className="text-xs text-muted-foreground">{formattedDate}</span>
         </div>
-        <p className="text-sm text-foreground whitespace-pre-wrap break-words">{message.content}</p>
+        <p className="text-sm text-foreground whitespace-pre-wrap break-words">
+          {message.content}
+        </p>
 
         {/* Actions */}
         <div className="flex items-center gap-2 mt-2">

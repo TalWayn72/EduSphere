@@ -44,7 +44,9 @@ describe('useContentMarketplace', () => {
       result.current.setSearchQuery('machine learning');
     });
     expect(result.current.filteredItems.length).toBe(1);
-    expect(result.current.filteredItems[0]?.title).toContain('Machine Learning');
+    expect(result.current.filteredItems[0]?.title).toContain(
+      'Machine Learning'
+    );
   });
 
   it('filters items by search query (description)', () => {

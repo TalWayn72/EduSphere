@@ -17,15 +17,27 @@ vi.mock('remotion', () => ({
     fps: 30,
     durationInFrames: 180,
   })),
-  AbsoluteFill: ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) =>
-    React.createElement('div', { 'data-testid': 'absolute-fill', style }, children),
+  AbsoluteFill: ({
+    children,
+    style,
+  }: {
+    children: React.ReactNode;
+    style?: React.CSSProperties;
+  }) =>
+    React.createElement(
+      'div',
+      { 'data-testid': 'absolute-fill', style },
+      children
+    ),
   spring: vi.fn(() => 0.5),
-  interpolate: vi.fn((input: number, inputRange: number[], outputRange: number[]) => {
-    const [inMin, inMax] = inputRange;
-    const [outMin, outMax] = outputRange;
-    const t = Math.max(0, Math.min(1, (input - inMin) / (inMax - inMin)));
-    return outMin + t * (outMax - outMin);
-  }),
+  interpolate: vi.fn(
+    (input: number, inputRange: number[], outputRange: number[]) => {
+      const [inMin, inMax] = inputRange;
+      const [outMin, outMax] = outputRange;
+      const t = Math.max(0, Math.min(1, (input - inMin) / (inMax - inMin)));
+      return outMin + t * (outMax - outMin);
+    }
+  ),
 }));
 
 import { ProgressJourney } from './ProgressJourney';

@@ -156,8 +156,7 @@ export function LessonPipelineBuilderPage() {
     toast.success('Lesson plan published');
   }
 
-  const displayedSteps =
-    activePlan?.steps.map((s) => s.stepType) ?? localSteps;
+  const displayedSteps = activePlan?.steps.map((s) => s.stepType) ?? localSteps;
   const planStatus = activePlan?.status ?? (planId ? 'DRAFT' : null);
 
   if (mounted && role && !INSTRUCTOR_ROLES.has(role)) {
@@ -179,10 +178,7 @@ export function LessonPipelineBuilderPage() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1
-              className="text-2xl font-bold"
-              data-testid="builder-heading"
-            >
+            <h1 className="text-2xl font-bold" data-testid="builder-heading">
               Lesson Pipeline Builder
             </h1>
             {courseId && (

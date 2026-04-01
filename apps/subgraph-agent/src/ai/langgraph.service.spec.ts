@@ -99,7 +99,9 @@ describe('LangGraphService', () => {
   it('trims MemorySaver storage when it exceeds max sessions', async () => {
     delete process.env.DATABASE_URL;
     await service.onModuleInit();
-    const saver = service.getCheckpointer() as unknown as { storage: Map<string, unknown> };
+    const saver = service.getCheckpointer() as unknown as {
+      storage: Map<string, unknown>;
+    };
     // Fill beyond max (3)
     for (let i = 0; i < 5; i++) saver.storage.set(`session-${i}`, {});
     expect(saver.storage.size).toBe(5);

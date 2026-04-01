@@ -230,7 +230,11 @@ async function doLogin(
   await keycloakLogin(page, email, password);
 
   // Wait for redirect back to app
-  await page.waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 20000 }).catch(() => {});
+  await page
+    .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), {
+      timeout: 20000,
+    })
+    .catch(() => {});
   await page.waitForLoadState('domcontentloaded').catch(() => {});
   await page.waitForTimeout(500);
 
@@ -246,7 +250,9 @@ async function doLogin(
       await page.waitForTimeout(500);
       await keycloakLogin(page, email, password);
       await page
-        .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 20000 })
+        .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), {
+          timeout: 20000,
+        })
         .catch(() => {});
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
@@ -371,7 +377,8 @@ test('S1.02 — Student login via Keycloak', async ({ page }) => {
   entry.screenshot = await snap(page, 'S1.02-student-after-login');
 
   const isOnApp =
-    page.url().includes(BASE.replace(/https?:\/\//, '').split('/')[0]) && !page.url().includes('/login');
+    page.url().includes(BASE.replace(/https?:\/\//, '').split('/')[0]) &&
+    !page.url().includes('/login');
   const isOnLogin = page.url().includes('/login');
 
   if (isOnApp) {

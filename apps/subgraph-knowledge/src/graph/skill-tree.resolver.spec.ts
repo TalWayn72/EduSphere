@@ -64,9 +64,9 @@ describe('SkillTreeResolver', () => {
     });
 
     it('throws UnauthorizedException when authContext missing', async () => {
-      await expect(
-        resolver.skillTree('course-1', {} as never)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.skillTree('course-1', {} as never)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 

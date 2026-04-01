@@ -65,7 +65,9 @@ export default function AIChatScreen({ route }: Props) {
         setMessages((prev) => [...prev, aiMsg]);
       }
     } catch (error: unknown) {
-      const gqlError = error as { graphQLErrors?: Array<{ extensions?: { code?: string } }> };
+      const gqlError = error as {
+        graphQLErrors?: Array<{ extensions?: { code?: string } }>;
+      };
       const consentErr = gqlError?.graphQLErrors?.find(
         (e) => e.extensions?.code === 'CONSENT_REQUIRED'
       );

@@ -64,14 +64,21 @@ export class TranscriptionService {
       );
 
       await this.helpers.uploadVtt(
-        assetId, courseId, tenantId, transcriptId,
-        result.language ?? 'en', result.segments
+        assetId,
+        courseId,
+        tenantId,
+        transcriptId,
+        result.language ?? 'en',
+        result.segments
       );
 
       await this.helpers.updateAssetStatus(assetId, 'COMPLETED');
 
       const completedEvent: TranscriptionCompletedEvent = {
-        assetId, courseId, tenantId, transcriptId,
+        assetId,
+        courseId,
+        tenantId,
+        transcriptId,
         segmentCount: result.segments.length,
         language: result.language ?? 'en',
       };
@@ -84,15 +91,25 @@ export class TranscriptionService {
       );
 
       this.requestEmbeddings(transcriptId, segmentIds, tenantId);
-      this.requestTranslation(transcriptId, assetId, courseId, tenantId, result.language ?? 'en');
+      this.requestTranslation(
+        transcriptId,
+        assetId,
+        courseId,
+        tenantId,
+        result.language ?? 'en'
+      );
       this.requestConceptExtraction(result.text, courseId, tenantId, assetId);
       this.requestHlsTranscode(fileKey, tenantId, courseId, assetId);
     } catch (err) {
       this.logger.error(`Transcription failed for assetId=${assetId}`, err);
-      await this.helpers.updateAssetStatus(assetId, 'FAILED').catch(() => undefined);
+      await this.helpers
+        .updateAssetStatus(assetId, 'FAILED')
+        .catch(() => undefined);
 
       const failedEvent: TranscriptionFailedEvent = {
-        assetId, courseId, tenantId,
+        assetId,
+        courseId,
+        tenantId,
         error: err instanceof Error ? err.message : String(err),
       };
       await this.natsService.publish(
@@ -110,42 +127,85 @@ export class TranscriptionService {
 
   // ─── Non-blocking fire-and-forget steps ─────────────────────────────────
 
-  private requestEmbeddings(transcriptId: string, segmentIds: string[], tenantId: string): void {
+  private requestEmbeddings(
+    transcriptId: string,
+    segmentIds: string[],
+    tenantId: string
+  ): void {
     if (segmentIds.length === 0) return;
-    const embeddingEvent: EmbeddingRequestedEvent = { transcriptId, segmentIds, tenantId };
+    const embeddingEvent: EmbeddingRequestedEvent = {
+      transcriptId,
+      segmentIds,
+      tenantId,
+    };
     this.natsService
-      .publish('transcription.embedding.requested', embeddingEvent as unknown as Record<string, unknown>)
-      .then(() => this.logger.log(`Embedding requested: transcriptId=${transcriptId} segments=${segmentIds.length}`))
-      .catch((err) => this.logger.error({ err }, 'Embedding request failed (non-fatal)'));
+      .publish(
+        'transcription.embedding.requested',
+        embeddingEvent as unknown as Record<string, unknown>
+      )
+      .then(() =>
+        this.logger.log(
+          `Embedding requested: transcriptId=${transcriptId} segments=${segmentIds.length}`
+        )
+      )
+      .catch((err) =>
+        this.logger.error({ err }, 'Embedding request failed (non-fatal)')
+      );
   }
 
   private requestTranslation(
-    transcriptId: string, assetId: string, courseId: string,
-    tenantId: string, language: string
+    transcriptId: string,
+    assetId: string,
+    courseId: string,
+    tenantId: string,
+    language: string
   ): void {
     this.translationService
       .translateTranscript(transcriptId, assetId, courseId, tenantId, language)
-      .catch((err) => this.logger.error({ err, assetId }, 'Subtitle translation error (non-fatal)'));
+      .catch((err) =>
+        this.logger.error(
+          { err, assetId },
+          'Subtitle translation error (non-fatal)'
+        )
+      );
   }
 
   private requestConceptExtraction(
-    fullText: string, courseId: string, tenantId: string, assetId: string
+    fullText: string,
+    courseId: string,
+    tenantId: string,
+    assetId: string
   ): void {
     this.helpers
       .extractAndPublishConcepts(fullText, courseId, tenantId)
-      .catch((err) => this.logger.error({ err, assetId }, 'Concept pipeline error (non-fatal)'));
+      .catch((err) =>
+        this.logger.error(
+          { err, assetId },
+          'Concept pipeline error (non-fatal)'
+        )
+      );
   }
 
   private requestHlsTranscode(
-    fileKey: string, tenantId: string, courseId: string, assetId: string
+    fileKey: string,
+    tenantId: string,
+    courseId: string,
+    assetId: string
   ): void {
     this.hlsService
       .transcodeToHls(fileKey, `${tenantId}/${courseId}/${assetId}/hls`)
       .then(async (hlsResult) => {
         if (!hlsResult) return;
-        this.logger.log(`HLS transcode complete: assetId=${assetId} manifest=${hlsResult.manifestKey}`);
-        await this.helpers.updateAssetHlsManifest(assetId, hlsResult.manifestKey);
+        this.logger.log(
+          `HLS transcode complete: assetId=${assetId} manifest=${hlsResult.manifestKey}`
+        );
+        await this.helpers.updateAssetHlsManifest(
+          assetId,
+          hlsResult.manifestKey
+        );
       })
-      .catch((err) => this.logger.error({ err, assetId }, 'HLS transcode failed (non-fatal)'));
+      .catch((err) =>
+        this.logger.error({ err, assetId }, 'HLS transcode failed (non-fatal)')
+      );
   }
 }

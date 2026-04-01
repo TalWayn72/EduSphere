@@ -45,7 +45,10 @@ vi.mock('@/components/ui/dialog', () => ({
   DialogTitle: ({ children }: { children: React.ReactNode }) => (
     <h2>{children}</h2>
   ),
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
 }));
@@ -63,7 +66,8 @@ beforeEach(() => {
   // Use mockImplementation (not mockReturnValueOnce) so re-renders don't exhaust the queue
   vi.mocked(urql.useMutation).mockImplementation((mutation: unknown) => {
     const key = String(mutation);
-    if (key.includes('CREATE')) return [{ fetching: false }, mockCreateCampaign] as never;
+    if (key.includes('CREATE'))
+      return [{ fetching: false }, mockCreateCampaign] as never;
     if (key.includes('ACTIVATE')) return [{}, mockActivate] as never;
     if (key.includes('COMPLETE')) return [{}, mockComplete] as never;
     return [{ fetching: false }, vi.fn()] as never;

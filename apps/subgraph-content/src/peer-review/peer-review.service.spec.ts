@@ -10,10 +10,7 @@ import { PeerReviewService } from './peer-review.service.js';
 // ---------------------------------------------------------------------------
 // Hoist mock factories
 // ---------------------------------------------------------------------------
-const {
-  mockCloseAllPools,
-  mockWithTenantContext,
-} = vi.hoisted(() => ({
+const { mockCloseAllPools, mockWithTenantContext } = vi.hoisted(() => ({
   mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
   mockWithTenantContext: vi.fn(),
 }));
@@ -23,7 +20,11 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: mockCloseAllPools,
   withTenantContext: mockWithTenantContext,
   schema: {
-    peerReviewRubrics: { id: 'id', contentItemId: 'contentItemId', tenantId: 'tenantId' },
+    peerReviewRubrics: {
+      id: 'id',
+      contentItemId: 'contentItemId',
+      tenantId: 'tenantId',
+    },
     peerReviewAssignments: {
       id: 'id',
       contentItemId: 'contentItemId',
@@ -58,7 +59,11 @@ const REVIEWER_ID = 'user-222';
 const CONTENT_ITEM_ID = 'content-xyz';
 const ASSIGNMENT_ID = 'assign-001';
 
-const baseCtx = { tenantId: TENANT_ID, userId: USER_ID, userRole: 'STUDENT' as const };
+const baseCtx = {
+  tenantId: TENANT_ID,
+  userId: USER_ID,
+  userRole: 'STUDENT' as const,
+};
 
 const makeAssignment = (overrides = {}) => ({
   id: ASSIGNMENT_ID,
@@ -79,7 +84,9 @@ const makeRubric = (overrides = {}) => ({
   id: 'rubric-001',
   tenantId: TENANT_ID,
   contentItemId: CONTENT_ITEM_ID,
-  criteria: [{ id: 'c1', label: 'Clarity', description: 'Is it clear?', maxScore: 5 }],
+  criteria: [
+    { id: 'c1', label: 'Clarity', description: 'Is it clear?', maxScore: 5 },
+  ],
   minReviewers: 3,
   isAnonymous: false,
   createdAt: new Date(),
@@ -102,10 +109,16 @@ describe('PeerReviewService', () => {
   // ── 1. getMyAssignmentsToReview ──────────────────────────────────────────
 
   it('returns only PENDING assignments for the given reviewer', async () => {
-    const pending = makeAssignment({ reviewerId: REVIEWER_ID, status: 'PENDING' });
+    const pending = makeAssignment({
+      reviewerId: REVIEWER_ID,
+      status: 'PENDING',
+    });
     mockWithTenantContext.mockResolvedValueOnce([pending]);
 
-    const result = await svc.getMyAssignmentsToReview(REVIEWER_ID, { ...baseCtx, userId: REVIEWER_ID });
+    const result = await svc.getMyAssignmentsToReview(REVIEWER_ID, {
+      ...baseCtx,
+      userId: REVIEWER_ID,
+    });
 
     expect(result).toHaveLength(1);
     expect(result[0]!.status).toBe('PENDING');
@@ -115,7 +128,10 @@ describe('PeerReviewService', () => {
   it('returns empty array when reviewer has no PENDING assignments', async () => {
     mockWithTenantContext.mockResolvedValueOnce([]);
 
-    const result = await svc.getMyAssignmentsToReview(REVIEWER_ID, { ...baseCtx, userId: REVIEWER_ID });
+    const result = await svc.getMyAssignmentsToReview(REVIEWER_ID, {
+      ...baseCtx,
+      userId: REVIEWER_ID,
+    });
 
     expect(result).toEqual([]);
   });
@@ -128,7 +144,13 @@ describe('PeerReviewService', () => {
     mockWithTenantContext.mockResolvedValueOnce([assignment]);
 
     await expect(
-      svc.submitReview(ASSIGNMENT_ID, REVIEWER_ID, '{"c1":4}', 'Good work', baseCtx),
+      svc.submitReview(
+        ASSIGNMENT_ID,
+        REVIEWER_ID,
+        '{"c1":4}',
+        'Good work',
+        baseCtx
+      )
     ).rejects.toThrow(UnauthorizedException);
   });
 
@@ -136,7 +158,13 @@ describe('PeerReviewService', () => {
     mockWithTenantContext.mockResolvedValueOnce([]); // empty rows
 
     await expect(
-      svc.submitReview('nonexistent', REVIEWER_ID, '{"c1":4}', 'feedback', baseCtx),
+      svc.submitReview(
+        'nonexistent',
+        REVIEWER_ID,
+        '{"c1":4}',
+        'feedback',
+        baseCtx
+      )
     ).rejects.toThrow(NotFoundException);
   });
 
@@ -145,8 +173,8 @@ describe('PeerReviewService', () => {
   it('updates status to SUBMITTED when reviewerId matches', async () => {
     const assignment = makeAssignment({ reviewerId: REVIEWER_ID });
     mockWithTenantContext
-      .mockResolvedValueOnce([assignment])         // fetch assignment
-      .mockResolvedValueOnce([])                   // update (returning nothing)
+      .mockResolvedValueOnce([assignment]) // fetch assignment
+      .mockResolvedValueOnce([]) // update (returning nothing)
       .mockResolvedValueOnce([{ ...assignment, status: 'SUBMITTED' }]); // completion check
 
     const result = await svc.submitReview(
@@ -154,7 +182,7 @@ describe('PeerReviewService', () => {
       REVIEWER_ID,
       '{"c1":4}',
       'Well done',
-      { ...baseCtx, userId: REVIEWER_ID },
+      { ...baseCtx, userId: REVIEWER_ID }
     );
 
     expect(result).toBe(true);
@@ -189,7 +217,9 @@ describe('PeerReviewService', () => {
 
     const input = {
       contentItemId: CONTENT_ITEM_ID,
-      criteria: JSON.stringify([{ id: 'c1', label: 'Clarity', description: 'desc', maxScore: 5 }]),
+      criteria: JSON.stringify([
+        { id: 'c1', label: 'Clarity', description: 'desc', maxScore: 5 },
+      ]),
     };
     const result = await svc.createRubric(input, baseCtx);
 
@@ -220,7 +250,7 @@ describe('PeerReviewService', () => {
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenantId: TENANT_ID }),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -230,13 +260,13 @@ describe('PeerReviewService', () => {
 
     await svc.createRubric(
       { contentItemId: CONTENT_ITEM_ID, criteria: '[]' },
-      baseCtx,
+      baseCtx
     );
 
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenantId: TENANT_ID }),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -268,7 +298,12 @@ describe('PeerReviewService', () => {
     // userCourses enrollment query — only submitter
     mockWithTenantContext.mockResolvedValueOnce([{ userId: USER_ID }]);
 
-    const result = await svc.createAssignment(CONTENT_ITEM_ID, USER_ID, 'text', baseCtx);
+    const result = await svc.createAssignment(
+      CONTENT_ITEM_ID,
+      USER_ID,
+      'text',
+      baseCtx
+    );
 
     expect(result).toEqual([]);
   });

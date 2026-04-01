@@ -271,9 +271,7 @@ describe('MyOpenBadgesPage', () => {
   it('renders error message when query returns an error', () => {
     mockQuery({ error: { message: 'Network error' } });
     renderPage();
-    expect(
-      screen.getByText(/Failed to load badges/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Failed to load badges/i)).toBeInTheDocument();
   });
 
   it('does not render badge cards when error is set', () => {

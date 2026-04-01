@@ -60,10 +60,13 @@ describe('KeycloakAdminHttpService', () => {
 
   describe('findGroupByName', () => {
     it('returns matching group', async () => {
-      globalThis.fetch = vi.fn()
+      globalThis.fetch = vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: vi.fn().mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
+          json: vi
+            .fn()
+            .mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -77,10 +80,13 @@ describe('KeycloakAdminHttpService', () => {
     });
 
     it('returns null when no group matches', async () => {
-      globalThis.fetch = vi.fn()
+      globalThis.fetch = vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: vi.fn().mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
+          json: vi
+            .fn()
+            .mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -93,26 +99,32 @@ describe('KeycloakAdminHttpService', () => {
 
   describe('findUserByEmail', () => {
     it('returns the first matched user', async () => {
-      globalThis.fetch = vi.fn()
+      globalThis.fetch = vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: vi.fn().mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
+          json: vi
+            .fn()
+            .mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: vi.fn().mockResolvedValue([
-            { id: 'u1', email: 'a@b.com', enabled: true },
-          ]),
+          json: vi
+            .fn()
+            .mockResolvedValue([{ id: 'u1', email: 'a@b.com', enabled: true }]),
         }) as any;
       const user = await service.findUserByEmail('a@b.com');
       expect(user).toEqual({ id: 'u1', email: 'a@b.com', enabled: true });
     });
 
     it('returns null when no user matches', async () => {
-      globalThis.fetch = vi.fn()
+      globalThis.fetch = vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: vi.fn().mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
+          json: vi
+            .fn()
+            .mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -125,10 +137,13 @@ describe('KeycloakAdminHttpService', () => {
 
   describe('sendPasswordResetEmail', () => {
     it('calls Keycloak execute-actions-email endpoint', async () => {
-      globalThis.fetch = vi.fn()
+      globalThis.fetch = vi
+        .fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: vi.fn().mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
+          json: vi
+            .fn()
+            .mockResolvedValue({ access_token: 'tok', expires_in: 300 }),
         })
         .mockResolvedValueOnce({ ok: true }) as any;
       await service.sendPasswordResetEmail('user-123');
@@ -141,10 +156,23 @@ describe('KeycloakAdminHttpService', () => {
 
   describe('fetchWithRetry', () => {
     it('retries on 500 errors up to MAX_RETRIES', async () => {
-      globalThis.fetch = vi.fn()
-        .mockResolvedValueOnce({ ok: false, status: 500, text: vi.fn().mockResolvedValue('err') })
-        .mockResolvedValueOnce({ ok: false, status: 500, text: vi.fn().mockResolvedValue('err') })
-        .mockResolvedValueOnce({ ok: false, status: 500, text: vi.fn().mockResolvedValue('err') }) as any;
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: vi.fn().mockResolvedValue('err'),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: vi.fn().mockResolvedValue('err'),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: vi.fn().mockResolvedValue('err'),
+        }) as any;
       await expect(
         service.fetchWithRetry('http://kc:8080/test', {})
       ).rejects.toThrow(InternalServerErrorException);
@@ -160,7 +188,8 @@ describe('KeycloakAdminHttpService', () => {
     });
 
     it('retries on network errors', async () => {
-      globalThis.fetch = vi.fn()
+      globalThis.fetch = vi
+        .fn()
         .mockRejectedValueOnce(new Error('ECONNREFUSED'))
         .mockResolvedValueOnce({ ok: true }) as any;
       const res = await service.fetchWithRetry('http://kc:8080/test', {});

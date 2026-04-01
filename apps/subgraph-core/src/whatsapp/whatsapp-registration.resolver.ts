@@ -14,7 +14,9 @@ interface GraphQLContext {
 
 @Resolver()
 export class WhatsAppRegistrationResolver {
-  constructor(private readonly registrationService: WhatsAppRegistrationService) {}
+  constructor(
+    private readonly registrationService: WhatsAppRegistrationService
+  ) {}
 
   @Mutation('registerWhatsApp')
   async registerWhatsApp(

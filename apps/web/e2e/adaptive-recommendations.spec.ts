@@ -24,7 +24,9 @@ test.describe('Adaptive Recommendations — DEV_MODE', () => {
     await login(page);
   });
 
-  test('no [object Object] serialization in dashboard DOM', async ({ page }) => {
+  test('no [object Object] serialization in dashboard DOM', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 

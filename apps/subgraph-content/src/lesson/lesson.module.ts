@@ -43,6 +43,13 @@ import { LessonPipelineTemplateResolver } from './lesson-pipeline-template.resol
     LessonPipelineTemplateService,
     LessonPipelineTemplateResolver,
   ],
-  exports: [LessonService, LessonQueryService, LessonAssetService, LessonPipelineService, LessonPlanService, LessonPipelineTemplateService],
+  exports: [
+    LessonService,
+    LessonQueryService,
+    LessonAssetService,
+    LessonPipelineService,
+    LessonPlanService,
+    LessonPipelineTemplateService,
+  ],
 })
 export class LessonModule {}

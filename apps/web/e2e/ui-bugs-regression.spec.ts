@@ -38,14 +38,16 @@ import { BASE_URL, IS_DEV_MODE, TEST_USERS } from './env';
 // ── BUG-001: Missing nav translation keys ─────────────────────────────────────
 
 test.describe('BUG-001: sidebar nav shows translated labels, not raw i18n keys', () => {
-  test('raw key names must never appear in the sidebar text', async ({ page }) => {
+  test('raw key names must never appear in the sidebar text', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
-    const sidebarText = await sidebar.textContent() ?? '';
+    const sidebarText = (await sidebar.textContent()) ?? '';
 
     // Every key in this list was once missing from nav.json and appeared verbatim
     const RAW_KEYS = [
@@ -61,19 +63,21 @@ test.describe('BUG-001: sidebar nav shows translated labels, not raw i18n keys',
     for (const key of RAW_KEYS) {
       expect(
         sidebarText,
-        `Raw i18n key "${key}" must not appear in sidebar — add it to nav.json`,
+        `Raw i18n key "${key}" must not appear in sidebar — add it to nav.json`
       ).not.toContain(key);
     }
   });
 
-  test('human-readable English labels appear in the sidebar', async ({ page }) => {
+  test('human-readable English labels appear in the sidebar', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
-    const sidebarText = await sidebar.textContent() ?? '';
+    const sidebarText = (await sidebar.textContent()) ?? '';
 
     // These are the expected English translations for the formerly-missing keys
     const EXPECTED_LABELS = [
@@ -85,20 +89,27 @@ test.describe('BUG-001: sidebar nav shows translated labels, not raw i18n keys',
     for (const label of EXPECTED_LABELS) {
       expect(
         sidebarText,
-        `Expected translated label "${label}" must appear in sidebar`,
+        `Expected translated label "${label}" must appear in sidebar`
       ).toContain(label);
     }
   });
 
-  test('sidebar nav items are visually rendered as links (not plain text)', async ({ page }) => {
+  test('sidebar nav items are visually rendered as links (not plain text)', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
     // At least one nav <a> or nav button must be present inside the sidebar
-    const navLinks = page.locator('[data-testid="app-sidebar"] a, [data-testid="app-sidebar"] nav button');
+    const navLinks = page.locator(
+      '[data-testid="app-sidebar"] a, [data-testid="app-sidebar"] nav button'
+    );
     const count = await navLinks.count();
-    expect(count, 'Sidebar must contain at least one nav link or button').toBeGreaterThan(0);
+    expect(
+      count,
+      'Sidebar must contain at least one nav link or button'
+    ).toBeGreaterThan(0);
   });
 });
 
@@ -114,16 +125,19 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
     const logoFallback = page.locator('[data-testid="sidebar-logo-fallback"]');
 
     const imgExists = (await logoImg.count()) > 0;
-    const imgVisible = imgExists && (await logoImg.isVisible().catch(() => false));
+    const imgVisible =
+      imgExists && (await logoImg.isVisible().catch(() => false));
     const fallbackVisible = await logoFallback.isVisible().catch(() => false);
 
     expect(
       imgVisible || fallbackVisible,
-      'Either the logo <img> or the fallback div must be visible in the sidebar',
+      'Either the logo <img> or the fallback div must be visible in the sidebar'
     ).toBe(true);
   });
 
-  test('if logo img is visible it must not be a broken image (naturalWidth > 0)', async ({ page }) => {
+  test('if logo img is visible it must not be a broken image (naturalWidth > 0)', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -133,13 +147,18 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
 
     if (imgVisible) {
       const naturalWidth = await logoImg.evaluate(
-        (el) => (el as HTMLImageElement).naturalWidth,
+        (el) => (el as HTMLImageElement).naturalWidth
       );
-      expect(naturalWidth, 'Logo image must load successfully (naturalWidth > 0)').toBeGreaterThan(0);
+      expect(
+        naturalWidth,
+        'Logo image must load successfully (naturalWidth > 0)'
+      ).toBeGreaterThan(0);
     }
   });
 
-  test('logo fallback is shown and img hidden when logo.svg returns 404', async ({ page }) => {
+  test('logo fallback is shown and img hidden when logo.svg returns 404', async ({
+    page,
+  }) => {
     // Intercept the logo request and return 404 to simulate missing asset
     await page.route('**/logo.svg', async (route) => {
       await route.fulfill({ status: 404, body: 'Not Found' });
@@ -163,7 +182,7 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
     // At least one of these must be true: img hidden (good onerror handling) OR fallback shown
     expect(
       fallbackVisible || !imgVisible,
-      'When logo.svg is 404, fallback must be visible OR broken img must be hidden',
+      'When logo.svg is 404, fallback must be visible OR broken img must be hidden'
     ).toBe(true);
   });
 });
@@ -171,7 +190,9 @@ test.describe('BUG-002: sidebar logo renders correctly', () => {
 // ── BUG-003: Main content overlaps sidebar ────────────────────────────────────
 
 test.describe('BUG-003: main content layout does not overlap sidebar', () => {
-  test('main content left edge is at or after sidebar right edge', async ({ page }) => {
+  test('main content left edge is at or after sidebar right edge', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -187,12 +208,14 @@ test.describe('BUG-003: main content layout does not overlap sidebar', () => {
       const mainLeft = Math.round(mainBox.x);
       expect(
         mainLeft,
-        `Main content left (${mainLeft}px) must be ≥ sidebar right (${sidebarRight}px)`,
+        `Main content left (${mainLeft}px) must be ≥ sidebar right (${sidebarRight}px)`
       ).toBeGreaterThanOrEqual(sidebarRight - 5); // 5px tolerance for sub-pixel rounding
     }
   });
 
-  test('main content does not overlap sidebar on courses page', async ({ page }) => {
+  test('main content does not overlap sidebar on courses page', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -208,7 +231,7 @@ test.describe('BUG-003: main content layout does not overlap sidebar', () => {
       const mainLeft = Math.round(mainBox.x);
       expect(
         mainLeft,
-        `Main content left (${mainLeft}px) must be ≥ sidebar right (${sidebarRight}px) on /courses`,
+        `Main content left (${mainLeft}px) must be ≥ sidebar right (${sidebarRight}px) on /courses`
       ).toBeGreaterThanOrEqual(sidebarRight - 5);
     }
   });
@@ -217,7 +240,9 @@ test.describe('BUG-003: main content layout does not overlap sidebar', () => {
 // ── BUG-004: SRS review page exposes raw [GraphQL] error string ───────────────
 
 test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', () => {
-  test('exact urql error string "[GraphQL] Unexpected error." is not visible', async ({ page }) => {
+  test('exact urql error string "[GraphQL] Unexpected error." is not visible', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('DueReviews') || body.includes('dueReviews')) {
@@ -239,18 +264,23 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     // Give React time to process the error response
     await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
-    expect(bodyText, 'Raw urql error string "[GraphQL] Unexpected error." must not appear in DOM').not.toContain(
-      '[GraphQL] Unexpected error.',
-    );
+    expect(
+      bodyText,
+      'Raw urql error string "[GraphQL] Unexpected error." must not appear in DOM'
+    ).not.toContain('[GraphQL] Unexpected error.');
   });
 
-  test('error state on SRS page uses friendly message, not raw error.message', async ({ page }) => {
+  test('error state on SRS page uses friendly message, not raw error.message', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('DueReviews') || body.includes('dueReviews')) {
@@ -258,7 +288,12 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
-            errors: [{ message: 'Unexpected error.', extensions: { code: 'INTERNAL_ERROR' } }],
+            errors: [
+              {
+                message: 'Unexpected error.',
+                extensions: { code: 'INTERNAL_ERROR' },
+              },
+            ],
           }),
         });
         return;
@@ -267,7 +302,9 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForLoadState('domcontentloaded');
 
@@ -278,17 +315,26 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
     for (const el of [errorState, errorMsg]) {
       const visible = await el.isVisible().catch(() => false);
       if (visible) {
-        const text = await el.textContent() ?? '';
-        expect(text, 'Error state must not expose raw GraphQL error string').not.toContain('[GraphQL]');
-        expect(text, 'Error state must not expose raw "Unexpected error." string').not.toContain(
-          'Unexpected error.',
-        );
-        expect(text.length, 'Error state must contain a non-empty friendly message').toBeGreaterThan(5);
+        const text = (await el.textContent()) ?? '';
+        expect(
+          text,
+          'Error state must not expose raw GraphQL error string'
+        ).not.toContain('[GraphQL]');
+        expect(
+          text,
+          'Error state must not expose raw "Unexpected error." string'
+        ).not.toContain('Unexpected error.');
+        expect(
+          text.length,
+          'Error state must contain a non-empty friendly message'
+        ).toBeGreaterThan(5);
       }
     }
   });
 
-  test('SRS page shows no [object Object] serialization in error scenario', async ({ page }) => {
+  test('SRS page shows no [object Object] serialization in error scenario', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('DueReviews') || body.includes('dueReviews')) {
@@ -296,7 +342,12 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
-            errors: [{ message: 'Unexpected error.', extensions: { code: 'INTERNAL_ERROR' } }],
+            errors: [
+              {
+                message: 'Unexpected error.',
+                extensions: { code: 'INTERNAL_ERROR' },
+              },
+            ],
           }),
         });
         return;
@@ -305,7 +356,9 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/srs-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/srs-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
@@ -316,7 +369,9 @@ test.describe('BUG-004: SRS review page hides raw GraphQL errors from users', ()
 // ── BUG-005: Certificates page shows hardcoded English error ──────────────────
 
 test.describe('BUG-005: certificates page error state uses i18n, not raw error.message', () => {
-  test('raw "Internal server error" string is not shown to user', async ({ page }) => {
+  test('raw "Internal server error" string is not shown to user', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('MyCertificates') || body.includes('myCertificates')) {
@@ -325,7 +380,10 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
           contentType: 'application/json',
           body: JSON.stringify({
             errors: [
-              { message: 'Internal server error', extensions: { code: 'INTERNAL_ERROR' } },
+              {
+                message: 'Internal server error',
+                extensions: { code: 'INTERNAL_ERROR' },
+              },
             ],
           }),
         });
@@ -335,14 +393,19 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
-    expect(bodyText, 'Raw "Internal server error" must not appear in DOM').not.toContain(
-      'Internal server error',
+    expect(
+      bodyText,
+      'Raw "Internal server error" must not appear in DOM'
+    ).not.toContain('Internal server error');
+    expect(bodyText, 'Raw "[GraphQL]" must not appear in DOM').not.toContain(
+      '[GraphQL]'
     );
-    expect(bodyText, 'Raw "[GraphQL]" must not appear in DOM').not.toContain('[GraphQL]');
   });
 
   test('data-testid="error-message" on certificates page contains a non-empty friendly string', async ({
@@ -355,7 +418,12 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
-            errors: [{ message: 'Internal error', extensions: { code: 'INTERNAL_ERROR' } }],
+            errors: [
+              {
+                message: 'Internal error',
+                extensions: { code: 'INTERNAL_ERROR' },
+              },
+            ],
           }),
         });
         return;
@@ -364,23 +432,34 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const errorMsg = page.locator('[data-testid="error-message"]');
     const visible = await errorMsg.isVisible().catch(() => false);
 
     if (visible) {
-      const text = await errorMsg.textContent() ?? '';
-      expect(text, 'Error message must not expose raw server error string').not.toContain(
-        'Internal error',
-      );
-      expect(text, 'Error message must not expose "[GraphQL]" prefix').not.toContain('[GraphQL]');
-      expect(text.trim().length, 'Error message must not be empty').toBeGreaterThan(5);
+      const text = (await errorMsg.textContent()) ?? '';
+      expect(
+        text,
+        'Error message must not expose raw server error string'
+      ).not.toContain('Internal error');
+      expect(
+        text,
+        'Error message must not expose "[GraphQL]" prefix'
+      ).not.toContain('[GraphQL]');
+      expect(
+        text.trim().length,
+        'Error message must not be empty'
+      ).toBeGreaterThan(5);
     }
   });
 
-  test('certificates page does not show [object Object] in any error path', async ({ page }) => {
+  test('certificates page does not show [object Object] in any error path', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('MyCertificates') || body.includes('myCertificates')) {
@@ -388,7 +467,12 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
-            errors: [{ message: 'Internal error', extensions: { code: 'INTERNAL_ERROR' } }],
+            errors: [
+              {
+                message: 'Internal error',
+                extensions: { code: 'INTERNAL_ERROR' },
+              },
+            ],
           }),
         });
         return;
@@ -397,7 +481,9 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
     });
 
     await login(page);
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const bodyText = await page.content();
@@ -408,7 +494,9 @@ test.describe('BUG-005: certificates page error state uses i18n, not raw error.m
 // ── BUG-006: Language preference reverts on page reload ──────────────────────
 
 test.describe('BUG-006: language preference persists across page reloads', () => {
-  test('locale stored in localStorage survives a page reload', async ({ page }) => {
+  test('locale stored in localStorage survives a page reload', async ({
+    page,
+  }) => {
     await login(page);
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -422,8 +510,13 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    const storedLocale = await page.evaluate(() => localStorage.getItem('edusphere_locale'));
-    expect(storedLocale, 'edusphere_locale in localStorage must survive a page reload').toBe('he');
+    const storedLocale = await page.evaluate(() =>
+      localStorage.getItem('edusphere_locale')
+    );
+    expect(
+      storedLocale,
+      'edusphere_locale in localStorage must survive a page reload'
+    ).toBe('he');
   });
 
   test('locale stored in localStorage is not overwritten by a DB failure response', async ({
@@ -432,12 +525,20 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
     // Simulate the user preference DB call failing (GlobalLocaleSync fallback test)
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
-      if (body.includes('UserPreferences') || body.includes('userPreferences')) {
+      if (
+        body.includes('UserPreferences') ||
+        body.includes('userPreferences')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
-            errors: [{ message: 'Service unavailable', extensions: { code: 'SERVICE_UNAVAILABLE' } }],
+            errors: [
+              {
+                message: 'Service unavailable',
+                extensions: { code: 'SERVICE_UNAVAILABLE' },
+              },
+            ],
           }),
         });
         return;
@@ -455,14 +556,18 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
     await page.waitForLoadState('domcontentloaded');
 
     // Despite the DB call failing, localStorage must still hold 'he'
-    const storedLocale = await page.evaluate(() => localStorage.getItem('edusphere_locale'));
+    const storedLocale = await page.evaluate(() =>
+      localStorage.getItem('edusphere_locale')
+    );
     expect(
       storedLocale,
-      'edusphere_locale must not be overwritten when DB preferences call fails',
+      'edusphere_locale must not be overwritten when DB preferences call fails'
     ).toBe('he');
   });
 
-  test('after setting Hebrew locale, sidebar shows Hebrew text on next load', async ({ page }) => {
+  test('after setting Hebrew locale, sidebar shows Hebrew text on next load', async ({
+    page,
+  }) => {
     // Set Hebrew locale before app initialises
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'he');
@@ -474,7 +579,7 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
 
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
-    const sidebarText = await sidebar.textContent() ?? '';
+    const sidebarText = (await sidebar.textContent()) ?? '';
 
     // At least one common Hebrew nav label should appear when locale is 'he'
     const hasHebrew =
@@ -483,7 +588,10 @@ test.describe('BUG-006: language preference persists across page reloads', () =>
       sidebarText.includes('תעודות') ||
       sidebarText.includes('קורסים') ||
       sidebarText.includes('לוח');
-    expect(hasHebrew, 'Sidebar should show Hebrew nav labels after locale set to "he"').toBe(true);
+    expect(
+      hasHebrew,
+      'Sidebar should show Hebrew nav labels after locale set to "he"'
+    ).toBe(true);
   });
 });
 
@@ -507,18 +615,25 @@ test.describe('Cross-bug smoke: all routes are clean of raw error strings', () =
 
       const content = await page.content();
 
-      expect(content, `${route}: must not contain "[GraphQL]"`).not.toContain('[GraphQL]');
-      expect(content, `${route}: must not contain "[object Object]"`).not.toContain('[object Object]');
-      expect(content, `${route}: must not contain "Unexpected error."`).not.toContain(
-        'Unexpected error.',
+      expect(content, `${route}: must not contain "[GraphQL]"`).not.toContain(
+        '[GraphQL]'
       );
       expect(
         content,
-        `${route}: must not contain "Cannot read properties of undefined"`,
+        `${route}: must not contain "[object Object]"`
+      ).not.toContain('[object Object]');
+      expect(
+        content,
+        `${route}: must not contain "Unexpected error."`
+      ).not.toContain('Unexpected error.');
+      expect(
+        content,
+        `${route}: must not contain "Cannot read properties of undefined"`
       ).not.toContain('Cannot read properties of undefined');
-      expect(content, `${route}: must not contain "Network request failed"`).not.toContain(
-        'Network request failed',
-      );
+      expect(
+        content,
+        `${route}: must not contain "Network request failed"`
+      ).not.toContain('Network request failed');
     });
   }
 });
@@ -526,9 +641,14 @@ test.describe('Cross-bug smoke: all routes are clean of raw error strings', () =
 // ── Live backend suite ────────────────────────────────────────────────────────
 
 test.describe('UI Bugs Regression — Live backend', () => {
-  test.skip(IS_DEV_MODE, 'Set VITE_DEV_MODE=false to run live-backend regression tests');
+  test.skip(
+    IS_DEV_MODE,
+    'Set VITE_DEV_MODE=false to run live-backend regression tests'
+  );
 
-  test('BUG-001 live: student sidebar shows translated nav labels', async ({ page }) => {
+  test('BUG-001 live: student sidebar shows translated nav labels', async ({
+    page,
+  }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -536,7 +656,7 @@ test.describe('UI Bugs Regression — Live backend', () => {
     const sidebar = page.locator('[data-testid="app-sidebar"]');
     await expect(sidebar).toBeVisible();
 
-    const sidebarText = await sidebar.textContent() ?? '';
+    const sidebarText = (await sidebar.textContent()) ?? '';
     const RAW_KEYS = [
       'skillPaths',
       'socialFeed',
@@ -548,11 +668,16 @@ test.describe('UI Bugs Regression — Live backend', () => {
       'cohortInsights',
     ];
     for (const key of RAW_KEYS) {
-      expect(sidebarText, `Live: raw key "${key}" must not appear`).not.toContain(key);
+      expect(
+        sidebarText,
+        `Live: raw key "${key}" must not appear`
+      ).not.toContain(key);
     }
   });
 
-  test('BUG-003 live: main content does not overlap sidebar (student)', async ({ page }) => {
+  test('BUG-003 live: main content does not overlap sidebar (student)', async ({
+    page,
+  }) => {
     await loginViaKeycloak(page, TEST_USERS.student);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');

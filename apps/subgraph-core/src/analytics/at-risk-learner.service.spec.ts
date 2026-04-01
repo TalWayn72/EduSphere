@@ -38,41 +38,47 @@ describe('AtRiskLearnerService', () => {
   describe('computeRiskLevel (via getAtRiskLearners)', () => {
     it('should return HIGH when 2+ criteria are met', () => {
       // Access private method via prototype
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       expect(computeRiskLevel(2, 30, 10, null)).toBe('HIGH');
       expect(computeRiskLevel(3, 20, 5, null)).toBe('HIGH');
     });
 
     it('should return MEDIUM when exactly 1 criteria is met', () => {
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       expect(computeRiskLevel(1, 60, 30, new Date())).toBe('MEDIUM');
     });
 
     it('should return LOW when borderline (within 20% of threshold)', () => {
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       // Quiz pass rate between 50% and 60% (within 20% of 50 threshold)
       expect(computeRiskLevel(0, 55, 30, new Date())).toBe('LOW');
@@ -82,56 +88,71 @@ describe('AtRiskLearnerService', () => {
     });
 
     it('should handle exactly 14 days inactive threshold', () => {
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       // Exactly 14 days ago - should count as 1 criteria met
-      expect(computeRiskLevel(1, 70, 50, new Date(Date.now() - 14 * 24 * 60 * 60 * 1000))).toBe('MEDIUM');
+      expect(
+        computeRiskLevel(
+          1,
+          70,
+          50,
+          new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
+        )
+      ).toBe('MEDIUM');
     });
 
     it('should handle exactly 50% quiz pass rate threshold', () => {
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       // Exactly at 50% - borderline case
       expect(computeRiskLevel(0, 50, 30, new Date())).toBe('LOW');
     });
 
     it('should handle exactly 20% completion rate threshold', () => {
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       // Exactly at 20% - borderline case
       expect(computeRiskLevel(0, 70, 20, new Date())).toBe('LOW');
     });
 
     it('should handle null lastActive as inactive', () => {
-      const computeRiskLevel = (service as unknown as {
-        computeRiskLevel: (
-          criteriaMet: number,
-          quizPassRate: number,
-          completionRate: number,
-          lastActive: Date | null
-        ) => string;
-      }).computeRiskLevel.bind(service);
+      const computeRiskLevel = (
+        service as unknown as {
+          computeRiskLevel: (
+            criteriaMet: number,
+            quizPassRate: number,
+            completionRate: number,
+            lastActive: Date | null
+          ) => string;
+        }
+      ).computeRiskLevel.bind(service);
 
       // null lastActive with 1 criteria = MEDIUM
       expect(computeRiskLevel(1, 70, 30, null)).toBe('MEDIUM');

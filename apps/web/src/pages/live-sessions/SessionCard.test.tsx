@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 
 vi.mock('./StatusBadge', () => ({
-  StatusBadge: ({ status }: { status: string }) => <span data-testid="status-badge">{status}</span>,
+  StatusBadge: ({ status }: { status: string }) => (
+    <span data-testid="status-badge">{status}</span>
+  ),
 }));
 
 vi.mock('./helpers', () => ({
@@ -11,14 +13,28 @@ vi.mock('./helpers', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: { children: React.ReactNode } & Record<string, unknown>) =>
-    <div data-testid="session-card" onClick={props.onClick as () => void}>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Card: ({
+    children,
+    ...props
+  }: { children: React.ReactNode } & Record<string, unknown>) => (
+    <div data-testid="session-card" onClick={props.onClick as () => void}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode; variant?: string; size?: string }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+    variant?: string;
+    size?: string;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({

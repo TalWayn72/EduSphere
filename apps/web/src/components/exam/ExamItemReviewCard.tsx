@@ -23,19 +23,30 @@ interface ExamItemReviewCardProps {
 }
 
 export function ExamItemReviewCard({
-  item, index, onApprove, onEdit, onReject,
+  item,
+  index,
+  onApprove,
+  onEdit,
+  onReject,
 }: ExamItemReviewCardProps) {
   const qd = item.questionData;
   const questionText = 'question' in qd ? qd.question : '';
 
   return (
-    <Card data-testid={`review-card-${index}`} className="border-l-4 border-l-blue-400">
+    <Card
+      data-testid={`review-card-${index}`}
+      className="border-l-4 border-l-blue-400"
+    >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-3">
           <p className="text-sm font-medium leading-snug">{questionText}</p>
           <div className="flex gap-1.5 flex-shrink-0">
-            <Badge variant="secondary" className="text-xs">{item.domainTag}</Badge>
-            <Badge variant="outline" className="text-xs">{item.bloomLevel}</Badge>
+            <Badge variant="secondary" className="text-xs">
+              {item.domainTag}
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              {item.bloomLevel}
+            </Badge>
           </div>
         </div>
       </CardHeader>
@@ -81,10 +92,13 @@ function ReviewCardOptions({ questionData }: { questionData: QuizItem }) {
           <li
             key={opt.id}
             className={`text-sm px-2 py-1 rounded ${
-              isCorrect ? 'bg-green-50 text-green-800 font-medium' : 'text-muted-foreground'
+              isCorrect
+                ? 'bg-green-50 text-green-800 font-medium'
+                : 'text-muted-foreground'
             }`}
           >
-            {isCorrect ? '✓ ' : '  '}{opt.text}
+            {isCorrect ? '✓ ' : '  '}
+            {opt.text}
           </li>
         );
       })}

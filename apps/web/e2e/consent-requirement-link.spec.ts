@@ -15,10 +15,14 @@ test.describe('Consent Requirement Link', () => {
     await login(page);
   });
 
-  test('settings page shows Privacy & AI card with toggles', async ({ page }) => {
+  test('settings page shows Privacy & AI card with toggles', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
-    await expect(page.locator('text=Privacy & AI')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('text=Privacy & AI')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.locator('#setting-ai-consent')).toBeVisible();
     await expect(page.locator('#setting-third-party-llm')).toBeVisible();
   });
@@ -36,8 +40,8 @@ test.describe('Consent Requirement Link', () => {
     await expect(toggle).toHaveAttribute('aria-checked', 'true');
 
     // Verify localStorage
-    const stored = await page.evaluate(
-      () => localStorage.getItem('edusphere_consent_AI_PROCESSING'),
+    const stored = await page.evaluate(() =>
+      localStorage.getItem('edusphere_consent_AI_PROCESSING')
     );
     expect(stored).toBe('true');
   });
@@ -54,8 +58,8 @@ test.describe('Consent Requirement Link', () => {
 
     // Wait for the highlight animation class to be applied (after 300ms scroll delay)
     await page.waitForTimeout(600);
-    const hasHighlight = await target.evaluate(
-      (el) => el.classList.contains('animate-settings-highlight'),
+    const hasHighlight = await target.evaluate((el) =>
+      el.classList.contains('animate-settings-highlight')
     );
     expect(hasHighlight).toBe(true);
   });
@@ -103,19 +107,21 @@ test.describe('Consent Requirement Link', () => {
         const generateBtn = page
           .locator('button:has-text("צור קורס"), button:has-text("Generate")')
           .first();
-        if (await generateBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
+        if (
+          await generateBtn.isVisible({ timeout: 3_000 }).catch(() => false)
+        ) {
           await generateBtn.click();
 
           // Verify RequirementLink appears
           await expect(
-            page.locator('[data-testid="requirement-link"]'),
+            page.locator('[data-testid="requirement-link"]')
           ).toBeVisible({ timeout: 5000 });
 
           // Verify it contains a link to settings
           const link = page.locator('[data-testid="requirement-link"] a');
           await expect(link).toHaveAttribute(
             'href',
-            '/settings?highlight=ai-consent',
+            '/settings?highlight=ai-consent'
           );
         }
       }
@@ -164,7 +170,9 @@ test.describe('Consent Requirement Link', () => {
   });
 
   // BUG-088 REGRESSION: consent toggle must persist (not just localStorage)
-  test('REGRESSION BUG-088: settings consent toggle is interactive and saves', async ({ page }) => {
+  test('REGRESSION BUG-088: settings consent toggle is interactive and saves', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
 
@@ -183,28 +191,36 @@ test.describe('Consent Requirement Link', () => {
     expect(newChecked).not.toBe(initialChecked);
 
     // Verify localStorage was updated
-    const stored = await page.evaluate(
-      () => localStorage.getItem('edusphere_consent_AI_PROCESSING'),
+    const stored = await page.evaluate(() =>
+      localStorage.getItem('edusphere_consent_AI_PROCESSING')
     );
     expect(stored).toBe(newChecked === 'true' ? 'true' : 'false');
   });
 
   // BUG-088 REGRESSION: back button appears when returnTo param is present
-  test('REGRESSION BUG-088: back button shown with returnTo param', async ({ page }) => {
+  test('REGRESSION BUG-088: back button shown with returnTo param', async ({
+    page,
+  }) => {
     await page.goto('/settings?highlight=ai-consent&returnTo=%2Fcourses%2Fnew');
     await page.waitForLoadState('networkidle');
 
     // Back button must be visible
-    const backBtn = page.locator('button[aria-label]').filter({ hasText: /←|back|חזרה/i }).first();
+    const backBtn = page
+      .locator('button[aria-label]')
+      .filter({ hasText: /←|back|חזרה/i })
+      .first();
     // Alternative: look for ArrowLeft icon button
     const arrowBtn = page.locator('button:has(svg.lucide-arrow-left)');
-    const hasBackButton = await backBtn.isVisible().catch(() => false) ||
-      await arrowBtn.isVisible().catch(() => false);
+    const hasBackButton =
+      (await backBtn.isVisible().catch(() => false)) ||
+      (await arrowBtn.isVisible().catch(() => false));
     expect(hasBackButton).toBe(true);
   });
 
   // BUG-088 REGRESSION: no back button on plain settings page
-  test('REGRESSION BUG-088: no back button without returnTo param', async ({ page }) => {
+  test('REGRESSION BUG-088: no back button without returnTo param', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
 
@@ -217,7 +233,9 @@ test.describe('Consent Requirement Link', () => {
   // This test verifies the ACTUAL mutation reaches the gateway and returns success,
   // not just that localStorage is updated. The original bug was that the mutation
   // didn't exist in the supergraph — gateway returned an error.
-  test('REGRESSION BUG-088: consent toggle mutation succeeds through gateway', async ({ page }) => {
+  test('REGRESSION BUG-088: consent toggle mutation succeeds through gateway', async ({
+    page,
+  }) => {
     let mutationSucceeded = false;
     let mutationPayload: Record<string, unknown> | null = null;
 
@@ -274,7 +292,9 @@ test.describe('Consent Requirement Link', () => {
   // BUG-092 REGRESSION: consent mutation must NOT return "Cannot return null for
   // non-nullable field Mutation.updateConsent" — root cause was consent.resolver.js
   // and consent.module.js missing from Docker container dist/ due to stale turbo cache.
-  test('REGRESSION BUG-092: consent save does not show sync error toast', async ({ page }) => {
+  test('REGRESSION BUG-092: consent save does not show sync error toast', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
 
@@ -292,7 +312,9 @@ test.describe('Consent Requirement Link', () => {
     await expect(errorToast).not.toBeVisible({ timeout: 2_000 });
 
     // Success toast should appear instead
-    const successToast = page.locator('[data-sonner-toast][data-type="success"]');
+    const successToast = page.locator(
+      '[data-sonner-toast][data-type="success"]'
+    );
     await expect(successToast).toBeVisible({ timeout: 5_000 });
   });
 });

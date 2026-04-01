@@ -60,7 +60,10 @@ export function DiscussionDetailPage() {
     pause: !mounted || subPaused || !id,
   });
 
-  const [replyTo, setReplyTo] = useState<{ id: string; content: string } | null>(null);
+  const [replyTo, setReplyTo] = useState<{
+    id: string;
+    content: string;
+  } | null>(null);
 
   const messages = data?.discussionMessages ?? [];
 

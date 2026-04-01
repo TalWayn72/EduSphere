@@ -20,10 +20,7 @@ test.use({ reducedMotion: 'reduce' });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SCREENSHOT_DIR = path.resolve(
-  __dirname,
-  '../../../docs/screenshots'
-);
+const SCREENSHOT_DIR = path.resolve(__dirname, '../../../docs/screenshots');
 
 // Fake IDs — pages should render gracefully even without real data
 const COURSE_ID = 'test-course-001';
@@ -96,7 +93,8 @@ test.describe('Exam System — Visual QA', () => {
       // wait for that to disappear (up to 10s), then add buffer for React render.
       await page
         .waitForFunction(
-          () => !document.body.textContent?.includes('Initializing authentication'),
+          () =>
+            !document.body.textContent?.includes('Initializing authentication'),
           { timeout: 10_000 }
         )
         .catch(() => {
@@ -105,7 +103,10 @@ test.describe('Exam System — Visual QA', () => {
       await page.waitForTimeout(1500);
 
       // Check page didn't hard-crash (no 500 error, no blank white page)
-      const bodyText = await page.locator('body').textContent({ timeout: 5000 }).catch(() => '');
+      const bodyText = await page
+        .locator('body')
+        .textContent({ timeout: 5000 })
+        .catch(() => '');
 
       // Capture screenshot regardless of content
       const screenshotPath = path.join(
@@ -119,7 +120,8 @@ test.describe('Exam System — Visual QA', () => {
 
       // Verify the page didn't show a fatal error boundary
       // (some pages may show "not found" or empty state — that's OK with fake IDs)
-      const hasFatalError = bodyText?.includes('Something went wrong') ||
+      const hasFatalError =
+        bodyText?.includes('Something went wrong') ||
         bodyText?.includes('Application error') ||
         bodyText?.includes('Unhandled Runtime Error');
 
@@ -131,7 +133,7 @@ test.describe('Exam System — Visual QA', () => {
       // Log what was rendered for debugging
       console.log(
         `[exam-visual] ${route.label}: status=${response?.status() ?? 'N/A'}, ` +
-        `url=${page.url()}, bodyLen=${bodyText?.length ?? 0}`
+          `url=${page.url()}, bodyLen=${bodyText?.length ?? 0}`
       );
     });
   }
@@ -149,8 +151,13 @@ test.describe('Exam System — Visual QA', () => {
     });
 
     // Courses page should render without crash
-    const body = await page.locator('body').textContent({ timeout: 5000 }).catch(() => '');
+    const body = await page
+      .locator('body')
+      .textContent({ timeout: 5000 })
+      .catch(() => '');
     expect(body?.length).toBeGreaterThan(0);
-    console.log(`[exam-visual] Courses entry: url=${page.url()}, bodyLen=${body?.length ?? 0}`);
+    console.log(
+      `[exam-visual] Courses entry: url=${page.url()}, bodyLen=${body?.length ?? 0}`
+    );
   });
 });

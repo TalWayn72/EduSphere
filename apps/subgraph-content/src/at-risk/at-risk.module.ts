@@ -10,7 +10,12 @@ import { AtRiskResolver } from './at-risk.resolver.js';
 
 @Module({
   imports: [ScheduleModule.forRoot()],
-  providers: [AtRiskFlagService, AtRiskDetectionService, AtRiskService, AtRiskResolver],
+  providers: [
+    AtRiskFlagService,
+    AtRiskDetectionService,
+    AtRiskService,
+    AtRiskResolver,
+  ],
   exports: [AtRiskService],
 })
 export class AtRiskModule {}

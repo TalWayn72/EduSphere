@@ -14,7 +14,8 @@ export class OnboardingResolver {
 
   @Query('myOnboardingState')
   async myOnboardingState(@Context() context: GraphQLContext) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     const { userId, tenantId, roles } = context.authContext;
     const role = (roles[0] ?? 'STUDENT').toLowerCase();
     return this.onboardingService.getState(userId, tenantId ?? '', role);
@@ -23,25 +24,38 @@ export class OnboardingResolver {
   @Mutation('updateOnboardingStep')
   async updateOnboardingStep(
     @Args('input') input: { step: number; data?: Record<string, unknown> },
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     const { userId, tenantId, roles } = context.authContext;
     const role = (roles[0] ?? 'STUDENT').toLowerCase();
-    return this.onboardingService.updateStep(userId, tenantId ?? '', role, input.step, input.data ?? {});
+    return this.onboardingService.updateStep(
+      userId,
+      tenantId ?? '',
+      role,
+      input.step,
+      input.data ?? {}
+    );
   }
 
   @Mutation('completeOnboarding')
   async completeOnboarding(@Context() context: GraphQLContext) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     const { userId, tenantId, roles } = context.authContext;
     const role = (roles[0] ?? 'STUDENT').toLowerCase();
-    return this.onboardingService.completeOnboarding(userId, tenantId ?? '', role);
+    return this.onboardingService.completeOnboarding(
+      userId,
+      tenantId ?? '',
+      role
+    );
   }
 
   @Mutation('skipOnboarding')
   async skipOnboarding(@Context() context: GraphQLContext) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     const { userId, tenantId, roles } = context.authContext;
     const role = (roles[0] ?? 'STUDENT').toLowerCase();
     return this.onboardingService.skipOnboarding(userId, tenantId ?? '', role);

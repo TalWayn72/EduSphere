@@ -49,8 +49,10 @@ export function AssessmentCampaignsPage() {
     pause: !mounted,
   });
 
-  const myCampaigns: Campaign[] = (myCampaignsData?.myCampaigns as Campaign[]) ?? [];
-  const toRespond: Campaign[] = (respondData?.campaignsToRespond as Campaign[]) ?? [];
+  const myCampaigns: Campaign[] =
+    (myCampaignsData?.myCampaigns as Campaign[]) ?? [];
+  const toRespond: Campaign[] =
+    (respondData?.campaignsToRespond as Campaign[]) ?? [];
 
   return (
     <Layout>
@@ -101,7 +103,9 @@ export function AssessmentCampaignsPage() {
                         </Badge>
                         {c.status === 'COMPLETED' && (
                           <Button size="sm" variant="outline" asChild>
-                            <Link to={`/assessments/${c.id}/results`}>View Results</Link>
+                            <Link to={`/assessments/${c.id}/results`}>
+                              View Results
+                            </Link>
                           </Button>
                         )}
                       </div>
@@ -146,7 +150,9 @@ export function AssessmentCampaignsPage() {
                           {c.status}
                         </Badge>
                         <Button size="sm" asChild>
-                          <Link to={`/assessments/${c.id}/respond`}>Respond</Link>
+                          <Link to={`/assessments/${c.id}/respond`}>
+                            Respond
+                          </Link>
                         </Button>
                       </div>
                     </CardContent>

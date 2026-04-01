@@ -18,7 +18,9 @@ test.describe('Instructor Onboarding — DEV_MODE guard', () => {
   test('/onboarding page renders without crash overlay (instructor context)', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -29,7 +31,9 @@ test.describe('Instructor Onboarding — DEV_MODE guard', () => {
   test('no MOCK_ sentinel strings in instructor onboarding DOM', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -49,7 +53,9 @@ test.describe('Instructor Onboarding — Live backend', () => {
   test('/onboarding page renders instructor wizard for instructor role', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Should not show raw MOCK_ strings
@@ -64,7 +70,9 @@ test.describe('Instructor Onboarding — Live backend', () => {
   test('no [object Object] serialization in instructor onboarding DOM', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -79,8 +87,12 @@ test.describe('Instructor Onboarding — Flow tests', () => {
     await login(page);
   });
 
-  test('welcome screen displays instructor-specific greeting', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+  test('welcome screen displays instructor-specific greeting', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // The page should render a heading
@@ -94,13 +106,17 @@ test.describe('Instructor Onboarding — Flow tests', () => {
   });
 
   test('bio setup step allows text entry', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Look for bio/description textarea or input
-    const bioField = page.locator(
-      'textarea[name*="bio"], textarea[placeholder*="bio" i], textarea[aria-label*="bio" i], input[name*="bio"]'
-    ).first();
+    const bioField = page
+      .locator(
+        'textarea[name*="bio"], textarea[placeholder*="bio" i], textarea[aria-label*="bio" i], input[name*="bio"]'
+      )
+      .first();
     const bioExists = await bioField.isVisible().catch(() => false);
 
     if (bioExists) {
@@ -115,12 +131,16 @@ test.describe('Instructor Onboarding — Flow tests', () => {
   });
 
   test('first course creation wizard has required fields', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Navigate to course creation step if multi-step
     for (let i = 0; i < 5; i++) {
-      const nextBtn = page.getByRole('button', { name: /next|continue/i }).first();
+      const nextBtn = page
+        .getByRole('button', { name: /next|continue/i })
+        .first();
       const visible = await nextBtn.isVisible().catch(() => false);
       if (visible) {
         await nextBtn.click();
@@ -131,9 +151,11 @@ test.describe('Instructor Onboarding — Flow tests', () => {
     }
 
     // Check for course-related form fields
-    const courseTitle = page.locator(
-      'input[name*="title"], input[name*="course"], input[placeholder*="course" i]'
-    ).first();
+    const courseTitle = page
+      .locator(
+        'input[name*="title"], input[name*="course"], input[placeholder*="course" i]'
+      )
+      .first();
     const titleExists = await courseTitle.isVisible().catch(() => false);
 
     if (titleExists) {
@@ -146,18 +168,24 @@ test.describe('Instructor Onboarding — Flow tests', () => {
   });
 
   test('content upload area is present in onboarding', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Navigate through steps looking for an upload area
     for (let i = 0; i < 5; i++) {
-      const uploadArea = page.locator(
-        'input[type="file"], [data-testid*="upload"], [data-testid*="dropzone"], [role="button"][aria-label*="upload" i]'
-      ).first();
+      const uploadArea = page
+        .locator(
+          'input[type="file"], [data-testid*="upload"], [data-testid*="dropzone"], [role="button"][aria-label*="upload" i]'
+        )
+        .first();
       const uploadExists = await uploadArea.isVisible().catch(() => false);
       if (uploadExists) break;
 
-      const nextBtn = page.getByRole('button', { name: /next|continue/i }).first();
+      const nextBtn = page
+        .getByRole('button', { name: /next|continue/i })
+        .first();
       const visible = await nextBtn.isVisible().catch(() => false);
       if (visible) {
         await nextBtn.click();
@@ -174,7 +202,9 @@ test.describe('Instructor Onboarding — Flow tests', () => {
   });
 
   test('dashboard redirect after completing onboarding', async ({ page }) => {
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Attempt to complete onboarding by clicking through all steps
@@ -188,7 +218,9 @@ test.describe('Instructor Onboarding — Flow tests', () => {
         break;
       }
 
-      const nextBtn = page.getByRole('button', { name: /next|continue/i }).first();
+      const nextBtn = page
+        .getByRole('button', { name: /next|continue/i })
+        .first();
       const nextVisible = await nextBtn.isVisible().catch(() => false);
       if (nextVisible) {
         await nextBtn.click();
@@ -205,9 +237,13 @@ test.describe('Instructor Onboarding — Flow tests', () => {
     });
   });
 
-  test('visual regression — instructor onboarding welcome', async ({ page }) => {
+  test('visual regression — instructor onboarding welcome', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto(`${BASE_URL}/onboarding`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/onboarding`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForLoadState('domcontentloaded');
 

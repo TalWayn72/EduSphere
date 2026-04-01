@@ -53,7 +53,11 @@ function collectGraphqlFiles(dir: string): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory() && entry.name !== 'node_modules' && entry.name !== 'dist') {
+    if (
+      entry.isDirectory() &&
+      entry.name !== 'node_modules' &&
+      entry.name !== 'dist'
+    ) {
       files.push(...collectGraphqlFiles(full));
     } else if (entry.isFile() && entry.name.endsWith('.graphql')) {
       files.push(full);
@@ -62,7 +66,9 @@ function collectGraphqlFiles(dir: string): string[] {
   return files;
 }
 
-function extractDirectivesUsed(sdl: string): { directive: string; file: string; line: number }[] {
+function extractDirectivesUsed(
+  sdl: string
+): { directive: string; file: string; line: number }[] {
   const results: { directive: string; file: string; line: number }[] = [];
   const lines = sdl.split('\n');
   for (let i = 0; i < lines.length; i++) {
@@ -242,7 +248,8 @@ describe('Knowledge subgraph — startup health (regression)', () => {
         for (const decl of allTypeDecls) {
           const typeName = decl.split(/\s+/).pop() || '';
           // Check that this type name appears in a declaration with a body
-          const bodyCheck = sdl.includes(`type ${typeName}`) &&
+          const bodyCheck =
+            sdl.includes(`type ${typeName}`) &&
             sdl.indexOf('{', sdl.indexOf(`type ${typeName}`)) !== -1;
           expect(
             bodyCheck,

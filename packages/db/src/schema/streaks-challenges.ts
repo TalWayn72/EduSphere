@@ -117,4 +117,5 @@ export const userChallengeProgress = pgTable(
 ).enableRLS();
 
 export type UserChallengeProgress = typeof userChallengeProgress.$inferSelect;
-export type NewUserChallengeProgress = typeof userChallengeProgress.$inferInsert;
+export type NewUserChallengeProgress =
+  typeof userChallengeProgress.$inferInsert;

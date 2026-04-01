@@ -22,11 +22,19 @@ vi.mock('@edusphere/db', () => ({
     update: vi.fn().mockReturnValue({
       set: (...a: unknown[]) => {
         mockSetValues(...a);
-        return { where: (...b: unknown[]) => { mockUpdateWhere(...b); return Promise.resolve(undefined); } };
+        return {
+          where: (...b: unknown[]) => {
+            mockUpdateWhere(...b);
+            return Promise.resolve(undefined);
+          },
+        };
       },
     }),
     insert: vi.fn().mockReturnValue({
-      values: (...a: unknown[]) => { mockInsertValues(...a); return Promise.resolve(undefined); },
+      values: (...a: unknown[]) => {
+        mockInsertValues(...a);
+        return Promise.resolve(undefined);
+      },
     }),
   },
   schema: {
@@ -94,7 +102,10 @@ describe('anonymize.helper', () => {
       ];
       mockLimit.mockResolvedValueOnce(staleUsers);
 
-      const result = await anonymizeUsers('USER_PROGRESS', new Date('2026-01-01'));
+      const result = await anonymizeUsers(
+        'USER_PROGRESS',
+        new Date('2026-01-01')
+      );
 
       expect(result.deletedCount).toBe(2);
       expect(result.mode).toBe('ANONYMIZE');
@@ -115,7 +126,9 @@ describe('anonymize.helper', () => {
     });
 
     it('hashes the email in the update', async () => {
-      mockLimit.mockResolvedValueOnce([{ userId: 'u-5', email: 'test@mail.com' }]);
+      mockLimit.mockResolvedValueOnce([
+        { userId: 'u-5', email: 'test@mail.com' },
+      ]);
 
       await anonymizeUsers('USER_PROGRESS', new Date());
 
@@ -132,7 +145,10 @@ describe('anonymize.helper', () => {
       await anonymizeUsers('ANNOTATIONS', new Date('2026-06-01'));
 
       expect(mockInsertValues).toHaveBeenCalledOnce();
-      const auditArg = mockInsertValues.mock.calls[0][0] as Record<string, unknown>;
+      const auditArg = mockInsertValues.mock.calls[0][0] as Record<
+        string,
+        unknown
+      >;
       expect(auditArg['action']).toBe('GDPR_ANONYMIZE');
       expect(auditArg['resourceType']).toBe('USER');
       const metadata = auditArg['metadata'] as Record<string, unknown>;

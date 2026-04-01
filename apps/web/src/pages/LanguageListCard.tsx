@@ -60,9 +60,7 @@ export function LanguageListCard({
                 onChange={() => onToggle(l.code)}
                 className="h-4 w-4 rounded border"
               />
-              <span className="text-sm font-medium flex-1">
-                {l.name}
-              </span>
+              <span className="text-sm font-medium flex-1">{l.name}</span>
               <span className="text-sm text-muted-foreground">
                 {l.nativeName}
               </span>

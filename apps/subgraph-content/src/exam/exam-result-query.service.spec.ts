@@ -113,15 +113,21 @@ describe('ExamResultQueryService', () => {
     it('computes pass rate, avg score, and domain breakdown', async () => {
       const results = [
         {
-          sessionId: 's1', passed: true, scaledScore: 700,
+          sessionId: 's1',
+          passed: true,
+          scaledScore: 700,
           domainScores: [{ domain: 'Math', correct: 8, total: 10 }],
         },
         {
-          sessionId: 's2', passed: false, scaledScore: 500,
+          sessionId: 's2',
+          passed: false,
+          scaledScore: 500,
           domainScores: [{ domain: 'Math', correct: 4, total: 10 }],
         },
         {
-          sessionId: 's3', passed: true, scaledScore: 800,
+          sessionId: 's3',
+          passed: true,
+          scaledScore: 800,
           domainScores: [
             { domain: 'Math', correct: 9, total: 10 },
             { domain: 'Reading', correct: 7, total: 10 },
@@ -139,7 +145,7 @@ describe('ExamResultQueryService', () => {
       expect(analytics.domainBreakdown.length).toBe(2);
 
       const mathDomain = analytics.domainBreakdown.find(
-        (d: { domain: string }) => d.domain === 'Math',
+        (d: { domain: string }) => d.domain === 'Math'
       );
       expect(mathDomain).toBeDefined();
       expect(mathDomain!.correct).toBe(21);
@@ -149,7 +155,9 @@ describe('ExamResultQueryService', () => {
 
   describe('getReliabilityReport()', () => {
     it('returns zeroed report when fewer than 2 sessions', async () => {
-      const chain = makeSelectChainNoLimit([{ rawScore: 80, itemAnalysis: [] }]);
+      const chain = makeSelectChainNoLimit([
+        { rawScore: 80, itemAnalysis: [] },
+      ]);
       mockTx.select.mockReturnValueOnce({ from: chain.from });
 
       const report = await service.getReliabilityReport('bp1', ctx);

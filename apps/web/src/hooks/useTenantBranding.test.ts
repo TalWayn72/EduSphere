@@ -53,20 +53,37 @@ describe('useTenantBranding', () => {
   });
 
   it('calls applyTenantBranding when data arrives', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{ data: { myTenantBranding: MOCK_BRANDING }, fetching: false, stale: false }] as never);
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        data: { myTenantBranding: MOCK_BRANDING },
+        fetching: false,
+        stale: false,
+      },
+    ] as never);
     renderHook(() => useTenantBranding());
     expect(applyTenantBranding).toHaveBeenCalledWith(MOCK_BRANDING);
   });
 
   it('does NOT call applyTenantBranding while fetching (no data yet)', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{ data: undefined, fetching: true, stale: false }] as never);
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { data: undefined, fetching: true, stale: false },
+    ] as never);
     renderHook(() => useTenantBranding());
     expect(applyTenantBranding).not.toHaveBeenCalled();
   });
 
   it('injects customCss into document head when present', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myTenantBranding: { ...MOCK_BRANDING, customCss: '.foo { color: red; }' } }, fetching: false, stale: false }
+      {
+        data: {
+          myTenantBranding: {
+            ...MOCK_BRANDING,
+            customCss: '.foo { color: red; }',
+          },
+        },
+        fetching: false,
+        stale: false,
+      },
     ] as never);
     renderHook(() => useTenantBranding());
     const el = document.getElementById('tenant-custom-css');
@@ -80,14 +97,20 @@ describe('useTenantBranding', () => {
     document.head.appendChild(el);
 
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myTenantBranding: { ...MOCK_BRANDING, customCss: null } }, fetching: false, stale: false }
+      {
+        data: { myTenantBranding: { ...MOCK_BRANDING, customCss: null } },
+        fetching: false,
+        stale: false,
+      },
     ] as never);
     renderHook(() => useTenantBranding());
     expect(document.getElementById('tenant-custom-css')).toBeNull();
   });
 
   it('returns DEFAULT_BRANDING when no data', () => {
-    vi.mocked(urql.useQuery).mockReturnValue([{ data: undefined, fetching: false, stale: false }] as never);
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { data: undefined, fetching: false, stale: false },
+    ] as never);
     const { result } = renderHook(() => useTenantBranding());
     expect(result.current.branding.organizationName).toBe('EduSphere');
   });

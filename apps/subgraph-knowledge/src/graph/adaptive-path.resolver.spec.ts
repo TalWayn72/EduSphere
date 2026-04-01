@@ -66,7 +66,10 @@ describe('AdaptivePathResolver', () => {
     });
 
     it('passes custom timeBudget to service', async () => {
-      mockGetAdaptivePath.mockResolvedValue({ ...mockPath, timeBudgetMinutes: 60 });
+      mockGetAdaptivePath.mockResolvedValue({
+        ...mockPath,
+        timeBudgetMinutes: 60,
+      });
 
       await resolver.adaptiveLearningPath('course-2', 60, makeCtx());
 

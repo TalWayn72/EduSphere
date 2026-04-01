@@ -158,7 +158,14 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
           return;
         }
       } catch (err: unknown) {
-        const gqlErrors = (err as { graphQLErrors?: Array<{ extensions?: { code?: string }; message?: string }> })?.graphQLErrors;
+        const gqlErrors = (
+          err as {
+            graphQLErrors?: Array<{
+              extensions?: { code?: string };
+              message?: string;
+            }>;
+          }
+        )?.graphQLErrors;
         const consentErr = gqlErrors?.find(
           (e) => e.extensions?.code === 'CONSENT_REQUIRED'
         );

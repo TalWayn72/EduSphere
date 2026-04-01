@@ -12,7 +12,11 @@ vi.mock('react-router-dom', async (importOriginal) => {
     ...actual,
     useParams: vi.fn(() => ({ courseId: 'course-1', lessonId: 'lesson-1' })),
     useNavigate: vi.fn(() => mockNavigate),
-    useBlocker: vi.fn(() => ({ state: 'unblocked' as const, proceed: vi.fn(), reset: vi.fn() })),
+    useBlocker: vi.fn(() => ({
+      state: 'unblocked' as const,
+      proceed: vi.fn(),
+      reset: vi.fn(),
+    })),
   };
 });
 
@@ -46,17 +50,37 @@ vi.mock('@/components/PageHeader', () => ({
 }));
 
 vi.mock('@/components/pipeline/PipelineConfigPanel', () => ({
-  PipelineConfigPanel: ({ node, onClose }: { node: { labelHe: string }; onClose: () => void }) => (
+  PipelineConfigPanel: ({
+    node,
+    onClose,
+  }: {
+    node: { labelHe: string };
+    onClose: () => void;
+  }) => (
     <div data-testid="config-panel">
       <span>{node.labelHe}</span>
-      <button onClick={onClose} data-testid="config-panel-close">סגור</button>
+      <button onClick={onClose} data-testid="config-panel-close">
+        סגור
+      </button>
     </div>
   ),
 }));
 
 vi.mock('@/components/pipeline/PipelineSortableCanvas', () => ({
-  PipelineSortableCanvas: ({ nodes, selectedNodeId, customMode, onSelect, onRemove }: {
-    nodes: Array<{ id: string; moduleType: string; labelHe: string; label: string; enabled: boolean }>;
+  PipelineSortableCanvas: ({
+    nodes,
+    selectedNodeId,
+    customMode,
+    onSelect,
+    onRemove,
+  }: {
+    nodes: Array<{
+      id: string;
+      moduleType: string;
+      labelHe: string;
+      label: string;
+      enabled: boolean;
+    }>;
     selectedNodeId: string | null;
     customMode: boolean;
     onSelect: (id: string | null) => void;
@@ -84,10 +108,20 @@ vi.mock('@/components/pipeline/PipelineSortableCanvas', () => ({
         {nodes.map((node) => (
           <div key={node.id} data-testid={`pipeline-node-${node.moduleType}`}>
             <button aria-label={`גרור ${node.labelHe}`}>drag</button>
-            <button aria-label={`הגדרות ${node.labelHe}`} onClick={() => onSelect(selectedNodeId === node.id ? null : node.id)}>
+            <button
+              aria-label={`הגדרות ${node.labelHe}`}
+              onClick={() =>
+                onSelect(selectedNodeId === node.id ? null : node.id)
+              }
+            >
               {node.labelHe}
             </button>
-            <button aria-label={`הסר ${node.labelHe}`} onClick={() => onRemove(node.id)}>remove</button>
+            <button
+              aria-label={`הסר ${node.labelHe}`}
+              onClick={() => onRemove(node.id)}
+            >
+              remove
+            </button>
           </div>
         ))}
       </div>
@@ -99,7 +133,10 @@ vi.mock('@/components/pipeline/PipelineModulePalette', () => {
   const labels: Record<string, { he: string; en: string }> = {
     INGESTION: { he: 'איסוף חומרים', en: 'Ingestion' },
     ASR: { he: 'תמלול', en: 'Transcription (ASR)' },
-    NER_SOURCE_LINKING: { he: 'זיהוי ישויות ומקורות', en: 'NER + Source Linking' },
+    NER_SOURCE_LINKING: {
+      he: 'זיהוי ישויות ומקורות',
+      en: 'NER + Source Linking',
+    },
     CONTENT_CLEANING: { he: 'ניקוי תוכן', en: 'Content Cleaning' },
     SUMMARIZATION: { he: 'סיכום', en: 'Summarization' },
     STRUCTURED_NOTES: { he: 'תיעוד מובנה', en: 'Structured Notes' },
@@ -109,10 +146,18 @@ vi.mock('@/components/pipeline/PipelineModulePalette', () => {
     PUBLISH_SHARE: { he: 'יצוא והפצה', en: 'Publish & Share' },
   };
   return {
-    PipelineModulePalette: ({ onAddModule }: { onAddModule: (m: string) => void }) => (
+    PipelineModulePalette: ({
+      onAddModule,
+    }: {
+      onAddModule: (m: string) => void;
+    }) => (
       <div data-testid="module-palette">
         {Object.entries(labels).map(([m, lbl]) => (
-          <button key={m} data-testid={`palette-module-${m}`} onClick={() => onAddModule(m)}>
+          <button
+            key={m}
+            data-testid={`palette-module-${m}`}
+            onClick={() => onAddModule(m)}
+          >
             <span>{lbl.he}</span>
             <span>{lbl.en}</span>
           </button>
@@ -124,8 +169,12 @@ vi.mock('@/components/pipeline/PipelineModulePalette', () => {
 
 vi.mock('@/components/pipeline/PipelineToolbar', () => ({
   PipelineToolbar: (props: {
-    lessonTitle: string; isDirty: boolean; saving: boolean; isRunning: boolean;
-    onSave: () => void; onRun: () => void;
+    lessonTitle: string;
+    isDirty: boolean;
+    saving: boolean;
+    isRunning: boolean;
+    onSave: () => void;
+    onRun: () => void;
     onTemplateChange: (val: string) => void;
     hasResults?: boolean;
   }) => (
@@ -134,17 +183,28 @@ vi.mock('@/components/pipeline/PipelineToolbar', () => ({
       <select
         data-testid="template-picker"
         defaultValue=""
-        onChange={(e) => { if (e.target.value) props.onTemplateChange(e.target.value); (e.target as HTMLSelectElement).value = ''; }}
+        onChange={(e) => {
+          if (e.target.value) props.onTemplateChange(e.target.value);
+          (e.target as HTMLSelectElement).value = '';
+        }}
       >
         <option value="">טעינת תבנית...</option>
         <option value="THEMATIC">תמטי (8 מודולים)</option>
         <option value="SEQUENTIAL">סדרתי (9 מודולים)</option>
         <option value="CUSTOM">בנה ידנית (מאפס)</option>
       </select>
-      <button data-testid="save-btn" disabled={!props.isDirty || props.saving} onClick={props.onSave}>
+      <button
+        data-testid="save-btn"
+        disabled={!props.isDirty || props.saving}
+        onClick={props.onSave}
+      >
         {props.saving ? 'שומר...' : 'שמור'}
       </button>
-      <button data-testid="run-btn" disabled={props.isRunning} onClick={props.onRun}>
+      <button
+        data-testid="run-btn"
+        disabled={props.isRunning}
+        onClick={props.onRun}
+      >
         {props.isRunning ? '▶ מריץ...' : '▶ הפעל Pipeline'}
       </button>
     </div>
@@ -152,15 +212,25 @@ vi.mock('@/components/pipeline/PipelineToolbar', () => ({
 }));
 
 vi.mock('@/components/pipeline/PipelinePrintStyles', () => ({
-  PipelineExportButton: () => <button data-testid="export-pdf-btn">ייצוא PDF</button>,
+  PipelineExportButton: () => (
+    <button data-testid="export-pdf-btn">ייצוא PDF</button>
+  ),
   PipelinePrintStylesheet: () => null,
 }));
 
 vi.mock('@/components/pipeline/PipelineRunStatus', () => ({
-  PipelineRunStatus: ({ run, onCancel }: { run: { status: string }; onCancel: () => void }) => (
+  PipelineRunStatus: ({
+    run,
+    onCancel,
+  }: {
+    run: { status: string };
+    onCancel: () => void;
+  }) => (
     <div data-testid="pipeline-run-status">
       <span data-testid="run-status-label">{run.status}</span>
-      <button onClick={onCancel} data-testid="cancel-run-btn">ביטול</button>
+      <button onClick={onCancel} data-testid="cancel-run-btn">
+        ביטול
+      </button>
     </div>
   ),
 }));
@@ -205,7 +275,10 @@ vi.mock('@/lib/lesson-pipeline.store', () => ({
   MODULE_LABELS: {
     INGESTION: { en: 'Ingestion', he: 'איסוף חומרים' },
     ASR: { en: 'Transcription (ASR)', he: 'תמלול' },
-    NER_SOURCE_LINKING: { en: 'NER + Source Linking', he: 'זיהוי ישויות ומקורות' },
+    NER_SOURCE_LINKING: {
+      en: 'NER + Source Linking',
+      he: 'זיהוי ישויות ומקורות',
+    },
     CONTENT_CLEANING: { en: 'Content Cleaning', he: 'ניקוי תוכן' },
     SUMMARIZATION: { en: 'Summarization', he: 'סיכום' },
     STRUCTURED_NOTES: { en: 'Structured Notes', he: 'תיעוד מובנה' },
@@ -224,25 +297,51 @@ import * as RRD from 'react-router-dom';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 const NOOP_MUTATION = [{ fetching: false }, NOOP_EXECUTE] as never;
 
-const MOCK_LESSON = { id: 'lesson-1', title: 'Test Lesson', assets: [], pipeline: null };
+const MOCK_LESSON = {
+  id: 'lesson-1',
+  title: 'Test Lesson',
+  assets: [],
+  pipeline: null,
+};
 const MOCK_LESSON_WITH_ASSETS = {
   ...MOCK_LESSON,
-  assets: [{ id: 'a1', assetType: 'VIDEO', sourceUrl: null, fileUrl: 'https://cdn.example.com/video.mp4' }],
+  assets: [
+    {
+      id: 'a1',
+      assetType: 'VIDEO',
+      sourceUrl: null,
+      fileUrl: 'https://cdn.example.com/video.mp4',
+    },
+  ],
 };
 
 function makeQuery(overrides: Record<string, unknown> = {}) {
-  return [{ data: { lesson: MOCK_LESSON }, fetching: false, error: undefined, ...overrides }, vi.fn()] as never;
+  return [
+    {
+      data: { lesson: MOCK_LESSON },
+      fetching: false,
+      error: undefined,
+      ...overrides,
+    },
+    vi.fn(),
+  ] as never;
 }
 
-const EMPTY_TEMPLATES_RESULT = [{ data: { pipelineTemplates: [] }, fetching: false, error: undefined }, vi.fn()] as never;
+const EMPTY_TEMPLATES_RESULT = [
+  { data: { pipelineTemplates: [] }, fetching: false, error: undefined },
+  vi.fn(),
+] as never;
 
 /** Mock useQuery: returns lesson data for LESSON_QUERY, empty templates for PIPELINE_TEMPLATES_QUERY */
 function mockUseQueryPair(lessonOverrides: Record<string, unknown> = {}) {
   vi.mocked(urql.useQuery).mockImplementation((opts: { query: unknown }) => {
-    if (opts?.query === 'PIPELINE_TEMPLATES_QUERY') return EMPTY_TEMPLATES_RESULT;
+    if (opts?.query === 'PIPELINE_TEMPLATES_QUERY')
+      return EMPTY_TEMPLATES_RESULT;
     return makeQuery(lessonOverrides);
   });
 }
@@ -265,100 +364,205 @@ describe('LessonPipelinePage', () => {
   });
 
   it('renders "Lesson Pipeline" heading via PageHeader', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getAllByRole('heading', { name: 'Lesson Pipeline' }).length).toBeGreaterThanOrEqual(1);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getAllByRole('heading', { name: 'Lesson Pipeline' }).length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('renders template picker', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('template-picker')).toBeInTheDocument();
   });
 
   it('shows module palette with Hebrew labels', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('איסוף חומרים')).toBeInTheDocument();
     expect(screen.getByText('תמלול')).toBeInTheDocument();
     expect(screen.getByText('Ingestion')).toBeInTheDocument();
   });
 
   it('shows all 10 palette modules', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('Publish & Share')).toBeInTheDocument();
     expect(screen.getByText('QA Gate')).toBeInTheDocument();
   });
 
   it('shows empty canvas drop zone when no nodes', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('גרור מודולים לכאן')).toBeInTheDocument();
   });
 
   it('shows template picker select', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('template-picker')).toBeInTheDocument();
   });
 
   it('calls loadTemplate when template is selected', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'THEMATIC' } });
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'THEMATIC' },
+    });
     expect(mockStore.loadTemplate).toHaveBeenCalledWith('THEMATIC');
   });
 
   it('Save button is disabled when isDirty is false', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('save-btn')).toBeDisabled();
   });
 
   it('Save button is enabled when isDirty is true', () => {
     mockStore.isDirty = true;
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('save-btn')).not.toBeDisabled();
   });
 
   it('calls savePipeline mutation when Save is clicked', async () => {
     mockStore.isDirty = true;
-    const mockSave = vi.fn().mockResolvedValue({ data: { saveLessonPipeline: { id: 'p1' } }, error: undefined });
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockSave] as never);
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    const mockSave = vi.fn().mockResolvedValue({
+      data: { saveLessonPipeline: { id: 'p1' } },
+      error: undefined,
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockSave,
+    ] as never);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('save-btn'));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledWith({ lessonId: 'lesson-1', input: { nodes: [], config: {} } }));
+    await waitFor(() =>
+      expect(mockSave).toHaveBeenCalledWith({
+        lessonId: 'lesson-1',
+        input: { nodes: [], config: {} },
+      })
+    );
   });
 
   it('shows "▶ הפעל Pipeline" run button when not running', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('run-btn')).toHaveTextContent('▶ הפעל Pipeline');
   });
 
   it('shows error when Run is clicked with empty nodes', async () => {
     mockStore.nodes = [];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('run-btn'));
-    await waitFor(() => expect(screen.getByTestId('pipeline-error')).toBeInTheDocument());
-    expect(screen.getByTestId('pipeline-error')).toHaveTextContent('לפחות מודול אחד');
+    await waitFor(() =>
+      expect(screen.getByTestId('pipeline-error')).toBeInTheDocument()
+    );
+    expect(screen.getByTestId('pipeline-error')).toHaveTextContent(
+      'לפחות מודול אחד'
+    );
   });
 
   // BUG FIX: handleRun no longer uses stale pipelineError state
   it('handleRun saves first then starts run when no pipeline ID exists', async () => {
-    const mockSave = vi.fn().mockResolvedValue({ data: { saveLessonPipeline: { id: 'new-pipeline-id' } }, error: undefined });
-    const mockStart = vi.fn().mockResolvedValue({ data: { startLessonPipelineRun: { id: 'run-1', status: 'RUNNING' } }, error: undefined });
+    const mockSave = vi.fn().mockResolvedValue({
+      data: { saveLessonPipeline: { id: 'new-pipeline-id' } },
+      error: undefined,
+    });
+    const mockStart = vi.fn().mockResolvedValue({
+      data: { startLessonPipelineRun: { id: 'run-1', status: 'RUNNING' } },
+      error: undefined,
+    });
     // Use mockImplementation (not mockReturnValueOnce) — the component re-renders after
     // setMounted(true) useEffect, which would consume the once-queue on first render and
     // leave NOOP_MUTATION for the second render where the handler closure captures savePipeline.
     vi.mocked(urql.useMutation).mockImplementation((doc: unknown) => {
-      if (doc === 'SAVE_LESSON_PIPELINE_MUTATION') return [{ fetching: false }, mockSave] as never;
-      if (doc === 'START_PIPELINE_RUN_MUTATION') return [{ fetching: false }, mockStart] as never;
+      if (doc === 'SAVE_LESSON_PIPELINE_MUTATION')
+        return [{ fetching: false }, mockSave] as never;
+      if (doc === 'START_PIPELINE_RUN_MUTATION')
+        return [{ fetching: false }, mockStart] as never;
       return NOOP_MUTATION;
     });
-    mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    mockStore.nodes = [
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+    ];
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('run-btn'));
     await waitFor(() => expect(mockSave).toHaveBeenCalled());
-    await waitFor(() => expect(mockStart).toHaveBeenCalledWith({ pipelineId: 'new-pipeline-id' }));
+    await waitFor(() =>
+      expect(mockStart).toHaveBeenCalledWith({ pipelineId: 'new-pipeline-id' })
+    );
   });
 
   it('shows config panel when a node is selected', () => {
-    mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
+    mockStore.nodes = [
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+    ];
     mockStore.selectedNodeId = 'n1';
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     // Both desktop (hidden lg:block) and mobile (lg:hidden) panels render in JSDOM
     const panels = screen.getAllByTestId('config-panel');
     expect(panels.length).toBeGreaterThanOrEqual(1);
@@ -366,7 +570,11 @@ describe('LessonPipelinePage', () => {
 
   it('config panel is hidden when no node selected', () => {
     mockStore.selectedNodeId = null;
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.queryByTestId('config-panel')).not.toBeInTheDocument();
   });
 
@@ -375,33 +583,80 @@ describe('LessonPipelinePage', () => {
       data: {
         lesson: {
           ...MOCK_LESSON,
-          pipeline: { id: 'p1', nodes: [], status: 'RUNNING', currentRun: { id: 'r1', status: 'RUNNING', results: [] } },
+          pipeline: {
+            id: 'p1',
+            nodes: [],
+            status: 'RUNNING',
+            currentRun: { id: 'r1', status: 'RUNNING', results: [] },
+          },
         },
       },
     });
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('pipeline-run-status')).toBeInTheDocument();
     expect(screen.getByTestId('run-status-label')).toHaveTextContent('RUNNING');
   });
 
   it('run status panel is hidden when no currentRun', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.queryByTestId('pipeline-run-status')).not.toBeInTheDocument();
   });
 
   it('renders pipeline nodes with move-up/move-down and remove buttons', () => {
     mockStore.nodes = [
-      { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
-      { id: 'n2', moduleType: 'ASR', label: 'Transcription (ASR)', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+      {
+        id: 'n2',
+        moduleType: 'ASR',
+        label: 'Transcription (ASR)',
+        labelHe: 'תמלול',
+        enabled: true,
+        order: 1,
+        config: {},
+      },
     ];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('pipeline-node-INGESTION')).toBeInTheDocument();
     expect(screen.getByTestId('pipeline-node-ASR')).toBeInTheDocument();
   });
 
   it('remove button calls removeNode', async () => {
-    mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    mockStore.nodes = [
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+    ];
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     const removeBtn = screen.getByLabelText('הסר איסוף חומרים');
     fireEvent.click(removeBtn);
     expect(mockStore.removeNode).toHaveBeenCalledWith('n1');
@@ -409,10 +664,30 @@ describe('LessonPipelinePage', () => {
 
   it('pipeline nodes have drag handles for reordering', () => {
     mockStore.nodes = [
-      { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
-      { id: 'n2', moduleType: 'ASR', label: 'Transcription (ASR)', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+      {
+        id: 'n2',
+        moduleType: 'ASR',
+        label: 'Transcription (ASR)',
+        labelHe: 'תמלול',
+        enabled: true,
+        order: 1,
+        config: {},
+      },
     ];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     // Each node has a drag handle with aria-label
     expect(screen.getByLabelText('גרור איסוף חומרים')).toBeInTheDocument();
     expect(screen.getByLabelText('גרור תמלול')).toBeInTheDocument();
@@ -422,34 +697,67 @@ describe('LessonPipelinePage', () => {
     mockStore.isDirty = true;
     // Use mockImplementation so saving=true survives the re-render from setMounted(true).
     vi.mocked(urql.useMutation).mockImplementation((doc: unknown) => {
-      if (doc === 'SAVE_LESSON_PIPELINE_MUTATION') return [{ fetching: true }, NOOP_EXECUTE] as never;
+      if (doc === 'SAVE_LESSON_PIPELINE_MUTATION')
+        return [{ fetching: true }, NOOP_EXECUTE] as never;
       return NOOP_MUTATION;
     });
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('שומר...')).toBeInTheDocument();
   });
 
   it('shows save error banner on failed save', async () => {
     mockStore.isDirty = true;
-    const mockFailSave = vi.fn().mockResolvedValue({ data: null, error: { message: 'Server down', graphQLErrors: [], networkError: null } });
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockFailSave] as never);
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    const mockFailSave = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        message: 'Server down',
+        graphQLErrors: [],
+        networkError: null,
+      },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockFailSave,
+    ] as never);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('save-btn'));
-    await waitFor(() => expect(screen.getByTestId('pipeline-error')).toBeInTheDocument());
-    expect(screen.getByTestId('pipeline-error')).toHaveTextContent('Server down');
+    await waitFor(() =>
+      expect(screen.getByTestId('pipeline-error')).toBeInTheDocument()
+    );
+    expect(screen.getByTestId('pipeline-error')).toHaveTextContent(
+      'Server down'
+    );
     // Regression guard: raw error.message must NOT be absent from the error banner (it should be shown, but via the banner not raw JS)
     expect(screen.queryByText(/\[object Object\]/)).not.toBeInTheDocument();
   });
 
   it('renders Lesson Pipeline heading', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    expect(screen.getAllByRole('heading', { name: 'Lesson Pipeline' }).length).toBeGreaterThanOrEqual(1);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getAllByRole('heading', { name: 'Lesson Pipeline' }).length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   // ── CUSTOM template (Build from scratch) ────────────────────────────────────
 
   it('template picker has a CUSTOM option', () => {
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     const picker = screen.getByTestId('template-picker');
     expect(picker).toContainHTML('CUSTOM');
     expect(screen.getByText(/בנה ידנית/)).toBeInTheDocument();
@@ -457,40 +765,88 @@ describe('LessonPipelinePage', () => {
 
   it('selecting CUSTOM calls clearNodes and shows empty canvas', async () => {
     // Start with nodes loaded (e.g. from a saved template)
-    mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'CUSTOM' } });
+    mockStore.nodes = [
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+    ];
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'CUSTOM' },
+    });
     expect(mockStore.clearNodes).toHaveBeenCalledTimes(1);
   });
 
   it('CUSTOM mode shows "מצב בנייה חופשית" message in empty canvas', async () => {
     mockStore.nodes = [];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     // Trigger custom mode
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'CUSTOM' } });
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'CUSTOM' },
+    });
     // The custom mode message should appear (since nodes is empty in mockStore)
-    await waitFor(() => expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument());
-    expect(screen.getByText(/גרור מודולים מהחלונית השמאלית לכאן/)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument()
+    );
+    expect(
+      screen.getByText(/גרור מודולים מהחלונית השמאלית לכאן/)
+    ).toBeInTheDocument();
   });
 
   it('CUSTOM mode empty canvas does NOT show default drag prompt', async () => {
     mockStore.nodes = [];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'CUSTOM' } });
-    await waitFor(() => expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument());
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'CUSTOM' },
+    });
+    await waitFor(() =>
+      expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument()
+    );
     // Default message should NOT appear
-    expect(screen.queryByText('בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל')
+    ).not.toBeInTheDocument();
   });
 
   it('selecting THEMATIC after CUSTOM shows default canvas message', async () => {
     mockStore.nodes = [];
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     // Enter custom mode
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'CUSTOM' } });
-    await waitFor(() => expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument());
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'CUSTOM' },
+    });
+    await waitFor(() =>
+      expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument()
+    );
     // Load THEMATIC (nodes remain empty in mockStore since loadTemplate is mocked)
-    fireEvent.change(screen.getByTestId('template-picker'), { target: { value: 'THEMATIC' } });
-    await waitFor(() => expect(screen.queryByText('מצב בנייה חופשית')).not.toBeInTheDocument());
+    fireEvent.change(screen.getByTestId('template-picker'), {
+      target: { value: 'THEMATIC' },
+    });
+    await waitFor(() =>
+      expect(screen.queryByText('מצב בנייה חופשית')).not.toBeInTheDocument()
+    );
     expect(mockStore.loadTemplate).toHaveBeenCalledWith('THEMATIC');
   });
 
@@ -506,8 +862,14 @@ describe('LessonPipelinePage', () => {
         proceed: vi.fn(),
         reset: vi.fn(),
       } as never);
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-      expect(screen.queryByTestId('unsaved-changes-dialog')).not.toBeInTheDocument();
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
+      expect(
+        screen.queryByTestId('unsaved-changes-dialog')
+      ).not.toBeInTheDocument();
     });
 
     it('unsaved-changes-dialog IS shown when navigation is blocked (isDirty=true)', () => {
@@ -517,7 +879,11 @@ describe('LessonPipelinePage', () => {
         proceed: vi.fn(),
         reset: vi.fn(),
       } as never);
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
       expect(screen.getByTestId('unsaved-changes-dialog')).toBeInTheDocument();
     });
 
@@ -528,9 +894,17 @@ describe('LessonPipelinePage', () => {
         proceed: vi.fn(),
         reset: vi.fn(),
       } as never);
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
-      expect(screen.getByTestId('unsaved-changes-title')).toHaveTextContent('Unsaved Changes');
-      expect(screen.getByTestId('unsaved-changes-message')).toHaveTextContent('unsaved changes');
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
+      expect(screen.getByTestId('unsaved-changes-title')).toHaveTextContent(
+        'Unsaved Changes'
+      );
+      expect(screen.getByTestId('unsaved-changes-message')).toHaveTextContent(
+        'unsaved changes'
+      );
     });
 
     it('clicking "Leave anyway" calls blocker.proceed', () => {
@@ -541,7 +915,11 @@ describe('LessonPipelinePage', () => {
         proceed: mockProceed,
         reset: vi.fn(),
       } as never);
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
       fireEvent.click(screen.getByTestId('unsaved-leave-btn'));
       expect(mockProceed).toHaveBeenCalledTimes(1);
     });
@@ -554,30 +932,61 @@ describe('LessonPipelinePage', () => {
         proceed: vi.fn(),
         reset: mockReset,
       } as never);
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
       fireEvent.click(screen.getByTestId('unsaved-stay-btn'));
       expect(mockReset).toHaveBeenCalledTimes(1);
     });
 
     it('useBlocker is called with isDirty=true when store is dirty', () => {
       mockStore.isDirty = true;
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
       expect(vi.mocked(RRD.useBlocker)).toHaveBeenCalledWith(true);
     });
 
     it('useBlocker is called with isDirty=false when store is clean', () => {
       mockStore.isDirty = false;
-      render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+      render(
+        <MemoryRouter>
+          <LessonPipelinePage />
+        </MemoryRouter>
+      );
       expect(vi.mocked(RRD.useBlocker)).toHaveBeenCalledWith(false);
     });
   });
 
   it('loads existing pipeline nodes from query data', () => {
-    const savedNodes = [{ id: 'saved-1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
+    const savedNodes = [
+      {
+        id: 'saved-1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+    ];
     mockUseQueryPair({
-      data: { lesson: { ...MOCK_LESSON, pipeline: { id: 'p1', nodes: savedNodes, status: 'DRAFT' } } },
+      data: {
+        lesson: {
+          ...MOCK_LESSON,
+          pipeline: { id: 'p1', nodes: savedNodes, status: 'DRAFT' },
+        },
+      },
     });
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     expect(mockStore.setNodes).toHaveBeenCalledWith(savedNodes);
   });
 
@@ -585,9 +994,23 @@ describe('LessonPipelinePage', () => {
     mockUseQueryPair({
       data: { lesson: MOCK_LESSON_WITH_ASSETS },
     });
-    mockStore.nodes = [{ id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} }];
+    mockStore.nodes = [
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+    ];
     mockStore.selectedNodeId = 'n1';
-    render(<MemoryRouter><LessonPipelinePage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonPipelinePage />
+      </MemoryRouter>
+    );
     // Config panel rendered in both desktop + mobile responsive wrappers
     const panels = screen.getAllByTestId('config-panel');
     expect(panels.length).toBeGreaterThanOrEqual(1);

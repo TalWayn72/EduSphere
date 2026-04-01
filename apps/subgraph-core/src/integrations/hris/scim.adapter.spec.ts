@@ -39,7 +39,9 @@ describe('ScimAdapter', () => {
     expect(fetch).toHaveBeenCalledWith(
       'https://scim.example.com/ServiceProviderConfig',
       expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: 'Bearer test-bearer-token' }),
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-bearer-token',
+        }),
       })
     );
   });

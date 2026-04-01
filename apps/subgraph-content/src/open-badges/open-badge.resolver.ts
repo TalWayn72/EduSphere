@@ -37,7 +37,7 @@ function requireAuth(ctx: GqlCtx): {
 export class OpenBadgeResolver {
   constructor(
     private readonly badgeService: OpenBadgeService,
-    private readonly graphCredentialService: GraphGroundedCredentialService,
+    private readonly graphCredentialService: GraphGroundedCredentialService
   ) {}
 
   // ── Queries ───────────────────────────────────────────────────────────────
@@ -130,14 +130,14 @@ export class OpenBadgeResolver {
   async knowledgePathCoverage(
     @Args('courseId') courseId: string,
     @Args('requiredConceptIds') requiredConceptIds: string[],
-    @Context() ctx: GqlCtx,
+    @Context() ctx: GqlCtx
   ): Promise<KnowledgePathCoverageResult> {
     const user = requireAuth(ctx);
     return this.graphCredentialService.verifyKnowledgePathCoverage(
       user.userId,
       user.tenantId,
       courseId,
-      requiredConceptIds,
+      requiredConceptIds
     );
   }
 
@@ -146,7 +146,7 @@ export class OpenBadgeResolver {
     @Args('courseId') courseId: string,
     @Args('definitionId') definitionId: string,
     @Args('requiredConceptIds') requiredConceptIds: string[],
-    @Context() ctx: GqlCtx,
+    @Context() ctx: GqlCtx
   ): Promise<BadgeAssertionResult> {
     const user = requireAuth(ctx);
     return this.badgeService.issueGraphGroundedBadge(
@@ -154,7 +154,7 @@ export class OpenBadgeResolver {
       user.tenantId,
       courseId,
       definitionId,
-      requiredConceptIds,
+      requiredConceptIds
     );
   }
 }

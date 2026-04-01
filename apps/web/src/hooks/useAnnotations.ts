@@ -37,8 +37,17 @@ export interface UseAnnotationsReturn {
   isPending: boolean;
   error: string | null;
   refetch: () => void;
-  addAnnotation: (content: string, layer: AnnotationLayer, timestamp: number) => void;
-  addReply: (parentId: string, content: string, layer: AnnotationLayer, timestamp: number) => void;
+  addAnnotation: (
+    content: string,
+    layer: AnnotationLayer,
+    timestamp: number
+  ) => void;
+  addReply: (
+    parentId: string,
+    content: string,
+    layer: AnnotationLayer,
+    timestamp: number
+  ) => void;
   createFlashcard: (annotationId: string, content: string) => Promise<boolean>;
   promoteAnnotation: (annotationId: string) => Promise<boolean>;
 }
@@ -49,7 +58,10 @@ export function useAnnotations(
 ): UseAnnotationsReturn {
   const validAssetId = !!contentId && isUUID(contentId);
 
-  const [result, executeQuery] = useQuery<AnnotationsQuery, AnnotationsQueryVariables>({
+  const [result, executeQuery] = useQuery<
+    AnnotationsQuery,
+    AnnotationsQueryVariables
+  >({
     query: ANNOTATIONS_QUERY,
     variables: { assetId: contentId },
     pause: !validAssetId,
@@ -72,7 +84,9 @@ export function useAnnotations(
   const serverAnnotations: Annotation[] =
     !validAssetId || hasError
       ? getThreadedAnnotations()
-      : (result.data?.annotations ?? []).map((a) => normaliseAnnotation(a, contentId));
+      : (result.data?.annotations ?? []).map((a) =>
+          normaliseAnnotation(a, contentId)
+        );
 
   const serverIds = new Set(serverAnnotations.map((a) => a.id));
 
@@ -86,7 +100,8 @@ export function useAnnotations(
     if (!incoming) return;
     const newAnn = normaliseAnnotation(incoming, contentId);
     setLocalAnnotations((prev) => {
-      if (prev.some((a) => a.id === newAnn.id) || serverIds.has(newAnn.id)) return prev;
+      if (prev.some((a) => a.id === newAnn.id) || serverIds.has(newAnn.id))
+        return prev;
       return [newAnn, ...prev];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,14 +127,18 @@ export function useAnnotations(
     contentId,
     validAssetId,
     setLocalAnnotations,
-    executeQuery: executeQuery as unknown as (opts: { requestPolicy: string }) => void,
+    executeQuery: executeQuery as unknown as (opts: {
+      requestPolicy: string;
+    }) => void,
   });
 
   return {
     annotations: visibleAnnotations,
     fetching: result.fetching,
     isPending: mutations.isPending,
-    error: hasError ? (result.error?.message ?? 'Failed to load annotations') : null,
+    error: hasError
+      ? (result.error?.message ?? 'Failed to load annotations')
+      : null,
     refetch,
     addAnnotation: mutations.addAnnotation,
     addReply: mutations.addReply,

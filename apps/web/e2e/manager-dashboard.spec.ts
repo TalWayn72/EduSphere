@@ -15,7 +15,9 @@ test.describe('Manager Dashboard — DEV_MODE guard', () => {
     await login(page);
   });
 
-  test('no MOCK_ sentinel strings in manager dashboard DOM', async ({ page }) => {
+  test('no MOCK_ sentinel strings in manager dashboard DOM', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/manager`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 

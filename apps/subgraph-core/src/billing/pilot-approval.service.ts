@@ -39,7 +39,10 @@ export class PilotApprovalService implements OnModuleDestroy {
   constructor(private readonly subscriptionService: SubscriptionService) {
     this.db = createDatabaseConnection();
     this.initNats().catch((err) =>
-      this.logger.warn({ err }, '[PilotApprovalService] NATS init skipped (non-fatal)')
+      this.logger.warn(
+        { err },
+        '[PilotApprovalService] NATS init skipped (non-fatal)'
+      )
     );
   }
 
@@ -53,7 +56,10 @@ export class PilotApprovalService implements OnModuleDestroy {
         await this.nats.drain();
       }
     } catch (err) {
-      this.logger.warn({ err }, '[PilotApprovalService] NATS drain error on destroy');
+      this.logger.warn(
+        { err },
+        '[PilotApprovalService] NATS drain error on destroy'
+      );
     }
     await closeAllPools();
   }
@@ -64,7 +70,9 @@ export class PilotApprovalService implements OnModuleDestroy {
     ctx: TenantContext
   ): Promise<void> {
     if (ctx.userRole !== 'SUPER_ADMIN') {
-      throw new UnauthorizedException('Only SUPER_ADMIN can approve pilot requests');
+      throw new UnauthorizedException(
+        'Only SUPER_ADMIN can approve pilot requests'
+      );
     }
 
     const [request] = await this.db
@@ -84,7 +92,7 @@ export class PilotApprovalService implements OnModuleDestroy {
 
     if (ctx.tenantId && request.tenantId && ctx.tenantId === request.tenantId) {
       throw new BadRequestException(
-        'Self-approval of own organization\'s pilot request is not permitted'
+        "Self-approval of own organization's pilot request is not permitted"
       );
     }
 
@@ -104,7 +112,9 @@ export class PilotApprovalService implements OnModuleDestroy {
       .returning();
 
     if (!newTenant) {
-      throw new InternalServerErrorException('[PilotApprovalService] Failed to provision tenant');
+      throw new InternalServerErrorException(
+        '[PilotApprovalService] Failed to provision tenant'
+      );
     }
 
     const [pilotPlan] = await this.db
@@ -114,7 +124,9 @@ export class PilotApprovalService implements OnModuleDestroy {
       .limit(1);
 
     if (!pilotPlan) {
-      throw new InternalServerErrorException('[PilotApprovalService] No active subscription plan found');
+      throw new InternalServerErrorException(
+        '[PilotApprovalService] No active subscription plan found'
+      );
     }
 
     const pilotEndsAt = new Date();
@@ -165,7 +177,9 @@ export class PilotApprovalService implements OnModuleDestroy {
     ctx: TenantContext
   ): Promise<void> {
     if (ctx.userRole !== 'SUPER_ADMIN') {
-      throw new UnauthorizedException('Only SUPER_ADMIN can reject pilot requests');
+      throw new UnauthorizedException(
+        'Only SUPER_ADMIN can reject pilot requests'
+      );
     }
 
     const validated = RejectPilotSchema.safeParse({ requestId, reason });
@@ -174,7 +188,10 @@ export class PilotApprovalService implements OnModuleDestroy {
     }
 
     const [request] = await this.db
-      .select({ id: schema.pilotRequests.id, status: schema.pilotRequests.status })
+      .select({
+        id: schema.pilotRequests.id,
+        status: schema.pilotRequests.status,
+      })
       .from(schema.pilotRequests)
       .where(eq(schema.pilotRequests.id, requestId))
       .limit(1);
@@ -199,7 +216,10 @@ export class PilotApprovalService implements OnModuleDestroy {
       timestamp: new Date().toISOString(),
     });
 
-    this.logger.log({ requestId }, '[PilotApprovalService] Pilot request rejected');
+    this.logger.log(
+      { requestId },
+      '[PilotApprovalService] Pilot request rejected'
+    );
   }
 
   async listPilotRequests(status?: string): Promise<PilotRequest[]> {
@@ -224,7 +244,10 @@ export class PilotApprovalService implements OnModuleDestroy {
         new TextEncoder().encode(JSON.stringify(payload))
       );
     } catch (err) {
-      this.logger.warn({ err, subject }, '[PilotApprovalService] NATS publish failed');
+      this.logger.warn(
+        { err, subject },
+        '[PilotApprovalService] NATS publish failed'
+      );
     }
   }
 }

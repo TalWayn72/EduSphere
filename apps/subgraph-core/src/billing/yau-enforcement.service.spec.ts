@@ -13,7 +13,8 @@ const { mockSelect, mockPublish, mockDrain } = vi.hoisted(() => ({
 }));
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -45,7 +46,10 @@ vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn(() => ({ servers: 'nats://localhost:4222' })),
 }));
 
-import { YauEnforcementService, QuotaExceededError } from './yau-enforcement.service.js';
+import {
+  YauEnforcementService,
+  QuotaExceededError,
+} from './yau-enforcement.service.js';
 
 describe('YauEnforcementService', () => {
   let service: YauEnforcementService;

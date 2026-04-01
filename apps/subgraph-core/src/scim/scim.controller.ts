@@ -2,11 +2,7 @@
  * ScimController — SCIM 2.0 ServiceProviderConfig endpoint + re-exports.
  * User and Group endpoints split into ScimUserController and ScimGroupController.
  */
-import {
-  Controller,
-  Get,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import type { ServiceProviderConfig } from './scim.types.js';
 

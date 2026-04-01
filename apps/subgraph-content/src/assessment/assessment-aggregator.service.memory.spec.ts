@@ -13,7 +13,9 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn(),
   and: vi.fn(),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) => fn({})),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) => fn({})
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 

@@ -139,7 +139,10 @@ export class KeycloakAdminHttpService implements OnModuleDestroy {
         `Keycloak API error ${res.status}: ${body}`
       );
     } catch (err) {
-      if (attempt < MAX_RETRIES && !(err instanceof InternalServerErrorException)) {
+      if (
+        attempt < MAX_RETRIES &&
+        !(err instanceof InternalServerErrorException)
+      ) {
         const delay = BACKOFF_BASE_MS * Math.pow(2, attempt - 1);
         await new Promise((r) => setTimeout(r, delay));
         return this.fetchWithRetry(url, init, attempt + 1);

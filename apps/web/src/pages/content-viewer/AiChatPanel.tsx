@@ -35,7 +35,12 @@ export interface AiChatPanelProps {
   onSourceClick?: (sourceId: string) => void;
 }
 
-const QUICK_PROMPTS = ['Debate free will', 'Quiz me', 'Summarize', 'Explain Rambam'];
+const QUICK_PROMPTS = [
+  'Debate free will',
+  'Quiz me',
+  'Summarize',
+  'Explain Rambam',
+];
 const CHAT_MODES = ['CHAVRUTA', 'QUIZ', 'EXPLAIN'];
 
 export const AiChatPanel = React.memo(function AiChatPanel({
@@ -48,7 +53,9 @@ export const AiChatPanel = React.memo(function AiChatPanel({
   onSourceClick,
 }: AiChatPanelProps) {
   const { t } = useTranslation(['content']);
-  const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set());
+  const [expandedSources, setExpandedSources] = useState<Set<string>>(
+    new Set()
+  );
 
   const toggleSources = useCallback((msgId: string) => {
     setExpandedSources((prev) => {
@@ -66,14 +73,16 @@ export const AiChatPanel = React.memo(function AiChatPanel({
         <div className="px-4 py-2 border-b flex items-center gap-2 flex-shrink-0">
           <Bot className="h-4 w-4 text-primary" aria-hidden="true" />
           <div>
-            <p className="text-sm font-semibold">
-              {t('content:chavrutaAi')}
-            </p>
+            <p className="text-sm font-semibold">{t('content:chavrutaAi')}</p>
             <p className="text-xs text-muted-foreground">
               {t('content:dialecticalPartner')}
             </p>
           </div>
-          <div className="ml-auto flex gap-1" role="group" aria-label={t('content:chatModes', 'Chat modes')}>
+          <div
+            className="ml-auto flex gap-1"
+            role="group"
+            aria-label={t('content:chatModes', 'Chat modes')}
+          >
             {CHAT_MODES.map((mode) => (
               <button
                 key={mode}
@@ -88,7 +97,12 @@ export const AiChatPanel = React.memo(function AiChatPanel({
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3" role="log" aria-label={t('content:chatMessages', 'Chat messages')} aria-live="polite">
+        <div
+          className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
+          role="log"
+          aria-label={t('content:chatMessages', 'Chat messages')}
+          aria-live="polite"
+        >
           {chatMessages.map((msg) => (
             <div
               key={msg.id}
@@ -111,7 +125,10 @@ export const AiChatPanel = React.memo(function AiChatPanel({
                     className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                     data-testid={`sources-toggle-${msg.id}`}
                     aria-expanded={expandedSources.has(msg.id)}
-                    aria-label={t('content:toggleSources', { count: msg.sources.length, defaultValue: 'Toggle {{count}} source references' })}
+                    aria-label={t('content:toggleSources', {
+                      count: msg.sources.length,
+                      defaultValue: 'Toggle {{count}} source references',
+                    })}
                   >
                     <FileText className="h-3 w-3" aria-hidden="true" />
                     {t('content:sourcesCount', {
@@ -130,7 +147,10 @@ export const AiChatPanel = React.memo(function AiChatPanel({
                       data-testid={`sources-list-${msg.id}`}
                     >
                       {msg.sources.map((src) => (
-                        <li key={src.sourceId} className="flex items-center justify-between text-xs">
+                        <li
+                          key={src.sourceId}
+                          className="flex items-center justify-between text-xs"
+                        >
                           <button
                             onClick={() => onSourceClick?.(src.sourceId)}
                             className="text-primary hover:underline truncate max-w-[70%] text-left"
@@ -150,8 +170,15 @@ export const AiChatPanel = React.memo(function AiChatPanel({
             </div>
           ))}
           {isStreaming && (
-            <div className="flex justify-start" role="status" aria-label={t('content:aiTyping', 'AI is responding')}>
-              <div className="bg-muted rounded-lg rounded-bl-none px-4 py-3 flex gap-1 items-center" aria-hidden="true">
+            <div
+              className="flex justify-start"
+              role="status"
+              aria-label={t('content:aiTyping', 'AI is responding')}
+            >
+              <div
+                className="bg-muted rounded-lg rounded-bl-none px-4 py-3 flex gap-1 items-center"
+                aria-hidden="true"
+              >
                 {DOT_DELAY_STYLES.map((style, i) => (
                   <span
                     key={i}
@@ -166,7 +193,11 @@ export const AiChatPanel = React.memo(function AiChatPanel({
         </div>
 
         {/* Quick prompts */}
-        <div className="px-4 py-2 border-t border-b flex gap-2 overflow-x-auto flex-shrink-0" role="group" aria-label={t('content:quickPrompts', 'Quick prompts')}>
+        <div
+          className="px-4 py-2 border-t border-b flex gap-2 overflow-x-auto flex-shrink-0"
+          role="group"
+          aria-label={t('content:quickPrompts', 'Quick prompts')}
+        >
           {QUICK_PROMPTS.map((prompt) => (
             <button
               key={prompt}
@@ -185,10 +216,7 @@ export const AiChatPanel = React.memo(function AiChatPanel({
             value={chatInput}
             onChange={(e) => onChatInputChange(e.target.value)}
             onKeyDown={(e) =>
-              e.key === 'Enter' &&
-              !e.shiftKey &&
-              !isStreaming &&
-              onSendChat()
+              e.key === 'Enter' && !e.shiftKey && !isStreaming && onSendChat()
             }
             placeholder={
               isStreaming
@@ -196,7 +224,10 @@ export const AiChatPanel = React.memo(function AiChatPanel({
                 : t('content:askOrDebate')
             }
             disabled={isStreaming}
-            aria-label={t('content:chatInputLabel', 'Type your message to the AI')}
+            aria-label={t(
+              'content:chatInputLabel',
+              'Type your message to the AI'
+            )}
             className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 disabled:cursor-not-allowed"
           />
           <Button

@@ -6,7 +6,13 @@ import { WebSiteSchema } from './WebSiteSchema';
 
 describe('WebSiteSchema', () => {
   it('renders without throwing', () => {
-    expect(() => render(<HelmetProvider><WebSiteSchema /></HelmetProvider>)).not.toThrow();
+    expect(() =>
+      render(
+        <HelmetProvider>
+          <WebSiteSchema />
+        </HelmetProvider>
+      )
+    ).not.toThrow();
   });
 
   it('type is WebSite', () => {

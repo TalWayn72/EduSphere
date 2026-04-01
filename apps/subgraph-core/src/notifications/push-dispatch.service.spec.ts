@@ -55,7 +55,12 @@ describe('PushDispatchService', () => {
     ]);
     mockFetch.mockResolvedValueOnce({ ok: true });
 
-    await service.dispatchToUser('user-1', 'tenant-1', 'Test Title', 'Test Body');
+    await service.dispatchToUser(
+      'user-1',
+      'tenant-1',
+      'Test Title',
+      'Test Body'
+    );
     // Let fire-and-forget settle
     await vi.runAllTimersAsync();
 

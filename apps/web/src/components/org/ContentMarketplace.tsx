@@ -28,7 +28,10 @@ function ItemCard({
       : `$${(item.priceUsdCents / 100).toFixed(2)}`;
 
   return (
-    <div data-testid={`item-${item.id}`} className="rounded-lg border p-4 space-y-2">
+    <div
+      data-testid={`item-${item.id}`}
+      className="rounded-lg border p-4 space-y-2"
+    >
       {item.thumbnailUrl ? (
         <img
           src={item.thumbnailUrl}
@@ -53,9 +56,7 @@ function ItemCard({
         disabled={isInCart}
         className="w-full rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground disabled:opacity-50"
       >
-        {isInCart
-          ? 'In Cart'
-          : t('marketplace.addToOrg', 'Add to Org')}
+        {isInCart ? 'In Cart' : t('marketplace.addToOrg', 'Add to Org')}
       </button>
     </div>
   );
@@ -77,14 +78,14 @@ function CartSidebar({
   if (cart.length === 0) return null;
 
   return (
-    <div
-      data-testid="cart-sidebar"
-      className="rounded-lg border p-4 space-y-3"
-    >
+    <div data-testid="cart-sidebar" className="rounded-lg border p-4 space-y-3">
       <h3 className="font-medium text-sm">Cart ({cart.length})</h3>
       <ul role="list" className="space-y-2">
         {cart.map((ci) => (
-          <li key={ci.itemId} className="flex items-center justify-between text-sm">
+          <li
+            key={ci.itemId}
+            className="flex items-center justify-between text-sm"
+          >
             <span className="truncate">{ci.title}</span>
             <div className="flex items-center gap-2">
               <span>${(ci.priceUsdCents / 100).toFixed(2)}</span>
@@ -105,7 +106,9 @@ function CartSidebar({
         </span>
         <button
           onClick={onCheckout}
-          disabled={checkoutStatus === 'creating' || checkoutStatus === 'redirecting'}
+          disabled={
+            checkoutStatus === 'creating' || checkoutStatus === 'redirecting'
+          }
           className="rounded-md bg-primary px-4 py-1.5 text-sm text-primary-foreground disabled:opacity-50"
         >
           {checkoutStatus === 'creating' ? 'Processing...' : 'Checkout'}
@@ -132,8 +135,7 @@ export function ContentMarketplace() {
     isInCart,
   } = useContentMarketplace();
 
-  const { status: checkoutStatus, createCheckoutSession } =
-    useStripeCheckout();
+  const { status: checkoutStatus, createCheckoutSession } = useStripeCheckout();
 
   const handleCheckout = () => {
     const lineItems = cart.map((ci) => ({
@@ -176,10 +178,7 @@ export function ContentMarketplace() {
           role="searchbox"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t(
-            'marketplace.searchPlaceholder',
-            'Search courses...'
-          )}
+          placeholder={t('marketplace.searchPlaceholder', 'Search courses...')}
           aria-label={t('marketplace.searchLabel', 'Search marketplace')}
           className="flex-1 rounded-md border px-3 py-2 text-sm"
         />

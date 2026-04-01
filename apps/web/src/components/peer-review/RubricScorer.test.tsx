@@ -3,7 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import RubricScorer from './RubricScorer';
 
 const criteria = [
-  { id: 'c1', label: 'Content Quality', description: 'How good is the content?', maxScore: 5 },
+  {
+    id: 'c1',
+    label: 'Content Quality',
+    description: 'How good is the content?',
+    maxScore: 5,
+  },
   { id: 'c2', label: 'Clarity', description: 'How clear is it?', maxScore: 5 },
 ];
 

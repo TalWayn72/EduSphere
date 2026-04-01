@@ -70,9 +70,9 @@ export function mapApiNodes(
   return apiNodes.map((n) => ({
     id: n.id,
     label: n.label,
-    mastery: localOverrides.get(n.id) ?? (MASTERY_MAP[n.masteryLevel] ?? 'none'),
+    mastery: localOverrides.get(n.id) ?? MASTERY_MAP[n.masteryLevel] ?? 'none',
     progress: masteryToProgress(
-      localOverrides.get(n.id) ?? (MASTERY_MAP[n.masteryLevel] ?? 'none')
+      localOverrides.get(n.id) ?? MASTERY_MAP[n.masteryLevel] ?? 'none'
     ),
     children: n.connections.filter((id) => allIds.has(id)),
     unlocked: true,

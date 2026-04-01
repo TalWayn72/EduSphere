@@ -20,7 +20,10 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   withReadReplica: vi.fn((fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) =>
+      fn(mockDb)
+  ),
   schema: {
     courses: {
       id: 'id',
@@ -317,7 +320,9 @@ describe('CourseService', () => {
     it('sets is_published to false (unpublish)', async () => {
       let cap: Record<string, unknown> = {};
       mockSet.mockImplementation((v: Record<string, unknown>) => {
-        const updateWhere = vi.fn().mockReturnValue({ returning: mockReturning });
+        const updateWhere = vi
+          .fn()
+          .mockReturnValue({ returning: mockReturning });
         cap = v;
         return { where: updateWhere };
       });
@@ -338,7 +343,11 @@ describe('CourseService', () => {
   });
 
   describe('delete()', () => {
-    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'INSTRUCTOR' as const };
+    const tenantCtx = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      userRole: 'INSTRUCTOR' as const,
+    };
     // DB returns snake_case; the service reads rawCourse['instructor_id']
     const MOCK_DB_COURSE = { ...MOCK_COURSE, instructor_id: 'user-1' };
 
@@ -460,7 +469,11 @@ describe('CourseService', () => {
     });
 
     it('creates a forked course with forkedFromId', async () => {
-      const forkRow = { ...MOCK_COURSE, id: 'fork-id', forked_from_id: 'course-1' };
+      const forkRow = {
+        ...MOCK_COURSE,
+        id: 'fork-id',
+        forked_from_id: 'course-1',
+      };
       mockReturning.mockResolvedValue([forkRow]);
       const result = await service.forkCourse('course-1', 'user-1', 'tenant-1');
       expect(result?.forkedFromId).toBe('course-1');
@@ -537,7 +550,11 @@ describe('CourseService', () => {
       lessons?: unknown[];
       pipelineRunCounts?: number[];
     }) {
-      const { course = READY_COURSE, lessons = [READY_LESSON], pipelineRunCounts = [1] } = options;
+      const {
+        course = READY_COURSE,
+        lessons = [READY_LESSON],
+        pipelineRunCounts = [1],
+      } = options;
       let withReadReplicaCallCount = 0;
 
       vi.mocked(withReadReplica).mockImplementation(
@@ -634,7 +651,9 @@ describe('CourseService', () => {
       const result = await service.checkCourseReadiness('course-1');
 
       expect(result.ready).toBe(false);
-      const pipelineCheck = result.checks.find((c) => c.name === 'has_pipeline_results');
+      const pipelineCheck = result.checks.find(
+        (c) => c.name === 'has_pipeline_results'
+      );
       expect(pipelineCheck?.passed).toBe(false);
     });
 
@@ -654,9 +673,9 @@ describe('CourseService', () => {
     it('throws NotFoundException when course not found', async () => {
       setupReadinessChain({ course: null });
 
-      await expect(
-        service.checkCourseReadiness('nonexistent')
-      ).rejects.toThrow('not found');
+      await expect(service.checkCourseReadiness('nonexistent')).rejects.toThrow(
+        'not found'
+      );
     });
   });
 
@@ -669,23 +688,27 @@ describe('CourseService', () => {
           (fn: (db: typeof mockDb) => unknown) => {
             callCount++;
             if (callCount === 1) {
-              mockLimit.mockResolvedValue([{
-                ...MOCK_COURSE,
-                title: 'Complete Course',
-                description: 'Has desc',
-              }]);
+              mockLimit.mockResolvedValue([
+                {
+                  ...MOCK_COURSE,
+                  title: 'Complete Course',
+                  description: 'Has desc',
+                },
+              ]);
               mockWhere.mockReturnValue({ limit: mockLimit });
               mockFrom.mockReturnValue({ where: mockWhere });
               mockSelect.mockReturnValue({ from: mockFrom });
               return fn(mockDb);
             }
             if (callCount === 2) {
-              mockWhere.mockResolvedValue([{
-                id: 'lesson-1',
-                course_id: 'course-1',
-                status: 'READY',
-                deleted_at: null,
-              }]);
+              mockWhere.mockResolvedValue([
+                {
+                  id: 'lesson-1',
+                  course_id: 'course-1',
+                  status: 'READY',
+                  deleted_at: null,
+                },
+              ]);
               mockFrom.mockReturnValue({ where: mockWhere });
               mockSelect.mockReturnValue({ from: mockFrom });
               return fn(mockDb);
@@ -703,11 +726,13 @@ describe('CourseService', () => {
           (fn: (db: typeof mockDb) => unknown) => {
             callCount++;
             if (callCount === 1) {
-              mockLimit.mockResolvedValue([{
-                ...MOCK_COURSE,
-                title: 'No Desc',
-                description: '',
-              }]);
+              mockLimit.mockResolvedValue([
+                {
+                  ...MOCK_COURSE,
+                  title: 'No Desc',
+                  description: '',
+                },
+              ]);
               mockWhere.mockReturnValue({ limit: mockLimit });
               mockFrom.mockReturnValue({ where: mockWhere });
               mockSelect.mockReturnValue({ from: mockFrom });
@@ -734,9 +759,9 @@ describe('CourseService', () => {
     it('throws BadRequestException when course is not ready', async () => {
       setupPublishWithReadiness(false);
 
-      await expect(
-        service.setPublished('course-1', true)
-      ).rejects.toThrow('Course is not ready to publish');
+      await expect(service.setPublished('course-1', true)).rejects.toThrow(
+        'Course is not ready to publish'
+      );
     });
 
     it('succeeds when course is ready', async () => {

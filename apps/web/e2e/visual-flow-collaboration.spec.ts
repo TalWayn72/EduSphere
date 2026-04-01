@@ -13,37 +13,37 @@ test.describe('Visual Flow — Collaboration', () => {
     await page.goto('/courses/1');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot(
-      'flow-collab-01-course-detail.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
-    );
+    await expect(page).toHaveScreenshot('flow-collab-01-course-detail.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     // Step 2: Annotation layer
     await page.goto('/courses/1/annotate');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot(
-      'flow-collab-02-annotate.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
-    );
+    await expect(page).toHaveScreenshot('flow-collab-02-annotate.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     // Step 3: Social feed
     await page.goto('/social');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot(
-      'flow-collab-03-social-feed.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
-    );
+    await expect(page).toHaveScreenshot('flow-collab-03-social-feed.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     // Step 4: Discussions list
     await page.goto('/courses/1/discussions');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot(
-      'flow-collab-04-discussions.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
-    );
+    await expect(page).toHaveScreenshot('flow-collab-04-discussions.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     // Step 5: Discussion thread detail
     await page.goto('/courses/1/discussions/1');
@@ -51,17 +51,17 @@ test.describe('Visual Flow — Collaboration', () => {
     await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot(
       'flow-collab-05-discussion-thread.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
+      { ...LOOSE_OPTS, mask: dynamicMasks(page) }
     );
 
     // Step 6: Peer review assignments
     await page.goto('/courses/1/peer-review');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot(
-      'flow-collab-06-peer-review.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
-    );
+    await expect(page).toHaveScreenshot('flow-collab-06-peer-review.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     // Step 7: Peer review detail
     await page.goto('/courses/1/peer-review/1');
@@ -69,17 +69,17 @@ test.describe('Visual Flow — Collaboration', () => {
     await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot(
       'flow-collab-07-peer-review-detail.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
+      { ...LOOSE_OPTS, mask: dynamicMasks(page) }
     );
 
     // Step 8: Collaboration activity log
     await page.goto('/courses/1/activity');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot(
-      'flow-collab-08-activity-log.png',
-      { ...LOOSE_OPTS, mask: dynamicMasks(page) },
-    );
+    await expect(page).toHaveScreenshot('flow-collab-08-activity-log.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
   });
 
   // === EXPANDED — Header sections per step ===
@@ -98,11 +98,13 @@ test.describe('Visual Flow — Collaboration', () => {
       await page.goto(step.path);
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
-      const header = page.locator('header, nav, [data-testid="app-header"]').first();
+      const header = page
+        .locator('header, nav, [data-testid="app-header"]')
+        .first();
       if (await header.isVisible().catch(() => false)) {
         await expect(header).toHaveScreenshot(
           `flow-collab-header-${step.name}.png`,
-          { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+          { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
         );
       }
     }
@@ -124,7 +126,7 @@ test.describe('Visual Flow — Collaboration', () => {
       if (await main.isVisible().catch(() => false)) {
         await expect(main).toHaveScreenshot(
           `flow-collab-main-${step.name}.png`,
-          { ...LOOSE_OPTS, mask: dynamicMasks(page) },
+          { ...LOOSE_OPTS, mask: dynamicMasks(page) }
         );
       }
     }
@@ -138,37 +140,58 @@ test.describe('Visual Flow — Collaboration', () => {
     await page.goto('/courses/1');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-01-course.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-tablet-01-course.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/courses/1/annotate');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-02-annotate.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-tablet-02-annotate.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/social');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-03-social.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-tablet-03-social.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/courses/1/discussions');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-04-discussions.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot(
+      'flow-collab-tablet-04-discussions.png',
+      { ...LOOSE_OPTS, mask: dynamicMasks(page) }
+    );
 
     await page.goto('/courses/1/discussions/1');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-05-thread.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-tablet-05-thread.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/courses/1/peer-review');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-06-peer-review.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot(
+      'flow-collab-tablet-06-peer-review.png',
+      { ...LOOSE_OPTS, mask: dynamicMasks(page) }
+    );
 
     await page.goto('/courses/1/activity');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-tablet-07-activity.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-tablet-07-activity.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
   });
 
   // === EXPANDED — Mobile viewport ===
@@ -179,31 +202,49 @@ test.describe('Visual Flow — Collaboration', () => {
     await page.goto('/courses/1');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-mobile-01-course.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-mobile-01-course.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/social');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-mobile-02-social.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-mobile-02-social.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/courses/1/discussions');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-mobile-03-discussions.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot(
+      'flow-collab-mobile-03-discussions.png',
+      { ...LOOSE_OPTS, mask: dynamicMasks(page) }
+    );
 
     await page.goto('/courses/1/discussions/1');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-mobile-04-thread.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-mobile-04-thread.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
 
     await page.goto('/courses/1/peer-review');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-mobile-05-peer-review.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot(
+      'flow-collab-mobile-05-peer-review.png',
+      { ...LOOSE_OPTS, mask: dynamicMasks(page) }
+    );
 
     await page.goto('/courses/1/activity');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('flow-collab-mobile-06-activity.png', { ...LOOSE_OPTS, mask: dynamicMasks(page) });
+    await expect(page).toHaveScreenshot('flow-collab-mobile-06-activity.png', {
+      ...LOOSE_OPTS,
+      mask: dynamicMasks(page),
+    });
   });
 });

@@ -49,10 +49,7 @@ export const AgentChatPanel = React.memo(function AgentChatPanel({
   const mode = AGENT_MODES.find((m) => m.id === activeMode)!;
 
   return (
-    <Card
-      className="flex flex-col"
-      style={PANEL_STYLE}
-    >
+    <Card className="flex flex-col" style={PANEL_STYLE}>
       {/* Header */}
       <div
         className={`flex items-center gap-3 px-4 py-3 border-b rounded-t-lg ${mode.bg}`}
@@ -135,9 +132,7 @@ export const AgentChatPanel = React.memo(function AgentChatPanel({
         <input
           value={chatInput}
           onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={(e) =>
-            e.key === 'Enter' && !e.shiftKey && onSend()
-          }
+          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && onSend()}
           placeholder={
             isTyping || streamingContent
               ? t('responding')

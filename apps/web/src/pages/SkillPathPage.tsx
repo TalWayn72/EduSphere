@@ -9,7 +9,10 @@ import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Target } from 'lucide-react';
-import { SKILL_PATHS_QUERY, MY_SKILL_PROGRESS_QUERY } from '@/lib/graphql/skills.queries';
+import {
+  SKILL_PATHS_QUERY,
+  MY_SKILL_PROGRESS_QUERY,
+} from '@/lib/graphql/skills.queries';
 import { SkillPathCard } from '@/components/skills/SkillPathCard';
 
 interface SkillPath {
@@ -98,8 +101,13 @@ export function SkillPathPage() {
         {/* Empty state */}
         {!isLoading && !pathsError && publishedPaths.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-            <Target className="h-10 w-10 text-muted-foreground/40" aria-hidden />
-            <p className="text-muted-foreground">No skill paths available yet.</p>
+            <Target
+              className="h-10 w-10 text-muted-foreground/40"
+              aria-hidden
+            />
+            <p className="text-muted-foreground">
+              No skill paths available yet.
+            </p>
           </div>
         )}
 

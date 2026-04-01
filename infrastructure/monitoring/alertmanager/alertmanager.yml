@@ -51,8 +51,8 @@ receivers:
   - name: "pagerduty"
     pagerduty_configs:
       - service_key: "${PAGERDUTY_SERVICE_KEY}"
-        description: '{{ .GroupLabels.alertname }}: {{ .CommonAnnotations.summary }}'
-        severity: '{{ .GroupLabels.severity }}'
+        description: "{{ .GroupLabels.alertname }}: {{ .CommonAnnotations.summary }}"
+        severity: "{{ .GroupLabels.severity }}"
 
   # Email — backup channel (requires SMTP_PASSWORD)
   - name: "team-email"

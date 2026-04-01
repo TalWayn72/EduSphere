@@ -4,12 +4,7 @@
  * Handles creating and publishing course listings in the marketplace.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  schema,
-  eq,
-  and,
-  withTenantContext,
-} from '@edusphere/db';
+import { schema, eq, and, withTenantContext } from '@edusphere/db';
 import type { TenantContext, Database } from '@edusphere/db';
 
 @Injectable()

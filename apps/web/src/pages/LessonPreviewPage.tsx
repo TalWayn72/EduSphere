@@ -15,7 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LESSON_QUERY } from '@/lib/graphql/lesson.queries';
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface LessonPreviewData {
   lesson: {
@@ -48,7 +49,10 @@ interface LessonPreviewData {
 }
 
 const ASSET_ICONS: Record<string, string> = {
-  VIDEO: '🎥', AUDIO: '🎙️', NOTES: '📄', WHITEBOARD: '📋',
+  VIDEO: '🎥',
+  AUDIO: '🎙️',
+  NOTES: '📄',
+  WHITEBOARD: '📋',
 };
 
 const OUTPUT_LABELS: Record<string, string> = {
@@ -60,11 +64,16 @@ const OUTPUT_LABELS: Record<string, string> = {
 };
 
 export function LessonPreviewPage() {
-  const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
+  const { courseId, lessonId } = useParams<{
+    courseId: string;
+    lessonId: string;
+  }>();
   const navigate = useNavigate();
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isValidId = lessonId ? UUID_RE.test(lessonId) : false;
 
@@ -106,7 +115,9 @@ export function LessonPreviewPage() {
 
   return (
     <Layout>
-      <PreviewBanner onClose={() => navigate(`/courses/${courseId}/lessons/${lessonId}`)} />
+      <PreviewBanner
+        onClose={() => navigate(`/courses/${courseId}/lessons/${lessonId}`)}
+      />
       <PageShell size="sm" className="max-w-3xl p-6">
         <header className="mb-6">
           <h1 className="text-2xl font-bold mb-2">{lesson.title}</h1>
@@ -114,14 +125,21 @@ export function LessonPreviewPage() {
             <span>סוג: {lesson.type === 'THEMATIC' ? 'הגות' : 'על הסדר'}</span>
             {lesson.series && <span>סדרה: {lesson.series}</span>}
             {lesson.lessonDate && (
-              <span>תאריך: {new Date(lesson.lessonDate).toLocaleDateString('he-IL')}</span>
+              <span>
+                תאריך: {new Date(lesson.lessonDate).toLocaleDateString('he-IL')}
+              </span>
             )}
           </div>
         </header>
 
         {lesson.assets.length > 0 && (
-          <section className="bg-card rounded-xl border p-4 mb-4" aria-labelledby="assets-heading">
-            <h2 id="assets-heading" className="text-base font-semibold mb-3">חומרי שיעור</h2>
+          <section
+            className="bg-card rounded-xl border p-4 mb-4"
+            aria-labelledby="assets-heading"
+          >
+            <h2 id="assets-heading" className="text-base font-semibold mb-3">
+              חומרי שיעור
+            </h2>
             <div className="space-y-2">
               {lesson.assets.map((asset) => (
                 <div key={asset.id} className="flex items-center gap-2 text-sm">
@@ -135,13 +153,20 @@ export function LessonPreviewPage() {
 
         {results.length > 0 && (
           <section className="space-y-4" aria-labelledby="results-heading">
-            <h2 id="results-heading" className="text-lg font-semibold">תוצרי השיעור</h2>
+            <h2 id="results-heading" className="text-lg font-semibold">
+              תוצרי השיעור
+            </h2>
             {results.map((result) => (
-              <article key={result.id} className="bg-card rounded-xl border p-4">
+              <article
+                key={result.id}
+                className="bg-card rounded-xl border p-4"
+              >
                 <h3 className="text-sm font-semibold mb-2">
                   {OUTPUT_LABELS[result.moduleName] ?? result.moduleName}
                 </h3>
-                <Badge variant="secondary" className="mb-2">{result.outputType}</Badge>
+                <Badge variant="secondary" className="mb-2">
+                  {result.outputType}
+                </Badge>
                 {result.outputData && (
                   <div className="text-sm text-muted-foreground whitespace-pre-wrap mt-2">
                     {typeof result.outputData === 'object'
@@ -150,8 +175,12 @@ export function LessonPreviewPage() {
                   </div>
                 )}
                 {result.fileUrl && (
-                  <a href={result.fileUrl} target="_blank" rel="noopener noreferrer"
-                    className="text-blue-500 text-sm underline mt-2 inline-block dark:text-blue-400">
+                  <a
+                    href={result.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 text-sm underline mt-2 inline-block dark:text-blue-400"
+                  >
                     פתח קובץ
                   </a>
                 )}
@@ -178,9 +207,16 @@ function PreviewBanner({ onClose }: { onClose: () => void }) {
       role="banner"
       aria-label="מצב תצוגה מקדימה"
     >
-      <span className="font-semibold text-sm">תצוגה מקדימה — כך יראו התלמידים את השיעור</span>
-      <Button variant="ghost" size="sm" onClick={onClose}
-        className="text-white hover:bg-amber-600 dark:text-white" aria-label="סגור תצוגה מקדימה">
+      <span className="font-semibold text-sm">
+        תצוגה מקדימה — כך יראו התלמידים את השיעור
+      </span>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onClose}
+        className="text-white hover:bg-amber-600 dark:text-white"
+        aria-label="סגור תצוגה מקדימה"
+      >
         ✕ סגור
       </Button>
     </div>

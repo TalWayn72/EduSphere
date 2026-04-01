@@ -37,7 +37,9 @@ interface UseProctoringSessionReturn {
   end: () => Promise<void>;
 }
 
-export function useProctoringSession(assessmentId: string): UseProctoringSessionReturn {
+export function useProctoringSession(
+  assessmentId: string
+): UseProctoringSessionReturn {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [flagCount, setFlagCount] = useState(0);
@@ -48,7 +50,9 @@ export function useProctoringSession(assessmentId: string): UseProctoringSession
 
   const start = useCallback(async () => {
     const result = await executeStart({ assessmentId });
-    const session = result.data?.startProctoringSession as ProctoringSession | undefined;
+    const session = result.data?.startProctoringSession as
+      | ProctoringSession
+      | undefined;
     if (session) {
       setSessionId(session.id);
       setStatus(session.status);
@@ -60,7 +64,9 @@ export function useProctoringSession(assessmentId: string): UseProctoringSession
     async (type: string, detail?: string) => {
       if (!sessionId) return;
       const result = await executeFlag({ sessionId, type, detail });
-      const session = result.data?.flagProctoringEvent as ProctoringSession | undefined;
+      const session = result.data?.flagProctoringEvent as
+        | ProctoringSession
+        | undefined;
       if (session) {
         setStatus(session.status);
         setFlagCount(session.flagCount);
@@ -72,7 +78,9 @@ export function useProctoringSession(assessmentId: string): UseProctoringSession
   const end = useCallback(async () => {
     if (!sessionId) return;
     const result = await executeEnd({ sessionId });
-    const session = result.data?.endProctoringSession as ProctoringSession | undefined;
+    const session = result.data?.endProctoringSession as
+      | ProctoringSession
+      | undefined;
     if (session) {
       setStatus(session.status);
       setFlagCount(session.flagCount);

@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -90,7 +96,9 @@ export class QAWorkflow {
 
   private async checkLinguisticNode(state: QAState): Promise<Partial<QAState>> {
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: injectLocale(
         'Evaluate the linguistic quality of Hebrew lesson content: clarity, grammar, Hebrew language use, academic tone.',
         this.locale
@@ -108,7 +116,9 @@ export class QAWorkflow {
     state: QAState
   ): Promise<Partial<QAState>> {
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: injectLocale(
         `Evaluate topic coverage for a ${state.lessonType === 'SEQUENTIAL' ? 'sequential book study' : 'thematic'} Hebrew lesson.
 Check: main topic addressed, subtopics covered, logical flow, completeness.`,
@@ -125,7 +135,9 @@ Check: main topic addressed, subtopics covered, logical flow, completeness.`,
 
   private async scanSensitivityNode(state: QAState): Promise<Partial<QAState>> {
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: injectLocale(
         'Scan Hebrew religious lesson content for sensitivity issues: controversial interpretations, potentially offensive content, halachic disputes that need clarification.',
         this.locale

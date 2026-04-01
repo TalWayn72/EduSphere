@@ -41,7 +41,13 @@ const LESSON_WITH_ASSETS = {
   createdAt: '2025-01-01T00:00:00Z',
   updatedAt: '2025-01-01T00:00:00Z',
   assets: [
-    { id: 'asset-1', assetType: 'VIDEO', sourceUrl: null, fileUrl: 'https://cdn.example.com/nahar-shalom.mp4', metadata: {} },
+    {
+      id: 'asset-1',
+      assetType: 'VIDEO',
+      sourceUrl: null,
+      fileUrl: 'https://cdn.example.com/nahar-shalom.mp4',
+      metadata: {},
+    },
   ],
   pipeline: null,
   citations: [],
@@ -52,11 +58,51 @@ const PIPELINE_SAVED = {
   lessonId: LESSON_ID,
   templateName: 'THEMATIC',
   nodes: [
-    { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
-    { id: 'n2', moduleType: 'ASR', label: 'Transcription (ASR)', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
-    { id: 'n3', moduleType: 'SUMMARIZATION', label: 'Summarization', labelHe: 'סיכום', enabled: true, order: 2, config: {} },
-    { id: 'n4', moduleType: 'QA_GATE', label: 'QA Gate', labelHe: 'בקרת איכות', enabled: true, order: 3, config: {} },
-    { id: 'n5', moduleType: 'PUBLISH_SHARE', label: 'Publish & Share', labelHe: 'יצוא והפצה', enabled: true, order: 4, config: {} },
+    {
+      id: 'n1',
+      moduleType: 'INGESTION',
+      label: 'Ingestion',
+      labelHe: 'איסוף חומרים',
+      enabled: true,
+      order: 0,
+      config: {},
+    },
+    {
+      id: 'n2',
+      moduleType: 'ASR',
+      label: 'Transcription (ASR)',
+      labelHe: 'תמלול',
+      enabled: true,
+      order: 1,
+      config: {},
+    },
+    {
+      id: 'n3',
+      moduleType: 'SUMMARIZATION',
+      label: 'Summarization',
+      labelHe: 'סיכום',
+      enabled: true,
+      order: 2,
+      config: {},
+    },
+    {
+      id: 'n4',
+      moduleType: 'QA_GATE',
+      label: 'QA Gate',
+      labelHe: 'בקרת איכות',
+      enabled: true,
+      order: 3,
+      config: {},
+    },
+    {
+      id: 'n5',
+      moduleType: 'PUBLISH_SHARE',
+      label: 'Publish & Share',
+      labelHe: 'יצוא והפצה',
+      enabled: true,
+      order: 4,
+      config: {},
+    },
   ],
   config: {},
   status: 'DRAFT',
@@ -79,11 +125,50 @@ const RUN_COMPLETED = {
   status: 'COMPLETED',
   completedAt: new Date().toISOString(),
   results: [
-    { id: 'r1', moduleName: 'INGESTION', outputType: 'ingestion', outputData: { ingestion: true }, fileUrl: null, createdAt: new Date().toISOString() },
-    { id: 'r2', moduleName: 'ASR', outputType: 'asr', outputData: { asrDelegated: true }, fileUrl: null, createdAt: new Date().toISOString() },
-    { id: 'r3', moduleName: 'SUMMARIZATION', outputType: 'summarization', outputData: { shortSummary: 'שיעור מרתק על הנהר הקדוש', longSummary: 'השיעור עוסק בנהר שלום...', keyPoints: ['נקודה 1', 'נקודה 2'] }, fileUrl: null, createdAt: new Date().toISOString() },
-    { id: 'r4', moduleName: 'QA_GATE', outputType: 'qa_gate', outputData: { qaScore: 92, fixList: [] }, fileUrl: null, createdAt: new Date().toISOString() },
-    { id: 'r5', moduleName: 'PUBLISH_SHARE', outputType: 'publish_share', outputData: { publishReady: true }, fileUrl: null, createdAt: new Date().toISOString() },
+    {
+      id: 'r1',
+      moduleName: 'INGESTION',
+      outputType: 'ingestion',
+      outputData: { ingestion: true },
+      fileUrl: null,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'r2',
+      moduleName: 'ASR',
+      outputType: 'asr',
+      outputData: { asrDelegated: true },
+      fileUrl: null,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'r3',
+      moduleName: 'SUMMARIZATION',
+      outputType: 'summarization',
+      outputData: {
+        shortSummary: 'שיעור מרתק על הנהר הקדוש',
+        longSummary: 'השיעור עוסק בנהר שלום...',
+        keyPoints: ['נקודה 1', 'נקודה 2'],
+      },
+      fileUrl: null,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'r4',
+      moduleName: 'QA_GATE',
+      outputType: 'qa_gate',
+      outputData: { qaScore: 92, fixList: [] },
+      fileUrl: null,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'r5',
+      moduleName: 'PUBLISH_SHARE',
+      outputType: 'publish_share',
+      outputData: { publishReady: true },
+      fileUrl: null,
+      createdAt: new Date().toISOString(),
+    },
   ],
 };
 
@@ -94,22 +179,36 @@ let runState: 'none' | 'running' | 'completed' = 'none';
 async function setupGraphQLMocks(page: Page) {
   runState = 'none';
   await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as { query?: string; operationName?: string };
+    const body = route.request().postDataJSON() as {
+      query?: string;
+      operationName?: string;
+    };
     const q = body?.query ?? '';
     const op = body?.operationName ?? '';
 
     // Lesson query
-    if (q.includes('lesson(id:') || q.includes('Lesson(') || op === 'Lesson' || q.includes('query Lesson')) {
-      const currentPipeline = runState === 'none'
-        ? null
-        : {
-            ...PIPELINE_SAVED,
-            currentRun: runState === 'completed' ? RUN_COMPLETED : RUN_STARTED,
-          };
+    if (
+      q.includes('lesson(id:') ||
+      q.includes('Lesson(') ||
+      op === 'Lesson' ||
+      q.includes('query Lesson')
+    ) {
+      const currentPipeline =
+        runState === 'none'
+          ? null
+          : {
+              ...PIPELINE_SAVED,
+              currentRun:
+                runState === 'completed' ? RUN_COMPLETED : RUN_STARTED,
+            };
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ data: { lesson: { ...LESSON_WITH_ASSETS, pipeline: currentPipeline } } }),
+        body: JSON.stringify({
+          data: {
+            lesson: { ...LESSON_WITH_ASSETS, pipeline: currentPipeline },
+          },
+        }),
       });
     }
 
@@ -123,7 +222,10 @@ async function setupGraphQLMocks(page: Page) {
     }
 
     // Start run
-    if (q.includes('startLessonPipelineRun') || op === 'StartLessonPipelineRun') {
+    if (
+      q.includes('startLessonPipelineRun') ||
+      op === 'StartLessonPipelineRun'
+    ) {
       runState = 'running';
       return route.fulfill({
         status: 200,
@@ -133,17 +235,28 @@ async function setupGraphQLMocks(page: Page) {
     }
 
     // Cancel run
-    if (q.includes('cancelLessonPipelineRun') || op === 'CancelLessonPipelineRun') {
+    if (
+      q.includes('cancelLessonPipelineRun') ||
+      op === 'CancelLessonPipelineRun'
+    ) {
       runState = 'none';
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ data: { cancelLessonPipelineRun: { id: RUN_ID, status: 'CANCELLED' } } }),
+        body: JSON.stringify({
+          data: {
+            cancelLessonPipelineRun: { id: RUN_ID, status: 'CANCELLED' },
+          },
+        }),
       });
     }
 
     // Notifications subscription or other — pass through or return empty
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: {} }),
+    });
   });
 }
 
@@ -159,7 +272,9 @@ test.describe('Pipeline Builder — page structure', () => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText('Pipeline Builder')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Pipeline Builder')).toBeVisible({
+      timeout: 10_000,
+    });
     // Module palette should list all modules
     await expect(page.getByText('איסוף חומרים')).toBeVisible();
     await expect(page.getByText('תמלול')).toBeVisible();
@@ -191,7 +306,9 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 
     await page.selectOption('[data-testid="template-picker"]', 'THEMATIC');
     // After template load, "גרור מודולים לכאן" should disappear
-    await expect(page.getByText('גרור מודולים לכאן')).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('גרור מודולים לכאן')).not.toBeVisible({
+      timeout: 5_000,
+    });
     // INGESTION should appear in canvas
     await expect(page.getByTestId('pipeline-node-INGESTION')).toBeVisible();
   });
@@ -208,10 +325,14 @@ test.describe('Pipeline Builder — template and node configuration', () => {
     const ingestionNode = page.getByTestId('pipeline-node-INGESTION');
     await ingestionNode.click();
 
-    await expect(page.getByTestId('config-panel')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('config-panel')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
-  test('INGESTION config panel shows asset picker with lesson assets', async ({ page }) => {
+  test('INGESTION config panel shows asset picker with lesson assets', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
@@ -221,9 +342,13 @@ test.describe('Pipeline Builder — template and node configuration', () => {
     const ingestionNode = page.getByTestId('pipeline-node-INGESTION');
     await ingestionNode.click();
 
-    await expect(page.getByTestId('ingestion-asset-picker')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('ingestion-asset-picker')).toBeVisible({
+      timeout: 5_000,
+    });
     // The lesson has a VIDEO asset — it should appear in the picker
-    await expect(page.getByTestId('ingestion-asset-picker')).toContainText('nahar-shalom.mp4');
+    await expect(page.getByTestId('ingestion-asset-picker')).toContainText(
+      'nahar-shalom.mp4'
+    );
   });
 
   test('config panel closes when close button is clicked', async ({ page }) => {
@@ -236,7 +361,9 @@ test.describe('Pipeline Builder — template and node configuration', () => {
     await expect(page.getByTestId('config-panel')).toBeVisible();
 
     await page.getByTestId('config-panel-close').click();
-    await expect(page.getByTestId('config-panel')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByTestId('config-panel')).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('node toggle enable/disable works', async ({ page }) => {
@@ -261,7 +388,9 @@ test.describe('Pipeline Builder — template and node configuration', () => {
 test.describe('Pipeline Builder — save and run flow', () => {
   test.skip(!RUN_WRITE_TESTS, 'Skipped in read-only mode');
 
-  test('Save button becomes enabled after template is loaded', async ({ page }) => {
+  test('Save button becomes enabled after template is loaded', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
@@ -282,16 +411,26 @@ test.describe('Pipeline Builder — save and run flow', () => {
     // Don't load a template — canvas is empty
     await page.getByTestId('run-btn').click();
 
-    await expect(page.getByTestId('pipeline-error')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('pipeline-error')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByTestId('pipeline-error')).toContainText('מודול אחד');
 
     // Regression guard: must not show raw technical error string
-    await expect(page.getByTestId('pipeline-error')).not.toContainText('[GraphQL]');
-    await expect(page.getByTestId('pipeline-error')).not.toContainText('Unexpected error');
-    await expect(page.getByTestId('pipeline-error')).not.toContainText('undefined');
+    await expect(page.getByTestId('pipeline-error')).not.toContainText(
+      '[GraphQL]'
+    );
+    await expect(page.getByTestId('pipeline-error')).not.toContainText(
+      'Unexpected error'
+    );
+    await expect(page.getByTestId('pipeline-error')).not.toContainText(
+      'undefined'
+    );
   });
 
-  test('Full E2E: load template → configure INGESTION → save → run → see results', async ({ page }) => {
+  test('Full E2E: load template → configure INGESTION → save → run → see results', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
@@ -303,7 +442,9 @@ test.describe('Pipeline Builder — save and run flow', () => {
     // Step 2: Configure INGESTION — select the video asset
     await page.getByTestId('pipeline-node-INGESTION').click();
     await expect(page.getByTestId('config-panel')).toBeVisible();
-    await page.selectOption('[data-testid="ingestion-asset-picker"]', { index: 1 }); // first real asset
+    await page.selectOption('[data-testid="ingestion-asset-picker"]', {
+      index: 1,
+    }); // first real asset
     // Close config panel
     await page.getByTestId('config-panel-close').click();
 
@@ -313,7 +454,9 @@ test.describe('Pipeline Builder — save and run flow', () => {
     await page.getByTestId('run-btn').click();
 
     // Step 4: Wait for run status to appear (RUNNING state)
-    await expect(page.getByTestId('pipeline-run-status')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByTestId('pipeline-run-status')).toBeVisible({
+      timeout: 8_000,
+    });
     const statusLabel = page.getByTestId('run-status-label');
     await expect(statusLabel).toContainText(/מריץ|RUNNING/);
 
@@ -322,11 +465,17 @@ test.describe('Pipeline Builder — save and run flow', () => {
     // Reload / wait for polling to pick up completed state (page polls every 3s)
     await page.waitForLoadState('networkidle').catch(() => {});
     // After poll, should show COMPLETED
-    await expect(statusLabel).toContainText(/הושלם|COMPLETED/, { timeout: 8_000 });
+    await expect(statusLabel).toContainText(/הושלם|COMPLETED/, {
+      timeout: 8_000,
+    });
 
     // Step 6: Verify results are shown
-    await expect(page.getByTestId('result-summary')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('result-summary')).toContainText('שיעור מרתק');
+    await expect(page.getByTestId('result-summary')).toBeVisible({
+      timeout: 5_000,
+    });
+    await expect(page.getByTestId('result-summary')).toContainText(
+      'שיעור מרתק'
+    );
     await expect(page.getByTestId('result-qa-score')).toBeVisible();
     await expect(page.getByTestId('result-qa-score')).toContainText('92');
 
@@ -347,8 +496,12 @@ test.describe('Pipeline Builder — save and run flow', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.getByTestId('run-btn').click();
 
-    await expect(page.getByTestId('pipeline-run-status')).toBeVisible({ timeout: 8_000 });
-    await expect(page.getByTestId('cancel-run-btn')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('pipeline-run-status')).toBeVisible({
+      timeout: 8_000,
+    });
+    await expect(page.getByTestId('cancel-run-btn')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 });
 
@@ -358,7 +511,10 @@ test.describe('Pipeline Builder — navigation', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByText('שיעור בנהר שלום').click();
-    await expect(page).toHaveURL(new RegExp(`/courses/${COURSE_ID}/lessons/${LESSON_ID}$`), { timeout: 5_000 });
+    await expect(page).toHaveURL(
+      new RegExp(`/courses/${COURSE_ID}/lessons/${LESSON_ID}$`),
+      { timeout: 5_000 }
+    );
   });
 
   test('page title has no raw error strings', async ({ page }) => {
@@ -384,7 +540,9 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
     await expect(customOption).toContainText('בנה ידנית');
   });
 
-  test('selecting CUSTOM shows empty canvas with custom mode message', async ({ page }) => {
+  test('selecting CUSTOM shows empty canvas with custom mode message', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
@@ -398,16 +556,24 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Canvas should be empty
-    await expect(page.getByTestId('empty-canvas')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('empty-canvas')).toBeVisible({
+      timeout: 5_000,
+    });
     // Custom mode message should appear
-    await expect(page.getByText('מצב בנייה חופשית')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('מצב בנייה חופשית')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText(/גרור מודולים מהחלונית השמאלית/)).toBeVisible();
 
     // Default message should NOT appear
-    await expect(page.getByText('בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל')).not.toBeVisible();
+    await expect(
+      page.getByText('בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל')
+    ).not.toBeVisible();
   });
 
-  test('CUSTOM mode: drag module from palette adds it to canvas', async ({ page }) => {
+  test('CUSTOM mode: drag module from palette adds it to canvas', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
@@ -421,18 +587,34 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
     await canvasEl.evaluate((el) => {
       const dt = new DataTransfer();
       dt.setData('moduleType', 'SUMMARIZATION');
-      el.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt }));
-      el.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }));
+      el.dispatchEvent(
+        new DragEvent('dragover', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: dt,
+        })
+      );
+      el.dispatchEvent(
+        new DragEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: dt,
+        })
+      );
     });
     await page.waitForLoadState('domcontentloaded');
 
     // Module should appear in canvas
-    await expect(page.getByTestId('pipeline-node-SUMMARIZATION')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('pipeline-node-SUMMARIZATION')).toBeVisible({
+      timeout: 5_000,
+    });
     // Empty canvas placeholder should be gone
     await expect(page.getByTestId('empty-canvas')).not.toBeVisible();
   });
 
-  test('CUSTOM mode: can switch back to template after custom build', async ({ page }) => {
+  test('CUSTOM mode: can switch back to template after custom build', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL);
     await page.waitForLoadState('domcontentloaded');
 
@@ -446,7 +628,9 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Custom message should disappear
-    await expect(page.getByText('מצב בנייה חופשית')).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('מצב בנייה חופשית')).not.toBeVisible({
+      timeout: 5_000,
+    });
     // THEMATIC modules should be loaded
     await expect(page.getByTestId('pipeline-node-INGESTION')).toBeVisible();
   });
@@ -474,7 +658,9 @@ test.describe('Pipeline Builder — custom (build from scratch) mode', () => {
 
     await expect(page.getByText('מצב בנייה חופשית')).toBeVisible();
     await expect(page.getByTestId('pipeline-error')).not.toBeVisible();
-    await expect(page).toHaveScreenshot('pipeline-builder-custom-mode.png', { maxDiffPixels: 300 });
+    await expect(page).toHaveScreenshot('pipeline-builder-custom-mode.png', {
+      maxDiffPixels: 300,
+    });
   });
 });
 
@@ -488,7 +674,9 @@ test.describe('Pipeline Builder — screenshot regression', () => {
     await expect(page.getByText(/\[GraphQL\]/)).not.toBeVisible();
     await expect(page.getByText(/Authentication required/)).not.toBeVisible();
 
-    await expect(page).toHaveScreenshot('pipeline-builder-initial.png', { maxDiffPixels: 300 });
+    await expect(page).toHaveScreenshot('pipeline-builder-initial.png', {
+      maxDiffPixels: 300,
+    });
   });
 
   test('pipeline with template loaded renders correctly', async ({ page }) => {
@@ -499,6 +687,9 @@ test.describe('Pipeline Builder — screenshot regression', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByTestId('pipeline-node-INGESTION')).toBeVisible();
-    await expect(page).toHaveScreenshot('pipeline-builder-thematic-template.png', { maxDiffPixels: 300 });
+    await expect(page).toHaveScreenshot(
+      'pipeline-builder-thematic-template.png',
+      { maxDiffPixels: 300 }
+    );
   });
 });

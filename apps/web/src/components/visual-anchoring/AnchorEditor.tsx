@@ -35,11 +35,15 @@ export default function AnchorEditor({
 }: AnchorEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [selection, setSelection] = useState<SelectionInfo | null>(null);
-  const [toolbarPos, setToolbarPos] = useState<{ x: number; y: number } | null>(null);
+  const [toolbarPos, setToolbarPos] = useState<{ x: number; y: number } | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
-  const [anchorCreatedAnnouncement, setAnchorCreatedAnnouncement] = useState('');
-  const [{ fetching: isCreating }, createAnchor] = useMutation(CREATE_VISUAL_ANCHOR);
+  const [anchorCreatedAnnouncement, setAnchorCreatedAnnouncement] =
+    useState('');
+  const [{ fetching: isCreating }, createAnchor] =
+    useMutation(CREATE_VISUAL_ANCHOR);
 
   const handleMouseUp = useCallback(() => {
     const sel = window.getSelection();
@@ -64,7 +68,15 @@ export default function AnchorEditor({
     const posW = rect.width / containerRect.width;
     const posH = rect.height / containerRect.height;
 
-    setSelection({ text, pageNumber: 1, posX, posY, posW, posH, containerRect });
+    setSelection({
+      text,
+      pageNumber: 1,
+      posX,
+      posY,
+      posW,
+      posH,
+      containerRect,
+    });
     setToolbarPos({ x: rect.left + rect.width / 2, y: rect.top - 8 });
   }, []);
 
@@ -158,7 +170,10 @@ export default function AnchorEditor({
       )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl" data-testid="anchor-creation-modal">
+        <DialogContent
+          className="max-w-2xl"
+          data-testid="anchor-creation-modal"
+        >
           <DialogHeader>
             <DialogTitle>Create Visual Anchor</DialogTitle>
             <DialogDescription className="sr-only">
@@ -175,7 +190,9 @@ export default function AnchorEditor({
             </div>
 
             <div>
-              <p className="text-sm font-medium mb-2">Assign an image (optional):</p>
+              <p className="text-sm font-medium mb-2">
+                Assign an image (optional):
+              </p>
               <AssetPicker
                 courseId={courseId}
                 selectedAssetId={selectedAssetId}
@@ -185,7 +202,11 @@ export default function AnchorEditor({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseModal} aria-label="בטל יצירת עוגן">
+            <Button
+              variant="outline"
+              onClick={handleCloseModal}
+              aria-label="בטל יצירת עוגן"
+            >
               Cancel
             </Button>
             <Button

@@ -35,7 +35,10 @@ function setupMocks(purchases?: unknown[], fetching = false) {
     { data: purchases ? { purchases } : undefined, fetching, error: undefined },
     vi.fn(),
   ] as never);
-  vi.mocked(urql.useMutation).mockReturnValue([{}, vi.fn().mockResolvedValue({ data: null })] as never);
+  vi.mocked(urql.useMutation).mockReturnValue([
+    {},
+    vi.fn().mockResolvedValue({ data: null }),
+  ] as never);
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -48,7 +51,9 @@ describe('MarketplacePurchases', () => {
   it('renders purchases page', () => {
     setupMocks([]);
     render(<MarketplacePurchases />);
-    expect(screen.getByTestId('marketplace-purchases-page')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('marketplace-purchases-page')
+    ).toBeInTheDocument();
   });
 
   it('shows skeleton when fetching', () => {
@@ -67,8 +72,11 @@ describe('MarketplacePurchases', () => {
   it('renders purchase rows with course title and price', () => {
     setupMocks([
       {
-        id: 'p1', listingId: 'l1', courseTitle: 'React Mastery',
-        price: 99.99, status: 'COMPLETED',
+        id: 'p1',
+        listingId: 'l1',
+        courseTitle: 'React Mastery',
+        price: 99.99,
+        status: 'COMPLETED',
         createdAt: new Date().toISOString(),
       },
     ]);
@@ -81,8 +89,11 @@ describe('MarketplacePurchases', () => {
   it('shows refund button for recent COMPLETED purchases', () => {
     setupMocks([
       {
-        id: 'p2', listingId: 'l2', courseTitle: 'Course X',
-        price: 49.00, status: 'COMPLETED',
+        id: 'p2',
+        listingId: 'l2',
+        courseTitle: 'Course X',
+        price: 49.0,
+        status: 'COMPLETED',
         createdAt: new Date().toISOString(), // within 14-day window
       },
     ]);
@@ -93,8 +104,11 @@ describe('MarketplacePurchases', () => {
   it('does not show refund button for REFUNDED purchases', () => {
     setupMocks([
       {
-        id: 'p3', listingId: 'l3', courseTitle: 'Course Y',
-        price: 29.00, status: 'REFUNDED',
+        id: 'p3',
+        listingId: 'l3',
+        courseTitle: 'Course Y',
+        price: 29.0,
+        status: 'REFUNDED',
         createdAt: new Date().toISOString(),
       },
     ]);

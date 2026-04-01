@@ -48,9 +48,7 @@ describe('LiveSessionsEventsService', () => {
 
       expect(mockConnect).toHaveBeenCalledTimes(1);
       expect(mockPublish).toHaveBeenCalledTimes(1);
-      expect(mockPublish.mock.calls[0][0]).toBe(
-        'EDUSPHERE.sessions.started'
-      );
+      expect(mockPublish.mock.calls[0][0]).toBe('EDUSPHERE.sessions.started');
     });
 
     it('encodes sessionId, tenantId, and ISO startedAt in payload', async () => {
@@ -87,9 +85,7 @@ describe('LiveSessionsEventsService', () => {
         new Date('2026-04-01T09:00:00Z')
       );
 
-      expect(mockPublish.mock.calls[0][0]).toBe(
-        'EDUSPHERE.sessions.created'
-      );
+      expect(mockPublish.mock.calls[0][0]).toBe('EDUSPHERE.sessions.created');
     });
 
     it('includes instructorId and scheduledAt in payload', async () => {
@@ -116,7 +112,12 @@ describe('LiveSessionsEventsService', () => {
       const startedAt = new Date('2026-03-15T10:00:00Z');
       const endedAt = new Date('2026-03-15T11:30:00Z');
 
-      await service.publishSessionEnded('ses-1', 'tenant-1', endedAt, startedAt);
+      await service.publishSessionEnded(
+        'ses-1',
+        'tenant-1',
+        endedAt,
+        startedAt
+      );
 
       const encoded = mockPublish.mock.calls[0][1] as Buffer;
       const payload = JSON.parse(Buffer.from(encoded).toString());
@@ -124,12 +125,7 @@ describe('LiveSessionsEventsService', () => {
     });
 
     it('sets durationSeconds to null when startedAt is null', async () => {
-      await service.publishSessionEnded(
-        'ses-1',
-        'tenant-1',
-        new Date(),
-        null
-      );
+      await service.publishSessionEnded('ses-1', 'tenant-1', new Date(), null);
 
       const encoded = mockPublish.mock.calls[0][1] as Buffer;
       const payload = JSON.parse(Buffer.from(encoded).toString());
@@ -137,12 +133,7 @@ describe('LiveSessionsEventsService', () => {
     });
 
     it('publishes to EDUSPHERE.sessions.ended subject', async () => {
-      await service.publishSessionEnded(
-        'ses-1',
-        'tenant-1',
-        new Date(),
-        null
-      );
+      await service.publishSessionEnded('ses-1', 'tenant-1', new Date(), null);
       expect(mockPublish.mock.calls[0][0]).toBe('EDUSPHERE.sessions.ended');
     });
   });

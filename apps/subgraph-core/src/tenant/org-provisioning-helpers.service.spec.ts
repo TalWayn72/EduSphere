@@ -22,7 +22,8 @@ vi.mock('@edusphere/db', () => ({
 vi.mock('drizzle-orm', () => ({
   sql: Object.assign(
     vi.fn((strings: TemplateStringsArray, ...vals: unknown[]) => ({
-      sql: strings, vals,
+      sql: strings,
+      vals,
     })),
     { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }
   ),
@@ -34,7 +35,9 @@ vi.mock('nats', () => ({
     encode: vi.fn((s: string) => new TextEncoder().encode(s)),
   })),
 }));
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn(() => ({})) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi.fn(() => ({})),
+}));
 
 import { OrgProvisioningHelpersService } from './org-provisioning-helpers.service';
 import type { ProvisioningSteps } from './org-provisioning.types';

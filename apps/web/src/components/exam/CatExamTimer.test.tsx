@@ -33,14 +33,18 @@ describe('CatExamTimer', () => {
 
   it('has aria-label with minutes and seconds', () => {
     render(<CatExamTimer totalSeconds={125} onExpired={vi.fn()} />);
-    expect(screen.getByLabelText('2 minutes 5 seconds remaining')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('2 minutes 5 seconds remaining')
+    ).toBeInTheDocument();
   });
 
   it('decrements each second', () => {
     render(<CatExamTimer totalSeconds={10} onExpired={vi.fn()} />);
     expect(screen.getByText('00:10')).toBeInTheDocument();
 
-    act(() => { vi.advanceTimersByTime(3000); });
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
     expect(screen.getByText('00:07')).toBeInTheDocument();
   });
 
@@ -61,7 +65,9 @@ describe('CatExamTimer', () => {
     const onExpired = vi.fn();
     render(<CatExamTimer totalSeconds={2} onExpired={onExpired} />);
 
-    act(() => { vi.advanceTimersByTime(2000); });
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
     expect(onExpired).toHaveBeenCalledTimes(1);
   });
 
@@ -69,20 +75,30 @@ describe('CatExamTimer', () => {
     const onExpired = vi.fn();
     render(<CatExamTimer totalSeconds={1} onExpired={onExpired} />);
 
-    act(() => { vi.advanceTimersByTime(5000); });
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
     expect(onExpired).toHaveBeenCalledTimes(1);
   });
 
   it('cleans up interval on unmount (MEMORY SAFETY)', () => {
     const clearSpy = vi.spyOn(globalThis, 'clearInterval');
-    const { unmount } = render(<CatExamTimer totalSeconds={100} onExpired={vi.fn()} />);
+    const { unmount } = render(
+      <CatExamTimer totalSeconds={100} onExpired={vi.fn()} />
+    );
     unmount();
     expect(clearSpy).toHaveBeenCalled();
     clearSpy.mockRestore();
   });
 
   it('applies custom className', () => {
-    render(<CatExamTimer totalSeconds={60} onExpired={vi.fn()} className="custom-class" />);
+    render(
+      <CatExamTimer
+        totalSeconds={60}
+        onExpired={vi.fn()}
+        className="custom-class"
+      />
+    );
     const timer = screen.getByRole('timer');
     expect(timer.className).toContain('custom-class');
   });

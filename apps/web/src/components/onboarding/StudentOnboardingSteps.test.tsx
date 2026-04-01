@@ -21,7 +21,10 @@ const mockCompleteOnboarding = vi.fn().mockResolvedValue({ data: {} });
 
 vi.mock('urql', () => ({
   useMutation: vi.fn((query: string) => {
-    if (query.includes('UpdateOnboardingStep') || query === 'UPDATE_ONBOARDING_STEP_MUTATION') {
+    if (
+      query.includes('UpdateOnboardingStep') ||
+      query === 'UPDATE_ONBOARDING_STEP_MUTATION'
+    ) {
       return [{ fetching: false }, mockUpdateStep];
     }
     return [{ fetching: false }, mockCompleteOnboarding];
@@ -76,9 +79,18 @@ describe('StudentOnboardingSteps', () => {
   it('renders all 12 topic categories', () => {
     render(<StudentOnboardingSteps {...defaultProps} currentStep={2} />);
     const categories = [
-      'Torah Study', 'Talmud', 'Halacha', 'Jewish History', 'Hebrew Language',
-      'Kabbalah', 'Jewish Philosophy', 'Prayer', 'Lifecycle Events', 'Ethics',
-      'Contemporary Issues', 'Israel Studies',
+      'Torah Study',
+      'Talmud',
+      'Halacha',
+      'Jewish History',
+      'Hebrew Language',
+      'Kabbalah',
+      'Jewish Philosophy',
+      'Prayer',
+      'Lifecycle Events',
+      'Ethics',
+      'Contemporary Issues',
+      'Israel Studies',
     ];
     categories.forEach((topic) => {
       expect(screen.getByText(topic)).toBeInTheDocument();
@@ -95,7 +107,9 @@ describe('StudentOnboardingSteps', () => {
 
   it('renders recommendations on step 4', () => {
     render(<StudentOnboardingSteps {...defaultProps} currentStep={4} />);
-    expect(screen.getByText('Your personalized recommendations')).toBeInTheDocument();
+    expect(
+      screen.getByText('Your personalized recommendations')
+    ).toBeInTheDocument();
   });
 
   it('renders completion message on step 5', () => {

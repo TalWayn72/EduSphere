@@ -45,7 +45,10 @@ export interface DeliveryStatusPayload {
 
 export interface AdminAlertPayload {
   readonly tenantId: string;
-  readonly alertType: 'enrollment_spike' | 'system_health' | 'compliance_deadline';
+  readonly alertType:
+    | 'enrollment_spike'
+    | 'system_health'
+    | 'compliance_deadline';
   readonly severity: 'info' | 'warning' | 'critical';
   readonly title: string;
   readonly body: string;
@@ -68,9 +71,7 @@ export function isNotificationDispatchEvent(
   );
 }
 
-export function isDeliveryStatusEvent(
-  e: unknown
-): e is DeliveryStatusPayload {
+export function isDeliveryStatusEvent(e: unknown): e is DeliveryStatusPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   return (

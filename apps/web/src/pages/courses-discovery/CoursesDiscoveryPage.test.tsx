@@ -4,24 +4,39 @@ import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en', changeLanguage: vi.fn() } }),
+  useTranslation: () => ({
+    t: (k: string) => k,
+    i18n: { language: 'en', changeLanguage: vi.fn() },
+  }),
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: React.InputHTMLAttributes<HTMLInputElement>) => <input {...props} />,
+  Input: (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input {...props} />
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode; variant?: string; size?: string }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+    variant?: string;
+    size?: string;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/CourseCard', () => ({
@@ -82,17 +97,29 @@ describe('CoursesDiscoveryPage', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('renders inside Layout', () => {
-    render(<MemoryRouter><CoursesDiscoveryPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CoursesDiscoveryPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders discovery filters', () => {
-    render(<MemoryRouter><CoursesDiscoveryPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CoursesDiscoveryPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('discovery-filters')).toBeInTheDocument();
   });
 
   it('shows empty state when no courses', () => {
-    render(<MemoryRouter><CoursesDiscoveryPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CoursesDiscoveryPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('empty-state')).toBeInTheDocument();
   });
 });

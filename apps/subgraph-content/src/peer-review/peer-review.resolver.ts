@@ -62,11 +62,20 @@ export class PeerReviewResolver {
   async myReviewAssignments(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
-    const list = await this.peerReviewService.getMyAssignmentsToReview(auth.userId, {
-      tenantId: auth.tenantId,
-      userId: auth.userId,
-      userRole: (auth.roles?.[0] as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER') ?? 'STUDENT',
-    });
+    const list = await this.peerReviewService.getMyAssignmentsToReview(
+      auth.userId,
+      {
+        tenantId: auth.tenantId,
+        userId: auth.userId,
+        userRole:
+          (auth.roles?.[0] as
+            | 'SUPER_ADMIN'
+            | 'ORG_ADMIN'
+            | 'INSTRUCTOR'
+            | 'STUDENT'
+            | 'RESEARCHER') ?? 'STUDENT',
+      }
+    );
     return list.map(mapAssignment);
   }
 
@@ -77,7 +86,13 @@ export class PeerReviewResolver {
     const list = await this.peerReviewService.getMySubmissions(auth.userId, {
       tenantId: auth.tenantId,
       userId: auth.userId,
-      userRole: (auth.roles?.[0] as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER') ?? 'STUDENT',
+      userRole:
+        (auth.roles?.[0] as
+          | 'SUPER_ADMIN'
+          | 'ORG_ADMIN'
+          | 'INSTRUCTOR'
+          | 'STUDENT'
+          | 'RESEARCHER') ?? 'STUDENT',
     });
     return list.map(mapSubmission);
   }
@@ -85,14 +100,20 @@ export class PeerReviewResolver {
   @Query('peerReviewRubric')
   async peerReviewRubric(
     @Args('contentItemId') contentItemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.tenantId) throw new UnauthorizedException();
     const rubric = await this.peerReviewService.getRubric(contentItemId, {
       tenantId: auth.tenantId,
       userId: auth.userId ?? '',
-      userRole: (auth.roles?.[0] as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER') ?? 'STUDENT',
+      userRole:
+        (auth.roles?.[0] as
+          | 'SUPER_ADMIN'
+          | 'ORG_ADMIN'
+          | 'INSTRUCTOR'
+          | 'STUDENT'
+          | 'RESEARCHER') ?? 'STUDENT',
     });
     if (!rubric) return null;
     return {
@@ -106,19 +127,31 @@ export class PeerReviewResolver {
 
   @Mutation('createPeerReviewRubric')
   async createPeerReviewRubric(
-    @Args('input') input: { contentItemId: string; criteria: string; minReviewers?: number; isAnonymous?: boolean },
-    @Context() ctx: GraphQLContext,
+    @Args('input')
+    input: {
+      contentItemId: string;
+      criteria: string;
+      minReviewers?: number;
+      isAnonymous?: boolean;
+    },
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
     this.logger.log(
       { contentItemId: input.contentItemId, tenantId: auth.tenantId },
-      'createPeerReviewRubric',
+      'createPeerReviewRubric'
     );
     const rubric = await this.peerReviewService.createRubric(input, {
       tenantId: auth.tenantId,
       userId: auth.userId,
-      userRole: (auth.roles?.[0] as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER') ?? 'INSTRUCTOR',
+      userRole:
+        (auth.roles?.[0] as
+          | 'SUPER_ADMIN'
+          | 'ORG_ADMIN'
+          | 'INSTRUCTOR'
+          | 'STUDENT'
+          | 'RESEARCHER') ?? 'INSTRUCTOR',
     });
     return {
       id: rubric.id,
@@ -133,13 +166,13 @@ export class PeerReviewResolver {
   async submitForPeerReview(
     @Args('contentItemId') contentItemId: string,
     @Args('submissionText') submissionText: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
     this.logger.log(
       { contentItemId, userId: auth.userId, tenantId: auth.tenantId },
-      'submitForPeerReview',
+      'submitForPeerReview'
     );
     const assignments = await this.peerReviewService.createAssignment(
       contentItemId,
@@ -148,8 +181,14 @@ export class PeerReviewResolver {
       {
         tenantId: auth.tenantId,
         userId: auth.userId,
-        userRole: (auth.roles?.[0] as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER') ?? 'STUDENT',
-      },
+        userRole:
+          (auth.roles?.[0] as
+            | 'SUPER_ADMIN'
+            | 'ORG_ADMIN'
+            | 'INSTRUCTOR'
+            | 'STUDENT'
+            | 'RESEARCHER') ?? 'STUDENT',
+      }
     );
     return assignments.map(mapAssignment);
   }
@@ -159,7 +198,7 @@ export class PeerReviewResolver {
     @Args('assignmentId') assignmentId: string,
     @Args('criteriaScores') criteriaScores: string,
     @Args('feedback') feedback: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
@@ -172,8 +211,14 @@ export class PeerReviewResolver {
       {
         tenantId: auth.tenantId,
         userId: auth.userId,
-        userRole: (auth.roles?.[0] as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER') ?? 'STUDENT',
-      },
+        userRole:
+          (auth.roles?.[0] as
+            | 'SUPER_ADMIN'
+            | 'ORG_ADMIN'
+            | 'INSTRUCTOR'
+            | 'STUDENT'
+            | 'RESEARCHER') ?? 'STUDENT',
+      }
     );
   }
 }

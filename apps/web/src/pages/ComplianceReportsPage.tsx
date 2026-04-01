@@ -59,7 +59,9 @@ export function ComplianceReportsPage() {
   const [reportResult, setReportResult] = useState<ReportResult | null>(null);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data, fetching, error }] = useQuery({
     query: COMPLIANCE_COURSES_QUERY,
     pause: !mounted,
@@ -113,10 +115,7 @@ export function ComplianceReportsPage() {
     <Layout>
       <PageShell size="md">
         <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Compliance' },
-          ]}
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'Compliance' }]}
         />
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-primary" />

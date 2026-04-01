@@ -52,24 +52,45 @@ vi.mock('@/components/AppSidebar', () => ({
   AppSidebar: () => {
     const user = mockGetCurrentUser();
     const srsCount = mockUseSrsQueueCount();
-    return React.createElement('nav', { 'data-testid': 'app-sidebar' },
+    return React.createElement(
+      'nav',
+      { 'data-testid': 'app-sidebar' },
       React.createElement('a', { href: '/courses' }, 'courses'),
       React.createElement('a', { href: '/agents' }, 'agents'),
-      user && React.createElement('a', { href: '/srs' }, 'srs',
-        srsCount > 0 && React.createElement('span', null,
-          srsCount > 99 ? '99+' : String(srsCount)
-        )
-      ),
+      user &&
+        React.createElement(
+          'a',
+          { href: '/srs' },
+          'srs',
+          srsCount > 0 &&
+            React.createElement(
+              'span',
+              null,
+              srsCount > 99 ? '99+' : String(srsCount)
+            )
+        ),
       user && React.createElement('a', { href: '/leaderboard' }, 'leaderboard'),
-      user && ['INSTRUCTOR', 'ORG_ADMIN'].includes((user as { role?: string }).role ?? '') &&
+      user &&
+        ['INSTRUCTOR', 'ORG_ADMIN'].includes(
+          (user as { role?: string }).role ?? ''
+        ) &&
         React.createElement('a', { href: '/courses/new' }, 'newCourse'),
-      user && (user as { role?: string }).role === 'ORG_ADMIN' && [
-        React.createElement('a', { href: '/admin', key: 'admin' }, 'adminPanel'),
-        React.createElement('a', { href: '/lti', key: 'lti' }, 'lti'),
-        React.createElement('a', { href: '/compliance', key: 'comp' }, 'compliance'),
-        React.createElement('a', { href: '/scim', key: 'scim' }, 'scimHris'),
-      ],
-      React.createElement('a', { href: '/' }, 'EduSphere'),
+      user &&
+        (user as { role?: string }).role === 'ORG_ADMIN' && [
+          React.createElement(
+            'a',
+            { href: '/admin', key: 'admin' },
+            'adminPanel'
+          ),
+          React.createElement('a', { href: '/lti', key: 'lti' }, 'lti'),
+          React.createElement(
+            'a',
+            { href: '/compliance', key: 'comp' },
+            'compliance'
+          ),
+          React.createElement('a', { href: '/scim', key: 'scim' }, 'scimHris'),
+        ],
+      React.createElement('a', { href: '/' }, 'EduSphere')
     );
   },
 }));

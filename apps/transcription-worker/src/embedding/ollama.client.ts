@@ -61,7 +61,9 @@ async function embedWithOllama(
     throw new Error('Ollama returned empty embedding vector');
   }
 
-  logger.debug(`Ollama embed: model=${model} dim=${json.embedding.length} hardware=${gpuConfig.summary}`);
+  logger.debug(
+    `Ollama embed: model=${model} dim=${json.embedding.length} hardware=${gpuConfig.summary}`
+  );
   return json.embedding;
 }
 

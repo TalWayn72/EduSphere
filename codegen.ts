@@ -13,6 +13,7 @@ const SCALAR_CONFIG = {
   Cursor: 'string',
   EmailAddress: 'string',
   UnitFloat: 'number',
+  Upload: 'File',
   ID: 'string',
   // Federation v2 internal scalars present in the composed supergraph SDL.
   // These are never queried by client operations; mapping them to string
@@ -75,6 +76,15 @@ const config: CodegenConfig = {
     '!apps/web/src/lib/graphql/srs.queries.ts',
     '!apps/web/src/lib/graphql/tenant-language.queries.ts',
     '!apps/web/src/lib/graphql/xapi.queries.ts',
+    // ── Schema-drift exclusions ────────────────────────────────────────────────
+    // These query files reference fields/types not yet in the composed supergraph
+    // or have mutation/query type mismatches. Exclude until supergraph is recomposed.
+    '!apps/web/src/lib/graphql/analytics.queries.ts',
+    '!apps/web/src/lib/graphql/embedding.queries.ts',
+    '!apps/web/src/lib/graphql/exam.operations.ts',
+    '!apps/web/src/lib/graphql/model3d.queries.ts',
+    '!apps/web/src/lib/graphql/tenant-analytics.queries.ts',
+    '!apps/web/src/lib/graphql/agent.queries.ts',
   ],
   generates: {
     'packages/graphql-types/src/generated/types.ts': {

@@ -6,7 +6,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Share2, Linkedin, Facebook, Twitter, MessageCircle, Copy, Check } from 'lucide-react';
+import {
+  Share2,
+  Linkedin,
+  Facebook,
+  Twitter,
+  MessageCircle,
+  Copy,
+  Check,
+} from 'lucide-react';
 
 interface SocialShareMenuProps {
   url: string;
@@ -34,16 +42,33 @@ function buildShareUrl(key: string, url: string, title: string): string {
   return urls[key] ?? '';
 }
 
-export function SocialShareMenu({ url, title, triggerLabel = 'Share' }: SocialShareMenuProps) {
+export function SocialShareMenu({
+  url,
+  title,
+  triggerLabel = 'Share',
+}: SocialShareMenuProps) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    []
+  );
 
-  const handleShare = useCallback((key: string) => {
-    const shareUrl = buildShareUrl(key, url, title);
-    if (shareUrl) window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
-  }, [url, title]);
+  const handleShare = useCallback(
+    (key: string) => {
+      const shareUrl = buildShareUrl(key, url, title);
+      if (shareUrl)
+        window.open(
+          shareUrl,
+          '_blank',
+          'noopener,noreferrer,width=600,height=400'
+        );
+    },
+    [url, title]
+  );
 
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(url).then(() => {

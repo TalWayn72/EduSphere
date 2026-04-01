@@ -43,7 +43,10 @@ export default function CrossFadeImage({
 
   const isSvgInteractive = mimeType === 'image/svg+xml' && interactiveSvg;
   const { sanitizedSvg } = useInteractiveSvg(src, isSvgInteractive);
-  const { scheduleGifPause } = useCrossFadeGif(current?.src ?? null, current?.mimeType ?? '');
+  const { scheduleGifPause } = useCrossFadeGif(
+    current?.src ?? null,
+    current?.mimeType ?? ''
+  );
 
   // Cleanup fade timer on unmount
   useEffect(() => {
@@ -108,7 +111,7 @@ export default function CrossFadeImage({
     );
   }
 
-  const visibleAlt = next ? (next.alt || undefined) : (current?.alt || undefined);
+  const visibleAlt = next ? next.alt || undefined : current?.alt || undefined;
 
   return (
     <div
@@ -124,7 +127,10 @@ export default function CrossFadeImage({
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain"
-          style={{ opacity: showNext ? 0 : 1, transition: `opacity ${fadeDuration}ms ease-in-out` }}
+          style={{
+            opacity: showNext ? 0 : 1,
+            transition: `opacity ${fadeDuration}ms ease-in-out`,
+          }}
           data-testid="cross-fade-current"
         />
       )}
@@ -134,7 +140,10 @@ export default function CrossFadeImage({
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain"
-          style={{ opacity: showNext ? 1 : 0, transition: `opacity ${fadeDuration}ms ease-in-out` }}
+          style={{
+            opacity: showNext ? 1 : 0,
+            transition: `opacity ${fadeDuration}ms ease-in-out`,
+          }}
           data-testid="cross-fade-next"
         />
       )}

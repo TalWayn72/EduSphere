@@ -41,10 +41,15 @@ const MOCK_UPLOAD_RESPONSE = {
 
 function interceptGraphQL(page: import('@playwright/test').Page) {
   return page.route('**/graphql', (route) => {
-    const body = route.request().postDataJSON() as { operationName?: string; query?: string };
+    const body = route.request().postDataJSON() as {
+      operationName?: string;
+      query?: string;
+    };
     const op = body.operationName ?? body.query ?? '';
-    if (op.includes('GetMediaAssetModel')) return route.fulfill({ json: MOCK_MODEL_ASSET });
-    if (op.includes('UploadModel3D')) return route.fulfill({ json: MOCK_UPLOAD_RESPONSE });
+    if (op.includes('GetMediaAssetModel'))
+      return route.fulfill({ json: MOCK_MODEL_ASSET });
+    if (op.includes('UploadModel3D'))
+      return route.fulfill({ json: MOCK_UPLOAD_RESPONSE });
     return route.continue();
   });
 }
@@ -59,12 +64,12 @@ test.describe('3D Model Viewer — Phase 34', () => {
     await page.goto(LESSON_URL);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.locator('[data-testid="model3d-canvas"]')
-    ).toBeVisible();
+    await expect(page.locator('[data-testid="model3d-canvas"]')).toBeVisible();
   });
 
-  test('loading state shown initially when src is provided', async ({ page }) => {
+  test('loading state shown initially when src is provided', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
     await page.goto(LESSON_URL);
 
@@ -79,7 +84,8 @@ test.describe('3D Model Viewer — Phase 34', () => {
     // Force Three.js to not be available by intercepting dynamic imports
     await page.addInitScript(() => {
       // Override dynamic import to simulate Three.js unavailable
-      const origImport = (window as unknown as { __importShim?: unknown }).__importShim;
+      const origImport = (window as unknown as { __importShim?: unknown })
+        .__importShim;
       void origImport; // suppress unused warning
     });
 
@@ -94,7 +100,9 @@ test.describe('3D Model Viewer — Phase 34', () => {
     expect(bodyText).not.toContain('[object Object]');
   });
 
-  test('unavailable state shown when Three.js is not available', async ({ page }) => {
+  test('unavailable state shown when Three.js is not available', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
 
     // Simulate Three.js import failure
@@ -112,7 +120,10 @@ test.describe('3D Model Viewer — Phase 34', () => {
   test('upload mutation returns assetId, uploadUrl, key', async ({ page }) => {
     let uploadCalled = false;
     await page.route('**/graphql', (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string; query?: string };
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+        query?: string;
+      };
       const op = body.operationName ?? body.query ?? '';
       if (op.includes('UploadModel3D')) {
         uploadCalled = true;
@@ -132,7 +143,9 @@ test.describe('3D Model Viewer — Phase 34', () => {
       expect(uploadCalled).toBe(true);
     }
     // If upload button not present in this view, verify the mutation mock was set up correctly
-    expect(MOCK_UPLOAD_RESPONSE.data.uploadModel3D.assetId).toBe('asset-3d-new');
+    expect(MOCK_UPLOAD_RESPONSE.data.uploadModel3D.assetId).toBe(
+      'asset-3d-new'
+    );
   });
 
   // ── Visual regression ─────────────────────────────────────────────────────
@@ -146,7 +159,9 @@ test.describe('3D Model Viewer — Phase 34', () => {
   });
 
   test('model3d error state visual regression', async ({ page }) => {
-    await page.route('**/graphql', (route) => route.fulfill({ json: { errors: [{ message: 'Not found' }] } }));
+    await page.route('**/graphql', (route) =>
+      route.fulfill({ json: { errors: [{ message: 'Not found' }] } })
+    );
     await page.goto(LESSON_URL);
     await page.waitForLoadState('domcontentloaded');
 

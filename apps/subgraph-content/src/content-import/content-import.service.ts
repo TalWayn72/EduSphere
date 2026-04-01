@@ -36,16 +36,17 @@ export class ContentImportService implements OnModuleDestroy {
   constructor(
     private readonly youtubeClient: YouTubeClient,
     private readonly firecrawlClient: FirecrawlClient,
-    private readonly driveIngestion: DriveIngestionService,
+    private readonly driveIngestion: DriveIngestionService
   ) {}
 
   async importFromYoutube(
     input: YoutubeImportInput,
     tenantId: string,
-    userId: string,
+    userId: string
   ): Promise<ImportJobResult> {
     const apiKey = process.env['YOUTUBE_API_KEY'];
-    if (!apiKey) throw new BadRequestException('YOUTUBE_API_KEY is not configured');
+    if (!apiKey)
+      throw new BadRequestException('YOUTUBE_API_KEY is not configured');
 
     const match = /[?&]list=([A-Za-z0-9_-]+)/.exec(input.playlistUrl);
     if (!match?.[1]) {
@@ -55,7 +56,7 @@ export class ContentImportService implements OnModuleDestroy {
 
     this.logger.log(
       { tenantId, userId, playlistId, courseId: input.courseId },
-      'Starting YouTube import',
+      'Starting YouTube import'
     );
 
     const items = await this.youtubeClient.getPlaylistItems(playlistId, apiKey);
@@ -71,17 +72,22 @@ export class ContentImportService implements OnModuleDestroy {
   async importFromWebsite(
     input: WebsiteImportInput,
     tenantId: string,
-    userId: string,
+    userId: string
   ): Promise<ImportJobResult> {
     const apiKey = process.env['FIRECRAWL_API_KEY'];
-    if (!apiKey) throw new BadRequestException('FIRECRAWL_API_KEY is not configured');
+    if (!apiKey)
+      throw new BadRequestException('FIRECRAWL_API_KEY is not configured');
 
     this.logger.log(
       { tenantId, userId, siteUrl: input.siteUrl, courseId: input.courseId },
-      'Starting website import',
+      'Starting website import'
     );
 
-    const pages = await this.firecrawlClient.crawlSite(input.siteUrl, 100, apiKey);
+    const pages = await this.firecrawlClient.crawlSite(
+      input.siteUrl,
+      100,
+      apiKey
+    );
 
     return {
       jobId: randomUUID(),
@@ -94,8 +100,13 @@ export class ContentImportService implements OnModuleDestroy {
   async importFromDrive(
     input: DriveImportInput,
     tenantId: string,
-    userId: string,
-  ): Promise<{ id: string; status: string; lessonCount: number; estimatedMinutes: number | null }> {
+    userId: string
+  ): Promise<{
+    id: string;
+    status: string;
+    lessonCount: number;
+    estimatedMinutes: number | null;
+  }> {
     return this.driveIngestion.startImport(input, tenantId, userId);
   }
 

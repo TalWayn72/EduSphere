@@ -15,14 +15,18 @@ describe('Highlight', () => {
   });
 
   it('highlights matching substring', () => {
-    const { container } = render(<Highlight text="Hello world" query="world" />);
+    const { container } = render(
+      <Highlight text="Hello world" query="world" />
+    );
     const marks = container.querySelectorAll('mark');
     expect(marks).toHaveLength(1);
     expect(marks[0]).toHaveTextContent('world');
   });
 
   it('highlights case-insensitively', () => {
-    const { container } = render(<Highlight text="Hello World" query="hello" />);
+    const { container } = render(
+      <Highlight text="Hello World" query="hello" />
+    );
     const marks = container.querySelectorAll('mark');
     expect(marks).toHaveLength(1);
     expect(marks[0]).toHaveTextContent('Hello');
@@ -35,7 +39,9 @@ describe('Highlight', () => {
   });
 
   it('escapes regex special characters', () => {
-    const { container } = render(<Highlight text="price is $10.00" query="$10" />);
+    const { container } = render(
+      <Highlight text="price is $10.00" query="$10" />
+    );
     const marks = container.querySelectorAll('mark');
     expect(marks).toHaveLength(1);
   });

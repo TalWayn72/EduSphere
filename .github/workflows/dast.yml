@@ -2,13 +2,13 @@ name: DAST — OWASP ZAP Baseline Scan
 
 on:
   schedule:
-    - cron: '0 2 * * 0'   # Weekly Sunday 02:00 UTC
+    - cron: "0 2 * * 0" # Weekly Sunday 02:00 UTC
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'apps/gateway/**'
-      - 'apps/subgraph-*/**'
+      - "apps/gateway/**"
+      - "apps/subgraph-*/**"
 
 jobs:
   zap-scan:
@@ -23,7 +23,7 @@ jobs:
           POSTGRES_PASSWORD: test_password
           POSTGRES_DB: edusphere_test
         ports:
-          - '5432:5432'
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -32,19 +32,19 @@ jobs:
       nats:
         image: nats:2.10-alpine
         ports:
-          - '4222:4222'
+          - "4222:4222"
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v3
         with:
-          version: '10'
+          version: "10"
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -93,9 +93,9 @@ jobs:
       - name: ZAP Baseline — Gateway (4000)
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'http://localhost:4000/graphql'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          target: "http://localhost:4000/graphql"
+          rules_file_name: ".zap/rules.tsv"
+          cmd_options: "-a -j"
           fail_action: true
           allow_issue_writing: false
 
@@ -103,9 +103,9 @@ jobs:
         if: always()
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'http://localhost:4005/graphql'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          target: "http://localhost:4005/graphql"
+          rules_file_name: ".zap/rules.tsv"
+          cmd_options: "-a -j"
           fail_action: false
           allow_issue_writing: false
 
@@ -113,9 +113,9 @@ jobs:
         if: always()
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'http://localhost:4006/graphql'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a -j'
+          target: "http://localhost:4006/graphql"
+          rules_file_name: ".zap/rules.tsv"
+          cmd_options: "-a -j"
           fail_action: false
           allow_issue_writing: false
 

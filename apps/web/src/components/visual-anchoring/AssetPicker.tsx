@@ -18,7 +18,11 @@ interface AssetPickerProps {
   onSelect: (assetId: string | null) => void;
 }
 
-export default function AssetPicker({ courseId, selectedAssetId, onSelect }: AssetPickerProps) {
+export default function AssetPicker({
+  courseId,
+  selectedAssetId,
+  onSelect,
+}: AssetPickerProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showUploader, setShowUploader] = useState(false);
 
@@ -30,9 +34,9 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
   const allAssets: VisualAsset[] = useMemo(
     () =>
       ((data?.getVisualAssets ?? []) as VisualAsset[]).filter(
-        (a) => a.scanStatus === 'CLEAN',
+        (a) => a.scanStatus === 'CLEAN'
       ),
-    [data],
+    [data]
   );
 
   const filteredAssets = useMemo(() => {
@@ -45,7 +49,7 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
     (assetId: string) => {
       onSelect(selectedAssetId === assetId ? null : assetId);
     },
-    [onSelect, selectedAssetId],
+    [onSelect, selectedAssetId]
   );
 
   const handleUploaded = useCallback(
@@ -53,7 +57,7 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
       setShowUploader(false);
       onSelect(asset.id);
     },
-    [onSelect],
+    [onSelect]
   );
 
   if (fetching) {
@@ -73,7 +77,10 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
     <div data-testid="asset-picker" className="space-y-3">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Search
+            className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
+            aria-hidden="true"
+          />
           <Input
             placeholder="Search images…"
             value={searchQuery}
@@ -101,7 +108,10 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
 
       {!showUploader && filteredAssets.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-8 text-center">
-          <ImageOff className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+          <ImageOff
+            className="h-8 w-8 text-muted-foreground/50"
+            aria-hidden="true"
+          />
           <p className="text-sm text-muted-foreground">
             {allAssets.length === 0
               ? 'No images uploaded yet.'
@@ -140,7 +150,7 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
                   'group relative flex flex-col overflow-hidden rounded-md border text-left',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   'transition-all hover:border-primary/60',
-                  isSelected && 'ring-2 ring-primary border-primary',
+                  isSelected && 'ring-2 ring-primary border-primary'
                 )}
               >
                 <div className="aspect-video w-full overflow-hidden bg-muted">

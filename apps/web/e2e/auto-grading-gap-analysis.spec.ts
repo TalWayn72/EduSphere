@@ -84,7 +84,9 @@ test.describe('Auto-Grading Results — /admin/auto-grading (INSTRUCTOR)', () =>
 
   // ── Score colour coding ────────────────────────────────────────────────────
 
-  test('question with score ≥80% renders with green colour class', async ({ page }) => {
+  test('question with score ≥80% renders with green colour class', async ({
+    page,
+  }) => {
     // q1 has percentageScore=80 → scoreColor returns text-green-700
     const q1Card = page.locator('[data-testid="grading-result-q1"]');
     await expect(q1Card).toBeVisible({ timeout: 10_000 });
@@ -94,7 +96,9 @@ test.describe('Auto-Grading Results — /admin/auto-grading (INSTRUCTOR)', () =>
     expect(classAttr).toMatch(/green/);
   });
 
-  test('question with score 60-79% renders with yellow colour class', async ({ page }) => {
+  test('question with score 60-79% renders with yellow colour class', async ({
+    page,
+  }) => {
     // MOCK_RESULTS only has q1 (80%) and q2 (50%).
     // To verify yellow path: the overall score card at 65% uses yellow text.
     // overall = (8+5)/(10+10)*100 = 65 → 'text-yellow-700'
@@ -112,7 +116,9 @@ test.describe('Auto-Grading Results — /admin/auto-grading (INSTRUCTOR)', () =>
     await expect(scoreP).toBeVisible({ timeout: 8_000 });
   });
 
-  test('question with score <60% renders with red colour class', async ({ page }) => {
+  test('question with score <60% renders with red colour class', async ({
+    page,
+  }) => {
     // q2 has percentageScore=50 → scoreColor returns text-red-700 bg-red-50 border-red-200
     const q2Card = page.locator('[data-testid="grading-result-q2"]');
     await expect(q2Card).toBeVisible({ timeout: 10_000 });
@@ -123,7 +129,9 @@ test.describe('Auto-Grading Results — /admin/auto-grading (INSTRUCTOR)', () =>
 
   // ── Privacy & PII guards ───────────────────────────────────────────────────
 
-  test('privacy notice is visible and mentions "student" and "local"', async ({ page }) => {
+  test('privacy notice is visible and mentions "student" and "local"', async ({
+    page,
+  }) => {
     const notice = page.locator('[data-testid="privacy-notice"]');
     await expect(notice).toBeVisible({ timeout: 10_000 });
 
@@ -206,9 +214,9 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
   });
 
   test('gap summary card is rendered', async ({ page }) => {
-    await expect(
-      page.locator('[data-testid="gap-summary-card"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="gap-summary-card"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('total active gaps count is visible', async ({ page }) => {
@@ -232,7 +240,13 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
 
   test('gap table has expected column headers', async ({ page }) => {
     const table = page.locator('[data-testid="critical-gaps-table"]');
-    const headers = ['Topic', 'Gap Type', 'Severity', 'Affected Users', 'Recommended Action'];
+    const headers = [
+      'Topic',
+      'Gap Type',
+      'Severity',
+      'Affected Users',
+      'Recommended Action',
+    ];
     for (const header of headers) {
       await expect(table.getByText(header, { exact: true })).toBeVisible({
         timeout: 10_000,
@@ -240,11 +254,19 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
     }
   });
 
-  test('all three mock gap topics are present in the table', async ({ page }) => {
+  test('all three mock gap topics are present in the table', async ({
+    page,
+  }) => {
     const table = page.locator('[data-testid="critical-gaps-table"]');
-    await expect(table.getByText('Advanced GraphRAG')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('Knowledge Graph Design')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('Vector Embeddings')).toBeVisible({ timeout: 10_000 });
+    await expect(table.getByText('Advanced GraphRAG')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(table.getByText('Knowledge Graph Design')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(table.getByText('Vector Embeddings')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   // ── Severity badges ────────────────────────────────────────────────────────
@@ -261,7 +283,9 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
     await expect(table.getByText('MEDIUM')).toBeVisible({ timeout: 10_000 });
   });
 
-  test('LOW severity badge is absent (no LOW gap in mock data)', async ({ page }) => {
+  test('LOW severity badge is absent (no LOW gap in mock data)', async ({
+    page,
+  }) => {
     // Validates that the test setup matches MOCK_GAPS — no LOW-severity row expected.
     const table = page.locator('[data-testid="critical-gaps-table"]');
     // LOW text must not appear in the severity cells (there's no LOW-severity gap)
@@ -269,11 +293,19 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
     await expect(lowBadge).toHaveCount(0);
   });
 
-  test('gap type badges are present (NOT_STARTED, LOW_MASTERY, MISSING_PREREQUISITE)', async ({ page }) => {
+  test('gap type badges are present (NOT_STARTED, LOW_MASTERY, MISSING_PREREQUISITE)', async ({
+    page,
+  }) => {
     const table = page.locator('[data-testid="critical-gaps-table"]');
-    await expect(table.getByText('NOT_STARTED')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('LOW_MASTERY')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('MISSING_PREREQUISITE')).toBeVisible({ timeout: 10_000 });
+    await expect(table.getByText('NOT_STARTED')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(table.getByText('LOW_MASTERY')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(table.getByText('MISSING_PREREQUISITE')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   // ── Recommended actions column ─────────────────────────────────────────────
@@ -285,14 +317,18 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('recommended action for LOW_MASTERY gap mentions workshop', async ({ page }) => {
+  test('recommended action for LOW_MASTERY gap mentions workshop', async ({
+    page,
+  }) => {
     const table = page.locator('[data-testid="critical-gaps-table"]');
-    await expect(
-      table.getByText(/Schedule workshop session/i)
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(table.getByText(/Schedule workshop session/i)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('recommended action for MISSING_PREREQUISITE mentions prerequisite', async ({ page }) => {
+  test('recommended action for MISSING_PREREQUISITE mentions prerequisite', async ({
+    page,
+  }) => {
     const table = page.locator('[data-testid="critical-gaps-table"]');
     await expect(
       table.getByText(/Linear Algebra.*prerequisite|prerequisite/i)
@@ -324,7 +360,9 @@ test.describe('Gap Analysis Dashboard — /admin/gap-analysis (ORG_ADMIN)', () =
 
   // ── Coverage summary ───────────────────────────────────────────────────────
 
-  test('tenant coverage percentage is displayed in summary card', async ({ page }) => {
+  test('tenant coverage percentage is displayed in summary card', async ({
+    page,
+  }) => {
     const card = page.locator('[data-testid="gap-summary-card"]');
     await expect(card).toBeVisible({ timeout: 10_000 });
     const text = (await card.textContent()) ?? '';

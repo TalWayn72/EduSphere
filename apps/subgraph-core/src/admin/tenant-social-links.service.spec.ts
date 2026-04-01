@@ -102,7 +102,11 @@ describe('TenantSocialLinksService', () => {
       });
 
       await service.get(TENANT_ID, USER_ID);
-      expect(capturedCtx).toMatchObject({ tenantId: TENANT_ID, userId: USER_ID, userRole: 'STUDENT' });
+      expect(capturedCtx).toMatchObject({
+        tenantId: TENANT_ID,
+        userId: USER_ID,
+        userRole: 'STUDENT',
+      });
     });
   });
 
@@ -139,7 +143,9 @@ describe('TenantSocialLinksService', () => {
         return fn(mockTx as never);
       });
 
-      await service.upsert(TENANT_ID, USER_ID, { githubUrl: 'https://github.com/x' });
+      await service.upsert(TENANT_ID, USER_ID, {
+        githubUrl: 'https://github.com/x',
+      });
       expect(capturedCtx).toMatchObject({ userRole: 'ORG_ADMIN' });
     });
 
@@ -150,7 +156,10 @@ describe('TenantSocialLinksService', () => {
           insert: vi.fn().mockReturnThis(),
           values: vi.fn((v: Record<string, unknown>) => {
             capturedValues = v;
-            return { onConflictDoUpdate: vi.fn().mockReturnThis(), returning: vi.fn().mockResolvedValue([FULL_ROW]) };
+            return {
+              onConflictDoUpdate: vi.fn().mockReturnThis(),
+              returning: vi.fn().mockResolvedValue([FULL_ROW]),
+            };
           }),
           onConflictDoUpdate: vi.fn().mockReturnThis(),
           returning: vi.fn().mockResolvedValue([FULL_ROW]),
@@ -158,10 +167,16 @@ describe('TenantSocialLinksService', () => {
         return fn(mockTx as never);
       });
 
-      await service.upsert(TENANT_ID, USER_ID, { linkedinUrl: 'https://linked.in' });
+      await service.upsert(TENANT_ID, USER_ID, {
+        linkedinUrl: 'https://linked.in',
+      });
       expect(capturedValues).toBeDefined();
-      expect((capturedValues as Record<string, unknown>)['facebookUrl']).toBeNull();
-      expect((capturedValues as Record<string, unknown>)['twitterUrl']).toBeNull();
+      expect(
+        (capturedValues as Record<string, unknown>)['facebookUrl']
+      ).toBeNull();
+      expect(
+        (capturedValues as Record<string, unknown>)['twitterUrl']
+      ).toBeNull();
     });
   });
 

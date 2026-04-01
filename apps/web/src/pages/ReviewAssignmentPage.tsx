@@ -10,7 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import RubricScorer, { type RubricCriterion } from '@/components/peer-review/RubricScorer';
+import RubricScorer, {
+  type RubricCriterion,
+} from '@/components/peer-review/RubricScorer';
 import { SUBMIT_PEER_REVIEW_MUTATION } from '@/lib/graphql/peer-review.queries';
 
 const DEFAULT_CRITERIA: RubricCriterion[] = [
@@ -80,8 +82,13 @@ export function ReviewAssignmentPage() {
         {submitted ? (
           <Card>
             <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-              <CheckCircle2 className="h-12 w-12 text-green-500 dark:text-green-400" aria-hidden="true" />
-              <p className="text-lg font-semibold">Review submitted successfully!</p>
+              <CheckCircle2
+                className="h-12 w-12 text-green-500 dark:text-green-400"
+                aria-hidden="true"
+              />
+              <p className="text-lg font-semibold">
+                Review submitted successfully!
+              </p>
               <Link
                 to="/peer-review"
                 className="text-sm text-primary underline-offset-2 hover:underline"
@@ -98,7 +105,10 @@ export function ReviewAssignmentPage() {
                 <CardTitle className="text-base">Evaluation Criteria</CardTitle>
               </CardHeader>
               <CardContent>
-                <RubricScorer criteria={DEFAULT_CRITERIA} onChange={setScores} />
+                <RubricScorer
+                  criteria={DEFAULT_CRITERIA}
+                  onChange={setScores}
+                />
               </CardContent>
             </Card>
 
@@ -119,10 +129,7 @@ export function ReviewAssignmentPage() {
             </Card>
 
             <div className="flex justify-end">
-              <Button
-                onClick={handleSubmit}
-                disabled={fetching}
-              >
+              <Button onClick={handleSubmit} disabled={fetching}>
                 {fetching ? 'Submitting…' : 'Submit Review'}
               </Button>
             </div>

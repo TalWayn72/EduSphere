@@ -19,25 +19,46 @@ const InstructorEarningsPage = lazy(() =>
   }))
 );
 const PartnerDashboardPage = lazy(() =>
-  import('@/pages/PartnerDashboardPage').then((m) => ({ default: m.PartnerDashboardPage }))
+  import('@/pages/PartnerDashboardPage').then((m) => ({
+    default: m.PartnerDashboardPage,
+  }))
 );
 const InvestorDeckPage = lazy(() =>
-  import('@/pages/InvestorDeckPage').then((m) => ({ default: m.InvestorDeckPage }))
+  import('@/pages/InvestorDeckPage').then((m) => ({
+    default: m.InvestorDeckPage,
+  }))
 );
 
-const INSTRUCTOR_ROLES = { requiredRoles: ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'] };
+const INSTRUCTOR_ROLES = {
+  requiredRoles: ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'],
+};
 
 /**
  * Instructor, partner, and internal routes.
  */
 export const instructorRoutes: RouteObject[] = [
   // Instructor Analytics Dashboard
-  { path: '/instructor/analytics', element: guarded(<InstructorAnalyticsDashboard />, INSTRUCTOR_ROLES) },
+  {
+    path: '/instructor/analytics',
+    element: guarded(<InstructorAnalyticsDashboard />, INSTRUCTOR_ROLES),
+  },
   // Instructor annotation merge queue
-  { path: '/instructor/merge-queue', element: guarded(<InstructorMergeQueuePage />, INSTRUCTOR_ROLES) },
-  { path: '/instructor/earnings', element: guarded(<InstructorEarningsPage />, INSTRUCTOR_ROLES) },
+  {
+    path: '/instructor/merge-queue',
+    element: guarded(<InstructorMergeQueuePage />, INSTRUCTOR_ROLES),
+  },
+  {
+    path: '/instructor/earnings',
+    element: guarded(<InstructorEarningsPage />, INSTRUCTOR_ROLES),
+  },
   // Partner revenue + API key dashboard
-  { path: '/partner/dashboard', element: guarded(<PartnerDashboardPage />, INSTRUCTOR_ROLES) },
+  {
+    path: '/partner/dashboard',
+    element: guarded(<PartnerDashboardPage />, INSTRUCTOR_ROLES),
+  },
   // Internal investor deck — SUPER_ADMIN only
-  { path: '/internal/investor-deck', element: guarded(<InvestorDeckPage />, { requiredRoles: ['SUPER_ADMIN'] }) },
+  {
+    path: '/internal/investor-deck',
+    element: guarded(<InvestorDeckPage />, { requiredRoles: ['SUPER_ADMIN'] }),
+  },
 ];

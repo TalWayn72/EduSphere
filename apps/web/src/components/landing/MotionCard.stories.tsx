@@ -69,7 +69,9 @@ export const MultipleCards: Story = {
           <MotionCard key={delay} delay={delay}>
             <div className="p-6 border rounded-lg w-48">
               <h3 className="font-bold mb-2">Card {delay}s</h3>
-              <p className="text-muted-foreground text-sm">Staggered animation.</p>
+              <p className="text-muted-foreground text-sm">
+                Staggered animation.
+              </p>
             </div>
           </MotionCard>
         ))}

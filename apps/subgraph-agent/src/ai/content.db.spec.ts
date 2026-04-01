@@ -43,11 +43,20 @@ const TENANT_ID = 'tenant-xyz';
 const CONTENT_ID = 'ci-123';
 
 function setupTenantContext(
-  item: { id: string; title: string; type: string; content: string | null } | null,
+  item: {
+    id: string;
+    title: string;
+    type: string;
+    content: string | null;
+  } | null
 ) {
   mockCreateDatabaseConnection.mockReturnValue({});
   mockWithTenantContext.mockImplementation(
-    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => {
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      fn: (tx: unknown) => Promise<unknown>
+    ) => {
       const tx = {
         select: () => ({
           from: () => ({
@@ -58,7 +67,7 @@ function setupTenantContext(
         }),
       };
       return fn(tx);
-    },
+    }
   );
 }
 
@@ -106,7 +115,7 @@ describe('fetchContentItem', () => {
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(), // db
       { tenantId: TENANT_ID, userId: 'system', userRole: 'STUDENT' },
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 

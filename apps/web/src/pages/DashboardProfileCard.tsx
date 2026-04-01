@@ -22,7 +22,10 @@ interface ProfileCardProps {
   } | null;
 }
 
-export function DashboardProfileCard({ meResult, localUser }: ProfileCardProps) {
+export function DashboardProfileCard({
+  meResult,
+  localUser,
+}: ProfileCardProps) {
   const { t } = useTranslation('common');
 
   const profile =

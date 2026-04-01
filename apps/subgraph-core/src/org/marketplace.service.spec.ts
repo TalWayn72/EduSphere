@@ -10,10 +10,7 @@
  *   - License count limits
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 // ── DB mock ───────────────────────────────────────────────────────────────────
 
@@ -22,7 +19,8 @@ const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -44,8 +42,9 @@ vi.mock('@edusphere/db', () => ({
     update: mockUpdate,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ select: mockSelect, insert: mockInsert }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({ select: mockSelect, insert: mockInsert })
   ),
   schema: {
     courseListings: {
@@ -77,7 +76,11 @@ import { MarketplaceService } from './marketplace.service.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 'buyer-001', userId: 'admin-001', role: 'ORG_ADMIN' };
+const TENANT_CTX = {
+  tenantId: 'buyer-001',
+  userId: 'admin-001',
+  role: 'ORG_ADMIN',
+};
 
 const MOCK_LISTING = {
   id: 'listing-001',
@@ -106,7 +109,7 @@ describe('MarketplaceService', () => {
   describe('browseCatalog()', () => {
     it('returns only published listings', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([MOCK_LISTING, { ...MOCK_LISTING, id: 'listing-002' }]),
+        makeChain([MOCK_LISTING, { ...MOCK_LISTING, id: 'listing-002' }])
       );
 
       const result = await service.browseCatalog({ page: 1, limit: 10 });
@@ -116,14 +119,22 @@ describe('MarketplaceService', () => {
     it('filters by category when provided', async () => {
       mockSelect.mockReturnValueOnce(makeChain([MOCK_LISTING]));
 
-      const result = await service.browseCatalog({ page: 1, limit: 10, category: 'Technology' });
+      const result = await service.browseCatalog({
+        page: 1,
+        limit: 10,
+        category: 'Technology',
+      });
       expect(result).toHaveLength(1);
     });
 
     it('filters by search query (title match)', async () => {
       mockSelect.mockReturnValueOnce(makeChain([MOCK_LISTING]));
 
-      const result = await service.browseCatalog({ page: 1, limit: 10, search: 'AI' });
+      const result = await service.browseCatalog({
+        page: 1,
+        limit: 10,
+        search: 'AI',
+      });
       expect(result).toBeDefined();
     });
 
@@ -138,7 +149,7 @@ describe('MarketplaceService', () => {
       // Own tenant's listing should not appear
       const result = await service.browseCatalog(
         { page: 1, limit: 10 },
-        'seller-001', // viewing tenant = selling tenant
+        'seller-001' // viewing tenant = selling tenant
       );
       expect(result).toBeDefined();
     });
@@ -160,38 +171,38 @@ describe('MarketplaceService', () => {
       mockSelect.mockReturnValueOnce(makeChain([]));
 
       await expect(
-        service.licenseCourse(TENANT_CTX, 'nonexistent'),
+        service.licenseCourse(TENANT_CTX, 'nonexistent')
       ).rejects.toThrow(NotFoundException);
     });
 
     it('rejects licensing unpublished listing', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...MOCK_LISTING, isPublished: false }]),
+        makeChain([{ ...MOCK_LISTING, isPublished: false }])
       );
 
       await expect(
-        service.licenseCourse(TENANT_CTX, 'listing-001'),
+        service.licenseCourse(TENANT_CTX, 'listing-001')
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects licensing own tenant course', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...MOCK_LISTING, tenantId: TENANT_CTX.tenantId }]),
+        makeChain([{ ...MOCK_LISTING, tenantId: TENANT_CTX.tenantId }])
       );
 
       await expect(
-        service.licenseCourse(TENANT_CTX, 'listing-001'),
+        service.licenseCourse(TENANT_CTX, 'listing-001')
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects duplicate license for same course', async () => {
       mockSelect.mockReturnValueOnce(makeChain([MOCK_LISTING]));
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'existing-purchase', status: 'active' }]),
+        makeChain([{ id: 'existing-purchase', status: 'active' }])
       );
 
       await expect(
-        service.licenseCourse(TENANT_CTX, 'listing-001'),
+        service.licenseCourse(TENANT_CTX, 'listing-001')
       ).rejects.toThrow(ConflictException);
     });
   });
@@ -201,11 +212,13 @@ describe('MarketplaceService', () => {
   describe('checkLicenseExpiry()', () => {
     it('returns active for non-expired license', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'purchase-001',
-          status: 'active',
-          expiresAt: new Date(Date.now() + 86400000),
-        }]),
+        makeChain([
+          {
+            id: 'purchase-001',
+            status: 'active',
+            expiresAt: new Date(Date.now() + 86400000),
+          },
+        ])
       );
 
       const result = await service.checkLicenseExpiry('purchase-001');
@@ -214,11 +227,13 @@ describe('MarketplaceService', () => {
 
     it('returns expired for past-expiry license', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'purchase-001',
-          status: 'active',
-          expiresAt: new Date(Date.now() - 86400000),
-        }]),
+        makeChain([
+          {
+            id: 'purchase-001',
+            status: 'active',
+            expiresAt: new Date(Date.now() - 86400000),
+          },
+        ])
       );
 
       const result = await service.checkLicenseExpiry('purchase-001');

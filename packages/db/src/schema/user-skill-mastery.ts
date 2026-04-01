@@ -7,10 +7,24 @@
  *
  * Created by migration 0011_user_skill_mastery.sql
  */
-import { pgTable, uuid, text, timestamp, primaryKey, pgPolicy, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  primaryKey,
+  pgPolicy,
+  index,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
-export const masteryLevels = ['NONE', 'ATTEMPTED', 'FAMILIAR', 'PROFICIENT', 'MASTERED'] as const;
+export const masteryLevels = [
+  'NONE',
+  'ATTEMPTED',
+  'FAMILIAR',
+  'PROFICIENT',
+  'MASTERED',
+] as const;
 export type MasteryLevel = (typeof masteryLevels)[number];
 
 export const userSkillMastery = pgTable(
@@ -20,11 +34,16 @@ export const userSkillMastery = pgTable(
     tenantId: uuid('tenant_id').notNull(),
     conceptId: uuid('concept_id').notNull(),
     masteryLevel: text('mastery_level').notNull().default('NONE'),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.tenantId, table.conceptId] }),
-    index('idx_user_skill_mastery_user_tenant').on(table.userId, table.tenantId),
+    index('idx_user_skill_mastery_user_tenant').on(
+      table.userId,
+      table.tenantId
+    ),
     index('idx_user_skill_mastery_concept').on(table.tenantId, table.conceptId),
     pgPolicy('user_skill_mastery_tenant_isolation', {
       for: 'all',

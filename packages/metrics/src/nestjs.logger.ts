@@ -8,7 +8,10 @@ export function createSubgraphLoggerModule(): DynamicModule {
       level: process.env['NODE_ENV'] === 'production' ? 'info' : 'debug',
       transport:
         process.env['NODE_ENV'] !== 'production'
-          ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
+          ? {
+              target: 'pino-pretty',
+              options: { singleLine: true, colorize: true },
+            }
           : undefined,
       redact: ['req.headers.authorization', 'req.headers.cookie'],
       customProps: (req: IncomingMessage) => ({

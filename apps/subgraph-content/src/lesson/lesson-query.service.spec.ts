@@ -33,7 +33,10 @@ function makeSelectChain(rows: unknown[]) {
   const limit = vi.fn().mockResolvedValue(rows);
   const offset = vi.fn().mockReturnValue(rows);
   const orderByResult = { limit: vi.fn().mockReturnValue({ offset }) };
-  const where = vi.fn().mockReturnValue({ limit, orderBy: vi.fn().mockReturnValue(orderByResult) });
+  const where = vi.fn().mockReturnValue({
+    limit,
+    orderBy: vi.fn().mockReturnValue(orderByResult),
+  });
   const from = vi.fn().mockReturnValue({ where });
   return { from, where, limit };
 }

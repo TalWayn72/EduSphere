@@ -113,7 +113,9 @@ describe('AltTextModal', () => {
     renderModal();
     fireEvent.click(screen.getByRole('button', { name: /save alt-text/i }));
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(/failed to save alt-text/i)
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        /failed to save alt-text/i
+      )
     );
   });
 

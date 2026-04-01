@@ -38,9 +38,7 @@ describe('PrimaryStatCards', () => {
   });
 
   it('shows "..." when coursesEnrolled is null', () => {
-    render(
-      <PrimaryStatCards {...defaultProps} coursesEnrolled={null} />,
-    );
+    render(<PrimaryStatCards {...defaultProps} coursesEnrolled={null} />);
     expect(screen.getByText('...')).toBeInTheDocument();
   });
 
@@ -55,9 +53,7 @@ describe('PrimaryStatCards', () => {
   });
 
   it('shows "..." for conceptsMastered when isStatsFetching is true', () => {
-    render(
-      <PrimaryStatCards {...defaultProps} isStatsFetching={true} />,
-    );
+    render(<PrimaryStatCards {...defaultProps} isStatsFetching={true} />);
     const dots = screen.getAllByText('...');
     expect(dots.length).toBeGreaterThanOrEqual(1);
   });
@@ -77,7 +73,9 @@ describe('PrimaryStatCards', () => {
     render(<PrimaryStatCards {...defaultProps} />);
     expect(screen.getByText('Available in catalog')).toBeInTheDocument();
     // "Estimated" text appears in both Study Time and Concepts cards
-    const estimatedTexts = screen.getAllByText('Estimated — real tracking coming soon');
+    const estimatedTexts = screen.getAllByText(
+      'Estimated — real tracking coming soon'
+    );
     expect(estimatedTexts).toHaveLength(2);
   });
 
@@ -85,7 +83,7 @@ describe('PrimaryStatCards', () => {
     render(<PrimaryStatCards {...defaultProps} />);
     // Global mock returns key as-is: "dashboard:stats.coursesEnrolled" or just "stats.coursesEnrolled"
     expect(
-      screen.getByText(/stats\.coursesEnrolled|Courses Enrolled/i),
+      screen.getByText(/stats\.coursesEnrolled|Courses Enrolled/i)
     ).toBeInTheDocument();
   });
 });
@@ -110,9 +108,7 @@ describe('SecondaryStatCards', () => {
   });
 
   it('shows "..." when coursesEnrolled is null', () => {
-    render(
-      <SecondaryStatCards {...defaultProps} coursesEnrolled={null} />,
-    );
+    render(<SecondaryStatCards {...defaultProps} coursesEnrolled={null} />);
     const dots = screen.getAllByText('...');
     expect(dots.length).toBeGreaterThanOrEqual(1);
   });
@@ -123,12 +119,7 @@ describe('SecondaryStatCards', () => {
   });
 
   it('shows "..." when annotationsCreated is null', () => {
-    render(
-      <SecondaryStatCards
-        {...defaultProps}
-        annotationsCreated={null}
-      />,
-    );
+    render(<SecondaryStatCards {...defaultProps} annotationsCreated={null} />);
     const dots = screen.getAllByText('...');
     expect(dots.length).toBeGreaterThanOrEqual(1);
   });
@@ -146,8 +137,6 @@ describe('SecondaryStatCards', () => {
   it('shows descriptive subtexts', () => {
     render(<SecondaryStatCards {...defaultProps} />);
     expect(screen.getByText('Notes and highlights')).toBeInTheDocument();
-    expect(
-      screen.getByText('Active collaborations'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Active collaborations')).toBeInTheDocument();
   });
 });

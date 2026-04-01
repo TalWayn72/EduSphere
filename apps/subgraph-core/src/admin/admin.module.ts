@@ -35,6 +35,10 @@ import { TenantSocialLinksService } from './tenant-social-links.service';
     TenantSocialLinksResolver,
     TenantSocialLinksService,
   ],
-  exports: [AdminOverviewService, AtRiskThresholdsService, TenantSocialLinksService],
+  exports: [
+    AdminOverviewService,
+    AtRiskThresholdsService,
+    TenantSocialLinksService,
+  ],
 })
 export class AdminModule {}

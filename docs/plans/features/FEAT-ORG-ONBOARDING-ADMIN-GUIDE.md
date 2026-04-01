@@ -49,12 +49,12 @@ stateDiagram-v2
 
 ### Available Plans
 
-| Plan | Price | Max Users | Storage | Features |
-|------|-------|-----------|---------|----------|
-| **FREE** | $0/mo | 10 | 1 GB | Basic courses, 1 admin |
-| **STARTER** | $12K/yr | 100 | 50 GB | Marketplace, API keys, branding |
-| **PROFESSIONAL** | $35K/yr | 1,000 | 500 GB | SSO, webhooks, analytics, gamification |
-| **ENTERPRISE** | Custom | Unlimited | Unlimited | White-label, SLA, dedicated support |
+| Plan             | Price   | Max Users | Storage   | Features                               |
+| ---------------- | ------- | --------- | --------- | -------------------------------------- |
+| **FREE**         | $0/mo   | 10        | 1 GB      | Basic courses, 1 admin                 |
+| **STARTER**      | $12K/yr | 100       | 50 GB     | Marketplace, API keys, branding        |
+| **PROFESSIONAL** | $35K/yr | 1,000     | 500 GB    | SSO, webhooks, analytics, gamification |
+| **ENTERPRISE**   | Custom  | Unlimited | Unlimited | White-label, SLA, dedicated support    |
 
 ---
 
@@ -77,16 +77,19 @@ flowchart LR
 ```
 
 **Step 1 — Organization Details:**
+
 - Organization name (required, 2-100 characters)
 - URL slug (auto-generated from name, editable, checked for uniqueness via `checkSlugAvailability`)
 - Slug format: lowercase letters, numbers, hyphens only
 
 **Step 2 — Admin Account:**
+
 - Admin email (required, validated)
 - First name and last name (required)
 - Password is set via Keycloak email verification flow
 
 **Step 3 — Branding Preview:**
+
 - Optional logo upload
 - Primary and secondary color selection
 - Live preview of the branded UI
@@ -146,13 +149,13 @@ mutation CreateOrg($input: CreateOrganizationInput!) {
 
 After organization creation, a checklist tracks progress through key setup tasks. The checklist is returned as part of the `myOrganization` query.
 
-| Step | Field | How to Complete |
-|------|-------|-----------------|
-| Configure Branding | `brandingConfigured` | Upload logo + set colors in Settings > Branding |
-| Invite First User | `firstUserInvited` | Send at least one invitation via Team Management |
-| Create First Course | `firstCourseCreated` | Create a course via Courses > New Course |
-| Configure Domain | `domainConfigured` | Add custom domain in Settings > Domains |
-| Configure SSO | `ssoConfigured` | Set up SAML/OIDC in Settings > SSO |
+| Step                | Field                | How to Complete                                  |
+| ------------------- | -------------------- | ------------------------------------------------ |
+| Configure Branding  | `brandingConfigured` | Upload logo + set colors in Settings > Branding  |
+| Invite First User   | `firstUserInvited`   | Send at least one invitation via Team Management |
+| Create First Course | `firstCourseCreated` | Create a course via Courses > New Course         |
+| Configure Domain    | `domainConfigured`   | Add custom domain in Settings > Domains          |
+| Configure SSO       | `ssoConfigured`      | Set up SAML/OIDC in Settings > SSO               |
 
 The `completionPercentage` field returns a 0-100 integer based on how many steps are complete.
 
@@ -193,6 +196,7 @@ mutation InviteUser($input: InviteUserInput!) {
 ```
 
 **Input fields:**
+
 - `email` (required) — Recipient email address
 - `role` (required) — One of: `STUDENT`, `INSTRUCTOR`, `ORG_ADMIN`, `RESEARCHER`
 - `message` (optional) — Custom message included in the invitation email
@@ -266,6 +270,7 @@ mutation RemoveMember($userId: ID!) {
 Branding is configured through the existing `tenantBranding` and `tenantThemes` infrastructure. The org onboarding wizard includes a branding preview step, and branding can be updated at any time through Settings > Branding.
 
 Configurable elements:
+
 - **Logo** — Uploaded to MinIO (`tenants/{tenant_id}/branding/logo.*`)
 - **Primary color** — Used for buttons, links, active states
 - **Secondary color** — Used for accents, hover states
@@ -308,6 +313,7 @@ sequenceDiagram
 ## 7. Managing Billing & Plans
 
 The Billing page (`/admin/billing`) shows:
+
 - Current plan and usage
 - Trial status (days remaining, grace period)
 - Upgrade/downgrade options
@@ -361,6 +367,7 @@ mutation PublishCourse($input: PublishToMarketplaceInput!) {
 ```
 
 **Pricing models:**
+
 - `FREE` — No charge, unlimited access
 - `PER_SEAT` — Price per active learner
 - `FLAT_RATE` — One-time or annual flat fee
@@ -433,7 +440,7 @@ mutation CreateKey($input: CreateApiKeyInput!) {
       scopes
       rateLimitPerMinute
     }
-    plainTextKey  # Shown ONCE — store securely!
+    plainTextKey # Shown ONCE — store securely!
   }
 }
 ```
@@ -441,6 +448,7 @@ mutation CreateKey($input: CreateApiKeyInput!) {
 **Important:** The `plainTextKey` is returned only on creation. It cannot be retrieved later. Store it securely immediately.
 
 **Available scopes:**
+
 - `courses:read` — Read course data
 - `courses:write` — Create/update courses
 - `users:read` — Read user data
@@ -490,6 +498,7 @@ mutation RegisterWebhook($input: CreateWebhookInput!) {
 ```
 
 **Available events:**
+
 - `user.created`, `user.updated`, `user.deleted`
 - `course.created`, `course.published`, `course.completed`
 - `enrollment.created`, `enrollment.completed`
@@ -575,6 +584,7 @@ mutation UpdateGamification($input: UpdateGamificationConfigInput!) {
 ```
 
 **Leaderboard scopes:**
+
 - `TENANT` — Organization-wide leaderboard
 - `DEPARTMENT` — Per-department leaderboards
 - `GLOBAL` — Cross-organization leaderboard (opt-in)
@@ -719,27 +729,27 @@ graph TD
 
 ### Database Tables (Migration 0036)
 
-| Table | Purpose | RLS |
-|-------|---------|-----|
-| `onboarding_checklist` | Tracks org setup progress | tenant_id |
-| `org_invitations` | User invitation records | tenant_id |
-| `course_licenses` | Marketplace course licenses | tenant_id |
-| `api_keys` | Scoped API keys per org | tenant_id |
-| `webhook_endpoints` | Registered webhook URLs | tenant_id |
-| `webhook_deliveries` | Delivery attempt logs | tenant_id (via webhook) |
-| `gamification_config` | Per-org gamification settings | tenant_id |
-| `marketplace_listings` | Published course listings | tenant_id |
+| Table                  | Purpose                       | RLS                     |
+| ---------------------- | ----------------------------- | ----------------------- |
+| `onboarding_checklist` | Tracks org setup progress     | tenant_id               |
+| `org_invitations`      | User invitation records       | tenant_id               |
+| `course_licenses`      | Marketplace course licenses   | tenant_id               |
+| `api_keys`             | Scoped API keys per org       | tenant_id               |
+| `webhook_endpoints`    | Registered webhook URLs       | tenant_id               |
+| `webhook_deliveries`   | Delivery attempt logs         | tenant_id (via webhook) |
+| `gamification_config`  | Per-org gamification settings | tenant_id               |
+| `marketplace_listings` | Published course listings     | tenant_id               |
 
 ### Related Files
 
-| Category | Path |
-|----------|------|
-| Architecture Design | `docs/plans/features/FEAT-ORG-ONBOARDING-ARCHITECTURE.md` |
-| PRD | `docs/plans/features/FEAT-ORG-ONBOARDING-PRD.md` |
-| UX Spec | `docs/plans/features/FEAT-ORG-ONBOARDING-UX.md` |
-| Core SDL | `apps/subgraph-core/src/tenant/org-onboarding.graphql` |
-| Marketplace SDL | `apps/subgraph-content/src/marketplace/marketplace-org.graphql` |
-| DB Migration | `packages/db/src/migrations/0036_org_onboarding.sql` |
-| API Contracts | `API_CONTRACTS_GRAPHQL_FEDERATION.md` (sections 7.2, 8.2) |
-| E2E Tests | `apps/web/e2e/org-signup-wizard.spec.ts`, `apps/web/e2e/org-i18n-pages.spec.ts` |
-| Security Tests | `tests/security/org-onboarding-rls.spec.ts`, `tests/security/org-onboarding-rate-csrf-gdpr.spec.ts` |
+| Category            | Path                                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------------- |
+| Architecture Design | `docs/plans/features/FEAT-ORG-ONBOARDING-ARCHITECTURE.md`                                           |
+| PRD                 | `docs/plans/features/FEAT-ORG-ONBOARDING-PRD.md`                                                    |
+| UX Spec             | `docs/plans/features/FEAT-ORG-ONBOARDING-UX.md`                                                     |
+| Core SDL            | `apps/subgraph-core/src/tenant/org-onboarding.graphql`                                              |
+| Marketplace SDL     | `apps/subgraph-content/src/marketplace/marketplace-org.graphql`                                     |
+| DB Migration        | `packages/db/src/migrations/0036_org_onboarding.sql`                                                |
+| API Contracts       | `API_CONTRACTS_GRAPHQL_FEDERATION.md` (sections 7.2, 8.2)                                           |
+| E2E Tests           | `apps/web/e2e/org-signup-wizard.spec.ts`, `apps/web/e2e/org-i18n-pages.spec.ts`                     |
+| Security Tests      | `tests/security/org-onboarding-rls.spec.ts`, `tests/security/org-onboarding-rate-csrf-gdpr.spec.ts` |

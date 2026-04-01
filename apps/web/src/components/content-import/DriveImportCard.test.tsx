@@ -5,7 +5,14 @@ import React from 'react';
 
 // Mock UI components
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, 'data-testid': testId, className: _cls, variant: _v }: {
+  Button: ({
+    children,
+    onClick,
+    disabled,
+    'data-testid': testId,
+    className: _cls,
+    variant: _v,
+  }: {
     children: React.ReactNode;
     onClick?: () => void;
     disabled?: boolean;
@@ -13,10 +20,21 @@ vi.mock('@/components/ui/button', () => ({
     className?: string;
     variant?: string;
   }) =>
-    React.createElement('button', { onClick, disabled, 'data-testid': testId }, children),
+    React.createElement(
+      'button',
+      { onClick, disabled, 'data-testid': testId },
+      children
+    ),
 }));
 vi.mock('@/components/ui/input', () => ({
-  Input: ({ value, onChange, disabled, 'data-testid': testId, placeholder, id }: {
+  Input: ({
+    value,
+    onChange,
+    disabled,
+    'data-testid': testId,
+    placeholder,
+    id,
+  }: {
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     disabled?: boolean;
@@ -24,11 +42,23 @@ vi.mock('@/components/ui/input', () => ({
     placeholder?: string;
     id?: string;
   }) =>
-    React.createElement('input', { value, onChange, disabled, 'data-testid': testId, placeholder, id }),
+    React.createElement('input', {
+      value,
+      onChange,
+      disabled,
+      'data-testid': testId,
+      placeholder,
+      id,
+    }),
 }));
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) =>
-    React.createElement('label', { htmlFor }, children),
+  Label: ({
+    children,
+    htmlFor,
+  }: {
+    children: React.ReactNode;
+    htmlFor?: string;
+  }) => React.createElement('label', { htmlFor }, children),
 }));
 
 import { DriveImportCard } from './DriveImportCard';
@@ -55,7 +85,9 @@ describe('DriveImportCard', () => {
   it('import button is disabled when folder ID is empty', () => {
     render(React.createElement(DriveImportCard, defaultProps));
     fireEvent.click(screen.getByTestId('connect-drive-btn')); // connect
-    const importBtn = screen.getByTestId('drive-import-btn') as HTMLButtonElement;
+    const importBtn = screen.getByTestId(
+      'drive-import-btn'
+    ) as HTMLButtonElement;
     expect(importBtn.disabled).toBe(true);
   });
 
@@ -82,8 +114,15 @@ describe('DriveImportCard', () => {
   });
 
   it('shows "Importing..." text when isImporting is true', () => {
-    render(React.createElement(DriveImportCard, { ...defaultProps, isImporting: true }));
+    render(
+      React.createElement(DriveImportCard, {
+        ...defaultProps,
+        isImporting: true,
+      })
+    );
     fireEvent.click(screen.getByTestId('connect-drive-btn'));
-    expect(screen.getByTestId('drive-import-btn').textContent).toBe('Importing...');
+    expect(screen.getByTestId('drive-import-btn').textContent).toBe(
+      'Importing...'
+    );
   });
 });

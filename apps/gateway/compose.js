@@ -169,16 +169,10 @@ function normalizeKnowledgeSdl(sdl) {
   out = out.replace(/\s*"""[^"]*"""\s*skillGapReport[^\n]*/gs, '');
   out = out.replace(/\s*skillGapReport[^\n]*/g, '');
   // Remove SkillGapReport type block (conflicts with agent's SkillGapAnalysis)
-  out = out.replace(
-    /"""[^"]*"""\s*type SkillGapReport\s*\{[^}]*\}/gs,
-    ''
-  );
+  out = out.replace(/"""[^"]*"""\s*type SkillGapReport\s*\{[^}]*\}/gs, '');
   out = out.replace(/type SkillGapReport\s*\{[^}]*\}/gs, '');
   // Remove SkillGapItem type block (part of knowledge's skill gap feature)
-  out = out.replace(
-    /"""[^"]*"""\s*type SkillGapItem\s*\{[^}]*\}/gs,
-    ''
-  );
+  out = out.replace(/"""[^"]*"""\s*type SkillGapItem\s*\{[^}]*\}/gs, '');
   out = out.replace(/type SkillGapItem\s*\{[^}]*\}/gs, '');
   // Remove empty extend type Query {} blocks left behind
   out = out.replace(/extend\s+type\s+Query\s*\{\s*\}/g, '');
@@ -192,7 +186,10 @@ function normalizeKnowledgeSdl(sdl) {
  * moduleName, etc.). This rename prevents federation composition conflicts.
  */
 function normalizeAgentSdl(sdl) {
-  let out = sdl.replace(/(?<!Agent)LessonPipelineResult/g, 'AgentLessonPipelineResult');
+  let out = sdl.replace(
+    /(?<!Agent)LessonPipelineResult/g,
+    'AgentLessonPipelineResult'
+  );
   return out;
 }
 
@@ -244,7 +241,8 @@ async function main() {
     console.warn('Continuing with warnings...');
   }
 
-  const outPath = process.env.SUPERGRAPH_OUTPUT || path.join(__dirname, 'supergraph.graphql');
+  const outPath =
+    process.env.SUPERGRAPH_OUTPUT || path.join(__dirname, 'supergraph.graphql');
   writeFileSync(outPath, result.supergraphSdl);
   console.log(`\nSupergraph written to ${outPath}`);
   console.log(`Schema size: ${result.supergraphSdl.length} chars`);

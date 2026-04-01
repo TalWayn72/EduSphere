@@ -29,11 +29,7 @@ export interface AnnotationsPanelProps {
   onCloseForm: () => void;
   onSearchChange: (value: string) => void;
   onSeek: (time: number) => void;
-  onReply: (
-    parentId: string,
-    content: string,
-    layer: AnnotationLayer
-  ) => void;
+  onReply: (parentId: string, content: string, layer: AnnotationLayer) => void;
 }
 
 export const AnnotationsPanel = React.memo(function AnnotationsPanel({
@@ -186,15 +182,10 @@ function AnnotationForm({
         >
           {t('common:cancel')}
         </Button>
-        <Button
-          size="sm"
-          className="h-7 text-xs"
-          onClick={onAddAnnotation}
-        >
+        <Button size="sm" className="h-7 text-xs" onClick={onAddAnnotation}>
           {t('content:saveAt', { time: formatTime(currentTime) })}
         </Button>
       </div>
     </div>
   );
 }
-

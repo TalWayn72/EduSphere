@@ -182,11 +182,9 @@ test.describe('Offline Behavior', () => {
     await page.route('**/*', (route) => route.abort());
 
     // Try navigating to a new page while offline
-    await page
-      .goto(`${BASE_URL}/courses`, { timeout: 10_000 })
-      .catch(() => {
-        // Expected: navigation may fail when offline
-      });
+    await page.goto(`${BASE_URL}/courses`, { timeout: 10_000 }).catch(() => {
+      // Expected: navigation may fail when offline
+    });
 
     // The page should still show something — either cached content or an offline banner
     const body = page.locator('body');
@@ -223,10 +221,7 @@ test.describe('Offline Behavior', () => {
     expect(bodyText).not.toContain('NetworkError');
     expect(bodyText).not.toContain('ECONNREFUSED');
 
-    await expect(page).toHaveScreenshot(
-      'pwa-api-offline.png',
-      SCREENSHOT_OPTS
-    );
+    await expect(page).toHaveScreenshot('pwa-api-offline.png', SCREENSHOT_OPTS);
   });
 
   test('offline — banner or indicator appears when network is unavailable', async ({
@@ -312,9 +307,7 @@ test.describe('PWA Install Criteria', () => {
     expect(url).toMatch(/^https?:\/\//);
   });
 
-  test('static assets are cacheable (have cache headers)', async ({
-    page,
-  }) => {
+  test('static assets are cacheable (have cache headers)', async ({ page }) => {
     // Intercept a JS or CSS asset request and check headers
     let assetCacheControl = '';
     page.on('response', (res) => {

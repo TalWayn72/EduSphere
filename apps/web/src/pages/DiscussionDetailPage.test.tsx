@@ -8,12 +8,22 @@ import React from 'react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
-  useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
-  useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -40,7 +50,10 @@ vi.mock('@/components/social/MessageItem', () => ({
 
 vi.mock('@/components/social/MessageComposer', () => ({
   default: (props: Record<string, unknown>) => (
-    <div data-testid="message-composer" data-discussion-id={props.discussionId} />
+    <div
+      data-testid="message-composer"
+      data-discussion-id={props.discussionId}
+    />
   ),
 }));
 
@@ -51,9 +64,14 @@ vi.mock('@/lib/graphql/discussion.queries', () => ({
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => ({
-    id: 'u-1', username: 'testuser', email: 'test@example.com',
-    firstName: 'Alice', lastName: 'Smith', tenantId: 't-1',
-    role: 'STUDENT', scopes: ['read'],
+    id: 'u-1',
+    username: 'testuser',
+    email: 'test@example.com',
+    firstName: 'Alice',
+    lastName: 'Smith',
+    tenantId: 't-1',
+    role: 'STUDENT',
+    scopes: ['read'],
   })),
   DEV_MODE: true,
   logout: vi.fn(),
@@ -61,12 +79,25 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/contexts/ThemeContext', () => ({
   useTheme: vi.fn(() => ({
-    resolvedMode: 'light', setThemeMode: vi.fn(), tenantPrimitives: {},
-    userPreferences: { mode: 'system', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
-    setTenantTheme: vi.fn(), setFontSize: vi.fn(), setReadingMode: vi.fn(),
-    setMotionPreference: vi.fn(), previewThemeChanges: vi.fn(),
+    resolvedMode: 'light',
+    setThemeMode: vi.fn(),
+    tenantPrimitives: {},
+    userPreferences: {
+      mode: 'system',
+      fontSize: 'md',
+      readingMode: false,
+      motionPreference: 'full',
+      contrastMode: 'normal',
+    },
+    setTenantTheme: vi.fn(),
+    setFontSize: vi.fn(),
+    setReadingMode: vi.fn(),
+    setMotionPreference: vi.fn(),
+    previewThemeChanges: vi.fn(),
   })),
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock('@/components/AppSidebar', () => ({
@@ -74,7 +105,9 @@ vi.mock('@/components/AppSidebar', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -92,8 +125,26 @@ const renderPage = () =>
   );
 
 const MOCK_MESSAGES = [
-  { id: 'm-1', userId: 'u-1', content: 'Hello there!', messageType: 'TEXT', parentMessageId: null, likesCount: 3, isLikedByMe: false, createdAt: '2026-03-01T10:00:00Z' },
-  { id: 'm-2', userId: 'u-2', content: 'Great point!', messageType: 'TEXT', parentMessageId: 'm-1', likesCount: 1, isLikedByMe: true, createdAt: '2026-03-01T10:05:00Z' },
+  {
+    id: 'm-1',
+    userId: 'u-1',
+    content: 'Hello there!',
+    messageType: 'TEXT',
+    parentMessageId: null,
+    likesCount: 3,
+    isLikedByMe: false,
+    createdAt: '2026-03-01T10:00:00Z',
+  },
+  {
+    id: 'm-2',
+    userId: 'u-2',
+    content: 'Great point!',
+    messageType: 'TEXT',
+    parentMessageId: 'm-1',
+    likesCount: 1,
+    isLikedByMe: true,
+    createdAt: '2026-03-01T10:05:00Z',
+  },
 ];
 
 describe('DiscussionDetailPage', () => {
@@ -108,7 +159,9 @@ describe('DiscussionDetailPage', () => {
 
   it('renders Discussion heading via PageHeader', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: 'Discussion' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Discussion' })
+    ).toBeInTheDocument();
   });
 
   it('renders message log region with aria-label', () => {
@@ -127,7 +180,13 @@ describe('DiscussionDetailPage', () => {
   // --- Loading state ---
   it('shows loading message when fetching', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: undefined, fetching: true, error: undefined, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: true,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -137,7 +196,13 @@ describe('DiscussionDetailPage', () => {
   // --- Empty state ---
   it('shows empty state when no messages', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { discussionMessages: [] }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { discussionMessages: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -146,17 +211,31 @@ describe('DiscussionDetailPage', () => {
 
   it('shows encouragement text in empty state', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { discussionMessages: [] }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { discussionMessages: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
-    expect(screen.getByText(/Be the first to say something/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Be the first to say something/)
+    ).toBeInTheDocument();
   });
 
   // --- Data loaded ---
   it('renders messages when data is available', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { discussionMessages: MOCK_MESSAGES }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { discussionMessages: MOCK_MESSAGES },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -166,7 +245,13 @@ describe('DiscussionDetailPage', () => {
 
   it('renders message content text', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { discussionMessages: MOCK_MESSAGES }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { discussionMessages: MOCK_MESSAGES },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -176,7 +261,13 @@ describe('DiscussionDetailPage', () => {
 
   it('does not show loading indicator when data is loaded', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { discussionMessages: MOCK_MESSAGES }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { discussionMessages: MOCK_MESSAGES },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -185,7 +276,13 @@ describe('DiscussionDetailPage', () => {
 
   it('does not show empty state when messages exist', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { discussionMessages: MOCK_MESSAGES }, fetching: false, error: undefined, stale: false, hasNext: false },
+      {
+        data: { discussionMessages: MOCK_MESSAGES },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -195,7 +292,13 @@ describe('DiscussionDetailPage', () => {
   // --- Error state ---
   it('does not crash on query error', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: new Error('Network error'), stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('Network error'),
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -204,7 +307,13 @@ describe('DiscussionDetailPage', () => {
 
   it('shows empty state on error (no messages)', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: new Error('Network error'), stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('Network error'),
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();
@@ -213,7 +322,13 @@ describe('DiscussionDetailPage', () => {
 
   it('does not display raw error messages to user', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: undefined, fetching: false, error: { message: 'Cannot query field' } as Error, stale: false, hasNext: false },
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Cannot query field' } as Error,
+        stale: false,
+        hasNext: false,
+      },
       vi.fn(),
     ] as never);
     renderPage();

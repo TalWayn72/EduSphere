@@ -59,12 +59,20 @@ interface LearnerDetailPanelProps {
   onClose: () => void;
 }
 
-export function LearnerDetailPanel({ userId, open, onClose }: LearnerDetailPanelProps) {
+export function LearnerDetailPanel({
+  userId,
+  open,
+  onClose,
+}: LearnerDetailPanelProps) {
   const { t } = useTranslation('orgAnalytics');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [{ data, fetching }] = useQuery<{ learnerDetail: LearnerDetail | null }>({
+  const [{ data, fetching }] = useQuery<{
+    learnerDetail: LearnerDetail | null;
+  }>({
     query: LEARNER_DETAIL_QUERY,
     variables: { userId: userId ?? '' },
     pause: !mounted || !userId || !open,
@@ -73,8 +81,16 @@ export function LearnerDetailPanel({ userId, open, onClose }: LearnerDetailPanel
   const learner = data?.learnerDetail;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" data-testid="learner-detail-panel">
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
+      <DialogContent
+        className="max-w-2xl max-h-[80vh] overflow-y-auto"
+        data-testid="learner-detail-panel"
+      >
         <DialogHeader>
           <DialogTitle>
             {learner?.name ?? t('analytics.learnerDetail', 'Learner Detail')}
@@ -119,7 +135,10 @@ export function LearnerDetailPanel({ userId, open, onClose }: LearnerDetailPanel
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">
-                  {t('analytics.activityTimeline', 'Activity Timeline (30 days)')}
+                  {t(
+                    'analytics.activityTimeline',
+                    'Activity Timeline (30 days)'
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>

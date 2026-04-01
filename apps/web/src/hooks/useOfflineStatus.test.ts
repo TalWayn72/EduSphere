@@ -75,7 +75,9 @@ describe('useOfflineStatus', () => {
     const after = Date.now();
 
     expect(result.current.lastOnlineAt).not.toBeNull();
-    expect(result.current.lastOnlineAt!.getTime()).toBeGreaterThanOrEqual(before);
+    expect(result.current.lastOnlineAt!.getTime()).toBeGreaterThanOrEqual(
+      before
+    );
     expect(result.current.lastOnlineAt!.getTime()).toBeLessThanOrEqual(after);
   });
 
@@ -96,7 +98,9 @@ describe('useOfflineStatus', () => {
 
     // Verify the same handlers were passed to removeEventListener
     const removedOnline = removeSpy.mock.calls.filter(([e]) => e === 'online');
-    const removedOffline = removeSpy.mock.calls.filter(([e]) => e === 'offline');
+    const removedOffline = removeSpy.mock.calls.filter(
+      ([e]) => e === 'offline'
+    );
     expect(removedOnline.length).toBeGreaterThanOrEqual(1);
     expect(removedOffline.length).toBeGreaterThanOrEqual(1);
 

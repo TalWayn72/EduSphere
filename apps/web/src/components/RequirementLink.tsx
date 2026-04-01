@@ -27,7 +27,9 @@ export function RequirementLink({
   returnTo,
 }: RequirementLinkProps) {
   const { t } = useTranslation('common');
-  const href = highlight ? `${to}?highlight=${highlight}${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ''}` : to;
+  const href = highlight
+    ? `${to}?highlight=${highlight}${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ''}`
+    : to;
 
   if (variant === 'inline') {
     return (

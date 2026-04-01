@@ -14,7 +14,9 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 vi.mock('urql', () => ({
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }]),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+  ]),
   useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
 }));
 
@@ -38,21 +40,44 @@ vi.mock('@/components/Breadcrumbs', () => ({
 
 // UI component mocks — return simple stubs for shadcn components
 vi.mock('@/components/ui/select', () => ({
-  Select: ({ children, onValueChange: _onValueChange, value }: React.PropsWithChildren<{ onValueChange?: (v: string) => void; value?: string }>) => (
-    <div data-testid="select-root" data-value={value}>{children}</div>
+  Select: ({
+    children,
+    onValueChange: _onValueChange,
+    value,
+  }: React.PropsWithChildren<{
+    onValueChange?: (v: string) => void;
+    value?: string;
+  }>) => (
+    <div data-testid="select-root" data-value={value}>
+      {children}
+    </div>
   ),
-  SelectTrigger: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+  SelectTrigger: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<Record<string, unknown>>) => (
     <button {...props}>{children}</button>
   ),
-  SelectValue: ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>,
-  SelectContent: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) => (
-    <div data-value={value}>{children}</div>
+  SelectValue: ({ placeholder }: { placeholder?: string }) => (
+    <span>{placeholder}</span>
   ),
+  SelectContent: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  SelectItem: ({
+    value,
+    children,
+  }: {
+    value: string;
+    children: React.ReactNode;
+  }) => <div data-value={value}>{children}</div>,
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+  Card: ({
+    children,
+    className,
+  }: React.PropsWithChildren<{ className?: string }>) => (
     <div className={className}>{children}</div>
   ),
   CardHeader: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
@@ -62,7 +87,10 @@ vi.mock('@/components/ui/card', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+  Button: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<Record<string, unknown>>) => (
     <button {...props}>{children}</button>
   ),
 }));
@@ -72,7 +100,10 @@ vi.mock('@/components/ui/input', () => ({
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+  Label: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<Record<string, unknown>>) => (
     <label {...props}>{children}</label>
   ),
 }));
@@ -119,7 +150,9 @@ describe('HrisConfigPage', () => {
     vi.mocked(useAuthRole).mockReturnValue('STUDENT');
     renderPage();
     expect(screen.getByTestId('access-denied')).toBeDefined();
-    expect(screen.getByTestId('access-denied').textContent).toContain('Access Denied');
+    expect(screen.getByTestId('access-denied').textContent).toContain(
+      'Access Denied'
+    );
     expect(screen.queryByTestId('hris-config-page')).toBeNull();
   });
 

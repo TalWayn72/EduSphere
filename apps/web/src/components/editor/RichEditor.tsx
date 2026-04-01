@@ -90,7 +90,10 @@ export function RichEditor({
         const url = await onImageUpload(file);
         editor.chain().focus().setImage({ src: url, alt: file.name }).run();
       } catch (err) {
-        console.error('[RichEditor] image upload failed:', err instanceof Error ? err.message : String(err));
+        console.error(
+          '[RichEditor] image upload failed:',
+          err instanceof Error ? err.message : String(err)
+        );
       } finally {
         e.target.value = '';
       }

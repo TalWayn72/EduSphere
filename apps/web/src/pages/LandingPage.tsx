@@ -1,4 +1,9 @@
-import { PageMeta, SoftwareApplicationSchema, OrganizationSchema, WebSiteSchema } from '@/components/seo';
+import {
+  PageMeta,
+  SoftwareApplicationSchema,
+  OrganizationSchema,
+  WebSiteSchema,
+} from '@/components/seo';
 import { PublicLayout } from '@/components/PublicLayout';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { TrustBar } from '@/components/landing/TrustBar';

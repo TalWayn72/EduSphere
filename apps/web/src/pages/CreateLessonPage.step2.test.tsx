@@ -84,7 +84,9 @@ describe('CreateLessonStep2', () => {
   it('does NOT show "Add" button when lessonId is empty', () => {
     renderStep2({ lessonId: '' });
     const buttons = screen.getAllByRole('button');
-    expect(buttons.every(b => !(/^Add$/i.test(b.textContent ?? '')))).toBe(true);
+    expect(buttons.every((b) => !/^Add$/i.test(b.textContent ?? ''))).toBe(
+      true
+    );
   });
 
   it('shows deferred hint text when lessonId is empty via i18n', () => {
@@ -133,7 +135,9 @@ describe('CreateLessonStep2', () => {
   it('calls onNext when "Continue to Template" button is clicked', () => {
     const onNext = vi.fn();
     renderStep2({ onNext });
-    fireEvent.click(screen.getByRole('button', { name: /Continue to Template/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Template/i })
+    );
     expect(onNext).toHaveBeenCalledTimes(1);
   });
 });

@@ -7,7 +7,12 @@
  *   - All DB queries bypass tenant context (partners are cross-tenant — SUPER_ADMIN gate)
  *   - Memory safety: OnModuleDestroy closes all DB pools
  */
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
   createDatabaseConnection,
@@ -67,7 +72,10 @@ export class PartnerService implements OnModuleDestroy {
       .returning({ id: schema.partners.id });
 
     const row = rows[0];
-    if (!row) throw new InternalServerErrorException('Failed to create partner application');
+    if (!row)
+      throw new InternalServerErrorException(
+        'Failed to create partner application'
+      );
 
     this.logger.log(
       { partnerId: row.id, contactEmail: input.contactEmail },
@@ -77,7 +85,9 @@ export class PartnerService implements OnModuleDestroy {
   }
 
   /** List partners, optionally filtered by status. */
-  async getPartners(status?: string): Promise<typeof schema.partners.$inferSelect[]> {
+  async getPartners(
+    status?: string
+  ): Promise<(typeof schema.partners.$inferSelect)[]> {
     if (status) {
       return this.db
         .select()
@@ -110,7 +120,7 @@ export class PartnerService implements OnModuleDestroy {
   /** Fetch the last 12 months of revenue records for a partner. */
   async getRevenueReport(
     partnerId: string
-  ): Promise<typeof schema.partnerRevenue.$inferSelect[]> {
+  ): Promise<(typeof schema.partnerRevenue.$inferSelect)[]> {
     return this.db
       .select()
       .from(schema.partnerRevenue)

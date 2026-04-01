@@ -68,7 +68,7 @@ function buildRadarData(
     const entry: Record<string, string | number> = { criterion: c.name };
     groups.forEach((g) => {
       const s = g.scores.find((sc) => sc.criterionId === c.id);
-      if (s) entry[g.raterType] = +(s.score.toFixed(1));
+      if (s) entry[g.raterType] = +s.score.toFixed(1);
     });
     return entry;
   });
@@ -108,17 +108,27 @@ export default function AssessmentResultsDetailPage() {
   if (result.error || !result.data?.assessmentCampaign) {
     return (
       <div className="p-6" role="alert">
-        <p className="text-sm text-red-600 dark:text-red-400">Unable to load assessment results.</p>
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Unable to load assessment results.
+        </p>
       </div>
     );
   }
 
   const campaign = result.data.assessmentCampaign;
-  const radarData = buildRadarData(campaign.rubricCriteria, campaign.raterGroups);
+  const radarData = buildRadarData(
+    campaign.rubricCriteria,
+    campaign.raterGroups
+  );
   const raterTypes = campaign.raterGroups.map((g) => g.raterType);
 
   return (
-    <PageShell size="md" spacing="relaxed" className="p-6" data-testid="assessment-results-shell">
+    <PageShell
+      size="md"
+      spacing="relaxed"
+      className="p-6"
+      data-testid="assessment-results-shell"
+    >
       <header>
         <h1 className="text-2xl font-bold">{campaign.title}</h1>
         <Badge variant="secondary" className="mt-1">
@@ -167,7 +177,9 @@ export default function AssessmentResultsDetailPage() {
                 <tr key={c.id} className="border-b">
                   <td className="p-3 font-medium">{c.name}</td>
                   {raterTypes.map((rt) => {
-                    const grp = campaign.raterGroups.find((g) => g.raterType === rt);
+                    const grp = campaign.raterGroups.find(
+                      (g) => g.raterType === rt
+                    );
                     const sc = grp?.scores.find((s) => s.criterionId === c.id);
                     return (
                       <td key={rt} className="text-center p-3">

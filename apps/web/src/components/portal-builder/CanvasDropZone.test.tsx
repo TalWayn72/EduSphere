@@ -137,7 +137,11 @@ describe('CanvasDropZone', () => {
   it('clicking Move down calls onReorder with correct indices', () => {
     const onReorder = vi.fn();
     render(
-      <CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} onReorder={onReorder} />
+      <CanvasDropZone
+        {...defaultProps}
+        blocks={MOCK_BLOCKS}
+        onReorder={onReorder}
+      />
     );
     fireEvent.click(
       screen.getByRole('button', { name: /move HeroBanner block down/i })
@@ -148,7 +152,11 @@ describe('CanvasDropZone', () => {
   it('clicking Move up calls onReorder with correct indices', () => {
     const onReorder = vi.fn();
     render(
-      <CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} onReorder={onReorder} />
+      <CanvasDropZone
+        {...defaultProps}
+        blocks={MOCK_BLOCKS}
+        onReorder={onReorder}
+      />
     );
     fireEvent.click(
       screen.getByRole('button', { name: /move TextBlock block up/i })

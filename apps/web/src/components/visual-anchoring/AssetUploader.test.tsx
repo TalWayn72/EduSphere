@@ -11,7 +11,13 @@
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import type { VisualAsset } from './visual-anchor.types';
 
 // ── urql mock ──────────────────────────────────────────────────────────────────
@@ -19,7 +25,10 @@ const mockConfirmUpload = vi.fn();
 const mockQueryFn = vi.fn();
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, mockConfirmUpload]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    mockConfirmUpload,
+  ]),
   useClient: vi.fn(() => ({ query: mockQueryFn })),
   gql: vi.fn((s: TemplateStringsArray) => String(s)),
 }));
@@ -43,12 +52,19 @@ vi.mock('@/components/ui/button', () => ({
     children,
     onClick,
     'data-testid': testId,
-  }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void; 'data-testid'?: string }) => (
-    <button onClick={onClick} data-testid={testId}>{children}</button>
+  }: React.HTMLAttributes<HTMLButtonElement> & {
+    onClick?: () => void;
+    'data-testid'?: string;
+  }) => (
+    <button onClick={onClick} data-testid={testId}>
+      {children}
+    </button>
   ),
 }));
 
-vi.mock('@/lib/utils', () => ({ cn: (...args: string[]) => args.filter(Boolean).join(' ') }));
+vi.mock('@/lib/utils', () => ({
+  cn: (...args: string[]) => args.filter(Boolean).join(' '),
+}));
 
 import AssetUploader from './AssetUploader';
 
@@ -73,15 +89,23 @@ function makeFile(name: string, sizeBytes: number, type = 'image/jpeg') {
 }
 
 function renderUploader(onUploaded = vi.fn()) {
-  return { onUploaded, ...render(<AssetUploader courseId="course-1" onUploaded={onUploaded} />) };
+  return {
+    onUploaded,
+    ...render(<AssetUploader courseId="course-1" onUploaded={onUploaded} />),
+  };
 }
 
 function dropFile(container: HTMLElement, file: File) {
   // Prefer fireEvent.change on the hidden file input — more reliable than drop events in jsdom.
   // The input has data-testid="asset-file-input".
-  const input = container.querySelector('[data-testid="asset-file-input"]') as HTMLInputElement | null;
+  const input = container.querySelector(
+    '[data-testid="asset-file-input"]'
+  ) as HTMLInputElement | null;
   if (input) {
-    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    Object.defineProperty(input, 'files', {
+      value: [file],
+      configurable: true,
+    });
     fireEvent.change(input);
     return;
   }
@@ -89,7 +113,8 @@ function dropFile(container: HTMLElement, file: File) {
   const wrapper = container.querySelector('[data-testid="asset-uploader"]');
   if (!wrapper) throw new Error('asset-uploader wrapper not found');
   const zone = wrapper.querySelector('[role="button"]');
-  if (!zone) throw new Error('Drop zone (role=button) not found inside asset-uploader');
+  if (!zone)
+    throw new Error('Drop zone (role=button) not found inside asset-uploader');
   fireEvent.drop(zone, { dataTransfer: { files: [file] } });
 }
 
@@ -149,7 +174,13 @@ describe('AssetUploader', () => {
 
   it('reaches success state and calls onUploaded after full flow', async () => {
     mockQueryFn.mockResolvedValue({
-      data: { getPresignedUploadUrl: { uploadUrl: 'https://minio/upload', fileKey: 'key-abc', expiresAt: '' } },
+      data: {
+        getPresignedUploadUrl: {
+          uploadUrl: 'https://minio/upload',
+          fileKey: 'key-abc',
+          expiresAt: '',
+        },
+      },
       error: undefined,
     });
     mockConfirmUpload.mockResolvedValue({
@@ -174,7 +205,13 @@ describe('AssetUploader', () => {
 
   it('shows error state when PUT to MinIO fails', async () => {
     mockQueryFn.mockResolvedValue({
-      data: { getPresignedUploadUrl: { uploadUrl: 'https://minio/upload', fileKey: 'key-abc', expiresAt: '' } },
+      data: {
+        getPresignedUploadUrl: {
+          uploadUrl: 'https://minio/upload',
+          fileKey: 'key-abc',
+          expiresAt: '',
+        },
+      },
       error: undefined,
     });
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
@@ -197,11 +234,19 @@ describe('AssetUploader', () => {
 
   it('shows infected state when scan returns INFECTED', async () => {
     mockQueryFn.mockResolvedValue({
-      data: { getPresignedUploadUrl: { uploadUrl: 'https://minio/upload', fileKey: 'key-abc', expiresAt: '' } },
+      data: {
+        getPresignedUploadUrl: {
+          uploadUrl: 'https://minio/upload',
+          fileKey: 'key-abc',
+          expiresAt: '',
+        },
+      },
       error: undefined,
     });
     mockConfirmUpload.mockResolvedValue({
-      data: { confirmVisualAssetUpload: { ...CLEAN_ASSET, scanStatus: 'INFECTED' } },
+      data: {
+        confirmVisualAssetUpload: { ...CLEAN_ASSET, scanStatus: 'INFECTED' },
+      },
       error: undefined,
     });
 
@@ -221,7 +266,13 @@ describe('AssetUploader', () => {
 
   it('returns to idle state when "Try again" is clicked after error', async () => {
     mockQueryFn.mockResolvedValue({
-      data: { getPresignedUploadUrl: { uploadUrl: 'https://minio/upload', fileKey: 'key-abc', expiresAt: '' } },
+      data: {
+        getPresignedUploadUrl: {
+          uploadUrl: 'https://minio/upload',
+          fileKey: 'key-abc',
+          expiresAt: '',
+        },
+      },
       error: undefined,
     });
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));

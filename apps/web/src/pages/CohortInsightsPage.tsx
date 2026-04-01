@@ -21,7 +21,10 @@ export function CohortInsightsPage() {
             {t('cohortInsights.title', 'Cohort Insights')}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {t('cohortInsights.subtitle', 'Discover how past cohorts approached the same concepts')}
+            {t(
+              'cohortInsights.subtitle',
+              'Discover how past cohorts approached the same concepts'
+            )}
           </p>
         </div>
         <CohortInsightsWidget conceptId={conceptId} courseId={courseId} />

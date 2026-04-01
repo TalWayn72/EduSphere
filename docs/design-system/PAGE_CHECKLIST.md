@@ -10,8 +10,11 @@
 ---
 
 ## Page: [Page Name]
+
 ## Route: [/route/path]
+
 ## Template: [ListPage | DetailPage | DashboardPage | FormPage | ContentPage | EditorPage]
+
 ## Layout: [PublicLayout | Layout | AdminLayout]
 
 ---
@@ -115,13 +118,13 @@
 
 ## Sign-off
 
-| Check | Reviewer | Date | Pass |
-|-------|----------|------|------|
-| Structure | | | |
-| Accessibility | | | |
-| Dark Mode | | | |
-| Responsive | | | |
-| Visual Consistency | | | |
-| Performance | | | |
+| Check              | Reviewer | Date | Pass |
+| ------------------ | -------- | ---- | ---- |
+| Structure          |          |      |      |
+| Accessibility      |          |      |      |
+| Dark Mode          |          |      |      |
+| Responsive         |          |      |      |
+| Visual Consistency |          |      |      |
+| Performance        |          |      |      |
 
 **Page approved:** [ ] Yes / [ ] No — Requires fixes listed above

@@ -43,7 +43,9 @@ vi.mock('@/components/AppSidebar', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/Breadcrumbs', () => ({
@@ -63,9 +65,7 @@ describe('ThemeSettingsPage', () => {
 
   it('renders the page title', () => {
     render(<ThemeSettingsPage />);
-    expect(
-      screen.getByText('Theme & Appearance Settings')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Theme & Appearance Settings')).toBeInTheDocument();
   });
 
   it('renders all 3 theme mode options (Light, Dark, System)', () => {

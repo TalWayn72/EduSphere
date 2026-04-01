@@ -28,13 +28,15 @@ describe('ImportSourceSelector', () => {
 
   it('deselects when clicking selected option', () => {
     const onSelect = vi.fn();
-    render(<ImportSourceSelector selected='youtube' onSelect={onSelect} />);
+    render(<ImportSourceSelector selected="youtube" onSelect={onSelect} />);
     fireEvent.click(screen.getByText('YouTube Playlist'));
     expect(onSelect).toHaveBeenCalledWith(null);
   });
 
   it('selected option has aria-pressed=true', () => {
-    render(<ImportSourceSelector selected='website' onSelect={vi.fn()} />);
-    expect(screen.getByText('Website / Blog').closest('button')).toHaveAttribute('aria-pressed', 'true');
+    render(<ImportSourceSelector selected="website" onSelect={vi.fn()} />);
+    expect(
+      screen.getByText('Website / Blog').closest('button')
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 });

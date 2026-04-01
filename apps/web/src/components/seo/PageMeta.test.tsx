@@ -102,9 +102,7 @@ describe('FAQSchema', () => {
       { question: 'What is EduSphere?', answer: 'An AI-powered LMS.' },
       { question: 'Is it free?', answer: 'Yes, with a free plan.' },
     ];
-    expect(() =>
-      renderWithHelmet(<FAQSchema items={items} />)
-    ).not.toThrow();
+    expect(() => renderWithHelmet(<FAQSchema items={items} />)).not.toThrow();
   });
 
   it('generates valid JSON-LD @type FAQPage structure', () => {
@@ -172,9 +170,7 @@ describe('FAQSchema', () => {
   });
 
   it('handles empty items array without throwing', () => {
-    expect(() =>
-      renderWithHelmet(<FAQSchema items={[]} />)
-    ).not.toThrow();
+    expect(() => renderWithHelmet(<FAQSchema items={[]} />)).not.toThrow();
   });
 
   it('handles 20 items (production FAQ count) without throwing', () => {
@@ -182,9 +178,7 @@ describe('FAQSchema', () => {
       question: `Question ${i + 1}?`,
       answer: `Answer ${i + 1}.`,
     }));
-    expect(() =>
-      renderWithHelmet(<FAQSchema items={items} />)
-    ).not.toThrow();
+    expect(() => renderWithHelmet(<FAQSchema items={items} />)).not.toThrow();
   });
 });
 
@@ -223,7 +217,9 @@ describe('BreadcrumbSchema', () => {
     expect(schema.itemListElement[0]['@type']).toBe('ListItem');
     expect(schema.itemListElement[0].position).toBe(1);
     expect(schema.itemListElement[0].name).toBe('EduSphere');
-    expect(schema.itemListElement[0].item).toBe('https://app.edusphere.dev/landing');
+    expect(schema.itemListElement[0].item).toBe(
+      'https://app.edusphere.dev/landing'
+    );
     expect(schema.itemListElement[1].position).toBe(2);
   });
 
@@ -232,7 +228,12 @@ describe('BreadcrumbSchema', () => {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com' },
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://example.com',
+        },
       ],
     };
     expect(() => JSON.parse(JSON.stringify(schema))).not.toThrow();

@@ -4,11 +4,7 @@
  * Tracks tab switches, fullscreen exits, clipboard attempts, DevTools detection.
  * Risk-weighted scoring determines whether to void an exam session.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -60,28 +56,39 @@ export class ExamSecurityService implements OnModuleDestroy {
   }
 
   async recordBrowserEvent(
-    sessionId: string, event: BrowserEvent, tenantId: string,
+    sessionId: string,
+    event: BrowserEvent,
+    tenantId: string
   ): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'INSTRUCTOR' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'INSTRUCTOR',
+    };
 
     await withTenantContext(this.db, ctx, (tx) =>
       tx.execute(
         sql`UPDATE exam_sessions
             SET browser_events = browser_events || ${JSON.stringify(event)}::jsonb
-            WHERE id = ${sessionId}`,
-      ),
+            WHERE id = ${sessionId}`
+      )
     );
 
     this.logger.warn(
       { sessionId, eventType: event.type, tenantId },
-      '[ExamSecurity] Browser violation event recorded',
+      '[ExamSecurity] Browser violation event recorded'
     );
   }
 
   async evaluateViolations(
-    sessionId: string, tenantId: string,
+    sessionId: string,
+    tenantId: string
   ): Promise<ViolationEvaluation> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'INSTRUCTOR' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'INSTRUCTOR',
+    };
     const session = await this.helpers.loadSession(sessionId, ctx);
     const events = (session.browserEvents ?? []) as BrowserEvent[];
 
@@ -97,19 +104,25 @@ export class ExamSecurityService implements OnModuleDestroy {
   }
 
   async voidSessionOnViolation(
-    sessionId: string, tenantId: string,
+    sessionId: string,
+    tenantId: string
   ): Promise<boolean> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
 
     await withTenantContext(this.db, ctx, (tx) =>
-      tx.update(schema.examSessions)
+      tx
+        .update(schema.examSessions)
         .set({ status: 'VOIDED' })
-        .where(eq(schema.examSessions.id, sessionId)),
+        .where(eq(schema.examSessions.id, sessionId))
     );
 
     this.logger.error(
       { sessionId, tenantId },
-      '[ExamSecurity] Session voided due to integrity violations',
+      '[ExamSecurity] Session voided due to integrity violations'
     );
     return true;
   }

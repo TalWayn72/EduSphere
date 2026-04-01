@@ -189,7 +189,9 @@ test.describe('AI Chat Panel', () => {
   });
 
   // 8. Streaming response placeholder — assistant message area appears
-  test('after sending message, assistant response area appears', async ({ page }) => {
+  test('after sending message, assistant response area appears', async ({
+    page,
+  }) => {
     const fab = page.locator('[aria-label="Open AI chat"]');
     await fab.click();
 
@@ -200,9 +202,11 @@ test.describe('AI Chat Panel', () => {
     await page.keyboard.press('Enter');
 
     // Look for the assistant bubble, loading indicator, or typing indicator
-    const assistantArea = page.locator(
-      '[data-testid*="assistant"], [data-testid*="message-ai"], [class*="assistant"], [aria-label*="thinking" i], [data-testid*="typing"]'
-    ).first();
+    const assistantArea = page
+      .locator(
+        '[data-testid*="assistant"], [data-testid*="message-ai"], [class*="assistant"], [aria-label*="thinking" i], [data-testid*="typing"]'
+      )
+      .first();
     const loadingDots = page.getByText(/\.\.\.|thinking|loading/i).first();
 
     // Wait a bit for response handling
@@ -210,7 +214,9 @@ test.describe('AI Chat Panel', () => {
 
     const assistantVisible = await assistantArea.isVisible().catch(() => false);
     const loadingVisible = await loadingDots.isVisible().catch(() => false);
-    const userMsgVisible = await page.getByText('What is machine learning?').isVisible();
+    const userMsgVisible = await page
+      .getByText('What is machine learning?')
+      .isVisible();
 
     // At minimum, the user message should be present
     expect(userMsgVisible).toBe(true);
@@ -227,12 +233,16 @@ test.describe('AI Chat Panel', () => {
     // Send first message
     await input.fill('Message one');
     await page.keyboard.press('Enter');
-    await expect(page.getByText('Message one')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Message one')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Send second message
     await input.fill('Message two');
     await page.keyboard.press('Enter');
-    await expect(page.getByText('Message two')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Message two')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Both messages should remain visible (chat history)
     await expect(page.getByText('Message one')).toBeVisible();
@@ -253,9 +263,11 @@ test.describe('AI Chat Panel', () => {
     await expect(page.getByText('Hello AI')).toBeVisible({ timeout: 10_000 });
 
     // Look for a clear/reset chat button
-    const clearBtn = page.locator(
-      'button[aria-label*="clear" i], button[aria-label*="reset" i], button:has-text("Clear"), button:has-text("New chat")'
-    ).first();
+    const clearBtn = page
+      .locator(
+        'button[aria-label*="clear" i], button[aria-label*="reset" i], button:has-text("Clear"), button:has-text("New chat")'
+      )
+      .first();
     const clearExists = await clearBtn.isVisible().catch(() => false);
 
     if (clearExists) {
@@ -263,20 +275,30 @@ test.describe('AI Chat Panel', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // After clearing, the old message should be gone
-      await expect(page.getByText('Hello AI')).not.toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText('Hello AI')).not.toBeVisible({
+        timeout: 5_000,
+      });
     }
   });
 
   // 11. Error handling — AI service unavailable
-  test('shows error state when AI service returns an error', async ({ page }) => {
+  test('shows error state when AI service returns an error', async ({
+    page,
+  }) => {
     // Intercept AI/GraphQL requests to simulate failure
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
-      if (body.includes('sendMessage') || body.includes('AgentChat') || body.includes('agentMessage')) {
+      if (
+        body.includes('sendMessage') ||
+        body.includes('AgentChat') ||
+        body.includes('agentMessage')
+      ) {
         await route.fulfill({
           status: 500,
           contentType: 'application/json',
-          body: JSON.stringify({ errors: [{ message: 'AI service unavailable' }] }),
+          body: JSON.stringify({
+            errors: [{ message: 'AI service unavailable' }],
+          }),
         });
       } else {
         await route.fulfill({
@@ -326,7 +348,10 @@ test.describe('AI Chat Panel', () => {
       // The input should be filled with the suggestion OR the message should be sent
       const input = page.locator('input[placeholder*="Ask "]').first();
       const inputValue = await input.inputValue().catch(() => '');
-      const messageSent = await page.getByText(suggestionText ?? '').isVisible().catch(() => false);
+      const messageSent = await page
+        .getByText(suggestionText ?? '')
+        .isVisible()
+        .catch(() => false);
 
       expect(inputValue.length > 0 || messageSent).toBe(true);
     }

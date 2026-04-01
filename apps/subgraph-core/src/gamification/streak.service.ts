@@ -28,7 +28,9 @@ export class StreakService implements OnModuleDestroy {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     await withTenantContext(this.db, ctx, async (tx) => {
       const today = new Date().toISOString().split('T')[0]!;
-      const yesterday = new Date(Date.now() - 86_400_000).toISOString().split('T')[0]!;
+      const yesterday = new Date(Date.now() - 86_400_000)
+        .toISOString()
+        .split('T')[0]!;
 
       const result = await tx.execute<{
         current_streak: number;

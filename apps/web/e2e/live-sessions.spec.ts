@@ -17,7 +17,9 @@ import { login } from './auth.helpers';
 import { IS_DEV_MODE, RUN_WRITE_TESTS } from './env';
 
 // ─── GraphQL mock helper ───────────────────────────────────────────────────────
-async function mockLiveSessionsSuccess(page: Parameters<typeof login>[0]): Promise<void> {
+async function mockLiveSessionsSuccess(
+  page: Parameters<typeof login>[0]
+): Promise<void> {
   await page.route('**/graphql', async (route: Route) => {
     const body = route.request().postData() ?? '';
     if (body.includes('liveSessions') || body.includes('ListLiveSessions')) {
@@ -485,7 +487,9 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
 
   // REGRESSION GUARD — BUG-055: liveSessions query returned 400 (not in supergraph)
   // This test MUST fail if the sessions page shows the error state instead of content.
-  test('sessions page does NOT show error state when GraphQL succeeds (BUG-055)', async ({ page }) => {
+  test('sessions page does NOT show error state when GraphQL succeeds (BUG-055)', async ({
+    page,
+  }) => {
     // Mock liveSessions to return an empty list — simulates a healthy API
     await mockLiveSessionsSuccess(page);
 
@@ -510,7 +514,9 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
     expect(hasValidContent).toBe(true);
   });
 
-  test('sessions page shows clean error UI when GraphQL fails (no raw error strings)', async ({ page }) => {
+  test('sessions page shows clean error UI when GraphQL fails (no raw error strings)', async ({
+    page,
+  }) => {
     // Block all GraphQL to simulate 400/network failure
     await page.route('**/graphql', (route: Route) => route.abort('failed'));
 
@@ -534,12 +540,14 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
     await page.waitForLoadState('domcontentloaded');
 
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
-    if (await upcomingTab.count() > 0) {
+    if ((await upcomingTab.count()) > 0) {
       await expect(upcomingTab).toHaveAttribute('aria-selected', 'true');
     }
   });
 
-  test('visual screenshot — /sessions list page (empty state, no error) @visual', async ({ page }) => {
+  test('visual screenshot — /sessions list page (empty state, no error) @visual', async ({
+    page,
+  }) => {
     // Mock liveSessions to return empty list — page must show empty state, NOT error state
     await mockLiveSessionsSuccess(page);
 
@@ -550,7 +558,9 @@ test.describe('LiveSessionsPage — /sessions route (REGRESSION: was 404)', () =
     await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: error state must NOT appear in the screenshot
-    await expect(page.locator('[data-testid="sessions-error"]')).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid="sessions-error"]')
+    ).not.toBeVisible();
 
     await expect(page).toHaveScreenshot('live-sessions-list-page.png', {
       fullPage: false,
@@ -680,7 +690,8 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
             data: null,
             errors: [
               {
-                message: 'Cannot read properties of undefined (reading \'tenant_id\')',
+                message:
+                  "Cannot read properties of undefined (reading 'tenant_id')",
                 extensions: { code: 'INTERNAL_SERVER_ERROR' },
                 path: ['liveSessions'],
               },
@@ -701,7 +712,9 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
 
     // The error state should show a user-friendly message
     const errorEl = page.locator('[data-testid="sessions-error"]');
-    const errorVisible = await errorEl.isVisible({ timeout: 5_000 }).catch(() => false);
+    const errorVisible = await errorEl
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     if (errorVisible) {
       const errorText = (await errorEl.textContent()) ?? '';
@@ -774,7 +787,9 @@ test.describe('LiveSessionsPage — Auth Context Regression (tenant_id fix)', ()
     await page.waitForLoadState('domcontentloaded');
 
     // REGRESSION GUARD: error state must NOT appear
-    await expect(page.locator('[data-testid="sessions-error"]')).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid="sessions-error"]')
+    ).not.toBeVisible();
 
     // Sessions grid should be visible with cards
     await expect(page.locator('[data-testid="sessions-grid"]')).toBeVisible();

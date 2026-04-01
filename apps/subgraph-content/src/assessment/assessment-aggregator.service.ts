@@ -5,7 +5,12 @@
  * the result in assessment_results.
  * Max 150 lines — no AI/LLM calls.
  */
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -68,7 +73,9 @@ export class AssessmentAggregatorService implements OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
-    this.logger.log('[AssessmentAggregatorService] onModuleDestroy: DB pools closed');
+    this.logger.log(
+      '[AssessmentAggregatorService] onModuleDestroy: DB pools closed'
+    );
   }
 
   async aggregate(

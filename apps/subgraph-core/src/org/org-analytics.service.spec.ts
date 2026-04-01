@@ -16,7 +16,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mockSelect = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -31,13 +32,18 @@ function makeChain(rows: unknown[] = []) {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({ select: mockSelect })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ select: mockSelect }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({ select: mockSelect })
   ),
   schema: {
     users: { id: 'id', tenantId: 'tenant_id' },
     courses: { id: 'id', tenantId: 'tenant_id' },
-    yauEvents: { tenantId: 'tenant_id', userId: 'user_id', yearMonth: 'year_month' },
+    yauEvents: {
+      tenantId: 'tenant_id',
+      userId: 'user_id',
+      yearMonth: 'year_month',
+    },
     usageSnapshots: {
       tenantId: 'tenant_id',
       snapshotDate: 'snapshot_date',
@@ -58,14 +64,21 @@ vi.mock('@edusphere/db', () => ({
   gte: vi.fn((a: unknown, b: unknown) => ({ gte: [a, b] })),
   lte: vi.fn((a: unknown, b: unknown) => ({ lte: [a, b] })),
   count: vi.fn(() => ({ count: 'count' })),
-  sql: vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => ({ sql: strings, values })),
+  sql: vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => ({
+    sql: strings,
+    values,
+  })),
 }));
 
 import { OrgAnalyticsService } from './org-analytics.service.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 'tenant-001', userId: 'admin-001', role: 'ORG_ADMIN' };
+const TENANT_CTX = {
+  tenantId: 'tenant-001',
+  userId: 'admin-001',
+  role: 'ORG_ADMIN',
+};
 
 const MOCK_KPI = {
   totalUsers: 250,
@@ -153,7 +166,7 @@ describe('OrgAnalyticsService', () => {
   describe('getAnalytics() with date range', () => {
     it('filters by start and end date', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ date: '2026-01-01', activeUsers: 100 }]),
+        makeChain([{ date: '2026-01-01', activeUsers: 100 }])
       );
 
       const result = await service.getAnalytics(TENANT_CTX, {
@@ -165,7 +178,7 @@ describe('OrgAnalyticsService', () => {
 
     it('uses last 30 days as default range', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ date: '2026-03-01', activeUsers: 150 }]),
+        makeChain([{ date: '2026-03-01', activeUsers: 150 }])
       );
 
       const result = await service.getAnalytics(TENANT_CTX, {});
@@ -181,7 +194,7 @@ describe('OrgAnalyticsService', () => {
         makeChain([
           { department: 'Engineering', userCount: 50, completionRate: 0.8 },
           { department: 'Marketing', userCount: 30, completionRate: 0.6 },
-        ]),
+        ])
       );
 
       const result = await service.getDepartmentDrilldown(TENANT_CTX);
@@ -202,12 +215,14 @@ describe('OrgAnalyticsService', () => {
   describe('getPrecomputedMetrics()', () => {
     it('reads from usage_snapshots for large orgs', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          yauCount: 45000,
-          activeUsersCount: 32000,
-          coursesCount: 500,
-          storageGb: 250,
-        }]),
+        makeChain([
+          {
+            yauCount: 45000,
+            activeUsersCount: 32000,
+            coursesCount: 500,
+            storageGb: 250,
+          },
+        ])
       );
 
       const result = await service.getPrecomputedMetrics(TENANT_CTX);

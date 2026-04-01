@@ -8,7 +8,9 @@ vi.mock('@edusphere/db', () => ({
   and: vi.fn(),
   eq: vi.fn(),
   createDatabaseConnection: vi.fn(() => ({
-    select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })) })),
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })),
+    })),
     insert: vi.fn(() => ({
       values: vi.fn(() => ({
         onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),

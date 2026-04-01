@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 
 export interface ApiKey {
@@ -25,17 +30,28 @@ interface ApiKeysTableProps {
   t: (key: string) => string;
 }
 
-export function ApiKeysTable({ keys, fetching, onRevoke, t }: ApiKeysTableProps) {
+export function ApiKeysTable({
+  keys,
+  fetching,
+  onRevoke,
+  t,
+}: ApiKeysTableProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">{t('apiKeys.existingTitle')}</CardTitle>
+        <CardTitle className="text-base">
+          {t('apiKeys.existingTitle')}
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {fetching ? (
-          <p className="p-4 text-sm text-muted-foreground">{t('apiKeys.loading')}</p>
+          <p className="p-4 text-sm text-muted-foreground">
+            {t('apiKeys.loading')}
+          </p>
         ) : keys.length === 0 ? (
-          <p className="p-4 text-sm text-muted-foreground">{t('apiKeys.noKeys')}</p>
+          <p className="p-4 text-sm text-muted-foreground">
+            {t('apiKeys.noKeys')}
+          </p>
         ) : (
           <Table>
             <TableHeader>
@@ -52,12 +68,16 @@ export function ApiKeysTable({ keys, fetching, onRevoke, t }: ApiKeysTableProps)
               {keys.map((k) => (
                 <TableRow key={k.id}>
                   <TableCell>{k.description}</TableCell>
-                  <TableCell><code className="text-xs">{k.prefix}...</code></TableCell>
+                  <TableCell>
+                    <code className="text-xs">{k.prefix}...</code>
+                  </TableCell>
                   <TableCell className="text-xs">
                     {new Date(k.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-xs">
-                    {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : t('apiKeys.never')}
+                    {k.lastUsedAt
+                      ? new Date(k.lastUsedAt).toLocaleDateString()
+                      : t('apiKeys.never')}
                   </TableCell>
                   <TableCell>
                     <Badge variant={k.isActive ? 'default' : 'secondary'}>
@@ -66,7 +86,11 @@ export function ApiKeysTable({ keys, fetching, onRevoke, t }: ApiKeysTableProps)
                   </TableCell>
                   <TableCell>
                     {k.isActive && (
-                      <Button variant="ghost" size="sm" onClick={() => onRevoke(k.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onRevoke(k.id)}
+                      >
                         {t('apiKeys.revoke')}
                       </Button>
                     )}

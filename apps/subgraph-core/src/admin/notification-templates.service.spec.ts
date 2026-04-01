@@ -153,7 +153,9 @@ describe('NotificationTemplatesService', () => {
         }),
       }),
     });
-    await expect(service.resetTemplate('ghost', 'tenant-1')).rejects.toThrow('not found');
+    await expect(service.resetTemplate('ghost', 'tenant-1')).rejects.toThrow(
+      'not found'
+    );
   });
 
   // ── onModuleDestroy ───────────────────────────────────────────────────────

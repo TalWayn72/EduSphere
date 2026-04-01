@@ -79,7 +79,8 @@ export function getFriendlySourceErrorKey(errorMessage?: string): string {
 
 /** @deprecated Use getSourceErrorKey() + t() instead. Kept for unit tests. */
 export function parseSourceError(e: unknown): string {
-  if (!e) return '\u05E9\u05D2\u05D9\u05D0\u05D4 \u05DC\u05D0 \u05D9\u05D3\u05D5\u05E2\u05D4';
+  if (!e)
+    return '\u05E9\u05D2\u05D9\u05D0\u05D4 \u05DC\u05D0 \u05D9\u05D3\u05D5\u05E2\u05D4';
   const msg = String(e);
   if (msg.includes('Unauthorized') || msg.includes('Auth required')) {
     return '\u05E9\u05D2\u05D9\u05D0\u05EA \u05D4\u05E8\u05E9\u05D0\u05D4 \u2014 \u05E0\u05D0 \u05DC\u05D4\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9 \u05D5\u05DC\u05E0\u05E1\u05D5\u05EA \u05E9\u05D5\u05D1. \u05D0\u05DD \u05D4\u05D1\u05E2\u05D9\u05D4 \u05E0\u05DE\u05E9\u05DB\u05EA, \u05E4\u05E0\u05D4 \u05DC\u05DE\u05E0\u05D4\u05DC \u05D4\u05DE\u05E2\u05E8\u05DB\u05EA.';
@@ -90,5 +91,7 @@ export function parseSourceError(e: unknown): string {
   if (msg.includes('Network') || msg.includes('fetch')) {
     return '\u05E9\u05D2\u05D9\u05D0\u05EA \u05E8\u05E9\u05EA \u2014 \u05D1\u05D3\u05D5\u05E7 \u05E9\u05D4\u05E9\u05E8\u05EA \u05E4\u05D5\u05E2\u05DC \u05D5\u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1.';
   }
-  return IS_DEV_MODE ? msg : '\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05D4\u05D5\u05E1\u05E4\u05EA \u05D4\u05DE\u05E7\u05D5\u05E8. \u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1.';
+  return IS_DEV_MODE
+    ? msg
+    : '\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05D4\u05D5\u05E1\u05E4\u05EA \u05D4\u05DE\u05E7\u05D5\u05E8. \u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1.';
 }

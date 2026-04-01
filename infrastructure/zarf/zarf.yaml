@@ -1,13 +1,13 @@
 kind: ZarfPackageConfig
 metadata:
   name: edusphere-airgapped
-  description: "EduSphere Air-Gapped deployment package for K3s"
-  version: "1.0.0"
+  description: 'EduSphere Air-Gapped deployment package for K3s'
+  version: '1.0.0'
 
 components:
   - name: edusphere-core
     required: true
-    description: "Core EduSphere services"
+    description: 'Core EduSphere services'
     charts:
       - name: edusphere-airgapped
         localPath: ../helm/edusphere-airgapped
@@ -23,13 +23,13 @@ components:
 
   - name: ollama-local
     required: true
-    description: "Local Ollama inference server (no internet required)"
+    description: 'Local Ollama inference server (no internet required)'
     images:
       - ollama/ollama:0.1.29
 
   - name: infrastructure
     required: true
-    description: "PostgreSQL + NATS + MinIO + Keycloak (all self-hosted)"
+    description: 'PostgreSQL + NATS + MinIO + Keycloak (all self-hosted)'
     images:
       - postgres:16
       - nats:2.10

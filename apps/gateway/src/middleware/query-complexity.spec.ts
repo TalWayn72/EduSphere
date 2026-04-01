@@ -32,7 +32,9 @@ describe('query-complexity', () => {
     });
 
     it('returns 10 for a leaf node with plural name (list heuristic)', () => {
-      expect(estimateComplexity({ name: { value: 'users' } }, 0, 'users')).toBe(10);
+      expect(estimateComplexity({ name: { value: 'users' } }, 0, 'users')).toBe(
+        10
+      );
     });
 
     it('does not apply list multiplier for single-char plural "s"', () => {
@@ -78,10 +80,7 @@ describe('query-complexity', () => {
       const usersNode: SelectableNode = {
         name: { value: 'users' },
         selectionSet: {
-          selections: [
-            { name: { value: 'id' } },
-            { name: { value: 'email' } },
-          ],
+          selections: [{ name: { value: 'id' } }, { name: { value: 'email' } }],
         },
       };
       // users (list): 1 + (id:1 + email:1) * 10 = 21
@@ -93,10 +92,7 @@ describe('query-complexity', () => {
       const node: SelectableNode = {
         name: { value: 'query' },
         selectionSet: {
-          selections: [
-            { name: { value: 'id' } },
-            { name: { value: 'name' } },
-          ],
+          selections: [{ name: { value: 'id' } }, { name: { value: 'name' } }],
         },
       };
       // 1 (self) + 1 (id) + 1 (name) = 3
@@ -167,7 +163,13 @@ describe('query-complexity', () => {
           },
         ],
       };
-      visitor.Document?.(shallowDoc as any, '' as any, undefined, [] as any, [] as any);
+      visitor.Document?.(
+        shallowDoc as any,
+        '' as any,
+        undefined,
+        [] as any,
+        [] as any
+      );
       expect(reportError).not.toHaveBeenCalled();
     });
 
@@ -183,9 +185,17 @@ describe('query-complexity', () => {
           },
         ],
       };
-      visitor.Document?.(deepDoc as any, '' as any, undefined, [] as any, [] as any);
+      visitor.Document?.(
+        deepDoc as any,
+        '' as any,
+        undefined,
+        [] as any,
+        [] as any
+      );
       expect(reportError).toHaveBeenCalledTimes(1);
-      expect(reportError.mock.calls[0][0].message).toContain('exceeds maximum allowed depth');
+      expect(reportError.mock.calls[0][0].message).toContain(
+        'exceeds maximum allowed depth'
+      );
     });
 
     it('skips non-OperationDefinition nodes', () => {
@@ -193,11 +203,15 @@ describe('query-complexity', () => {
       const context = { reportError } as any;
       const visitor = depthLimitRule(1)(context);
       const doc = {
-        definitions: [
-          { kind: 'FragmentDefinition', ...buildTree(10) },
-        ],
+        definitions: [{ kind: 'FragmentDefinition', ...buildTree(10) }],
       };
-      visitor.Document?.(doc as any, '' as any, undefined, [] as any, [] as any);
+      visitor.Document?.(
+        doc as any,
+        '' as any,
+        undefined,
+        [] as any,
+        [] as any
+      );
       expect(reportError).not.toHaveBeenCalled();
     });
 
@@ -224,7 +238,13 @@ describe('query-complexity', () => {
           },
         ],
       };
-      visitor.Document?.(simpleDoc as any, '' as any, undefined, [] as any, [] as any);
+      visitor.Document?.(
+        simpleDoc as any,
+        '' as any,
+        undefined,
+        [] as any,
+        [] as any
+      );
       expect(reportError).not.toHaveBeenCalled();
     });
 
@@ -244,9 +264,17 @@ describe('query-complexity', () => {
           },
         ],
       };
-      visitor.Document?.(complexDoc as any, '' as any, undefined, [] as any, [] as any);
+      visitor.Document?.(
+        complexDoc as any,
+        '' as any,
+        undefined,
+        [] as any,
+        [] as any
+      );
       expect(reportError).toHaveBeenCalledTimes(1);
-      expect(reportError.mock.calls[0][0].message).toContain('exceeds maximum allowed complexity');
+      expect(reportError.mock.calls[0][0].message).toContain(
+        'exceeds maximum allowed complexity'
+      );
     });
 
     it('uses default MAX_COMPLEXITY when no argument given', () => {

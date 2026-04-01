@@ -17,6 +17,11 @@ import { ModuleModule } from '../module/module.module';
     AdminEnrollmentService,
     ComplianceLibraryService,
   ],
-  exports: [CourseService, EnrollmentService, AdminEnrollmentService, ComplianceLibraryService],
+  exports: [
+    CourseService,
+    EnrollmentService,
+    AdminEnrollmentService,
+    ComplianceLibraryService,
+  ],
 })
 export class CourseModule {}

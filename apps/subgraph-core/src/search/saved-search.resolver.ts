@@ -22,7 +22,10 @@ export class SavedSearchResolver {
   @Query('savedSearches')
   async getSavedSearches(@Context() ctx: GqlContext) {
     const auth = requireAuth(ctx);
-    return this.savedSearchService.listSavedSearches(auth.userId, auth.tenantId);
+    return this.savedSearchService.listSavedSearches(
+      auth.userId,
+      auth.tenantId
+    );
   }
 
   @Mutation('createSavedSearch')

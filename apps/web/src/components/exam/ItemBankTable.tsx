@@ -47,17 +47,25 @@ interface ItemBankTableProps {
 
 function extractQuestionText(item: ExamItem): string {
   const qd = item.questionData;
-  const text = typeof qd === 'object' && qd !== null && 'question' in qd
-    ? (qd as { question: string }).question
-    : '';
+  const text =
+    typeof qd === 'object' && qd !== null && 'question' in qd
+      ? (qd as { question: string }).question
+      : '';
   return text.length > 60 ? `${text.slice(0, 60)}...` : text;
 }
 
 export function ItemBankTable({
-  items, totalCount, page, pageSize,
-  selectedIds, onPageChange, onSelect, onRowClick,
+  items,
+  totalCount,
+  page,
+  pageSize,
+  selectedIds,
+  onPageChange,
+  onSelect,
+  onRowClick,
 }: ItemBankTableProps) {
-  const allSelected = items.length > 0 && items.every((i) => selectedIds.has(i.id));
+  const allSelected =
+    items.length > 0 && items.every((i) => selectedIds.has(i.id));
 
   const toggleAll = () => {
     if (allSelected) {
@@ -69,7 +77,8 @@ export function ItemBankTable({
 
   const toggleOne = (id: string) => {
     const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id); else next.add(id);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
     onSelect(next);
   };
 
@@ -80,7 +89,11 @@ export function ItemBankTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
-                <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all" />
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={toggleAll}
+                  aria-label="Select all"
+                />
               </TableHead>
               <TableHead>Question</TableHead>
               <TableHead>Domain</TableHead>
@@ -110,14 +123,18 @@ export function ItemBankTable({
                 </TableCell>
                 <TableCell>{item.domainTag}</TableCell>
                 <TableCell>
-                  <Badge className={BLOOM_COLORS[item.bloomLevel]}>{item.bloomLevel}</Badge>
+                  <Badge className={BLOOM_COLORS[item.bloomLevel]}>
+                    {item.bloomLevel}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge className={STATUS_COLORS[item.calibrationStatus]}>
                     {item.calibrationStatus}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{item.source}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {item.source}
+                </TableCell>
                 <TableCell className="text-right font-mono text-sm">
                   {item.irtB != null ? item.irtB.toFixed(2) : '—'}
                 </TableCell>
@@ -125,7 +142,10 @@ export function ItemBankTable({
             ))}
             {items.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={7}
+                  className="h-24 text-center text-muted-foreground"
+                >
                   No items found. Create or generate items to get started.
                 </TableCell>
               </TableRow>

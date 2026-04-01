@@ -171,7 +171,13 @@ vi.mock('./CourseWizardStep3', () => ({
 
 // Stub AiCourseCreatorModal — prevents lucide-react Dialog X icon from failing in jsdom
 vi.mock('@/components/AiCourseCreatorModal', () => ({
-  AiCourseCreatorModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+  AiCourseCreatorModal: ({
+    isOpen,
+    onClose,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+  }) =>
     isOpen ? (
       <div data-testid="ai-course-modal">
         <button onClick={onClose}>Close</button>

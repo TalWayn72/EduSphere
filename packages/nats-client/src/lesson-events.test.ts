@@ -20,15 +20,21 @@ describe('lesson-events type guards', () => {
     });
 
     it('returns true for lesson.asset.uploaded', () => {
-      expect(isLessonEvent({ ...valid, type: 'lesson.asset.uploaded' })).toBe(true);
+      expect(isLessonEvent({ ...valid, type: 'lesson.asset.uploaded' })).toBe(
+        true
+      );
     });
 
     it('returns true for lesson.pipeline.started', () => {
-      expect(isLessonEvent({ ...valid, type: 'lesson.pipeline.started' })).toBe(true);
+      expect(isLessonEvent({ ...valid, type: 'lesson.pipeline.started' })).toBe(
+        true
+      );
     });
 
     it('returns true for lesson.pipeline.completed', () => {
-      expect(isLessonEvent({ ...valid, type: 'lesson.pipeline.completed' })).toBe(true);
+      expect(
+        isLessonEvent({ ...valid, type: 'lesson.pipeline.completed' })
+      ).toBe(true);
     });
 
     it('returns true for lesson.published', () => {
@@ -78,9 +84,7 @@ describe('lesson-events type guards', () => {
       tenantId: 't-001',
       lessonId: 'l-001',
       runId: 'run-001',
-      entities: [
-        { name: 'DNA', type: 'Concept', confidence: 0.95 },
-      ],
+      entities: [{ name: 'DNA', type: 'Concept', confidence: 0.95 }],
       timestamp: '2026-03-30T00:00:00Z',
     };
 
@@ -142,7 +146,10 @@ describe('lesson-events type guards', () => {
 
     it('returns false for wrong type', () => {
       expect(
-        isLessonPipelineModuleCompletedEvent({ ...valid, type: 'lesson.created' })
+        isLessonPipelineModuleCompletedEvent({
+          ...valid,
+          type: 'lesson.created',
+        })
       ).toBe(false);
     });
 

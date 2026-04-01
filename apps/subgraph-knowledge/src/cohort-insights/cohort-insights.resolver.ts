@@ -31,7 +31,7 @@ export class CohortInsightsResolver {
     @Args('conceptId') conceptId: string,
     @Args('courseId') courseId: string,
     @Args('limit') limit: number | undefined,
-    @Context() ctx: GqlCtx,
+    @Context() ctx: GqlCtx
   ): Promise<CohortInsightsResult> {
     const user = requireAuth(ctx);
     return this.insightsService.getCohortInsights(
@@ -39,7 +39,7 @@ export class CohortInsightsResolver {
       courseId,
       user.tenantId,
       user.userId,
-      limit ?? 5,
+      limit ?? 5
     );
   }
 }

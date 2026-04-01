@@ -51,7 +51,9 @@ export const WithForm: Story = {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New Course</DialogTitle>
-          <DialogDescription>Add a new course to the platform.</DialogDescription>
+          <DialogDescription>
+            Add a new course to the platform.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-1.5">

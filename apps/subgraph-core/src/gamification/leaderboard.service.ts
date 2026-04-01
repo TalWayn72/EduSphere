@@ -33,17 +33,27 @@ export class LeaderboardService implements OnModuleDestroy {
 
   constructor() {
     this.db = createDatabaseConnection();
-    this.cleanupHandle = setInterval(() => this.evictExpiredEntries(), CLEANUP_INTERVAL_MS);
+    this.cleanupHandle = setInterval(
+      () => this.evictExpiredEntries(),
+      CLEANUP_INTERVAL_MS
+    );
   }
 
-  async getLeaderboard(tenantId: string, limit = 10): Promise<LeaderboardEntry[]> {
+  async getLeaderboard(
+    tenantId: string,
+    limit = 10
+  ): Promise<LeaderboardEntry[]> {
     const cacheKey = `${tenantId}:${limit}`;
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() < cached.expiresAt) {
       return cached.data;
     }
 
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     const data = await withTenantContext(this.db, ctx, async (tx) => {
       const result = await tx.execute<{
         user_id: string;

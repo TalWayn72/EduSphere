@@ -37,7 +37,7 @@ test.describe('Viewport Matrix — Admin Pages @visual', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
     await login(page);
   });
@@ -50,38 +50,50 @@ test.describe('Viewport Matrix — Admin Pages @visual', () => {
 
       for (const pg of ADMIN_PAGES) {
         test(`${pg.name} — full page`, async ({ page }) => {
-          await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`${BASE_URL}${pg.path}`, {
+            waitUntil: 'domcontentloaded',
+          });
           await page.waitForTimeout(500);
           await expect(page).toHaveScreenshot(
             `vp-${vp.name}-${pg.name}-full.png`,
-            { ...LOOSE_OPTS, mask: dynamicMasks(page) },
+            { ...LOOSE_OPTS, mask: dynamicMasks(page) }
           );
         });
 
         test(`${pg.name} — sidebar`, async ({ page }) => {
-          await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`${BASE_URL}${pg.path}`, {
+            waitUntil: 'domcontentloaded',
+          });
           await page.waitForTimeout(300);
-          const sidebar = page.locator(
-            '[data-testid="admin-sidebar"], [data-testid="app-sidebar"], aside',
-          ).first();
+          const sidebar = page
+            .locator(
+              '[data-testid="admin-sidebar"], [data-testid="app-sidebar"], aside'
+            )
+            .first();
           if (await sidebar.isVisible().catch(() => false)) {
             await expect(sidebar).toHaveScreenshot(
               `vp-${vp.name}-${pg.name}-sidebar.png`,
-              { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+              { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
             );
           }
         });
 
         test(`${pg.name} — content area`, async ({ page }) => {
-          await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`${BASE_URL}${pg.path}`, {
+            waitUntil: 'domcontentloaded',
+          });
           await page.waitForTimeout(300);
-          const content = page.locator(
-            '[data-testid="admin-content"], main, [role="main"]',
-          ).first();
+          const content = page
+            .locator('[data-testid="admin-content"], main, [role="main"]')
+            .first();
           if (await content.isVisible().catch(() => false)) {
             await expect(content).toHaveScreenshot(
               `vp-${vp.name}-${pg.name}-content.png`,
-              { maxDiffPixelRatio: 0.05, animations: 'disabled' as const, mask: dynamicMasks(page) },
+              {
+                maxDiffPixelRatio: 0.05,
+                animations: 'disabled' as const,
+                mask: dynamicMasks(page),
+              }
             );
           }
         });
@@ -96,24 +108,32 @@ test.describe('Viewport Matrix — Admin Pages @visual', () => {
         await page.setViewportSize({ width: vp.width, height: vp.height });
         await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
         await page.waitForTimeout(500);
-        const header = page.locator('header, nav, [data-testid="app-header"]').first();
+        const header = page
+          .locator('header, nav, [data-testid="app-header"]')
+          .first();
         if (await header.isVisible().catch(() => false)) {
           await expect(header).toHaveScreenshot(
             `vp-${vp.name}-admin-header.png`,
-            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
           );
         }
       });
 
       test(`admin breadcrumbs at ${vp.name}`, async ({ page }) => {
         await page.setViewportSize({ width: vp.width, height: vp.height });
-        await page.goto(`${BASE_URL}/admin/compliance`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${BASE_URL}/admin/compliance`, {
+          waitUntil: 'domcontentloaded',
+        });
         await page.waitForTimeout(500);
-        const breadcrumbs = page.locator('[data-testid="breadcrumbs"], nav[aria-label="breadcrumb"], .breadcrumbs').first();
+        const breadcrumbs = page
+          .locator(
+            '[data-testid="breadcrumbs"], nav[aria-label="breadcrumb"], .breadcrumbs'
+          )
+          .first();
         if (await breadcrumbs.isVisible().catch(() => false)) {
           await expect(breadcrumbs).toHaveScreenshot(
             `vp-${vp.name}-admin-breadcrumbs.png`,
-            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
           );
         }
       });
@@ -122,11 +142,13 @@ test.describe('Viewport Matrix — Admin Pages @visual', () => {
         await page.setViewportSize({ width: vp.width, height: vp.height });
         await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
         await page.waitForTimeout(500);
-        const footer = page.locator('footer, [data-testid="app-footer"]').first();
+        const footer = page
+          .locator('footer, [data-testid="app-footer"]')
+          .first();
         if (await footer.isVisible().catch(() => false)) {
           await expect(footer).toHaveScreenshot(
             `vp-${vp.name}-admin-footer.png`,
-            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
           );
         }
       });

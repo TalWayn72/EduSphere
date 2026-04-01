@@ -7,7 +7,10 @@ vi.mock('@/components/ui/card', () => ({
   Card: function MockCard({ children, ...props }: Record<string, unknown>) {
     return <div {...props}>{children as React.ReactNode}</div>;
   },
-  CardContent: function MockCardContent({ children, ...props }: Record<string, unknown>) {
+  CardContent: function MockCardContent({
+    children,
+    ...props
+  }: Record<string, unknown>) {
     return <div {...props}>{children as React.ReactNode}</div>;
   },
 }));
@@ -26,7 +29,7 @@ describe('TestimonialsSection', () => {
   it('renders the section heading', () => {
     render(<TestimonialsSection />);
     expect(
-      screen.getByText(/Trusted by Institutions That Take Learning Seriously/i),
+      screen.getByText(/Trusted by Institutions That Take Learning Seriously/i)
     ).toBeInTheDocument();
   });
 
@@ -42,8 +45,14 @@ describe('TestimonialsSection', () => {
 
   it('renders testimonial quote content', () => {
     render(<TestimonialsSection />);
-    expect(screen.getByText(/Visual Anchoring transformed/)).toBeInTheDocument();
-    expect(screen.getByText(/cut course creation time by 65%/)).toBeInTheDocument();
-    expect(screen.getByText(/air-gapped deployment was non-negotiable/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Visual Anchoring transformed/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/cut course creation time by 65%/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/air-gapped deployment was non-negotiable/)
+    ).toBeInTheDocument();
   });
 });

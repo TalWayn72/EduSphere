@@ -1,6 +1,9 @@
 import type { AgentType } from '@/types/chat';
 
-export function generateMockResponse(userInput: string, agentType: AgentType): string {
+export function generateMockResponse(
+  userInput: string,
+  agentType: AgentType
+): string {
   const preview = userInput.slice(0, 30);
   const responses: Record<AgentType, string> = {
     chavruta: `That's an interesting point! Consider the **counter-argument** from Rambam's perspective.\n\nHe would say that your assumption about "${preview}..." requires a deeper definition first.\n\nWhat evidence supports your position?`,

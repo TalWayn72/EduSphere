@@ -31,7 +31,15 @@ describe('SkillGapRecommendations', () => {
   describe('buildGapItems()', () => {
     it('returns one gap item per concept with content recommendations', async () => {
       mockBatchLoad.mockResolvedValue(
-        new Map([['React', [{ refId: 'seg-1', similarity: 0.92 }, { refId: 'seg-2', similarity: 0.85 }]]])
+        new Map([
+          [
+            'React',
+            [
+              { refId: 'seg-1', similarity: 0.92 },
+              { refId: 'seg-2', similarity: 0.85 },
+            ],
+          ],
+        ])
       );
       mockDbExecute.mockResolvedValue([{ title: 'Intro to React' }]);
 
@@ -104,7 +112,10 @@ describe('SkillGapRecommendations', () => {
 
     it('marks all items as isMastered = false', async () => {
       mockBatchLoad.mockResolvedValue(
-        new Map([['A', []], ['B', []]])
+        new Map([
+          ['A', []],
+          ['B', []],
+        ])
       );
       mockDbExecute.mockResolvedValue([]);
 
@@ -124,7 +135,11 @@ describe('SkillGapRecommendations', () => {
 
     it('calls batchLoad once for all concepts (N+1 fix)', async () => {
       mockBatchLoad.mockResolvedValue(
-        new Map([['A', []], ['B', []], ['C', []]])
+        new Map([
+          ['A', []],
+          ['B', []],
+          ['C', []],
+        ])
       );
       mockDbExecute.mockResolvedValue([]);
 

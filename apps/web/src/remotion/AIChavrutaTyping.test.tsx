@@ -18,16 +18,28 @@ vi.mock('remotion', () => ({
     fps: 30,
     durationInFrames: 240,
   })),
-  AbsoluteFill: ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) =>
-    React.createElement('div', { 'data-testid': 'absolute-fill', style }, children),
+  AbsoluteFill: ({
+    children,
+    style,
+  }: {
+    children: React.ReactNode;
+    style?: React.CSSProperties;
+  }) =>
+    React.createElement(
+      'div',
+      { 'data-testid': 'absolute-fill', style },
+      children
+    ),
   spring: vi.fn(() => 0.5),
-  interpolate: vi.fn((input: number, inputRange: number[], outputRange: number[]) => {
-    // Simple linear interpolation for tests
-    const [inMin, inMax] = inputRange;
-    const [outMin, outMax] = outputRange;
-    const t = Math.max(0, Math.min(1, (input - inMin) / (inMax - inMin)));
-    return outMin + t * (outMax - outMin);
-  }),
+  interpolate: vi.fn(
+    (input: number, inputRange: number[], outputRange: number[]) => {
+      // Simple linear interpolation for tests
+      const [inMin, inMax] = inputRange;
+      const [outMin, outMax] = outputRange;
+      const t = Math.max(0, Math.min(1, (input - inMin) / (inMax - inMin)));
+      return outMin + t * (outMax - outMin);
+    }
+  ),
 }));
 
 import { AIChavrutaTyping } from './AIChavrutaTyping';

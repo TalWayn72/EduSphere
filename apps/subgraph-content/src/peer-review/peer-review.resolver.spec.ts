@@ -60,20 +60,24 @@ describe('PeerReviewResolver', () => {
   // ── 1. myReviewAssignments delegates with ctx.userId ────────────────────
 
   it('calls service.getMyAssignmentsToReview with ctx.userId', async () => {
-    mockSvc['getMyAssignmentsToReview']!.mockResolvedValueOnce([makeAssignment()]);
+    mockSvc['getMyAssignmentsToReview']!.mockResolvedValueOnce([
+      makeAssignment(),
+    ]);
     const ctx = makeCtx();
 
     await resolver.myReviewAssignments(ctx);
 
     expect(mockSvc['getMyAssignmentsToReview']).toHaveBeenCalledWith(
       'user-abc',
-      expect.objectContaining({ tenantId: 'tenant-xyz', userId: 'user-abc' }),
+      expect.objectContaining({ tenantId: 'tenant-xyz', userId: 'user-abc' })
     );
   });
 
   it('throws UnauthorizedException when userId is missing from context', async () => {
     const ctx = makeCtx({ userId: undefined });
-    await expect(resolver.myReviewAssignments(ctx)).rejects.toThrow(UnauthorizedException);
+    await expect(resolver.myReviewAssignments(ctx)).rejects.toThrow(
+      UnauthorizedException
+    );
   });
 
   // ── 2. submitPeerReview IDOR protection ──────────────────────────────────
@@ -85,10 +89,10 @@ describe('PeerReviewResolver', () => {
 
     expect(mockSvc['submitReview']).toHaveBeenCalledWith(
       'assign-1',
-      'ctx-user-id',           // MUST be ctx.userId — never a GraphQL arg
+      'ctx-user-id', // MUST be ctx.userId — never a GraphQL arg
       '{"c1":4}',
       'feedback',
-      expect.objectContaining({ userId: 'ctx-user-id' }),
+      expect.objectContaining({ userId: 'ctx-user-id' })
     );
   });
 
@@ -96,7 +100,12 @@ describe('PeerReviewResolver', () => {
     mockSvc['submitReview']!.mockResolvedValueOnce(true);
     const ctx = makeCtx();
 
-    const result = await resolver.submitPeerReview('assign-1', '{"c1":5}', 'great', ctx);
+    const result = await resolver.submitPeerReview(
+      'assign-1',
+      '{"c1":5}',
+      'great',
+      ctx
+    );
 
     expect(result).toBe(true);
   });
@@ -112,7 +121,7 @@ describe('PeerReviewResolver', () => {
       'content-1',
       'submitter-id',
       'my text',
-      expect.objectContaining({ userId: 'submitter-id' }),
+      expect.objectContaining({ userId: 'submitter-id' })
     );
   });
 });

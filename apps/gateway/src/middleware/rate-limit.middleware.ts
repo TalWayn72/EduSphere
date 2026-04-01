@@ -11,16 +11,23 @@ const FALLBACK_MAP_MAX = 10_000;
 export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
   private readonly logger = new Logger(RateLimitMiddleware.name);
   private redis: Redis | null = null;
-  private readonly fallback = new Map<string, { count: number; reset: number }>();
+  private readonly fallback = new Map<
+    string,
+    { count: number; reset: number }
+  >();
 
   constructor() {
-    const redisUrl = process.env['REDIS_RATE_LIMIT_URL'] ?? process.env['REDIS_URL'];
+    const redisUrl =
+      process.env['REDIS_RATE_LIMIT_URL'] ?? process.env['REDIS_URL'];
     if (redisUrl) {
-      this.redis = new Redis(redisUrl, { lazyConnect: true, enableOfflineQueue: false });
+      this.redis = new Redis(redisUrl, {
+        lazyConnect: true,
+        enableOfflineQueue: false,
+      });
       this.redis.on('error', (err: Error) => {
         this.logger.warn(
           { err: String(err) },
-          '[RateLimitMiddleware] Redis unavailable — falling back to in-memory',
+          '[RateLimitMiddleware] Redis unavailable — falling back to in-memory'
         );
         this.redis = null;
       });
@@ -38,7 +45,9 @@ export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
       : this.checkFallback(key);
 
     if (!allowed) {
-      res.status(429).json({ error: 'Too Many Requests', retryAfter: WINDOW_MS / 1000 });
+      res
+        .status(429)
+        .json({ error: 'Too Many Requests', retryAfter: WINDOW_MS / 1000 });
       return;
     }
     next();
@@ -54,7 +63,10 @@ export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
       }
       return count <= MAX_REQUESTS;
     } catch (err) {
-      this.logger.warn({ err: String(err) }, '[RateLimitMiddleware] Redis incr failed — allowing request');
+      this.logger.warn(
+        { err: String(err) },
+        '[RateLimitMiddleware] Redis incr failed — allowing request'
+      );
       return true;
     }
   }

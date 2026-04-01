@@ -42,10 +42,16 @@ vi.mock('@edusphere/db', () => ({
     vi.fn((str: TemplateStringsArray) => str),
     { placeholder: vi.fn() }
   ),
-  withTenantContext: vi.fn(async (_db: unknown, ctx: { tenantId: string; userId: string; userRole: string }, cb: (tx: typeof mockTx) => unknown) => {
-    capturedContexts.push({ ...ctx });
-    return cb(mockTx);
-  }),
+  withTenantContext: vi.fn(
+    async (
+      _db: unknown,
+      ctx: { tenantId: string; userId: string; userRole: string },
+      cb: (tx: typeof mockTx) => unknown
+    ) => {
+      capturedContexts.push({ ...ctx });
+      return cb(mockTx);
+    }
+  ),
   closeAllPools: vi.fn(),
 }));
 
@@ -93,7 +99,9 @@ describe('Tenant Isolation — cross-tenant annotation security', () => {
     mockReturning.mockResolvedValue([]);
     mockLimit.mockResolvedValue([]);
     mockOffset.mockResolvedValue([]);
-    mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+    mockOrderBy.mockReturnValue({
+      limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+    });
     mockWhere.mockReturnValue({
       limit: mockLimit,
       returning: mockReturning,
@@ -108,10 +116,7 @@ describe('Tenant Isolation — cross-tenant annotation security', () => {
   it('tenant A cannot see tenant B annotations — withTenantContext enforces isolation', async () => {
     // Tenant B queries — RLS context is set to tenant-B, so tenant-A rows are invisible
     mockOffset.mockResolvedValue([]);
-    const result = await service.findAll(
-      { limit: 10, offset: 0 },
-      tenantBAuth
-    );
+    const result = await service.findAll({ limit: 10, offset: 0 }, tenantBAuth);
     expect(result).toEqual([]);
 
     // Verify the tenant context was set to tenant-B (not tenant-A)

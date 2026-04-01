@@ -17,17 +17,21 @@ export type Scorm2004ErrorCode =
   (typeof SCORM2004_ERROR_CODES)[keyof typeof SCORM2004_ERROR_CODES];
 
 export interface ScormCmiModel {
-  'cmi.completion_status': 'completed' | 'incomplete' | 'not attempted' | 'unknown';
+  'cmi.completion_status':
+    | 'completed'
+    | 'incomplete'
+    | 'not attempted'
+    | 'unknown';
   'cmi.success_status': 'passed' | 'failed' | 'unknown';
-  'cmi.score.scaled': number | null;   // -1.0 to 1.0
+  'cmi.score.scaled': number | null; // -1.0 to 1.0
   'cmi.score.raw': number | null;
   'cmi.score.min': number | null;
   'cmi.score.max': number | null;
   'cmi.progress_measure': number | null; // 0.0 to 1.0
-  'cmi.session_time': string;            // ISO 8601 duration e.g. PT1H30M
+  'cmi.session_time': string; // ISO 8601 duration e.g. PT1H30M
   'cmi.total_time': string;
-  'cmi.suspend_data': string;            // Unlimited — no SCORM 1.2 suspend_data cap
-  'cmi.location': string;               // Bookmark
+  'cmi.suspend_data': string; // Unlimited — no SCORM 1.2 suspend_data cap
+  'cmi.location': string; // Bookmark
   'cmi.learner_id': string;
   'cmi.learner_name': string;
   'cmi.entry': 'ab-initio' | 'resume' | '';
@@ -37,7 +41,7 @@ export interface ScormCmiModel {
 
 export function createDefaultCmiModel(
   learnerId: string,
-  learnerName: string,
+  learnerName: string
 ): ScormCmiModel {
   return {
     'cmi.completion_status': 'not attempted',
@@ -65,7 +69,7 @@ export function createDefaultCmiModel(
  */
 export function parseDuration(iso: string): number {
   const match = iso.match(
-    /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/,
+    /P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/
   );
   if (!match) return 0;
   const [, , , d, h, m, s] = match;
@@ -85,11 +89,7 @@ export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.round(seconds % 60);
-  const parts = [
-    h ? `${h}H` : '',
-    m ? `${m}M` : '',
-    s ? `${s}S` : '',
-  ].join('');
+  const parts = [h ? `${h}H` : '', m ? `${m}M` : '', s ? `${s}S` : ''].join('');
   return parts ? `PT${parts}` : 'PT0S';
 }
 

@@ -51,20 +51,24 @@ vi.mock('react-i18next', () => ({
       const translations: Record<string, string> = {
         'createLesson.step1Title': 'Lesson Details',
         'createLesson.lessonTitleLabel': 'Lesson Title *',
-        'createLesson.lessonTitlePlaceholder': 'e.g. Tree of Life lesson — Gate of Cutting, paragraph 3',
-        'createLesson.titleMinLength': 'Title must contain at least 3 characters',
+        'createLesson.lessonTitlePlaceholder':
+          'e.g. Tree of Life lesson — Gate of Cutting, paragraph 3',
+        'createLesson.titleMinLength':
+          'Title must contain at least 3 characters',
         'createLesson.lessonType': 'Lesson Type *',
         'createLesson.typeThematic': 'General (Thematic)',
         'createLesson.typeSequential': 'Sequential',
         'createLesson.lessonDate': 'Lesson Date',
         'createLesson.continueToMaterials': 'Continue to Materials \u2190',
         'createLesson.step2Title': 'Add Materials',
-        'createLesson.step2Hint': 'You can skip this step and add materials after creating the lesson',
+        'createLesson.step2Hint':
+          'You can skip this step and add materials after creating the lesson',
         'createLesson.youtubeLink': '\uD83C\uDFA5 YouTube Link',
         'createLesson.youtubeValidation': 'Must be a valid YouTube URL',
         'createLesson.invalidUrl': 'Invalid URL',
         'createLesson.addButton': 'Add',
-        'createLesson.linkAddedAfterCreation': 'The link will be added after creating the lesson',
+        'createLesson.linkAddedAfterCreation':
+          'The link will be added after creating the lesson',
         'createLesson.notesFile': '\uD83D\uDCC4 Notes File (PDF)',
         'createLesson.supportedFormats': 'Supports PDF, Word, TXT files',
         'createLesson.skip': 'Skip',
@@ -106,7 +110,9 @@ async function advanceToStep2() {
   fireEvent.change(screen.getByPlaceholderText(/Tree of Life lesson/i), {
     target: { value: 'Test Lesson Title' },
   });
-  fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
+  fireEvent.click(
+    screen.getByRole('button', { name: /Continue to Materials/i })
+  );
   await waitFor(() => screen.getByText('Add Materials'));
 }
 
@@ -136,7 +142,9 @@ describe('CreateLessonPage', () => {
       </MemoryRouter>
     );
     expect(screen.getByText('Lesson Details')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Tree of Life lesson/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Tree of Life lesson/i)
+    ).toBeInTheDocument();
   });
 
   it('renders THEMATIC and SEQUENTIAL radio buttons in step 1', () => {
@@ -155,7 +163,9 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /Continue to Materials/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Materials/i })
+    );
     await waitFor(() => {
       expect(
         screen.getByText('Title must contain at least 3 characters')
@@ -285,7 +295,10 @@ describe('CreateLessonPage', () => {
   it('shows error message on mutation failure', async () => {
     const mockExecute = vi.fn().mockResolvedValue({
       data: null,
-      error: { message: 'Server error', graphQLErrors: [{ message: 'הקורס לא נמצא' }] },
+      error: {
+        message: 'Server error',
+        graphQLErrors: [{ message: 'הקורס לא נמצא' }],
+      },
     });
     vi.mocked(urql.useMutation).mockReturnValue([
       { fetching: false },
@@ -304,7 +317,9 @@ describe('CreateLessonPage', () => {
         .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
-    await waitFor(() => expect(screen.getByText('הקורס לא נמצא')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('הקורס לא נמצא')).toBeInTheDocument()
+    );
   });
 
   it('error alert has dismiss button that clears the error', async () => {
@@ -324,7 +339,9 @@ describe('CreateLessonPage', () => {
     );
     await advanceToStep3();
     fireEvent.click(
-      screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement
+      screen
+        .getByText(/שיעור כללי/i)
+        .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
     await waitFor(() => screen.getByText('שגיאה בדיקה'));
@@ -356,7 +373,9 @@ describe('CreateLessonPage', () => {
     );
     await advanceToStep3();
     fireEvent.click(
-      screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement
+      screen
+        .getByText(/שיעור כללי/i)
+        .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
     await waitFor(() => {
@@ -385,7 +404,11 @@ describe('CreateLessonPage', () => {
       </MemoryRouter>
     );
     await advanceToStep3();
-    fireEvent.click(screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement);
+    fireEvent.click(
+      screen
+        .getByText(/שיעור כללי/i)
+        .closest('[class*="border"]') as HTMLElement
+    );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
     await waitFor(() => {
       const errorEl = screen.getByRole('alert');
@@ -397,14 +420,21 @@ describe('CreateLessonPage', () => {
   it('BUG-049: createLesson mutation NOT called when user is null (no silent return)', async () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(null as never);
     const mockExecute = vi.fn();
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockExecute] as never);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockExecute,
+    ] as never);
     render(
       <MemoryRouter>
         <CreateLessonPage />
       </MemoryRouter>
     );
     await advanceToStep3();
-    fireEvent.click(screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement);
+    fireEvent.click(
+      screen
+        .getByText(/שיעור כללי/i)
+        .closest('[class*="border"]') as HTMLElement
+    );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
     await waitFor(() => screen.getByRole('alert'));
     expect(mockExecute).not.toHaveBeenCalled();

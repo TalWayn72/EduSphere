@@ -50,14 +50,17 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly followService: SocialFollowService,
-    private readonly feedService: SocialFeedService,
+    private readonly feedService: SocialFeedService
   ) {}
 
   async onModuleInit(): Promise<void> {
     try {
       this.nats = await connect(buildNatsOptions());
       this.logger.log('SocialService: NATS connected');
-      await this.feedService.registerFeedSubscriptions(this.nats, this.feedSubs);
+      await this.feedService.registerFeedSubscriptions(
+        this.nats,
+        this.feedSubs
+      );
     } catch (err) {
       this.logger.warn(
         { err },
@@ -80,12 +83,20 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
 
   // Follow operations
   async followUser(followerId: string, followingId: string, tenantId: string) {
-    const result = await this.followService.followUser(followerId, followingId, tenantId);
+    const result = await this.followService.followUser(
+      followerId,
+      followingId,
+      tenantId
+    );
     await this.publishFollowEvent(followerId, followingId, tenantId);
     return result;
   }
 
-  async unfollowUser(followerId: string, followingId: string, tenantId: string) {
+  async unfollowUser(
+    followerId: string,
+    followingId: string,
+    tenantId: string
+  ) {
     return this.followService.unfollowUser(followerId, followingId, tenantId);
   }
 
@@ -122,7 +133,11 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
     return this.feedService.getSocialFeed(userId, tenantId, limit);
   }
 
-  async getSocialRecommendations(userId: string, tenantId: string, limit?: number) {
+  async getSocialRecommendations(
+    userId: string,
+    tenantId: string,
+    limit?: number
+  ) {
     return this.feedService.getSocialRecommendations(userId, tenantId, limit);
   }
 

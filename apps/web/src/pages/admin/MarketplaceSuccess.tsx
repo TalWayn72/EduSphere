@@ -18,9 +18,15 @@ export function MarketplaceSuccess() {
   return (
     <AdminLayout
       title={t('marketplace.successTitle', 'Purchase Complete')}
-      description={t('marketplace.successDescription', 'Your course has been added to your organization.')}
+      description={t(
+        'marketplace.successDescription',
+        'Your course has been added to your organization.'
+      )}
     >
-      <div data-testid="marketplace-success-page" className="max-w-lg mx-auto mt-12">
+      <div
+        data-testid="marketplace-success-page"
+        className="max-w-lg mx-auto mt-12"
+      >
         <Card>
           <CardContent className="p-8 text-center space-y-4">
             <div className="text-4xl">&#10003;</div>
@@ -35,7 +41,8 @@ export function MarketplaceSuccess() {
             </p>
             {sessionId && (
               <p className="text-xs text-muted-foreground">
-                {t('marketplace.sessionId', 'Session')}: {sessionId.slice(0, 20)}...
+                {t('marketplace.sessionId', 'Session')}:{' '}
+                {sessionId.slice(0, 20)}...
               </p>
             )}
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">

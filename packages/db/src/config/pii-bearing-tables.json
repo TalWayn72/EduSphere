@@ -6,7 +6,13 @@
     {
       "name": "users",
       "schemaFile": "core.ts",
-      "piiColumns": ["email", "first_name", "last_name", "display_name", "avatar_url"],
+      "piiColumns": [
+        "email",
+        "first_name",
+        "last_name",
+        "display_name",
+        "avatar_url"
+      ],
       "note": "Primary definition in core.ts; also re-exported from users.ts (base subset)"
     },
     {

@@ -2,11 +2,11 @@ name: Load Test (Nightly Smoke)
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 2 AM UTC daily
+    - cron: "0 2 * * *" # 2 AM UTC daily
   workflow_dispatch:
 
 env:
-  K6_VERSION: '0.50.0'
+  K6_VERSION: "0.50.0"
 
 jobs:
   smoke-test:
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
 

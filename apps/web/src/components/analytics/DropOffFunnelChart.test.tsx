@@ -15,9 +15,16 @@ vi.mock('recharts', () => ({
   YAxis: () => null,
   Tooltip: () => null,
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) =>
-    React.createElement('div', { 'data-testid': 'responsive-container' }, children),
+    React.createElement(
+      'div',
+      { 'data-testid': 'responsive-container' },
+      children
+    ),
   Cell: ({ fill }: { fill: string }) =>
-    React.createElement('div', { 'data-testid': 'bar-cell', 'data-fill': fill }),
+    React.createElement('div', {
+      'data-testid': 'bar-cell',
+      'data-fill': fill,
+    }),
 }));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────

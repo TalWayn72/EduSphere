@@ -6,7 +6,13 @@ import { OrganizationSchema } from './OrganizationSchema';
 
 describe('OrganizationSchema', () => {
   it('renders without throwing', () => {
-    expect(() => render(<HelmetProvider><OrganizationSchema /></HelmetProvider>)).not.toThrow();
+    expect(() =>
+      render(
+        <HelmetProvider>
+          <OrganizationSchema />
+        </HelmetProvider>
+      )
+    ).not.toThrow();
   });
 
   it('type is EducationalOrganization', () => {

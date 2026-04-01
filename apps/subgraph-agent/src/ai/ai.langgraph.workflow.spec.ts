@@ -522,7 +522,11 @@ describe('runLangGraphTutor()', () => {
     mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'ok' });
     await runLangGraphTutor('t', 'q', {}, 'he');
     // Third argument (tools) may be undefined when not provided
-    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'he', undefined);
+    expect(createTutorWorkflow).toHaveBeenCalledWith(
+      undefined,
+      'he',
+      undefined
+    );
   });
 });
 
@@ -640,28 +644,60 @@ describe('runLangGraphTutor() — tool calling', () => {
       fetchCourseContent: { description: 'fetch', execute: vi.fn() },
     };
     await expect(
-      runLangGraphTutor('thread-tools', 'question', {}, 'en', undefined, mockTools as never)
+      runLangGraphTutor(
+        'thread-tools',
+        'question',
+        {},
+        'en',
+        undefined,
+        mockTools as never
+      )
     ).resolves.toBeDefined();
   });
 
   it('passes tools to createTutorWorkflow factory', async () => {
-    const { createTutorWorkflow } = await import('@edusphere/langgraph-workflows');
+    const { createTutorWorkflow } =
+      await import('@edusphere/langgraph-workflows');
     mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'Tools answer' });
-    const mockTools = { searchKnowledgeGraph: { description: 'search', execute: vi.fn() } };
-    await runLangGraphTutor('thread-t-tools', 'question', {}, 'en', undefined, mockTools as never);
-    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'en', mockTools);
+    const mockTools = {
+      searchKnowledgeGraph: { description: 'search', execute: vi.fn() },
+    };
+    await runLangGraphTutor(
+      'thread-t-tools',
+      'question',
+      {},
+      'en',
+      undefined,
+      mockTools as never
+    );
+    expect(createTutorWorkflow).toHaveBeenCalledWith(
+      undefined,
+      'en',
+      mockTools
+    );
   });
 
   it('works without tools (tools=undefined) for backward compatibility', async () => {
-    const { createTutorWorkflow } = await import('@edusphere/langgraph-workflows');
-    mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'No tools answer' });
+    const { createTutorWorkflow } =
+      await import('@edusphere/langgraph-workflows');
+    mockCompiledInvoke.mockResolvedValueOnce({
+      explanation: 'No tools answer',
+    });
     await runLangGraphTutor('thread-no-tools', 'question', {});
-    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'en', undefined);
+    expect(createTutorWorkflow).toHaveBeenCalledWith(
+      undefined,
+      'en',
+      undefined
+    );
   });
 
   it('returns explanation from state when tools are provided', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'Tool-assisted explanation' });
-    const mockTools = { searchKnowledgeGraph: { description: 's', execute: vi.fn() } };
+    mockCompiledInvoke.mockResolvedValueOnce({
+      explanation: 'Tool-assisted explanation',
+    });
+    const mockTools = {
+      searchKnowledgeGraph: { description: 's', execute: vi.fn() },
+    };
     const result = await runLangGraphTutor(
       'thread-tool-result',
       'What is photosynthesis?',
@@ -675,7 +711,9 @@ describe('runLangGraphTutor() — tool calling', () => {
 
   it('falls back to message text when explanation absent (with tools)', async () => {
     mockCompiledInvoke.mockResolvedValueOnce({ isComplete: true });
-    const mockTools = { fetchCourseContent: { description: 'f', execute: vi.fn() } };
+    const mockTools = {
+      fetchCourseContent: { description: 'f', execute: vi.fn() },
+    };
     const result = await runLangGraphTutor(
       'thread-fallback-tools',
       'Fallback with tools',

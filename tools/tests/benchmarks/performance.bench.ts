@@ -1,6 +1,9 @@
 import { describe, bench, beforeEach, afterEach, vi } from 'vitest';
 import Database from 'better-sqlite3';
-import { createTestDb, closeTestDb } from '../../mcp-coordination-bridge/tests/helpers.js';
+import {
+  createTestDb,
+  closeTestDb,
+} from '../../mcp-coordination-bridge/tests/helpers.js';
 
 let db: Database.Database;
 
@@ -9,8 +12,10 @@ vi.mock('../../mcp-coordination-bridge/src/db.js', () => ({
   closeDb: () => {},
 }));
 
-const { publish, subscribe } = await import('../../mcp-coordination-bridge/src/pubsub.js');
-const { acquireLock } = await import('../../mcp-coordination-bridge/src/locks.js');
+const { publish, subscribe } =
+  await import('../../mcp-coordination-bridge/src/pubsub.js');
+const { acquireLock } =
+  await import('../../mcp-coordination-bridge/src/locks.js');
 
 let counter = 0;
 

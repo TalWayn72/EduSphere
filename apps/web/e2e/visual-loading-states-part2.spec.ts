@@ -37,7 +37,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-profile-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -47,7 +47,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-settings-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -57,7 +57,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-notifications-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -67,7 +67,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-lesson-viewer-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
 
@@ -77,7 +77,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
       await page.waitForTimeout(SKELETON_RENDER_DELAY);
       await expect(page).toHaveScreenshot(
         'loading-calendar-skeleton.png',
-        STABLE_OPTS,
+        STABLE_OPTS
       );
     });
   });
@@ -108,7 +108,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
         await page.waitForTimeout(SKELETON_RENDER_DELAY);
         await expect(page).toHaveScreenshot(
           `loading-${pg.name}-tablet-skeleton.png`,
-          STABLE_OPTS,
+          STABLE_OPTS
         );
       });
     }
@@ -140,7 +140,7 @@ test.describe('Visual Regression — Loading States (Part 2)', () => {
         await page.waitForTimeout(SKELETON_RENDER_DELAY);
         await expect(page).toHaveScreenshot(
           `loading-${pg.name}-mobile-skeleton.png`,
-          STABLE_OPTS,
+          STABLE_OPTS
         );
       });
     }

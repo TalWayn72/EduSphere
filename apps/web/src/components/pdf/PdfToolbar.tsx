@@ -45,25 +45,59 @@ export function PdfToolbar({
       role="toolbar"
       aria-label="PDF controls"
     >
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onPrevPage} disabled={pageNum <= 1} aria-label="Previous page">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7"
+        onClick={onPrevPage}
+        disabled={pageNum <= 1}
+        aria-label="Previous page"
+      >
         <ChevronLeft className="h-4 w-4" />
       </Button>
-      <span className="text-xs font-mono tabular-nums min-w-[4rem] text-center" aria-live="polite">
+      <span
+        className="text-xs font-mono tabular-nums min-w-[4rem] text-center"
+        aria-live="polite"
+      >
         {pageNum} / {totalPages}
       </span>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onNextPage} disabled={pageNum >= totalPages} aria-label="Next page">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7"
+        onClick={onNextPage}
+        disabled={pageNum >= totalPages}
+        aria-label="Next page"
+      >
         <ChevronRight className="h-4 w-4" />
       </Button>
 
       <div className="w-px h-4 bg-border mx-1" />
 
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onZoomOut} aria-label="Zoom out">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7"
+        onClick={onZoomOut}
+        aria-label="Zoom out"
+      >
         <ZoomOut className="h-4 w-4" />
       </Button>
-      <span className="text-xs font-mono tabular-nums min-w-[3rem] text-center" aria-live="polite" aria-atomic="true" role="status">
+      <span
+        className="text-xs font-mono tabular-nums min-w-[3rem] text-center"
+        aria-live="polite"
+        aria-atomic="true"
+        role="status"
+      >
         {Math.round(scale * 100)}%
       </span>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onZoomIn} aria-label="Zoom in">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7"
+        onClick={onZoomIn}
+        aria-label="Zoom in"
+      >
         <ZoomIn className="h-4 w-4" />
       </Button>
 

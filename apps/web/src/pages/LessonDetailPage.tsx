@@ -9,7 +9,8 @@ import { login } from '@/lib/auth';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const AUTH_ERROR_PATTERNS = [
   'unauthorized',
@@ -63,7 +64,9 @@ export function LessonDetailPage() {
 
   // Defer query to prevent urql cache race with concurrently-unmounting siblings
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isValidId = lessonId ? UUID_RE.test(lessonId) : false;
 
@@ -94,8 +97,12 @@ export function LessonDetailPage() {
       return (
         <Layout>
           <div className="p-6 space-y-3">
-            <p className="text-amber-700 font-medium dark:text-amber-300">הסשן פג תוקף</p>
-            <p className="text-sm text-muted-foreground">יש להתחבר מחדש כדי להמשיך.</p>
+            <p className="text-amber-700 font-medium dark:text-amber-300">
+              הסשן פג תוקף
+            </p>
+            <p className="text-sm text-muted-foreground">
+              יש להתחבר מחדש כדי להמשיך.
+            </p>
             <Button onClick={() => login()}>התחבר מחדש</Button>
           </div>
         </Layout>
@@ -103,7 +110,9 @@ export function LessonDetailPage() {
     }
     return (
       <Layout>
-        <div className="p-6 text-red-600 dark:text-red-400">שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.</div>
+        <div className="p-6 text-red-600 dark:text-red-400">
+          שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.
+        </div>
       </Layout>
     );
   }

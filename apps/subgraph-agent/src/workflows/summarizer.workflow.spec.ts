@@ -55,7 +55,10 @@ function makeContext(
 function makeValidRefineJson() {
   return JSON.stringify({
     keyConcepts: ['Arrays', 'Linked Lists'],
-    mainPoints: ['Arrays provide O(1) access', 'Linked lists allow O(1) insert'],
+    mainPoints: [
+      'Arrays provide O(1) access',
+      'Linked lists allow O(1) insert',
+    ],
     learningObjectives: ['Understand array vs linked list trade-offs'],
     summary: 'A comprehensive overview of basic data structures.',
     estimatedReadTime: 5,

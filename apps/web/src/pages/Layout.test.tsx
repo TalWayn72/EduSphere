@@ -54,7 +54,9 @@ vi.mock('react-router-dom', async (importOriginal) => ({
 
 // Mock AppSidebar (nav items now belong to AppSidebar.test.tsx)
 vi.mock('@/components/AppSidebar', () => ({
-  AppSidebar: () => <nav data-testid="app-sidebar" aria-label="Main navigation" />,
+  AppSidebar: () => (
+    <nav data-testid="app-sidebar" aria-label="Main navigation" />
+  ),
 }));
 
 import { getCurrentUser } from '@/lib/auth';
@@ -120,7 +122,10 @@ describe('Layout', () => {
   it('registers keydown event listener on mount', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
     renderLayout();
-    expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
     vi.restoreAllMocks();
   });
 
@@ -128,7 +133,10 @@ describe('Layout', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
     const { unmount } = renderLayout();
     unmount();
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
     vi.restoreAllMocks();
   });
 

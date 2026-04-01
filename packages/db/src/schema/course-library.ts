@@ -32,7 +32,9 @@ export const libraryCourses = pgTable('library_courses', {
   licenseType: libraryLicenseEnum('license_type').notNull().default('FREE'),
   priceCents: integer('price_cents').notNull().default(0),
   durationMinutes: integer('duration_minutes').notNull().default(60),
-  lastUpdated: timestamp('last_updated', { withTimezone: true }).notNull().defaultNow(),
+  lastUpdated: timestamp('last_updated', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   isActive: boolean('is_active').notNull().default(true),
 });
 
@@ -43,7 +45,9 @@ export const tenantLibraryActivations = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     tenantId: uuid('tenant_id').notNull(),
     libraryCourseId: uuid('library_course_id').notNull(),
-    activatedAt: timestamp('activated_at', { withTimezone: true }).notNull().defaultNow(),
+    activatedAt: timestamp('activated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     activatedBy: uuid('activated_by').notNull(),
     // The resulting course inserted into tenant's catalog
     courseId: uuid('course_id'),

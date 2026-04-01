@@ -15,7 +15,9 @@ import {
   SOCIAL_FEED_QUERY,
   SOCIAL_RECOMMENDATIONS_QUERY,
 } from '@/lib/graphql/social.queries';
-import FeedItem, { type SocialFeedItemData } from '@/components/social/FeedItem';
+import FeedItem, {
+  type SocialFeedItemData,
+} from '@/components/social/FeedItem';
 
 interface RecommendationItem {
   contentItemId: string;
@@ -41,11 +43,13 @@ export function SocialFeedPage() {
     setMounted(true);
   }, []);
 
-  const [{ data: feedData, fetching: feedFetching }] = useQuery<SocialFeedData>({
-    query: SOCIAL_FEED_QUERY,
-    variables: { limit: 20 },
-    pause: !mounted,
-  });
+  const [{ data: feedData, fetching: feedFetching }] = useQuery<SocialFeedData>(
+    {
+      query: SOCIAL_FEED_QUERY,
+      variables: { limit: 20 },
+      pause: !mounted,
+    }
+  );
 
   const [{ data: recsData, fetching: recsFetching }] =
     useQuery<RecommendationsData>({
@@ -120,13 +124,18 @@ export function SocialFeedPage() {
             )}
 
             {mounted && !recsFetching && recs.length > 0 && (
-              <ul className="divide-y divide-border" aria-label="Recommended content">
+              <ul
+                className="divide-y divide-border"
+                aria-label="Recommended content"
+              >
                 {recs.map((rec) => (
                   <li key={rec.contentItemId} className="py-3">
                     <p className="text-sm font-medium">{rec.contentTitle}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {rec.followersCount}{' '}
-                      {rec.followersCount !== 1 ? t('followers') : t('follower')}{' '}
+                      {rec.followersCount !== 1
+                        ? t('followers')
+                        : t('follower')}{' '}
                       {t('completedThis')}
                     </p>
                   </li>

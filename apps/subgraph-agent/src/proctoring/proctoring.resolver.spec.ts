@@ -24,11 +24,21 @@ const mockEndSession = vi.hoisted(() => vi.fn());
 
 vi.mock('./proctoring.service', () => {
   class MockProctoringService {
-    getSession(...args: unknown[]) { return mockGetSession(...args); }
-    getReport(...args: unknown[]) { return mockGetReport(...args); }
-    startSession(...args: unknown[]) { return mockStartSession(...args); }
-    flagEvent(...args: unknown[]) { return mockFlagEvent(...args); }
-    endSession(...args: unknown[]) { return mockEndSession(...args); }
+    getSession(...args: unknown[]) {
+      return mockGetSession(...args);
+    }
+    getReport(...args: unknown[]) {
+      return mockGetReport(...args);
+    }
+    startSession(...args: unknown[]) {
+      return mockStartSession(...args);
+    }
+    flagEvent(...args: unknown[]) {
+      return mockFlagEvent(...args);
+    }
+    endSession(...args: unknown[]) {
+      return mockEndSession(...args);
+    }
   }
   return { ProctoringService: MockProctoringService };
 });
@@ -38,10 +48,12 @@ import { ProctoringService } from './proctoring.service';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeContext(overrides: Partial<{
-  userId: string;
-  tenantId: string | null;
-}> = {}) {
+function makeContext(
+  overrides: Partial<{
+    userId: string;
+    tenantId: string | null;
+  }> = {}
+) {
   return {
     authContext: {
       userId: overrides.userId ?? 'user-1',
@@ -89,10 +101,7 @@ describe('ProctoringResolver', () => {
   it('proctoringReport delegates to service.getReport', async () => {
     mockGetReport.mockResolvedValueOnce([{ id: 'sess-1' }]);
 
-    const result = await resolver.proctoringReport(
-      'assess-1',
-      makeContext()
-    );
+    const result = await resolver.proctoringReport('assess-1', makeContext());
 
     expect(mockGetReport).toHaveBeenCalledWith('assess-1', 'tenant-1');
     expect(result).toEqual([{ id: 'sess-1' }]);
@@ -192,10 +201,7 @@ describe('ProctoringResolver', () => {
       status: 'COMPLETED',
     });
 
-    const result = await resolver.endProctoringSession(
-      'sess-1',
-      makeContext()
-    );
+    const result = await resolver.endProctoringSession('sess-1', makeContext());
 
     expect(mockEndSession).toHaveBeenCalledWith('sess-1', 'tenant-1');
     expect(result.status).toBe('COMPLETED');
@@ -212,10 +218,7 @@ describe('ProctoringResolver', () => {
   it('uses empty string for tenantId when null', async () => {
     mockGetSession.mockResolvedValueOnce(null);
 
-    await resolver.proctoringSession(
-      'sess-1',
-      makeContext({ tenantId: null })
-    );
+    await resolver.proctoringSession('sess-1', makeContext({ tenantId: null }));
 
     expect(mockGetSession).toHaveBeenCalledWith('sess-1', '');
   });

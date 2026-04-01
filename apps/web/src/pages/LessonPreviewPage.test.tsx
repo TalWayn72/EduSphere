@@ -66,12 +66,9 @@ vi.mock('@/components/ui/button', () => ({
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({
-    children,
-  }: {
-    children: React.ReactNode;
-    variant?: string;
-  }) => <span>{children}</span>,
+  Badge: ({ children }: { children: React.ReactNode; variant?: string }) => (
+    <span>{children}</span>
+  ),
 }));
 
 vi.mock('@/components/ui/skeleton', () => ({
@@ -124,10 +121,7 @@ const LESSON_DATA = {
 };
 
 function makeDataQuery(data: unknown) {
-  return [
-    { data, fetching: false, error: undefined },
-    vi.fn(),
-  ] as never;
+  return [{ data, fetching: false, error: undefined }, vi.fn()] as never;
 }
 
 function makeLoadingQuery() {
@@ -155,7 +149,9 @@ describe('LessonPreviewPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
     render(<LessonPreviewPage />);
 
-    expect(screen.getByRole('banner', { name: /תצוגה מקדימה/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('banner', { name: /תצוגה מקדימה/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/תצוגה מקדימה/)).toBeInTheDocument();
   });
 
@@ -199,7 +195,9 @@ describe('LessonPreviewPage', () => {
     // No edit, save, delete, or publish buttons should be visible
     const allButtons = screen.getAllByRole('button');
     const buttonTexts = allButtons.map((b) => b.textContent ?? '');
-    expect(buttonTexts.join(' ')).not.toMatch(/עריכה|שמירה|מחיקה|פרסום|edit|save|delete|publish/i);
+    expect(buttonTexts.join(' ')).not.toMatch(
+      /עריכה|שמירה|מחיקה|פרסום|edit|save|delete|publish/i
+    );
   });
 
   it('shows loading skeleton while fetching', () => {
@@ -209,7 +207,9 @@ describe('LessonPreviewPage', () => {
     const skeletons = screen.getAllByTestId('skeleton');
     expect(skeletons.length).toBeGreaterThanOrEqual(2);
     // Should still show the banner during loading
-    expect(screen.getByRole('banner', { name: /תצוגה מקדימה/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('banner', { name: /תצוגה מקדימה/i })
+    ).toBeInTheDocument();
   });
 
   it('close button on banner navigates back', () => {
@@ -232,9 +232,7 @@ describe('LessonPreviewPage', () => {
   });
 
   it('shows not found message when lesson is null', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(
-      makeDataQuery({ lesson: null })
-    );
+    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery({ lesson: null }));
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('השיעור לא נמצא.')).toBeInTheDocument();
@@ -270,9 +268,7 @@ describe('LessonPreviewPage', () => {
       courseId: 'course-abc',
       lessonId: 'not-a-uuid',
     });
-    vi.mocked(urql.useQuery).mockReturnValue(
-      makeDataQuery({ lesson: null })
-    );
+    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery({ lesson: null }));
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('השיעור לא נמצא.')).toBeInTheDocument();

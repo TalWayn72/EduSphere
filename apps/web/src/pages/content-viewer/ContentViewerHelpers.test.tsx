@@ -11,7 +11,9 @@ describe('ContentViewerHelpers', () => {
   });
 
   it('ErrorBanner renders message', () => {
-    const { container } = render(<ErrorBanner message="Something went wrong" />);
+    const { container } = render(
+      <ErrorBanner message="Something went wrong" />
+    );
     expect(container.textContent).toContain('Something went wrong');
   });
 });

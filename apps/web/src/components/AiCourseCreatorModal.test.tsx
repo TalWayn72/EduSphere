@@ -17,7 +17,11 @@ vi.mock('urql', () => ({
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
-  return { ...actual, useNavigate: vi.fn(() => vi.fn()), useLocation: vi.fn(() => ({ pathname: '/courses' })) };
+  return {
+    ...actual,
+    useNavigate: vi.fn(() => vi.fn()),
+    useLocation: vi.fn(() => ({ pathname: '/courses' })),
+  };
 });
 
 vi.mock('@/lib/graphql/agent-course-gen.queries', () => ({
@@ -31,7 +35,10 @@ vi.mock('@/lib/graphql/content.queries', () => ({
 }));
 
 vi.mock('@/lib/auth', () => ({
-  getCurrentUser: vi.fn(() => ({ id: 'user-1', email: 'instructor@example.com' })),
+  getCurrentUser: vi.fn(() => ({
+    id: 'user-1',
+    email: 'instructor@example.com',
+  })),
   getToken: vi.fn(() => 'mock-token'),
   isAuthenticated: vi.fn(() => true),
   logout: vi.fn(),
@@ -40,7 +47,9 @@ vi.mock('@/lib/auth', () => ({
 // BUG-095: Mock urqlClient used for direct polling
 vi.mock('@/lib/urql-client', () => ({
   urqlClient: {
-    query: vi.fn().mockReturnValue({ toPromise: vi.fn().mockResolvedValue({ data: null }) }),
+    query: vi.fn().mockReturnValue({
+      toPromise: vi.fn().mockResolvedValue({ data: null }),
+    }),
   },
   disposeWsClient: vi.fn(),
 }));
@@ -203,10 +212,7 @@ describe('AiCourseCreatorModal', () => {
         ],
       },
     });
-    vi.mocked(urql.useMutation).mockReturnValue([
-      {} as never,
-      serverExecute,
-    ]);
+    vi.mocked(urql.useMutation).mockReturnValue([{} as never, serverExecute]);
     renderModal();
     const textarea = screen.getByPlaceholderText(
       /introduction to machine learning/i
@@ -219,9 +225,7 @@ describe('AiCourseCreatorModal', () => {
       ).toBeInTheDocument()
     );
     // Consent error link should NOT appear
-    expect(
-      screen.queryByTestId('requirement-link')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('requirement-link')).not.toBeInTheDocument();
   });
 
   // ── i18n regression tests (BUG: modal showed English when locale=he) ──
@@ -235,7 +239,9 @@ describe('AiCourseCreatorModal', () => {
     expect(screen.queryByText('aiCreator.title')).not.toBeInTheDocument();
     expect(screen.queryByText('aiCreator.description')).not.toBeInTheDocument();
     expect(screen.queryByText('aiCreator.topicLabel')).not.toBeInTheDocument();
-    expect(screen.queryByText('aiCreator.audienceLevel')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('aiCreator.audienceLevel')
+    ).not.toBeInTheDocument();
   });
 
   it('renders translated module label with interpolation', async () => {
@@ -331,13 +337,13 @@ describe('AiCourseCreatorModal', () => {
       { target: { value: 'Colors' } }
     );
     fireEvent.click(screen.getByRole('button', { name: /generate course/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/retry/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/retry/i)).toBeInTheDocument());
     // Click retry — error should clear
     fireEvent.click(screen.getByText(/retry/i));
     expect(screen.queryByText(/failed to generate/i)).not.toBeInTheDocument();
     // Generate button should be enabled again
-    expect(screen.getByRole('button', { name: /generate course/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /generate course/i })
+    ).not.toBeDisabled();
   });
 });

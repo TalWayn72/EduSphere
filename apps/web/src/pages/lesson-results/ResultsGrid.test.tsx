@@ -4,15 +4,34 @@ import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode; variant?: string; size?: string }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+    variant?: string;
+    size?: string;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('./ResultCard', () => ({
-  ResultCard: ({ title, testId, children }: { title: string; testId: string; children: React.ReactNode }) =>
-    <div data-testid={testId}>{title}{children}</div>,
-  ExpandableText: ({ text, testId }: { text: string; testId: string }) =>
-    <pre data-testid={testId}>{text}</pre>,
+  ResultCard: ({
+    title,
+    testId,
+    children,
+  }: {
+    title: string;
+    testId: string;
+    children: React.ReactNode;
+  }) => (
+    <div data-testid={testId}>
+      {title}
+      {children}
+    </div>
+  ),
+  ExpandableText: ({ text, testId }: { text: string; testId: string }) => (
+    <pre data-testid={testId}>{text}</pre>
+  ),
 }));
 
 import { ResultsGrid } from './ResultsGrid';

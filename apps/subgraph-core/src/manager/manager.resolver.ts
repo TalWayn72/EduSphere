@@ -22,7 +22,9 @@ function requireManagerRole(authContext: AuthContext | undefined): void {
 
 @Resolver()
 export class ManagerResolver {
-  constructor(private readonly managerDashboardService: ManagerDashboardService) {}
+  constructor(
+    private readonly managerDashboardService: ManagerDashboardService
+  ) {}
 
   @Query('myTeamOverview')
   async myTeamOverview(@Context() context: GraphQLContext) {
@@ -35,26 +37,37 @@ export class ManagerResolver {
   async myTeamMemberProgress(@Context() context: GraphQLContext) {
     requireManagerRole(context.authContext);
     const { userId, tenantId } = context.authContext!;
-    return this.managerDashboardService.getTeamMemberProgress(userId, tenantId ?? '');
+    return this.managerDashboardService.getTeamMemberProgress(
+      userId,
+      tenantId ?? ''
+    );
   }
 
   @Mutation('addTeamMember')
   async addTeamMember(
     @Args('memberId') memberId: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ): Promise<boolean> {
     requireManagerRole(context.authContext);
     const { userId, tenantId } = context.authContext!;
-    return this.managerDashboardService.addTeamMember(userId, memberId, tenantId ?? '');
+    return this.managerDashboardService.addTeamMember(
+      userId,
+      memberId,
+      tenantId ?? ''
+    );
   }
 
   @Mutation('removeTeamMember')
   async removeTeamMember(
     @Args('memberId') memberId: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ): Promise<boolean> {
     requireManagerRole(context.authContext);
     const { userId, tenantId } = context.authContext!;
-    return this.managerDashboardService.removeTeamMember(userId, memberId, tenantId ?? '');
+    return this.managerDashboardService.removeTeamMember(
+      userId,
+      memberId,
+      tenantId ?? ''
+    );
   }
 }

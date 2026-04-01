@@ -17,7 +17,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 const { mockGetDocument } = vi.hoisted(() => {
   const mockPage = {
     getViewport: vi.fn().mockReturnValue({ width: 800, height: 600, scale: 1 }),
-    render: vi.fn().mockReturnValue({ promise: Promise.resolve(), cancel: vi.fn() }),
+    render: vi
+      .fn()
+      .mockReturnValue({ promise: Promise.resolve(), cancel: vi.fn() }),
     getTextContent: vi.fn().mockResolvedValue({ items: [] }),
     cleanup: vi.fn(),
   };
@@ -68,12 +70,18 @@ const mockCtx = {
   scale: vi.fn(),
   save: vi.fn(),
   restore: vi.fn(),
-  canvas: { width: 800, height: 600, toDataURL: vi.fn().mockReturnValue('data:image/png;stub') },
+  canvas: {
+    width: 800,
+    height: 600,
+    toDataURL: vi.fn().mockReturnValue('data:image/png;stub'),
+  },
 } as unknown as CanvasRenderingContext2D;
 
 const origGetContext = HTMLCanvasElement.prototype.getContext;
 beforeEach(() => {
-  HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockCtx) as unknown as typeof origGetContext;
+  HTMLCanvasElement.prototype.getContext = vi
+    .fn()
+    .mockReturnValue(mockCtx) as unknown as typeof origGetContext;
 });
 afterEach(() => {
   HTMLCanvasElement.prototype.getContext = origGetContext;
@@ -82,7 +90,9 @@ afterEach(() => {
 // Mock toDataURL
 const origToDataURL = HTMLCanvasElement.prototype.toDataURL;
 beforeEach(() => {
-  HTMLCanvasElement.prototype.toDataURL = vi.fn().mockReturnValue('data:image/png;base64,stub');
+  HTMLCanvasElement.prototype.toDataURL = vi
+    .fn()
+    .mockReturnValue('data:image/png;base64,stub');
 });
 afterEach(() => {
   HTMLCanvasElement.prototype.toDataURL = origToDataURL;
@@ -113,22 +123,37 @@ describe('PdfDocumentViewer', () => {
 
   it('defaults to view mode', async () => {
     render(<PdfDocumentViewer url="https://example.com/doc.pdf" />);
-    expect(screen.getByTestId('mode-view')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('mode-annotate')).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByTestId('mode-sketch')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('mode-view')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('mode-annotate')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+    expect(screen.getByTestId('mode-sketch')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('switches to annotate mode on toolbar click', async () => {
     render(<PdfDocumentViewer url="https://example.com/doc.pdf" />);
     fireEvent.click(screen.getByTestId('mode-annotate'));
-    expect(screen.getByTestId('mode-annotate')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('mode-annotate')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
     expect(screen.getByTestId('text-selection-area')).toBeInTheDocument();
   });
 
   it('switches to sketch mode and shows sketch toolbar', async () => {
     render(<PdfDocumentViewer url="https://example.com/doc.pdf" />);
     fireEvent.click(screen.getByTestId('mode-sketch'));
-    expect(screen.getByTestId('mode-sketch')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('mode-sketch')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
     expect(screen.getByTestId('sketch-tool-bar')).toBeInTheDocument();
   });
 
@@ -137,12 +162,21 @@ describe('PdfDocumentViewer', () => {
     fireEvent.click(screen.getByTestId('mode-sketch'));
 
     // Default is freehand
-    expect(screen.getByTestId('viewer-sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('viewer-sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
 
     // Switch to rect
     fireEvent.click(screen.getByTestId('viewer-sketch-tool-rect'));
-    expect(screen.getByTestId('viewer-sketch-tool-rect')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('viewer-sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('viewer-sketch-tool-rect')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('viewer-sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('annotation creation flow fires callback', async () => {
@@ -151,7 +185,7 @@ describe('PdfDocumentViewer', () => {
       <PdfDocumentViewer
         url="https://example.com/doc.pdf"
         onAnnotationCreate={onAnnotationCreate}
-      />,
+      />
     );
 
     // Switch to annotate mode
@@ -177,7 +211,7 @@ describe('PdfDocumentViewer', () => {
       <PdfDocumentViewer
         url="https://example.com/doc.pdf"
         onAnnotationCreate={onAnnotationCreate}
-      />,
+      />
     );
 
     // Should not have text-selection-area in view mode
@@ -197,11 +231,15 @@ describe('PdfDocumentViewer', () => {
   it('has correct ARIA labels', () => {
     render(<PdfDocumentViewer url="https://example.com/doc.pdf" />);
     expect(screen.getByLabelText('PDF Document Viewer')).toBeInTheDocument();
-    expect(screen.getByRole('toolbar', { name: 'Document toolbar' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('toolbar', { name: 'Document toolbar' })
+    ).toBeInTheDocument();
   });
 
   it('applies className prop', () => {
-    render(<PdfDocumentViewer url="https://example.com/doc.pdf" className="custom" />);
+    render(
+      <PdfDocumentViewer url="https://example.com/doc.pdf" className="custom" />
+    );
     expect(screen.getByTestId('pdf-document-viewer')).toHaveClass('custom');
   });
 
@@ -242,14 +280,25 @@ describe('PdfDocumentViewer — Accessibility', () => {
 
   it('document toolbar has role="toolbar" with aria-label', () => {
     render(<PdfDocumentViewer url="https://example.com/doc.pdf" />);
-    expect(screen.getByRole('toolbar', { name: 'Document toolbar' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('toolbar', { name: 'Document toolbar' })
+    ).toBeInTheDocument();
   });
 
   it('mode buttons have aria-pressed states', () => {
     render(<PdfDocumentViewer url="https://example.com/doc.pdf" />);
-    expect(screen.getByTestId('mode-view')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('mode-annotate')).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByTestId('mode-sketch')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('mode-view')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('mode-annotate')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+    expect(screen.getByTestId('mode-sketch')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('sketch tool bar has role="toolbar" with aria-label in sketch mode', () => {
@@ -265,7 +314,10 @@ describe('PdfDocumentViewer — Accessibility', () => {
     fireEvent.click(screen.getByTestId('mode-annotate'));
     const selectionArea = screen.getByTestId('text-selection-area');
     expect(selectionArea).toHaveAttribute('role', 'region');
-    expect(selectionArea).toHaveAttribute('aria-label', 'Text selection area for annotations');
+    expect(selectionArea).toHaveAttribute(
+      'aria-label',
+      'Text selection area for annotations'
+    );
   });
 
   it('sketch tool buttons have aria-labels in sketch mode', () => {
@@ -275,7 +327,7 @@ describe('PdfDocumentViewer — Accessibility', () => {
     for (const tool of tools) {
       expect(screen.getByTestId(`viewer-sketch-tool-${tool}`)).toHaveAttribute(
         'aria-label',
-        `${tool} drawing tool`,
+        `${tool} drawing tool`
       );
     }
   });

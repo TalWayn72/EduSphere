@@ -13,11 +13,11 @@ import { resolve, join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
 const LINKERD_DIR = resolve(
-  join(import.meta.dirname, '../../infrastructure/k8s/linkerd'),
+  join(import.meta.dirname, '../../infrastructure/k8s/linkerd')
 );
 
 const NETWORK_POLICY_DIR = resolve(
-  join(import.meta.dirname, '../../infrastructure/k8s/network-policies'),
+  join(import.meta.dirname, '../../infrastructure/k8s/network-policies')
 );
 
 function readYaml(filePath: string): string {
@@ -28,7 +28,9 @@ function readYaml(filePath: string): string {
 
 describe('Linkerd mTLS manifest files exist', () => {
   it('namespace-annotations.yaml exists', () => {
-    expect(existsSync(join(LINKERD_DIR, 'namespace-annotations.yaml'))).toBe(true);
+    expect(existsSync(join(LINKERD_DIR, 'namespace-annotations.yaml'))).toBe(
+      true
+    );
   });
 
   it('server-policies.yaml exists', () => {
@@ -45,7 +47,7 @@ describe('Linkerd mTLS manifest files exist', () => {
 
   it('edusphere-network-policies.yaml exists', () => {
     expect(
-      existsSync(join(NETWORK_POLICY_DIR, 'edusphere-network-policies.yaml')),
+      existsSync(join(NETWORK_POLICY_DIR, 'edusphere-network-policies.yaml'))
     ).toBe(true);
   });
 });
@@ -145,7 +147,7 @@ describe('server-policies.yaml — ServerAuthorization per subgraph', () => {
   it('gateway and subgraph-knowledge are allowed inbound to subgraph-agent', () => {
     const agentAuthSection = content.substring(
       content.indexOf('subgraph-agent-allow-gateway'),
-      content.indexOf('subgraph-knowledge-allow-gateway'),
+      content.indexOf('subgraph-knowledge-allow-gateway')
     );
     expect(agentAuthSection).toContain('edusphere-gateway');
     expect(agentAuthSection).toContain('subgraph-knowledge');
@@ -153,7 +155,7 @@ describe('server-policies.yaml — ServerAuthorization per subgraph', () => {
 
   it('gateway and subgraph-agent are allowed inbound to subgraph-knowledge', () => {
     const knowledgeAuthSection = content.substring(
-      content.indexOf('subgraph-knowledge-allow-gateway'),
+      content.indexOf('subgraph-knowledge-allow-gateway')
     );
     expect(knowledgeAuthSection).toContain('edusphere-gateway');
     expect(knowledgeAuthSection).toContain('subgraph-agent');
@@ -210,7 +212,9 @@ describe('edusphere-network-policies.yaml — K8s NetworkPolicy', () => {
   let content: string;
 
   beforeAll(() => {
-    content = readYaml(join(NETWORK_POLICY_DIR, 'edusphere-network-policies.yaml'));
+    content = readYaml(
+      join(NETWORK_POLICY_DIR, 'edusphere-network-policies.yaml')
+    );
   });
 
   it('has a default-deny-all policy covering both Ingress and Egress', () => {
@@ -222,7 +226,7 @@ describe('edusphere-network-policies.yaml — K8s NetworkPolicy', () => {
   it('allows gateway to subgraph-core on port 4001', () => {
     const section = content.substring(
       content.indexOf('allow-gateway-to-subgraph-core'),
-      content.indexOf('allow-gateway-to-subgraph-content'),
+      content.indexOf('allow-gateway-to-subgraph-content')
     );
     expect(section).toContain('port: 4001');
     expect(section).toContain('app: edusphere-gateway');
@@ -231,7 +235,7 @@ describe('edusphere-network-policies.yaml — K8s NetworkPolicy', () => {
   it('allows gateway to subgraph-content on port 4002', () => {
     const section = content.substring(
       content.indexOf('allow-gateway-to-subgraph-content'),
-      content.indexOf('allow-gateway-to-subgraph-annotation'),
+      content.indexOf('allow-gateway-to-subgraph-annotation')
     );
     expect(section).toContain('port: 4002');
   });
@@ -243,7 +247,7 @@ describe('edusphere-network-policies.yaml — K8s NetworkPolicy', () => {
   it('allows gateway and core to subgraph-collaboration on port 4004', () => {
     const section = content.substring(
       content.indexOf('allow-gateway-core-to-subgraph-collaboration'),
-      content.indexOf('allow-gateway-knowledge-to-subgraph-agent'),
+      content.indexOf('allow-gateway-knowledge-to-subgraph-agent')
     );
     expect(section).toContain('port: 4004');
     expect(section).toContain('app: edusphere-gateway');
@@ -253,7 +257,7 @@ describe('edusphere-network-policies.yaml — K8s NetworkPolicy', () => {
   it('allows gateway and knowledge to subgraph-agent on port 4005', () => {
     const section = content.substring(
       content.indexOf('allow-gateway-knowledge-to-subgraph-agent'),
-      content.indexOf('allow-gateway-agent-to-subgraph-knowledge'),
+      content.indexOf('allow-gateway-agent-to-subgraph-knowledge')
     );
     expect(section).toContain('port: 4005');
     expect(section).toContain('app: subgraph-knowledge');

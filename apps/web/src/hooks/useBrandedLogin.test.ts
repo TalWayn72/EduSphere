@@ -52,9 +52,7 @@ describe('useBrandedLogin', () => {
     expect(result.current.logoUrl).toBe('/acme-logo.png');
     expect(result.current.primaryColor).toBe('#ff0000');
     expect(result.current.secondaryColor).toBe('#00ff00');
-    expect(result.current.welcomeMessage).toBe(
-      'Welcome to AcmeCorp Learning!',
-    );
+    expect(result.current.welcomeMessage).toBe('Welcome to AcmeCorp Learning!');
     expect(result.current.ssoProviders).toHaveLength(1);
   });
 
@@ -76,7 +74,7 @@ describe('useBrandedLogin', () => {
     ]);
     const { result } = renderHook(() => useBrandedLogin('acme'));
     expect(result.current.keycloakAuthUrl).toContain(
-      '/realms/edusphere/protocol/openid-connect/auth',
+      '/realms/edusphere/protocol/openid-connect/auth'
     );
     expect(result.current.keycloakAuthUrl).toContain('client_id=edusphere-web');
   });

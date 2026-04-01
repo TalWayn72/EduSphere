@@ -33,7 +33,7 @@ describe('useProgressStatus timer cleanup (memory safety)', () => {
     const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
 
     const { unmount } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES_A, active: true, interval: 500 }),
+      useProgressStatus({ messages: MESSAGES_A, active: true, interval: 500 })
     );
 
     unmount();
@@ -43,7 +43,7 @@ describe('useProgressStatus timer cleanup (memory safety)', () => {
 
   it('does not fire interval callback after unmount (mountedRef guard)', () => {
     const { result, unmount } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES_A, active: true, interval: 500 }),
+      useProgressStatus({ messages: MESSAGES_A, active: true, interval: 500 })
     );
 
     expect(result.current.currentIndex).toBe(0);
@@ -66,7 +66,7 @@ describe('useProgressStatus timer cleanup (memory safety)', () => {
     const { rerender } = renderHook(
       ({ msgs }: { msgs: string[] }) =>
         useProgressStatus({ messages: msgs, active: true, interval: 500 }),
-      { initialProps: { msgs: MESSAGES_A } },
+      { initialProps: { msgs: MESSAGES_A } }
     );
 
     // Changing messages.length triggers the cycling useEffect cleanup path
@@ -78,7 +78,7 @@ describe('useProgressStatus timer cleanup (memory safety)', () => {
 
   it('does not throw when unmounting immediately without any timer ticks', () => {
     const { unmount } = renderHook(() =>
-      useProgressStatus({ messages: MESSAGES_A, active: true }),
+      useProgressStatus({ messages: MESSAGES_A, active: true })
     );
 
     expect(() => unmount()).not.toThrow();
@@ -90,7 +90,7 @@ describe('useProgressStatus timer cleanup (memory safety)', () => {
     const { rerender } = renderHook(
       ({ active }: { active: boolean }) =>
         useProgressStatus({ messages: MESSAGES_A, active, interval: 500 }),
-      { initialProps: { active: true } },
+      { initialProps: { active: true } }
     );
 
     rerender({ active: false });

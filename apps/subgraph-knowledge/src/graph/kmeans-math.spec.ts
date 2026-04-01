@@ -70,12 +70,19 @@ describe('meanVector', () => {
   });
 
   it('computes element-wise mean', () => {
-    const result = meanVector([[2, 4], [4, 6]]);
+    const result = meanVector([
+      [2, 4],
+      [4, 6],
+    ]);
     expect(result).toEqual([3, 5]);
   });
 
   it('handles three vectors', () => {
-    const result = meanVector([[0, 0], [3, 6], [6, 3]]);
+    const result = meanVector([
+      [0, 0],
+      [3, 6],
+      [6, 3],
+    ]);
     expect(result).toEqual([3, 3]);
   });
 });
@@ -86,19 +93,32 @@ describe('initCentroidsKMeansPlusPlus', () => {
   });
 
   it('returns k centroids from points', () => {
-    const points = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+    const points = [
+      [1, 0],
+      [0, 1],
+      [-1, 0],
+      [0, -1],
+    ];
     const result = initCentroidsKMeansPlusPlus(points, 2);
     expect(result).toHaveLength(2);
   });
 
   it('returns all points when k equals point count', () => {
-    const points = [[1, 0], [0, 1]];
+    const points = [
+      [1, 0],
+      [0, 1],
+    ];
     const result = initCentroidsKMeansPlusPlus(points, 2);
     expect(result).toHaveLength(2);
   });
 
   it('each centroid is from the original points', () => {
-    const points = [[1, 2], [3, 4], [5, 6], [7, 8]];
+    const points = [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+      [7, 8],
+    ];
     const result = initCentroidsKMeansPlusPlus(points, 3);
     for (const c of result) {
       expect(points).toContainEqual(c);

@@ -12,14 +12,17 @@ import {
 
 const mkItem = (
   question: string,
-  options: Array<{ text: string; isCorrect: boolean }>,
+  options: Array<{ text: string; isCorrect: boolean }>
 ) => ({ question, options });
 
 describe('IWF Detector', () => {
   describe('checkCorrectAnswerLonger', () => {
     it('flags when correct answer is >1.5x average distractor length', () => {
       const item = mkItem('What is photosynthesis?', [
-        { text: 'The process by which green plants convert sunlight into chemical energy using chlorophyll', isCorrect: true },
+        {
+          text: 'The process by which green plants convert sunlight into chemical energy using chlorophyll',
+          isCorrect: true,
+        },
         { text: 'Cell division', isCorrect: false },
         { text: 'Respiration', isCorrect: false },
         { text: 'Osmosis', isCorrect: false },
@@ -91,7 +94,10 @@ describe('IWF Detector', () => {
     it('flags when longest option is >2x shortest', () => {
       const item = mkItem('Describe DNA', [
         { text: 'Yes', isCorrect: false },
-        { text: 'Deoxyribonucleic acid is a molecule that carries genetic instructions', isCorrect: true },
+        {
+          text: 'Deoxyribonucleic acid is a molecule that carries genetic instructions',
+          isCorrect: true,
+        },
         { text: 'A type of protein found in cells', isCorrect: false },
       ]);
       expect(checkOptionLengthVariance(item)).toBe(true);
@@ -147,7 +153,8 @@ describe('IWF Detector', () => {
 
   describe('checkImplausibleDistractor', () => {
     it('flags very short distractor among long ones', () => {
-      const long = 'This is a detailed and thorough explanation that contains many words about a very specific and complex topic area in advanced science education and research methodology';
+      const long =
+        'This is a detailed and thorough explanation that contains many words about a very specific and complex topic area in advanced science education and research methodology';
       const item = mkItem('Explain evolution', [
         { text: long, isCorrect: true },
         { text: long, isCorrect: false },
@@ -171,7 +178,10 @@ describe('IWF Detector', () => {
 
     it('returns multiple flags for poorly written item', () => {
       const item = mkItem('Which of the following is not correct?', [
-        { text: 'The process by which green plants convert sunlight energy into food using chlorophyll molecules', isCorrect: true },
+        {
+          text: 'The process by which green plants convert sunlight energy into food using chlorophyll molecules',
+          isCorrect: true,
+        },
         { text: 'Always true', isCorrect: false },
         { text: 'Never', isCorrect: false },
         { text: 'None of the above', isCorrect: false },

@@ -6,8 +6,14 @@ import { ADD_LESSON_ASSET_MUTATION } from '@/lib/graphql/lesson.queries';
 
 // ── Quick Video URL adder (empty state) ──────────────────────────────────────
 
-export function AddVideoPanel({ lessonId, courseId, lessonTitle }: {
-  lessonId: string; courseId: string; lessonTitle: string;
+export function AddVideoPanel({
+  lessonId,
+  courseId,
+  lessonTitle,
+}: {
+  lessonId: string;
+  courseId: string;
+  lessonTitle: string;
 }) {
   const navigate = useNavigate();
   const [url, setUrl] = useState('');
@@ -15,7 +21,10 @@ export function AddVideoPanel({ lessonId, courseId, lessonTitle }: {
   const [{ fetching }, addAsset] = useMutation(ADD_LESSON_ASSET_MUTATION);
 
   const handleAdd = async () => {
-    if (!url.trim()) { setError('נא להזין קישור לסרטון'); return; }
+    if (!url.trim()) {
+      setError('נא להזין קישור לסרטון');
+      return;
+    }
     setError(null);
     const { error: addErr } = await addAsset({
       lessonId,
@@ -31,10 +40,16 @@ export function AddVideoPanel({ lessonId, courseId, lessonTitle }: {
   };
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mt-4 dark:bg-blue-950 dark:border-blue-700" data-testid="add-video-panel">
-      <h3 className="font-semibold text-blue-800 mb-2 dark:text-blue-200">הוסף קישור לסרטון להרצת Pipeline</h3>
+    <div
+      className="bg-blue-50 border border-blue-200 rounded-xl p-5 mt-4 dark:bg-blue-950 dark:border-blue-700"
+      data-testid="add-video-panel"
+    >
+      <h3 className="font-semibold text-blue-800 mb-2 dark:text-blue-200">
+        הוסף קישור לסרטון להרצת Pipeline
+      </h3>
       <p className="text-sm text-blue-700 mb-3 dark:text-blue-300">
-        הכנס קישור לסרטון (YouTube, Vimeo, URL ישיר) כדי להפעיל את ה-Pipeline ולקבל תמלול וסיכום.
+        הכנס קישור לסרטון (YouTube, Vimeo, URL ישיר) כדי להפעיל את ה-Pipeline
+        ולקבל תמלול וסיכום.
       </p>
       <div className="flex gap-2">
         <input
@@ -46,12 +61,23 @@ export function AddVideoPanel({ lessonId, courseId, lessonTitle }: {
           data-testid="video-url-input"
           aria-label={`קישור לסרטון עבור שיעור ${lessonTitle}`}
         />
-        <Button size="sm" onClick={handleAdd} disabled={fetching} data-testid="add-video-btn">
+        <Button
+          size="sm"
+          onClick={handleAdd}
+          disabled={fetching}
+          data-testid="add-video-btn"
+        >
           {fetching ? 'מוסיף...' : 'הוסף ופתח Pipeline'}
         </Button>
       </div>
       {error && (
-        <p className="text-red-600 text-xs mt-2 dark:text-red-400" data-testid="add-video-error" role="alert">{error}</p>
+        <p
+          className="text-red-600 text-xs mt-2 dark:text-red-400"
+          data-testid="add-video-error"
+          role="alert"
+        >
+          {error}
+        </p>
       )}
     </div>
   );

@@ -29,21 +29,21 @@
 
 ### Top 5 Cross-Division Consensus Issues (flagged by 3+ divisions)
 
-| # | Issue | Flagged By | Priority |
-|---|-------|-----------|----------|
-| 1 | **Keycloak Client-ID Mismatch (BUG-073)** — `edusphere-app` vs `edusphere-web` causes silent JWT audience failure across all 6 subgraphs | Orchestrator, Product, Architecture, Security, Backend, DevOps | **P0** |
-| 2 | **Security tests are static-analysis only** — grep source files but never test runtime behavior | Orchestrator, Security, QA | **P0** |
-| 3 | **Upload error recovery broken across 4 components** — no retry, no logging, generic errors | Orchestrator, Product, UX/UI, Frontend | **P1** |
-| 4 | **Documentation pipeline frozen 11 days** — CHANGELOG, TEST_REGISTRY, PROJECT_STATUS all stale | Orchestrator, Documentation | **P1** |
-| 5 | **Visual snapshots disabled in CI** — `ignoreSnapshots: !!process.env.CI` bypasses all visual regression | QA, UX/UI | **P1** |
+| #   | Issue                                                                                                                                    | Flagged By                                                     | Priority |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | -------- |
+| 1   | **Keycloak Client-ID Mismatch (BUG-073)** — `edusphere-app` vs `edusphere-web` causes silent JWT audience failure across all 6 subgraphs | Orchestrator, Product, Architecture, Security, Backend, DevOps | **P0**   |
+| 2   | **Security tests are static-analysis only** — grep source files but never test runtime behavior                                          | Orchestrator, Security, QA                                     | **P0**   |
+| 3   | **Upload error recovery broken across 4 components** — no retry, no logging, generic errors                                              | Orchestrator, Product, UX/UI, Frontend                         | **P1**   |
+| 4   | **Documentation pipeline frozen 11 days** — CHANGELOG, TEST_REGISTRY, PROJECT_STATUS all stale                                           | Orchestrator, Documentation                                    | **P1**   |
+| 5   | **Visual snapshots disabled in CI** — `ignoreSnapshots: !!process.env.CI` bypasses all visual regression                                 | QA, UX/UI                                                      | **P1**   |
 
 ### Recommendation Distribution by Category
 
-| Category | Count |
-|----------|-------|
-| [Product] — Product/architecture improvements | 62 |
-| [Operations] — Inter-agent workflow improvements | 27 |
-| [Self] — Division self-improvement | 21 |
+| Category                                         | Count |
+| ------------------------------------------------ | ----- |
+| [Product] — Product/architecture improvements    | 62    |
+| [Operations] — Inter-agent workflow improvements | 27    |
+| [Self] — Division self-improvement               | 21    |
 
 ---
 
@@ -51,33 +51,33 @@
 
 ### P0 — Must Fix Before Next Production Deploy
 
-| ID | Recommendation | Division | Category |
-|----|---------------|----------|----------|
-| SEC-1 | Dev-token bypass + header fallback grants SUPER_ADMIN | Security | Product |
-| SEC-3 | Subgraphs skip JWT audience check — direct access bypasses auth | Security | Product |
-| BE-1 | SI-7: 15+ services use raw NATS `connect()` without TLS/auth | Backend | Product |
-| BE-7 | Auth header fallback is single point of failure — no header stripping | Backend | Operations |
-| ARCH-3 | Keycloak Client-ID mismatch — systemic auth fragility | Architecture | Product |
-| DB-3 | `annotations` and `agentSessions` lack `tenant_id` column | Database | Product |
+| ID     | Recommendation                                                        | Division     | Category   |
+| ------ | --------------------------------------------------------------------- | ------------ | ---------- |
+| SEC-1  | Dev-token bypass + header fallback grants SUPER_ADMIN                 | Security     | Product    |
+| SEC-3  | Subgraphs skip JWT audience check — direct access bypasses auth       | Security     | Product    |
+| BE-1   | SI-7: 15+ services use raw NATS `connect()` without TLS/auth          | Backend      | Product    |
+| BE-7   | Auth header fallback is single point of failure — no header stripping | Backend      | Operations |
+| ARCH-3 | Keycloak Client-ID mismatch — systemic auth fragility                 | Architecture | Product    |
+| DB-3   | `annotations` and `agentSessions` lack `tenant_id` column             | Database     | Product    |
 
 ### P1 — Must Fix Before Enterprise Pilot
 
-| ID | Recommendation | Division | Category |
-|----|---------------|----------|----------|
-| ORCH-2 | supergraph.graphql is hand-maintained — will drift again | Orchestrator | Product |
-| PROD-5 | YAU pricing enforcement infrastructure missing entirely | Product | Product |
-| PROD-6 | Admin Dashboard is the platform's biggest onboarding liability | Product | Product |
-| ARCH-4 | Content subgraph grew to 38 domains — needs splitting | Architecture | Product |
-| UX-2 | UnifiedLearningPage has zero responsive design | UX/UI | Product |
-| UX-6 | AgentStudio/PortalBuilder DnD has no keyboard fallback (WCAG) | UX/UI | Product |
-| FE-1 | Route-level error boundaries absent — crash kills entire shell | Frontend | Product |
-| BE-2 | AgentService lacks mandatory `Promise.race` timeout guard | Backend | Product |
-| BE-9 | Critical features are stubs returning `true` (password reset, graph enrich) | Backend | Product |
-| DB-2 | HNSW indexes missing on 3 primary embedding tables | Database | Product |
-| QA-4 | Visual snapshot baselines disabled in CI (`ignoreSnapshots`) | QA | Self |
-| QA-5 | Apache AGE graph queries untested in CI | QA | Product |
-| DOC-2 | CHANGELOG missing versions 0.45.0 through 0.64.0 | Documentation | Product |
-| OPS-2 | GraphQL Hive schema registry is optional — breaking changes pass CI | DevOps | Product |
+| ID     | Recommendation                                                              | Division      | Category |
+| ------ | --------------------------------------------------------------------------- | ------------- | -------- |
+| ORCH-2 | supergraph.graphql is hand-maintained — will drift again                    | Orchestrator  | Product  |
+| PROD-5 | YAU pricing enforcement infrastructure missing entirely                     | Product       | Product  |
+| PROD-6 | Admin Dashboard is the platform's biggest onboarding liability              | Product       | Product  |
+| ARCH-4 | Content subgraph grew to 38 domains — needs splitting                       | Architecture  | Product  |
+| UX-2   | UnifiedLearningPage has zero responsive design                              | UX/UI         | Product  |
+| UX-6   | AgentStudio/PortalBuilder DnD has no keyboard fallback (WCAG)               | UX/UI         | Product  |
+| FE-1   | Route-level error boundaries absent — crash kills entire shell              | Frontend      | Product  |
+| BE-2   | AgentService lacks mandatory `Promise.race` timeout guard                   | Backend       | Product  |
+| BE-9   | Critical features are stubs returning `true` (password reset, graph enrich) | Backend       | Product  |
+| DB-2   | HNSW indexes missing on 3 primary embedding tables                          | Database      | Product  |
+| QA-4   | Visual snapshot baselines disabled in CI (`ignoreSnapshots`)                | QA            | Self     |
+| QA-5   | Apache AGE graph queries untested in CI                                     | QA            | Product  |
+| DOC-2  | CHANGELOG missing versions 0.45.0 through 0.64.0                            | Documentation | Product  |
+| OPS-2  | GraphQL Hive schema registry is optional — breaking changes pass CI         | DevOps        | Product  |
 
 ---
 
@@ -348,12 +348,14 @@
 ## Action Items — Recommended Sprint Priorities
 
 ### Sprint 1 (Immediate — P0 Security)
+
 - [ ] Fix KEYCLOAK_CLIENT_ID across all environments (ARCH-3, DevOps-7)
 - [ ] Remove SUPER_ADMIN from header fallback path (SEC-1)
 - [ ] Replace 15 raw NATS `connect()` with `buildNatsOptions()` (BE-1)
 - [ ] Add `tenant_id` to annotations and agentSessions (DB-3)
 
 ### Sprint 2 (Pre-Pilot — P1 Product)
+
 - [ ] Build Admin Dashboard MVP — 5 screens (PROD-6)
 - [ ] Create HNSW indexes on 3 embedding tables (DB-2)
 - [ ] Make supergraph.graphql a generated artifact (ORCH-2)
@@ -363,6 +365,7 @@
 - [ ] Complete `Promise.race` timeout on AgentService (BE-2)
 
 ### Sprint 3 (Quality & Ops)
+
 - [ ] Build `packages/test-utils` shared factory (QA-2)
 - [ ] Eliminate 504 `waitForTimeout` calls (QA-1)
 - [ ] Update CHANGELOG with 20 missing versions (DOC-2)
@@ -373,4 +376,4 @@
 
 ---
 
-*Generated by 11 parallel division agents on 2026-03-17. Each agent independently read all project documentation before producing recommendations.*
+_Generated by 11 parallel division agents on 2026-03-17. Each agent independently read all project documentation before producing recommendations._

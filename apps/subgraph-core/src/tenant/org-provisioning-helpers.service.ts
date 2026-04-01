@@ -3,11 +3,7 @@
  * provisioning step tracking for organization creation pipeline.
  * Extracted from OrgProvisioningService to keep files under 300 lines.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -18,7 +14,10 @@ import type { Database } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { sql } from 'drizzle-orm';
-import type { CreateOrgInput, ProvisioningSteps } from './org-provisioning.types';
+import type {
+  CreateOrgInput,
+  ProvisioningSteps,
+} from './org-provisioning.types';
 
 const ORG_PROVISIONED_SUBJECT = 'EDUSPHERE.org.provisioned';
 const NOTIFICATION_SUBJECT = 'EDUSPHERE.notification.dispatch';
@@ -40,7 +39,9 @@ export class OrgProvisioningHelpersService implements OnModuleDestroy {
       this.nc = null;
     }
     await closeAllPools();
-    this.logger.log('[OrgProvisioningHelpersService] onModuleDestroy: cleaned up');
+    this.logger.log(
+      '[OrgProvisioningHelpersService] onModuleDestroy: cleaned up'
+    );
   }
 
   private async getNats(): Promise<NatsConnection> {

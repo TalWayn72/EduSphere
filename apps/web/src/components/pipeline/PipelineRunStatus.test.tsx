@@ -5,21 +5,34 @@ import { render, screen, fireEvent } from '@testing-library/react';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('./PipelineStepper', () => ({
-  PipelineStepper: (props: Record<string, unknown>) => <div data-testid="pipeline-stepper" {...props} />,
-}));
-
-vi.mock('./PipelineStepperSkeleton', () => ({
-  PipelineStepperSkeleton: () => <div data-testid="pipeline-stepper-skeleton" />,
-}));
-
-vi.mock('./PipelineResultDetail', () => ({
-  PipelineResultDetail: ({ open, result }: { open: boolean; result: unknown }) => (
-    open ? <div data-testid="pipeline-result-detail">{JSON.stringify(result)}</div> : null
+  PipelineStepper: (props: Record<string, unknown>) => (
+    <div data-testid="pipeline-stepper" {...props} />
   ),
 }));
 
+vi.mock('./PipelineStepperSkeleton', () => ({
+  PipelineStepperSkeleton: () => (
+    <div data-testid="pipeline-stepper-skeleton" />
+  ),
+}));
+
+vi.mock('./PipelineResultDetail', () => ({
+  PipelineResultDetail: ({
+    open,
+    result,
+  }: {
+    open: boolean;
+    result: unknown;
+  }) =>
+    open ? (
+      <div data-testid="pipeline-result-detail">{JSON.stringify(result)}</div>
+    ) : null,
+}));
+
 vi.mock('@/lib/lesson-pipeline.store', () => ({
-  useLessonPipelineStore: (selector: (s: Record<string, unknown>) => unknown) => {
+  useLessonPipelineStore: (
+    selector: (s: Record<string, unknown>) => unknown
+  ) => {
     const state = {
       moduleStatuses: { INGESTION: 'done', ASR: 'running' },
       nodes: [
@@ -41,9 +54,24 @@ const COMPLETED_RUN = {
   startedAt: '2026-03-10T10:00:00Z',
   completedAt: '2026-03-10T10:05:00Z',
   results: [
-    { id: 'r1', moduleName: 'SUMMARIZATION', outputType: 'TEXT', outputData: { shortSummary: 'Summary text here' } },
-    { id: 'r2', moduleName: 'QA_GATE', outputType: 'TEXT', outputData: { qaScore: 85 } },
-    { id: 'r3', moduleName: 'ASR', outputType: 'TEXT', outputData: { transcript: 'Transcript text' } },
+    {
+      id: 'r1',
+      moduleName: 'SUMMARIZATION',
+      outputType: 'TEXT',
+      outputData: { shortSummary: 'Summary text here' },
+    },
+    {
+      id: 'r2',
+      moduleName: 'QA_GATE',
+      outputType: 'TEXT',
+      outputData: { qaScore: 85 },
+    },
+    {
+      id: 'r3',
+      moduleName: 'ASR',
+      outputType: 'TEXT',
+      outputData: { transcript: 'Transcript text' },
+    },
   ],
 };
 
@@ -127,7 +155,9 @@ describe('PipelineRunStatus', () => {
   });
 
   it('shows skeleton when running and isLoading', () => {
-    render(<PipelineRunStatus run={RUNNING_RUN} onCancel={onCancel} isLoading />);
+    render(
+      <PipelineRunStatus run={RUNNING_RUN} onCancel={onCancel} isLoading />
+    );
     expect(screen.getByTestId('pipeline-stepper-skeleton')).toBeInTheDocument();
   });
 
@@ -140,7 +170,9 @@ describe('PipelineRunStatus', () => {
 
   it('shows summary output for completed runs', () => {
     render(<PipelineRunStatus run={COMPLETED_RUN} onCancel={onCancel} />);
-    expect(screen.getByTestId('result-summary')).toHaveTextContent('Summary text here');
+    expect(screen.getByTestId('result-summary')).toHaveTextContent(
+      'Summary text here'
+    );
   });
 
   it('shows QA score for completed runs', () => {
@@ -150,7 +182,9 @@ describe('PipelineRunStatus', () => {
 
   it('shows transcript snippet for completed runs', () => {
     render(<PipelineRunStatus run={COMPLETED_RUN} onCancel={onCancel} />);
-    expect(screen.getByTestId('result-transcript')).toHaveTextContent('Transcript text');
+    expect(screen.getByTestId('result-transcript')).toHaveTextContent(
+      'Transcript text'
+    );
   });
 
   it('clicking a result pill opens detail', () => {
@@ -162,7 +196,9 @@ describe('PipelineRunStatus', () => {
   it('shows fallback message when no key outputs', () => {
     const runNoOutputs = {
       ...COMPLETED_RUN,
-      results: [{ id: 'r1', moduleName: 'OTHER', outputType: 'TEXT', outputData: null }],
+      results: [
+        { id: 'r1', moduleName: 'OTHER', outputType: 'TEXT', outputData: null },
+      ],
     };
     render(<PipelineRunStatus run={runNoOutputs} onCancel={onCancel} />);
     expect(screen.getByText(/Pipeline הסתיים/)).toBeInTheDocument();

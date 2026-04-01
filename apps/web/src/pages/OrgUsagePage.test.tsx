@@ -48,7 +48,11 @@ function renderPage() {
 describe('OrgUsagePage', () => {
   beforeEach(() => {
     vi.mocked(useQuery).mockReturnValue([
-      { data: { myTenantUsage: MOCK_USAGE }, fetching: false, error: undefined },
+      {
+        data: { myTenantUsage: MOCK_USAGE },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
       vi.fn(),
     ] as ReturnType<typeof useQuery>);
@@ -83,7 +87,11 @@ describe('OrgUsagePage', () => {
     vi.mocked(useQuery).mockReturnValue([
       {
         data: {
-          myTenantUsage: { ...MOCK_USAGE, yearlyActiveUsers: 550, overageUsers: 50 },
+          myTenantUsage: {
+            ...MOCK_USAGE,
+            yearlyActiveUsers: 550,
+            overageUsers: 50,
+          },
         },
         fetching: false,
         error: undefined,
@@ -115,7 +123,12 @@ describe('OrgUsagePage', () => {
       {
         data: undefined,
         fetching: false,
-        error: { message: 'Network error', graphQLErrors: [], networkError: undefined, response: undefined },
+        error: {
+          message: 'Network error',
+          graphQLErrors: [],
+          networkError: undefined,
+          response: undefined,
+        },
       },
       vi.fn(),
       vi.fn(),

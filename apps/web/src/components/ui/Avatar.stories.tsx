@@ -22,7 +22,10 @@ export const Default: Story = {
 export const WithImage: Story = {
   render: () => (
     <Avatar>
-      <AvatarImage src="https://i.pravatar.cc/150?u=edusphere" alt="User avatar" />
+      <AvatarImage
+        src="https://i.pravatar.cc/150?u=edusphere"
+        alt="User avatar"
+      />
       <AvatarFallback>JD</AvatarFallback>
     </Avatar>
   ),

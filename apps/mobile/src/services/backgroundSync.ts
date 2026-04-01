@@ -39,7 +39,9 @@ export class BackgroundSyncService {
 
   async performSync(): Promise<void> {
     if (!this.apolloClient) {
-      console.error('[BackgroundSyncService] Apollo client not configured — skipping sync');
+      console.error(
+        '[BackgroundSyncService] Apollo client not configured — skipping sync'
+      );
       return;
     }
 
@@ -63,7 +65,10 @@ export class BackgroundSyncService {
         // Mark as synced
         await database.updateMutationStatus(mutation.id, 'synced');
       } catch (error) {
-        console.error(`[BackgroundSyncService] Failed to sync mutation ${mutation.id}:`, error);
+        console.error(
+          `[BackgroundSyncService] Failed to sync mutation ${mutation.id}:`,
+          error
+        );
         await database.updateMutationStatus(mutation.id, 'failed');
       }
     }

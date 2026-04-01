@@ -59,8 +59,7 @@ export const GraphCanvas = React.memo(function GraphCanvas({
             connectedIds.has(e.target) &&
             (e.source === effectiveSelectedId ||
               e.target === effectiveSelectedId);
-          const dimmed =
-            !visibleIds.has(e.source) || !visibleIds.has(e.target);
+          const dimmed = !visibleIds.has(e.source) || !visibleIds.has(e.target);
           return (
             <line
               key={e.id}
@@ -71,9 +70,7 @@ export const GraphCanvas = React.memo(function GraphCanvas({
               stroke={isActive ? EDGE_COLOR[e.type] : '#cbd5e1'}
               strokeWidth={isActive ? 2 : 1}
               opacity={dimmed ? 0.15 : isActive ? 1 : 0.45}
-              strokeDasharray={
-                e.type === 'CONTRADICTS' ? '5,3' : undefined
-              }
+              strokeDasharray={e.type === 'CONTRADICTS' ? '5,3' : undefined}
             />
           );
         })}
@@ -120,21 +117,9 @@ export const GraphCanvas = React.memo(function GraphCanvas({
                 r={r}
                 fill={NODE_COLOR[n.type] ?? '#94a3b8'}
                 opacity={
-                  dimmed
-                    ? 0.2
-                    : isSelected
-                      ? 1
-                      : isConnected
-                        ? 0.9
-                        : 0.6
+                  dimmed ? 0.2 : isSelected ? 1 : isConnected ? 0.9 : 0.6
                 }
-                stroke={
-                  isOnPath
-                    ? '#facc15'
-                    : isSelected
-                      ? '#1d4ed8'
-                      : 'white'
-                }
+                stroke={isOnPath ? '#facc15' : isSelected ? '#1d4ed8' : 'white'}
                 strokeWidth={isOnPath ? 3 : isSelected ? 2.5 : 1.5}
               />
               <text

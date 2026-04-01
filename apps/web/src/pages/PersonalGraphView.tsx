@@ -13,7 +13,11 @@ import {
   PersonalGraphNode,
 } from '@/lib/mock-personal-graph';
 
-const SVG_W = 520, SVG_H = 380, CX = 260, CY = 195, R = 155;
+const SVG_W = 520,
+  SVG_H = 380,
+  CX = 260,
+  CY = 195,
+  R = 155;
 
 const COURSE_COLORS: Record<string, string> = {
   'cc000000-0000-0000-0000-000000000002': '#6366f1',
@@ -68,8 +72,11 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
 
   // Unique course list for legend
   const courses = useMemo(
-    () =>
-      [...new Map(mockPersonalNodes.map((n) => [n.courseId, n.courseName])).entries()],
+    () => [
+      ...new Map(
+        mockPersonalNodes.map((n) => [n.courseId, n.courseName])
+      ).entries(),
+    ],
     []
   );
 
@@ -93,8 +100,10 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
               return (
                 <line
                   key={e.id}
-                  x1={from.x} y1={from.y}
-                  x2={to.x} y2={to.y}
+                  x1={from.x}
+                  y1={from.y}
+                  x2={to.x}
+                  y2={to.y}
                   stroke="#94a3b8"
                   strokeWidth={active ? 1.5 : 0.5}
                   opacity={active ? 0.6 : 0.15}
@@ -112,22 +121,38 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
                 <g
                   key={n.id}
                   data-personal-node={n.id}
-                  onClick={() => setSelectedId(n.id === selectedId ? null : n.id)}
+                  onClick={() =>
+                    setSelectedId(n.id === selectedId ? null : n.id)
+                  }
                   style={{ cursor: 'pointer' }}
                 >
                   {isSelected && (
-                    <circle cx={pos.x} cy={pos.y} r={r + 6} fill="none"
-                      stroke={getColor(n.courseId)} strokeWidth={2} opacity={0.4} />
+                    <circle
+                      cx={pos.x}
+                      cy={pos.y}
+                      r={r + 6}
+                      fill="none"
+                      stroke={getColor(n.courseId)}
+                      strokeWidth={2}
+                      opacity={0.4}
+                    />
                   )}
                   <circle
-                    cx={pos.x} cy={pos.y} r={r}
+                    cx={pos.x}
+                    cy={pos.y}
+                    r={r}
                     fill={getColor(n.courseId)}
-                    opacity={dimmed ? 0.15 : isSelected ? 1 : isConnected ? 0.85 : 0.65}
-                    stroke="white" strokeWidth={isSelected ? 2.5 : 1.5}
+                    opacity={
+                      dimmed ? 0.15 : isSelected ? 1 : isConnected ? 0.85 : 0.65
+                    }
+                    stroke="white"
+                    strokeWidth={isSelected ? 2.5 : 1.5}
                   />
                   <text
-                    x={pos.x} y={pos.y + r + 12}
-                    textAnchor="middle" fontSize={isSelected ? 9 : 8}
+                    x={pos.x}
+                    y={pos.y + r + 12}
+                    textAnchor="middle"
+                    fontSize={isSelected ? 9 : 8}
                     fontWeight={isSelected ? 700 : 400}
                     fill={dimmed ? '#cbd5e1' : '#1e293b'}
                   >
@@ -141,8 +166,10 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
           <div className="flex flex-wrap gap-3 px-2 pb-2 text-xs text-muted-foreground">
             {courses.map(([courseId, courseName]) => (
               <span key={courseId} className="flex items-center gap-1">
-                <span className="inline-block h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: getColor(courseId) }} />
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: getColor(courseId) }}
+                />
                 {courseName}
               </span>
             ))}
@@ -173,7 +200,8 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
                     Connected via:
                   </p>
                   {connectedEdges.map((e) => (
-                    <span key={e.id}
+                    <span
+                      key={e.id}
                       className="inline-block mr-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-700"
                     >
                       {e.sharedConcept}
@@ -197,7 +225,8 @@ export function PersonalGraphView({ onViewCourse }: PersonalGraphViewProps) {
           <Card>
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground">
-                Click a node to see your annotation details and conceptual connections.
+                Click a node to see your annotation details and conceptual
+                connections.
               </p>
             </CardContent>
           </Card>

@@ -8,10 +8,21 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 
-const ROLES = ['STUDENT', 'INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN', 'RESEARCHER'] as const;
+const ROLES = [
+  'STUDENT',
+  'INSTRUCTOR',
+  'ORG_ADMIN',
+  'SUPER_ADMIN',
+  'RESEARCHER',
+] as const;
 
 const PERMISSIONS = [
   'course:read',
@@ -33,12 +44,31 @@ type Permission = (typeof PERMISSIONS)[number];
 
 const MATRIX: Record<Role, Set<Permission>> = {
   STUDENT: new Set(['course:read', 'agent:execute']),
-  INSTRUCTOR: new Set(['course:read', 'course:write', 'analytics:view', 'announcement:create', 'agent:execute']),
-  RESEARCHER: new Set(['course:read', 'analytics:view', 'analytics:export', 'agent:execute']),
+  INSTRUCTOR: new Set([
+    'course:read',
+    'course:write',
+    'analytics:view',
+    'announcement:create',
+    'agent:execute',
+  ]),
+  RESEARCHER: new Set([
+    'course:read',
+    'analytics:view',
+    'analytics:export',
+    'agent:execute',
+  ]),
   ORG_ADMIN: new Set([
-    'course:read', 'course:write', 'course:delete', 'user:read', 'user:manage',
-    'analytics:view', 'analytics:export', 'audit:view', 'announcement:create',
-    'settings:manage', 'agent:execute',
+    'course:read',
+    'course:write',
+    'course:delete',
+    'user:read',
+    'user:manage',
+    'analytics:view',
+    'analytics:export',
+    'audit:view',
+    'announcement:create',
+    'settings:manage',
+    'agent:execute',
   ]),
   SUPER_ADMIN: new Set(PERMISSIONS),
 };
@@ -46,10 +76,18 @@ const MATRIX: Record<Role, Set<Permission>> = {
 export function AdminRoleMatrixPage() {
   const { t } = useTranslation('admin');
   return (
-    <AdminLayout title={t('roleMatrix.title')} description={t('roleMatrix.description')}>
+    <AdminLayout
+      title={t('roleMatrix.title')}
+      description={t('roleMatrix.description')}
+    >
       <h1 className="sr-only">Role Matrix</h1>
       <div data-testid="admin-role-matrix-page" className="space-y-4">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">BETA</Badge>
+        <Badge
+          variant="outline"
+          className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300"
+        >
+          BETA
+        </Badge>
 
         <Card>
           <CardHeader>
@@ -60,9 +98,14 @@ export function AdminRoleMatrixPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="sticky left-0 bg-background">{t('roleMatrix.permission')}</TableHead>
+                    <TableHead className="sticky left-0 bg-background">
+                      {t('roleMatrix.permission')}
+                    </TableHead>
                     {ROLES.map((role) => (
-                      <TableHead key={role} className="text-center min-w-[100px]">
+                      <TableHead
+                        key={role}
+                        className="text-center min-w-[100px]"
+                      >
                         {role}
                       </TableHead>
                     ))}
@@ -77,9 +120,19 @@ export function AdminRoleMatrixPage() {
                       {ROLES.map((role) => (
                         <TableCell key={role} className="text-center">
                           {MATRIX[role].has(perm) ? (
-                            <span className="text-green-600 font-bold dark:text-green-400" aria-label="granted">&#10003;</span>
+                            <span
+                              className="text-green-600 font-bold dark:text-green-400"
+                              aria-label="granted"
+                            >
+                              &#10003;
+                            </span>
                           ) : (
-                            <span className="text-muted-foreground" aria-label="denied">&mdash;</span>
+                            <span
+                              className="text-muted-foreground"
+                              aria-label="denied"
+                            >
+                              &mdash;
+                            </span>
                           )}
                         </TableCell>
                       ))}

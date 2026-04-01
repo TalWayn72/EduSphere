@@ -134,13 +134,7 @@ export class GraphQueryFacadeService {
     userId: string,
     role: string
   ) {
-    return this.sourceCluster.getLearningPath(
-      from,
-      to,
-      tenantId,
-      userId,
-      role
-    );
+    return this.sourceCluster.getLearningPath(from, to, tenantId, userId, role);
   }
 
   getRelatedConceptsByName(

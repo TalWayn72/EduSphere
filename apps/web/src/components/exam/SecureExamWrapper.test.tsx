@@ -27,7 +27,8 @@ vi.mock('./ExamViolationWarning', () => ({
 vi.mock('./ExamLockdownStatus', () => ({
   ExamLockdownStatus: vi.fn(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ({ active }: any) => active ? <div data-testid="lockdown-status">Secure Mode</div> : null,
+    ({ active }: any) =>
+      active ? <div data-testid="lockdown-status">Secure Mode</div> : null
   ),
 }));
 
@@ -46,7 +47,7 @@ describe('SecureExamWrapper', () => {
     render(
       <SecureExamWrapper sessionId="s1" enabled={true}>
         <div data-testid="child">Exam Content</div>
-      </SecureExamWrapper>,
+      </SecureExamWrapper>
     );
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
@@ -55,7 +56,7 @@ describe('SecureExamWrapper', () => {
     render(
       <SecureExamWrapper sessionId="s1" enabled={true}>
         <span>test</span>
-      </SecureExamWrapper>,
+      </SecureExamWrapper>
     );
     expect(screen.getByTestId('lockdown-status')).toBeInTheDocument();
   });
@@ -64,7 +65,7 @@ describe('SecureExamWrapper', () => {
     render(
       <SecureExamWrapper sessionId="s1" enabled={false}>
         <span>test</span>
-      </SecureExamWrapper>,
+      </SecureExamWrapper>
     );
     expect(screen.queryByTestId('lockdown-status')).not.toBeInTheDocument();
   });
@@ -73,10 +74,13 @@ describe('SecureExamWrapper', () => {
     render(
       <SecureExamWrapper sessionId="s1" enabled={true}>
         <span>test</span>
-      </SecureExamWrapper>,
+      </SecureExamWrapper>
     );
     expect(mockUseBrowserLockdown).toHaveBeenCalledWith(
-      expect.objectContaining({ enabled: true, onViolation: expect.any(Function) }),
+      expect.objectContaining({
+        enabled: true,
+        onViolation: expect.any(Function),
+      })
     );
   });
 
@@ -84,7 +88,7 @@ describe('SecureExamWrapper', () => {
     const { unmount } = render(
       <SecureExamWrapper sessionId="s1" enabled={true}>
         <span>test</span>
-      </SecureExamWrapper>,
+      </SecureExamWrapper>
     );
     // Unmount should not throw — cleanup happens inside useBrowserLockdown
     expect(() => unmount()).not.toThrow();

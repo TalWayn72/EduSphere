@@ -73,9 +73,7 @@ export function AIOverrideRequestButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              Request Human Review
-            </DialogTitle>
+            <DialogTitle>Request Human Review</DialogTitle>
             <DialogDescription>
               You have the right to request a human review of any AI-generated
               assessment or recommendation. A qualified educator will review

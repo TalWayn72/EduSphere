@@ -94,13 +94,11 @@ export function BrandedLoginPage({ slug }: BrandedLoginPageProps) {
       >
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle>
-              {t('orgNotFound', 'Organization not found')}
-            </CardTitle>
+            <CardTitle>{t('orgNotFound', 'Organization not found')}</CardTitle>
             <CardDescription>
               {t(
                 'orgNotFoundDesc',
-                'The organization slug is invalid or does not exist.',
+                'The organization slug is invalid or does not exist.'
               )}
             </CardDescription>
           </CardHeader>

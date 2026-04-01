@@ -5,8 +5,12 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog, DialogContent, DialogDescription,
-  DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 
@@ -20,7 +24,12 @@ interface EmbeddingReindexDialogProps {
 }
 
 export function EmbeddingReindexDialog({
-  open, onOpenChange, onConfirm, loading, totalSources, courseCount,
+  open,
+  onOpenChange,
+  onConfirm,
+  loading,
+  totalSources,
+  courseCount,
 }: EmbeddingReindexDialogProps) {
   const { t } = useTranslation('admin');
 
@@ -28,11 +37,15 @@ export function EmbeddingReindexDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent data-testid="reindex-confirm-dialog">
         <DialogHeader>
-          <DialogTitle>{t('embeddings.reindexDialogTitle', 'Confirm Reindex')}</DialogTitle>
+          <DialogTitle>
+            {t('embeddings.reindexDialogTitle', 'Confirm Reindex')}
+          </DialogTitle>
           <DialogDescription id="reindex-dialog-description">
-            {t('embeddings.reindexDialogDescription',
+            {t(
+              'embeddings.reindexDialogDescription',
               'This will regenerate embeddings for {{sources}} sources in {{courses}} courses. Continue?',
-              { sources: totalSources, courses: courseCount })}
+              { sources: totalSources, courses: courseCount }
+            )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -51,7 +64,13 @@ export function EmbeddingReindexDialog({
             aria-describedby="reindex-dialog-description"
           >
             {loading ? (
-              <><Loader2 className="h-4 w-4 mr-1 animate-spin" aria-hidden="true" />{t('embeddings.reindexing', 'Reindexing...')}</>
+              <>
+                <Loader2
+                  className="h-4 w-4 mr-1 animate-spin"
+                  aria-hidden="true"
+                />
+                {t('embeddings.reindexing', 'Reindexing...')}
+              </>
             ) : (
               t('embeddings.confirmReindex', 'Yes, Reindex')
             )}

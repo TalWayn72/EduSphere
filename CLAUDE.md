@@ -61,24 +61,24 @@
 
 ### Allowed Tools (Orchestrator ONLY uses these)
 
-| Tool | Permitted Use |
-|------|---------------|
-| `Agent` | Spawn sub-agents for ALL implementation work — this is the PRIMARY tool |
-| `Read` | Read tracking docs ONLY (OPEN_ISSUES.md, CLAUDE.md, MEMORY.md, docs/*.md, plan files). NEVER read source code (.ts/.tsx/.graphql/.sql) to solve problems — delegate to Explore agent |
-| `Glob` / `Grep` | ONLY for task decomposition analysis (understanding scope before spawning agents). NEVER to debug or fix issues |
-| `Bash` (read-only) | ONLY: `git status`, `git log`, `git diff`, `docker ps`, `./scripts/health-check.sh`. NEVER: `pnpm`, `npm`, build commands, test commands, Docker build/up/down |
-| `TodoWrite` | Track agent progress and task state |
-| Direct text output | Communicate with user (Hebrew), report progress, present agent results |
+| Tool               | Permitted Use                                                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Agent`            | Spawn sub-agents for ALL implementation work — this is the PRIMARY tool                                                                                                               |
+| `Read`             | Read tracking docs ONLY (OPEN_ISSUES.md, CLAUDE.md, MEMORY.md, docs/\*.md, plan files). NEVER read source code (.ts/.tsx/.graphql/.sql) to solve problems — delegate to Explore agent |
+| `Glob` / `Grep`    | ONLY for task decomposition analysis (understanding scope before spawning agents). NEVER to debug or fix issues                                                                       |
+| `Bash` (read-only) | ONLY: `git status`, `git log`, `git diff`, `docker ps`, `./scripts/health-check.sh`. NEVER: `pnpm`, `npm`, build commands, test commands, Docker build/up/down                        |
+| `TodoWrite`        | Track agent progress and task state                                                                                                                                                   |
+| Direct text output | Communicate with user (Hebrew), report progress, present agent results                                                                                                                |
 
 ### FORBIDDEN Tools (Orchestrator MUST NEVER use these directly)
 
-| Tool | Why Forbidden |
-|------|---------------|
-| `Edit` | Code changes are agent work — delegate to FE/BE/DB/DevOps agent |
-| `Write` | File creation is agent work — delegate to appropriate division agent |
-| `Bash` (mutating) | `pnpm test`, `pnpm build`, `docker-compose up`, `git commit`, `git push` — delegate to QA/DevOps agent |
-| `MCP tools` (code-affecting) | `mcp__eslint__*`, `mcp__playwright__*`, `mcp__postgres__*` for fixing — delegate to appropriate agent |
-| `Read` (source code) | Reading `.ts`, `.tsx`, `.graphql`, `.sql` files to solve a problem — delegate to an Explore agent |
+| Tool                         | Why Forbidden                                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `Edit`                       | Code changes are agent work — delegate to FE/BE/DB/DevOps agent                                        |
+| `Write`                      | File creation is agent work — delegate to appropriate division agent                                   |
+| `Bash` (mutating)            | `pnpm test`, `pnpm build`, `docker-compose up`, `git commit`, `git push` — delegate to QA/DevOps agent |
+| `MCP tools` (code-affecting) | `mcp__eslint__*`, `mcp__playwright__*`, `mcp__postgres__*` for fixing — delegate to appropriate agent  |
+| `Read` (source code)         | Reading `.ts`, `.tsx`, `.graphql`, `.sql` files to solve a problem — delegate to an Explore agent      |
 
 ### What the Orchestrator DOES
 
@@ -93,29 +93,30 @@
 
 ### Agent Type Catalog
 
-| Work Type | Agent Division | Agent Prompt Pattern |
-|-----------|---------------|----------------------|
-| React/UI component changes | Frontend Engineering | `Agent("Fix/build the X component in apps/web/src/...")` |
-| NestJS/resolver/service changes | Backend Engineering | `Agent("Update the Y service in apps/subgraph-Z/...")` |
-| Schema/migration/RLS changes | Database & Data | `Agent("Add migration for table Z...")` |
-| Docker/CI/deployment/git ops | DevOps & Release | `Agent("Rebuild Docker image and verify..." / "Commit and push...")` |
-| Unit/integration/E2E tests | QA & Validation | `Agent("Write E2E test for feature X...")` |
-| Security audit/pen test | Security & Compliance | `Agent("Audit RLS policies for table X...")` |
-| README/OPEN_ISSUES/docs update | Documentation | `Agent("Update OPEN_ISSUES.md with bug X status...")` |
-| Code exploration/debugging | Architecture (Explore) | `Agent("Investigate why X fails...", subagent_type="Explore")` |
-| Bug investigation (3 waves) | Architecture (Explore) | `Agent("Run discovery waves for bug pattern X...", subagent_type="Explore")` |
-| Planning/design decisions | Architecture (Plan) | `Agent("Design approach for feature X...", subagent_type="Plan")` |
-| Expo/React Native mobile screens | Frontend Engineering | `Agent("Build mobile screen X in apps/mobile/src/...")` |
-| LangGraph AI agent workflows | Backend Engineering | `Agent("Implement AI agent workflow for X in apps/subgraph-agent/...")` |
-| GraphQL federation contract testing | Backend Engineering | `Agent("Validate federation composition for entity X...")` |
-| Apache AGE graph queries/ontology | Database & Data | `Agent("Write Cypher query for knowledge graph traversal X...")` |
-| Container/infra security audit | Security & Compliance | `Agent("Audit Docker security and TLS config for service X...")` |
-| Mobile E2E testing | QA & Validation | `Agent("Write mobile E2E tests for screen X...")` |
-| Observability/tracing/metrics | DevOps & Release | `Agent("Configure distributed tracing for service X...")` |
+| Work Type                           | Agent Division         | Agent Prompt Pattern                                                         |
+| ----------------------------------- | ---------------------- | ---------------------------------------------------------------------------- |
+| React/UI component changes          | Frontend Engineering   | `Agent("Fix/build the X component in apps/web/src/...")`                     |
+| NestJS/resolver/service changes     | Backend Engineering    | `Agent("Update the Y service in apps/subgraph-Z/...")`                       |
+| Schema/migration/RLS changes        | Database & Data        | `Agent("Add migration for table Z...")`                                      |
+| Docker/CI/deployment/git ops        | DevOps & Release       | `Agent("Rebuild Docker image and verify..." / "Commit and push...")`         |
+| Unit/integration/E2E tests          | QA & Validation        | `Agent("Write E2E test for feature X...")`                                   |
+| Security audit/pen test             | Security & Compliance  | `Agent("Audit RLS policies for table X...")`                                 |
+| README/OPEN_ISSUES/docs update      | Documentation          | `Agent("Update OPEN_ISSUES.md with bug X status...")`                        |
+| Code exploration/debugging          | Architecture (Explore) | `Agent("Investigate why X fails...", subagent_type="Explore")`               |
+| Bug investigation (3 waves)         | Architecture (Explore) | `Agent("Run discovery waves for bug pattern X...", subagent_type="Explore")` |
+| Planning/design decisions           | Architecture (Plan)    | `Agent("Design approach for feature X...", subagent_type="Plan")`            |
+| Expo/React Native mobile screens    | Frontend Engineering   | `Agent("Build mobile screen X in apps/mobile/src/...")`                      |
+| LangGraph AI agent workflows        | Backend Engineering    | `Agent("Implement AI agent workflow for X in apps/subgraph-agent/...")`      |
+| GraphQL federation contract testing | Backend Engineering    | `Agent("Validate federation composition for entity X...")`                   |
+| Apache AGE graph queries/ontology   | Database & Data        | `Agent("Write Cypher query for knowledge graph traversal X...")`             |
+| Container/infra security audit      | Security & Compliance  | `Agent("Audit Docker security and TLS config for service X...")`             |
+| Mobile E2E testing                  | QA & Validation        | `Agent("Write mobile E2E tests for screen X...")`                            |
+| Observability/tracing/metrics       | DevOps & Release       | `Agent("Configure distributed tracing for service X...")`                    |
 
 ### CRITICAL: "Execute directly" means "spawn agents directly"
 
 The existing rule "Don't ask questions — Execute directly" means:
+
 - DO spawn agents immediately without asking the user
 - DO NOT execute code changes yourself
 - "Execute" = "launch the right agents" — NOT "write the code yourself"
@@ -294,28 +295,28 @@ Skills are markdown-based expertise guides that auto-load when Claude detects re
 
 ### EduSphere Custom Skills (Auto-Loaded)
 
-| Skill | Auto-Triggers On | Content |
-|-------|-------------------|---------|
-| `graphql-federation-edusphere` | `.graphql` files, `apps/gateway/`, resolver files | Federation v2.7, 6-subgraph map, entity resolution, SDL-first workflow |
-| `apache-age-knowledge-graph` | `packages/db/src/graph/`, `apps/subgraph-knowledge/` | Cypher queries, 5-node ontology, executeCypher(), RLS in graph |
-| `pgvector-hybrid-rag` | embeddings schema, `apps/subgraph-knowledge/` | HNSW indexes, 768-dim embeddings, HybridRAG fusion, RRF reranking |
-| `langgraph-agent-workflows` | `apps/subgraph-agent/`, AI agent code | StateGraph, assess-quiz-explain-debate, Vercel AI SDK v6, gVisor |
-| `drizzle-orm-edusphere` | `packages/db/`, schema/migration files | pgTable.withRLS(), withTenantContext(), SI-1/SI-3/SI-8 compliance |
-| `nats-jetstream-patterns` | `packages/nats-client/`, NATS imports | 23 event subjects, stream retention, KV stores, SI-7 TLS |
-| `session-completion-gate` | task completion, before git push | 10-check gate, 5-user auth, Docker health, failure protocol |
-| `discovery-wave-automator` | bug fixes, test failures | 3-wave search, 7-dir checklist, Discovery List, pattern-class search |
-| `rls-policy-patterns-edusphere` | `packages/db/src/rls/`, RLS policy files | RLS policy templates, tenant isolation patterns, cross-tenant guards |
-| `memory-safety-resource-lifecycle-edusphere` | `OnModuleDestroy`, cleanup patterns | Resource lifecycle management, connection pool cleanup, timer guards |
-| `keycloak-oauth-oidc-edusphere` | Keycloak config, `packages/auth/`, JWT/OIDC code | OIDC flows, realm config, brute-force protection, JWKS validation |
-| `expo-sdk-54-mobile-edusphere` | `apps/mobile/`, Expo config files | Expo SDK 54 patterns, expo-sqlite offline-first, React Native 0.81 |
-| `multi-tenant-architecture-edusphere` | `withTenantContext`, tenant isolation code | Multi-tenant RLS patterns, tenant context propagation, SI-9 compliance |
-| `react-19-vite-6-edusphere` | `apps/web/`, React 19 components, Vite config | React 19 features, Vite 6 config, mounted-guard patterns |
-| `hive-gateway-v2-patterns` | `apps/gateway/`, supergraph composition | Hive Gateway v2 config, Federation v2.7, subgraph routing |
-| `playwright-visual-regression-edusphere` | `apps/web/e2e/`, visual test files | toHaveScreenshot() patterns, visual baseline management |
-| `docker-blue-green-deployment-edusphere` | `docker-compose.yml`, Dockerfile | Blue-green protocol, mem_limit/mem_reservation, rollback strategy |
-| `turborepo-edusphere-monorepo` | `turbo.json`, monorepo config | Turborepo caching, workspace filtering, pipeline configuration |
-| `graphql-authorization-directives-edusphere` | `@authenticated`, `@requiresScopes` directives | GraphQL authorization directives, scope enforcement |
-| `scorm-edusphere-lms-integration` | SCORM-related code, LMS integration files | SCORM 1.2/2004 compliance, LMS data model, xAPI integration |
+| Skill                                        | Auto-Triggers On                                     | Content                                                                |
+| -------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------- |
+| `graphql-federation-edusphere`               | `.graphql` files, `apps/gateway/`, resolver files    | Federation v2.7, 6-subgraph map, entity resolution, SDL-first workflow |
+| `apache-age-knowledge-graph`                 | `packages/db/src/graph/`, `apps/subgraph-knowledge/` | Cypher queries, 5-node ontology, executeCypher(), RLS in graph         |
+| `pgvector-hybrid-rag`                        | embeddings schema, `apps/subgraph-knowledge/`        | HNSW indexes, 768-dim embeddings, HybridRAG fusion, RRF reranking      |
+| `langgraph-agent-workflows`                  | `apps/subgraph-agent/`, AI agent code                | StateGraph, assess-quiz-explain-debate, Vercel AI SDK v6, gVisor       |
+| `drizzle-orm-edusphere`                      | `packages/db/`, schema/migration files               | pgTable.withRLS(), withTenantContext(), SI-1/SI-3/SI-8 compliance      |
+| `nats-jetstream-patterns`                    | `packages/nats-client/`, NATS imports                | 23 event subjects, stream retention, KV stores, SI-7 TLS               |
+| `session-completion-gate`                    | task completion, before git push                     | 10-check gate, 5-user auth, Docker health, failure protocol            |
+| `discovery-wave-automator`                   | bug fixes, test failures                             | 3-wave search, 7-dir checklist, Discovery List, pattern-class search   |
+| `rls-policy-patterns-edusphere`              | `packages/db/src/rls/`, RLS policy files             | RLS policy templates, tenant isolation patterns, cross-tenant guards   |
+| `memory-safety-resource-lifecycle-edusphere` | `OnModuleDestroy`, cleanup patterns                  | Resource lifecycle management, connection pool cleanup, timer guards   |
+| `keycloak-oauth-oidc-edusphere`              | Keycloak config, `packages/auth/`, JWT/OIDC code     | OIDC flows, realm config, brute-force protection, JWKS validation      |
+| `expo-sdk-54-mobile-edusphere`               | `apps/mobile/`, Expo config files                    | Expo SDK 54 patterns, expo-sqlite offline-first, React Native 0.81     |
+| `multi-tenant-architecture-edusphere`        | `withTenantContext`, tenant isolation code           | Multi-tenant RLS patterns, tenant context propagation, SI-9 compliance |
+| `react-19-vite-6-edusphere`                  | `apps/web/`, React 19 components, Vite config        | React 19 features, Vite 6 config, mounted-guard patterns               |
+| `hive-gateway-v2-patterns`                   | `apps/gateway/`, supergraph composition              | Hive Gateway v2 config, Federation v2.7, subgraph routing              |
+| `playwright-visual-regression-edusphere`     | `apps/web/e2e/`, visual test files                   | toHaveScreenshot() patterns, visual baseline management                |
+| `docker-blue-green-deployment-edusphere`     | `docker-compose.yml`, Dockerfile                     | Blue-green protocol, mem_limit/mem_reservation, rollback strategy      |
+| `turborepo-edusphere-monorepo`               | `turbo.json`, monorepo config                        | Turborepo caching, workspace filtering, pipeline configuration         |
+| `graphql-authorization-directives-edusphere` | `@authenticated`, `@requiresScopes` directives       | GraphQL authorization directives, scope enforcement                    |
+| `scorm-edusphere-lms-integration`            | SCORM-related code, LMS integration files            | SCORM 1.2/2004 compliance, LMS data model, xAPI integration            |
 
 ### Skills per Wave (Mandatory Loading)
 
@@ -615,13 +616,13 @@ Every new or updated `.md` file describing architecture, flows, relationships, s
 
 The following sections have been extracted to keep CLAUDE.md focused. Each document contains the full content and links back here.
 
-| Document | Content |
-|----------|---------|
-| [docs/operations/IRON_RULES.md](docs/operations/IRON_RULES.md) | Security Invariants (SI-1 to SI-10), Memory Safety rules (backend/frontend/infrastructure), OOM Response Protocol |
-| [docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md](docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md) | Enterprise Division Structure, Wave-Based Parallel Model, Agent Orchestration, Phase Execution, Autonomous Execution Rules |
-| [docs/operations/SESSION_COMPLETION_GATE.md](docs/operations/SESSION_COMPLETION_GATE.md) | 12-check completion table, Iron Rules for Completion, Parallel Agents Completion Protocol |
-| [docs/operations/MCP_DECISION_MATRIX.md](docs/operations/MCP_DECISION_MATRIX.md) | 14 MCP servers config, Decision Matrix, Tool Usage Guidelines, HIVEMIND/MindHive protocol |
-| [docs/operations/BUG_FIX_PROTOCOL_QUICK_REF.md](docs/operations/BUG_FIX_PROTOCOL_QUICK_REF.md) | Bug Fix Protocol phases 0-5, Discovery Waves, Round Completion Gate, `dap` debugger reference. Full protocol: [docs/reference/BUG_FIX_PROTOCOL.md](docs/reference/BUG_FIX_PROTOCOL.md) |
+| Document                                                                                             | Content                                                                                                                                                                                |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [docs/operations/IRON_RULES.md](docs/operations/IRON_RULES.md)                                       | Security Invariants (SI-1 to SI-10), Memory Safety rules (backend/frontend/infrastructure), OOM Response Protocol                                                                      |
+| [docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md](docs/operations/ENTERPRISE_EXECUTION_PROTOCOL.md) | Enterprise Division Structure, Wave-Based Parallel Model, Agent Orchestration, Phase Execution, Autonomous Execution Rules                                                             |
+| [docs/operations/SESSION_COMPLETION_GATE.md](docs/operations/SESSION_COMPLETION_GATE.md)             | 12-check completion table, Iron Rules for Completion, Parallel Agents Completion Protocol                                                                                              |
+| [docs/operations/MCP_DECISION_MATRIX.md](docs/operations/MCP_DECISION_MATRIX.md)                     | 14 MCP servers config, Decision Matrix, Tool Usage Guidelines, HIVEMIND/MindHive protocol                                                                                              |
+| [docs/operations/BUG_FIX_PROTOCOL_QUICK_REF.md](docs/operations/BUG_FIX_PROTOCOL_QUICK_REF.md)       | Bug Fix Protocol phases 0-5, Discovery Waves, Round Completion Gate, `dap` debugger reference. Full protocol: [docs/reference/BUG_FIX_PROTOCOL.md](docs/reference/BUG_FIX_PROTOCOL.md) |
 
 ---
 

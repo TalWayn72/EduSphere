@@ -105,7 +105,9 @@ function _setupFindRun(run: unknown = MOCK_RUN_COMPLETED) {
   return { limitFn, whereFn, fromFn };
 }
 
-function setupUpdateLesson(updated: unknown = { ...MOCK_LESSON, status: 'PUBLISHED' }) {
+function setupUpdateLesson(
+  updated: unknown = { ...MOCK_LESSON, status: 'PUBLISHED' }
+) {
   const returningFn = vi.fn().mockResolvedValue([updated]);
   const whereFn = vi.fn().mockReturnValue({ returning: returningFn });
   const setFn = vi.fn().mockReturnValue({ where: whereFn });
@@ -153,7 +155,11 @@ describe('LessonPublishService', () => {
       });
       setupUpdateLesson();
 
-      const result = await service.publishLesson('lesson-1', 'run-1', TENANT_CTX);
+      const result = await service.publishLesson(
+        'lesson-1',
+        'run-1',
+        TENANT_CTX
+      );
 
       expect(result.status).toBe('PUBLISHED');
       expect(result.lessonId).toBe('lesson-1');
@@ -185,7 +191,9 @@ describe('LessonPublishService', () => {
       });
 
       let capturedSet: Record<string, unknown> = {};
-      const returningFn = vi.fn().mockResolvedValue([{ ...MOCK_LESSON, status: 'PUBLISHED' }]);
+      const returningFn = vi
+        .fn()
+        .mockResolvedValue([{ ...MOCK_LESSON, status: 'PUBLISHED' }]);
       const whereFn = vi.fn().mockReturnValue({ returning: returningFn });
       const setFn = vi.fn().mockImplementation((v: Record<string, unknown>) => {
         capturedSet = v;

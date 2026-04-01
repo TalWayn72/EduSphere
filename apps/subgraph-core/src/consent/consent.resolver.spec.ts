@@ -20,7 +20,7 @@ describe('ConsentResolver', () => {
     };
     const result = await resolver.updateConsent(
       { consentType: 'AI_PROCESSING', given: true },
-      context,
+      context
     );
     expect(result).toBe(true);
     expect(mockUpdateConsent).toHaveBeenCalledWith({
@@ -35,7 +35,10 @@ describe('ConsentResolver', () => {
   it('throws when authContext is missing', async () => {
     const context = { req: {} };
     await expect(
-      resolver.updateConsent({ consentType: 'AI_PROCESSING', given: true }, context),
+      resolver.updateConsent(
+        { consentType: 'AI_PROCESSING', given: true },
+        context
+      )
     ).rejects.toThrow('Unauthenticated');
   });
 
@@ -48,8 +51,8 @@ describe('ConsentResolver', () => {
     await expect(
       resolver.updateConsent(
         { consentType: 'AI_PROCESSING', given: true },
-        context,
-      ),
+        context
+      )
     ).rejects.toThrow('Missing tenant context');
     expect(mockUpdateConsent).not.toHaveBeenCalled();
   });
@@ -62,10 +65,7 @@ describe('ConsentResolver', () => {
       authContext: { tenantId: 't-1', userId: 'u-1', roles: ['STUDENT'] },
     };
     await expect(
-      resolver.updateConsent(
-        { consentType: 'ANALYTICS', given: true },
-        context,
-      ),
+      resolver.updateConsent({ consentType: 'ANALYTICS', given: true }, context)
     ).rejects.toThrow('DB constraint');
   });
 
@@ -77,10 +77,10 @@ describe('ConsentResolver', () => {
     };
     await resolver.updateConsent(
       { consentType: 'THIRD_PARTY_LLM', given: false },
-      context,
+      context
     );
     expect(mockUpdateConsent).toHaveBeenCalledWith(
-      expect.objectContaining({ consentType: 'THIRD_PARTY_LLM', given: false }),
+      expect.objectContaining({ consentType: 'THIRD_PARTY_LLM', given: false })
     );
   });
 });

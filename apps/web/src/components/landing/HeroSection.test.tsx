@@ -17,7 +17,11 @@ vi.mock('@/remotion/KnowledgeGraphGrow', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: function MockButton({ children, asChild: _asChild, ...props }: Record<string, unknown>) {
+  Button: function MockButton({
+    children,
+    asChild: _asChild,
+    ...props
+  }: Record<string, unknown>) {
     return <div {...props}>{children as React.ReactNode}</div>;
   },
 }));
@@ -40,7 +44,7 @@ describe('HeroSection', () => {
   it('renders the main heading', () => {
     renderWithRouter(<HeroSection />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      /The AI-Native LMS/i,
+      /The AI-Native LMS/i
     );
   });
 

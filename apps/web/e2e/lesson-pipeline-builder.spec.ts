@@ -53,12 +53,10 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // All five step types are rendered as palette buttons
-    await expect(
-      page.locator('[data-testid="add-step-VIDEO"]')
-    ).toBeVisible({ timeout: 10_000 });
-    await expect(
-      page.locator('[data-testid="add-step-QUIZ"]')
-    ).toBeVisible();
+    await expect(page.locator('[data-testid="add-step-VIDEO"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.locator('[data-testid="add-step-QUIZ"]')).toBeVisible();
     await expect(
       page.locator('[data-testid="add-step-DISCUSSION"]')
     ).toBeVisible();
@@ -77,9 +75,9 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
     );
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.locator('[data-testid="save-draft-btn"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="save-draft-btn"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('Publish button is visible', async ({ page }) => {
@@ -89,9 +87,9 @@ test.describe('Lesson Pipeline Builder — DEV_MODE guard', () => {
     );
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.locator('[data-testid="publish-btn"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="publish-btn"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('no crash overlay appears', async ({ page }) => {

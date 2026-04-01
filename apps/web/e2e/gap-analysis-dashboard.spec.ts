@@ -32,8 +32,20 @@ async function assertNoRawErrors(page: Page): Promise<void> {
 // ─── Mock data ──────────────────────────────────────────────────────────────
 
 const MOCK_PROFILES = [
-  { __typename: 'SkillProfile', id: 'role-1', roleName: 'Data Engineer', description: 'Data pipeline role', requiredConceptsCount: 10 },
-  { __typename: 'SkillProfile', id: 'role-2', roleName: 'ML Engineer', description: 'Machine learning role', requiredConceptsCount: 8 },
+  {
+    __typename: 'SkillProfile',
+    id: 'role-1',
+    roleName: 'Data Engineer',
+    description: 'Data pipeline role',
+    requiredConceptsCount: 10,
+  },
+  {
+    __typename: 'SkillProfile',
+    id: 'role-2',
+    roleName: 'ML Engineer',
+    description: 'Machine learning role',
+    requiredConceptsCount: 8,
+  },
 ];
 
 const MOCK_GAP_REPORT = {
@@ -111,15 +123,17 @@ test.describe('Gap Analysis Dashboard — Data Loaded', () => {
   });
 
   test('page loads with gap-analysis container', async ({ page }) => {
-    await expect(page.locator('[data-testid="gap-analysis-page"]')).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.locator('[data-testid="gap-analysis-page"]')).toBeVisible(
+      {
+        timeout: 10_000,
+      }
+    );
   });
 
   test('gap summary card is rendered', async ({ page }) => {
-    await expect(
-      page.locator('[data-testid="gap-summary-card"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="gap-summary-card"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('total gaps count shows 3', async ({ page }) => {
@@ -142,8 +156,12 @@ test.describe('Gap Analysis Dashboard — Data Loaded', () => {
 
   test('unmastered gaps appear in the table', async ({ page }) => {
     const table = page.locator('[data-testid="critical-gaps-table"]');
-    await expect(table.getByText('Apache Spark Optimization')).toBeVisible({ timeout: 10_000 });
-    await expect(table.getByText('Data Lakehouse Architecture')).toBeVisible({ timeout: 10_000 });
+    await expect(table.getByText('Apache Spark Optimization')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(table.getByText('Data Lakehouse Architecture')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('mastered concepts do NOT appear in the gap table', async ({ page }) => {
@@ -151,7 +169,9 @@ test.describe('Gap Analysis Dashboard — Data Loaded', () => {
     // Stream Processing is mastered — should not show in gap rows
     const rows = table.locator('tbody tr');
     const rowTexts = await rows.allTextContents();
-    const hasStreamProcessing = rowTexts.some((t) => t.includes('Stream Processing'));
+    const hasStreamProcessing = rowTexts.some((t) =>
+      t.includes('Stream Processing')
+    );
     expect(hasStreamProcessing).toBe(false);
   });
 
@@ -185,7 +205,9 @@ test.describe('Gap Analysis Dashboard — Empty State', () => {
     await page.waitForLoadState('domcontentloaded');
   });
 
-  test('empty state is shown when no skill profiles exist', async ({ page }) => {
+  test('empty state is shown when no skill profiles exist', async ({
+    page,
+  }) => {
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
       timeout: 10_000,
     });
@@ -193,7 +215,9 @@ test.describe('Gap Analysis Dashboard — Empty State', () => {
 
   test('empty state mentions creating a skill profile', async ({ page }) => {
     const el = page.locator('[data-testid="empty-state"]');
-    await expect(el).toHaveText(/No skill profiles found/i, { timeout: 10_000 });
+    await expect(el).toHaveText(/No skill profiles found/i, {
+      timeout: 10_000,
+    });
   });
 
   test('gap summary card is NOT visible in empty state', async ({ page }) => {

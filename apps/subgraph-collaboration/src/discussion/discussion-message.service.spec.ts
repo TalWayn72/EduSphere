@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
 
 // ─── DB mock ───────────────────────────────────────────────────────────────
@@ -98,11 +95,15 @@ describe('DiscussionMessageService', () => {
       mockTx.select.mockReturnValue({ from: mockFrom });
 
       const result = await service.findMessagesByDiscussion(
-        'disc-1', 20, 0, authContext
+        'disc-1',
+        20,
+        0,
+        authContext
       );
       expect(result).toEqual([sampleMessage]);
       expect(mockFindDiscussionById).toHaveBeenCalledWith(
-        'disc-1', authContext
+        'disc-1',
+        authContext
       );
     });
   });
@@ -142,7 +143,11 @@ describe('DiscussionMessageService', () => {
         messageType: 'TEXT',
       };
 
-      const result = await service.addMessage('disc-1', input as never, authContext);
+      const result = await service.addMessage(
+        'disc-1',
+        input as never,
+        authContext
+      );
       expect(result).toEqual(sampleMessage);
     });
 
@@ -158,10 +163,12 @@ describe('DiscussionMessageService', () => {
     });
 
     it('strips HTML tags from content (XSS prevention)', async () => {
-      const mockReturning = vi.fn().mockResolvedValue([{
-        ...sampleMessage,
-        content: 'alert',
-      }]);
+      const mockReturning = vi.fn().mockResolvedValue([
+        {
+          ...sampleMessage,
+          content: 'alert',
+        },
+      ]);
       const mockValues = vi.fn((..._args: unknown[]) => {
         return { returning: mockReturning };
       });

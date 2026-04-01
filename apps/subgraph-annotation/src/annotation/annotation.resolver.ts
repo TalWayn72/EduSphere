@@ -219,7 +219,12 @@ export class AnnotationResolver {
 
   @ResolveField('textRange')
   resolveTextRange(
-    @Parent() annotation: { text_start?: number | null; text_end?: number | null; range_type?: string | null }
+    @Parent()
+    annotation: {
+      text_start?: number | null;
+      text_end?: number | null;
+      range_type?: string | null;
+    }
   ) {
     if (annotation.text_start == null || annotation.text_end == null) {
       return null;

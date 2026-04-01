@@ -19,10 +19,7 @@ import {
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 
-import type {
-  ProgramProgress,
-  EnrollmentResult,
-} from './program.types.js';
+import type { ProgramProgress, EnrollmentResult } from './program.types.js';
 
 @Injectable()
 export class ProgramEnrollmentService implements OnModuleDestroy {

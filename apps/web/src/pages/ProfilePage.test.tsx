@@ -258,9 +258,7 @@ describe('ProfilePage', () => {
     renderPage();
     // t('profile.fields.tenantIdMissing', 'Not available') returns the default
     // string since the key does not exist in EN translation resources
-    expect(
-      screen.getByText('Not available')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Not available')).toBeInTheDocument();
   });
 
   // ── getInitials ?? / || fallback branches (lines 69-71) ──────────────────

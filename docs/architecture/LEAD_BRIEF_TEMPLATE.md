@@ -126,18 +126,18 @@ Your report MUST list SPECIALISTS_USED — empty list = violation.
 
 Each division has additional quality gates beyond the standard 4. The Orchestrator populates Section 6 from this table.
 
-| Division | Division-Specific Gate |
-|----------|----------------------|
-| Product & Requirements | Acceptance criteria defined for every user story |
-| Software Architecture | ADR written for non-trivial decisions |
-| UX/UI Design | WCAG 2.1 AA compliance verified |
-| Frontend Engineering | Playwright E2E spec for every new component |
-| Backend Engineering | RLS validation test for every new resolver |
-| Database & Data | Migration rollback tested; RLS policy 100% coverage |
-| Security & Compliance | All SI-1 through SI-10 invariants verified |
-| QA & Validation | Coverage thresholds met (BE >90%, FE >80%) |
-| Documentation | All affected docs updated; Mermaid diagrams included |
-| DevOps & Release | Health check passes; Docker containers healthy |
+| Division               | Division-Specific Gate                               |
+| ---------------------- | ---------------------------------------------------- |
+| Product & Requirements | Acceptance criteria defined for every user story     |
+| Software Architecture  | ADR written for non-trivial decisions                |
+| UX/UI Design           | WCAG 2.1 AA compliance verified                      |
+| Frontend Engineering   | Playwright E2E spec for every new component          |
+| Backend Engineering    | RLS validation test for every new resolver           |
+| Database & Data        | Migration rollback tested; RLS policy 100% coverage  |
+| Security & Compliance  | All SI-1 through SI-10 invariants verified           |
+| QA & Validation        | Coverage thresholds met (BE >90%, FE >80%)           |
+| Documentation          | All affected docs updated; Mermaid diagrams included |
+| DevOps & Release       | Health check passes; Docker containers healthy       |
 
 ---
 
@@ -145,18 +145,18 @@ Each division has additional quality gates beyond the standard 4. The Orchestrat
 
 Auto-populate Section 4 from this reference. Each Lead receives only their division's skills.
 
-| Division | Skills |
-|----------|--------|
-| Product | `writing-plans`, `brainstorming`, `product-requirements` |
-| Architecture | `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere` |
-| UX/UI | `accessibility-compliance`, `wcag-audit-patterns`, `design-system-patterns` |
-| Frontend | `react-state-management`, `drizzle-orm-edusphere`, `e2e-testing-patterns` |
-| Backend | `nestjs-best-practices`, `graphql-federation-edusphere`, `nats-jetstream-patterns` |
-| Database | `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag` |
-| Security | `auth-implementation-patterns`, `secrets-management`, `sast-configuration` |
-| QA | `test-driven-development`, `e2e-testing-patterns`, `discovery-wave-automator` |
-| Documentation | `changelog-automation`, `mermaid-graph-writer` |
-| DevOps | `deployment-pipeline-design`, `distributed-tracing`, `github-actions-templates` |
+| Division      | Skills                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Product       | `writing-plans`, `brainstorming`, `product-requirements`                                 |
+| Architecture  | `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere` |
+| UX/UI         | `accessibility-compliance`, `wcag-audit-patterns`, `design-system-patterns`              |
+| Frontend      | `react-state-management`, `drizzle-orm-edusphere`, `e2e-testing-patterns`                |
+| Backend       | `nestjs-best-practices`, `graphql-federation-edusphere`, `nats-jetstream-patterns`       |
+| Database      | `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`             |
+| Security      | `auth-implementation-patterns`, `secrets-management`, `sast-configuration`               |
+| QA            | `test-driven-development`, `e2e-testing-patterns`, `discovery-wave-automator`            |
+| Documentation | `changelog-automation`, `mermaid-graph-writer`                                           |
+| DevOps        | `deployment-pipeline-design`, `distributed-tracing`, `github-actions-templates`          |
 
 ---
 
@@ -164,18 +164,18 @@ Auto-populate Section 4 from this reference. Each Lead receives only their divis
 
 Auto-reference for Orchestrator when composing briefs. Each Lead's specialists use these MCP servers.
 
-| Division | Primary MCP Tools |
-|----------|------------------|
-| Product | `sequential-thinking` |
-| Architecture | `sequential-thinking`, `memory` |
-| UX/UI | `playwright` |
-| Frontend | `eslint`, `typescript-diagnostics`, `playwright` |
-| Backend | `eslint`, `typescript-diagnostics`, `graphql`, `context7` |
-| Database | `postgres`, `eslint`, `typescript-diagnostics` |
-| Security | `eslint`, `postgres`, `tavily` |
-| QA | `playwright`, `eslint`, `typescript-diagnostics`, `postgres` |
-| Documentation | `github`, `memory` |
-| DevOps | `github`, `nats` |
+| Division      | Primary MCP Tools                                            |
+| ------------- | ------------------------------------------------------------ |
+| Product       | `sequential-thinking`                                        |
+| Architecture  | `sequential-thinking`, `memory`                              |
+| UX/UI         | `playwright`                                                 |
+| Frontend      | `eslint`, `typescript-diagnostics`, `playwright`             |
+| Backend       | `eslint`, `typescript-diagnostics`, `graphql`, `context7`    |
+| Database      | `postgres`, `eslint`, `typescript-diagnostics`               |
+| Security      | `eslint`, `postgres`, `tavily`                               |
+| QA            | `playwright`, `eslint`, `typescript-diagnostics`, `postgres` |
+| Documentation | `github`, `memory`                                           |
+| DevOps        | `github`, `nats`                                             |
 
 ---
 
@@ -185,13 +185,13 @@ Auto-reference for Orchestrator when composing briefs. Each Lead's specialists u
 
 The following patterns in Section 1 are **violations** that the Orchestrator must self-check before sending:
 
-| Violation Pattern | Why Forbidden | Correct Alternative |
-|-------------------|---------------|---------------------|
-| "Fix the bug in `src/hooks/useAuth.ts`" | Specifies file path | "Authentication fails when user logs in" |
-| "Change `useState` to `useRef`" | Prescribes solution | "Component re-renders excessively on state change" |
-| "The root cause is missing cleanup" | Pre-determines root cause | "Memory usage increases over time in this view" |
-| "Add a try-catch around line 42" | Code-level instruction | "Unhandled errors crash the page" |
-| "Use `withTenantContext()` wrapper" | Implementation detail | "Queries return data from other tenants" |
+| Violation Pattern                       | Why Forbidden             | Correct Alternative                                |
+| --------------------------------------- | ------------------------- | -------------------------------------------------- |
+| "Fix the bug in `src/hooks/useAuth.ts`" | Specifies file path       | "Authentication fails when user logs in"           |
+| "Change `useState` to `useRef`"         | Prescribes solution       | "Component re-renders excessively on state change" |
+| "The root cause is missing cleanup"     | Pre-determines root cause | "Memory usage increases over time in this view"    |
+| "Add a try-catch around line 42"        | Code-level instruction    | "Unhandled errors crash the page"                  |
+| "Use `withTenantContext()` wrapper"     | Implementation detail     | "Queries return data from other tenants"           |
 
 ### Template Usage Rules
 

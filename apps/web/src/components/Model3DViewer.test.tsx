@@ -1,4 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterAll, type Mock } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterAll,
+  type Mock,
+} from 'vitest';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import React from 'react';
 
@@ -68,19 +76,33 @@ const mockLoadedObject = {
 };
 
 vi.mock('three', () => ({
-  WebGLRenderer: vi.fn(function MockWebGLRenderer() { return mockRenderer; }),
-  Scene: vi.fn(function MockScene() { return mockScene; }),
-  PerspectiveCamera: vi.fn(function MockPerspectiveCamera() { return mockCamera; }),
-  AmbientLight: vi.fn(function MockAmbientLight() { return mockAmbientLight; }),
-  DirectionalLight: vi.fn(function MockDirectionalLight() { return mockDirLight; }),
+  WebGLRenderer: vi.fn(function MockWebGLRenderer() {
+    return mockRenderer;
+  }),
+  Scene: vi.fn(function MockScene() {
+    return mockScene;
+  }),
+  PerspectiveCamera: vi.fn(function MockPerspectiveCamera() {
+    return mockCamera;
+  }),
+  AmbientLight: vi.fn(function MockAmbientLight() {
+    return mockAmbientLight;
+  }),
+  DirectionalLight: vi.fn(function MockDirectionalLight() {
+    return mockDirLight;
+  }),
 }));
 
 vi.mock('three/examples/jsm/loaders/GLTFLoader.js', () => ({
-  GLTFLoader: vi.fn(function MockGLTFLoader() { return mockGLTFLoader; }),
+  GLTFLoader: vi.fn(function MockGLTFLoader() {
+    return mockGLTFLoader;
+  }),
 }));
 
 vi.mock('three/examples/jsm/controls/OrbitControls.js', () => ({
-  OrbitControls: vi.fn(function MockOrbitControls() { return mockControls; }),
+  OrbitControls: vi.fn(function MockOrbitControls() {
+    return mockControls;
+  }),
 }));
 
 // ── ResizeObserver mock ───────────────────────────────────────────────────────
@@ -97,7 +119,9 @@ class MockResizeObserver {
  */
 function resolveLoad() {
   const loadCall = (mockLoaderLoad as Mock).mock.calls[0];
-  const onLoadCallback = loadCall?.[1] as ((gltf: { scene: typeof mockLoadedObject }) => void) | undefined;
+  const onLoadCallback = loadCall?.[1] as
+    | ((gltf: { scene: typeof mockLoadedObject }) => void)
+    | undefined;
   if (onLoadCallback) {
     act(() => {
       onLoadCallback({ scene: mockLoadedObject });
@@ -124,10 +148,13 @@ const originalCancelAnimationFrame = globalThis.cancelAnimationFrame;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+  globalThis.ResizeObserver =
+    MockResizeObserver as unknown as typeof ResizeObserver;
   globalThis.cancelAnimationFrame = mockCancelAnimationFrame;
   // By default loader does NOT auto-resolve — each test controls this
-  mockLoaderLoad.mockImplementation(function () { return undefined; });
+  mockLoaderLoad.mockImplementation(function () {
+    return undefined;
+  });
 });
 
 afterAll(() => {
@@ -155,7 +182,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     resolveLoad();
     await waitFor(() =>
-      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument(),
+      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument()
     );
   });
 
@@ -165,7 +192,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     rejectLoad();
     await waitFor(() =>
-      expect(screen.getByTestId('model3d-error')).toBeInTheDocument(),
+      expect(screen.getByTestId('model3d-error')).toBeInTheDocument()
     );
   });
 
@@ -175,7 +202,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     rejectLoad(new Error('GLTFLoader internal error: unexpected token'));
     await waitFor(() =>
-      expect(screen.getByTestId('model3d-error')).toBeInTheDocument(),
+      expect(screen.getByTestId('model3d-error')).toBeInTheDocument()
     );
     const errorEl = screen.getByTestId('model3d-error');
     expect(errorEl.textContent).not.toContain('GLTFLoader internal error');
@@ -188,7 +215,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     rejectLoad();
     await waitFor(() =>
-      expect(screen.getByTestId('model3d-error')).toBeInTheDocument(),
+      expect(screen.getByTestId('model3d-error')).toBeInTheDocument()
     );
   });
 
@@ -225,7 +252,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     resolveLoad();
     await waitFor(() =>
-      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument(),
+      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument()
     );
     unmount();
     await waitFor(() => expect(mockDispose).toHaveBeenCalled());
@@ -237,7 +264,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     resolveLoad();
     await waitFor(() =>
-      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument(),
+      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument()
     );
     unmount();
     await waitFor(() => expect(mockCancelAnimationFrame).toHaveBeenCalled());
@@ -249,7 +276,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     resolveLoad();
     await waitFor(() =>
-      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument(),
+      expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument()
     );
     unmount();
     await waitFor(() => expect(mockControlsDispose).toHaveBeenCalled());
@@ -260,7 +287,9 @@ describe('Model3DViewer', () => {
     const { unmount } = render(<Model3DViewer src="model.glb" />);
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     unmount();
-    await waitFor(() => expect(mockResizeObserverDisconnect).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(mockResizeObserverDisconnect).toHaveBeenCalled()
+    );
   });
 
   it('shows data-testid="model3d-unavailable" when THREE fails to import', async () => {
@@ -274,17 +303,20 @@ describe('Model3DViewer', () => {
 
     render(<Model3DViewer src="model.glb" />);
     await waitFor(
-      () => expect(screen.getByTestId('model3d-unavailable')).toBeInTheDocument(),
-      { timeout: 3000 },
+      () =>
+        expect(screen.getByTestId('model3d-unavailable')).toBeInTheDocument(),
+      { timeout: 3000 }
     );
     expect(screen.getByTestId('model3d-unavailable').textContent).toContain(
-      '3D viewer is not available in this environment',
+      '3D viewer is not available in this environment'
     );
   });
 
   it('component renders without crashing with minimal props (src only)', async () => {
     const { Model3DViewer } = await import('./Model3DViewer');
-    expect(() => render(<Model3DViewer src="https://example.com/model.glb" />)).not.toThrow();
+    expect(() =>
+      render(<Model3DViewer src="https://example.com/model.glb" />)
+    ).not.toThrow();
     expect(screen.getByTestId('model3d-canvas')).toBeInTheDocument();
   });
 
@@ -303,7 +335,7 @@ describe('Model3DViewer', () => {
     await waitFor(() => expect(mockLoaderLoad).toHaveBeenCalled());
     rejectLoad();
     await waitFor(() =>
-      expect(screen.getByTestId('model3d-error')).toBeInTheDocument(),
+      expect(screen.getByTestId('model3d-error')).toBeInTheDocument()
     );
     expect(screen.queryByTestId('model3d-loading')).not.toBeInTheDocument();
   });
@@ -317,7 +349,9 @@ describe('Model3DViewer', () => {
     const loadCall = (mockLoaderLoad as Mock).mock.calls[0];
     const onErrorCallback = loadCall?.[3] as ((e: unknown) => void) | undefined;
     if (onErrorCallback) {
-      act(() => { onErrorCallback('string error'); });
+      act(() => {
+        onErrorCallback('string error');
+      });
     }
     await waitFor(() => expect(handleError).toHaveBeenCalled());
     expect(handleError.mock.calls[0]?.[0]).toBeInstanceOf(Error);

@@ -44,7 +44,7 @@ test.describe('Visual Regression Baseline — Public Pages', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
   });
 
@@ -59,13 +59,10 @@ test.describe('Visual Regression Baseline — Public Pages', () => {
         await page.waitForLoadState('domcontentloaded').catch(() => {});
         await page.waitForTimeout(500);
 
-        await expect(page).toHaveScreenshot(
-          `${pg.name}-${vp.label}.png`,
-          {
-            fullPage: true,
-            maxDiffPixelRatio: 0.02,
-          },
-        );
+        await expect(page).toHaveScreenshot(`${pg.name}-${vp.label}.png`, {
+          fullPage: true,
+          maxDiffPixelRatio: 0.02,
+        });
       });
     }
   }

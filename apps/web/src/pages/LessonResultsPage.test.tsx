@@ -16,7 +16,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -30,7 +31,9 @@ vi.mock('@/components/Layout', () => ({
 
 vi.mock('@/components/PageShell', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: any) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/Breadcrumbs', () => ({
@@ -52,7 +55,10 @@ const MOCK_RESULTS_FULL = [
     id: 'r-ingestion',
     moduleName: 'INGESTION',
     outputType: 'INGESTION',
-    outputData: { sourceUrl: 'https://youtube.com/watch?v=abc123', assetType: 'VIDEO' },
+    outputData: {
+      sourceUrl: 'https://youtube.com/watch?v=abc123',
+      assetType: 'VIDEO',
+    },
     fileUrl: null,
   },
   {
@@ -70,7 +76,9 @@ const MOCK_RESULTS_FULL = [
     id: 'r-cleaning',
     moduleName: 'CONTENT_CLEANING',
     outputType: 'CONTENT_CLEANING',
-    outputData: { cleanedText: 'ברוכים הבאים לשיעור על הלכות שבת היום נלמד על מלאכת הבערה' },
+    outputData: {
+      cleanedText: 'ברוכים הבאים לשיעור על הלכות שבת היום נלמד על מלאכת הבערה',
+    },
     fileUrl: null,
   },
   {
@@ -78,7 +86,10 @@ const MOCK_RESULTS_FULL = [
     moduleName: 'NER_SOURCE_LINKING',
     outputType: 'NER_SOURCE_LINKING',
     outputData: {
-      entities: [{ text: 'שבת', type: 'CONCEPT' }, { text: 'הבערה', type: 'CONCEPT' }],
+      entities: [
+        { text: 'שבת', type: 'CONCEPT' },
+        { text: 'הבערה', type: 'CONCEPT' },
+      ],
       linkedSources: [{ title: 'שולחן ערוך, אורח חיים', url: null }],
     },
     fileUrl: null,
@@ -122,14 +133,20 @@ const MOCK_RESULTS_FULL = [
     id: 'r-qa',
     moduleName: 'QA_GATE',
     outputType: 'QA_GATE',
-    outputData: { overallScore: 0.85, fixList: [{ description: 'תקן ציטוט חסר', severity: 'MEDIUM' }] },
+    outputData: {
+      overallScore: 0.85,
+      fixList: [{ description: 'תקן ציטוט חסר', severity: 'MEDIUM' }],
+    },
     fileUrl: null,
   },
   {
     id: 'r-publish',
     moduleName: 'PUBLISH_SHARE',
     outputType: 'PUBLISH_SHARE',
-    outputData: { publishReady: true, publishedUrl: 'https://cdn.example.com/lesson-abc' },
+    outputData: {
+      publishReady: true,
+      publishedUrl: 'https://cdn.example.com/lesson-abc',
+    },
     fileUrl: null,
   },
 ];
@@ -139,10 +156,23 @@ const MOCK_LESSON = {
     id: 'lesson-1',
     title: 'שיעור בעץ חיים',
     status: 'READY',
-    assets: [{ id: 'a1', assetType: 'VIDEO', sourceUrl: 'https://youtube.com/watch?v=abc123', fileUrl: null }],
+    assets: [
+      {
+        id: 'a1',
+        assetType: 'VIDEO',
+        sourceUrl: 'https://youtube.com/watch?v=abc123',
+        fileUrl: null,
+      },
+    ],
     pipeline: {
       id: 'pipeline-1',
-      currentRun: { id: 'run-1', status: 'COMPLETED', startedAt: null, completedAt: '2025-03-01T10:00:00Z', results: MOCK_RESULTS_FULL },
+      currentRun: {
+        id: 'run-1',
+        status: 'COMPLETED',
+        startedAt: null,
+        completedAt: '2025-03-01T10:00:00Z',
+        results: MOCK_RESULTS_FULL,
+      },
     },
   },
 };
@@ -154,7 +184,10 @@ function makeQuery(overrides: Record<string, unknown> = {}) {
   ] as never;
 }
 
-const NOOP_MUTATION = [{ fetching: false }, vi.fn().mockResolvedValue({ data: undefined, error: undefined })] as never;
+const NOOP_MUTATION = [
+  { fetching: false },
+  vi.fn().mockResolvedValue({ data: undefined, error: undefined }),
+] as never;
 
 describe('LessonResultsPage', () => {
   beforeEach(() => {
@@ -167,43 +200,78 @@ describe('LessonResultsPage', () => {
 
   it('BUG-049: does NOT call console.error synchronously during render (must use useEffect)', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({ error: { message: 'query failed' } }));
-    const { unmount } = render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({ error: { message: 'query failed' } })
+    );
+    const { unmount } = render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     consoleSpy.mockRestore();
     unmount();
   });
 
   it('BUG-049: renders without "Cannot update a component while rendering" error', () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation((msg: unknown) => {
-      if (typeof msg === 'string' && msg.includes('Cannot update a component')) {
-        throw new Error(`React render violation: ${msg}`);
-      }
-    });
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    const spy = vi
+      .spyOn(console, 'error')
+      .mockImplementation((msg: unknown) => {
+        if (
+          typeof msg === 'string' &&
+          msg.includes('Cannot update a component')
+        ) {
+          throw new Error(`React render violation: ${msg}`);
+        }
+      });
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     spy.mockRestore();
   });
 
   // ── Loading / empty ───────────────────────────────────────────────────────────
 
   it('shows loading spinner while fetching', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({ fetching: true, data: undefined }));
-    const { container } = render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({ fetching: true, data: undefined })
+    );
+    const { container } = render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
   it('shows "השיעור לא נמצא" when lesson is null', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({ data: { lesson: null } }));
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({ data: { lesson: null } })
+    );
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('השיעור לא נמצא')).toBeInTheDocument();
   });
 
   it('shows page heading תוצאות Pipeline', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('תוצאות Pipeline')).toBeInTheDocument();
   });
 
   it('shows lesson title in back button', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/שיעור בעץ חיים/)).toBeInTheDocument();
   });
 
@@ -211,9 +279,29 @@ describe('LessonResultsPage', () => {
 
   it('shows empty state with Pipeline Builder button when results are empty', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: { id: 'p1', currentRun: { id: 'r', status: 'IDLE', startedAt: null, completedAt: null, results: [] } } } } })
+      makeQuery({
+        data: {
+          lesson: {
+            ...MOCK_LESSON.lesson,
+            pipeline: {
+              id: 'p1',
+              currentRun: {
+                id: 'r',
+                status: 'IDLE',
+                startedAt: null,
+                completedAt: null,
+                results: [],
+              },
+            },
+          },
+        },
+      })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('empty-results')).toBeInTheDocument();
     expect(screen.getByText(/אין תוצאות עדיין/)).toBeInTheDocument();
     expect(screen.getByTestId('open-pipeline-from-empty')).toBeInTheDocument();
@@ -223,7 +311,11 @@ describe('LessonResultsPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: null } } })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('add-video-panel')).toBeInTheDocument();
     expect(screen.getByTestId('video-url-input')).toBeInTheDocument();
     expect(screen.getByTestId('add-video-btn')).toBeInTheDocument();
@@ -233,46 +325,92 @@ describe('LessonResultsPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: null } } })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('add-video-btn'));
     expect(await screen.findByTestId('add-video-error')).toBeInTheDocument();
     expect(screen.getByTestId('add-video-error')).toHaveTextContent('קישור');
   });
 
   it('video URL input: navigates to pipeline after successful asset add', async () => {
-    const mockAdd = vi.fn().mockResolvedValue({ data: { addLessonAsset: { id: 'a-new' } }, error: undefined });
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockAdd] as never);
+    const mockAdd = vi.fn().mockResolvedValue({
+      data: { addLessonAsset: { id: 'a-new' } },
+      error: undefined,
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockAdd,
+    ] as never);
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: null } } })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
-    fireEvent.change(screen.getByTestId('video-url-input'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByTestId('video-url-input'), {
+      target: { value: 'https://youtube.com/watch?v=xyz' },
+    });
     fireEvent.click(screen.getByTestId('add-video-btn'));
     await vi.waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/lessons/lesson-1/pipeline');
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/courses/course-1/lessons/lesson-1/pipeline'
+      );
     });
   });
 
   // ── Run status badge ──────────────────────────────────────────────────────────
 
   it('shows COMPLETED badge when run is completed', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('run-status-badge')).toBeInTheDocument();
     expect(screen.getByText(/הושלם/)).toBeInTheDocument();
   });
 
   it('shows RUNNING badge when run is running', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: { id: 'p1', currentRun: { id: 'r', status: 'RUNNING', startedAt: null, completedAt: null, results: MOCK_RESULTS_FULL } } } } })
+      makeQuery({
+        data: {
+          lesson: {
+            ...MOCK_LESSON.lesson,
+            pipeline: {
+              id: 'p1',
+              currentRun: {
+                id: 'r',
+                status: 'RUNNING',
+                startedAt: null,
+                completedAt: null,
+                results: MOCK_RESULTS_FULL,
+              },
+            },
+          },
+        },
+      })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/מריץ/)).toBeInTheDocument();
   });
 
   // ── INGESTION ─────────────────────────────────────────────────────────────────
 
   it('renders INGESTION section with source URL', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-ingestion')).toBeInTheDocument();
     expect(screen.getByTestId('ingestion-url')).toBeInTheDocument();
     expect(document.body.textContent).toContain('youtube.com');
@@ -281,14 +419,22 @@ describe('LessonResultsPage', () => {
   // ── ASR / Transcription ───────────────────────────────────────────────────────
 
   it('renders ASR section with transcript text', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-asr')).toBeInTheDocument();
     expect(screen.getByTestId('asr-transcript')).toBeInTheDocument();
     expect(document.body.textContent).toContain('ברוכים הבאים לשיעור');
   });
 
   it('renders ASR language and duration', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('asr-language')).toHaveTextContent('he');
     expect(screen.getByTestId('asr-duration')).toBeInTheDocument();
   });
@@ -296,16 +442,48 @@ describe('LessonResultsPage', () => {
   it('ASR: expand button appears for long transcripts', () => {
     const longTranscript = 'א'.repeat(900);
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: { id: 'p', currentRun: { id: 'r', status: 'COMPLETED', startedAt: null, completedAt: null, results: [{ id: 'r-asr', moduleName: 'ASR', outputType: 'ASR', outputData: { transcript: longTranscript, language: 'he' }, fileUrl: null }] } } } } })
+      makeQuery({
+        data: {
+          lesson: {
+            ...MOCK_LESSON.lesson,
+            pipeline: {
+              id: 'p',
+              currentRun: {
+                id: 'r',
+                status: 'COMPLETED',
+                startedAt: null,
+                completedAt: null,
+                results: [
+                  {
+                    id: 'r-asr',
+                    moduleName: 'ASR',
+                    outputType: 'ASR',
+                    outputData: { transcript: longTranscript, language: 'he' },
+                    fileUrl: null,
+                  },
+                ],
+              },
+            },
+          },
+        },
+      })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('asr-transcript-expand')).toBeInTheDocument();
   });
 
   // ── CONTENT_CLEANING ─────────────────────────────────────────────────────────
 
   it('renders CONTENT_CLEANING section when present', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-cleaning')).toBeInTheDocument();
     expect(screen.getByTestId('cleaned-text')).toBeInTheDocument();
   });
@@ -313,27 +491,45 @@ describe('LessonResultsPage', () => {
   // ── NER_SOURCE_LINKING ────────────────────────────────────────────────────────
 
   it('renders NER entities as chips', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-ner')).toBeInTheDocument();
     expect(screen.getByTestId('entity-0')).toHaveTextContent('שבת');
     expect(screen.getByTestId('entity-1')).toHaveTextContent('הבערה');
   });
 
   it('renders NER linked sources', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(document.body.textContent).toContain('שולחן ערוך');
   });
 
   // ── SUMMARIZATION ─────────────────────────────────────────────────────────────
 
   it('renders summarization section with short summary', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-summarization')).toBeInTheDocument();
-    expect(screen.getByTestId('summary-short')).toHaveTextContent('סיכום קצר לשיעור');
+    expect(screen.getByTestId('summary-short')).toHaveTextContent(
+      'סיכום קצר לשיעור'
+    );
   });
 
   it('renders key points list', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('summary-keypoints')).toBeInTheDocument();
     expect(document.body.textContent).toContain('נקודה א');
     expect(document.body.textContent).toContain('נקודה ב');
@@ -342,7 +538,11 @@ describe('LessonResultsPage', () => {
   // ── STRUCTURED_NOTES ─────────────────────────────────────────────────────────
 
   it('renders structured notes section', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-structured-notes')).toBeInTheDocument();
     expect(screen.getByTestId('notes-markdown')).toBeInTheDocument();
     expect(document.body.textContent).toContain('הלכות שבת');
@@ -351,7 +551,11 @@ describe('LessonResultsPage', () => {
   // ── DIAGRAM ───────────────────────────────────────────────────────────────────
 
   it('renders diagram mermaid section', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-diagram')).toBeInTheDocument();
     expect(screen.getByTestId('diagram-mermaid')).toHaveTextContent('graph LR');
   });
@@ -359,27 +563,45 @@ describe('LessonResultsPage', () => {
   // ── CITATION_VERIFIER ────────────────────────────────────────────────────────
 
   it('renders citation verifier with verified count', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-citations')).toBeInTheDocument();
     expect(screen.getByTestId('citations-verified')).toHaveTextContent('1');
     expect(screen.getByTestId('citations-failed')).toHaveTextContent('0');
   });
 
   it('renders citation match report', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
-    expect(screen.getByTestId('citations-report')).toHaveTextContent('כל הציטוטים אומתו');
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('citations-report')).toHaveTextContent(
+      'כל הציטוטים אומתו'
+    );
   });
 
   // ── QA_GATE ───────────────────────────────────────────────────────────────────
 
   it('renders QA score as percentage', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-qa')).toBeInTheDocument();
     expect(screen.getByTestId('qa-score')).toHaveTextContent('85%');
   });
 
   it('renders QA fix list', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('qa-fix-list')).toBeInTheDocument();
     expect(document.body.textContent).toContain('תקן ציטוט חסר');
   });
@@ -388,40 +610,87 @@ describe('LessonResultsPage', () => {
 
   it('renders QA score correctly when raw value > 1 (e.g. 92)', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeQuery({ data: { lesson: { ...MOCK_LESSON.lesson, pipeline: { id: 'p', currentRun: { id: 'r', status: 'COMPLETED', startedAt: null, completedAt: null, results: [
-        { id: 'r-qa', moduleName: 'QA_GATE', outputType: 'QA_GATE', outputData: { overallScore: 92, fixList: [] }, fileUrl: null }
-      ] } } } } })
+      makeQuery({
+        data: {
+          lesson: {
+            ...MOCK_LESSON.lesson,
+            pipeline: {
+              id: 'p',
+              currentRun: {
+                id: 'r',
+                status: 'COMPLETED',
+                startedAt: null,
+                completedAt: null,
+                results: [
+                  {
+                    id: 'r-qa',
+                    moduleName: 'QA_GATE',
+                    outputType: 'QA_GATE',
+                    outputData: { overallScore: 92, fixList: [] },
+                    fileUrl: null,
+                  },
+                ],
+              },
+            },
+          },
+        },
+      })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('qa-score')).toHaveTextContent('92%');
   });
 
   // ── PUBLISH_SHARE ────────────────────────────────────────────────────────────
 
   it('renders publish section with publishReady and URL', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('result-publish')).toBeInTheDocument();
     expect(screen.getByTestId('publish-ready')).toBeInTheDocument();
-    expect(screen.getByTestId('publish-url')).toHaveAttribute('href', 'https://cdn.example.com/lesson-abc');
+    expect(screen.getByTestId('publish-url')).toHaveAttribute(
+      'href',
+      'https://cdn.example.com/lesson-abc'
+    );
   });
 
   // ── "Run Again" button ────────────────────────────────────────────────────────
 
   it('shows run pipeline again button', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('run-pipeline-again-btn')).toBeInTheDocument();
   });
 
   it('run pipeline again navigates to pipeline page', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     fireEvent.click(screen.getByTestId('run-pipeline-again-btn'));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/lessons/lesson-1/pipeline');
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/courses/course-1/lessons/lesson-1/pipeline'
+    );
   });
 
   // ── Regression: no raw technical strings ─────────────────────────────────────
 
   it('does NOT show raw [GraphQL] or [object Object] strings', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(document.body.textContent).not.toContain('[GraphQL]');
     expect(document.body.textContent).not.toContain('[object Object]');
     expect(document.body.textContent).not.toContain('undefined');

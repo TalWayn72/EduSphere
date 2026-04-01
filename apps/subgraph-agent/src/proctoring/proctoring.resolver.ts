@@ -20,7 +20,9 @@ export class ProctoringResolver {
   ) {
     const authContext = this.extractAuthContext(context);
     const tenantId = authContext.tenantId ?? '';
-    this.logger.debug(`[ProctoringResolver] proctoringSession sessionId=${sessionId} tenantId=${tenantId}`);
+    this.logger.debug(
+      `[ProctoringResolver] proctoringSession sessionId=${sessionId} tenantId=${tenantId}`
+    );
     return this.proctoringService.getSession(sessionId, tenantId);
   }
 
@@ -31,7 +33,9 @@ export class ProctoringResolver {
   ) {
     const authContext = this.extractAuthContext(context);
     const tenantId = authContext.tenantId ?? '';
-    this.logger.debug(`[ProctoringResolver] proctoringReport assessmentId=${assessmentId} tenantId=${tenantId}`);
+    this.logger.debug(
+      `[ProctoringResolver] proctoringReport assessmentId=${assessmentId} tenantId=${tenantId}`
+    );
     return this.proctoringService.getReport(assessmentId, tenantId);
   }
 
@@ -43,7 +47,9 @@ export class ProctoringResolver {
     const authContext = this.extractAuthContext(context);
     const tenantId = authContext.tenantId ?? '';
     const userId = authContext.userId;
-    this.logger.log(`[ProctoringResolver] startProctoringSession assessmentId=${assessmentId} userId=${userId}`);
+    this.logger.log(
+      `[ProctoringResolver] startProctoringSession assessmentId=${assessmentId} userId=${userId}`
+    );
     return this.proctoringService.startSession(assessmentId, tenantId, userId);
   }
 
@@ -57,8 +63,15 @@ export class ProctoringResolver {
     const authContext = this.extractAuthContext(context);
     const tenantId = authContext.tenantId ?? '';
     const userId = authContext.userId;
-    this.logger.log(`[ProctoringResolver] flagProctoringEvent sessionId=${sessionId} type=${type} userId=${userId}`);
-    return this.proctoringService.flagEvent(sessionId, type, detail ?? null, tenantId);
+    this.logger.log(
+      `[ProctoringResolver] flagProctoringEvent sessionId=${sessionId} type=${type} userId=${userId}`
+    );
+    return this.proctoringService.flagEvent(
+      sessionId,
+      type,
+      detail ?? null,
+      tenantId
+    );
   }
 
   @Mutation('endProctoringSession')
@@ -69,7 +82,9 @@ export class ProctoringResolver {
     const authContext = this.extractAuthContext(context);
     const tenantId = authContext.tenantId ?? '';
     const userId = authContext.userId;
-    this.logger.log(`[ProctoringResolver] endProctoringSession sessionId=${sessionId} userId=${userId}`);
+    this.logger.log(
+      `[ProctoringResolver] endProctoringSession sessionId=${sessionId} userId=${userId}`
+    );
     return this.proctoringService.endSession(sessionId, tenantId);
   }
 

@@ -5,7 +5,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PartnerSignupPage } from './PartnerSignupPage';
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('urql', async (importOriginal) => {
@@ -36,7 +38,9 @@ describe('PartnerSignupPage', () => {
 
   it('renders page heading', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /become an edusphere partner/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /become an edusphere partner/i })
+    ).toBeInTheDocument();
   });
 
   it('renders page wrapper with data-testid', () => {
@@ -47,15 +51,25 @@ describe('PartnerSignupPage', () => {
   it('shows revenue share info card', () => {
     renderPage();
     expect(screen.getByText(/30% Revenue Share/i)).toBeInTheDocument();
-    expect(screen.getByText(/70% goes to you as a partner/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/70% goes to you as a partner/i)
+    ).toBeInTheDocument();
   });
 
   it('shows all 4 partner type options in descriptions', () => {
     renderPage();
-    expect(screen.getByText(/Deliver corporate training on white-label EduSphere/i)).toBeInTheDocument();
-    expect(screen.getByText(/Publish courses in EduSphere marketplace/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sell EduSphere to institutions/i)).toBeInTheDocument();
-    expect(screen.getByText(/Deploy & customize EduSphere for enterprise clients/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Deliver corporate training on white-label EduSphere/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Publish courses in EduSphere marketplace/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Sell EduSphere to institutions/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Deploy & customize EduSphere for enterprise clients/i)
+    ).toBeInTheDocument();
   });
 
   it('submit button is disabled when form is empty', () => {
@@ -67,27 +81,45 @@ describe('PartnerSignupPage', () => {
   it('shows loading text on submit button when fetching', async () => {
     const { useMutation } = await import('urql');
     vi.mocked(useMutation).mockReturnValue([
-      { fetching: true, error: undefined, data: undefined, stale: false, operation: undefined as never },
+      {
+        fetching: true,
+        error: undefined,
+        data: undefined,
+        stale: false,
+        operation: undefined as never,
+      },
       vi.fn(),
     ]);
     renderPage();
-    expect(screen.getByTestId('partner-submit-btn')).toHaveTextContent(/submitting/i);
+    expect(screen.getByTestId('partner-submit-btn')).toHaveTextContent(
+      /submitting/i
+    );
   });
 
   it('does not show success message initially', () => {
     renderPage();
-    expect(screen.queryByTestId('partner-success-message')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('partner-success-message')
+    ).not.toBeInTheDocument();
   });
 
   it('does not show error message when no error', () => {
     renderPage();
-    expect(screen.queryByTestId('partner-error-message')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('partner-error-message')
+    ).not.toBeInTheDocument();
   });
 
   it('shows error message when mutation returns error', async () => {
     const { useMutation } = await import('urql');
     vi.mocked(useMutation).mockReturnValue([
-      { fetching: false, error: { message: 'Server error' } as never, data: undefined, stale: false, operation: undefined as never },
+      {
+        fetching: false,
+        error: { message: 'Server error' } as never,
+        data: undefined,
+        stale: false,
+        operation: undefined as never,
+      },
       vi.fn(),
     ]);
     renderPage();
@@ -98,19 +130,39 @@ describe('PartnerSignupPage', () => {
     const { useMutation } = await import('urql');
     const mockExecute = vi.fn().mockResolvedValue({ error: null });
     vi.mocked(useMutation).mockReturnValue([
-      { fetching: false, error: undefined, data: undefined, stale: false, operation: undefined as never },
+      {
+        fetching: false,
+        error: undefined,
+        data: undefined,
+        stale: false,
+        operation: undefined as never,
+      },
       mockExecute,
     ]);
     renderPage();
 
-    fireEvent.change(screen.getByLabelText(/organization name/i), { target: { value: 'Test Corp' } });
-    fireEvent.change(screen.getByLabelText(/contact name/i), { target: { value: 'Jane Smith' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'jane@example.com' } });
-    fireEvent.change(screen.getByLabelText(/expected learners/i), { target: { value: '100' } });
-    fireEvent.change(screen.getByLabelText(/describe your use case/i), { target: { value: 'We plan to use EduSphere for all our corporate training needs.' } });
+    fireEvent.change(screen.getByLabelText(/organization name/i), {
+      target: { value: 'Test Corp' },
+    });
+    fireEvent.change(screen.getByLabelText(/contact name/i), {
+      target: { value: 'Jane Smith' },
+    });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'jane@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/expected learners/i), {
+      target: { value: '100' },
+    });
+    fireEvent.change(screen.getByLabelText(/describe your use case/i), {
+      target: {
+        value: 'We plan to use EduSphere for all our corporate training needs.',
+      },
+    });
 
     await waitFor(() => {
-      expect(screen.queryByTestId('partner-success-message')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('partner-success-message')
+      ).not.toBeInTheDocument();
     });
   });
 

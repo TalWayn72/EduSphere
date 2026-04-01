@@ -42,11 +42,36 @@ export const MOCK_RECOMMENDED: MockCourse[] = [
 ];
 
 export const MOCK_ACTIVITY: MockActivity[] = [
-  { id: 'a-1', icon: 'study', action: 'Completed study session in Tractate Bava Metzia', timeAgo: '2h ago' },
-  { id: 'a-2', icon: 'quiz', action: 'Scored 85% on Concepts of Damages quiz', timeAgo: '5h ago' },
-  { id: 'a-3', icon: 'ai', action: 'AI Tutor session — explored Chavruta concepts', timeAgo: '1d ago' },
-  { id: 'a-4', icon: 'annotation', action: 'Added 3 highlights to Chapter 4', timeAgo: '2d ago' },
-  { id: 'a-5', icon: 'course', action: 'Enrolled in Knowledge Graph Navigation', timeAgo: '3d ago' },
+  {
+    id: 'a-1',
+    icon: 'study',
+    action: 'Completed study session in Tractate Bava Metzia',
+    timeAgo: '2h ago',
+  },
+  {
+    id: 'a-2',
+    icon: 'quiz',
+    action: 'Scored 85% on Concepts of Damages quiz',
+    timeAgo: '5h ago',
+  },
+  {
+    id: 'a-3',
+    icon: 'ai',
+    action: 'AI Tutor session — explored Chavruta concepts',
+    timeAgo: '1d ago',
+  },
+  {
+    id: 'a-4',
+    icon: 'annotation',
+    action: 'Added 3 highlights to Chapter 4',
+    timeAgo: '2d ago',
+  },
+  {
+    id: 'a-5',
+    icon: 'course',
+    action: 'Enrolled in Knowledge Graph Navigation',
+    timeAgo: '3d ago',
+  },
 ];
 
 export const MOCK_MASTERY: MockMasteryItem[] = [

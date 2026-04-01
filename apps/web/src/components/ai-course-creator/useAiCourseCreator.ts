@@ -2,9 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from 'urql';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  GENERATE_COURSE_FROM_PROMPT_MUTATION,
-} from '@/lib/graphql/agent-course-gen.queries';
+import { GENERATE_COURSE_FROM_PROMPT_MUTATION } from '@/lib/graphql/agent-course-gen.queries';
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 import { getCurrentUser } from '@/lib/auth';
 import type {
@@ -33,7 +31,7 @@ export function useAiCourseCreator(open: boolean) {
   const needsConsent = useMemo(
     () => localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true',
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [open],
+    [open]
   );
 
   const returnTo = location.pathname;
@@ -44,10 +42,16 @@ export function useAiCourseCreator(open: boolean) {
         return t('aiCreator.generationFailed');
       }
       if (raw.includes('timed out')) {
-        return t('aiCreator.generationTimeout', 'Generation timed out. Please try again with a simpler topic.');
+        return t(
+          'aiCreator.generationTimeout',
+          'Generation timed out. Please try again with a simpler topic.'
+        );
       }
       if (raw.includes('LLM service unavailable')) {
-        return t('aiCreator.llmUnavailable', 'AI service is temporarily unavailable. Please try again later.');
+        return t(
+          'aiCreator.llmUnavailable',
+          'AI service is temporarily unavailable. Please try again later.'
+        );
       }
       const cleaned = raw.replace(/^outline_generation failed:\s*/i, '');
       if (cleaned.startsWith('[') || cleaned.startsWith('{')) {
@@ -55,7 +59,7 @@ export function useAiCourseCreator(open: boolean) {
       }
       return cleaned || t('aiCreator.generationFailed');
     },
-    [t],
+    [t]
   );
 
   const onExecutionResult = useCallback(
@@ -75,14 +79,21 @@ export function useAiCourseCreator(open: boolean) {
         setErrorMsg(formatError(rawError));
       }
     },
-    [t, formatError],
+    [t, formatError]
   );
 
   const onExecutionTimeout = useCallback(() => {
     setPauseSubscription(true);
     setGenerating(false);
-    console.error('[AiCourseCreatorModal] Hard timeout reached after 5 minutes');
-    setErrorMsg(t('aiCreator.generationTimeout', 'Generation timed out. Please try again with a simpler topic.'));
+    console.error(
+      '[AiCourseCreatorModal] Hard timeout reached after 5 minutes'
+    );
+    setErrorMsg(
+      t(
+        'aiCreator.generationTimeout',
+        'Generation timed out. Please try again with a simpler topic.'
+      )
+    );
   }, [t]);
 
   const tracking = useExecutionTracking({
@@ -120,10 +131,10 @@ export function useAiCourseCreator(open: boolean) {
   }, [open]);
 
   const [, generateCourse] = useMutation<GenerateCourseResult>(
-    GENERATE_COURSE_FROM_PROMPT_MUTATION,
+    GENERATE_COURSE_FROM_PROMPT_MUTATION
   );
   const [, createCourse] = useMutation<CreateCourseResult>(
-    CREATE_COURSE_MUTATION,
+    CREATE_COURSE_MUTATION
   );
 
   const handleGenerate = async () => {
@@ -143,7 +154,7 @@ export function useAiCourseCreator(open: boolean) {
     if (error || !data) {
       setGenerating(false);
       const consentErr = error?.graphQLErrors?.find(
-        (e) => e.extensions?.code === 'CONSENT_REQUIRED',
+        (e) => e.extensions?.code === 'CONSENT_REQUIRED'
       );
       if (consentErr) {
         setIsConsentError(true);
@@ -195,12 +206,19 @@ export function useAiCourseCreator(open: boolean) {
       },
     });
     if (error || !data) {
-      console.error('[AiCourseCreatorModal] createCourse error:', error?.message);
+      console.error(
+        '[AiCourseCreatorModal] createCourse error:',
+        error?.message
+      );
       setErrorMsg(t('aiCreator.createDraftError'));
       return;
     }
     navigate('/courses/' + data.createCourse.id, {
-      state: { message: t('aiCreator.createdAsDraft', { title: data.createCourse.title }) },
+      state: {
+        message: t('aiCreator.createdAsDraft', {
+          title: data.createCourse.title,
+        }),
+      },
     });
   };
 

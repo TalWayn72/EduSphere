@@ -25,7 +25,9 @@ export class EmailChannelService implements OnModuleDestroy {
   constructor() {
     // Select provider based on environment configuration.
     const useResend = !!process.env['RESEND_API_KEY'];
-    this.provider = useResend ? new EmailResendProvider() : new EmailSmtpProvider();
+    this.provider = useResend
+      ? new EmailResendProvider()
+      : new EmailSmtpProvider();
     this.logger.log(
       `[EmailChannelService] Using provider: ${useResend ? 'Resend' : 'SMTP'}`
     );
@@ -67,7 +69,8 @@ export class EmailChannelService implements OnModuleDestroy {
   private timeout(ms: number): Promise<never> {
     return new Promise((_, reject) =>
       setTimeout(
-        () => reject(new Error(`Email send timed out after ${ms.toString()}ms`)),
+        () =>
+          reject(new Error(`Email send timed out after ${ms.toString()}ms`)),
         ms
       )
     );

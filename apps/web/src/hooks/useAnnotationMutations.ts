@@ -8,9 +8,7 @@ import {
   REPLY_TO_ANNOTATION_MUTATION,
   PROMOTE_ANNOTATION_MUTATION,
 } from '@/lib/graphql/annotation.queries';
-import {
-  CREATE_ANNOTATION_MUTATION,
-} from '@/lib/graphql/annotation.mutations';
+import { CREATE_ANNOTATION_MUTATION } from '@/lib/graphql/annotation.mutations';
 import { CREATE_REVIEW_CARD_MUTATION } from '@/lib/graphql/srs.queries';
 import { formatTime } from '@/pages/content-viewer.utils';
 
@@ -30,7 +28,9 @@ export function useAnnotationMutations({
   const [, createAnnotation] = useMutation(CREATE_ANNOTATION_MUTATION);
   const [, replyToAnnotation] = useMutation(REPLY_TO_ANNOTATION_MUTATION);
   const [, createReviewCard] = useMutation(CREATE_REVIEW_CARD_MUTATION);
-  const [, promoteAnnotationMutation] = useMutation(PROMOTE_ANNOTATION_MUTATION);
+  const [, promoteAnnotationMutation] = useMutation(
+    PROMOTE_ANNOTATION_MUTATION
+  );
 
   const [isPending, setIsPending] = useState(false);
 
@@ -68,7 +68,10 @@ export function useAnnotationMutations({
       }).then((response) => {
         setIsPending(false);
         if (response.error) {
-          console.error('[useAnnotations] Failed to save annotation:', response.error.message);
+          console.error(
+            '[useAnnotations] Failed to save annotation:',
+            response.error.message
+          );
           setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
         } else {
           setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
@@ -76,11 +79,22 @@ export function useAnnotationMutations({
         }
       });
     },
-    [contentId, validAssetId, createAnnotation, executeQuery, setLocalAnnotations]
+    [
+      contentId,
+      validAssetId,
+      createAnnotation,
+      executeQuery,
+      setLocalAnnotations,
+    ]
   );
 
   const addReply = useCallback(
-    (parentId: string, content: string, layer: AnnotationLayer, timestamp: number) => {
+    (
+      parentId: string,
+      content: string,
+      layer: AnnotationLayer,
+      timestamp: number
+    ) => {
       const tempId = `local-reply-${Date.now()}`;
       const tempReply: Annotation = {
         id: tempId,
@@ -104,7 +118,10 @@ export function useAnnotationMutations({
       void replyToAnnotation({ annotationId: parentId, content }).then(
         (response) => {
           if (response.error) {
-            console.error('[useAnnotations] Failed to save reply:', response.error.message);
+            console.error(
+              '[useAnnotations] Failed to save reply:',
+              response.error.message
+            );
             setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
           } else {
             setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
@@ -113,7 +130,13 @@ export function useAnnotationMutations({
         }
       );
     },
-    [contentId, validAssetId, replyToAnnotation, executeQuery, setLocalAnnotations]
+    [
+      contentId,
+      validAssetId,
+      replyToAnnotation,
+      executeQuery,
+      setLocalAnnotations,
+    ]
   );
 
   const createFlashcard = useCallback(

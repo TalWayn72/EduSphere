@@ -151,7 +151,9 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
     // User is still on dashboard — session not expired
     // Dashboard uses a personalized welcome heading (data-testid="welcome-heading")
     await expect(
-      page.getByTestId('welcome-heading').or(page.getByRole('heading', { name: /Dashboard|Welcome/i }))
+      page
+        .getByTestId('welcome-heading')
+        .or(page.getByRole('heading', { name: /Dashboard|Welcome/i }))
     ).toBeVisible({ timeout: 10_000 });
   });
 });

@@ -17,48 +17,48 @@ Enable organizations to self-service onboard onto EduSphere with a guided signup
 
 ## Existing Infrastructure (as of 2026-03-22)
 
-| Component | Schema/Location | Status |
-|-----------|----------------|--------|
-| `tenants` table | `packages/db/src/schema/tenants.ts` | slug, plan enum (FREE/STARTER/PROFESSIONAL/ENTERPRISE), settings jsonb, portalConfig, subscription_expires_at |
-| `tenant_branding` table | `packages/db/src/schema/tenantBranding.ts` | logoUrl, colors (primary/secondary/accent/bg), fontFamily, orgName, tagline, customCss, hideEduSphereBranding |
-| `tenant_domains` table | `packages/db/src/schema/tenantDomains.ts` | domain, domainType (SUBDOMAIN/CUSTOM), verified, verificationToken, sslProvisioned, keycloakRealm |
-| `subscription_plans` table | `packages/db/src/schema/billing.ts` | name, priceUsdCents, billingPeriodMonths, maxYau, features jsonb |
-| `tenant_subscriptions` table | `packages/db/src/schema/billing.ts` | status (trialing/active/past_due/canceled/pilot), stripe fields, pilotEndsAt |
-| `yau_events` table | `packages/db/src/schema/billing.ts` | YAU tracking per tenant/user/year |
-| `pilot_requests` table | `packages/db/src/schema/billing.ts` | orgName, orgType, contactEmail, status (pending/approved/rejected/expired) |
-| `usage_snapshots` table | `packages/db/src/schema/billing.ts` | monthly snapshots: yauCount, activeUsersCount, coursesCount, storageGb |
-| `onboarding_state` table | `packages/db/src/schema/onboarding.ts` | userId-scoped, currentStep, totalSteps, completed, data jsonb |
-| `bi_api_tokens` table | `packages/db/src/schema/bi-tokens.ts` | tokenHash (SHA-256), description, isActive, lastUsedAt |
-| `gamification` tables | `packages/db/src/schema/gamification.ts` | badges, userBadges, userPoints, pointEvents |
-| `marketplace` tables | `packages/db/src/schema/marketplace.ts` | courseListings, stripeCustomers, purchases, instructorPayouts |
-| `tenant_analytics_snapshots` | `packages/db/src/schema/tenant-analytics-snapshots.ts` | snapshot_type enum, metrics jsonb |
-| `tenant_themes` | `packages/db/src/schema/tenant-themes.ts` | Theme presets |
-| `tenant_social_links` | `packages/db/src/schema/tenant-social-links.ts` | Social media links |
-| White-label runtime | `apps/web/src/lib/branding.ts` | applyTenantBranding(), detectTenantSlug() — partially wired |
-| BrandingSettingsPage | `apps/web/src/pages/BrandingSettingsPage.tsx` | Admin branding form |
-| Keycloak auth | Single realm `edusphere`, JWT with tenant_id | RLS via withTenantContext() |
+| Component                    | Schema/Location                                        | Status                                                                                                        |
+| ---------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `tenants` table              | `packages/db/src/schema/tenants.ts`                    | slug, plan enum (FREE/STARTER/PROFESSIONAL/ENTERPRISE), settings jsonb, portalConfig, subscription_expires_at |
+| `tenant_branding` table      | `packages/db/src/schema/tenantBranding.ts`             | logoUrl, colors (primary/secondary/accent/bg), fontFamily, orgName, tagline, customCss, hideEduSphereBranding |
+| `tenant_domains` table       | `packages/db/src/schema/tenantDomains.ts`              | domain, domainType (SUBDOMAIN/CUSTOM), verified, verificationToken, sslProvisioned, keycloakRealm             |
+| `subscription_plans` table   | `packages/db/src/schema/billing.ts`                    | name, priceUsdCents, billingPeriodMonths, maxYau, features jsonb                                              |
+| `tenant_subscriptions` table | `packages/db/src/schema/billing.ts`                    | status (trialing/active/past_due/canceled/pilot), stripe fields, pilotEndsAt                                  |
+| `yau_events` table           | `packages/db/src/schema/billing.ts`                    | YAU tracking per tenant/user/year                                                                             |
+| `pilot_requests` table       | `packages/db/src/schema/billing.ts`                    | orgName, orgType, contactEmail, status (pending/approved/rejected/expired)                                    |
+| `usage_snapshots` table      | `packages/db/src/schema/billing.ts`                    | monthly snapshots: yauCount, activeUsersCount, coursesCount, storageGb                                        |
+| `onboarding_state` table     | `packages/db/src/schema/onboarding.ts`                 | userId-scoped, currentStep, totalSteps, completed, data jsonb                                                 |
+| `bi_api_tokens` table        | `packages/db/src/schema/bi-tokens.ts`                  | tokenHash (SHA-256), description, isActive, lastUsedAt                                                        |
+| `gamification` tables        | `packages/db/src/schema/gamification.ts`               | badges, userBadges, userPoints, pointEvents                                                                   |
+| `marketplace` tables         | `packages/db/src/schema/marketplace.ts`                | courseListings, stripeCustomers, purchases, instructorPayouts                                                 |
+| `tenant_analytics_snapshots` | `packages/db/src/schema/tenant-analytics-snapshots.ts` | snapshot_type enum, metrics jsonb                                                                             |
+| `tenant_themes`              | `packages/db/src/schema/tenant-themes.ts`              | Theme presets                                                                                                 |
+| `tenant_social_links`        | `packages/db/src/schema/tenant-social-links.ts`        | Social media links                                                                                            |
+| White-label runtime          | `apps/web/src/lib/branding.ts`                         | applyTenantBranding(), detectTenantSlug() — partially wired                                                   |
+| BrandingSettingsPage         | `apps/web/src/pages/BrandingSettingsPage.tsx`          | Admin branding form                                                                                           |
+| Keycloak auth                | Single realm `edusphere`, JWT with tenant_id           | RLS via withTenantContext()                                                                                   |
 
 ---
 
 ## P0 Feature List
 
-| # | Feature | Owner Role | Description |
-|---|---------|-----------|-------------|
-| F-01 | Self-Service Signup Wizard | ORG_ADMIN | Multi-step wizard: org details → plan selection → branding → subdomain → admin account |
-| F-02 | Branding Editor | ORG_ADMIN | Live-preview WYSIWYG editor for colors, logo, fonts, custom CSS, favicon |
-| F-03 | Subdomain Provisioning | System | Auto-provision `{slug}.edusphere.io` with SSL, DNS, and Keycloak client |
-| F-04 | Admin Dashboard | ORG_ADMIN | Central hub: user count, active users, storage, subscription status, quick actions |
-| F-05 | User Invitations | ORG_ADMIN | Email-based invitation system with role assignment, expiry, resend, bulk invite |
-| F-06 | CSV User Import | ORG_ADMIN | Upload CSV with user data, validate, preview, import with progress tracking |
-| F-07 | Free Trial Management | ORG_ADMIN, SUPER_ADMIN | 90-day trial lifecycle: start → warnings → grace period → downgrade/convert |
-| F-08 | Keycloak Auto-Provisioning | System | Auto-create Keycloak client, roles, identity provider config per tenant |
-| F-09 | Branded Login Page | ORG_ADMIN | Tenant-branded Keycloak login with org logo, colors, custom welcome message |
-| F-10 | Content Isolation | System | RLS enforcement ensuring zero cross-tenant data leakage for all content types |
-| F-11 | White-Label Mobile | ORG_ADMIN | Expo SDK 54 app with dynamic branding, push notification channels per org |
-| F-12 | Per-Org Gamification | ORG_ADMIN | Org-scoped badges, points, leaderboards with configurable rules per tenant |
-| F-13 | Org API Keys | ORG_ADMIN | Generate/revoke API keys for integrations (LTI, SCIM, webhooks, BI export) |
-| F-14 | Content Marketplace | ORG_ADMIN, INSTRUCTOR | Browse/purchase/license courses from other orgs or EduSphere content library |
-| F-15 | Org Analytics Dashboard | ORG_ADMIN | Real-time analytics: engagement, completion rates, learning paths, ROI metrics |
+| #    | Feature                    | Owner Role             | Description                                                                            |
+| ---- | -------------------------- | ---------------------- | -------------------------------------------------------------------------------------- |
+| F-01 | Self-Service Signup Wizard | ORG_ADMIN              | Multi-step wizard: org details → plan selection → branding → subdomain → admin account |
+| F-02 | Branding Editor            | ORG_ADMIN              | Live-preview WYSIWYG editor for colors, logo, fonts, custom CSS, favicon               |
+| F-03 | Subdomain Provisioning     | System                 | Auto-provision `{slug}.edusphere.io` with SSL, DNS, and Keycloak client                |
+| F-04 | Admin Dashboard            | ORG_ADMIN              | Central hub: user count, active users, storage, subscription status, quick actions     |
+| F-05 | User Invitations           | ORG_ADMIN              | Email-based invitation system with role assignment, expiry, resend, bulk invite        |
+| F-06 | CSV User Import            | ORG_ADMIN              | Upload CSV with user data, validate, preview, import with progress tracking            |
+| F-07 | Free Trial Management      | ORG_ADMIN, SUPER_ADMIN | 90-day trial lifecycle: start → warnings → grace period → downgrade/convert            |
+| F-08 | Keycloak Auto-Provisioning | System                 | Auto-create Keycloak client, roles, identity provider config per tenant                |
+| F-09 | Branded Login Page         | ORG_ADMIN              | Tenant-branded Keycloak login with org logo, colors, custom welcome message            |
+| F-10 | Content Isolation          | System                 | RLS enforcement ensuring zero cross-tenant data leakage for all content types          |
+| F-11 | White-Label Mobile         | ORG_ADMIN              | Expo SDK 54 app with dynamic branding, push notification channels per org              |
+| F-12 | Per-Org Gamification       | ORG_ADMIN              | Org-scoped badges, points, leaderboards with configurable rules per tenant             |
+| F-13 | Org API Keys               | ORG_ADMIN              | Generate/revoke API keys for integrations (LTI, SCIM, webhooks, BI export)             |
+| F-14 | Content Marketplace        | ORG_ADMIN, INSTRUCTOR  | Browse/purchase/license courses from other orgs or EduSphere content library           |
+| F-15 | Org Analytics Dashboard    | ORG_ADMIN              | Real-time analytics: engagement, completion rates, learning paths, ROI metrics         |
 
 ---
 
@@ -131,14 +131,14 @@ Scenario: SUPER_ADMIN reviews pending signups
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Network failure during final submission | Wizard shows retry button; partial tenant data is rolled back via DB transaction |
-| Keycloak is down during provisioning | Tenant is created with status "PROVISIONING_FAILED"; background retry job attempts 3x with exponential backoff; admin sees "Setup in progress, we'll email you when ready" |
-| Duplicate concurrent signups with same slug | Database unique constraint prevents duplicate; second request gets "slug taken" error |
-| SQL injection in org name | Zod validation strips/escapes; Drizzle ORM parameterized queries prevent injection |
-| XSS in organization name field | Input sanitized via DOMPurify before storage; output escaped in all rendering contexts |
-| Very long org name (>255 chars) | Zod schema rejects with "Organization name must be under 255 characters" |
+| Scenario                                    | Expected Behavior                                                                                                                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Network failure during final submission     | Wizard shows retry button; partial tenant data is rolled back via DB transaction                                                                                           |
+| Keycloak is down during provisioning        | Tenant is created with status "PROVISIONING_FAILED"; background retry job attempts 3x with exponential backoff; admin sees "Setup in progress, we'll email you when ready" |
+| Duplicate concurrent signups with same slug | Database unique constraint prevents duplicate; second request gets "slug taken" error                                                                                      |
+| SQL injection in org name                   | Zod validation strips/escapes; Drizzle ORM parameterized queries prevent injection                                                                                         |
+| XSS in organization name field              | Input sanitized via DOMPurify before storage; output escaped in all rendering contexts                                                                                     |
+| Very long org name (>255 chars)             | Zod schema rejects with "Organization name must be under 255 characters"                                                                                                   |
 
 ---
 
@@ -193,13 +193,13 @@ Scenario: Hide EduSphere branding (ENTERPRISE plan only)
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Invalid hex color (e.g., "#GGGGGG") | Input validation rejects; color picker enforces valid hex |
-| Logo upload fails mid-stream | Progress bar shows error; previous logo preserved; retry available |
-| Custom CSS causes layout breakage | Preview shows warning "Your CSS may affect layout"; changes are sandboxed to preview until saved |
-| Concurrent branding edits by two admins | Last-write-wins with optimistic locking (updatedAt check); second admin sees "Branding was updated by another admin. Reload to see changes." |
-| Font family not available on user device | System font fallback chain: `{customFont}, Inter, system-ui, sans-serif` |
+| Scenario                                 | Expected Behavior                                                                                                                            |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invalid hex color (e.g., "#GGGGGG")      | Input validation rejects; color picker enforces valid hex                                                                                    |
+| Logo upload fails mid-stream             | Progress bar shows error; previous logo preserved; retry available                                                                           |
+| Custom CSS causes layout breakage        | Preview shows warning "Your CSS may affect layout"; changes are sandboxed to preview until saved                                             |
+| Concurrent branding edits by two admins  | Last-write-wins with optimistic locking (updatedAt check); second admin sees "Branding was updated by another admin. Reload to see changes." |
+| Font family not available on user device | System font fallback chain: `{customFont}, Inter, system-ui, sans-serif`                                                                     |
 
 ---
 
@@ -250,14 +250,14 @@ Scenario: Custom domain on non-ENTERPRISE plan
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| SSL provisioning fails (rate limit) | Retry with exponential backoff (1h, 2h, 4h); admin notified via email after 3 failures |
-| Domain already pointed to another service | Verification fails; clear error message shown |
-| Subdomain conflicts with reserved words | Rejected at signup; reserved list includes: admin, api, www, mail, support, app, dashboard, status, docs, blog, help |
-| DNS propagation delay | "Verification pending — DNS changes can take up to 48 hours to propagate" |
-| Let's Encrypt downtime | Fallback to self-signed cert with browser warning; re-attempt when LE recovers |
-| Custom domain pointed to wrong CNAME | Verification succeeds for TXT but CNAME doesn't match; specific error shown |
+| Scenario                                  | Expected Behavior                                                                                                    |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| SSL provisioning fails (rate limit)       | Retry with exponential backoff (1h, 2h, 4h); admin notified via email after 3 failures                               |
+| Domain already pointed to another service | Verification fails; clear error message shown                                                                        |
+| Subdomain conflicts with reserved words   | Rejected at signup; reserved list includes: admin, api, www, mail, support, app, dashboard, status, docs, blog, help |
+| DNS propagation delay                     | "Verification pending — DNS changes can take up to 48 hours to propagate"                                            |
+| Let's Encrypt downtime                    | Fallback to self-signed cert with browser warning; re-attempt when LE recovers                                       |
+| Custom domain pointed to wrong CNAME      | Verification succeeds for TXT but CNAME doesn't match; specific error shown                                          |
 
 ---
 
@@ -316,12 +316,12 @@ Scenario: Dashboard respects RLS
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| No usage snapshots yet (new org) | Metrics show "0" with "Data collection starts after first user activity" |
-| Subscription expired | Dashboard shows warning banner: "Your subscription expired on {date}. Upgrade to restore full access." with CTA |
-| Database query timeout | Individual metric cards show skeleton loading → error state with retry button; other cards still display |
-| Very large org (50,000+ users) | Metrics are pre-computed in usage_snapshots, not live-counted; dashboard remains fast |
+| Scenario                         | Expected Behavior                                                                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| No usage snapshots yet (new org) | Metrics show "0" with "Data collection starts after first user activity"                                        |
+| Subscription expired             | Dashboard shows warning banner: "Your subscription expired on {date}. Upgrade to restore full access." with CTA |
+| Database query timeout           | Individual metric cards show skeleton loading → error state with retry button; other cards still display        |
+| Very large org (50,000+ users)   | Metrics are pre-computed in usage_snapshots, not live-counted; dashboard remains fast                           |
 
 ---
 
@@ -391,14 +391,14 @@ Scenario: Max users limit reached
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Email delivery fails (SMTP error) | Invitation stays "PENDING"; admin sees "Email delivery failed" badge; retry available |
-| Invitee already has account in different org | "This email is already registered. The user can request access to your org via the org join page." |
-| Invalid email format in bulk invite | Invalid rows highlighted in red; valid rows processed; summary: "95 sent, 5 failed (invalid email format)" |
-| ORG_ADMIN tries to invite SUPER_ADMIN role | Role dropdown does not include SUPER_ADMIN; only: STUDENT, INSTRUCTOR, ORG_ADMIN |
-| Invitation token tampered/forged | Cryptographic signature verification fails; "Invalid invitation link" shown |
-| Race condition: two admins invite same email simultaneously | Database unique constraint on (email, tenant_id, status=PENDING); second request gets "already invited" |
+| Scenario                                                    | Expected Behavior                                                                                          |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Email delivery fails (SMTP error)                           | Invitation stays "PENDING"; admin sees "Email delivery failed" badge; retry available                      |
+| Invitee already has account in different org                | "This email is already registered. The user can request access to your org via the org join page."         |
+| Invalid email format in bulk invite                         | Invalid rows highlighted in red; valid rows processed; summary: "95 sent, 5 failed (invalid email format)" |
+| ORG_ADMIN tries to invite SUPER_ADMIN role                  | Role dropdown does not include SUPER_ADMIN; only: STUDENT, INSTRUCTOR, ORG_ADMIN                           |
+| Invitation token tampered/forged                            | Cryptographic signature verification fails; "Invalid invitation link" shown                                |
+| Race condition: two admins invite same email simultaneously | Database unique constraint on (email, tenant_id, status=PENDING); second request gets "already invited"    |
 
 ---
 
@@ -471,18 +471,18 @@ Scenario: Large CSV (10,000 rows)
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| CSV file > 10MB | Rejected: "File too large. Maximum 10MB (approximately 50,000 users)." |
-| Non-CSV file uploaded (.xlsx, .pdf) | Rejected: "Please upload a CSV file (.csv)" |
-| CSV with wrong delimiter (semicolons) | Auto-detect common delimiters (comma, semicolon, tab); ask user to confirm if ambiguous |
-| CSV with BOM (UTF-8-BOM) | BOM stripped silently; import proceeds normally |
-| Empty CSV (headers only) | "No user data found. Please ensure your CSV has at least one data row." |
-| CSV with extra columns | Extra columns ignored; only mapped columns processed |
-| Keycloak down during import | Partial import; failed rows logged with "Keycloak unavailable"; retry button for failed rows |
-| Concurrent imports by two admins | Second import queued: "An import is already in progress. Please wait for it to complete." |
-| CSV with unicode/non-Latin names | Full UTF-8 support; names stored and displayed correctly |
-| Duplicate email across orgs (allowed) | Users can exist in multiple orgs; each org has its own user record scoped by tenant_id |
+| Scenario                              | Expected Behavior                                                                            |
+| ------------------------------------- | -------------------------------------------------------------------------------------------- |
+| CSV file > 10MB                       | Rejected: "File too large. Maximum 10MB (approximately 50,000 users)."                       |
+| Non-CSV file uploaded (.xlsx, .pdf)   | Rejected: "Please upload a CSV file (.csv)"                                                  |
+| CSV with wrong delimiter (semicolons) | Auto-detect common delimiters (comma, semicolon, tab); ask user to confirm if ambiguous      |
+| CSV with BOM (UTF-8-BOM)              | BOM stripped silently; import proceeds normally                                              |
+| Empty CSV (headers only)              | "No user data found. Please ensure your CSV has at least one data row."                      |
+| CSV with extra columns                | Extra columns ignored; only mapped columns processed                                         |
+| Keycloak down during import           | Partial import; failed rows logged with "Keycloak unavailable"; retry button for failed rows |
+| Concurrent imports by two admins      | Second import queued: "An import is already in progress. Please wait for it to complete."    |
+| CSV with unicode/non-Latin names      | Full UTF-8 support; names stored and displayed correctly                                     |
+| Duplicate email across orgs (allowed) | Users can exist in multiple orgs; each org has its own user record scoped by tenant_id       |
 
 ---
 
@@ -551,14 +551,14 @@ Scenario: Trial extension by SUPER_ADMIN
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Stripe webhook is replayed (duplicate event) | Idempotent handling: check stripeSubscriptionId existence; skip if already processed; return 200 |
-| Stripe webhook signature invalid | Return 400; log security event; do not update subscription |
-| Payment fails during upgrade | subscription stays "trialing"; user sees "Payment failed. Please update your payment method." |
-| Org tries to sign up again after trial expiry | Email recognized; "Your previous trial has ended. Contact sales for a new trial or upgrade." |
-| Clock skew between servers | Trial expiry checked with 1-hour tolerance; background job runs hourly to process expirations |
-| Trial org creates 10,000 users then expires | Data preserved during grace; user count shown in export summary; exceeding new plan limits flagged at upgrade |
+| Scenario                                      | Expected Behavior                                                                                             |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Stripe webhook is replayed (duplicate event)  | Idempotent handling: check stripeSubscriptionId existence; skip if already processed; return 200              |
+| Stripe webhook signature invalid              | Return 400; log security event; do not update subscription                                                    |
+| Payment fails during upgrade                  | subscription stays "trialing"; user sees "Payment failed. Please update your payment method."                 |
+| Org tries to sign up again after trial expiry | Email recognized; "Your previous trial has ended. Contact sales for a new trial or upgrade."                  |
+| Clock skew between servers                    | Trial expiry checked with 1-hour tolerance; background job runs hourly to process expirations                 |
+| Trial org creates 10,000 users then expires   | Data preserved during grace; user count shown in export summary; exceeding new plan limits flagged at upgrade |
 
 ---
 
@@ -608,13 +608,13 @@ Scenario: Keycloak client cleanup on org deletion
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Keycloak admin credentials expired | Provisioning fails gracefully; SUPER_ADMIN alerted; org gets "setup pending" status |
-| Rate limiting on Keycloak Admin API | Exponential backoff on 429 responses; max 5 retries |
-| Orphaned Keycloak clients (no matching tenant) | Weekly cleanup job detects and reports orphaned clients to SUPER_ADMIN |
-| SSO metadata URL unreachable | "Cannot reach your identity provider. Please verify the metadata URL is publicly accessible." |
-| Concurrent provisioning of 50 orgs | Queue-based processing via NATS JetStream; max 5 concurrent Keycloak provisioning jobs |
+| Scenario                                       | Expected Behavior                                                                             |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Keycloak admin credentials expired             | Provisioning fails gracefully; SUPER_ADMIN alerted; org gets "setup pending" status           |
+| Rate limiting on Keycloak Admin API            | Exponential backoff on 429 responses; max 5 retries                                           |
+| Orphaned Keycloak clients (no matching tenant) | Weekly cleanup job detects and reports orphaned clients to SUPER_ADMIN                        |
+| SSO metadata URL unreachable                   | "Cannot reach your identity provider. Please verify the metadata URL is publicly accessible." |
+| Concurrent provisioning of 50 orgs             | Queue-based processing via NATS JetStream; max 5 concurrent Keycloak provisioning jobs        |
 
 ---
 
@@ -664,12 +664,12 @@ Scenario: SSO login button on branded page
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Logo URL returns 404 | Fallback to EduSphere default logo; log error for admin review |
-| Branding API slow (>2s) | Login form renders with defaults immediately; branding applied when response arrives (progressive enhancement) |
-| Invalid slug in URL | Redirect to main EduSphere login with "Organization not found" message |
-| Branding API completely down | Login page works with default EduSphere branding; auth flow unaffected |
+| Scenario                     | Expected Behavior                                                                                              |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Logo URL returns 404         | Fallback to EduSphere default logo; log error for admin review                                                 |
+| Branding API slow (>2s)      | Login form renders with defaults immediately; branding applied when response arrives (progressive enhancement) |
+| Invalid slug in URL          | Redirect to main EduSphere login with "Organization not found" message                                         |
+| Branding API completely down | Login page works with default EduSphere branding; auth flow unaffected                                         |
 
 ---
 
@@ -728,14 +728,14 @@ Scenario: RLS validation test suite
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Missing tenant context in query | RLS policy returns empty result set (fail-closed, not fail-open) |
-| SQL injection attempt to bypass RLS | Parameterized queries via Drizzle prevent injection; RLS is server-side enforcement |
-| Bulk operations (migrations, seeds) | Use SUPER_ADMIN context with explicit audit logging |
-| GraphQL federation entity resolution cross-subgraph | Tenant context propagated via x-tenant-id header in all inter-subgraph calls |
-| Apache AGE graph queries | Graph queries use tenant-scoped namespaces; Cypher queries include tenant filter |
-| pgvector similarity search | Embedding queries include tenant_id filter to prevent cross-tenant semantic matches |
+| Scenario                                            | Expected Behavior                                                                   |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Missing tenant context in query                     | RLS policy returns empty result set (fail-closed, not fail-open)                    |
+| SQL injection attempt to bypass RLS                 | Parameterized queries via Drizzle prevent injection; RLS is server-side enforcement |
+| Bulk operations (migrations, seeds)                 | Use SUPER_ADMIN context with explicit audit logging                                 |
+| GraphQL federation entity resolution cross-subgraph | Tenant context propagated via x-tenant-id header in all inter-subgraph calls        |
+| Apache AGE graph queries                            | Graph queries use tenant-scoped namespaces; Cypher queries include tenant filter    |
+| pgvector similarity search                          | Embedding queries include tenant_id filter to prevent cross-tenant semantic matches |
 
 ---
 
@@ -786,13 +786,13 @@ Scenario: Standalone app build (ENTERPRISE)
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Branding fetch fails on app launch | Cached branding used; if no cache, EduSphere defaults shown |
-| User belongs to multiple orgs | Org picker shown on login; branding switches based on selected org |
-| Push notification for user in multiple orgs | Each notification clearly identifies which org it's from via title and icon |
-| Standalone app needs update | OTA updates via Expo (code changes); native updates require new app store submission |
-| App store rejection for branding issues | Template branding reviewed before submission; fallback guidelines provided |
+| Scenario                                    | Expected Behavior                                                                    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Branding fetch fails on app launch          | Cached branding used; if no cache, EduSphere defaults shown                          |
+| User belongs to multiple orgs               | Org picker shown on login; branding switches based on selected org                   |
+| Push notification for user in multiple orgs | Each notification clearly identifies which org it's from via title and icon          |
+| Standalone app needs update                 | OTA updates via Expo (code changes); native updates require new app store submission |
+| App store rejection for branding issues     | Template branding reviewed before submission; fallback guidelines provided           |
 
 ---
 
@@ -843,13 +843,13 @@ Scenario: Gamification disabled
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Badge icon upload fails | Fallback to default badge icon; retry available |
-| Points overflow (>2^31) | Use bigint for point accumulation; warn admin if approaching limits |
-| Concurrent point awards (race condition) | Use database-level atomic increment; no lost updates |
-| Custom badge criteria conflict | Clear error: "This criteria overlaps with badge 'X'. Users may receive both." |
-| Leaderboard with tied scores | Tie-breaking by earliest achievement date; display same rank for ties |
+| Scenario                                 | Expected Behavior                                                             |
+| ---------------------------------------- | ----------------------------------------------------------------------------- |
+| Badge icon upload fails                  | Fallback to default badge icon; retry available                               |
+| Points overflow (>2^31)                  | Use bigint for point accumulation; warn admin if approaching limits           |
+| Concurrent point awards (race condition) | Use database-level atomic increment; no lost updates                          |
+| Custom badge criteria conflict           | Clear error: "This criteria overlaps with badge 'X'. Users may receive both." |
+| Leaderboard with tied scores             | Tie-breaking by earliest achievement date; display same rank for ties         |
 
 ---
 
@@ -916,14 +916,14 @@ Scenario: Maximum keys per org
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| API key used from different tenant context | Key's tenant_id must match; cross-tenant use returns 403 Forbidden |
-| Brute force API key guessing | Rate limit on auth failures: 10 failed attempts → 15-minute lockout for IP |
+| Scenario                                      | Expected Behavior                                                                |
+| --------------------------------------------- | -------------------------------------------------------------------------------- |
+| API key used from different tenant context    | Key's tenant_id must match; cross-tenant use returns 403 Forbidden               |
+| Brute force API key guessing                  | Rate limit on auth failures: 10 failed attempts → 15-minute lockout for IP       |
 | Key rotation (create new before revoking old) | Both keys work simultaneously during transition period; old key revoked manually |
-| Database down during key validation | Return 503 Service Unavailable; do not cache key validation results |
-| Key with no scopes selected | Rejected: "At least one scope is required" |
-| Leaked API key detection | SUPER_ADMIN can search by key prefix; revoke all keys for an org in one action |
+| Database down during key validation           | Return 503 Service Unavailable; do not cache key validation results              |
+| Key with no scopes selected                   | Rejected: "At least one scope is required"                                       |
+| Leaked API key detection                      | SUPER_ADMIN can search by key prefix; revoke all keys for an org in one action   |
 
 ---
 
@@ -1001,15 +1001,15 @@ Scenario: Instructor lists course on marketplace
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Payment fails | Purchase stays PENDING; user sees "Payment failed. Please try again." |
-| Course delisted after purchase | Buyer retains their licensed copy; original listing marked as delisted |
-| Refund requested within 14 days | Stripe refund processed; purchase status → REFUNDED; licensed copy removed from buyer's tenant |
-| Author updates course after purchase | Buyer's copy is independent; they can choose to "Sync updates from marketplace" (optional) |
-| Marketplace search with 0 results | "No courses found matching your criteria. Try broadening your search." |
-| Org tries to buy own course | "You already own this course. No purchase needed." |
-| Currency conversion | All prices stored in USD cents; display currency converted based on org locale; settlement in USD |
+| Scenario                             | Expected Behavior                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Payment fails                        | Purchase stays PENDING; user sees "Payment failed. Please try again."                             |
+| Course delisted after purchase       | Buyer retains their licensed copy; original listing marked as delisted                            |
+| Refund requested within 14 days      | Stripe refund processed; purchase status → REFUNDED; licensed copy removed from buyer's tenant    |
+| Author updates course after purchase | Buyer's copy is independent; they can choose to "Sync updates from marketplace" (optional)        |
+| Marketplace search with 0 results    | "No courses found matching your criteria. Try broadening your search."                            |
+| Org tries to buy own course          | "You already own this course. No purchase needed."                                                |
+| Currency conversion                  | All prices stored in USD cents; display currency converted based on org locale; settlement in USD |
 
 ---
 
@@ -1087,104 +1087,104 @@ Scenario: Analytics data isolation
 
 #### Edge Cases & Error Scenarios
 
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| New org with no data yet | Dashboard shows "No data yet. Analytics will populate after your first users start learning." |
-| Analytics for 50,000+ users | Pre-computed in tenant_analytics_snapshots; live queries used only for last-24h data |
-| BI tool connects with revoked key | 401 returned; clear error message in BI tool connection |
-| Date range > 1 year | Aggregated data shown (monthly granularity instead of daily) to maintain performance |
-| Dashboard loads slowly (>3s) | Show skeleton loaders per card; lazy-load charts; cache 5-minute TTL |
-| GDPR data subject access request | Individual learner data exportable in JSON/CSV; follows GDPR erasure protocol |
+| Scenario                          | Expected Behavior                                                                             |
+| --------------------------------- | --------------------------------------------------------------------------------------------- |
+| New org with no data yet          | Dashboard shows "No data yet. Analytics will populate after your first users start learning." |
+| Analytics for 50,000+ users       | Pre-computed in tenant_analytics_snapshots; live queries used only for last-24h data          |
+| BI tool connects with revoked key | 401 returned; clear error message in BI tool connection                                       |
+| Date range > 1 year               | Aggregated data shown (monthly granularity instead of daily) to maintain performance          |
+| Dashboard loads slowly (>3s)      | Show skeleton loaders per card; lazy-load charts; cache 5-minute TTL                          |
+| GDPR data subject access request  | Individual learner data exportable in JSON/CSV; follows GDPR erasure protocol                 |
 
 ---
 
 ## Non-Functional Requirements
 
-| ID | Requirement | Target | Measurement |
-|----|-------------|--------|-------------|
-| NFR-01 | Signup wizard completion time | < 60 seconds (happy path) | Timer from first step to dashboard redirect |
-| NFR-02 | Subdomain accessibility after signup | < 30 seconds | Time from "Create Organization" click to HTTPS accessible |
-| NFR-03 | CSV import throughput | 10,000 rows in < 5 minutes | Background job processing time |
-| NFR-04 | API key generation latency | < 1 second | Time from click to key displayed |
-| NFR-05 | Analytics dashboard load time | < 3 seconds | Time to interactive (all KPI cards rendered) |
-| NFR-06 | Marketplace catalog load time | < 2 seconds for 10,000+ courses | Time to first page of results rendered |
-| NFR-07 | Branding preview latency | < 200ms | Time from color picker change to preview update |
-| NFR-08 | Invitation email delivery | < 30 seconds (95th percentile) | Time from "Send" to email received |
-| NFR-09 | Trial warning email accuracy | 100% delivery to active ORG_ADMIN | Verified via email delivery logs |
-| NFR-10 | RLS policy coverage | 100% of tenant-scoped tables | Verified via pnpm test:rls |
-| NFR-11 | Concurrent org signups | Support 100 simultaneous signups | Load test with k6 |
-| NFR-12 | API key validation latency | < 50ms (p99) | Hash lookup + cache check |
-| NFR-13 | Mobile branding load | < 1 second on 3G | Time from app launch to branded UI |
-| NFR-14 | Cross-tenant data leakage | Zero incidents | Continuous RLS testing + penetration testing |
-| NFR-15 | WCAG 2.1 AA compliance | All new UI components | Automated axe-core + manual audit |
+| ID     | Requirement                          | Target                            | Measurement                                               |
+| ------ | ------------------------------------ | --------------------------------- | --------------------------------------------------------- |
+| NFR-01 | Signup wizard completion time        | < 60 seconds (happy path)         | Timer from first step to dashboard redirect               |
+| NFR-02 | Subdomain accessibility after signup | < 30 seconds                      | Time from "Create Organization" click to HTTPS accessible |
+| NFR-03 | CSV import throughput                | 10,000 rows in < 5 minutes        | Background job processing time                            |
+| NFR-04 | API key generation latency           | < 1 second                        | Time from click to key displayed                          |
+| NFR-05 | Analytics dashboard load time        | < 3 seconds                       | Time to interactive (all KPI cards rendered)              |
+| NFR-06 | Marketplace catalog load time        | < 2 seconds for 10,000+ courses   | Time to first page of results rendered                    |
+| NFR-07 | Branding preview latency             | < 200ms                           | Time from color picker change to preview update           |
+| NFR-08 | Invitation email delivery            | < 30 seconds (95th percentile)    | Time from "Send" to email received                        |
+| NFR-09 | Trial warning email accuracy         | 100% delivery to active ORG_ADMIN | Verified via email delivery logs                          |
+| NFR-10 | RLS policy coverage                  | 100% of tenant-scoped tables      | Verified via pnpm test:rls                                |
+| NFR-11 | Concurrent org signups               | Support 100 simultaneous signups  | Load test with k6                                         |
+| NFR-12 | API key validation latency           | < 50ms (p99)                      | Hash lookup + cache check                                 |
+| NFR-13 | Mobile branding load                 | < 1 second on 3G                  | Time from app launch to branded UI                        |
+| NFR-14 | Cross-tenant data leakage            | Zero incidents                    | Continuous RLS testing + penetration testing              |
+| NFR-15 | WCAG 2.1 AA compliance               | All new UI components             | Automated axe-core + manual audit                         |
 
 ---
 
 ## Risk Matrix
 
-| # | Risk | Likelihood | Impact | Severity | Mitigation |
-|---|------|-----------|--------|----------|------------|
-| R-01 | Keycloak becomes bottleneck with 1000+ tenant clients | Medium | High | **High** | Connection pooling; consider per-tenant realm if >500 clients; monitor Keycloak heap |
-| R-02 | Subdomain DNS propagation delays | Medium | Medium | **Medium** | Use wildcard DNS *.edusphere.io; only custom domains need propagation |
-| R-03 | Stripe webhook delivery failures | Low | High | **Medium** | Idempotent webhook handling; reconciliation job runs hourly; manual retry in admin panel |
-| R-04 | CSV import OOM on large files | Medium | Medium | **Medium** | Stream processing (not full-file load); chunk size 500 rows; memory limit per import job |
-| R-05 | RLS policy bypass via SQL injection | Very Low | Critical | **High** | Drizzle ORM parameterized queries; no raw SQL; quarterly penetration testing |
-| R-06 | Trial expiry email not received | Medium | Medium | **Medium** | Multiple email channels (primary + fallback); in-app notification as backup; SMS for final warning |
-| R-07 | Cross-tenant data leak in search | Low | Critical | **Critical** | pgvector queries MUST include tenant_id filter; dedicated RLS test for vector search |
-| R-08 | API key brute force attack | Medium | High | **High** | Rate limiting (10 failures/15min lockout); key prefix + sufficient entropy (256-bit); monitoring alerts |
-| R-09 | Marketplace payment disputes | Medium | Medium | **Medium** | Clear refund policy; Stripe Radar for fraud detection; purchase audit trail |
-| R-10 | Mobile app store rejection | Low | Medium | **Medium** | Pre-submission review checklist; compliance with Apple/Google guidelines; template validation |
-| R-11 | Analytics dashboard performance at scale | Medium | Medium | **Medium** | Pre-computed snapshots; materialized views; query result caching |
-| R-12 | GDPR compliance for trial data retention | Medium | High | **High** | Automated data deletion after 210-day retention; audit log; DPO review |
-| R-13 | Single realm Keycloak limits multi-tenancy | Medium | High | **High** | Monitor client count; prepare migration path to per-tenant realms if >500 |
-| R-14 | Concurrent branding edits cause visual glitches | Low | Low | **Low** | Optimistic locking on branding records; last-write-wins with notification |
-| R-15 | Let's Encrypt rate limits for SSL provisioning | Low | Medium | **Medium** | Use wildcard cert for subdomains; only custom domains need individual certs |
+| #    | Risk                                                  | Likelihood | Impact   | Severity     | Mitigation                                                                                              |
+| ---- | ----------------------------------------------------- | ---------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------- |
+| R-01 | Keycloak becomes bottleneck with 1000+ tenant clients | Medium     | High     | **High**     | Connection pooling; consider per-tenant realm if >500 clients; monitor Keycloak heap                    |
+| R-02 | Subdomain DNS propagation delays                      | Medium     | Medium   | **Medium**   | Use wildcard DNS \*.edusphere.io; only custom domains need propagation                                  |
+| R-03 | Stripe webhook delivery failures                      | Low        | High     | **Medium**   | Idempotent webhook handling; reconciliation job runs hourly; manual retry in admin panel                |
+| R-04 | CSV import OOM on large files                         | Medium     | Medium   | **Medium**   | Stream processing (not full-file load); chunk size 500 rows; memory limit per import job                |
+| R-05 | RLS policy bypass via SQL injection                   | Very Low   | Critical | **High**     | Drizzle ORM parameterized queries; no raw SQL; quarterly penetration testing                            |
+| R-06 | Trial expiry email not received                       | Medium     | Medium   | **Medium**   | Multiple email channels (primary + fallback); in-app notification as backup; SMS for final warning      |
+| R-07 | Cross-tenant data leak in search                      | Low        | Critical | **Critical** | pgvector queries MUST include tenant_id filter; dedicated RLS test for vector search                    |
+| R-08 | API key brute force attack                            | Medium     | High     | **High**     | Rate limiting (10 failures/15min lockout); key prefix + sufficient entropy (256-bit); monitoring alerts |
+| R-09 | Marketplace payment disputes                          | Medium     | Medium   | **Medium**   | Clear refund policy; Stripe Radar for fraud detection; purchase audit trail                             |
+| R-10 | Mobile app store rejection                            | Low        | Medium   | **Medium**   | Pre-submission review checklist; compliance with Apple/Google guidelines; template validation           |
+| R-11 | Analytics dashboard performance at scale              | Medium     | Medium   | **Medium**   | Pre-computed snapshots; materialized views; query result caching                                        |
+| R-12 | GDPR compliance for trial data retention              | Medium     | High     | **High**     | Automated data deletion after 210-day retention; audit log; DPO review                                  |
+| R-13 | Single realm Keycloak limits multi-tenancy            | Medium     | High     | **High**     | Monitor client count; prepare migration path to per-tenant realms if >500                               |
+| R-14 | Concurrent branding edits cause visual glitches       | Low        | Low      | **Low**      | Optimistic locking on branding records; last-write-wins with notification                               |
+| R-15 | Let's Encrypt rate limits for SSL provisioning        | Low        | Medium   | **Medium**   | Use wildcard cert for subdomains; only custom domains need individual certs                             |
 
 ---
 
 ## Dependencies
 
-| Dependency | Required For | Status |
-|------------|-------------|--------|
-| Stripe API integration | F-07, F-14, F-15 | Partially built (marketplace schema exists) |
-| Keycloak Admin API client | F-01, F-03, F-08, F-09 | Needs dedicated NestJS service |
-| NATS JetStream | F-01, F-05, F-06 (background jobs) | Existing infrastructure |
-| MinIO file storage | F-02 (logo upload), F-06 (CSV upload) | Existing infrastructure |
-| Email service (SMTP/SES) | F-05, F-07 | Needs configuration |
-| DNS management API (Route53/Cloudflare) | F-03 | New integration needed |
-| Let's Encrypt / ACME client | F-03 | New integration needed |
-| Expo EAS Build | F-11 (standalone apps) | Existing but needs CI/CD pipeline |
+| Dependency                              | Required For                          | Status                                      |
+| --------------------------------------- | ------------------------------------- | ------------------------------------------- |
+| Stripe API integration                  | F-07, F-14, F-15                      | Partially built (marketplace schema exists) |
+| Keycloak Admin API client               | F-01, F-03, F-08, F-09                | Needs dedicated NestJS service              |
+| NATS JetStream                          | F-01, F-05, F-06 (background jobs)    | Existing infrastructure                     |
+| MinIO file storage                      | F-02 (logo upload), F-06 (CSV upload) | Existing infrastructure                     |
+| Email service (SMTP/SES)                | F-05, F-07                            | Needs configuration                         |
+| DNS management API (Route53/Cloudflare) | F-03                                  | New integration needed                      |
+| Let's Encrypt / ACME client             | F-03                                  | New integration needed                      |
+| Expo EAS Build                          | F-11 (standalone apps)                | Existing but needs CI/CD pipeline           |
 
 ---
 
 ## Success Metrics
 
-| Metric | Target | Measurement Period |
-|--------|--------|--------------------|
-| Org signup conversion rate | > 30% (visitor → completed signup) | First 90 days |
-| Time to first course published | < 24 hours after signup | Per-org tracking |
-| Trial-to-paid conversion rate | > 15% | Quarterly |
-| Average onboarding NPS | > 50 | Monthly survey |
-| Platform uptime (per org) | > 99.9% | Monthly |
-| Support tickets during onboarding | < 2 per org | First 30 days |
-| CSV import success rate | > 98% of valid rows | Ongoing |
-| API key adoption rate | > 40% of PROFESSIONAL+ orgs | Quarterly |
-| Marketplace courses purchased | > 100 per quarter | Quarterly |
-| Analytics dashboard daily usage | > 60% of ORG_ADMINs | Monthly |
+| Metric                            | Target                             | Measurement Period |
+| --------------------------------- | ---------------------------------- | ------------------ |
+| Org signup conversion rate        | > 30% (visitor → completed signup) | First 90 days      |
+| Time to first course published    | < 24 hours after signup            | Per-org tracking   |
+| Trial-to-paid conversion rate     | > 15%                              | Quarterly          |
+| Average onboarding NPS            | > 50                               | Monthly survey     |
+| Platform uptime (per org)         | > 99.9%                            | Monthly            |
+| Support tickets during onboarding | < 2 per org                        | First 30 days      |
+| CSV import success rate           | > 98% of valid rows                | Ongoing            |
+| API key adoption rate             | > 40% of PROFESSIONAL+ orgs        | Quarterly          |
+| Marketplace courses purchased     | > 100 per quarter                  | Quarterly          |
+| Analytics dashboard daily usage   | > 60% of ORG_ADMINs                | Monthly            |
 
 ---
 
 ## Glossary
 
-| Term | Definition |
-|------|-----------|
-| Tenant | An organization instance with isolated data, branding, and configuration |
-| Slug | URL-safe identifier for the org (e.g., "acme-university" in acme-university.edusphere.io) |
-| YAU | Yearly Active User — a unique user who performed a meaningful action within a calendar year |
-| RLS | Row-Level Security — PostgreSQL feature ensuring data isolation per tenant |
-| White-Label | Platform appearance fully customized to org's brand, hiding EduSphere identity |
-| Pilot | A 90-day trial period with full feature access and no payment required |
-| OTA | Over-The-Air — mobile app updates pushed without app store submission (via Expo) |
+| Term        | Definition                                                                                  |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| Tenant      | An organization instance with isolated data, branding, and configuration                    |
+| Slug        | URL-safe identifier for the org (e.g., "acme-university" in acme-university.edusphere.io)   |
+| YAU         | Yearly Active User — a unique user who performed a meaningful action within a calendar year |
+| RLS         | Row-Level Security — PostgreSQL feature ensuring data isolation per tenant                  |
+| White-Label | Platform appearance fully customized to org's brand, hiding EduSphere identity              |
+| Pilot       | A 90-day trial period with full feature access and no payment required                      |
+| OTA         | Over-The-Air — mobile app updates pushed without app store submission (via Expo)            |
 
 ---
 

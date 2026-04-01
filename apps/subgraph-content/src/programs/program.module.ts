@@ -7,7 +7,12 @@ import { CertificateModule } from '../certificate/certificate.module.js';
 
 @Module({
   imports: [CertificateModule],
-  providers: [ProgramService, ProgramEnrollmentService, ProgramResolver, ProgramEventsHandler],
+  providers: [
+    ProgramService,
+    ProgramEnrollmentService,
+    ProgramResolver,
+    ProgramEventsHandler,
+  ],
   exports: [ProgramService],
 })
 export class ProgramModule {}

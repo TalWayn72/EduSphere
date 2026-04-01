@@ -23,7 +23,10 @@ interface RadarChartProps {
   ariaLabel?: string;
 }
 
-export function AssessmentRadarChart({ criteria, ariaLabel = 'Assessment radar chart' }: RadarChartProps) {
+export function AssessmentRadarChart({
+  criteria,
+  ariaLabel = 'Assessment radar chart',
+}: RadarChartProps) {
   const data = criteria.map((c) => ({
     subject: c.name,
     A: c.score,
@@ -39,7 +42,10 @@ export function AssessmentRadarChart({ criteria, ariaLabel = 'Assessment radar c
           <Tooltip
             formatter={(value) => {
               const v = value as number | string | undefined;
-              return [typeof v === 'number' ? v.toFixed(1) : String(v ?? ''), 'Score'] as [string, string];
+              return [
+                typeof v === 'number' ? v.toFixed(1) : String(v ?? ''),
+                'Score',
+              ] as [string, string];
             }}
           />
           <Radar

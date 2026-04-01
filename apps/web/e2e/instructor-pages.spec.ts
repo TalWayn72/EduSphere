@@ -29,8 +29,20 @@ const MOCK_COURSES_WITH_ANALYTICS = [
       avgQuizScore: 78.4,
       activeLearnersLast7Days: 38,
       dropOffFunnel: [
-        { moduleId: 'mod-001', moduleName: 'Foundations', learnersStarted: 142, learnersCompleted: 120, dropOffRate: 0.15 },
-        { moduleId: 'mod-002', moduleName: 'Linear Algebra', learnersStarted: 120, learnersCompleted: 95, dropOffRate: 0.21 },
+        {
+          moduleId: 'mod-001',
+          moduleName: 'Foundations',
+          learnersStarted: 142,
+          learnersCompleted: 120,
+          dropOffRate: 0.15,
+        },
+        {
+          moduleId: 'mod-002',
+          moduleName: 'Linear Algebra',
+          learnersStarted: 120,
+          learnersCompleted: 95,
+          dropOffRate: 0.21,
+        },
       ],
     },
   },
@@ -41,8 +53,20 @@ const MOCK_EARNINGS = {
   pendingPayoutCents: 45000,
   paidOutCents: 80000,
   purchases: [
-    { id: 'purchase-001', courseId: 'course-001', amountCents: 4900, status: 'COMPLETED', purchasedAt: '2026-03-01T00:00:00Z' },
-    { id: 'purchase-002', courseId: 'course-001', amountCents: 4900, status: 'COMPLETED', purchasedAt: '2026-03-05T00:00:00Z' },
+    {
+      id: 'purchase-001',
+      courseId: 'course-001',
+      amountCents: 4900,
+      status: 'COMPLETED',
+      purchasedAt: '2026-03-01T00:00:00Z',
+    },
+    {
+      id: 'purchase-002',
+      courseId: 'course-001',
+      amountCents: 4900,
+      status: 'COMPLETED',
+      purchasedAt: '2026-03-05T00:00:00Z',
+    },
   ],
 };
 
@@ -70,15 +94,21 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // No raw errors
-    await expect(page.getByText('CombinedError')).not.toBeVisible({ timeout: 2_000 });
-    await expect(page.getByText('INTERNAL_SERVER_ERROR')).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('CombinedError')).not.toBeVisible({
+      timeout: 2_000,
+    });
+    await expect(page.getByText('INTERNAL_SERVER_ERROR')).not.toBeVisible({
+      timeout: 2_000,
+    });
 
     await expect(page).toHaveScreenshot('instructor-analytics-loaded.png', {
       maxDiffPixelRatio: 0.05,
     });
   });
 
-  test('analytics dashboard shows enrollment count from mock data', async ({ page }) => {
+  test('analytics dashboard shows enrollment count from mock data', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'InstructorAnalyticsOverview') {
         return JSON.stringify({
@@ -94,15 +124,19 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     // 142 enrollments or the course title should appear
     await expect(
       page.getByText(/142|Introduction to Machine Learning/i).first()
-    ).toBeVisible({ timeout: 10_000 }).catch(() => {
-      // If mocked data doesn't map — still must not crash
-    });
+    )
+      .toBeVisible({ timeout: 10_000 })
+      .catch(() => {
+        // If mocked data doesn't map — still must not crash
+      });
   });
 
   test('analytics dashboard tabs are clickable', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'InstructorAnalyticsOverview') {
-        return JSON.stringify({ data: { myCourses: MOCK_COURSES_WITH_ANALYTICS } });
+        return JSON.stringify({
+          data: { myCourses: MOCK_COURSES_WITH_ANALYTICS },
+        });
       }
       if (opName === 'AtRiskLearners' || opName === 'GetAtRiskLearners') {
         return JSON.stringify({ data: { atRiskLearners: [] } });
@@ -130,12 +164,19 @@ test.describe('instructor-pages — T-09: Analytics Dashboard', () => {
     });
   });
 
-  test('analytics error state shows no raw GraphQL messages', async ({ page }) => {
+  test('analytics error state shows no raw GraphQL messages', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'InstructorAnalyticsOverview') {
         return JSON.stringify({
           data: { myCourses: null },
-          errors: [{ message: 'Cannot query field "courseAnalytics" on type "Course"', extensions: { code: 'GRAPHQL_VALIDATION_FAILED' } }],
+          errors: [
+            {
+              message: 'Cannot query field "courseAnalytics" on type "Course"',
+              extensions: { code: 'GRAPHQL_VALIDATION_FAILED' },
+            },
+          ],
         });
       }
       return null;
@@ -186,7 +227,13 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
       if (opName === 'InstructorEarnings') {
         return JSON.stringify({
           data: { instructorEarnings: null },
-          errors: [{ message: 'Access denied: user is not an instructor in this tenant', extensions: { code: 'FORBIDDEN' } }],
+          errors: [
+            {
+              message:
+                'Access denied: user is not an instructor in this tenant',
+              extensions: { code: 'FORBIDDEN' },
+            },
+          ],
         });
       }
       return null;
@@ -222,19 +269,26 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     await loginAndNavigate(page, '/instructor/earnings');
     await page.waitForLoadState('domcontentloaded');
 
-    const payoutBtn = page.getByRole('button', { name: /request payout|withdraw|payout/i }).first();
+    const payoutBtn = page
+      .getByRole('button', { name: /request payout|withdraw|payout/i })
+      .first();
     if (await payoutBtn.isVisible({ timeout: 8_000 }).catch(() => false)) {
       await payoutBtn.click();
       await page.waitForLoadState('domcontentloaded');
       expect(payoutCalled).toBe(true);
     }
 
-    await expect(page).toHaveScreenshot('instructor-earnings-payout-clicked.png', {
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page).toHaveScreenshot(
+      'instructor-earnings-payout-clicked.png',
+      {
+        maxDiffPixelRatio: 0.05,
+      }
+    );
   });
 
-  test('requestPayout error shows friendly message (not raw error)', async ({ page }) => {
+  test('requestPayout error shows friendly message (not raw error)', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'InstructorEarnings') {
         return JSON.stringify({ data: { instructorEarnings: MOCK_EARNINGS } });
@@ -242,7 +296,13 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
       if (opName === 'RequestPayout') {
         return JSON.stringify({
           data: { requestPayout: null },
-          errors: [{ message: 'Payout failed: stripe_account_id is null for instructor user-001', extensions: { code: 'PAYMENT_ERROR' } }],
+          errors: [
+            {
+              message:
+                'Payout failed: stripe_account_id is null for instructor user-001',
+              extensions: { code: 'PAYMENT_ERROR' },
+            },
+          ],
         });
       }
       return null;
@@ -251,20 +311,25 @@ test.describe('instructor-pages — T-10: Earnings Page', () => {
     await loginAndNavigate(page, '/instructor/earnings');
     await page.waitForLoadState('domcontentloaded');
 
-    const payoutBtn = page.getByRole('button', { name: /request payout|withdraw|payout/i }).first();
+    const payoutBtn = page
+      .getByRole('button', { name: /request payout|withdraw|payout/i })
+      .first();
     if (await payoutBtn.isVisible({ timeout: 8_000 }).catch(() => false)) {
       await payoutBtn.click();
       await page.waitForLoadState('domcontentloaded');
 
       // Raw Stripe/internal error must NOT be visible
-      await expect(
-        page.getByText('stripe_account_id is null')
-      ).not.toBeVisible({ timeout: 3_000 });
+      await expect(page.getByText('stripe_account_id is null')).not.toBeVisible(
+        { timeout: 3_000 }
+      );
     }
 
-    await expect(page).toHaveScreenshot('instructor-earnings-payout-error.png', {
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page).toHaveScreenshot(
+      'instructor-earnings-payout-error.png',
+      {
+        maxDiffPixelRatio: 0.05,
+      }
+    );
   });
 
   test('earnings purchases list renders table rows', async ({ page }) => {
@@ -307,7 +372,9 @@ test.describe('instructor-pages — Merge Queue', () => {
     await loginAndNavigate(page, '/instructor/merge-queue');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText('CombinedError')).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('CombinedError')).not.toBeVisible({
+      timeout: 2_000,
+    });
 
     await expect(page).toHaveScreenshot('instructor-merge-queue-loaded.png', {
       maxDiffPixelRatio: 0.05,

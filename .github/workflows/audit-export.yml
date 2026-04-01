@@ -23,7 +23,7 @@ jobs:
         with:
           ref: audit-logs
           fetch-depth: 1
-        continue-on-error: true  # Branch may not exist yet
+        continue-on-error: true # Branch may not exist yet
 
       - name: Checkout main branch (fallback)
         if: steps.checkout-audit.outcome == 'failure'
@@ -87,10 +87,7 @@ jobs:
             echo "No new audit events to commit"
           else
             EVENTS=$(git diff --staged --stat | tail -1)
-            git commit -m "chore(audit): export GitHub audit logs $(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-SOC2 CC3.3: Automated audit log retention beyond GitHub 90-day limit.
-$EVENTS"
+            git commit -m "chore(audit): export GitHub audit logs $(date -u +%Y-%m-%dT%H:%M:%SZ) - SOC2 CC3.3 - $EVENTS"
             git push origin HEAD:audit-logs 2>/dev/null || \
               git push --set-upstream origin HEAD:audit-logs
             echo "✅ Audit logs pushed to audit-logs branch"

@@ -9,14 +9,21 @@ function slugToBundleSegment(slug: string): string {
   return slug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }
 
-function buildBundleId(orgSlug: string | undefined, appVariant: string | undefined): string {
+function buildBundleId(
+  orgSlug: string | undefined,
+  appVariant: string | undefined
+): string {
   const isOrgBuild = Boolean(orgSlug && appVariant === 'org');
   return isOrgBuild
     ? `com.${slugToBundleSegment(orgSlug!)}.learning`
     : 'com.edusphere.app';
 }
 
-function buildAppName(orgName: string | undefined, orgSlug: string | undefined, appVariant: string | undefined): string {
+function buildAppName(
+  orgName: string | undefined,
+  orgSlug: string | undefined,
+  appVariant: string | undefined
+): string {
   const isOrgBuild = Boolean(orgSlug && appVariant === 'org');
   return isOrgBuild && orgName ? orgName : 'EduSphere';
 }

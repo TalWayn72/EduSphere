@@ -33,7 +33,9 @@ export function MergeRequestCard({ request: req, onApprove, onReject }: Props) {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <CardTitle className="text-sm font-semibold">{req.authorName}</CardTitle>
+            <CardTitle className="text-sm font-semibold">
+              {req.authorName}
+            </CardTitle>
             <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
               <BookOpen className="h-3 w-3" />
               {req.courseName}
@@ -52,15 +54,26 @@ export function MergeRequestCard({ request: req, onApprove, onReject }: Props) {
       </CardHeader>
       <CardContent className="space-y-3">
         <div>
-          <p className="text-xs font-medium text-muted-foreground mb-1">Proposed annotation:</p>
-          <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm dark:bg-green-950 dark:border-green-700" data-testid={`proposal-content-${req.id}`}>
-            <span className="text-green-700 font-mono text-xs mr-1 dark:text-green-300">+</span>
+          <p className="text-xs font-medium text-muted-foreground mb-1">
+            Proposed annotation:
+          </p>
+          <div
+            className="bg-green-50 border border-green-200 rounded-md p-3 text-sm dark:bg-green-950 dark:border-green-700"
+            data-testid={`proposal-content-${req.id}`}
+          >
+            <span className="text-green-700 font-mono text-xs mr-1 dark:text-green-300">
+              +
+            </span>
             {req.content}
           </div>
         </div>
         <div>
-          <p className="text-xs font-medium text-muted-foreground mb-1">Reason:</p>
-          <p className="text-sm text-muted-foreground italic">&quot;{req.description}&quot;</p>
+          <p className="text-xs font-medium text-muted-foreground mb-1">
+            Reason:
+          </p>
+          <p className="text-sm text-muted-foreground italic">
+            &quot;{req.description}&quot;
+          </p>
         </div>
         <div className="flex gap-2 pt-1">
           <Button

@@ -168,7 +168,11 @@ describe('OpenBadgeQueryService', () => {
     const assertion = makeAssertion();
     const def = makeDefinition();
     mockWithTenantContext.mockResolvedValueOnce([
-      { id: assertion.id, badgeName: def.name, badgeDescription: def.description },
+      {
+        id: assertion.id,
+        badgeName: def.name,
+        badgeDescription: def.description,
+      },
     ]);
 
     const results = await svc.getUserBadges(USER, TENANT);
@@ -187,7 +191,10 @@ describe('OpenBadgeQueryService', () => {
   // ── getBadgeDefinitions ───────────────────────────────────────────────────
 
   it('getBadgeDefinitions returns definitions for tenant', async () => {
-    const defs = [makeDefinition(), makeDefinition({ id: 'def-2', name: 'Graph Expert' })];
+    const defs = [
+      makeDefinition(),
+      makeDefinition({ id: 'def-2', name: 'Graph Expert' }),
+    ];
     mockWithTenantContext.mockResolvedValueOnce(defs);
 
     const results = await svc.getBadgeDefinitions(TENANT);
@@ -199,7 +206,11 @@ describe('OpenBadgeQueryService', () => {
 
   it('buildCredentialBody returns valid OBv3 structure', () => {
     const def = makeDefinition() as never;
-    const input = { userId: USER, badgeDefinitionId: 'def-1', tenantId: TENANT };
+    const input = {
+      userId: USER,
+      badgeDefinitionId: 'def-1',
+      tenantId: TENANT,
+    };
     const keyPair = makeKeyPair();
 
     const body = svc.buildCredentialBody(def, input, keyPair);
@@ -214,7 +225,12 @@ describe('OpenBadgeQueryService', () => {
   it('buildCredentialBody includes expirationDate when expiresAt provided', () => {
     const def = makeDefinition() as never;
     const expiresAt = new Date('2026-12-31');
-    const input = { userId: USER, badgeDefinitionId: 'def-1', tenantId: TENANT, expiresAt };
+    const input = {
+      userId: USER,
+      badgeDefinitionId: 'def-1',
+      tenantId: TENANT,
+      expiresAt,
+    };
     const keyPair = makeKeyPair();
 
     const body = svc.buildCredentialBody(def, input, keyPair);
@@ -224,7 +240,11 @@ describe('OpenBadgeQueryService', () => {
 
   it('buildCredentialBody omits expirationDate when expiresAt is undefined', () => {
     const def = makeDefinition() as never;
-    const input = { userId: USER, badgeDefinitionId: 'def-1', tenantId: TENANT };
+    const input = {
+      userId: USER,
+      badgeDefinitionId: 'def-1',
+      tenantId: TENANT,
+    };
     const keyPair = makeKeyPair();
 
     const body = svc.buildCredentialBody(def, input, keyPair);

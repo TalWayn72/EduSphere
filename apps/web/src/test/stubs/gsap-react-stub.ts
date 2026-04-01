@@ -4,10 +4,7 @@
 
 import { useEffect } from 'react';
 
-export function useGSAP(
-  callback: () => void,
-  _dependencies?: unknown,
-): void {
+export function useGSAP(callback: () => void, _dependencies?: unknown): void {
   // Run the callback in useEffect so it is called during the React lifecycle
   // in tests. GSAP calls inside the callback are no-ops (gsap-stub.ts).
   useEffect(() => {
@@ -16,7 +13,7 @@ export function useGSAP(
     } catch {
       // Silently ignore — jsdom may lack some GSAP-required browser APIs
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 

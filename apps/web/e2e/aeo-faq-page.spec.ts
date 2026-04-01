@@ -33,21 +33,29 @@ test.describe('FAQ Page — AEO', () => {
   });
 
   test('has correct meta description', async ({ page }) => {
-    const desc = await page.locator('meta[name="description"]').getAttribute('content');
+    const desc = await page
+      .locator('meta[name="description"]')
+      .getAttribute('content');
     expect(desc).toBeTruthy();
     expect(desc).toContain('EduSphere');
     if (desc) expect(desc.length).toBeLessThan(165);
   });
 
   test('has canonical link tag pointing to /faq', async ({ page }) => {
-    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+    const canonical = await page
+      .locator('link[rel="canonical"]')
+      .getAttribute('href');
     expect(canonical).toContain('/faq');
   });
 
   // ─── JSON-LD Structured Data ───────────────────────────────────────────────
 
-  test('has FAQPage JSON-LD structured data with Questions and Answers', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+  test('has FAQPage JSON-LD structured data with Questions and Answers', async ({
+    page,
+  }) => {
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     const schemas: unknown[] = [];
     for (const script of ldScripts) {
       const text = await script.textContent();
@@ -64,14 +72,18 @@ test.describe('FAQ Page — AEO', () => {
   });
 
   test('has BreadcrumbList JSON-LD with at least 2 items', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     const schemas: unknown[] = [];
     for (const script of ldScripts) {
       const text = await script.textContent();
       if (text) schemas.push(JSON.parse(text));
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const breadcrumb = schemas.find((s: any) => s['@type'] === 'BreadcrumbList') as any;
+    const breadcrumb = schemas.find(
+      (s: any) => s['@type'] === 'BreadcrumbList'
+    ) as any;
     expect(breadcrumb).toBeTruthy();
     expect(breadcrumb.itemListElement.length).toBeGreaterThanOrEqual(2);
   });
@@ -85,13 +97,17 @@ test.describe('FAQ Page — AEO', () => {
   });
 
   test('first question "What is EduSphere?" is visible', async ({ page }) => {
-    const firstQuestion = page.getByRole('button').filter({ hasText: /What is EduSphere/i });
+    const firstQuestion = page
+      .getByRole('button')
+      .filter({ hasText: /What is EduSphere/i });
     await expect(firstQuestion).toBeVisible({ timeout: 10_000 });
   });
 
   test('accordion opens on click and reveals answer', async ({ page }) => {
     // Close the first item if it is open by default, then reopen it
-    const firstQuestion = page.getByRole('button').filter({ hasText: /What is EduSphere/i });
+    const firstQuestion = page
+      .getByRole('button')
+      .filter({ hasText: /What is EduSphere/i });
     await firstQuestion.click();
     // Check aria-expanded state changed
     const expanded = await firstQuestion.getAttribute('aria-expanded');
@@ -101,12 +117,16 @@ test.describe('FAQ Page — AEO', () => {
 
   test('accordion answer text is visible after opening', async ({ page }) => {
     // Start with item closed (click to toggle open)
-    const firstQuestion = page.getByRole('button').filter({ hasText: /What is EduSphere/i });
+    const firstQuestion = page
+      .getByRole('button')
+      .filter({ hasText: /What is EduSphere/i });
     const expanded = await firstQuestion.getAttribute('aria-expanded');
     if (expanded === 'false') {
       await firstQuestion.click();
     }
-    await expect(page.getByText(/AI-powered learning management system/i)).toBeVisible();
+    await expect(
+      page.getByText(/AI-powered learning management system/i)
+    ).toBeVisible();
   });
 
   // ─── Search ────────────────────────────────────────────────────────────────
@@ -118,13 +138,17 @@ test.describe('FAQ Page — AEO', () => {
     expect(ariaLabel).toBeTruthy();
   });
 
-  test('search filters FAQ items to show SCORM-related question', async ({ page }) => {
+  test('search filters FAQ items to show SCORM-related question', async ({
+    page,
+  }) => {
     const searchInput = page.getByPlaceholder('Search questions...');
     await searchInput.fill('SCORM');
     await expect(page.getByText(/SCORM/i)).toBeVisible();
   });
 
-  test('search with no matching term shows empty state message', async ({ page }) => {
+  test('search with no matching term shows empty state message', async ({
+    page,
+  }) => {
     const searchInput = page.getByPlaceholder('Search questions...');
     await searchInput.fill('xyznonexistentterm12345');
     await expect(page.getByText(/No questions found/i)).toBeVisible();
@@ -133,7 +157,9 @@ test.describe('FAQ Page — AEO', () => {
   // ─── Category Tabs ────────────────────────────────────────────────────────
 
   test('category tabs are rendered with correct roles', async ({ page }) => {
-    await expect(page.getByRole('tab', { name: /All Questions/i })).toBeVisible();
+    await expect(
+      page.getByRole('tab', { name: /All Questions/i })
+    ).toBeVisible();
     await expect(page.getByRole('tab', { name: /Pricing/i })).toBeVisible();
     await expect(page.getByRole('tab', { name: /Enterprise/i })).toBeVisible();
     await expect(page.getByRole('tab', { name: /Technical/i })).toBeVisible();
@@ -147,16 +173,25 @@ test.describe('FAQ Page — AEO', () => {
 
   // ─── Contact CTA ──────────────────────────────────────────────────────────
 
-  test('contact support link is present and has correct href', async ({ page }) => {
+  test('contact support link is present and has correct href', async ({
+    page,
+  }) => {
     const contactLink = page.getByRole('link', { name: /Contact Support/i });
     await expect(contactLink).toBeVisible();
-    await expect(contactLink).toHaveAttribute('href', 'mailto:support@edusphere.dev');
+    await expect(contactLink).toHaveAttribute(
+      'href',
+      'mailto:support@edusphere.dev'
+    );
   });
 
   // ─── Security ─────────────────────────────────────────────────────────────
 
-  test('JSON-LD scripts do not contain </script> XSS vector', async ({ page }) => {
-    const ldScripts = await page.locator('script[type="application/ld+json"]').all();
+  test('JSON-LD scripts do not contain </script> XSS vector', async ({
+    page,
+  }) => {
+    const ldScripts = await page
+      .locator('script[type="application/ld+json"]')
+      .all();
     for (const script of ldScripts) {
       const text = await script.textContent();
       // </script> inside JSON-LD would break out of the script block
@@ -164,7 +199,9 @@ test.describe('FAQ Page — AEO', () => {
     }
   });
 
-  test('page does not expose internal hostnames or port numbers', async ({ page }) => {
+  test('page does not expose internal hostnames or port numbers', async ({
+    page,
+  }) => {
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toMatch(/localhost:\d{4}/);
     expect(bodyText).not.toMatch(/127\.0\.0\.1/);

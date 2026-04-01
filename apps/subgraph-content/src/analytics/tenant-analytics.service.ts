@@ -39,7 +39,7 @@ export class TenantAnalyticsService implements OnModuleDestroy {
   private readonly db = createDatabaseConnection();
 
   constructor(
-    private readonly aggregation: TenantAnalyticsAggregationService,
+    private readonly aggregation: TenantAnalyticsAggregationService
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -62,22 +62,18 @@ export class TenantAnalyticsService implements OnModuleDestroy {
 
     if (period === 'NINETY_DAYS') {
       try {
-        const snapshots = await withTenantContext(
-          this.db,
-          ctx,
-          async (tx) => {
-            return tx
-              .select()
-              .from(schema.tenantAnalyticsSnapshots)
-              .where(
-                and(
-                  sql`${schema.tenantAnalyticsSnapshots.tenantId} = ${tenantId}`,
-                  sql`${schema.tenantAnalyticsSnapshots.snapshotDate} >= ${cutoff.toISOString().split('T')[0]}`,
-                  sql`${schema.tenantAnalyticsSnapshots.snapshotType} = 'daily'`
-                )
-              );
-          }
-        );
+        const snapshots = await withTenantContext(this.db, ctx, async (tx) => {
+          return tx
+            .select()
+            .from(schema.tenantAnalyticsSnapshots)
+            .where(
+              and(
+                sql`${schema.tenantAnalyticsSnapshots.tenantId} = ${tenantId}`,
+                sql`${schema.tenantAnalyticsSnapshots.snapshotDate} >= ${cutoff.toISOString().split('T')[0]}`,
+                sql`${schema.tenantAnalyticsSnapshots.snapshotType} = 'daily'`
+              )
+            );
+        });
         if (snapshots.length > 0) {
           return this.buildDtoFromSnapshots(tenantId, period, snapshots);
         }
@@ -88,14 +84,34 @@ export class TenantAnalyticsService implements OnModuleDestroy {
       }
     }
 
-    const [totalEnrollments, activeLearnersTrend, completionRateTrend, avgLearningVelocity, topCourses] =
-      await Promise.all([
-        this.aggregation.getTotalEnrollments(this.db, tenantId, userId, cutoff),
-        this.aggregation.getActiveLearnersTrend(this.db, tenantId, userId, cutoff),
-        this.aggregation.getCompletionRateTrend(this.db, tenantId, userId, cutoff),
-        this.aggregation.getAvgLearningVelocity(this.db, tenantId, userId, cutoff),
-        this.aggregation.getTopCourses(this.db, tenantId, userId, cutoff),
-      ]);
+    const [
+      totalEnrollments,
+      activeLearnersTrend,
+      completionRateTrend,
+      avgLearningVelocity,
+      topCourses,
+    ] = await Promise.all([
+      this.aggregation.getTotalEnrollments(this.db, tenantId, userId, cutoff),
+      this.aggregation.getActiveLearnersTrend(
+        this.db,
+        tenantId,
+        userId,
+        cutoff
+      ),
+      this.aggregation.getCompletionRateTrend(
+        this.db,
+        tenantId,
+        userId,
+        cutoff
+      ),
+      this.aggregation.getAvgLearningVelocity(
+        this.db,
+        tenantId,
+        userId,
+        cutoff
+      ),
+      this.aggregation.getTopCourses(this.db, tenantId, userId, cutoff),
+    ]);
 
     return {
       tenantId,
@@ -111,7 +127,7 @@ export class TenantAnalyticsService implements OnModuleDestroy {
   private buildDtoFromSnapshots(
     tenantId: string,
     period: AnalyticsPeriod,
-    snapshots: typeof schema.tenantAnalyticsSnapshots.$inferSelect[],
+    snapshots: (typeof schema.tenantAnalyticsSnapshots.$inferSelect)[]
   ): TenantAnalyticsDto {
     const activeLearnersTrend: DailyMetric[] = snapshots.map((s) => ({
       date: String(s.snapshotDate),
@@ -121,7 +137,10 @@ export class TenantAnalyticsService implements OnModuleDestroy {
       date: String(s.snapshotDate),
       value: Math.round(s.avgCompletionRate * 10) / 10,
     }));
-    const totalEnrollments = snapshots.reduce((acc, s) => acc + s.newEnrollments, 0);
+    const totalEnrollments = snapshots.reduce(
+      (acc, s) => acc + s.newEnrollments,
+      0
+    );
 
     return {
       tenantId,
@@ -153,7 +172,9 @@ export class TenantAnalyticsService implements OnModuleDestroy {
             totalWeeks: count(),
           })
           .from(schema.userLearningVelocity)
-          .where(sql`${schema.userLearningVelocity.tenantId} = ${tenantId}::uuid`)
+          .where(
+            sql`${schema.userLearningVelocity.tenantId} = ${tenantId}::uuid`
+          )
           .groupBy(schema.userLearningVelocity.userId);
 
         const sorted = rows
@@ -211,9 +232,7 @@ export class TenantAnalyticsService implements OnModuleDestroy {
             sql`${schema.userCourses.enrolledAt} >= ${cutoff}`
           )
         )
-        .groupBy(
-          sql`DATE_TRUNC('week', ${schema.userCourses.enrolledAt})`
-        );
+        .groupBy(sql`DATE_TRUNC('week', ${schema.userCourses.enrolledAt})`);
 
       return cohortRows.map((r) => {
         const enrolled = Number(r.enrolled);
@@ -225,9 +244,13 @@ export class TenantAnalyticsService implements OnModuleDestroy {
           activeAt7Days,
           activeAt30Days,
           retentionAt7Days:
-            enrolled > 0 ? Math.round((activeAt7Days / enrolled) * 1000) / 10 : 0,
+            enrolled > 0
+              ? Math.round((activeAt7Days / enrolled) * 1000) / 10
+              : 0,
           retentionAt30Days:
-            enrolled > 0 ? Math.round((activeAt30Days / enrolled) * 1000) / 10 : 0,
+            enrolled > 0
+              ? Math.round((activeAt30Days / enrolled) * 1000) / 10
+              : 0,
         };
       });
     });

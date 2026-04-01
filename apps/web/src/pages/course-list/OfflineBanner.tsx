@@ -6,7 +6,9 @@ interface OfflineBannerProps {
   onRetry: () => void;
 }
 
-export const OfflineBanner = React.memo(function OfflineBanner({ onRetry }: OfflineBannerProps) {
+export const OfflineBanner = React.memo(function OfflineBanner({
+  onRetry,
+}: OfflineBannerProps) {
   const { t } = useTranslation('courses');
   return (
     <div

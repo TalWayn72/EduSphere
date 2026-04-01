@@ -44,7 +44,9 @@ async function loginWithLocale(
   await devBtn.waitFor({ timeout: 10_000 });
   await devBtn.click();
   await page
-    .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+    .waitForURL((url) => !url.toString().includes('/login'), {
+      timeout: 20_000,
+    })
     .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
 }
@@ -58,9 +60,13 @@ test.describe('BUG-096: All-locales smoke test', () => {
     test.describe(`${label} (${locale})`, () => {
       test.describe.configure({ timeout: 60_000 });
 
-      test(`document dir is "${expectedDir}" for ${locale}`, async ({ page }) => {
+      test(`document dir is "${expectedDir}" for ${locale}`, async ({
+        page,
+      }) => {
         await loginWithLocale(page, locale);
-        await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${BASE_URL}/dashboard`, {
+          waitUntil: 'domcontentloaded',
+        });
         await page.waitForLoadState('networkidle').catch(() => {});
 
         const dir = await page.evaluate(() => document.documentElement.dir);
@@ -69,7 +75,9 @@ test.describe('BUG-096: All-locales smoke test', () => {
 
       test(`document lang is "${locale}" for ${label}`, async ({ page }) => {
         await loginWithLocale(page, locale);
-        await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${BASE_URL}/dashboard`, {
+          waitUntil: 'domcontentloaded',
+        });
         await page.waitForLoadState('networkidle').catch(() => {});
 
         const lang = await page.evaluate(() => document.documentElement.lang);
@@ -80,19 +88,18 @@ test.describe('BUG-096: All-locales smoke test', () => {
 
       test(`visual regression screenshot for ${locale}`, async ({ page }) => {
         await loginWithLocale(page, locale);
-        await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${BASE_URL}/dashboard`, {
+          waitUntil: 'domcontentloaded',
+        });
         await page.waitForLoadState('networkidle').catch(() => {});
 
         // Wait for layout to settle
         await page.waitForTimeout(1000);
 
-        await expect(page).toHaveScreenshot(
-          `bug096-dashboard-${locale}.png`,
-          {
-            maxDiffPixelRatio: 0.05,
-            fullPage: false,
-          }
-        );
+        await expect(page).toHaveScreenshot(`bug096-dashboard-${locale}.png`, {
+          maxDiffPixelRatio: 0.05,
+          fullPage: false,
+        });
       });
     });
   }

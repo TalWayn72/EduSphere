@@ -58,7 +58,8 @@ function CampaignRow({
       <div>
         <p className="font-medium text-sm">{c.title}</p>
         <p className="text-xs text-muted-foreground">
-          {t('assessmentCampaign.target')} {c.targetUserId} · {c.criteriaCount} {t('assessmentCampaign.criteria')}
+          {t('assessmentCampaign.target')} {c.targetUserId} · {c.criteriaCount}{' '}
+          {t('assessmentCampaign.criteria')}
           {c.dueDate
             ? ` · ${t('assessmentCampaign.due')} ${new Date(c.dueDate).toLocaleDateString()}`
             : ''}
@@ -131,7 +132,9 @@ export function AssessmentCampaignPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Users className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">{t('assessmentCampaign.pageTitle')}</h1>
+            <h1 className="text-2xl font-bold">
+              {t('assessmentCampaign.pageTitle')}
+            </h1>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -143,23 +146,33 @@ export function AssessmentCampaignPage() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t('assessmentCampaign.createTitle')}</DialogTitle>
-                <DialogDescription className="sr-only">Create a new 360° assessment campaign.</DialogDescription>
+                <DialogDescription className="sr-only">
+                  Create a new 360° assessment campaign.
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-3 pt-2">
                 <div>
-                  <label className="text-sm font-medium">{t('assessmentCampaign.campaignTitleLabel')}</label>
+                  <label className="text-sm font-medium">
+                    {t('assessmentCampaign.campaignTitleLabel')}
+                  </label>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder={t('assessmentCampaign.campaignTitlePlaceholder')}
+                    placeholder={t(
+                      'assessmentCampaign.campaignTitlePlaceholder'
+                    )}
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">{t('assessmentCampaign.targetUserIdLabel')}</label>
+                  <label className="text-sm font-medium">
+                    {t('assessmentCampaign.targetUserIdLabel')}
+                  </label>
                   <Input
                     value={targetUserId}
                     onChange={(e) => setTargetUserId(e.target.value)}
-                    placeholder={t('assessmentCampaign.targetUserIdPlaceholder')}
+                    placeholder={t(
+                      'assessmentCampaign.targetUserIdPlaceholder'
+                    )}
                   />
                 </div>
                 <div>

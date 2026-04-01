@@ -37,7 +37,12 @@ import { RoleplayService } from './roleplay.service.js';
 import { RoleplaySessionService } from './roleplay-session.service.js';
 
 const makeCtx = (userId = 'user-1', tenantId = 'tenant-1') => ({
-  authContext: { userId, tenantId, roles: ['STUDENT'], email: 'test@example.com' },
+  authContext: {
+    userId,
+    tenantId,
+    roles: ['STUDENT'],
+    email: 'test@example.com',
+  },
   req: { headers: { 'x-tenant-id': tenantId } },
 });
 

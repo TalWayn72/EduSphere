@@ -58,7 +58,11 @@ const MOCK_ANCHOR_2 = {
     mimeType: 'image/png',
     filename: 'traversal-algorithm.png',
     scanStatus: 'CLEAN',
-    metadata: { width: 400, height: 300, altText: 'Traversal algorithm illustration' },
+    metadata: {
+      width: 400,
+      height: 300,
+      altText: 'Traversal algorithm illustration',
+    },
   },
 };
 
@@ -75,7 +79,9 @@ test.describe('Visual Anchoring — Instructor Flow (Part 2)', () => {
     let anchorsInStore = [MOCK_ANCHOR_1, MOCK_ANCHOR_2];
 
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({
           json: { data: { getVisualAnchors: anchorsInStore } },
@@ -127,7 +133,9 @@ test.describe('Visual Anchoring — Instructor Flow (Part 2)', () => {
     page,
   }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({
           json: { data: { getVisualAnchors: [MOCK_ANCHOR_1] } },
@@ -155,8 +163,12 @@ test.describe('Visual Anchoring — Instructor Flow (Part 2)', () => {
     const visualSidebar = page.locator('[data-testid="visual-sidebar"]');
     await expect(visualSidebar).toBeVisible({ timeout: 8_000 });
 
-    await expect(page.locator('[data-testid="anchor-editor"]')).not.toBeVisible();
-    await expect(page.locator('[data-testid="create-anchor-btn"]')).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid="anchor-editor"]')
+    ).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid="create-anchor-btn"]')
+    ).not.toBeVisible();
 
     await expect(page).toHaveScreenshot('instructor-preview-student-mode.png', {
       maxDiffPixels: 100,

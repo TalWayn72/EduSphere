@@ -147,8 +147,12 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-4 bg-gray-900 border-b border-gray-700 dark:bg-gray-100 dark:border-gray-300">
         <div className="flex-1">
-          <h2 className="text-white font-bold text-lg dark:text-white">{scenario.title}</h2>
-          <p className="text-gray-300 text-sm dark:text-gray-600">{scenario.sceneDescription}</p>
+          <h2 className="text-white font-bold text-lg dark:text-white">
+            {scenario.title}
+          </h2>
+          <p className="text-gray-300 text-sm dark:text-gray-600">
+            {scenario.sceneDescription}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <span

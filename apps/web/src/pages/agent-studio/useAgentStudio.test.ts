@@ -204,7 +204,7 @@ describe('useAgentStudio', () => {
     expect(result.current.saveStatus).toBe('error');
     expect(toast.error).toHaveBeenCalledWith(
       'AI features require your consent.',
-      expect.objectContaining({ action: expect.any(Object) }),
+      expect.objectContaining({ action: expect.any(Object) })
     );
   });
 

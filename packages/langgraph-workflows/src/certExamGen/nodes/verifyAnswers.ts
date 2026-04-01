@@ -20,7 +20,9 @@ const VerificationSchema = z.object({
 });
 
 export function verifyAnswersNode(model: LanguageModel) {
-  return async (state: CertExamGenState): Promise<Partial<CertExamGenState>> => {
+  return async (
+    state: CertExamGenState
+  ): Promise<Partial<CertExamGenState>> => {
     const items = state.distractorEnhanced;
     if (items.length === 0) return { finalItems: [] };
 

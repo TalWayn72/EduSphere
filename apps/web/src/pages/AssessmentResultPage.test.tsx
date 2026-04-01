@@ -5,7 +5,9 @@ import * as urql from 'urql';
 import { AssessmentResultPage } from './AssessmentResultPage';
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('urql', async () => ({
@@ -15,21 +17,31 @@ vi.mock('urql', async () => ({
 
 // Mock recharts for the embedded RadarChart
 vi.mock('recharts', () => ({
-  RadarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  RadarChart: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   Radar: () => null,
   PolarGrid: () => null,
   PolarAngleAxis: () => null,
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   Tooltip: () => null,
 }));
 
-const NOOP_QUERY = [{ data: undefined, fetching: false, error: undefined }, vi.fn()] as never;
+const NOOP_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+  vi.fn(),
+] as never;
 
 function renderWithRoute() {
   return render(
     <MemoryRouter initialEntries={['/assessments/c1/results']}>
       <Routes>
-        <Route path="/assessments/:id/results" element={<AssessmentResultPage />} />
+        <Route
+          path="/assessments/:id/results"
+          element={<AssessmentResultPage />}
+        />
       </Routes>
     </MemoryRouter>
   );

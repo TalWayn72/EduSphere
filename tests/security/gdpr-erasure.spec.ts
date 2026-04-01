@@ -115,12 +115,9 @@ describe('G-03: Right to Erasure (GDPR Art.17)', () => {
 // ── G-03b: Cryptographic Proof of Erasure ────────────────────────────────────
 
 describe('G-03b: Cryptographic Proof of Erasure', () => {
-  const PROOF_SERVICE =
-    'apps/subgraph-core/src/user/erasure-proof.service.ts';
-  const ERASURE_LOG_SCHEMA =
-    'packages/db/src/schema/gdpr-erasure-log.ts';
-  const MIGRATION =
-    'packages/db/src/migrations/0043_gdpr_erasure_log.sql';
+  const PROOF_SERVICE = 'apps/subgraph-core/src/user/erasure-proof.service.ts';
+  const ERASURE_LOG_SCHEMA = 'packages/db/src/schema/gdpr-erasure-log.ts';
+  const MIGRATION = 'packages/db/src/migrations/0043_gdpr_erasure_log.sql';
 
   it('erasure-proof.service.ts exists', () => {
     expect(fileExists(PROOF_SERVICE)).toBe(true);
@@ -200,27 +197,19 @@ describe('G-03b: Cryptographic Proof of Erasure', () => {
 
   it('proof service has unit tests', () => {
     expect(
-      fileExists(
-        'apps/subgraph-core/src/user/erasure-proof.service.spec.ts'
-      )
+      fileExists('apps/subgraph-core/src/user/erasure-proof.service.spec.ts')
     ).toBe(true);
   });
 
   it('GraphQL schema includes verifyErasure query', () => {
-    const content = readFile(
-      'apps/subgraph-core/src/admin/audit.graphql'
-    );
+    const content = readFile('apps/subgraph-core/src/admin/audit.graphql');
     expect(content).toContain('verifyErasure');
     expect(content).toContain('ErasureVerification');
   });
 
   it('verifyErasure requires ORG_ADMIN or SUPER_ADMIN', () => {
-    const content = readFile(
-      'apps/subgraph-core/src/admin/audit.graphql'
-    );
-    const verifyBlock = content.slice(
-      content.indexOf('verifyErasure')
-    );
+    const content = readFile('apps/subgraph-core/src/admin/audit.graphql');
+    const verifyBlock = content.slice(content.indexOf('verifyErasure'));
     expect(verifyBlock).toContain('@authenticated');
     expect(verifyBlock).toContain('ORG_ADMIN');
     expect(verifyBlock).toContain('SUPER_ADMIN');

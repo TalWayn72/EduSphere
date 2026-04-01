@@ -108,9 +108,15 @@ describe('ROIAnalyticsDashboardPage', () => {
   });
 
   it('shows loading skeleton when fetching=true', () => {
-    mockQueryResult = { fetching: true, data: undefined as typeof mockData | undefined, error: undefined };
+    mockQueryResult = {
+      fetching: true,
+      data: undefined as typeof mockData | undefined,
+      error: undefined,
+    };
     renderPage();
-    const skeleton = document.querySelector('[aria-label="Loading ROI analytics"]');
+    const skeleton = document.querySelector(
+      '[aria-label="Loading ROI analytics"]'
+    );
     expect(skeleton).toBeInTheDocument();
     // reset for other tests
     mockQueryResult = { fetching: false, data: mockData, error: undefined };

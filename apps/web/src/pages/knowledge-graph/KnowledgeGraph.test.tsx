@@ -10,7 +10,9 @@ vi.mock('react-i18next', () => ({
 vi.mock('@/lib/auth', () => ({ DEV_MODE: true }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -19,12 +21,18 @@ vi.mock('@/components/PageHeader', () => ({
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -118,12 +126,20 @@ import { KnowledgeGraph } from './KnowledgeGraph';
 
 describe('KnowledgeGraph', () => {
   it('renders inside Layout', () => {
-    render(<MemoryRouter><KnowledgeGraph /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <KnowledgeGraph />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><KnowledgeGraph /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <KnowledgeGraph />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

@@ -12,7 +12,13 @@ import { buildNatsOptions } from '@edusphere/nats-client';
 
 export interface IngestionResult {
   extractedText: string;
-  ocrMethod: 'EMBEDDED_TEXT' | 'TESSERACT' | 'PADDLE' | 'TROCR' | 'MOONDREAM' | 'NONE';
+  ocrMethod:
+    | 'EMBEDDED_TEXT'
+    | 'TESSERACT'
+    | 'PADDLE'
+    | 'TROCR'
+    | 'MOONDREAM'
+    | 'NONE';
   ocrConfidence: number;
   topics: string[];
   thumbnailUrl: string | null;
@@ -24,7 +30,10 @@ export interface IngestionResult {
 }
 
 /** Factory for IngestionResult with sensible defaults — eliminates repeated boilerplate. */
-function createResult(overrides: Partial<IngestionResult> & Pick<IngestionResult, 'extractedText' | 'ocrMethod' | 'ocrConfidence'>): IngestionResult {
+function createResult(
+  overrides: Partial<IngestionResult> &
+    Pick<IngestionResult, 'extractedText' | 'ocrMethod' | 'ocrConfidence'>
+): IngestionResult {
   return {
     topics: [],
     thumbnailUrl: null,
@@ -38,7 +47,9 @@ function createResult(overrides: Partial<IngestionResult> & Pick<IngestionResult
 }
 
 @Injectable()
-export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDestroy {
+export class ContentIngestionPipelineService
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(ContentIngestionPipelineService.name);
   private natsConnection: NatsConnection | null = null;
   private readonly sc = StringCodec();
@@ -50,16 +61,22 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
     } catch (err) {
       this.logger.warn(
         { err },
-        '[ContentIngestionPipelineService] NATS connection failed — video dispatch disabled',
+        '[ContentIngestionPipelineService] NATS connection failed — video dispatch disabled'
       );
     }
   }
 
-  async ingest(buffer: Buffer, filename: string, tenantId: string): Promise<IngestionResult> {
+  async ingest(
+    buffer: Buffer,
+    filename: string,
+    tenantId: string
+  ): Promise<IngestionResult> {
     const fileType = await fileTypeFromBuffer(buffer);
     const mime = fileType?.mime ?? this.guessMimeFromExtension(filename);
 
-    this.logger.log(`Ingesting ${filename} detected as ${mime} for tenant ${tenantId}`);
+    this.logger.log(
+      `Ingesting ${filename} detected as ${mime} for tenant ${tenantId}`
+    );
 
     if (mime === 'application/zip') {
       return this.handleZip(buffer, filename, tenantId);
@@ -80,10 +97,16 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
       return this.handleOfficeDocument(filename);
     }
 
-    throw new UnsupportedMediaTypeException(`File type ${mime ?? 'unknown'} is not supported`);
+    throw new UnsupportedMediaTypeException(
+      `File type ${mime ?? 'unknown'} is not supported`
+    );
   }
 
-  private async handleZip(buffer: Buffer, filename: string, tenantId: string): Promise<IngestionResult> {
+  private async handleZip(
+    buffer: Buffer,
+    filename: string,
+    tenantId: string
+  ): Promise<IngestionResult> {
     const MAX_UNCOMPRESSED = 5 * 1024 * 1024 * 1024;
     const { Open } = await import('unzipper');
     const directory = await Open.buffer(buffer);
@@ -93,17 +116,21 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
 
     for (const entry of directory.files) {
       if (entry.path.includes('../') || entry.path.startsWith('/')) {
-        throw new BadRequestException(`ZIP contains path traversal: ${entry.path}`);
+        throw new BadRequestException(
+          `ZIP contains path traversal: ${entry.path}`
+        );
       }
       totalSize += entry.uncompressedSize ?? 0;
       if (totalSize > MAX_UNCOMPRESSED) {
-        throw new BadRequestException('ZIP file exceeds 5GB uncompressed limit (potential ZIP bomb)');
+        throw new BadRequestException(
+          'ZIP file exceeds 5GB uncompressed limit (potential ZIP bomb)'
+        );
       }
     }
 
     this.logger.log(
       `ZIP ${filename}: ${directory.files.length} entries, ` +
-      `${Math.round(totalSize / 1024 / 1024)}MB uncompressed (tenant: ${tenantId})`,
+        `${Math.round(totalSize / 1024 / 1024)}MB uncompressed (tenant: ${tenantId})`
     );
     warnings.push(`ZIP extracted: ${directory.files.length} files`);
 
@@ -115,15 +142,22 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
     });
   }
 
-  private async handlePdf(buffer: Buffer, filename: string): Promise<IngestionResult> {
-    this.logger.log(`[ContentIngestionPipelineService] PDF pipeline: ${filename}`);
+  private async handlePdf(
+    buffer: Buffer,
+    filename: string
+  ): Promise<IngestionResult> {
+    this.logger.log(
+      `[ContentIngestionPipelineService] PDF pipeline: ${filename}`
+    );
     const warnings: string[] = [];
 
     try {
-      const { PDFParse } = await import('pdf-parse') as { PDFParse: new (opts: { data: Buffer }) => {
-        getText(): Promise<{ text: string; total: number }>;
-        destroy(): Promise<void>;
-      }};
+      const { PDFParse } = (await import('pdf-parse')) as {
+        PDFParse: new (opts: { data: Buffer }) => {
+          getText(): Promise<{ text: string; total: number }>;
+          destroy(): Promise<void>;
+        };
+      };
       const parser = new PDFParse({ data: buffer });
       const result = await parser.getText();
       await parser.destroy();
@@ -134,14 +168,16 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
         .trim();
 
       this.logger.log(
-        `[ContentIngestionPipelineService] PDF extracted: ${text.length} chars, ${result.total} pages from ${filename}`,
+        `[ContentIngestionPipelineService] PDF extracted: ${text.length} chars, ${result.total} pages from ${filename}`
       );
 
       return createResult({
         extractedText: text,
         ocrMethod: 'EMBEDDED_TEXT',
         ocrConfidence: text.length > 0 ? 0.95 : 0,
-        estimatedDuration: Math.ceil(text.split(/\s+/).filter(Boolean).length / 250),
+        estimatedDuration: Math.ceil(
+          text.split(/\s+/).filter(Boolean).length / 250
+        ),
         pageCount: result.total,
         warnings,
       });
@@ -149,7 +185,7 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.error(
         { err, filename },
-        `[ContentIngestionPipelineService] PDF parsing failed: ${msg}`,
+        `[ContentIngestionPipelineService] PDF parsing failed: ${msg}`
       );
       warnings.push(`PDF parsing failed: ${msg}`);
       return createResult({
@@ -163,7 +199,7 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
 
   private handleImage(filename: string): IngestionResult {
     this.logger.warn(
-      `[ContentIngestionPipelineService] OCR not yet available for image: ${filename} — returning empty text`,
+      `[ContentIngestionPipelineService] OCR not yet available for image: ${filename} — returning empty text`
     );
     return createResult({
       extractedText: '',
@@ -176,10 +212,10 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
   private async handleVideo(
     _buffer: Buffer,
     filename: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<IngestionResult> {
     this.logger.log(
-      `[ContentIngestionPipelineService] Video pipeline — dispatching to transcription worker: ${filename}`,
+      `[ContentIngestionPipelineService] Video pipeline — dispatching to transcription worker: ${filename}`
     );
     const warnings: string[] = [];
 
@@ -197,19 +233,19 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
         const data = this.sc.encode(JSON.stringify(payload));
         await js.publish('media.uploaded', data);
         this.logger.log(
-          `[ContentIngestionPipelineService] Published media.uploaded for ${filename} (tenant: ${tenantId})`,
+          `[ContentIngestionPipelineService] Published media.uploaded for ${filename} (tenant: ${tenantId})`
         );
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         this.logger.error(
           { err, filename, tenantId },
-          `[ContentIngestionPipelineService] Failed to dispatch video to transcription worker: ${msg}`,
+          `[ContentIngestionPipelineService] Failed to dispatch video to transcription worker: ${msg}`
         );
         warnings.push(`Video dispatch failed: ${msg}`);
       }
     } else {
       this.logger.warn(
-        `[ContentIngestionPipelineService] NATS not connected — video ${filename} not dispatched`,
+        `[ContentIngestionPipelineService] NATS not connected — video ${filename} not dispatched`
       );
       warnings.push('Video: NATS not connected — transcription not dispatched');
     }
@@ -218,7 +254,10 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
       extractedText: '',
       ocrMethod: 'NONE',
       ocrConfidence: 1,
-      warnings: [...warnings, 'Video: dispatched to transcription worker — text available after processing'],
+      warnings: [
+        ...warnings,
+        'Video: dispatched to transcription worker — text available after processing',
+      ],
     });
   }
 
@@ -270,7 +309,9 @@ export class ContentIngestionPipelineService implements OnModuleInit, OnModuleDe
     if (this.natsConnection) {
       await this.natsConnection.drain().catch(() => undefined);
       this.natsConnection = null;
-      this.logger.log('ContentIngestionPipelineService NATS connection drained');
+      this.logger.log(
+        'ContentIngestionPipelineService NATS connection drained'
+      );
     }
     this.logger.log('ContentIngestionPipelineService destroyed');
   }

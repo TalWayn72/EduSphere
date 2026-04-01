@@ -70,7 +70,13 @@ function makeAuthCtx(tenantId?: string): GraphQLContext {
   return {
     req: { headers: {} },
     authContext: tenantId
-      ? { tenantId, userId: 'jwt-user', email: 'a@b.com', roles: ['ORG_ADMIN'], scopes: [] }
+      ? {
+          tenantId,
+          userId: 'jwt-user',
+          email: 'a@b.com',
+          roles: ['ORG_ADMIN'],
+          scopes: [],
+        }
       : undefined,
   } as unknown as GraphQLContext;
 }
@@ -91,7 +97,13 @@ function makeDualCtx(
 ): GraphQLContext {
   return {
     req: { headers: { 'x-tenant-id': headerTenantId } },
-    authContext: { tenantId: authTenantId, userId: 'jwt-user', email: 'a@b.com', roles: ['ORG_ADMIN'], scopes: [] },
+    authContext: {
+      tenantId: authTenantId,
+      userId: 'jwt-user',
+      email: 'a@b.com',
+      roles: ['ORG_ADMIN'],
+      scopes: [],
+    },
   } as unknown as GraphQLContext;
 }
 
@@ -203,7 +215,12 @@ describe('CrmResolver', () => {
     it('returns null when authContext exists but tenantId is undefined', async () => {
       const ctx = {
         req: { headers: {} },
-        authContext: { userId: 'u1', email: 'a@b.com', roles: ['STUDENT'], scopes: [] },
+        authContext: {
+          userId: 'u1',
+          email: 'a@b.com',
+          roles: ['STUDENT'],
+          scopes: [],
+        },
       } as unknown as GraphQLContext;
       const result = await resolver.crmConnection(ctx);
       expect(result).toBeNull();

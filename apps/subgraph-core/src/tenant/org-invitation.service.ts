@@ -135,7 +135,10 @@ export class OrgInvitationService implements OnModuleDestroy {
 
     // Emit invitation event (fire-and-forget)
     this.emitInviteEvent(ctx.tenantId, input, token).catch((err) =>
-      this.logger.warn({ err }, '[OrgInvitationService] Failed to emit invite event')
+      this.logger.warn(
+        { err },
+        '[OrgInvitationService] Failed to emit invite event'
+      )
     );
 
     this.logger.log(
@@ -174,7 +177,9 @@ export class OrgInvitationService implements OnModuleDestroy {
     }
 
     if (invitation.status !== 'PENDING') {
-      throw new BadRequestException(`Invitation already ${invitation.status.toLowerCase()}`);
+      throw new BadRequestException(
+        `Invitation already ${invitation.status.toLowerCase()}`
+      );
     }
 
     if (new Date(invitation.expires_at) < new Date()) {
@@ -229,9 +234,7 @@ export class OrgInvitationService implements OnModuleDestroy {
     status?: string
   ): Promise<OrgInvitation[]> {
     return withTenantContext(this.db, ctx, async (tx) => {
-      const statusFilter = status
-        ? sql`AND status = ${status}`
-        : sql``;
+      const statusFilter = status ? sql`AND status = ${status}` : sql``;
 
       const result = await tx.execute<{
         id: string;

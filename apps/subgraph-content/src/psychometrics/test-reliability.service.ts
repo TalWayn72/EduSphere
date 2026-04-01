@@ -45,7 +45,7 @@ export class TestReliabilityService implements OnModuleDestroy {
   /** Cronbach's Alpha for a blueprint. */
   async computeCronbachAlpha(
     blueprintId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<number> {
     const matrix = await this.buildResponseMatrix(blueprintId, tenantId);
     return computeAlphaFromMatrix(matrix);
@@ -54,15 +54,19 @@ export class TestReliabilityService implements OnModuleDestroy {
   /** Full reliability report for a blueprint. */
   async getReliabilityReport(
     blueprintId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<ExamReliabilityReport> {
     const matrix = await this.buildResponseMatrix(blueprintId, tenantId);
     const totalSessions = matrix.length;
 
     if (totalSessions === 0) {
       return {
-        blueprintId, kr20: 0, cronbachAlpha: 0,
-        sem: 0, totalSessions: 0, averageScore: 0,
+        blueprintId,
+        kr20: 0,
+        cronbachAlpha: 0,
+        sem: 0,
+        totalSessions: 0,
+        averageScore: 0,
       };
     }
 
@@ -75,10 +79,17 @@ export class TestReliabilityService implements OnModuleDestroy {
 
     this.logger.log(
       { blueprintId, tenantId, kr20, cronbachAlpha, sem, totalSessions },
-      '[TestReliabilityService] Reliability report generated',
+      '[TestReliabilityService] Reliability report generated'
     );
 
-    return { blueprintId, kr20, cronbachAlpha, sem, totalSessions, averageScore };
+    return {
+      blueprintId,
+      kr20,
+      cronbachAlpha,
+      sem,
+      totalSessions,
+      averageScore,
+    };
   }
 
   /**
@@ -87,7 +98,7 @@ export class TestReliabilityService implements OnModuleDestroy {
    */
   private async buildResponseMatrix(
     blueprintId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<number[][]> {
     const ctx = sysCtx(tenantId);
     const sessions = await withTenantContext(this.db, ctx, (tx) =>
@@ -98,9 +109,9 @@ export class TestReliabilityService implements OnModuleDestroy {
           and(
             eq(schema.examSessions.blueprintId, blueprintId),
             eq(schema.examSessions.tenantId, tenantId),
-            eq(schema.examSessions.status, 'GRADED'),
-          ),
-        ),
+            eq(schema.examSessions.status, 'GRADED')
+          )
+        )
     );
 
     if (sessions.length === 0) return [];
@@ -120,7 +131,7 @@ export class TestReliabilityService implements OnModuleDestroy {
             isCorrect: schema.examResponses.isCorrect,
           })
           .from(schema.examResponses)
-          .where(eq(schema.examResponses.sessionId, session.id)),
+          .where(eq(schema.examResponses.sessionId, session.id))
       );
       allResponses.push(...resp);
     }

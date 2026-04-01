@@ -16,10 +16,7 @@ import { IS_DEV_MODE } from './env';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function loginAndGoto(
-  page: Parameters<typeof login>[0],
-  path: string,
-) {
+async function loginAndGoto(page: Parameters<typeof login>[0], path: string) {
   await login(page);
   await page.goto(path, { waitUntil: 'domcontentloaded' });
 }
@@ -98,15 +95,15 @@ test.describe('RAG Activation — Source Manager', () => {
 // ─── Search — Empty State ────────────────────────────────────────────────────
 
 test.describe('RAG Activation — Search Empty State', () => {
-  test('search page shows empty state hint when no query', async ({
-    page,
-  }) => {
+  test('search page shows empty state hint when no query', async ({ page }) => {
     await loginAndGoto(page, '/search');
     await page.waitForLoadState('networkidle');
 
     // The search page should show the search hint when no query is active
     const searchHint = page.locator('text=searchHint').first();
-    const searchIcon = page.locator('.lucide-search, [data-testid="search-icon"]').first();
+    const searchIcon = page
+      .locator('.lucide-search, [data-testid="search-icon"]')
+      .first();
 
     // At least the search input should be present
     const searchInput = page.locator('input[placeholder]').first();
@@ -146,9 +143,7 @@ test.describe('RAG Activation — Search Empty State', () => {
     expect(count).toBeGreaterThanOrEqual(0); // May be 0 if not loaded yet
   });
 
-  test('search loading skeleton appears while searching', async ({
-    page,
-  }) => {
+  test('search loading skeleton appears while searching', async ({ page }) => {
     await loginAndGoto(page, '/search');
     await page.waitForLoadState('networkidle');
 
@@ -177,7 +172,15 @@ test.describe('RAG Activation — Source Upload Flow', () => {
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+          body: '',
+        });
         return;
       }
       const body = req.postDataJSON() as { operationName?: string } | null;
@@ -190,8 +193,13 @@ test.describe('RAG Activation — Source Upload Flow', () => {
           body: JSON.stringify({
             data: {
               addKnowledgeSource: {
-                id: 'src-new-1', title: 'Uploaded.pdf', sourceType: 'FILE_PDF',
-                status: 'PENDING', chunkCount: 0, errorMessage: null, createdAt: new Date().toISOString(),
+                id: 'src-new-1',
+                title: 'Uploaded.pdf',
+                sourceType: 'FILE_PDF',
+                status: 'PENDING',
+                chunkCount: 0,
+                errorMessage: null,
+                createdAt: new Date().toISOString(),
               },
             },
           }),
@@ -199,7 +207,10 @@ test.describe('RAG Activation — Source Upload Flow', () => {
         return;
       }
 
-      if (op.includes('KnowledgeSources') || op.includes('CourseKnowledgeSources')) {
+      if (
+        op.includes('KnowledgeSources') ||
+        op.includes('CourseKnowledgeSources')
+      ) {
         pollCount++;
         const status = pollCount <= 2 ? 'PROCESSING' : 'READY';
         const chunkCount = pollCount <= 2 ? 0 : 15;
@@ -208,17 +219,28 @@ test.describe('RAG Activation — Source Upload Flow', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             data: {
-              knowledgeSources: [{
-                id: 'src-new-1', title: 'Uploaded.pdf', sourceType: 'FILE_PDF',
-                status, chunkCount, errorMessage: null, createdAt: new Date().toISOString(),
-              }],
+              knowledgeSources: [
+                {
+                  id: 'src-new-1',
+                  title: 'Uploaded.pdf',
+                  sourceType: 'FILE_PDF',
+                  status,
+                  chunkCount,
+                  errorMessage: null,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
             },
           }),
         });
         return;
       }
 
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await login(page);
@@ -265,7 +287,15 @@ test.describe('RAG Activation — Search DEV_MODE', () => {
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+          body: '',
+        });
         return;
       }
       const body = req.postDataJSON() as { operationName?: string } | null;
@@ -275,11 +305,17 @@ test.describe('RAG Activation — Search DEV_MODE', () => {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { search: { results: [], totalCount: 0 } } }),
+          body: JSON.stringify({
+            data: { search: { results: [], totalCount: 0 } },
+          }),
         });
         return;
       }
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await login(page);
@@ -301,9 +337,7 @@ test.describe('RAG Activation — Search DEV_MODE', () => {
 // ─── Admin — Embedding Dashboard ─────────────────────────────────────────────
 
 test.describe('RAG Activation — Admin Embedding Dashboard', () => {
-  test('admin can navigate to embeddings management area', async ({
-    page,
-  }) => {
+  test('admin can navigate to embeddings management area', async ({ page }) => {
     await loginAndGoto(page, '/admin');
     await page.waitForLoadState('networkidle');
 
@@ -333,12 +367,12 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
       (e) =>
         !e.includes('favicon') &&
         !e.includes('Failed to load resource') &&
-        !e.includes('net::ERR'),
+        !e.includes('net::ERR')
     );
 
     // GraphQL field errors should not appear
     const graphqlErrors = criticalErrors.filter(
-      (e) => e.includes('Cannot query field') || e.includes('GraphQL error'),
+      (e) => e.includes('Cannot query field') || e.includes('GraphQL error')
     );
     expect(graphqlErrors).toHaveLength(0);
   });
@@ -358,11 +392,21 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
     expect(bodyText!.length).toBeGreaterThan(100);
   });
 
-  test('admin embedding dashboard shows stats cards via mock', async ({ page }) => {
+  test('admin embedding dashboard shows stats cards via mock', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+          body: '',
+        });
         return;
       }
       const body = req.postDataJSON() as { operationName?: string } | null;
@@ -375,11 +419,26 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
           body: JSON.stringify({
             data: {
               embeddingStats: {
-                totalSources: 50, indexedSources: 40, pendingSources: 5, failedSources: 5,
+                totalSources: 50,
+                indexedSources: 40,
+                pendingSources: 5,
+                failedSources: 5,
                 totalChunks: 1200,
                 courseBreakdown: [
-                  { courseId: 'c1', courseTitle: 'AI Basics', sourceCount: 20, indexedCount: 18, chunkCount: 500 },
-                  { courseId: 'c2', courseTitle: 'ML Advanced', sourceCount: 30, indexedCount: 22, chunkCount: 700 },
+                  {
+                    courseId: 'c1',
+                    courseTitle: 'AI Basics',
+                    sourceCount: 20,
+                    indexedCount: 18,
+                    chunkCount: 500,
+                  },
+                  {
+                    courseId: 'c2',
+                    courseTitle: 'ML Advanced',
+                    sourceCount: 30,
+                    indexedCount: 22,
+                    chunkCount: 700,
+                  },
                 ],
               },
             },
@@ -395,8 +454,22 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
           body: JSON.stringify({
             data: {
               embeddingActivity: [
-                { id: 'a1', timestamp: '2026-03-27T10:00:00Z', courseName: 'AI Basics', operation: 'index', status: 'completed', count: 42 },
-                { id: 'a2', timestamp: '2026-03-27T09:30:00Z', courseName: 'ML Advanced', operation: 'reindex', status: 'in_progress', count: 15 },
+                {
+                  id: 'a1',
+                  timestamp: '2026-03-27T10:00:00Z',
+                  courseName: 'AI Basics',
+                  operation: 'index',
+                  status: 'completed',
+                  count: 42,
+                },
+                {
+                  id: 'a2',
+                  timestamp: '2026-03-27T09:30:00Z',
+                  courseName: 'ML Advanced',
+                  operation: 'reindex',
+                  status: 'in_progress',
+                  count: 15,
+                },
               ],
             },
           }),
@@ -404,7 +477,11 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
         return;
       }
 
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await login(page);
@@ -417,13 +494,23 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
     expect(bodyText).not.toContain('Cannot query field');
   });
 
-  test('admin reindex flow: click Reindex All → confirmation dialog → execute → success', async ({ page }) => {
+  test('admin reindex flow: click Reindex All → confirmation dialog → execute → success', async ({
+    page,
+  }) => {
     let reindexCalled = false;
 
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
+        await route.fulfill({
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'content-type, authorization',
+          },
+          body: '',
+        });
         return;
       }
       const body = req.postDataJSON() as { operationName?: string } | null;
@@ -436,11 +523,26 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
           body: JSON.stringify({
             data: {
               embeddingStats: {
-                totalSources: 30, indexedSources: 25, pendingSources: 3, failedSources: 2,
+                totalSources: 30,
+                indexedSources: 25,
+                pendingSources: 3,
+                failedSources: 2,
                 totalChunks: 800,
                 courseBreakdown: [
-                  { courseId: 'c1', courseTitle: 'Course A', sourceCount: 15, indexedCount: 12, chunkCount: 400 },
-                  { courseId: 'c2', courseTitle: 'Course B', sourceCount: 15, indexedCount: 13, chunkCount: 400 },
+                  {
+                    courseId: 'c1',
+                    courseTitle: 'Course A',
+                    sourceCount: 15,
+                    indexedCount: 12,
+                    chunkCount: 400,
+                  },
+                  {
+                    courseId: 'c2',
+                    courseTitle: 'Course B',
+                    sourceCount: 15,
+                    indexedCount: 13,
+                    chunkCount: 400,
+                  },
                 ],
               },
             },
@@ -454,7 +556,9 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { reindexCourseEmbeddings: { success: true } } }),
+          body: JSON.stringify({
+            data: { reindexCourseEmbeddings: { success: true } },
+          }),
         });
         return;
       }
@@ -468,7 +572,11 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
         return;
       }
 
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await login(page);
@@ -481,7 +589,9 @@ test.describe('RAG Activation — Admin Embedding Dashboard', () => {
       await reindexBtn.click();
 
       // Confirmation dialog should appear
-      const confirmDialog = page.locator('[data-testid="reindex-confirm-dialog"]');
+      const confirmDialog = page.locator(
+        '[data-testid="reindex-confirm-dialog"]'
+      );
       if (await confirmDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
         await expect(confirmDialog).toBeVisible();
 

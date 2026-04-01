@@ -21,7 +21,10 @@ function KpiCard({ label, value }: KpiCardProps) {
 
 function KpiSkeleton() {
   return (
-    <div data-testid="kpi-skeleton" className="animate-pulse h-16 bg-muted rounded" />
+    <div
+      data-testid="kpi-skeleton"
+      className="animate-pulse h-16 bg-muted rounded"
+    />
   );
 }
 
@@ -48,7 +51,11 @@ export function AnalyticsDashboard() {
         <label htmlFor="date-range-select" className="sr-only">
           Date Range
         </label>
-        <select id="date-range-select" aria-label="Date Range" className="border rounded px-2 py-1">
+        <select
+          id="date-range-select"
+          aria-label="Date Range"
+          className="border rounded px-2 py-1"
+        >
           <option>Last 30 days</option>
           <option>Last 90 days</option>
         </select>

@@ -52,16 +52,14 @@ export function GlobalLocaleSync() {
     // login()/logout() clear this flag, so the first GlobalLocaleSync run
     // after login always re-reads from DB — preventing stale localStorage
     // from overriding the user's saved preference.
-    const alreadySynced =
-      sessionStorage.getItem(LOCALE_SYNCED_KEY) === 'true';
+    const alreadySynced = sessionStorage.getItem(LOCALE_SYNCED_KEY) === 'true';
 
     // Only change language when the DB locale actually differs from current.
     // Two cases where we sync:
     //   1. No localStorage (fresh session) AND DB locale differs from i18n
     //   2. Not yet synced this session (BUG-091: fresh login) AND DB differs
     const needsSync =
-      dbLocale !== i18n.language &&
-      (!cachedLocale || !alreadySynced);
+      dbLocale !== i18n.language && (!cachedLocale || !alreadySynced);
 
     if (needsSync) {
       void i18n.changeLanguage(dbLocale as SupportedLocale);

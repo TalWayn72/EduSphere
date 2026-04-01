@@ -11,11 +11,30 @@ interface Props {
   size?: BadgeSize;
 }
 
-const TIER_CONFIG: Record<PartnerTier, { icon: string; label: string; className: string }> = {
-  BRONZE: { icon: '🥉', label: 'Bronze', className: 'bg-amber-100 text-amber-800 border-amber-300' },
-  SILVER: { icon: '🥈', label: 'Silver', className: 'bg-slate-100 text-slate-700 border-slate-300' },
-  GOLD:   { icon: '🥇', label: 'Gold',   className: 'bg-yellow-100 text-yellow-800 border-yellow-400' },
-  PLATINUM: { icon: '💎', label: 'Platinum', className: 'bg-violet-100 text-violet-800 border-violet-300' },
+const TIER_CONFIG: Record<
+  PartnerTier,
+  { icon: string; label: string; className: string }
+> = {
+  BRONZE: {
+    icon: '🥉',
+    label: 'Bronze',
+    className: 'bg-amber-100 text-amber-800 border-amber-300',
+  },
+  SILVER: {
+    icon: '🥈',
+    label: 'Silver',
+    className: 'bg-slate-100 text-slate-700 border-slate-300',
+  },
+  GOLD: {
+    icon: '🥇',
+    label: 'Gold',
+    className: 'bg-yellow-100 text-yellow-800 border-yellow-400',
+  },
+  PLATINUM: {
+    icon: '💎',
+    label: 'Platinum',
+    className: 'bg-violet-100 text-violet-800 border-violet-300',
+  },
 };
 
 const SIZE_CLASS: Record<BadgeSize, string> = {
@@ -32,7 +51,9 @@ export function PartnerTierBadge({ tier, size = 'md' }: Props) {
       data-tier={tier.toLowerCase()}
       className={`inline-flex items-center gap-1 rounded border font-semibold ${config.className} ${SIZE_CLASS[size]}`}
     >
-      <span data-testid={`tier-${tier.toLowerCase()}`} aria-hidden="true">{config.icon}</span>
+      <span data-testid={`tier-${tier.toLowerCase()}`} aria-hidden="true">
+        {config.icon}
+      </span>
       {config.label}
     </span>
   );

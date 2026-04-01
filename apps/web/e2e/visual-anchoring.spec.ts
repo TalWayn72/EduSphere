@@ -23,7 +23,9 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     // Confirm anchor creation
     await page.click('[data-testid="confirm-anchor-btn"]');
-    await expect(page.locator('[data-testid="instructor-anchor-panel"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="instructor-anchor-panel"]')
+    ).toBeVisible();
   });
 
   test('asset uploader rejects files over 15MB', async ({ page }) => {
@@ -31,11 +33,15 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     // Mock a large file upload attempt
     await page.route('**/graphql', (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetPresignedUploadUrl') {
         // This should never be called for oversized files
         void route.fulfill({
-          json: { errors: [{ message: 'Should not reach server for 15MB+ files' }] },
+          json: {
+            errors: [{ message: 'Should not reach server for 15MB+ files' }],
+          },
         });
       } else {
         void route.continue();
@@ -57,7 +63,9 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
       input.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
-    await expect(page.locator('[data-testid="upload-error"]')).toContainText('15MB');
+    await expect(page.locator('[data-testid="upload-error"]')).toContainText(
+      '15MB'
+    );
   });
 
   test('student sees visual sidebar update on scroll', async ({ page }) => {
@@ -65,7 +73,9 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     // Mock GraphQL: return anchors with assigned images
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({
           json: {
@@ -110,7 +120,9 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
   test('sidebar shows empty state when no anchors', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({ json: { data: { getVisualAnchors: [] } } });
       } else {
@@ -120,7 +132,9 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 
     await page.goto('/learn/empty-doc');
     // Sidebar should render but show empty state (no image)
-    await expect(page.locator('[data-testid="sidebar-empty-state"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="sidebar-empty-state"]')
+    ).toBeVisible();
   });
 });
 
@@ -131,7 +145,9 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
   test('sidebar with image matches snapshot', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({
           json: {
@@ -153,7 +169,11 @@ test.describe('Visual Anchoring — Visual Regression', () => {
                     mimeType: 'image/png',
                     filename: 'test.png',
                     scanStatus: 'CLEAN',
-                    metadata: { width: 280, height: 200, altText: 'Test image' },
+                    metadata: {
+                      width: 280,
+                      height: 200,
+                      altText: 'Test image',
+                    },
                   },
                 },
               ],
@@ -167,14 +187,16 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.goto('/learn/m1');
     await page.waitForSelector('[data-testid="visual-sidebar"]');
-    await expect(page.locator('[data-testid="visual-sidebar"]')).toHaveScreenshot(
-      'visual-sidebar-with-image.png'
-    );
+    await expect(
+      page.locator('[data-testid="visual-sidebar"]')
+    ).toHaveScreenshot('visual-sidebar-with-image.png');
   });
 
   test('sidebar empty state matches snapshot', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({ json: { data: { getVisualAnchors: [] } } });
       } else {
@@ -184,8 +206,8 @@ test.describe('Visual Anchoring — Visual Regression', () => {
 
     await page.goto('/learn/empty-doc');
     await page.waitForSelector('[data-testid="visual-sidebar"]');
-    await expect(page.locator('[data-testid="visual-sidebar"]')).toHaveScreenshot(
-      'visual-sidebar-empty.png'
-    );
+    await expect(
+      page.locator('[data-testid="visual-sidebar"]')
+    ).toHaveScreenshot('visual-sidebar-empty.png');
   });
 });

@@ -56,6 +56,7 @@ flowchart TD
 **Severity:** P0 — affects all users
 
 ### Diagnosis
+
 ```bash
 # Check active connections
 docker exec edusphere-postgres psql -U edusphere -c \
@@ -67,6 +68,7 @@ docker exec edusphere-postgres psql -U edusphere -c \
 ```
 
 ### Resolution
+
 1. **Immediate:** Kill idle connections
    ```bash
    docker exec edusphere-postgres psql -U edusphere -c \
@@ -80,6 +82,7 @@ docker exec edusphere-postgres psql -U edusphere -c \
 4. **Root cause:** Check for connection leaks — verify all services implement `OnModuleDestroy` with `closeAllPools()`
 
 ### Prevention
+
 - Monitor `pg_stat_activity` count in Grafana
 - Alert at 80% of `max_connections`
 - Verify connection pool cleanup in code review
@@ -92,6 +95,7 @@ docker exec edusphere-postgres psql -U edusphere -c \
 **Severity:** P0 — all users locked out
 
 ### Diagnosis
+
 ```bash
 # Check Keycloak health
 curl -s http://localhost:8080/health/ready | jq .
@@ -104,6 +108,7 @@ curl -s http://localhost:8080/realms/edusphere/protocol/openid-connect/certs | j
 ```
 
 ### Resolution
+
 1. **If Keycloak is down:** Restart container
    ```bash
    docker restart edusphere-keycloak
@@ -124,6 +129,7 @@ curl -s http://localhost:8080/realms/edusphere/protocol/openid-connect/certs | j
    ```
 
 ### Prevention
+
 - JWKS cache TTL should be < 5 minutes
 - Keycloak liveness probe in Kubernetes
 - Daily realm export backup
@@ -136,6 +142,7 @@ curl -s http://localhost:8080/realms/edusphere/protocol/openid-connect/certs | j
 **Severity:** P1 — async features broken, core features still work
 
 ### Diagnosis
+
 ```bash
 # Check NATS server health
 docker exec edusphere-nats nats server check connection
@@ -151,6 +158,7 @@ docker exec edusphere-nats nats consumer ls EDUSPHERE
 ```
 
 ### Resolution
+
 1. **If NATS is down:** Restart container
    ```bash
    docker restart edusphere-nats
@@ -172,6 +180,7 @@ docker exec edusphere-nats nats consumer ls EDUSPHERE
    ```
 
 ### Prevention
+
 - Set `max_age` and `max_bytes` on all streams
 - Monitor consumer lag in Grafana
 - Alert when pending messages > 1000
@@ -184,6 +193,7 @@ docker exec edusphere-nats nats consumer ls EDUSPHERE
 **Severity:** P1 — upload/download broken, existing cached content may still work
 
 ### Diagnosis
+
 ```bash
 # Check MinIO health
 curl -s http://localhost:9000/minio/health/live
@@ -196,6 +206,7 @@ docker exec edusphere-minio mc ls local/edusphere
 ```
 
 ### Resolution
+
 1. **If MinIO is down:** Restart container
    ```bash
    docker restart edusphere-minio
@@ -217,6 +228,7 @@ docker exec edusphere-minio mc ls local/edusphere
    ```
 
 ### Prevention
+
 - Monitor disk usage with alerts at 80%
 - Set lifecycle rules for temporary upload folders
 - Use CDN for public assets to reduce MinIO load
@@ -229,6 +241,7 @@ docker exec edusphere-minio mc ls local/edusphere
 **Severity:** P1 — API layer broken
 
 ### Diagnosis
+
 ```bash
 # Check gateway health
 curl -s http://localhost:4000/graphql -H 'Content-Type: application/json' \
@@ -244,6 +257,7 @@ pnpm --filter @edusphere/gateway compose 2>&1 | tail -5
 ```
 
 ### Resolution
+
 1. **If gateway down:** Restart
    ```bash
    # Kill and restart gateway process
@@ -261,6 +275,7 @@ pnpm --filter @edusphere/gateway compose 2>&1 | tail -5
 4. **If entity resolution fails:** Check `@key` stubs in extending subgraphs
 
 ### Prevention
+
 - Gateway health check endpoint in load balancer
 - Supergraph composition in CI (already implemented)
 - Individual subgraph liveness probes
@@ -273,6 +288,7 @@ pnpm --filter @edusphere/gateway compose 2>&1 | tail -5
 **Severity:** P1 — affected service restarts, brief downtime
 
 ### Diagnosis
+
 ```bash
 # Check container restart counts
 docker ps --format "table {{.Names}}\t{{.Status}}"
@@ -288,10 +304,11 @@ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
 ```
 
 ### Resolution
+
 1. **Immediate:** Increase `mem_limit` in docker-compose
    ```yaml
-   mem_limit: 2g        # was 1g
-   mem_reservation: 1g  # was 512m
+   mem_limit: 2g # was 1g
+   mem_reservation: 1g # was 512m
    ```
 2. **If recurring:** Profile the heap
    ```bash
@@ -303,6 +320,7 @@ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
 4. **If database pool:** Check for connection pool leaks (missing `closeAllPools()`)
 
 ### Prevention
+
 - All containers MUST have `mem_limit` AND `mem_reservation`
 - `NODE_OPTIONS=--max-old-space-size` ≤ 75% of container `mem_limit`
 - Memory alerts in Grafana at 80% of container limit
@@ -319,4 +337,4 @@ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
 
 ---
 
-*Last updated: March 2026 — Enterprise Audit Wave 1*
+_Last updated: March 2026 — Enterprise Audit Wave 1_

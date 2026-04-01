@@ -9,8 +9,18 @@
  * Returns actionable gap report with recommended courses/lessons.
  */
 
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
-import { createDatabaseConnection, closeAllPools, schema, eq } from '@edusphere/db';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import {
+  createDatabaseConnection,
+  closeAllPools,
+  schema,
+  eq,
+} from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 
 export interface KnowledgeGap {
@@ -115,7 +125,11 @@ export class GapAnalysisService implements OnModuleDestroy {
     const criticalGaps = sorted.filter((g) => g.severity === 'HIGH');
 
     this.logger.log(
-      { tenantId, totalGaps: sorted.length, criticalCount: criticalGaps.length },
+      {
+        tenantId,
+        totalGaps: sorted.length,
+        criticalCount: criticalGaps.length,
+      },
       'GapAnalysisService: gap report generated'
     );
 

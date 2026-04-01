@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('@dnd-kit/core', () => ({
-  DndContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DndContext: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   closestCenter: vi.fn(),
   KeyboardSensor: vi.fn(),
   PointerSensor: vi.fn(),
@@ -12,7 +14,9 @@ vi.mock('@dnd-kit/core', () => ({
 }));
 
 vi.mock('@dnd-kit/sortable', () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SortableContext: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   sortableKeyboardCoordinates: vi.fn(),
   verticalListSortingStrategy: 'vertical',
   useSortable: vi.fn(() => ({
@@ -26,7 +30,9 @@ vi.mock('@dnd-kit/sortable', () => ({
 }));
 
 vi.mock('lucide-react', () => ({
-  GripVertical: ({ size }: { size: number }) => <span data-testid="grip-icon">{size}</span>,
+  GripVertical: ({ size }: { size: number }) => (
+    <span data-testid="grip-icon">{size}</span>
+  ),
 }));
 
 vi.mock('@/lib/lesson-pipeline.store', () => ({
@@ -40,8 +46,24 @@ import { PipelineSortableCanvas } from './PipelineSortableCanvas';
 import type { PipelineNode } from '@/lib/lesson-pipeline.store';
 
 const MOCK_NODES: PipelineNode[] = [
-  { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
-  { id: 'n2', moduleType: 'ASR', label: 'Transcription (ASR)', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
+  {
+    id: 'n1',
+    moduleType: 'INGESTION',
+    label: 'Ingestion',
+    labelHe: 'איסוף חומרים',
+    enabled: true,
+    order: 0,
+    config: {},
+  },
+  {
+    id: 'n2',
+    moduleType: 'ASR',
+    label: 'Transcription (ASR)',
+    labelHe: 'תמלול',
+    enabled: true,
+    order: 1,
+    config: {},
+  },
 ];
 
 describe('PipelineSortableCanvas', () => {
@@ -73,7 +95,9 @@ describe('PipelineSortableCanvas', () => {
   });
 
   it('renders custom mode empty canvas message', () => {
-    render(<PipelineSortableCanvas {...defaultProps} nodes={[]} customMode={true} />);
+    render(
+      <PipelineSortableCanvas {...defaultProps} nodes={[]} customMode={true} />
+    );
     expect(screen.getByText('מצב בנייה חופשית')).toBeInTheDocument();
   });
 

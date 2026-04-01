@@ -40,7 +40,9 @@ import { RichDocumentPageAnchors } from './RichDocumentPageAnchors';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const EMPTY_QUERY = [{ data: undefined, fetching: false, error: undefined }] as never;
+const EMPTY_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+] as never;
 const ANCHORS_QUERY = [
   {
     data: {
@@ -74,7 +76,7 @@ describe('RichDocumentPageAnchors', () => {
         scrollContainerRef={createScrollRef()}
       >
         <div>Document content</div>
-      </RichDocumentPageAnchors>,
+      </RichDocumentPageAnchors>
     );
     expect(screen.getByTestId('visual-sidebar')).toBeInTheDocument();
     expect(screen.queryByTestId('instructor-panel')).not.toBeInTheDocument();
@@ -89,7 +91,7 @@ describe('RichDocumentPageAnchors', () => {
         scrollContainerRef={createScrollRef()}
       >
         <div>Document content</div>
-      </RichDocumentPageAnchors>,
+      </RichDocumentPageAnchors>
     );
     expect(screen.getByTestId('instructor-panel')).toBeInTheDocument();
     expect(screen.queryByTestId('visual-sidebar')).not.toBeInTheDocument();
@@ -104,9 +106,11 @@ describe('RichDocumentPageAnchors', () => {
         scrollContainerRef={createScrollRef()}
       >
         <div data-testid="child-content">Hello World</div>
-      </RichDocumentPageAnchors>,
+      </RichDocumentPageAnchors>
     );
-    expect(screen.getByTestId('child-content')).toHaveTextContent('Hello World');
+    expect(screen.getByTestId('child-content')).toHaveTextContent(
+      'Hello World'
+    );
   });
 
   it('renders AnchorFrame overlay', () => {
@@ -118,7 +122,7 @@ describe('RichDocumentPageAnchors', () => {
         scrollContainerRef={createScrollRef()}
       >
         <div>Content</div>
-      </RichDocumentPageAnchors>,
+      </RichDocumentPageAnchors>
     );
     expect(screen.getByTestId('anchor-frame')).toBeInTheDocument();
   });
@@ -132,10 +136,10 @@ describe('RichDocumentPageAnchors', () => {
         scrollContainerRef={createScrollRef()}
       >
         <div>Content</div>
-      </RichDocumentPageAnchors>,
+      </RichDocumentPageAnchors>
     );
     expect(urql.useQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ pause: true }),
+      expect.objectContaining({ pause: true })
     );
   });
 });

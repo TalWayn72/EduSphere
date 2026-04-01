@@ -65,16 +65,12 @@ beforeEach(() => {
 // ── tests ─────────────────────────────────────────────────────────────────────
 describe('ModuleConfigs — ASR module', () => {
   it('renders ASR language field', () => {
-    render(
-      <ModuleConfigs moduleType="ASR" config={{}} onChange={vi.fn()} />
-    );
+    render(<ModuleConfigs moduleType="ASR" config={{}} onChange={vi.fn()} />);
     expect(screen.getByText('pipeline.asrLanguage')).toBeTruthy();
   });
 
   it('defaults to DEFAULT_LOCALE when no language set', () => {
-    render(
-      <ModuleConfigs moduleType="ASR" config={{}} onChange={vi.fn()} />
-    );
+    render(<ModuleConfigs moduleType="ASR" config={{}} onChange={vi.fn()} />);
     const select = screen.getByTestId('config-select') as HTMLSelectElement;
     expect(select.value).toBe('he');
   });
@@ -93,9 +89,7 @@ describe('ModuleConfigs — ASR module', () => {
 
   it('calls onChange with language key when changed', () => {
     const onChange = vi.fn();
-    render(
-      <ModuleConfigs moduleType="ASR" config={{}} onChange={onChange} />
-    );
+    render(<ModuleConfigs moduleType="ASR" config={{}} onChange={onChange} />);
     fireEvent.change(screen.getByTestId('config-select'), {
       target: { value: 'ar' },
     });
@@ -106,14 +100,22 @@ describe('ModuleConfigs — ASR module', () => {
 describe('ModuleConfigs — SUMMARIZATION module', () => {
   it('renders summarization style field', () => {
     render(
-      <ModuleConfigs moduleType="SUMMARIZATION" config={{}} onChange={vi.fn()} />
+      <ModuleConfigs
+        moduleType="SUMMARIZATION"
+        config={{}}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByText('pipeline.summarizationStyle')).toBeTruthy();
   });
 
   it('defaults to academic style', () => {
     render(
-      <ModuleConfigs moduleType="SUMMARIZATION" config={{}} onChange={vi.fn()} />
+      <ModuleConfigs
+        moduleType="SUMMARIZATION"
+        config={{}}
+        onChange={vi.fn()}
+      />
     );
     const select = screen.getByTestId('config-select') as HTMLSelectElement;
     expect(select.value).toBe('academic');
@@ -122,7 +124,11 @@ describe('ModuleConfigs — SUMMARIZATION module', () => {
   it('calls onChange with style when changed', () => {
     const onChange = vi.fn();
     render(
-      <ModuleConfigs moduleType="SUMMARIZATION" config={{}} onChange={onChange} />
+      <ModuleConfigs
+        moduleType="SUMMARIZATION"
+        config={{}}
+        onChange={onChange}
+      />
     );
     fireEvent.change(screen.getByTestId('config-select'), {
       target: { value: 'friendly' },
@@ -134,14 +140,22 @@ describe('ModuleConfigs — SUMMARIZATION module', () => {
 describe('ModuleConfigs — DIAGRAM_GENERATOR module', () => {
   it('renders diagram type field', () => {
     render(
-      <ModuleConfigs moduleType="DIAGRAM_GENERATOR" config={{}} onChange={vi.fn()} />
+      <ModuleConfigs
+        moduleType="DIAGRAM_GENERATOR"
+        config={{}}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByText('pipeline.diagramType')).toBeTruthy();
   });
 
   it('defaults to mindmap type', () => {
     render(
-      <ModuleConfigs moduleType="DIAGRAM_GENERATOR" config={{}} onChange={vi.fn()} />
+      <ModuleConfigs
+        moduleType="DIAGRAM_GENERATOR"
+        config={{}}
+        onChange={vi.fn()}
+      />
     );
     const select = screen.getByTestId('config-select') as HTMLSelectElement;
     expect(select.value).toBe('mindmap');
@@ -150,7 +164,11 @@ describe('ModuleConfigs — DIAGRAM_GENERATOR module', () => {
   it('calls onChange with diagramType when changed', () => {
     const onChange = vi.fn();
     render(
-      <ModuleConfigs moduleType="DIAGRAM_GENERATOR" config={{}} onChange={onChange} />
+      <ModuleConfigs
+        moduleType="DIAGRAM_GENERATOR"
+        config={{}}
+        onChange={onChange}
+      />
     );
     fireEvent.change(screen.getByTestId('config-select'), {
       target: { value: 'flowchart' },
@@ -162,7 +180,11 @@ describe('ModuleConfigs — DIAGRAM_GENERATOR module', () => {
 describe('ModuleConfigs — CITATION_VERIFIER module', () => {
   it('renders strict mode checkbox', () => {
     render(
-      <ModuleConfigs moduleType="CITATION_VERIFIER" config={{}} onChange={vi.fn()} />
+      <ModuleConfigs
+        moduleType="CITATION_VERIFIER"
+        config={{}}
+        onChange={vi.fn()}
+      />
     );
     expect(screen.getByTestId('strict-mode-toggle')).toBeTruthy();
     expect(screen.getByText('pipeline.strictMode')).toBeTruthy();
@@ -263,7 +285,11 @@ describe('ModuleConfigs — auto modules', () => {
 describe('ModuleConfigs — unknown module', () => {
   it('renders nothing for unknown module type', () => {
     const { container } = render(
-      <ModuleConfigs moduleType="UNKNOWN_MODULE" config={{}} onChange={vi.fn()} />
+      <ModuleConfigs
+        moduleType="UNKNOWN_MODULE"
+        config={{}}
+        onChange={vi.fn()}
+      />
     );
     expect(container.innerHTML).toBe('');
   });

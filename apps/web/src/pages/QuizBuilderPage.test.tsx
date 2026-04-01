@@ -4,10 +4,15 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import React from 'react';
 
 // ── urql mock ──────────────────────────────────────────────────────────────────
-const mockCreateContentItem = vi.fn().mockResolvedValue({ data: {}, error: undefined });
+const mockCreateContentItem = vi
+  .fn()
+  .mockResolvedValue({ data: {}, error: undefined });
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, mockCreateContentItem]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    mockCreateContentItem,
+  ]),
   gql: (s: TemplateStringsArray) => s.join(''),
 }));
 
@@ -32,11 +37,15 @@ vi.mock('react-router-dom', async () => {
 
 // ── UI component mocks ────────────────────────────────────────────────────────
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -45,9 +54,15 @@ vi.mock('@/components/PageHeader', () => ({
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardTitle: ({ children }: { children: React.ReactNode }) => <h1>{children}</h1>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <h1>{children}</h1>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
@@ -57,21 +72,34 @@ vi.mock('@/components/ui/button', () => ({
     type,
     disabled,
     ...rest
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => (
-    <button type={type ?? 'button'} onClick={onClick} disabled={disabled} {...rest}>
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => (
+    <button
+      type={type ?? 'button'}
+      onClick={onClick}
+      disabled={disabled}
+      {...rest}
+    >
       {children}
     </button>
   ),
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: React.InputHTMLAttributes<HTMLInputElement>) => <input {...props} />,
+  Input: (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input {...props} />
+  ),
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
-    <label htmlFor={htmlFor}>{children}</label>
-  ),
+  Label: ({
+    children,
+    htmlFor,
+  }: {
+    children: React.ReactNode;
+    htmlFor?: string;
+  }) => <label htmlFor={htmlFor}>{children}</label>,
 }));
 
 vi.mock('@/components/ui/slider', () => ({
@@ -114,12 +142,26 @@ vi.mock('lucide-react', () => ({
 }));
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
-    open ? <div role="dialog">{children}</div> : null,
-  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  Dialog: ({
+    children,
+    open,
+  }: {
+    children: React.ReactNode;
+    open?: boolean;
+  }) => (open ? <div role="dialog">{children}</div> : null),
+  DialogContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2>{children}</h2>
+  ),
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
 }));
@@ -138,7 +180,7 @@ function renderPage() {
         />
         <Route path="/dashboard" element={<div>Dashboard</div>} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -174,24 +216,34 @@ describe('QuizBuilderPage', () => {
     const addBtn = screen.getByRole('button', { name: /add question/i });
     fireEvent.click(addBtn);
     fireEvent.click(addBtn);
-    expect(screen.getAllByRole('button', { name: /remove question/i })).toHaveLength(2);
+    expect(
+      screen.getAllByRole('button', { name: /remove question/i })
+    ).toHaveLength(2);
 
-    const removeButtons = screen.getAllByRole('button', { name: /remove question/i });
+    const removeButtons = screen.getAllByRole('button', {
+      name: /remove question/i,
+    });
     fireEvent.click(removeButtons[0]);
-    expect(screen.getAllByRole('button', { name: /remove question/i })).toHaveLength(1);
+    expect(
+      screen.getAllByRole('button', { name: /remove question/i })
+    ).toHaveLength(1);
   });
 
   it('shows validation error when submitting with no questions', async () => {
     renderPage();
     // Fill in the title to avoid the "title required" error
-    const titleInput = screen.getByPlaceholderText(/e\.g\. Module 1 Assessment/i);
+    const titleInput = screen.getByPlaceholderText(
+      /e\.g\. Module 1 Assessment/i
+    );
     fireEvent.change(titleInput, { target: { value: 'My Quiz' } });
 
     const submitBtn = screen.getByRole('button', { name: /create quiz/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.getByRole('alert').textContent).toContain('Add at least one question');
+      expect(screen.getByRole('alert').textContent).toContain(
+        'Add at least one question'
+      );
     });
     expect(mockCreateContentItem).not.toHaveBeenCalled();
   });
@@ -200,7 +252,9 @@ describe('QuizBuilderPage', () => {
     renderPage();
 
     // Set title
-    const titleInput = screen.getByPlaceholderText(/e\.g\. Module 1 Assessment/i);
+    const titleInput = screen.getByPlaceholderText(
+      /e\.g\. Module 1 Assessment/i
+    );
     fireEvent.change(titleInput, { target: { value: 'Test Quiz' } });
 
     // Add a question
@@ -238,7 +292,12 @@ describe('QuizBuilderPage', () => {
 
     const body = JSON.parse(callArg.input.body) as {
       passingScore: number;
-      items: { type: string; question: string; choices: string[]; correctIndex: number }[];
+      items: {
+        type: string;
+        question: string;
+        choices: string[];
+        correctIndex: number;
+      }[];
     };
     expect(typeof body.passingScore).toBe('number');
     expect(Array.isArray(body.items)).toBe(true);

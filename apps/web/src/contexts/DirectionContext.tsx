@@ -19,7 +19,7 @@ function getDirection(lang: string): 'ltr' | 'rtl' {
 
 export function DirectionProvider({ children }: { children: React.ReactNode }) {
   const [direction, setDirection] = useState<'ltr' | 'rtl'>(() =>
-    getDirection(i18n.language ?? 'en'),
+    getDirection(i18n.language ?? 'en')
   );
 
   useEffect(() => {

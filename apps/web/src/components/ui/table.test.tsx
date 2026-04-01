@@ -1,7 +1,16 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from './table';
 
 describe('Table', () => {
   it('renders a table element', () => {
@@ -34,14 +43,26 @@ describe('Table', () => {
 describe('TableHeader', () => {
   it('renders a thead element', () => {
     render(
-      <table><TableHeader data-testid="thead"><tr><td>H</td></tr></TableHeader></table>
+      <table>
+        <TableHeader data-testid="thead">
+          <tr>
+            <td>H</td>
+          </tr>
+        </TableHeader>
+      </table>
     );
     expect(screen.getByTestId('thead').tagName).toBe('THEAD');
   });
 
   it('forwards className', () => {
     render(
-      <table><TableHeader className="bg-gray" data-testid="thead"><tr><td>H</td></tr></TableHeader></table>
+      <table>
+        <TableHeader className="bg-gray" data-testid="thead">
+          <tr>
+            <td>H</td>
+          </tr>
+        </TableHeader>
+      </table>
     );
     expect(screen.getByTestId('thead')).toHaveClass('bg-gray');
   });
@@ -54,7 +75,13 @@ describe('TableHeader', () => {
 describe('TableBody', () => {
   it('renders a tbody element', () => {
     render(
-      <table><TableBody data-testid="tbody"><tr><td>B</td></tr></TableBody></table>
+      <table>
+        <TableBody data-testid="tbody">
+          <tr>
+            <td>B</td>
+          </tr>
+        </TableBody>
+      </table>
     );
     expect(screen.getByTestId('tbody').tagName).toBe('TBODY');
   });
@@ -67,7 +94,13 @@ describe('TableBody', () => {
 describe('TableFooter', () => {
   it('renders a tfoot element', () => {
     render(
-      <table><TableFooter data-testid="tfoot"><tr><td>F</td></tr></TableFooter></table>
+      <table>
+        <TableFooter data-testid="tfoot">
+          <tr>
+            <td>F</td>
+          </tr>
+        </TableFooter>
+      </table>
     );
     expect(screen.getByTestId('tfoot').tagName).toBe('TFOOT');
   });
@@ -80,14 +113,26 @@ describe('TableFooter', () => {
 describe('TableRow', () => {
   it('renders a tr element', () => {
     render(
-      <table><tbody><TableRow data-testid="tr"><td>R</td></TableRow></tbody></table>
+      <table>
+        <tbody>
+          <TableRow data-testid="tr">
+            <td>R</td>
+          </TableRow>
+        </tbody>
+      </table>
     );
     expect(screen.getByTestId('tr').tagName).toBe('TR');
   });
 
   it('forwards className', () => {
     render(
-      <table><tbody><TableRow className="bg-red" data-testid="tr"><td>R</td></TableRow></tbody></table>
+      <table>
+        <tbody>
+          <TableRow className="bg-red" data-testid="tr">
+            <td>R</td>
+          </TableRow>
+        </tbody>
+      </table>
     );
     expect(screen.getByTestId('tr')).toHaveClass('bg-red');
   });
@@ -100,7 +145,13 @@ describe('TableRow', () => {
 describe('TableHead', () => {
   it('renders a th element', () => {
     render(
-      <table><thead><tr><TableHead data-testid="th">Header</TableHead></tr></thead></table>
+      <table>
+        <thead>
+          <tr>
+            <TableHead data-testid="th">Header</TableHead>
+          </tr>
+        </thead>
+      </table>
     );
     expect(screen.getByTestId('th').tagName).toBe('TH');
   });
@@ -113,14 +164,28 @@ describe('TableHead', () => {
 describe('TableCell', () => {
   it('renders a td element', () => {
     render(
-      <table><tbody><tr><TableCell data-testid="td">Cell</TableCell></tr></tbody></table>
+      <table>
+        <tbody>
+          <tr>
+            <TableCell data-testid="td">Cell</TableCell>
+          </tr>
+        </tbody>
+      </table>
     );
     expect(screen.getByTestId('td').tagName).toBe('TD');
   });
 
   it('forwards className', () => {
     render(
-      <table><tbody><tr><TableCell className="px-8" data-testid="td">C</TableCell></tr></tbody></table>
+      <table>
+        <tbody>
+          <tr>
+            <TableCell className="px-8" data-testid="td">
+              C
+            </TableCell>
+          </tr>
+        </tbody>
+      </table>
     );
     expect(screen.getByTestId('td')).toHaveClass('px-8');
   });
@@ -133,7 +198,9 @@ describe('TableCell', () => {
 describe('TableCaption', () => {
   it('renders a caption element', () => {
     render(
-      <table><TableCaption data-testid="cap">Caption</TableCaption></table>
+      <table>
+        <TableCaption data-testid="cap">Caption</TableCaption>
+      </table>
     );
     expect(screen.getByTestId('cap').tagName).toBe('CAPTION');
   });

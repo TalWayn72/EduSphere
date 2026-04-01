@@ -63,8 +63,20 @@ export async function runVisualAssetUploadPipeline(opts: {
   imageOptimizer: ImageOptimizerService;
   logger: Logger;
 }): Promise<VisualAssetRow> {
-  const { fileKey, courseId, originalName, declaredMimeType, declaredSize,
-          authCtx, db, s3, bucket, clamav, imageOptimizer, logger } = opts;
+  const {
+    fileKey,
+    courseId,
+    originalName,
+    declaredMimeType,
+    declaredSize,
+    authCtx,
+    db,
+    s3,
+    bucket,
+    clamav,
+    imageOptimizer,
+    logger,
+  } = opts;
 
   // 1. Declared size guard
   if (declaredSize > MAX_VISUAL_ASSET_BYTES) {
@@ -76,11 +88,15 @@ export async function runVisualAssetUploadPipeline(opts: {
   // 2. Download buffer from MinIO quarantine key
   let buffer: Buffer;
   try {
-    const resp = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: fileKey }));
+    const resp = await s3.send(
+      new GetObjectCommand({ Bucket: bucket, Key: fileKey })
+    );
     if (!resp.Body) throw new Error('Empty response body');
     buffer = await streamToBuffer(resp.Body as NodeJS.ReadableStream);
   } catch (err) {
-    logger.error(`[VisualAssetUpload] Failed to download quarantine file ${fileKey}: ${String(err)}`);
+    logger.error(
+      `[VisualAssetUpload] Failed to download quarantine file ${fileKey}: ${String(err)}`
+    );
     throw new InternalServerErrorException('Failed to retrieve uploaded file.');
   }
 
@@ -96,7 +112,9 @@ export async function runVisualAssetUploadPipeline(opts: {
 
   if (scanResult.isInfected) {
     // Delete quarantine copy immediately (do not store infected file)
-    await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: fileKey })).catch(() => undefined);
+    await s3
+      .send(new DeleteObjectCommand({ Bucket: bucket, Key: fileKey }))
+      .catch(() => undefined);
     logger.error(
       `[VisualAssetUpload] INFECTED upload rejected | tenantId=${authCtx.tenantId} userId=${authCtx.userId} filename=${sanitizedName} viruses=${scanResult.viruses.join(',')}`
     );
@@ -116,29 +134,37 @@ export async function runVisualAssetUploadPipeline(opts: {
   const webpKey = producesWebp ? `${productionKey}.webp` : null;
 
   // 9. Upload original to production key
-  await s3.send(new PutObjectCommand({
-    Bucket: bucket,
-    Key: productionKey,
-    Body: buffer,
-    ContentType: actualMime,
-    ContentLength: buffer.length,
-  }));
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: productionKey,
+      Body: buffer,
+      ContentType: actualMime,
+      ContentLength: buffer.length,
+    })
+  );
 
   // 10. Upload WebP variant if produced
   if (webpKey && producesWebp) {
-    await s3.send(new PutObjectCommand({
-      Bucket: bucket,
-      Key: webpKey,
-      Body: webpBuffer,
-      ContentType: 'image/webp',
-      ContentLength: webpBuffer.length,
-    }));
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: webpKey,
+        Body: webpBuffer,
+        ContentType: 'image/webp',
+        ContentLength: webpBuffer.length,
+      })
+    );
   }
 
   // 11. Delete quarantine file (best-effort, non-fatal)
-  await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: fileKey })).catch((err: unknown) => {
-    logger.warn(`[VisualAssetUpload] Could not delete quarantine key ${fileKey}: ${String(err)}`);
-  });
+  await s3
+    .send(new DeleteObjectCommand({ Bucket: bucket, Key: fileKey }))
+    .catch((err: unknown) => {
+      logger.warn(
+        `[VisualAssetUpload] Could not delete quarantine key ${fileKey}: ${String(err)}`
+      );
+    });
 
   // 12. Generate presigned read URLs
   const storageUrl = await getSignedUrl(
@@ -176,7 +202,9 @@ export async function runVisualAssetUploadPipeline(opts: {
   );
 
   if (!asset) {
-    throw new InternalServerErrorException('Failed to save visual asset record.');
+    throw new InternalServerErrorException(
+      'Failed to save visual asset record.'
+    );
   }
 
   logger.log(

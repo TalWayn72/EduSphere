@@ -9,9 +9,11 @@ vi.mock('../src/db.js', () => ({
   closeDb: () => {},
 }));
 
-const { registerAgent, updateStatus, getDivisionStatus } = await import('../src/status.js');
+const { registerAgent, updateStatus, getDivisionStatus } =
+  await import('../src/status.js');
 const { logViolation, getViolations } = await import('../src/rules.js');
-const { requestHelp, respondHelp, getPendingHelp } = await import('../src/help.js');
+const { requestHelp, respondHelp, getPendingHelp } =
+  await import('../src/help.js');
 
 beforeEach(() => {
   db = createTestDb();
@@ -51,7 +53,9 @@ describe('updateStatus', () => {
 
   it('throws on invalid status', () => {
     registerAgent('be-1', 'Backend', 'API');
-    expect(() => updateStatus('be-1', 'invalid_status')).toThrow('Invalid status');
+    expect(() => updateStatus('be-1', 'invalid_status')).toThrow(
+      'Invalid status'
+    );
   });
 });
 

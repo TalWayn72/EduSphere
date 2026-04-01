@@ -40,8 +40,8 @@ export function ExamViolationWarning({
   isVoided,
   onDismiss,
 }: ExamViolationWarningProps) {
-  const description = VIOLATION_LABELS[violationType]
-    ?? 'An integrity violation was detected.';
+  const description =
+    VIOLATION_LABELS[violationType] ?? 'An integrity violation was detected.';
 
   return (
     <Dialog open={open} onOpenChange={() => !isVoided && onDismiss()}>

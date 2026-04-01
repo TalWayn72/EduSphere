@@ -26,7 +26,9 @@ export function useLiveSessionActions(): UseLiveSessionActionsReturn {
   const [startResult, executeStart] = useMutation(START_LIVE_SESSION_MUTATION);
   const [endResult, executeEnd] = useMutation(END_LIVE_SESSION_MUTATION);
   const [joinResult, executeJoin] = useMutation(JOIN_LIVE_SESSION_MUTATION);
-  const [cancelResult, executeCancel] = useMutation(CANCEL_LIVE_SESSION_MUTATION);
+  const [cancelResult, executeCancel] = useMutation(
+    CANCEL_LIVE_SESSION_MUTATION
+  );
 
   const startSession = async (sessionId: string): Promise<void> => {
     const result = await executeStart({ sessionId });
@@ -48,7 +50,9 @@ export function useLiveSessionActions(): UseLiveSessionActionsReturn {
       toast.error('Failed to join session. Please try again.');
       return null;
     }
-    return (result.data?.joinLiveSession?.roomUrl as string | undefined) ?? null;
+    return (
+      (result.data?.joinLiveSession?.roomUrl as string | undefined) ?? null
+    );
   };
 
   const cancelSession = async (sessionId: string): Promise<void> => {

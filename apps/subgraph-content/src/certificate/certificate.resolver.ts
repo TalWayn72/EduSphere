@@ -25,7 +25,7 @@ function requireAuth(ctx: GqlContext): TenantContext {
 export class CertificateResolver {
   constructor(
     private readonly certificateService: CertificateService,
-    private readonly certificateDownloadService: CertificateDownloadService,
+    private readonly certificateDownloadService: CertificateDownloadService
   ) {}
 
   @Query('myCertificates')
@@ -42,13 +42,13 @@ export class CertificateResolver {
   @Query('certificateDownloadUrl')
   async getCertificateDownloadUrl(
     @Context() ctx: GqlContext,
-    @Args('certId') certId: string,
+    @Args('certId') certId: string
   ): Promise<string> {
     const tenantCtx = requireAuth(ctx);
     return this.certificateDownloadService.getCertificateDownloadUrl(
       certId,
       tenantCtx.userId,
-      tenantCtx.tenantId,
+      tenantCtx.tenantId
     );
   }
 }

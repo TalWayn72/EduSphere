@@ -33,9 +33,7 @@ export const apiKeys = pgTable(
     keyPrefix: varchar('key_prefix', { length: 8 }).notNull(),
     /** e.g., ['courses:read', 'users:read', 'analytics:read'] */
     scopes: varchar('scopes', { length: 50 }).array().notNull().default([]),
-    rateLimitPerMinute: integer('rate_limit_per_minute')
-      .notNull()
-      .default(60),
+    rateLimitPerMinute: integer('rate_limit_per_minute').notNull().default(60),
     lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     isActive: boolean('is_active').notNull().default(true),

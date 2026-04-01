@@ -28,7 +28,7 @@ const SECTIONS = [
     body: 'We use essential cookies for authentication and platform functionality, and optional analytics cookies to understand usage patterns. You can manage cookie preferences through your browser settings. The platform functions fully with only essential cookies enabled.',
   },
   {
-    title: '7. Children\'s Privacy',
+    title: "7. Children's Privacy",
     body: 'EduSphere is designed for users aged 16 and above. We do not knowingly collect personal data from children under 16. If we discover such data has been collected, it will be promptly deleted. Institutions deploying EduSphere for younger learners must obtain appropriate parental consent.',
   },
   {
@@ -46,14 +46,20 @@ export function PrivacyPage() {
         description="EduSphere Privacy Policy — how we collect, use, and protect your data."
       />
 
-      <div data-testid="privacy-page" className="mx-auto w-full max-w-3xl px-6 py-12">
+      <div
+        data-testid="privacy-page"
+        className="mx-auto w-full max-w-3xl px-6 py-12"
+      >
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <h1>{t('privacyPage.heading')}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('privacyPage.lastUpdated')}: March 2026</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t('privacyPage.lastUpdated')}: March 2026
+          </p>
           <p>
-            EduSphere (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is committed to protecting your
-            privacy. This policy explains how we collect, use, and safeguard your personal
-            information when you use our knowledge-graph educational platform.
+            EduSphere (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is
+            committed to protecting your privacy. This policy explains how we
+            collect, use, and safeguard your personal information when you use
+            our knowledge-graph educational platform.
           </p>
 
           {SECTIONS.map((section) => (

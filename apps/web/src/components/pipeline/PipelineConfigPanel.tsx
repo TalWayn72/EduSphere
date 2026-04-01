@@ -10,7 +10,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_LOCALE } from '@edusphere/i18n';
-import { useLessonPipelineStore, type PipelineNode } from '@/lib/lesson-pipeline.store';
+import {
+  useLessonPipelineStore,
+  type PipelineNode,
+} from '@/lib/lesson-pipeline.store';
 import { IngestionConfig } from './config-panel/IngestionConfig';
 import { ModuleConfigs } from './config-panel/ModuleConfigs';
 
@@ -34,7 +37,11 @@ const PIPELINE_LOCALE_KEY = 'edusphere:pipeline:contentLocale';
 function useLastPipelineLocale(): [string, (v: string) => void] {
   const { i18n } = useTranslation();
   const [locale, setLocaleState] = useState<string>(() => {
-    return localStorage.getItem(PIPELINE_LOCALE_KEY) ?? i18n.language ?? DEFAULT_LOCALE;
+    return (
+      localStorage.getItem(PIPELINE_LOCALE_KEY) ??
+      i18n.language ??
+      DEFAULT_LOCALE
+    );
   });
   const setLocale = (v: string) => {
     localStorage.setItem(PIPELINE_LOCALE_KEY, v);
@@ -81,7 +88,9 @@ export function PipelineConfigPanel({ node, assets, onClose }: Props) {
 
       {/* Enable / Disable */}
       <div className="px-4 py-3 border-b flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{t('pipeline.enableModule')}</span>
+        <span className="text-sm text-muted-foreground">
+          {t('pipeline.enableModule')}
+        </span>
         <button
           role="switch"
           aria-checked={node.enabled}

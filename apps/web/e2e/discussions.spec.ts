@@ -17,7 +17,9 @@ test.describe('Discussions — DEV_MODE guard', () => {
   });
 
   test('discussions page renders heading', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -26,24 +28,34 @@ test.describe('Discussions — DEV_MODE guard', () => {
   });
 
   test('discussions page has no crash overlay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
     });
   });
 
   test('no [object Object] in discussions DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
-  test('discussions page shows threads list or empty state', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+  test('discussions page shows threads list or empty state', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
-    const hasThreads = await page.locator('[data-testid="discussion-thread"]').count();
+    const hasThreads = await page
+      .locator('[data-testid="discussion-thread"]')
+      .count();
     const hasEmpty = await page
       .getByText(/No discussions yet|Start a discussion|Be the first/i)
       .count();
@@ -61,7 +73,9 @@ test.describe('Discussions — Live backend', () => {
   });
 
   test('discussions page renders with screenshot', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -75,7 +89,9 @@ test.describe('Discussions — Live backend', () => {
   test('XSS guard — raw HTML tags not rendered in discussion messages', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Verify no unescaped script tags appear in visible text
@@ -157,7 +173,11 @@ test.describe('Discussions — thread and reply flows', () => {
       if (op === 'CreateDiscussion' || op === 'CreateThread') {
         return JSON.stringify({
           data: {
-            createDiscussion: { id: 'thread-new', title: 'New Thread', success: true },
+            createDiscussion: {
+              id: 'thread-new',
+              title: 'New Thread',
+              success: true,
+            },
           },
         });
       }
@@ -178,15 +198,22 @@ test.describe('Discussions — thread and reply flows', () => {
     await login(page);
   });
 
-  test('thread creation — new thread button does not crash', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+  test('thread creation — new thread button does not crash', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const newThreadBtn = page.locator(
       '[data-testid="new-discussion-btn"], button:has-text("New Discussion"), button:has-text("Start"), button:has-text("New Thread")'
     );
     if ((await newThreadBtn.count()) > 0) {
-      await newThreadBtn.first().click().catch(() => {});
+      await newThreadBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -195,8 +222,12 @@ test.describe('Discussions — thread and reply flows', () => {
     });
   });
 
-  test('thread creation form — title and body inputs work', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions/new`, { waitUntil: 'domcontentloaded' });
+  test('thread creation form — title and body inputs work', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/discussions/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const titleInput = page.locator(
@@ -210,7 +241,9 @@ test.describe('Discussions — thread and reply flows', () => {
       '[data-testid="thread-body-input"], textarea[name="body"], textarea[placeholder*="message" i], [contenteditable="true"]'
     );
     if ((await bodyInput.count()) > 0) {
-      await bodyInput.first().fill('How do I set up row-level security for multi-tenant apps?');
+      await bodyInput
+        .first()
+        .fill('How do I set up row-level security for multi-tenant apps?');
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -219,7 +252,9 @@ test.describe('Discussions — thread and reply flows', () => {
   });
 
   test('reply to thread — reply input is accessible', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions/thread-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions/thread-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const replyInput = page.locator(
@@ -239,7 +274,9 @@ test.describe('Discussions — thread and reply flows', () => {
   test('nested replies — thread detail page shows nested structure without crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/discussions/thread-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions/thread-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Page should render replies (nested or flat) without crash
@@ -254,14 +291,19 @@ test.describe('Discussions — thread and reply flows', () => {
   test('moderation — pin/lock buttons do not crash when present', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/discussions/thread-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions/thread-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const pinBtn = page.locator(
       '[data-testid="pin-discussion-btn"], button:has-text("Pin"), button[aria-label*="pin" i]'
     );
     if ((await pinBtn.count()) > 0) {
-      await pinBtn.first().click().catch(() => {});
+      await pinBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -269,7 +311,10 @@ test.describe('Discussions — thread and reply flows', () => {
       '[data-testid="lock-discussion-btn"], button:has-text("Lock"), button[aria-label*="lock" i]'
     );
     if ((await lockBtn.count()) > 0) {
-      await lockBtn.first().click().catch(() => {});
+      await lockBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -296,7 +341,9 @@ test.describe('Discussions — thread and reply flows', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Should show empty state or create prompt — not a crash
@@ -310,7 +357,9 @@ test.describe('Discussions — thread and reply flows', () => {
   test('search within discussions — search input does not crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator(
@@ -337,7 +386,9 @@ test.describe('Discussions — thread and reply flows', () => {
       });
     });
 
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -345,8 +396,12 @@ test.describe('Discussions — thread and reply flows', () => {
     expect(body).not.toContain('stream.consume');
   });
 
-  test('visual regression — discussions list page (mocked)', async ({ page }) => {
-    await page.goto(`${BASE_URL}/discussions`, { waitUntil: 'domcontentloaded' });
+  test('visual regression — discussions list page (mocked)', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/discussions`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('discussions-list-mocked.png', {

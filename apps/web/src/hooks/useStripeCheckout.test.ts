@@ -25,7 +25,12 @@ describe('useStripeCheckout', () => {
 
   const sampleItems: CheckoutLineItem[] = [
     { itemId: 'mkt-1', title: 'ML Course', priceUsdCents: 4999, quantity: 1 },
-    { itemId: 'mkt-2', title: 'Business Course', priceUsdCents: 3999, quantity: 1 },
+    {
+      itemId: 'mkt-2',
+      title: 'Business Course',
+      priceUsdCents: 3999,
+      quantity: 1,
+    },
   ];
 
   it('starts in idle state with no errors', () => {

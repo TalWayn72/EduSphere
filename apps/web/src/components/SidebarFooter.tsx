@@ -77,7 +77,9 @@ export function SidebarFooter({
         title={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
         data-testid="theme-toggle"
         className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60 transition-colors border-s-2 border-transparent"
-        aria-label={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
+        aria-label={
+          resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')
+        }
       >
         {resolvedMode === 'dark' ? (
           <Sun className="h-4 w-4 shrink-0" aria-hidden />
@@ -85,7 +87,9 @@ export function SidebarFooter({
           <Moon className="h-4 w-4 shrink-0" aria-hidden />
         )}
         {!collapsed && (
-          <span>{resolvedMode === 'dark' ? t('lightMode') : t('darkMode')}</span>
+          <span>
+            {resolvedMode === 'dark' ? t('lightMode') : t('darkMode')}
+          </span>
         )}
       </button>
 
@@ -102,7 +106,10 @@ export function SidebarFooter({
             {getInitials(user.firstName, user.lastName, user.username)}
           </div>
           {!collapsed && (
-            <span className="text-xs font-medium text-foreground truncate" data-testid="sidebar-user-name">
+            <span
+              className="text-xs font-medium text-foreground truncate"
+              data-testid="sidebar-user-name"
+            >
               {user.firstName || user.username}
             </span>
           )}
@@ -111,7 +118,9 @@ export function SidebarFooter({
 
       {!hideEduSphereBranding && !collapsed && (
         <div className="mx-2 px-3 py-1" data-testid="powered-by-edusphere">
-          <span className="text-xs text-muted-foreground/60">{t('poweredBy')}</span>
+          <span className="text-xs text-muted-foreground/60">
+            {t('poweredBy')}
+          </span>
         </div>
       )}
 

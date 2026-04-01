@@ -10,7 +10,14 @@ import { z } from 'zod';
 import type { CertExamGenState } from '../state';
 import type { GeneratedItem } from '../types';
 
-const BLOOM_ORDER = ['REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'EVALUATE', 'CREATE'];
+const BLOOM_ORDER = [
+  'REMEMBER',
+  'UNDERSTAND',
+  'APPLY',
+  'ANALYZE',
+  'EVALUATE',
+  'CREATE',
+];
 
 const ClassificationSchema = z.object({
   classifications: z.array(
@@ -29,7 +36,9 @@ function bloomDistance(a: string, b: string): number {
 }
 
 export function validateBloomNode(model: LanguageModel) {
-  return async (state: CertExamGenState): Promise<Partial<CertExamGenState>> => {
+  return async (
+    state: CertExamGenState
+  ): Promise<Partial<CertExamGenState>> => {
     const items = state.generatedItems;
     if (items.length === 0) return { bloomValidated: [] };
 
@@ -40,14 +49,17 @@ export function validateBloomNode(model: LanguageModel) {
     const { object } = await generateObject({
       model: model as Parameters<typeof generateObject>[0]['model'],
       system:
-        'You are a Bloom\'s taxonomy classifier. For each question, determine which cognitive level it assesses: REMEMBER, UNDERSTAND, APPLY, ANALYZE, EVALUATE, or CREATE. Be precise.',
+        "You are a Bloom's taxonomy classifier. For each question, determine which cognitive level it assesses: REMEMBER, UNDERSTAND, APPLY, ANALYZE, EVALUATE, or CREATE. Be precise.",
       schema: ClassificationSchema,
       prompt: `Classify each question by Bloom's taxonomy level:\n\n${questionsBlock}`,
       temperature: 0,
     });
 
     const classMap = new Map(
-      object.classifications.map((c) => [c.index, c.classifiedLevel.toUpperCase()])
+      object.classifications.map((c) => [
+        c.index,
+        c.classifiedLevel.toUpperCase(),
+      ])
     );
 
     const validated: GeneratedItem[] = [];

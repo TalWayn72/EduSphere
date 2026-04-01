@@ -52,7 +52,7 @@ export async function assertNoVisibleErrors(page: Page): Promise<void> {
         }
         throw new Error(
           `Visible error detected on page ${page.url()}: "${match[0]}"\n` +
-            `Pattern: ${pattern.source}`,
+            `Pattern: ${pattern.source}`
         );
       }
     }
@@ -64,7 +64,7 @@ export async function assertNoVisibleErrors(page: Page): Promise<void> {
  */
 export async function collectConsoleErrors(
   page: Page,
-  action: () => Promise<void>,
+  action: () => Promise<void>
 ): Promise<string[]> {
   const errors: string[] = [];
   const handler = (msg: import('@playwright/test').ConsoleMessage) => {

@@ -16,11 +16,10 @@ export function stddev(values: number[], mean: number): number {
  */
 export function computeDIndex(
   responses: { userId: string; isCorrect: boolean }[],
-  userScores: Map<string, number>,
+  userScores: Map<string, number>
 ): number {
   const sorted = [...responses].sort(
-    (a, b) =>
-      (userScores.get(b.userId) ?? 0) - (userScores.get(a.userId) ?? 0),
+    (a, b) => (userScores.get(b.userId) ?? 0) - (userScores.get(a.userId) ?? 0)
   );
   const n27 = Math.max(1, Math.floor(sorted.length * 0.27));
   const upper = sorted.slice(0, n27);
@@ -36,7 +35,7 @@ export function computeDIndex(
 export function computeRpbis(
   responses: { userId: string; isCorrect: boolean }[],
   userScores: Map<string, number>,
-  pValue: number,
+  pValue: number
 ): number {
   const correctScores: number[] = [];
   const wrongScores: number[] = [];
@@ -66,7 +65,7 @@ export function computeRpbis(
 export function computeOptionRpbis(
   optResponses: { userId: string }[],
   allResponses: { userId: string }[],
-  userScores: Map<string, number>,
+  userScores: Map<string, number>
 ): number {
   const chose = new Set(optResponses.map((r) => r.userId));
   const choseScores: number[] = [];

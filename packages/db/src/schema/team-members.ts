@@ -1,4 +1,10 @@
-import { pgTable, uuid, timestamp, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  timestamp,
+  uniqueIndex,
+  index,
+} from 'drizzle-orm/pg-core';
 
 export const teamMembers = pgTable(
   'team_members',
@@ -7,13 +13,19 @@ export const teamMembers = pgTable(
     managerId: uuid('manager_id').notNull(),
     memberId: uuid('member_id').notNull(),
     tenantId: uuid('tenant_id').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => ({
-    uniqueManagerMember: uniqueIndex('idx_team_members_unique').on(t.managerId, t.memberId, t.tenantId),
+    uniqueManagerMember: uniqueIndex('idx_team_members_unique').on(
+      t.managerId,
+      t.memberId,
+      t.tenantId
+    ),
     managerIdx: index('idx_team_members_manager').on(t.managerId, t.tenantId),
     memberIdx: index('idx_team_members_member').on(t.memberId, t.tenantId),
-  }),
+  })
 );
 
 export type TeamMember = typeof teamMembers.$inferSelect;

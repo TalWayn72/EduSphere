@@ -155,7 +155,9 @@ describe('PII Manifest — completeness', () => {
 
   it('schema files with known PII columns are all covered', () => {
     const manifest = loadManifest();
-    const manifestSchemaFiles = new Set(manifest.tables.map((t) => t.schemaFile));
+    const manifestSchemaFiles = new Set(
+      manifest.tables.map((t) => t.schemaFile)
+    );
 
     // Read all .ts schema files (skip test files, index, shared)
     const schemaFiles = readdirSync(SCHEMA_DIR).filter(

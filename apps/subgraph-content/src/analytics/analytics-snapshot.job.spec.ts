@@ -62,7 +62,10 @@ describe('AnalyticsSnapshotJob', () => {
 
   describe('runDailySnapshot()', () => {
     it('processes all tenants and upserts snapshots', async () => {
-      const tenantChain = makeSelectChainDirect([{ id: 'tenant-1' }, { id: 'tenant-2' }]);
+      const tenantChain = makeSelectChainDirect([
+        { id: 'tenant-1' },
+        { id: 'tenant-2' },
+      ]);
       const activeChain = makeSelectChain([{ activeLearners: 5 }]);
       const completionChain = makeSelectChain([{ completions: 3 }]);
       const enrollChain = makeSelectChain([{ newEnrollments: 7 }]);
@@ -94,7 +97,11 @@ describe('AnalyticsSnapshotJob', () => {
 
     it('does not throw when DB query fails', async () => {
       const tenantChain = makeSelectChainDirect([{ id: 't1' }]);
-      const failChain = { from: vi.fn().mockReturnValue({ where: vi.fn().mockRejectedValue(new Error('DB error')) }) };
+      const failChain = {
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockRejectedValue(new Error('DB error')),
+        }),
+      };
 
       mockDb.select
         .mockReturnValueOnce({ from: tenantChain.from })
@@ -130,7 +137,7 @@ describe('AnalyticsSnapshotJob', () => {
           activeLearners: 0,
           completions: 0,
           newEnrollments: 0,
-        }),
+        })
       );
     });
   });

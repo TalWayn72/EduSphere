@@ -94,37 +94,48 @@ export function MarketplacePage() {
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [priceFilter, setPriceFilter] = useState<'any' | 'free' | 'under25' | 'under50'>('any');
+  const [priceFilter, setPriceFilter] = useState<
+    'any' | 'free' | 'under25' | 'under50'
+  >('any');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const prefetchCourse = useCallback(
     (courseId: string) => {
       void queryClient.prefetchQuery({
         queryKey: ['course-detail', courseId],
-        queryFn: () =>
-          request(GRAPHQL_URL, COURSE_DETAIL_QUERY, { courseId }),
+        queryFn: () => request(GRAPHQL_URL, COURSE_DETAIL_QUERY, { courseId }),
         staleTime: 5 * 60 * 1000, // 5 minutes — don't re-fetch if already warm
       });
     },
-    [queryClient],
+    [queryClient]
   );
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedSearch(searchText), SEARCH_DEBOUNCE_MS);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    debounceRef.current = setTimeout(
+      () => setDebouncedSearch(searchText),
+      SEARCH_DEBOUNCE_MS
+    );
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [searchText]);
 
   const filters: CourseListingFilters = {
     search: debouncedSearch || undefined,
     priceMax:
-      priceFilter === 'free' ? 0
-      : priceFilter === 'under25' ? 25
-      : priceFilter === 'under50' ? 50
-      : undefined,
+      priceFilter === 'free'
+        ? 0
+        : priceFilter === 'under25'
+          ? 25
+          : priceFilter === 'under50'
+            ? 50
+            : undefined,
   };
 
   const { data, isLoading, error } = useQuery<ListingsData>({
@@ -135,9 +146,7 @@ export function MarketplacePage() {
   });
 
   if (isLoading) {
-    return (
-      <LoadingSpinner />
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -175,7 +184,9 @@ export function MarketplacePage() {
           <select
             value={priceFilter}
             onChange={(e) =>
-              setPriceFilter(e.target.value as 'any' | 'free' | 'under25' | 'under50')
+              setPriceFilter(
+                e.target.value as 'any' | 'free' | 'under25' | 'under50'
+              )
             }
             className="border rounded px-3 py-2 text-sm"
           >
@@ -225,11 +236,15 @@ export function MarketplacePage() {
                       <span className="text-2xl font-bold text-primary">
                         {listing.priceCents === 0
                           ? 'Free'
-                          : formatPrice(listing.priceCents, listing.currency ?? 'USD')}
+                          : formatPrice(
+                              listing.priceCents,
+                              listing.currency ?? 'USD'
+                            )}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Instructor earns {listing.revenueSplitPercent}% of each sale
+                      Instructor earns {listing.revenueSplitPercent}% of each
+                      sale
                     </p>
                   </CardContent>
                   <CardFooter>

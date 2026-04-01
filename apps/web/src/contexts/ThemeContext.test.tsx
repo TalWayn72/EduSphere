@@ -35,13 +35,28 @@ function ThemeConsumer() {
     <div>
       <span data-testid="resolved-mode">{resolvedMode}</span>
       <span data-testid="font-size">{userPreferences.fontSize}</span>
-      <span data-testid="reading-mode">{String(userPreferences.readingMode)}</span>
+      <span data-testid="reading-mode">
+        {String(userPreferences.readingMode)}
+      </span>
       <span data-testid="motion">{userPreferences.motionPreference}</span>
-      <button onClick={() => setThemeMode('dark')} data-testid="set-dark">dark</button>
-      <button onClick={() => setThemeMode('light')} data-testid="set-light">light</button>
-      <button onClick={() => setFontSize('lg')} data-testid="set-lg">lg</button>
-      <button onClick={() => setReadingMode(true)} data-testid="set-reading">reading</button>
-      <button onClick={() => setMotionPreference('reduced')} data-testid="set-reduced">reduced</button>
+      <button onClick={() => setThemeMode('dark')} data-testid="set-dark">
+        dark
+      </button>
+      <button onClick={() => setThemeMode('light')} data-testid="set-light">
+        light
+      </button>
+      <button onClick={() => setFontSize('lg')} data-testid="set-lg">
+        lg
+      </button>
+      <button onClick={() => setReadingMode(true)} data-testid="set-reading">
+        reading
+      </button>
+      <button
+        onClick={() => setMotionPreference('reduced')}
+        data-testid="set-reduced"
+      >
+        reduced
+      </button>
     </div>
   );
 }
@@ -190,14 +205,22 @@ describe('ThemeProvider', () => {
       screen.getByTestId('set-dark').click();
     });
 
-    const stored = JSON.parse(localStorage.getItem('edusphere-user-prefs') ?? '{}');
+    const stored = JSON.parse(
+      localStorage.getItem('edusphere-user-prefs') ?? '{}'
+    );
     expect(stored.mode).toBe('dark');
   });
 
   it('reads persisted preferences from localStorage on mount', () => {
     localStorage.setItem(
       'edusphere-user-prefs',
-      JSON.stringify({ mode: 'dark', fontSize: 'xl', readingMode: false, motionPreference: 'full', contrastMode: 'normal' })
+      JSON.stringify({
+        mode: 'dark',
+        fontSize: 'xl',
+        readingMode: false,
+        motionPreference: 'full',
+        contrastMode: 'normal',
+      })
     );
     render(
       <ThemeProvider>

@@ -77,6 +77,8 @@ describe('CohortRetentionTable', () => {
 
   it('has accessible table label', () => {
     render(<CohortRetentionTable rows={[]} />);
-    expect(screen.getByRole('table', { name: /Cohort retention table/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: /Cohort retention table/i })
+    ).toBeInTheDocument();
   });
 });

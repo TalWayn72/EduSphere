@@ -20,7 +20,9 @@ function renderWithUrql(ui: React.ReactElement) {
 describe('PilotCTASection', () => {
   it('renders the section heading', () => {
     renderWithUrql(<PilotCTASection />);
-    expect(screen.getByText(/Ready to Transform Your Learning Experience/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Ready to Transform Your Learning Experience/i)
+    ).toBeInTheDocument();
   });
 
   it('renders required form fields', () => {
@@ -36,22 +38,32 @@ describe('PilotCTASection', () => {
     const user = userEvent.setup();
     renderWithUrql(<PilotCTASection />);
     await user.type(screen.getByLabelText(/Email/i), 'not-an-email');
-    await user.click(screen.getByRole('button', { name: /Apply for Free Pilot/i }));
-    expect(await screen.findByText(/Valid email required/i)).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: /Apply for Free Pilot/i })
+    );
+    expect(
+      await screen.findByText(/Valid email required/i)
+    ).toBeInTheDocument();
   });
 
   it('shows validation error when organization name is empty', async () => {
     const user = userEvent.setup();
     renderWithUrql(<PilotCTASection />);
-    await user.click(screen.getByRole('button', { name: /Apply for Free Pilot/i }));
-    expect(await screen.findByText(/Organization name is required/i)).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: /Apply for Free Pilot/i })
+    );
+    expect(
+      await screen.findByText(/Organization name is required/i)
+    ).toBeInTheDocument();
   });
 
   it('renders all 5 benefit items', () => {
     renderWithUrql(<PilotCTASection />);
     expect(screen.getByText(/90 days free/i)).toBeInTheDocument();
     expect(screen.getByText(/Full feature access/i)).toBeInTheDocument();
-    expect(screen.getByText(/Dedicated onboarding specialist/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Dedicated onboarding specialist/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Data migration assistance/i)).toBeInTheDocument();
     expect(screen.getByText(/Custom white-label domain/i)).toBeInTheDocument();
   });

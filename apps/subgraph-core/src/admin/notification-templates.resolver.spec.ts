@@ -78,7 +78,11 @@ describe('NotificationTemplatesResolver', () => {
       const input = { subject: 'New Subject', isActive: false };
       svc.updateTemplate.mockResolvedValue({ ...TEMPLATE_ROW, ...input });
       await resolver.updateNotificationTemplate('tpl-1', input, CTX_AUTHED);
-      expect(svc.updateTemplate).toHaveBeenCalledWith('tpl-1', input, 'tenant-1');
+      expect(svc.updateTemplate).toHaveBeenCalledWith(
+        'tpl-1',
+        input,
+        'tenant-1'
+      );
     });
 
     it('returns the updated template', async () => {
@@ -117,7 +121,10 @@ describe('NotificationTemplatesResolver', () => {
 
     it('returns the reset template', async () => {
       svc.resetTemplate.mockResolvedValue(TEMPLATE_ROW);
-      const result = await resolver.resetNotificationTemplate('tpl-1', CTX_AUTHED);
+      const result = await resolver.resetNotificationTemplate(
+        'tpl-1',
+        CTX_AUTHED
+      );
       expect(result).toEqual(TEMPLATE_ROW);
     });
 

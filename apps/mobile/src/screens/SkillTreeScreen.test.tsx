@@ -10,22 +10,36 @@ import { COLORS } from '../lib/theme';
 // ---------------------------------------------------------------------------
 // Mirror masteryColor from SkillTreeScreen for unit testing
 // ---------------------------------------------------------------------------
-type MasteryLevel = 'NONE' | 'ATTEMPTED' | 'FAMILIAR' | 'PROFICIENT' | 'MASTERED';
+type MasteryLevel =
+  | 'NONE'
+  | 'ATTEMPTED'
+  | 'FAMILIAR'
+  | 'PROFICIENT'
+  | 'MASTERED';
 
 function masteryColor(level: MasteryLevel): string {
   switch (level) {
-    case 'MASTERED': return COLORS.masteryMastered;
-    case 'PROFICIENT': return COLORS.masteryProficient;
-    case 'FAMILIAR': return COLORS.masteryFamiliar;
-    case 'ATTEMPTED': return COLORS.masteryAttempted;
-    default: return COLORS.masteryNone;
+    case 'MASTERED':
+      return COLORS.masteryMastered;
+    case 'PROFICIENT':
+      return COLORS.masteryProficient;
+    case 'FAMILIAR':
+      return COLORS.masteryFamiliar;
+    case 'ATTEMPTED':
+      return COLORS.masteryAttempted;
+    default:
+      return COLORS.masteryNone;
   }
 }
 
 // Mirror masteryPercent from SkillTreeScreen for unit testing
 function masteryPercent(level: MasteryLevel): number {
   const map: Record<MasteryLevel, number> = {
-    NONE: 0, ATTEMPTED: 25, FAMILIAR: 50, PROFICIENT: 75, MASTERED: 100,
+    NONE: 0,
+    ATTEMPTED: 25,
+    FAMILIAR: 50,
+    PROFICIENT: 75,
+    MASTERED: 100,
   };
   return map[level] ?? 0;
 }
@@ -84,7 +98,13 @@ describe('SkillTreeScreen — masteryPercent', () => {
   });
 
   it('all levels produce values in [0, 100]', () => {
-    const levels: MasteryLevel[] = ['NONE', 'ATTEMPTED', 'FAMILIAR', 'PROFICIENT', 'MASTERED'];
+    const levels: MasteryLevel[] = [
+      'NONE',
+      'ATTEMPTED',
+      'FAMILIAR',
+      'PROFICIENT',
+      'MASTERED',
+    ];
     for (const level of levels) {
       const pct = masteryPercent(level);
       expect(pct).toBeGreaterThanOrEqual(0);
@@ -94,9 +114,15 @@ describe('SkillTreeScreen — masteryPercent', () => {
 
   it('percentages are strictly increasing', () => {
     expect(masteryPercent('NONE')).toBeLessThan(masteryPercent('ATTEMPTED'));
-    expect(masteryPercent('ATTEMPTED')).toBeLessThan(masteryPercent('FAMILIAR'));
-    expect(masteryPercent('FAMILIAR')).toBeLessThan(masteryPercent('PROFICIENT'));
-    expect(masteryPercent('PROFICIENT')).toBeLessThan(masteryPercent('MASTERED'));
+    expect(masteryPercent('ATTEMPTED')).toBeLessThan(
+      masteryPercent('FAMILIAR')
+    );
+    expect(masteryPercent('FAMILIAR')).toBeLessThan(
+      masteryPercent('PROFICIENT')
+    );
+    expect(masteryPercent('PROFICIENT')).toBeLessThan(
+      masteryPercent('MASTERED')
+    );
   });
 });
 
@@ -132,7 +158,13 @@ describe('SkillTreeScreen — mock node shape', () => {
   });
 
   it('has valid masteryLevel', () => {
-    const valid: string[] = ['NONE', 'ATTEMPTED', 'FAMILIAR', 'PROFICIENT', 'MASTERED'];
+    const valid: string[] = [
+      'NONE',
+      'ATTEMPTED',
+      'FAMILIAR',
+      'PROFICIENT',
+      'MASTERED',
+    ];
     expect(valid).toContain(mockNode.masteryLevel);
   });
 

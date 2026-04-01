@@ -55,7 +55,10 @@ describe('EmbeddingDataLoader', () => {
         { id: 'emb-1', refId: 'seg-1', type: 'content', similarity: 0.85 },
       ]);
 
-      const result = await loader.batchLoad(['conceptA', 'conceptB'], mockTenantCtx);
+      const result = await loader.batchLoad(
+        ['conceptA', 'conceptB'],
+        mockTenantCtx
+      );
 
       expect(result.size).toBe(2);
       expect(result.has('conceptA')).toBe(true);
@@ -104,7 +107,10 @@ describe('EmbeddingDataLoader', () => {
         { id: 'e1', refId: 's1', type: 'content', similarity: 0.8 },
       ]);
 
-      const result = await loader.batchLoad(['conceptA', 'conceptB'], mockTenantCtx);
+      const result = await loader.batchLoad(
+        ['conceptA', 'conceptB'],
+        mockTenantCtx
+      );
 
       expect(result.get('conceptA')).toHaveLength(1);
       expect(result.get('conceptB')).toEqual([]);

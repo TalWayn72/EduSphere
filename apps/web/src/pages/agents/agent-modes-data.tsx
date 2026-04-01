@@ -4,13 +4,7 @@
  * Kept in its own file so the pure-TS types file (agent-modes.ts) stays free of
  * React imports, which helps with tree-shaking and test isolation.
  */
-import {
-  Bot,
-  Zap,
-  BookOpen,
-  FlaskConical,
-  Lightbulb,
-} from 'lucide-react';
+import { Bot, Zap, BookOpen, FlaskConical, Lightbulb } from 'lucide-react';
 import type { AgentModeDefinition } from './agent-modes';
 
 export const AGENT_MODES: readonly AgentModeDefinition[] = [

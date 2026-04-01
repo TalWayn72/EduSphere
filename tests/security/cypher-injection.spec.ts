@@ -21,8 +21,7 @@ const CONCEPT_RELATION_SERVICE =
   'apps/subgraph-knowledge/src/graph/cypher-concept-relation.service.ts';
 const LEARNING_PATH_SERVICE =
   'apps/subgraph-knowledge/src/graph/cypher-learning-path.service.ts';
-const AGE_HELPERS =
-  'apps/subgraph-knowledge/src/graph/cypher-age-helpers.ts';
+const AGE_HELPERS = 'apps/subgraph-knowledge/src/graph/cypher-age-helpers.ts';
 const GRAPH_DIR = 'apps/subgraph-knowledge/src/graph';
 
 // ---------------------------------------------------------------------------
@@ -101,9 +100,7 @@ describe('No user-input string concatenation in Cypher queries', () => {
         const trimmed = pv.replace(/^:\s*/, '').trim();
         // Acceptable: $paramName, gen_random_uuid()::text, timestamp()
         // Not acceptable: ${someVar} (template literal interpolation of user input)
-        expect(trimmed).not.toMatch(
-          /\$\{(?!safeLimit|safeDepth)[a-z]/i
-        );
+        expect(trimmed).not.toMatch(/\$\{(?!safeLimit|safeDepth)[a-z]/i);
       }
     }
   });
@@ -155,12 +152,32 @@ describe('No user-input string concatenation in Cypher queries', () => {
     // Variables used in Drizzle sql`` tagged templates (auto-parameterized, safe),
     // logger messages, or error strings — NOT in raw Cypher queries
     const drizzleAndLoggerVars = new Set([
-      'userId', 'tenantId', 'courseId', 'nodeId', 'level', 'ids',
-      'vectorString', 'limit', 'searchTerm', 'segmentIds',
-      'followedIds', 'cutoff', 'id', 'name', 'topicName',
-      'masteryLevel', 'sorted', 'roleId', 'entityType', 'entityId',
-      'err', 'value', 'masteryOrder', 'transcript_segments',
-      'sourceConceptId', 'targetConceptId',
+      'userId',
+      'tenantId',
+      'courseId',
+      'nodeId',
+      'level',
+      'ids',
+      'vectorString',
+      'limit',
+      'searchTerm',
+      'segmentIds',
+      'followedIds',
+      'cutoff',
+      'id',
+      'name',
+      'topicName',
+      'masteryLevel',
+      'sorted',
+      'roleId',
+      'entityType',
+      'entityId',
+      'err',
+      'value',
+      'masteryOrder',
+      'transcript_segments',
+      'sourceConceptId',
+      'targetConceptId',
     ]);
 
     for (const file of graphFiles) {
@@ -237,7 +254,10 @@ describe('Depth limits in traverse function', () => {
     // Ensure raw maxDepth is NOT used in the query string
     const traverseFn = src.slice(
       src.indexOf('export async function traverse'),
-      src.indexOf('}', src.indexOf('return executeCypher', src.indexOf('traverse'))) + 1
+      src.indexOf(
+        '}',
+        src.indexOf('return executeCypher', src.indexOf('traverse'))
+      ) + 1
     );
     expect(traverseFn).not.toMatch(/\*1\.\.\$\{maxDepth\}/);
   });
@@ -256,9 +276,7 @@ describe('Update operations — field name allowlist', () => {
   it('allowedKeys contains only safe domain fields', () => {
     const match = src.match(/new\s*Set<string>\(\[([^\]]+)\]\)/);
     expect(match).not.toBeNull();
-    const keys = match![1]
-      .split(',')
-      .map((k) => k.trim().replace(/['"]/g, ''));
+    const keys = match![1].split(',').map((k) => k.trim().replace(/['"]/g, ''));
     // All keys must be known safe domain fields
     const safeDomainFields = new Set([
       'name',
@@ -277,7 +295,9 @@ describe('Update operations — field name allowlist', () => {
 
   it('updateConcept filters entries through allowedKeys before building SET clause', () => {
     // safeUpdates must be derived from filtering through allowedKeys
-    expect(src).toMatch(/Object\.entries\(updates\)\.filter\(\(\[key\]\)\s*=>\s*allowedKeys\.has\(key\)\)/);
+    expect(src).toMatch(
+      /Object\.entries\(updates\)\.filter\(\(\[key\]\)\s*=>\s*allowedKeys\.has\(key\)\)/
+    );
   });
 
   it('SET clause is built from safeUpdates keys, not raw input keys', () => {
@@ -285,7 +305,10 @@ describe('Update operations — field name allowlist', () => {
     // Must NOT directly iterate over raw `updates`
     const updateFn = src.slice(
       src.indexOf('async updateConcept'),
-      src.indexOf('}', src.indexOf('return result', src.indexOf('updateConcept'))) + 1
+      src.indexOf(
+        '}',
+        src.indexOf('return result', src.indexOf('updateConcept'))
+      ) + 1
     );
     expect(updateFn).not.toMatch(/Object\.keys\(updates\)\.map/);
   });

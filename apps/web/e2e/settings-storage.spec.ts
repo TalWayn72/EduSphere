@@ -31,7 +31,7 @@ test.describe('Settings — storage progress bar', () => {
     // Intercept navigator.storage.estimate to return controlled values
     await page.addInitScript(() => {
       const quota = 2 * 1024 * 1024 * 1024; // 2 GB quota
-      const usage = 1016;                   // ~1 KB used → ~0%
+      const usage = 1016; // ~1 KB used → ~0%
 
       Object.defineProperty(navigator, 'storage', {
         value: {
@@ -53,7 +53,9 @@ test.describe('Settings — storage progress bar', () => {
   });
 
   // BUG-054 REGRESSION: bar must not appear full when usage is ~0%
-  test('REGRESSION BUG-054: progress bar indicator is nearly empty at ~0% usage', async ({ page }) => {
+  test('REGRESSION BUG-054: progress bar indicator is nearly empty at ~0% usage', async ({
+    page,
+  }) => {
     const progressBar = page.getByRole('progressbar');
     await expect(progressBar).toBeVisible({ timeout: 5000 });
 
@@ -68,7 +70,9 @@ test.describe('Settings — storage progress bar', () => {
     expect(indicatorTransform).toMatch(/translateX\(-(?:9[5-9]|100)%\)/);
   });
 
-  test('REGRESSION BUG-054: container div does NOT have solid bg-primary class', async ({ page }) => {
+  test('REGRESSION BUG-054: container div does NOT have solid bg-primary class', async ({
+    page,
+  }) => {
     const progressBar = page.getByRole('progressbar');
     await expect(progressBar).toBeVisible({ timeout: 5000 });
 
@@ -81,7 +85,9 @@ test.describe('Settings — storage progress bar', () => {
     expect(containerClasses).not.toContain('bg-yellow-500');
   });
 
-  test('aria-valuenow reflects actual usage percentage (near 0)', async ({ page }) => {
+  test('aria-valuenow reflects actual usage percentage (near 0)', async ({
+    page,
+  }) => {
     const progressBar = page.getByRole('progressbar');
     await expect(progressBar).toBeVisible({ timeout: 5000 });
 
@@ -91,11 +97,15 @@ test.describe('Settings — storage progress bar', () => {
     expect(pct).toBe(0);
   });
 
-  test('usage text shows correct byte count and percentage', async ({ page }) => {
+  test('usage text shows correct byte count and percentage', async ({
+    page,
+  }) => {
     await expect(page.getByRole('progressbar')).toBeVisible({ timeout: 5000 });
 
     // Text should show 1016 B and (0%)
-    const pageText = await page.locator('[class*="tabular-nums"]').textContent();
+    const pageText = await page
+      .locator('[class*="tabular-nums"]')
+      .textContent();
     expect(pageText).toContain('1016 B');
     expect(pageText).toContain('0%');
   });
@@ -126,7 +136,9 @@ test.describe('Settings — storage at 85% usage (warning state)', () => {
     await page.goto(SETTINGS_URL, { waitUntil: 'domcontentloaded' });
   });
 
-  test('progress bar indicator reaches ~85% width at 85% usage', async ({ page }) => {
+  test('progress bar indicator reaches ~85% width at 85% usage', async ({
+    page,
+  }) => {
     const progressBar = page.getByRole('progressbar');
     await expect(progressBar).toBeVisible({ timeout: 5000 });
 
@@ -180,8 +192,11 @@ test.describe('Settings — storage visual screenshot', () => {
       .locator('..')
       .locator('..');
 
-    await expect(storageCard).toHaveScreenshot('storage-progress-bar-empty.png', {
-      threshold: 0.05,
-    });
+    await expect(storageCard).toHaveScreenshot(
+      'storage-progress-bar-empty.png',
+      {
+        threshold: 0.05,
+      }
+    );
   });
 });

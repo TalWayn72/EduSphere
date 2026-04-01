@@ -11,12 +11,12 @@
 
 Deep security audit of Sprint 1-3 code covering the Knowledge Graph subgraph (NATS consumers, content ingestion, MinIO integration, Apache AGE queries) and frontend components (pipeline results, notification editor, visual anchoring). **6 vulnerabilities found and fixed, 58 security tests added.**
 
-| Severity | Found | Fixed | Remaining |
-|----------|-------|-------|-----------|
-| Critical | 2 | 2 | 0 |
-| High | 2 | 2 | 0 |
-| Medium | 2 | 2 | 0 |
-| Low (deps) | 44 | 0 | 44 (transitive) |
+| Severity   | Found | Fixed | Remaining       |
+| ---------- | ----- | ----- | --------------- |
+| Critical   | 2     | 2     | 0               |
+| High       | 2     | 2     | 0               |
+| Medium     | 2     | 2     | 0               |
+| Low (deps) | 44    | 0     | 44 (transitive) |
 
 ---
 
@@ -82,12 +82,12 @@ Deep security audit of Sprint 1-3 code covering the Knowledge Graph subgraph (NA
 
 ### Critical (5)
 
-| Package | Advisory | Impact | Remediation |
-|---------|----------|--------|-------------|
-| `@apollo/query-planner` >=2.13.0 <2.13.2 | GHSA-pfjj-6f4p-rvmh | Prototype pollution via key sanitization | Transitive via `@graphql-yoga/nestjs-federation` — awaiting upstream update |
-| `@apollo/gateway` >=2.13.0 <2.13.2 | GHSA-pfjj-6f4p-rvmh | Same as above | Same — not directly exploitable since we use Hive Gateway, not Apollo Gateway directly |
-| `@apollo/federation-internals` >=2.13.0 <2.13.2 | GHSA-pfjj-6f4p-rvmh | Same as above | Same |
-| `convict` <=6.2.4 | Prototype pollution via startsWith() | Transitive via `@argos-ci/playwright` (dev dependency) | Dev-only — no production impact |
+| Package                                         | Advisory                             | Impact                                                 | Remediation                                                                            |
+| ----------------------------------------------- | ------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `@apollo/query-planner` >=2.13.0 <2.13.2        | GHSA-pfjj-6f4p-rvmh                  | Prototype pollution via key sanitization               | Transitive via `@graphql-yoga/nestjs-federation` — awaiting upstream update            |
+| `@apollo/gateway` >=2.13.0 <2.13.2              | GHSA-pfjj-6f4p-rvmh                  | Same as above                                          | Same — not directly exploitable since we use Hive Gateway, not Apollo Gateway directly |
+| `@apollo/federation-internals` >=2.13.0 <2.13.2 | GHSA-pfjj-6f4p-rvmh                  | Same as above                                          | Same                                                                                   |
+| `convict` <=6.2.4                               | Prototype pollution via startsWith() | Transitive via `@argos-ci/playwright` (dev dependency) | Dev-only — no production impact                                                        |
 
 ### High (14)
 
@@ -95,14 +95,14 @@ Most are transitive dependencies in dev tools (`vitest`, `@nestjs/cli`, `@angula
 
 ### Key Direct Dependencies — Status
 
-| Package | Version | Status |
-|---------|---------|--------|
-| `pdfjs-dist` | ^5.5.207 | No known CVEs at this version |
-| `pdf-parse` | ^2.4.5 | No active security advisories |
+| Package              | Version         | Status                                      |
+| -------------------- | --------------- | ------------------------------------------- |
+| `pdfjs-dist`         | ^5.5.207        | No known CVEs at this version               |
+| `pdf-parse`          | ^2.4.5          | No active security advisories               |
 | `@aws-sdk/client-s3` | (via workspace) | Current — AWS SDK v3 is actively maintained |
-| `mammoth` | ^1.11.0 | No known CVEs |
-| `tesseract.js` | ^5.1.1 | No known CVEs |
-| `dompurify` | ^3.3.2 | Current — actively maintained |
+| `mammoth`            | ^1.11.0         | No known CVEs                               |
+| `tesseract.js`       | ^5.1.1          | No known CVEs                               |
+| `dompurify`          | ^3.3.2          | Current — actively maintained               |
 
 ---
 
@@ -136,32 +136,32 @@ These patterns were audited and found to be properly implemented:
 
 New security test file: `tests/security/rag-pdf-security.spec.ts` — **58 tests**
 
-| Test Suite | Tests |
-|-----------|-------|
-| Path Traversal — MinIO file_key sanitization | 6 |
-| Presigned URL — expiry configuration | 5 |
-| SSRF Protection — ContentIngestionResolver | 9 |
-| SSRF Protection — DocumentParserService.parseUrl | 5 |
-| Tenant Validation — TranscriptBridgeConsumer | 6 |
-| Tenant Validation — LessonNERConsumer | 4 |
-| File Upload Security — KnowledgeSourceController | 8 |
-| XSS Protection — PipelineResultDetail mermaidSvg | 4 |
-| XSS Protection — NotificationTemplateEditor email HTML | 5 |
-| Auth Directives — Knowledge Source GraphQL SDL | 4 |
-| Auth Directives — Content Ingestion GraphQL SDL | 2 |
+| Test Suite                                             | Tests |
+| ------------------------------------------------------ | ----- |
+| Path Traversal — MinIO file_key sanitization           | 6     |
+| Presigned URL — expiry configuration                   | 5     |
+| SSRF Protection — ContentIngestionResolver             | 9     |
+| SSRF Protection — DocumentParserService.parseUrl       | 5     |
+| Tenant Validation — TranscriptBridgeConsumer           | 6     |
+| Tenant Validation — LessonNERConsumer                  | 4     |
+| File Upload Security — KnowledgeSourceController       | 8     |
+| XSS Protection — PipelineResultDetail mermaidSvg       | 4     |
+| XSS Protection — NotificationTemplateEditor email HTML | 5     |
+| Auth Directives — Knowledge Source GraphQL SDL         | 4     |
+| Auth Directives — Content Ingestion GraphQL SDL        | 2     |
 
 ---
 
 ## Files Modified
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/pipeline/PipelineResultDetail.tsx` | Added DOMPurify sanitization for mermaidSvg |
-| `apps/web/src/pages/NotificationTemplatesPage.editor.tsx` | Replaced regex sanitizer with DOMPurify |
-| `apps/subgraph-knowledge/src/sources/content-ingestion.resolver.ts` | Added SSRF guard + AbortSignal timeout |
-| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts` | Added path traversal sanitization for MinIO file keys |
-| `apps/subgraph-knowledge/src/nats/transcript-bridge.consumer.ts` | Added UUID format validation for tenantId |
-| `tests/security/rag-pdf-security.spec.ts` | New — 58 security tests |
+| File                                                                | Change                                                |
+| ------------------------------------------------------------------- | ----------------------------------------------------- |
+| `apps/web/src/components/pipeline/PipelineResultDetail.tsx`         | Added DOMPurify sanitization for mermaidSvg           |
+| `apps/web/src/pages/NotificationTemplatesPage.editor.tsx`           | Replaced regex sanitizer with DOMPurify               |
+| `apps/subgraph-knowledge/src/sources/content-ingestion.resolver.ts` | Added SSRF guard + AbortSignal timeout                |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts`   | Added path traversal sanitization for MinIO file keys |
+| `apps/subgraph-knowledge/src/nats/transcript-bridge.consumer.ts`    | Added UUID format validation for tenantId             |
+| `tests/security/rag-pdf-security.spec.ts`                           | New — 58 security tests                               |
 
 ---
 

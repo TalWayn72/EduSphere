@@ -29,9 +29,7 @@ export interface DnsProvider {
   /**
    * Start custom domain verification — returns DNS record instructions.
    */
-  requestDomainVerification(
-    domain: string
-  ): Promise<DomainVerificationRequest>;
+  requestDomainVerification(domain: string): Promise<DomainVerificationRequest>;
 
   /**
    * Check whether the domain's DNS record matches the verification token.

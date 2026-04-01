@@ -335,7 +335,10 @@ describe('UserManagementPage', () => {
       const executor = isReset
         ? mockResetPassword
         : vi.fn().mockResolvedValue({ error: undefined });
-      return [{ fetching: false, error: undefined }, executor] as unknown as ReturnType<typeof useMutation>;
+      return [
+        { fetching: false, error: undefined },
+        executor,
+      ] as unknown as ReturnType<typeof useMutation>;
     });
 
     renderPage();

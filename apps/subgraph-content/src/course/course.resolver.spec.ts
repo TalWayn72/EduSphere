@@ -196,7 +196,11 @@ describe('CourseResolver', () => {
       const result = await resolver.deleteCourse('course-1', AUTH_CTX);
       expect(mockCourseService.delete).toHaveBeenCalledWith(
         'course-1',
-        expect.objectContaining({ userId: 'user-1', tenantId: 'tenant-1', userRole: 'STUDENT' })
+        expect.objectContaining({
+          userId: 'user-1',
+          tenantId: 'tenant-1',
+          userRole: 'STUDENT',
+        })
       );
       expect(result).toBe(true);
     });
@@ -212,7 +216,9 @@ describe('CourseResolver', () => {
     it('delegates to service.getEnrollmentCount', async () => {
       mockCourseService.getEnrollmentCount.mockResolvedValue(5);
       const result = await resolver.courseEnrollmentCount('course-1', AUTH_CTX);
-      expect(mockCourseService.getEnrollmentCount).toHaveBeenCalledWith('course-1');
+      expect(mockCourseService.getEnrollmentCount).toHaveBeenCalledWith(
+        'course-1'
+      );
       expect(result).toBe(5);
     });
 

@@ -46,15 +46,15 @@ export const subscriptionPlans = pgTable(
     // feature flags, e.g. { "sso": true, "api_access": true }
     features: jsonb('features').notNull().default({}),
     isActive: boolean('is_active').notNull().default(true),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (t) => [
-    index('idx_subscription_plans_active').on(t.isActive),
-  ]
+  (t) => [index('idx_subscription_plans_active').on(t.isActive)]
 );
 
 export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
@@ -70,19 +70,27 @@ export const tenantSubscriptions = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     tenantId: uuid('tenant_id').notNull(),
-    planId: uuid('plan_id').notNull().references(() => subscriptionPlans.id),
+    planId: uuid('plan_id')
+      .notNull()
+      .references(() => subscriptionPlans.id),
     // trialing | active | past_due | canceled | pilot
     status: varchar('status', { length: 20 }).notNull().default('trialing'),
     // null unless status = 'pilot'
     pilotEndsAt: timestamp('pilot_ends_at', { withTimezone: true }),
-    currentPeriodStart: timestamp('current_period_start', { withTimezone: true }).notNull(),
-    currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }).notNull(),
+    currentPeriodStart: timestamp('current_period_start', {
+      withTimezone: true,
+    }).notNull(),
+    currentPeriodEnd: timestamp('current_period_end', {
+      withTimezone: true,
+    }).notNull(),
     // Stripe sync fields — nullable for manual/pilot subscriptions
     stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }),
     stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),
     // per-tenant YAU override (null = use plan default)
     maxYau: integer('max_yau'),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow()
@@ -122,19 +130,29 @@ export const yauEvents = pgTable(
     // Calendar year, e.g. 2026
     year: integer('year').notNull(),
     // Timestamp of first meaningful action in this year
-    firstActiveAt: timestamp('first_active_at', { withTimezone: true }).notNull().defaultNow(),
+    firstActiveAt: timestamp('first_active_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     // Updated on every meaningful action
-    lastActiveAt: timestamp('last_active_at', { withTimezone: true }).notNull().defaultNow(),
+    lastActiveAt: timestamp('last_active_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     // true once this user has been counted toward the YAU limit
     isCounted: boolean('is_counted').notNull().default(false),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (t) => [
-    uniqueIndex('yau_events_tenant_user_year_unique').on(t.tenantId, t.userId, t.year),
+    uniqueIndex('yau_events_tenant_user_year_unique').on(
+      t.tenantId,
+      t.userId,
+      t.year
+    ),
     index('idx_yau_events_tenant_year').on(t.tenantId, t.year),
     index('idx_yau_events_user').on(t.userId),
     index('idx_yau_events_is_counted').on(t.tenantId, t.isCounted),
@@ -200,7 +218,9 @@ export const pilotRequests = pgTable(
     pilotEndsAt: timestamp('pilot_ends_at', { withTimezone: true }),
     // internal admin notes
     notes: text('notes'),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow()
@@ -231,12 +251,21 @@ export const usageSnapshots = pgTable(
     yauCount: integer('yau_count').notNull().default(0),
     activeUsersCount: integer('active_users_count').notNull().default(0),
     coursesCount: integer('courses_count').notNull().default(0),
-    storageGb: numeric('storage_gb', { precision: 10, scale: 4 }).notNull().default('0'),
-    computedAt: timestamp('computed_at', { withTimezone: true }).notNull().defaultNow(),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    storageGb: numeric('storage_gb', { precision: 10, scale: 4 })
+      .notNull()
+      .default('0'),
+    computedAt: timestamp('computed_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
-    uniqueIndex('usage_snapshots_tenant_month_unique').on(t.tenantId, t.snapshotMonth),
+    uniqueIndex('usage_snapshots_tenant_month_unique').on(
+      t.tenantId,
+      t.snapshotMonth
+    ),
     index('idx_usage_snapshots_tenant').on(t.tenantId),
     index('idx_usage_snapshots_month').on(t.snapshotMonth),
     pgPolicy('usage_snapshots_tenant_isolation', {

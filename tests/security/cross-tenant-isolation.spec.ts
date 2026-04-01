@@ -166,10 +166,9 @@ describe('F-10: Cross-Tenant Isolation — Major Table Coverage', () => {
         : '';
 
       it('schema file exists', () => {
-        expect(
-          existsSync(filePath),
-          `Schema file ${file} does not exist`
-        ).toBe(true);
+        expect(existsSync(filePath), `Schema file ${file} does not exist`).toBe(
+          true
+        );
       });
 
       it('has RLS enabled (schema-level or migration-level)', () => {

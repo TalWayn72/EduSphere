@@ -10,20 +10,30 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  schema,
-  eq,
-  sql,
-} from '@edusphere/db';
+import { createDatabaseConnection, schema, eq, sql } from '@edusphere/db';
 import type { EmbeddingRecord, SearchResult } from './embedding.types.js';
 
 const safeDate = (v: unknown): string =>
   v ? new Date(v as string | number).toISOString() : new Date().toISOString();
 
-type ContentRow = { id: string; segment_id: string; embedding: number[]; created_at: Date };
-type AnnotationRow = { id: string; annotation_id: string; embedding: number[]; created_at: Date };
-type ConceptRow = { id: string; concept_id: string; embedding: number[]; created_at: Date };
+type ContentRow = {
+  id: string;
+  segment_id: string;
+  embedding: number[];
+  created_at: Date;
+};
+type AnnotationRow = {
+  id: string;
+  annotation_id: string;
+  embedding: number[];
+  created_at: Date;
+};
+type ConceptRow = {
+  id: string;
+  concept_id: string;
+  embedding: number[];
+  created_at: Date;
+};
 
 @Injectable()
 export class EmbeddingFallbackService {
@@ -63,9 +73,17 @@ export class EmbeddingFallbackService {
     return rows.map((r) => this.mapContent(r as ContentRow));
   }
 
-  async upsertContent(segmentId: string, vector: number[]): Promise<EmbeddingRecord> {
+  async upsertContent(
+    segmentId: string,
+    vector: number[]
+  ): Promise<EmbeddingRecord> {
     const vecStr = `[${vector.join(',')}]`;
-    type R = { id: string; segment_id: string; embedding: number[]; created_at: Date };
+    type R = {
+      id: string;
+      segment_id: string;
+      embedding: number[];
+      created_at: Date;
+    };
     const [row] = (await this.db.execute<R>(sql`
       INSERT INTO content_embeddings (segment_id, embedding)
       VALUES (${segmentId}, ${vecStr}::vector)
@@ -73,8 +91,13 @@ export class EmbeddingFallbackService {
       DO UPDATE SET embedding = EXCLUDED.embedding
       RETURNING id, segment_id, embedding, created_at
     `)) as unknown as R[];
-    if (!row) throw new InternalServerErrorException('Failed to upsert content embedding');
-    this.logger.log(`Generated embedding: segmentId=${segmentId} dim=${vector.length}`);
+    if (!row)
+      throw new InternalServerErrorException(
+        'Failed to upsert content embedding'
+      );
+    this.logger.log(
+      `Generated embedding: segmentId=${segmentId} dim=${vector.length}`
+    );
     return this.mapContent(row);
   }
 
@@ -97,8 +120,17 @@ export class EmbeddingFallbackService {
     }));
   }
 
-  async vectorSearch(vecStr: string, limit: number, minSimilarity = 0): Promise<SearchResult[]> {
-    type R = { id: string; segment_id: string; type: string; similarity: string };
+  async vectorSearch(
+    vecStr: string,
+    limit: number,
+    minSimilarity = 0
+  ): Promise<SearchResult[]> {
+    type R = {
+      id: string;
+      segment_id: string;
+      type: string;
+      similarity: string;
+    };
     if (minSimilarity > 0) {
       const rows = (await this.db.execute<R>(sql`
         SELECT 'content' AS type, ce.id, ce.segment_id,
@@ -109,7 +141,9 @@ export class EmbeddingFallbackService {
         LIMIT ${limit}
       `)) as unknown as R[];
       return rows.map((r) => ({
-        id: r.id, refId: r.segment_id, type: r.type,
+        id: r.id,
+        refId: r.segment_id,
+        type: r.type,
         similarity: parseFloat(r.similarity),
       }));
     }
@@ -122,7 +156,9 @@ export class EmbeddingFallbackService {
       LIMIT ${limit}
     `)) as unknown as R[];
     return rows.map((r) => ({
-      id: r.id, refId: r.segment_id, type: 'transcript_segment',
+      id: r.id,
+      refId: r.segment_id,
+      type: 'transcript_segment',
       similarity: parseFloat(r.similarity),
     }));
   }
@@ -172,7 +208,8 @@ export class EmbeddingFallbackService {
           body: JSON.stringify({ model, prompt: text }),
         }
       );
-      if (!resp.ok) throw new BadRequestException(`Ollama error ${resp.status}`);
+      if (!resp.ok)
+        throw new BadRequestException(`Ollama error ${resp.status}`);
       const json = (await resp.json()) as { embedding: number[] };
       return json.embedding;
     }
@@ -190,25 +227,50 @@ export class EmbeddingFallbackService {
           dimensions: 768,
         }),
       });
-      if (!resp.ok) throw new BadRequestException(`OpenAI error ${resp.status}`);
-      const json = (await resp.json()) as { data: Array<{ embedding: number[] }> };
+      if (!resp.ok)
+        throw new BadRequestException(`OpenAI error ${resp.status}`);
+      const json = (await resp.json()) as {
+        data: Array<{ embedding: number[] }>;
+      };
       return json.data[0]!.embedding;
     }
 
-    throw new BadRequestException('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
+    throw new BadRequestException(
+      'No embedding provider: set OLLAMA_URL or OPENAI_API_KEY'
+    );
   }
 
   // ── Mappers ──────────────────────────────────────────────────────────────
 
   mapContent(r: ContentRow & { created_at: Date | null }): EmbeddingRecord {
-    return { id: r.id, type: 'content', refId: r.segment_id, embedding: r.embedding, createdAt: safeDate(r.created_at) };
+    return {
+      id: r.id,
+      type: 'content',
+      refId: r.segment_id,
+      embedding: r.embedding,
+      createdAt: safeDate(r.created_at),
+    };
   }
 
-  mapAnnotation(r: AnnotationRow & { created_at: Date | null }): EmbeddingRecord {
-    return { id: r.id, type: 'annotation', refId: r.annotation_id, embedding: r.embedding, createdAt: safeDate(r.created_at) };
+  mapAnnotation(
+    r: AnnotationRow & { created_at: Date | null }
+  ): EmbeddingRecord {
+    return {
+      id: r.id,
+      type: 'annotation',
+      refId: r.annotation_id,
+      embedding: r.embedding,
+      createdAt: safeDate(r.created_at),
+    };
   }
 
   mapConcept(r: ConceptRow & { created_at: Date | null }): EmbeddingRecord {
-    return { id: r.id, type: 'concept', refId: r.concept_id, embedding: r.embedding, createdAt: safeDate(r.created_at) };
+    return {
+      id: r.id,
+      type: 'concept',
+      refId: r.concept_id,
+      embedding: r.embedding,
+      createdAt: safeDate(r.created_at),
+    };
   }
 }

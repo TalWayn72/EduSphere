@@ -30,7 +30,8 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
     courseId: 'cc000000-0000-0000-0000-000000000002',
     courseName: 'Jewish Philosophy 101',
     contentTimestamp: 312,
-    excerpt: 'Maimonides argues free will is essential to moral responsibility...',
+    excerpt:
+      'Maimonides argues free will is essential to moral responsibility...',
     createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
   },
   {
@@ -39,15 +40,16 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
     courseId: 'cc000000-0000-0000-0000-000000000002',
     courseName: 'Jewish Philosophy 101',
     contentTimestamp: 540,
-    excerpt: 'Divine providence operates through intellect, not arbitrary will...',
+    excerpt:
+      'Divine providence operates through intellect, not arbitrary will...',
     createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
   {
     id: 'pn-3',
-    label: 'Spinoza\'s Determinism',
+    label: "Spinoza's Determinism",
     courseId: '22222222-2222-2222-2222-222222222221',
     courseName: 'Early Modern Philosophy',
-    excerpt: 'Everything follows from God\'s nature with the same necessity...',
+    excerpt: "Everything follows from God's nature with the same necessity...",
     createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
   },
   {
@@ -55,7 +57,8 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
     label: 'Kant — Autonomy & Duty',
     courseId: '22222222-2222-2222-2222-222222222221',
     courseName: 'Early Modern Philosophy',
-    excerpt: 'Moral law is self-legislated; freedom is presupposed by rational action...',
+    excerpt:
+      'Moral law is self-legislated; freedom is presupposed by rational action...',
     createdAt: new Date(Date.now() - 86400000).toISOString(),
   },
   {
@@ -64,7 +67,8 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
     courseId: 'ea2e14c1-424e-4bcd-a209-13fb0c7ce84c',
     courseName: 'Halakha and Ethics',
     contentTimestamp: 90,
-    excerpt: 'Repentance presupposes genuine capacity for change — a form of freedom...',
+    excerpt:
+      'Repentance presupposes genuine capacity for change — a form of freedom...',
     createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
   },
   {
@@ -72,7 +76,8 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
     label: 'Compatibilism',
     courseId: '22222222-2222-2222-2222-222222222221',
     courseName: 'Early Modern Philosophy',
-    excerpt: 'Freedom and determinism can coexist if "free" means acting without coercion...',
+    excerpt:
+      'Freedom and determinism can coexist if "free" means acting without coercion...',
     createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
   },
 ];
@@ -80,7 +85,12 @@ export const mockPersonalNodes: PersonalGraphNode[] = [
 export const mockPersonalEdges: PersonalGraphEdge[] = [
   { id: 'pe-1', source: 'pn-1', target: 'pn-2', sharedConcept: 'Free Will' },
   { id: 'pe-2', source: 'pn-1', target: 'pn-3', sharedConcept: 'Determinism' },
-  { id: 'pe-3', source: 'pn-1', target: 'pn-6', sharedConcept: 'Compatibilism' },
+  {
+    id: 'pe-3',
+    source: 'pn-1',
+    target: 'pn-6',
+    sharedConcept: 'Compatibilism',
+  },
   { id: 'pe-4', source: 'pn-3', target: 'pn-6', sharedConcept: 'Determinism' },
   { id: 'pe-5', source: 'pn-4', target: 'pn-1', sharedConcept: 'Autonomy' },
   { id: 'pe-6', source: 'pn-5', target: 'pn-1', sharedConcept: 'Freedom' },

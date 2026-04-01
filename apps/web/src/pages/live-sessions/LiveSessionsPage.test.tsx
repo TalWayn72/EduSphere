@@ -32,16 +32,26 @@ vi.mock('@/hooks/useLiveSessionActions', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode; variant?: string; size?: string }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+    variant?: string;
+    size?: string;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -66,12 +76,20 @@ import { LiveSessionsPage } from './LiveSessionsPage';
 
 describe('LiveSessionsPage', () => {
   it('renders inside Layout', () => {
-    render(<MemoryRouter><LiveSessionsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LiveSessionsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><LiveSessionsPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <LiveSessionsPage />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

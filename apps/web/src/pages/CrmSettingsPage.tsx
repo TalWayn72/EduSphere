@@ -56,7 +56,9 @@ export function CrmSettingsPage() {
   const role = useAuthRole();
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -64,7 +66,10 @@ export function CrmSettingsPage() {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[CrmSettingsPage] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[CrmSettingsPage] cleanup: copy timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -104,17 +109,17 @@ export function CrmSettingsPage() {
     await navigator.clipboard.writeText(webhookUrl);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
+    copyTimerRef.current = setTimeout(
+      () => setCopied(false),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
   return (
     <Layout>
       <PageShell size="md">
         <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'CRM' },
-          ]}
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'CRM' }]}
         />
         <div className="flex items-center gap-3">
           <Link className="h-6 w-6 text-primary" />

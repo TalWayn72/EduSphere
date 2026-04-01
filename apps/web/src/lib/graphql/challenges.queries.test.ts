@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { ACTIVE_CHALLENGES_QUERY, MY_PARTICIPATIONS_QUERY, CHALLENGE_LEADERBOARD_QUERY, JOIN_CHALLENGE_MUTATION, SUBMIT_SCORE_MUTATION } from './challenges.queries';
+import {
+  ACTIVE_CHALLENGES_QUERY,
+  MY_PARTICIPATIONS_QUERY,
+  CHALLENGE_LEADERBOARD_QUERY,
+  JOIN_CHALLENGE_MUTATION,
+  SUBMIT_SCORE_MUTATION,
+} from './challenges.queries';
 
 describe('challenges.queries', () => {
   it('exports ACTIVE_CHALLENGES_QUERY as a query string', () => {
@@ -11,7 +17,9 @@ describe('challenges.queries', () => {
   it('exports MY_PARTICIPATIONS_QUERY as a query string', () => {
     expect(MY_PARTICIPATIONS_QUERY).toBeDefined();
     expect(typeof MY_PARTICIPATIONS_QUERY).toBe('string');
-    expect(MY_PARTICIPATIONS_QUERY).toContain('query MyChallengeParticipations');
+    expect(MY_PARTICIPATIONS_QUERY).toContain(
+      'query MyChallengeParticipations'
+    );
   });
 
   it('exports CHALLENGE_LEADERBOARD_QUERY as a query string', () => {
@@ -31,5 +39,4 @@ describe('challenges.queries', () => {
     expect(typeof SUBMIT_SCORE_MUTATION).toBe('string');
     expect(SUBMIT_SCORE_MUTATION).toContain('mutation SubmitChallengeScore');
   });
-
 });

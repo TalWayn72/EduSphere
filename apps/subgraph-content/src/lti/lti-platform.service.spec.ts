@@ -137,7 +137,7 @@ describe('LtiPlatformService', () => {
         service.registerPlatform('t1', {
           ...validInput,
           platformUrl: 'not-a-url',
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -146,7 +146,7 @@ describe('LtiPlatformService', () => {
         service.registerPlatform('t1', {
           ...validInput,
           platformName: '',
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -154,9 +154,9 @@ describe('LtiPlatformService', () => {
       const chain = makeInsertChain([]);
       mockTx.insert.mockReturnValueOnce({ values: chain.values });
 
-      await expect(
-        service.registerPlatform('t1', validInput),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.registerPlatform('t1', validInput)).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -175,7 +175,7 @@ describe('LtiPlatformService', () => {
       mockTx.update.mockReturnValueOnce({ set: chain.set });
 
       await expect(
-        service.togglePlatform('missing', 't1', true),
+        service.togglePlatform('missing', 't1', true)
       ).rejects.toThrow(NotFoundException);
     });
   });

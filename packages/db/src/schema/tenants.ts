@@ -1,4 +1,11 @@
-import { pgTable, text, jsonb, timestamp, varchar, uuid } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  jsonb,
+  timestamp,
+  varchar,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import { pk, timestamps } from './_shared';
 
 /** Phase 63: No-Code Portal Builder — JSON schema for tenant portal config. */
@@ -29,7 +36,9 @@ export const tenants = pgTable('tenants', {
     .notNull()
     .default('FREE'),
   settings: jsonb('settings').notNull().default({}),
-  portalConfig: jsonb('portal_config').$type<PortalConfig>().default({ blocks: [] }),
+  portalConfig: jsonb('portal_config')
+    .$type<PortalConfig>()
+    .default({ blocks: [] }),
   subscription_expires_at: timestamp('subscription_expires_at', {
     withTimezone: true,
   }),

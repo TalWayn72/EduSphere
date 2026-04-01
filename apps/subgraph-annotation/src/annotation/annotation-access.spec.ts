@@ -9,7 +9,10 @@ vi.mock('@edusphere/db', () => ({
   }),
 }));
 
-import { isInstructorRole, buildLayerVisibilityConditions } from './annotation-access';
+import {
+  isInstructorRole,
+  buildLayerVisibilityConditions,
+} from './annotation-access';
 import type { AuthContext } from '@edusphere/auth';
 
 // ---------------------------------------------------------------------------

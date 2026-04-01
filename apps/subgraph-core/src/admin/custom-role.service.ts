@@ -96,7 +96,8 @@ export class CustomRoleService implements OnModuleDestroy {
           createdBy: tenantCtx.userId,
         })
         .returning();
-      if (!created) throw new InternalServerErrorException('Role insert failed');
+      if (!created)
+        throw new InternalServerErrorException('Role insert failed');
       this.logger.log(
         `Created custom role "${input.name}" in tenant ${tenantCtx.tenantId}`
       );
@@ -138,7 +139,8 @@ export class CustomRoleService implements OnModuleDestroy {
         })
         .where(eq(schema.customRoles.id, id))
         .returning();
-      if (!updated) throw new InternalServerErrorException('Role update failed');
+      if (!updated)
+        throw new InternalServerErrorException('Role update failed');
       this.logger.log(`Updated custom role ${id}`);
       return this.mapRole(updated, 0);
     });
@@ -202,7 +204,8 @@ export class CustomRoleService implements OnModuleDestroy {
           isActive: true,
         })
         .returning();
-      if (!delegation) throw new InternalServerErrorException('Delegation insert failed');
+      if (!delegation)
+        throw new InternalServerErrorException('Delegation insert failed');
       this.logger.log(`Delegated role ${roleId} to user ${userId}`);
       return this.mapDelegation(delegation);
     });

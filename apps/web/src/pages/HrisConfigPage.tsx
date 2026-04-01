@@ -85,15 +85,14 @@ export function HrisConfigPage() {
     <Layout>
       <div className="p-6 space-y-6" data-testid="hris-config-page">
         <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'HRIS' },
-          ]}
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'HRIS' }]}
         />
         <div className="flex items-center gap-3">
           <Building2 className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">HRIS &amp; Enterprise Integrations</h1>
+            <h1 className="text-2xl font-bold">
+              HRIS &amp; Enterprise Integrations
+            </h1>
             <p className="text-muted-foreground text-sm">
               Connect your HR system to auto-provision and sync users.
             </p>
@@ -103,10 +102,15 @@ export function HrisConfigPage() {
         {/* System status cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {SYSTEM_CARDS.map((sys) => (
-            <Card key={sys.type} className={`border ${STATUS_STYLES[sys.status]}`}>
+            <Card
+              key={sys.type}
+              className={`border ${STATUS_STYLES[sys.status]}`}
+            >
               <CardHeader className="pb-2 pt-3 px-4">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium">{sys.label}</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {sys.label}
+                  </CardTitle>
                   {STATUS_ICONS[sys.status]}
                 </div>
               </CardHeader>
@@ -138,7 +142,10 @@ export function HrisConfigPage() {
                 value={systemType}
                 onValueChange={(v) => setSystemType(v as HrisType)}
               >
-                <SelectTrigger id="system-type" data-testid="system-type-select">
+                <SelectTrigger
+                  id="system-type"
+                  data-testid="system-type-select"
+                >
                   <SelectValue placeholder="Select HRIS system" />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,7 +159,10 @@ export function HrisConfigPage() {
 
             <div className="space-y-2">
               <Label htmlFor="base-url">
-                Base URL <span aria-hidden="true" className="text-destructive">*</span>
+                Base URL{' '}
+                <span aria-hidden="true" className="text-destructive">
+                  *
+                </span>
                 <span className="sr-only">(required)</span>
               </Label>
               <Input
@@ -161,13 +171,17 @@ export function HrisConfigPage() {
                 value={baseUrl}
                 required
                 aria-required="true"
-                aria-invalid={baseUrlTouched && baseUrlError ? 'true' : undefined}
+                aria-invalid={
+                  baseUrlTouched && baseUrlError ? 'true' : undefined
+                }
                 aria-describedby={baseUrlError ? 'base-url-error' : undefined}
                 onChange={(e) => {
                   setBaseUrl(e.target.value);
                   const val = e.target.value.trim();
                   if (val && !/^https?:\/\/.+/i.test(val)) {
-                    setBaseUrlError('Please enter a valid URL starting with http:// or https://');
+                    setBaseUrlError(
+                      'Please enter a valid URL starting with http:// or https://'
+                    );
                   } else {
                     setBaseUrlError('');
                   }
@@ -175,7 +189,11 @@ export function HrisConfigPage() {
                 onBlur={() => setBaseUrlTouched(true)}
               />
               {baseUrlTouched && baseUrlError && (
-                <p id="base-url-error" className="text-sm text-destructive" role="alert">
+                <p
+                  id="base-url-error"
+                  className="text-sm text-destructive"
+                  role="alert"
+                >
                   {baseUrlError}
                 </p>
               )}
@@ -193,7 +211,10 @@ export function HrisConfigPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="client-secret">
-                  Client Secret / API Token <span aria-hidden="true" className="text-destructive">*</span>
+                  Client Secret / API Token{' '}
+                  <span aria-hidden="true" className="text-destructive">
+                    *
+                  </span>
                   <span className="sr-only">(required)</span>
                 </Label>
                 <Input

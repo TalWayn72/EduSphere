@@ -17,7 +17,10 @@ import { DEV_MODE } from '@/lib/auth';
 import type { ApiConcept, ApiRelatedConcept, ApiConceptNode } from './types';
 
 /** Empty graph returned when real data is unavailable in production. */
-const EMPTY_GRAPH: { nodes: GraphNode[]; edges: GraphEdge[] } = { nodes: [], edges: [] };
+const EMPTY_GRAPH: { nodes: GraphNode[]; edges: GraphEdge[] } = {
+  nodes: [],
+  edges: [],
+};
 
 /**
  * Classify a urql CombinedError into a category so the UI can show
@@ -32,14 +35,22 @@ const AUTH_PATTERNS = [
   'forbidden',
 ];
 
-export function classifyGraphError(error: CombinedError | undefined): GraphErrorKind {
+export function classifyGraphError(
+  error: CombinedError | undefined
+): GraphErrorKind {
   if (!error) return null;
   if (error.networkError) return 'network';
   const msg = error.message?.toLowerCase() ?? '';
   if (AUTH_PATTERNS.some((p) => msg.includes(p))) return 'auth';
   const hasAuthCode = error.graphQLErrors?.some((e) => {
-    const code = String((e.extensions as Record<string, unknown>)?.code ?? '').toUpperCase();
-    return code === 'UNAUTHENTICATED' || code === 'UNAUTHORIZED' || code === 'FORBIDDEN';
+    const code = String(
+      (e.extensions as Record<string, unknown>)?.code ?? ''
+    ).toUpperCase();
+    return (
+      code === 'UNAUTHENTICATED' ||
+      code === 'UNAUTHORIZED' ||
+      code === 'FORBIDDEN'
+    );
   });
   if (hasAuthCode) return 'auth';
   if (error.graphQLErrors?.length) return 'graphql';
@@ -168,7 +179,10 @@ export function useGraphData() {
   // Log GraphQL errors so they are observable in devtools / CI logs
   useEffect(() => {
     if (conceptsResult.error) {
-      console.error('[KnowledgeGraph] Concepts query error:', conceptsResult.error.message);
+      console.error(
+        '[KnowledgeGraph] Concepts query error:',
+        conceptsResult.error.message
+      );
     }
   }, [conceptsResult.error]);
 

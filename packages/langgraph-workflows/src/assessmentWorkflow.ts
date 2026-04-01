@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateText, generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -80,7 +86,9 @@ export class AssessmentWorkflow {
 
     for (const submission of state.submissions) {
       const { text } = await generateText({
-        model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+        model: openai(this.model) as unknown as Parameters<
+          typeof generateText
+        >[0]['model'],
         system: injectLocale(
           'You are an expert educational assessor providing fair and constructive feedback.',
           this.locale
@@ -123,7 +131,9 @@ Feedback: [detailed feedback]`,
       .join('\n\n');
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       system: injectLocale(
         'You are an expert educational assessor providing fair and constructive feedback.',
         this.locale

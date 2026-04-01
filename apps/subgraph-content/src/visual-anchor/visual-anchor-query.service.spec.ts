@@ -49,10 +49,14 @@ vi.mock('@edusphere/db', () => ({
 
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: class MockS3Client {
-    constructor() { /* noop */ }
+    constructor() {
+      /* noop */
+    }
   },
   GetObjectCommand: class MockGetObjectCommand {
-    constructor(public input: unknown) { /* noop */ }
+    constructor(public input: unknown) {
+      /* noop */
+    }
   },
 }));
 
@@ -77,7 +81,11 @@ import { VisualAnchorQueryService } from './visual-anchor-query.service.js';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const AUTH_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'INSTRUCTOR' as const };
+const AUTH_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 function makeAnchorRow(overrides: Record<string, unknown> = {}) {
   return {
@@ -188,7 +196,11 @@ describe('VisualAnchorQueryService', () => {
     ];
     mockWithTenantContext.mockResolvedValueOnce(assets);
 
-    const results = await svc.searchVisualAssets('course-1', 'diagram', AUTH_CTX);
+    const results = await svc.searchVisualAssets(
+      'course-1',
+      'diagram',
+      AUTH_CTX
+    );
 
     expect(results).toHaveLength(1);
     expect(results[0]!.asset.id).toBe('a-1');
@@ -199,7 +211,11 @@ describe('VisualAnchorQueryService', () => {
       makeAssetRow({ original_name: 'Photo.jpg' }),
     ]);
 
-    const results = await svc.searchVisualAssets('course-1', 'nonexistent', AUTH_CTX);
+    const results = await svc.searchVisualAssets(
+      'course-1',
+      'nonexistent',
+      AUTH_CTX
+    );
 
     expect(results).toEqual([]);
   });
@@ -234,7 +250,9 @@ describe('VisualAnchorQueryService', () => {
   it('mapAsset sets webpUrl to null when no webp_key', async () => {
     mockGetSignedUrl.mockResolvedValueOnce('https://signed/storage.png');
 
-    const mapped = await svc.mapAsset(makeAssetRow({ webp_key: null }) as never);
+    const mapped = await svc.mapAsset(
+      makeAssetRow({ webp_key: null }) as never
+    );
 
     expect(mapped.webpUrl).toBeNull();
   });

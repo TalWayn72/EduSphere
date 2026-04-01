@@ -44,7 +44,9 @@ test.describe('Visual Regression Auth — Layout Structure', () => {
 
   for (const pg of AUTH_PAGES) {
     test(`${pg.name} — has sidebar or aside`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
       // AppSidebar uses data-testid="app-sidebar" or falls back to <aside> or <nav>
@@ -52,27 +54,41 @@ test.describe('Visual Regression Auth — Layout Structure', () => {
         .getByTestId('app-sidebar')
         .or(page.locator('aside'))
         .or(page.locator('nav'));
-      const visible = await sidebar.first().isVisible({ timeout: 10_000 }).catch(() => false);
+      const visible = await sidebar
+        .first()
+        .isVisible({ timeout: 10_000 })
+        .catch(() => false);
       // Soft-check: take a screenshot even if sidebar is not found
       if (!visible) {
-        await expect(page).toHaveScreenshot(`auth-${pg.name}-sidebar-check.png`, {
-          fullPage: true, maxDiffPixelRatio: 0.05, animations: 'disabled' as const,
-        });
+        await expect(page).toHaveScreenshot(
+          `auth-${pg.name}-sidebar-check.png`,
+          {
+            fullPage: true,
+            maxDiffPixelRatio: 0.05,
+            animations: 'disabled' as const,
+          }
+        );
       }
       expect(visible).toBe(true);
     });
 
     test(`${pg.name} — has at least one h1 or h2`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
       const heading = page.locator('h1, h2').first();
-      const visible = await heading.isVisible({ timeout: 10_000 }).catch(() => false);
+      const visible = await heading
+        .isVisible({ timeout: 10_000 })
+        .catch(() => false);
       expect(visible).toBe(true);
     });
 
     test(`${pg.name} — has topbar or header`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
       // Topbar uses data-testid="topbar" or falls back to <header> or <nav>
@@ -80,7 +96,10 @@ test.describe('Visual Regression Auth — Layout Structure', () => {
         .getByTestId('topbar')
         .or(page.locator('header'))
         .or(page.locator('nav'));
-      const visible = await topbar.first().isVisible({ timeout: 10_000 }).catch(() => false);
+      const visible = await topbar
+        .first()
+        .isVisible({ timeout: 10_000 })
+        .catch(() => false);
       expect(visible).toBe(true);
     });
   }
@@ -95,7 +114,9 @@ test.describe('Visual Regression Auth — Light Mode @visual', () => {
 
   for (const pg of AUTH_PAGES) {
     test(`${pg.name} — light mode screenshot`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(`auth-${pg.name}-light.png`, {
@@ -122,7 +143,9 @@ test.describe('Visual Regression Auth — Dark Mode @visual', () => {
 
   for (const pg of AUTH_PAGES) {
     test(`${pg.name} — dark mode screenshot`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForTimeout(500);
       // Toggle dark mode via Tailwind dark class
       await page.evaluate(() => document.documentElement.classList.add('dark'));

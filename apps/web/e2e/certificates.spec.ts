@@ -54,7 +54,9 @@ test.describe('CertificatesPage — DEV_MODE guard', () => {
       }
     });
     await login(page);
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
   });
 
@@ -113,8 +115,12 @@ test.describe('CertificatesPage — Live backend', () => {
     await loginViaKeycloak(page, TEST_USERS.student);
   });
 
-  test('certificates page loads for authenticated student', async ({ page }) => {
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+  test('certificates page loads for authenticated student', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -127,10 +133,14 @@ test.describe('CertificatesPage — Live backend', () => {
   });
 
   test('certificate list or empty state is visible', async ({ page }) => {
-    await page.goto(`${BASE_URL}/certificates`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/certificates`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
-    const hasCerts = await page.locator('[data-testid="certificate-card"]').count();
+    const hasCerts = await page
+      .locator('[data-testid="certificate-card"]')
+      .count();
     const hasEmpty = await page
       .getByText(/no certificates yet|you haven't earned/i)
       .count();

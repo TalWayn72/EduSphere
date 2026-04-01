@@ -8,7 +8,7 @@ const withDarkMode: DecoratorFunction<ReactRenderer> = (Story, context) => {
   return React.createElement(
     'div',
     { className: dark ? 'dark' : '', style: { padding: '1rem' } },
-    React.createElement(Story),
+    React.createElement(Story)
   );
 };
 
@@ -40,19 +40,35 @@ const preview: Preview = {
     },
     a11y: {
       config: {
-        rules: [
-          { id: 'color-contrast', enabled: true },
-        ],
+        rules: [{ id: 'color-contrast', enabled: true }],
       },
     },
     viewport: {
       viewports: {
-        smallMobile: { name: 'Small Mobile (320×568)', styles: { width: '320px', height: '568px' } },
-        mobile: { name: 'Mobile (375×812)', styles: { width: '375px', height: '812px' } },
-        tablet: { name: 'Tablet (768×1024)', styles: { width: '768px', height: '1024px' } },
-        laptop: { name: 'Laptop (1024×768)', styles: { width: '1024px', height: '768px' } },
-        desktop: { name: 'Desktop (1280×720)', styles: { width: '1280px', height: '720px' } },
-        qhd: { name: '4K QHD (2560×1440)', styles: { width: '2560px', height: '1440px' } },
+        smallMobile: {
+          name: 'Small Mobile (320×568)',
+          styles: { width: '320px', height: '568px' },
+        },
+        mobile: {
+          name: 'Mobile (375×812)',
+          styles: { width: '375px', height: '812px' },
+        },
+        tablet: {
+          name: 'Tablet (768×1024)',
+          styles: { width: '768px', height: '1024px' },
+        },
+        laptop: {
+          name: 'Laptop (1024×768)',
+          styles: { width: '1024px', height: '768px' },
+        },
+        desktop: {
+          name: 'Desktop (1280×720)',
+          styles: { width: '1280px', height: '720px' },
+        },
+        qhd: {
+          name: '4K QHD (2560×1440)',
+          styles: { width: '2560px', height: '1440px' },
+        },
       },
     },
   },

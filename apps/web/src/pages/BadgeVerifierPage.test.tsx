@@ -5,7 +5,9 @@ import { render, screen } from '@testing-library/react';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {

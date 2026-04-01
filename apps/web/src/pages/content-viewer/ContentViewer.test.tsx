@@ -9,7 +9,10 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useParams: () => ({ courseId: 'c-1', contentItemId: 'ci-1' }) };
+  return {
+    ...actual,
+    useParams: () => ({ courseId: 'c-1', contentItemId: 'ci-1' }),
+  };
 });
 
 vi.mock('urql', () => ({
@@ -25,7 +28,9 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('./VideoSection', () => ({
@@ -48,7 +53,11 @@ import { ContentViewer } from './ContentViewer';
 
 describe('ContentViewer', () => {
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><ContentViewer /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <ContentViewer />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

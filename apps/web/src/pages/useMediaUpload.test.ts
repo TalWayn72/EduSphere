@@ -27,7 +27,9 @@ const mockMutation = vi.fn();
 vi.mock('@/lib/urql-client', () => ({
   urqlClient: {
     query: (...args: unknown[]) => ({ toPromise: () => mockQuery(...args) }),
-    mutation: (...args: unknown[]) => ({ toPromise: () => mockMutation(...args) }),
+    mutation: (...args: unknown[]) => ({
+      toPromise: () => mockMutation(...args),
+    }),
   },
 }));
 
@@ -57,9 +59,14 @@ function createMockFile(name: string, type = 'image/png'): File {
 }
 
 const baseMedia: UploadedMedia = {
-  id: 'media-1', courseId: 'c-1', fileKey: 'key-1',
-  title: 'Asset', contentType: 'image/png', status: 'READY',
-  downloadUrl: 'https://cdn.example.com/asset.png', altText: null,
+  id: 'media-1',
+  courseId: 'c-1',
+  fileKey: 'key-1',
+  title: 'Asset',
+  contentType: 'image/png',
+  status: 'READY',
+  downloadUrl: 'https://cdn.example.com/asset.png',
+  altText: null,
 };
 
 beforeEach(() => {
@@ -78,9 +85,7 @@ describe('useMediaUpload', () => {
   const onChange = vi.fn();
 
   it('returns correct initial state', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     expect(result.current.entries).toEqual([]);
     expect(result.current.altTextTarget).toBeNull();
     expect(result.current.richDocTitle).toBe('');
@@ -89,9 +94,7 @@ describe('useMediaUpload', () => {
   });
 
   it('handleFileSelect adds entries from file input', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     const file = createMockFile('photo.png');
     const event = {
       target: { files: [file], value: 'C:\\fakepath\\photo.png' },
@@ -107,9 +110,7 @@ describe('useMediaUpload', () => {
   });
 
   it('handleFileSelect ignores empty file list', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     const event = {
       target: { files: [], value: '' },
     } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -133,9 +134,7 @@ describe('useMediaUpload', () => {
       data: { confirmMediaUpload: { ...baseMedia, id: 'new-1' } },
     });
 
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
 
     // Add a file entry
     const file = createMockFile('doc.pdf', 'application/pdf');
@@ -159,9 +158,7 @@ describe('useMediaUpload', () => {
       error: { message: 'presign failed' },
     });
 
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
 
     act(() => {
       result.current.handleFileSelect({
@@ -188,9 +185,7 @@ describe('useMediaUpload', () => {
     });
     vi.mocked(globalThis.fetch).mockRejectedValue(new Error('network'));
 
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     act(() => {
       result.current.handleFileSelect({
         target: { files: [createMockFile('f.png')], value: '' },
@@ -207,7 +202,7 @@ describe('useMediaUpload', () => {
   it('removeEntry removes entry and calls onChange', () => {
     const existingMedia = [baseMedia];
     const { result } = renderHook(() =>
-      useMediaUpload('c-1', existingMedia, onChange),
+      useMediaUpload('c-1', existingMedia, onChange)
     );
 
     // Add an entry with result matching baseMedia
@@ -222,9 +217,7 @@ describe('useMediaUpload', () => {
   });
 
   it('handleSaveRichDoc adds rich document to mediaList', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
 
     act(() => result.current.setRichDocTitle('My Document'));
     act(() => result.current.setRichDocContent('Some content'));
@@ -238,24 +231,20 @@ describe('useMediaUpload', () => {
             contentType: 'RICH_DOCUMENT',
           }),
         ]),
-      }),
+      })
     );
     expect(result.current.richDocSaved).toBe(true);
     expect(result.current.richDocTitle).toBe('');
   });
 
   it('handleSaveRichDoc ignores empty title', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     act(() => result.current.handleSaveRichDoc());
     expect(onChange).not.toHaveBeenCalled();
   });
 
   it('richDocSaved resets after SAVED_CONFIRMATION_MS', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     act(() => result.current.setRichDocTitle('Title'));
     act(() => result.current.handleSaveRichDoc());
     expect(result.current.richDocSaved).toBe(true);
@@ -266,7 +255,7 @@ describe('useMediaUpload', () => {
 
   it('cleans up timer on unmount (memory safety)', () => {
     const { result, unmount } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
+      useMediaUpload('c-1', [], onChange)
     );
     act(() => result.current.setRichDocTitle('Doc'));
     act(() => result.current.handleSaveRichDoc());
@@ -276,12 +265,13 @@ describe('useMediaUpload', () => {
   });
 
   it('updateEntry patches specific entry by index', () => {
-    const { result } = renderHook(() =>
-      useMediaUpload('c-1', [], onChange),
-    );
+    const { result } = renderHook(() => useMediaUpload('c-1', [], onChange));
     act(() => {
       result.current.handleFileSelect({
-        target: { files: [createMockFile('a.png'), createMockFile('b.png')], value: '' },
+        target: {
+          files: [createMockFile('a.png'), createMockFile('b.png')],
+          value: '',
+        },
       } as unknown as React.ChangeEvent<HTMLInputElement>);
     });
 

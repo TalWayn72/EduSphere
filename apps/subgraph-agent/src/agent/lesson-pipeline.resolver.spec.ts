@@ -17,9 +17,9 @@ vi.mock('../workflows/lesson-pipeline.workflow.js', () => ({
 }));
 
 vi.mock('ollama-ai-provider', () => ({
-  createOllama: vi.fn().mockReturnValue(
-    vi.fn().mockReturnValue({ modelId: 'llama3' }),
-  ),
+  createOllama: vi
+    .fn()
+    .mockReturnValue(vi.fn().mockReturnValue({ modelId: 'llama3' })),
 }));
 
 vi.mock('crypto', () => ({
@@ -60,11 +60,11 @@ describe('LessonPipelineResolver', () => {
   describe('generateLesson', () => {
     it('throws UNAUTHORIZED when no authContext', async () => {
       await expect(
-        resolver.generateLesson(VALID_INPUT, makeCtx() as never),
+        resolver.generateLesson(VALID_INPUT, makeCtx() as never)
       ).rejects.toThrow(GraphQLError);
 
       await expect(
-        resolver.generateLesson(VALID_INPUT, makeCtx() as never),
+        resolver.generateLesson(VALID_INPUT, makeCtx() as never)
       ).rejects.toMatchObject({
         extensions: { code: 'UNAUTHORIZED' },
       });
@@ -73,7 +73,7 @@ describe('LessonPipelineResolver', () => {
     it('throws UNAUTHORIZED when userId is missing', async () => {
       const ctx = { authContext: { tenantId: 'tenant-1' } };
       await expect(
-        resolver.generateLesson(VALID_INPUT, ctx as never),
+        resolver.generateLesson(VALID_INPUT, ctx as never)
       ).rejects.toThrow(GraphQLError);
     });
 
@@ -85,7 +85,7 @@ describe('LessonPipelineResolver', () => {
         VALID_INPUT,
         expect.anything(), // model
         'test-uuid-1234', // executionId
-        expect.any(Function), // searchFn
+        expect.any(Function) // searchFn
       );
       expect(result).toEqual({
         id: 'exec-1',
@@ -101,7 +101,7 @@ describe('LessonPipelineResolver', () => {
       // Extract the searchFn that was passed to runLessonPipeline
       const searchFn = mockRunLessonPipeline.mock.calls[0][3] as (
         query: string,
-        limit: number,
+        limit: number
       ) => Promise<unknown>;
 
       // Mock the knowledge subgraph response
@@ -110,7 +110,12 @@ describe('LessonPipelineResolver', () => {
         json: async () => ({
           data: {
             searchSemantic: [
-              { id: 's-1', text: 'segment text', similarity: 0.95, entityType: 'concept' },
+              {
+                id: 's-1',
+                text: 'segment text',
+                similarity: 0.95,
+                entityType: 'concept',
+              },
             ],
           },
         }),
@@ -125,10 +130,15 @@ describe('LessonPipelineResolver', () => {
           headers: expect.objectContaining({
             Authorization: 'Bearer tok-123',
           }),
-        }),
+        })
       );
       expect(results).toEqual([
-        { id: 's-1', text: 'segment text', similarity: 0.95, source: 'concept' },
+        {
+          id: 's-1',
+          text: 'segment text',
+          similarity: 0.95,
+          source: 'concept',
+        },
       ]);
     });
 
@@ -138,7 +148,7 @@ describe('LessonPipelineResolver', () => {
 
       const searchFn = mockRunLessonPipeline.mock.calls[0][3] as (
         query: string,
-        limit: number,
+        limit: number
       ) => Promise<unknown>;
 
       mockFetch.mockResolvedValueOnce({
@@ -147,7 +157,7 @@ describe('LessonPipelineResolver', () => {
       });
 
       await expect(searchFn('fail', 5)).rejects.toThrow(
-        'Knowledge subgraph HTTP 503',
+        'Knowledge subgraph HTTP 503'
       );
     });
 
@@ -157,7 +167,7 @@ describe('LessonPipelineResolver', () => {
 
       const searchFn = mockRunLessonPipeline.mock.calls[0][3] as (
         query: string,
-        limit: number,
+        limit: number
       ) => Promise<unknown>;
 
       mockFetch.mockResolvedValueOnce({
@@ -175,7 +185,7 @@ describe('LessonPipelineResolver', () => {
 
       const searchFn = mockRunLessonPipeline.mock.calls[0][3] as (
         query: string,
-        limit: number,
+        limit: number
       ) => Promise<unknown>;
 
       mockFetch.mockResolvedValueOnce({
@@ -185,7 +195,10 @@ describe('LessonPipelineResolver', () => {
 
       await searchFn('test', 3);
 
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers['Authorization']).toBeUndefined();
     });
   });

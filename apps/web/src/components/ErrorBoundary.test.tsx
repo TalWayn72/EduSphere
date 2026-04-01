@@ -25,7 +25,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <div data-testid="child">Content</div>
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
@@ -34,7 +34,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowingChild shouldThrow={true} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary fallback={<div data-testid="custom-fallback">Custom</div>}>
         <ThrowingChild shouldThrow={true} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
   });
@@ -53,7 +53,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowingChild shouldThrow={true} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByRole('alert')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Try again'));
@@ -66,12 +66,12 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary pageName="Dashboard">
         <ThrowingChild shouldThrow={true} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining('[ErrorBoundary:Dashboard]'),
       expect.any(Error),
-      expect.anything(),
+      expect.anything()
     );
   });
 
@@ -79,7 +79,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowingChild shouldThrow={true} />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByText(/unexpected error occurred/i)).toBeInTheDocument();
   });

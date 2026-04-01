@@ -176,7 +176,8 @@ test.describe('Admin Roles — /admin/roles', () => {
 
     // RoleManagementPage uses "New Custom Role" button text
     const hasCreateUI =
-      /Create Role|Add Role|New Role|New Custom Role/i.test(body) || spinnerCount > 0;
+      /Create Role|Add Role|New Role|New Custom Role/i.test(body) ||
+      spinnerCount > 0;
 
     expect(hasCreateUI).toBe(true);
   });

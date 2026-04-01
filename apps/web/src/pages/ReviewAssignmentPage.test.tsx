@@ -45,7 +45,9 @@ describe('ReviewAssignmentPage', () => {
         </Routes>
       </MemoryRouter>
     );
-    expect(screen.getByRole('button', { name: /Submit Review/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Submit Review/i })
+    ).toBeInTheDocument();
   });
 
   it('renders feedback textarea', () => {

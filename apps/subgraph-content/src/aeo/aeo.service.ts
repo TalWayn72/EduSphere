@@ -84,7 +84,10 @@ export class AeoService implements OnModuleDestroy {
       );
       return rows as unknown as PublicCourse[];
     } catch (err) {
-      this.logger.error({ err }, '[AeoService] getPublicCourses failed — returning empty list');
+      this.logger.error(
+        { err },
+        '[AeoService] getPublicCourses failed — returning empty list'
+      );
       return [];
     }
   }
@@ -99,12 +102,32 @@ export class AeoService implements OnModuleDestroy {
       { loc: `${BASE_URL}/instructors`, changefreq: 'monthly', priority: 0.8 },
       { loc: `${BASE_URL}/pricing`, changefreq: 'monthly', priority: 0.8 },
       { loc: `${BASE_URL}/pilot`, changefreq: 'monthly', priority: 0.7 },
-      { loc: `${BASE_URL}/accessibility`, changefreq: 'monthly', priority: 0.5 },
+      {
+        loc: `${BASE_URL}/accessibility`,
+        changefreq: 'monthly',
+        priority: 0.5,
+      },
       { loc: `${BASE_URL}/blog`, changefreq: 'weekly', priority: 0.9 },
-      { loc: `${BASE_URL}/blog/knowledge-graphs-in-education`, changefreq: 'monthly', priority: 0.8 },
-      { loc: `${BASE_URL}/blog/ai-tutoring-chavruta-method`, changefreq: 'monthly', priority: 0.8 },
-      { loc: `${BASE_URL}/blog/scorm-future-xapi-lti`, changefreq: 'monthly', priority: 0.8 },
-      { loc: `${BASE_URL}/blog/compliance-learning-automation`, changefreq: 'monthly', priority: 0.8 },
+      {
+        loc: `${BASE_URL}/blog/knowledge-graphs-in-education`,
+        changefreq: 'monthly',
+        priority: 0.8,
+      },
+      {
+        loc: `${BASE_URL}/blog/ai-tutoring-chavruta-method`,
+        changefreq: 'monthly',
+        priority: 0.8,
+      },
+      {
+        loc: `${BASE_URL}/blog/scorm-future-xapi-lti`,
+        changefreq: 'monthly',
+        priority: 0.8,
+      },
+      {
+        loc: `${BASE_URL}/blog/compliance-learning-automation`,
+        changefreq: 'monthly',
+        priority: 0.8,
+      },
     ];
   }
 
@@ -117,7 +140,10 @@ export class AeoService implements OnModuleDestroy {
         priority: 0.7,
       }));
     } catch (err) {
-      this.logger.warn({ err }, '[AeoService] Sitemap course fetch failed — using static URLs only');
+      this.logger.warn(
+        { err },
+        '[AeoService] Sitemap course fetch failed — using static URLs only'
+      );
       return [];
     }
   }

@@ -26,8 +26,9 @@ export const customDomains = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     domain: varchar('domain', { length: 255 }).notNull().unique(),
     verificationToken: varchar('verification_token', { length: 64 }),
-    verificationRecordType: varchar('verification_record_type', { length: 10 })
-      .default('TXT'),
+    verificationRecordType: varchar('verification_record_type', {
+      length: 10,
+    }).default('TXT'),
     verifiedAt: timestamp('verified_at', { withTimezone: true }),
     sslStatus: varchar('ssl_status', { length: 20 })
       .notNull()

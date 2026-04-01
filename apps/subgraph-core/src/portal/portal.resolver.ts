@@ -64,7 +64,9 @@ export class PortalResolver {
   constructor(private readonly portalService: PortalService) {}
 
   @Query('myPortal')
-  async myPortal(@Context() ctx: GraphQLContext): Promise<PortalPageGql | null> {
+  async myPortal(
+    @Context() ctx: GraphQLContext
+  ): Promise<PortalPageGql | null> {
     const tenantId = extractTenantId(ctx);
     if (!tenantId) return null;
     const page = await this.portalService.getPortalPage(tenantId);

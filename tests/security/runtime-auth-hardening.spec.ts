@@ -66,7 +66,9 @@ describe('SEC-1: dev-token requires ALLOW_DEV_TOKEN env var', () => {
     for (const file of files) {
       const content = readSource(file);
       // Must require the env var to equal 'true', not just be truthy
-      expect(content).toMatch(/ALLOW_DEV_TOKEN.*===.*'true'|ALLOW_DEV_TOKEN.*===.*"true"/);
+      expect(content).toMatch(
+        /ALLOW_DEV_TOKEN.*===.*'true'|ALLOW_DEV_TOKEN.*===.*"true"/
+      );
     }
   });
 });

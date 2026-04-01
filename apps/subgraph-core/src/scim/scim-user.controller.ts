@@ -93,7 +93,11 @@ export class ScimUserController {
   ): Promise<void> {
     const authResult = await this.auth.authorize(req, res);
     if (!authResult) return;
-    const user = await this.userService.replaceUser(authResult.tenantId, id, body);
+    const user = await this.userService.replaceUser(
+      authResult.tenantId,
+      id,
+      body
+    );
     if (!user) {
       this.auth.scimError(res, 404, 'User not found');
       return;

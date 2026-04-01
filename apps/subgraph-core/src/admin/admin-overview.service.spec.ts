@@ -150,7 +150,9 @@ describe('AdminOverviewService', () => {
   });
 
   it('getDashboardStats returns zero-defaults on DB error', async () => {
-    mockDbSelect.mockImplementation(() => { throw new Error('DB down'); });
+    mockDbSelect.mockImplementation(() => {
+      throw new Error('DB down');
+    });
     const result = await service.getDashboardStats('tenant-err');
     expect(result).toMatchObject({
       totalUsers: 0,

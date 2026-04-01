@@ -2,10 +2,7 @@
  * AnnotationFilterControls -- Layer filters and sort controls for AnnotationPanel.
  * Extracted from AnnotationPanel for file-size compliance.
  */
-import {
-  AnnotationLayer,
-  ANNOTATION_LAYER_CONFIGS,
-} from '@/types/annotations';
+import { AnnotationLayer, ANNOTATION_LAYER_CONFIGS } from '@/types/annotations';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -47,7 +44,9 @@ export function AnnotationFilterControls({
                 >
                   <span>{config.icon}</span>
                   <span className={config.color}>{config.label}</span>
-                  <span className="text-gray-400 dark:text-slate-400">({count})</span>
+                  <span className="text-gray-400 dark:text-slate-400">
+                    ({count})
+                  </span>
                 </Label>
               </div>
             );

@@ -67,7 +67,8 @@ const MOCK_LESSON = {
           moduleName: 'SUMMARIZATION',
           outputType: 'SUMMARIZATION',
           outputData: {
-            shortSummary: 'An introduction to the structure and study of the Mishnah.',
+            shortSummary:
+              'An introduction to the structure and study of the Mishnah.',
             keyPoints: ['Oral Torah', 'Six Orders', 'Rabbi Yehuda HaNasi'],
           },
           fileUrl: null,
@@ -105,10 +106,9 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   });
 
   test('preview button is visible on lesson detail page', async ({ page }) => {
-    await page.goto(
-      `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}`,
-      { waitUntil: 'domcontentloaded' },
-    );
+    await page.goto(`${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const previewBtn = page.getByTestId('lesson-preview-btn');
@@ -118,10 +118,9 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   });
 
   test('clicking preview navigates to preview page', async ({ page }) => {
-    await page.goto(
-      `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}`,
-      { waitUntil: 'domcontentloaded' },
-    );
+    await page.goto(`${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const previewBtn = page.getByTestId('lesson-preview-btn');
@@ -131,14 +130,14 @@ test.describe('Lesson Preview — DEV_MODE', () => {
     // Should navigate to preview URL
     await expect(page).toHaveURL(
       new RegExp(`/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`),
-      { timeout: 8_000 },
+      { timeout: 8_000 }
     );
   });
 
   test('preview page shows preview banner', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`,
-      { waitUntil: 'domcontentloaded' },
+      { waitUntil: 'domcontentloaded' }
     );
     await page.waitForLoadState('domcontentloaded');
 
@@ -151,7 +150,7 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   test('preview page does not show edit buttons', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`,
-      { waitUntil: 'domcontentloaded' },
+      { waitUntil: 'domcontentloaded' }
     );
     await page.waitForLoadState('domcontentloaded');
 
@@ -173,7 +172,7 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   test('preview page renders lesson content correctly', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`,
-      { waitUntil: 'domcontentloaded' },
+      { waitUntil: 'domcontentloaded' }
     );
     await page.waitForLoadState('domcontentloaded');
 
@@ -188,7 +187,7 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   test('preview page shows no raw GraphQL errors', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`,
-      { waitUntil: 'domcontentloaded' },
+      { waitUntil: 'domcontentloaded' }
     );
     await page.waitForLoadState('domcontentloaded');
 
@@ -203,7 +202,7 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   test('preview page shows no [object Object] in DOM', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`,
-      { waitUntil: 'domcontentloaded' },
+      { waitUntil: 'domcontentloaded' }
     );
     await page.waitForLoadState('domcontentloaded');
 
@@ -214,7 +213,7 @@ test.describe('Lesson Preview — DEV_MODE', () => {
   test('preview page visual snapshot', async ({ page }) => {
     await page.goto(
       `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/preview`,
-      { waitUntil: 'domcontentloaded' },
+      { waitUntil: 'domcontentloaded' }
     );
     await page.waitForLoadState('domcontentloaded');
     await page.getByTestId('preview-banner').waitFor({ timeout: 10_000 });

@@ -38,14 +38,18 @@ describe('MockDnsProvider', () => {
 
   describe('requestDomainVerification', () => {
     it('returns verification info with token and record details', async () => {
-      const info = await provider.requestDomainVerification('learn.example.com');
+      const info =
+        await provider.requestDomainVerification('learn.example.com');
       expect(info.token).toBeTruthy();
       expect(info.recordType).toBe('TXT');
-      expect(info.recordValue).toBe('_edusphere-verification.learn.example.com');
+      expect(info.recordValue).toBe(
+        '_edusphere-verification.learn.example.com'
+      );
     });
 
     it('stores domain entry for later verification', async () => {
-      const info = await provider.requestDomainVerification('learn.example.com');
+      const info =
+        await provider.requestDomainVerification('learn.example.com');
       const entry = provider.getDomainEntry('learn.example.com');
       expect(entry).toBeDefined();
       expect(entry?.token).toBe(info.token);
@@ -55,7 +59,8 @@ describe('MockDnsProvider', () => {
 
   describe('checkDomainVerification', () => {
     it('verifies domain when token matches', async () => {
-      const info = await provider.requestDomainVerification('learn.example.com');
+      const info =
+        await provider.requestDomainVerification('learn.example.com');
       const result = await provider.checkDomainVerification(
         'learn.example.com',
         info.token

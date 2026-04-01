@@ -25,10 +25,7 @@ import {
   TENANT_LANGUAGE_SETTINGS_QUERY,
   UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION,
 } from '@/lib/graphql/admin-language.queries';
-import {
-  ADMIN_ROLES,
-  AVAILABLE_LOCALES,
-} from './LanguageSettingsPage.locales';
+import { ADMIN_ROLES, AVAILABLE_LOCALES } from './LanguageSettingsPage.locales';
 import type { QueryResult } from './LanguageSettingsPage.locales';
 import { LanguageListCard } from './LanguageListCard';
 import { LanguagePreviewCard } from './LanguagePreviewCard';
@@ -51,7 +48,9 @@ export function LanguageSettingsPage() {
   const [supported, setSupported] = useState<Set<string>>(new Set(['en']));
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -79,7 +78,10 @@ export function LanguageSettingsPage() {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[LanguageSettingsPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[LanguageSettingsPage] cleanup: saved timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -121,7 +123,10 @@ export function LanguageSettingsPage() {
     } else {
       setSaved(true);
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-      savedTimerRef.current = setTimeout(() => setSaved(false), SAVED_CONFIRMATION_MS);
+      savedTimerRef.current = setTimeout(
+        () => setSaved(false),
+        SAVED_CONFIRMATION_MS
+      );
     }
   };
 
@@ -150,7 +155,8 @@ export function LanguageSettingsPage() {
 
         {queryResult.fetching ? (
           <div className="flex items-center gap-2 text-muted-foreground py-8">
-            <Loader2 className="h-5 w-5 animate-spin" /> {t('languageAdmin.loading')}
+            <Loader2 className="h-5 w-5 animate-spin" />{' '}
+            {t('languageAdmin.loading')}
           </div>
         ) : (
           <>
@@ -202,7 +208,8 @@ export function LanguageSettingsPage() {
               </Button>
               {saved && (
                 <span className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
-                  <CheckCircle2 className="h-4 w-4" /> {t('languageAdmin.saved')}
+                  <CheckCircle2 className="h-4 w-4" />{' '}
+                  {t('languageAdmin.saved')}
                 </span>
               )}
               {saveError && (

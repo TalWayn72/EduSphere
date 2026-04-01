@@ -19,7 +19,11 @@ export const styles = StyleSheet.create({
   },
   headerLeft: { flex: 1 },
   greeting: { fontSize: FONT.sm, color: COLORS.textSecondary },
-  userName: { fontSize: FONT.xxl, fontWeight: FONT.bold, color: COLORS.textPrimary },
+  userName: {
+    fontSize: FONT.xxl,
+    fontWeight: FONT.bold,
+    color: COLORS.textPrimary,
+  },
   streakRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -79,9 +83,18 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.sm,
   },
-  courseTitle: { fontSize: FONT.base, fontWeight: FONT.semibold, flex: 1, marginRight: SPACING.sm },
+  courseTitle: {
+    fontSize: FONT.base,
+    fontWeight: FONT.semibold,
+    flex: 1,
+    marginRight: SPACING.sm,
+  },
   courseAccessed: { fontSize: FONT.sm, color: COLORS.textMuted },
-  progressContainer: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
   progressBar: {
     flex: 1,
     height: 6,
@@ -89,8 +102,17 @@ export const styles = StyleSheet.create({
     borderRadius: 3,
     overflow: 'hidden',
   },
-  progressFill: { height: '100%', backgroundColor: COLORS.primary, borderRadius: 3 },
-  progressText: { fontSize: FONT.sm, color: COLORS.textSecondary, width: 35, textAlign: 'right' },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 3,
+  },
+  progressText: {
+    fontSize: FONT.sm,
+    color: COLORS.textSecondary,
+    width: 35,
+    textAlign: 'right',
+  },
 });
 
 export function formatRelativeTime(isoString: string): string {

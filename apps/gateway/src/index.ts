@@ -2,7 +2,10 @@
 import { initTelemetry } from '@edusphere/telemetry';
 initTelemetry('gateway');
 
-import { createGatewayRuntime, getGraphQLWSOptions } from '@graphql-hive/gateway';
+import {
+  createGatewayRuntime,
+  getGraphQLWSOptions,
+} from '@graphql-hive/gateway';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { resolve, dirname } from 'path';
@@ -25,7 +28,10 @@ const pubSub = await createNatsPubSub(logger);
 
 const gateway = createGatewayRuntime({
   // Load the composed supergraph SDL (run `pnpm compose` to regenerate).
-  supergraph: resolve(dirname(fileURLToPath(import.meta.url)), '../supergraph.graphql'),
+  supergraph: resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    '../supergraph.graphql'
+  ),
   additionalResolvers: [],
   cors: {
     origin: process.env.CORS_ORIGIN
@@ -34,7 +40,8 @@ const gateway = createGatewayRuntime({
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
   },
-  logging: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
+  logging:
+    (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
   plugins: () => createGatewayPlugins(pubSub),
 });
 
@@ -106,7 +113,9 @@ logger.info('WebSocket upgrade handler registered for /graphql');
 
 server.listen(port, () => {
   logger.info(`Gateway running on http://localhost:${port}/graphql`);
-  logger.info(`WebSocket subscriptions available at ws://localhost:${port}/graphql`);
+  logger.info(
+    `WebSocket subscriptions available at ws://localhost:${port}/graphql`
+  );
   logger.info('GraphQL Playground available');
   logger.info(
     {

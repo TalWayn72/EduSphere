@@ -38,7 +38,8 @@ export function RejectDialog({ open, onClose, onConfirm }: Props) {
         <DialogHeader>
           <DialogTitle>Reject Proposal</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. The student will be notified of the rejection.
+            This action cannot be undone. The student will be notified of the
+            rejection.
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -55,7 +56,9 @@ export function RejectDialog({ open, onClose, onConfirm }: Props) {
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>Cancel</Button>
+          <Button variant="outline" onClick={handleClose}>
+            Cancel
+          </Button>
           <Button
             variant="destructive"
             onClick={handleConfirm}

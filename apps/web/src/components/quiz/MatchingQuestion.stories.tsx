@@ -27,8 +27,17 @@ const sampleItem: Matching = {
 };
 
 function Wrapper({ disabled }: { disabled?: boolean }) {
-  const [value, setValue] = useState<Array<{ leftId: string; rightId: string }>>([]);
-  return <MatchingQuestion item={sampleItem} value={value} onChange={setValue} disabled={disabled} />;
+  const [value, setValue] = useState<
+    Array<{ leftId: string; rightId: string }>
+  >([]);
+  return (
+    <MatchingQuestion
+      item={sampleItem}
+      value={value}
+      onChange={setValue}
+      disabled={disabled}
+    />
+  );
 }
 
 const meta: Meta<typeof MatchingQuestion> = {

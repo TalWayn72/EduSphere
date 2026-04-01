@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { CountdownTimer } from './CountdownTimer';
 
 describe('CountdownTimer', () => {
-  afterEach(() => { vi.useRealTimers(); });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it('shows time remaining for future date', () => {
     const future = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();

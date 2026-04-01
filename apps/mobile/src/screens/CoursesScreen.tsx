@@ -79,7 +79,7 @@ export default function CoursesScreen() {
 
   const courses = search.trim()
     ? allCourses.filter((c) =>
-        c.title.toLowerCase().includes(search.trim().toLowerCase()),
+        c.title.toLowerCase().includes(search.trim().toLowerCase())
       )
     : allCourses;
 
@@ -113,7 +113,9 @@ export default function CoursesScreen() {
         <TextInput
           testID="courses-search-input"
           style={styles.searchInput}
-          placeholder={t('searchPlaceholder', { defaultValue: 'Search courses…' })}
+          placeholder={t('searchPlaceholder', {
+            defaultValue: 'Search courses…',
+          })}
           placeholderTextColor={COLORS.textMuted}
           value={search}
           onChangeText={setSearch}

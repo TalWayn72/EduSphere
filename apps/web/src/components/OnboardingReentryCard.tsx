@@ -24,7 +24,9 @@ function isDismissed(): boolean {
   }
 }
 
-export function OnboardingReentryCard({ onboardingSkipped }: OnboardingReentryCardProps) {
+export function OnboardingReentryCard({
+  onboardingSkipped,
+}: OnboardingReentryCardProps) {
   const { t } = useTranslation('dashboard');
   const [dismissed, setDismissed] = useState(isDismissed);
 
@@ -42,7 +44,10 @@ export function OnboardingReentryCard({ onboardingSkipped }: OnboardingReentryCa
   }
 
   return (
-    <Card data-testid="onboarding-reentry-card" className="border-amber-200 bg-amber-50 dark:border-amber-700 dark:bg-amber-950">
+    <Card
+      data-testid="onboarding-reentry-card"
+      className="border-amber-200 bg-amber-50 dark:border-amber-700 dark:bg-amber-950"
+    >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="flex items-center gap-2 text-lg">
           <UserCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />

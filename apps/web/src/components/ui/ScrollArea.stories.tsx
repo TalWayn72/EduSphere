@@ -15,7 +15,10 @@ const ITEMS = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
 
 export const Vertical: Story = {
   render: () => (
-    <ScrollArea className="h-48 w-48 rounded-md border p-4" orientation="vertical">
+    <ScrollArea
+      className="h-48 w-48 rounded-md border p-4"
+      orientation="vertical"
+    >
       {ITEMS.map((item) => (
         <div key={item}>
           <div className="text-sm py-1">{item}</div>
@@ -49,7 +52,8 @@ export const BothDirections: Story = {
       <div className="w-[600px]">
         {ITEMS.map((item) => (
           <div key={item} className="text-sm py-1 whitespace-nowrap">
-            {item} — Extended content that overflows horizontally to demonstrate scrolling
+            {item} — Extended content that overflows horizontally to demonstrate
+            scrolling
           </div>
         ))}
       </div>

@@ -77,7 +77,9 @@ describe('PipelineStepper', () => {
 
     expect(screen.getByTestId('stepper-step-INGESTION')).toBeInTheDocument();
     expect(screen.getByTestId('stepper-step-ASR')).toBeInTheDocument();
-    expect(screen.getByTestId('stepper-step-SUMMARIZATION')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('stepper-step-SUMMARIZATION')
+    ).toBeInTheDocument();
   });
 
   it('shows Hebrew labels for each step', () => {
@@ -131,12 +133,23 @@ describe('PipelineStepper', () => {
   });
 
   it('sets aria-current="step" on running step', () => {
-    const steps = makeSteps({ INGESTION: 'done', ASR: 'running', SUMMARIZATION: 'pending' });
+    const steps = makeSteps({
+      INGESTION: 'done',
+      ASR: 'running',
+      SUMMARIZATION: 'pending',
+    });
     render(<PipelineStepper steps={steps} />);
 
-    expect(screen.getByTestId('stepper-step-ASR')).toHaveAttribute('aria-current', 'step');
-    expect(screen.getByTestId('stepper-step-INGESTION')).not.toHaveAttribute('aria-current');
-    expect(screen.getByTestId('stepper-step-SUMMARIZATION')).not.toHaveAttribute('aria-current');
+    expect(screen.getByTestId('stepper-step-ASR')).toHaveAttribute(
+      'aria-current',
+      'step'
+    );
+    expect(screen.getByTestId('stepper-step-INGESTION')).not.toHaveAttribute(
+      'aria-current'
+    );
+    expect(
+      screen.getByTestId('stepper-step-SUMMARIZATION')
+    ).not.toHaveAttribute('aria-current');
   });
 
   it('failed step shows retry and skip buttons when expanded', () => {
@@ -146,7 +159,9 @@ describe('PipelineStepper', () => {
     render(<PipelineStepper steps={steps} onRetry={onRetry} onSkip={onSkip} />);
 
     // Click to expand the failed step
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
     fireEvent.click(stepButton);
 
     expect(screen.getByTestId('step-retry-btn')).toBeInTheDocument();
@@ -160,7 +175,9 @@ describe('PipelineStepper', () => {
     const steps = makeSteps({ INGESTION: 'failed' });
     render(<PipelineStepper steps={steps} onRetry={onRetry} />);
 
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
     fireEvent.click(stepButton);
     fireEvent.click(screen.getByTestId('step-retry-btn'));
 
@@ -172,7 +189,9 @@ describe('PipelineStepper', () => {
     const steps = makeSteps({ INGESTION: 'failed' });
     render(<PipelineStepper steps={steps} onSkip={onSkip} />);
 
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
     fireEvent.click(stepButton);
     fireEvent.click(screen.getByTestId('step-skip-btn'));
 
@@ -187,19 +206,29 @@ describe('PipelineStepper', () => {
     expect(screen.queryByTestId('step-error-message')).not.toBeInTheDocument();
 
     // Expand
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
     fireEvent.click(stepButton);
 
-    expect(screen.getByTestId('step-error-message')).toHaveTextContent('Error in INGESTION');
+    expect(screen.getByTestId('step-error-message')).toHaveTextContent(
+      'Error in INGESTION'
+    );
   });
 
   it('expanding a done step shows output', () => {
     const steps: StepData[] = [
-      { moduleType: 'INGESTION', status: 'done', output: 'Completed successfully' },
+      {
+        moduleType: 'INGESTION',
+        status: 'done',
+        output: 'Completed successfully',
+      },
     ];
     render(<PipelineStepper steps={steps} />);
 
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
     fireEvent.click(stepButton);
 
     expect(screen.getByText('Completed successfully')).toBeInTheDocument();
@@ -209,7 +238,9 @@ describe('PipelineStepper', () => {
     const steps = makeSteps({ INGESTION: 'pending' });
     render(<PipelineStepper steps={steps} />);
 
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
     expect(stepButton).toBeDisabled();
   });
 
@@ -220,8 +251,8 @@ describe('PipelineStepper', () => {
     const stepEl = screen.getByTestId('stepper-step-ASR');
     // The icon span should have motion-safe:animate-spin (NOT animate-spin directly)
     const iconSpans = stepEl.querySelectorAll('span[aria-hidden="true"]');
-    const spinnerSpan = Array.from(iconSpans).find(
-      (s) => s.className.includes('motion-safe:animate-spin')
+    const spinnerSpan = Array.from(iconSpans).find((s) =>
+      s.className.includes('motion-safe:animate-spin')
     );
     expect(spinnerSpan).toBeDefined();
     // Should NOT have plain animate-spin (without the motion-safe prefix)
@@ -232,7 +263,9 @@ describe('PipelineStepper', () => {
     const steps = makeSteps({ INGESTION: 'failed' });
     render(<PipelineStepper steps={steps} />);
 
-    const stepButton = screen.getByTestId('stepper-step-INGESTION').querySelector('button')!;
+    const stepButton = screen
+      .getByTestId('stepper-step-INGESTION')
+      .querySelector('button')!;
 
     // Expand
     fireEvent.click(stepButton);
@@ -244,7 +277,11 @@ describe('PipelineStepper', () => {
   });
 
   it('renders step numbers starting from 1', () => {
-    const steps = makeSteps({ INGESTION: 'pending', ASR: 'pending', QA_GATE: 'pending' });
+    const steps = makeSteps({
+      INGESTION: 'pending',
+      ASR: 'pending',
+      QA_GATE: 'pending',
+    });
     render(<PipelineStepper steps={steps} />);
 
     const container = screen.getByTestId('pipeline-stepper');

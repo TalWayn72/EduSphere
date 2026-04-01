@@ -58,7 +58,9 @@ interface ConfigData {
 export function GamificationConfig() {
   const { t } = useTranslation('orgGamification');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data: configData }] = useQuery({
     query: GAMIFICATION_CONFIG_QUERY,

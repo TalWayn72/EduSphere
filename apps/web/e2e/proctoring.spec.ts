@@ -29,7 +29,14 @@ const MOCK_FLAG_RESPONSE = {
       id: 'sess-e2e-1',
       status: 'FLAGGED',
       flagCount: 1,
-      flags: [{ type: 'TAB_SWITCH', timestamp: '2026-01-01T10:01:00Z', detail: 'Tab hidden', __typename: 'ProctoringFlag' }],
+      flags: [
+        {
+          type: 'TAB_SWITCH',
+          timestamp: '2026-01-01T10:01:00Z',
+          detail: 'Tab hidden',
+          __typename: 'ProctoringFlag',
+        },
+      ],
       __typename: 'ProctoringSession',
     },
   },
@@ -42,7 +49,14 @@ const MOCK_END_RESPONSE = {
       status: 'COMPLETED',
       endedAt: '2026-01-01T11:00:00Z',
       flagCount: 1,
-      flags: [{ type: 'TAB_SWITCH', timestamp: '2026-01-01T10:01:00Z', detail: 'Tab hidden', __typename: 'ProctoringFlag' }],
+      flags: [
+        {
+          type: 'TAB_SWITCH',
+          timestamp: '2026-01-01T10:01:00Z',
+          detail: 'Tab hidden',
+          __typename: 'ProctoringFlag',
+        },
+      ],
       __typename: 'ProctoringSession',
     },
   },
@@ -50,7 +64,10 @@ const MOCK_END_RESPONSE = {
 
 function interceptGraphQL(page: import('@playwright/test').Page) {
   return page.route('**/graphql', (route) => {
-    const body = route.request().postDataJSON() as { query?: string; operationName?: string };
+    const body = route.request().postDataJSON() as {
+      query?: string;
+      operationName?: string;
+    };
     const op = body.operationName ?? body.query ?? '';
     if (op.includes('StartProctoringSession')) {
       return route.fulfill({ json: MOCK_START_RESPONSE });
@@ -70,7 +87,9 @@ test.describe('Remote Proctoring — Phase 33', () => {
     await login(page);
   });
 
-  test('proctoring start button visible when proctoring enabled', async ({ page }) => {
+  test('proctoring start button visible when proctoring enabled', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -81,7 +100,9 @@ test.describe('Remote Proctoring — Phase 33', () => {
     ).toBeVisible();
   });
 
-  test('clicking start button shows proctoring-active-badge', async ({ page }) => {
+  test('clicking start button shows proctoring-active-badge', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -117,7 +138,11 @@ test.describe('Remote Proctoring — Phase 33', () => {
 
     // Simulate tab switch by dispatching visibilitychange with document.hidden = true
     await page.evaluate(() => {
-      Object.defineProperty(document, 'hidden', { value: true, writable: true, configurable: true });
+      Object.defineProperty(document, 'hidden', {
+        value: true,
+        writable: true,
+        configurable: true,
+      });
       document.dispatchEvent(new Event('visibilitychange'));
     });
 
@@ -135,7 +160,9 @@ test.describe('Remote Proctoring — Phase 33', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
-    await expect(page.locator('[data-testid="proctoring-active-badge"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="proctoring-active-badge"]')
+    ).toBeVisible();
 
     await page.locator('[data-testid="proctoring-stop-btn"]').click();
 
@@ -145,7 +172,11 @@ test.describe('Remote Proctoring — Phase 33', () => {
   });
 
   test('raw technical strings are NOT shown to users', async ({ page }) => {
-    await page.route('**/graphql', (route) => route.fulfill({ json: { errors: [{ message: 'Internal server error' }] } }));
+    await page.route('**/graphql', (route) =>
+      route.fulfill({
+        json: { errors: [{ message: 'Internal server error' }] },
+      })
+    );
 
     await page.goto(ASSESSMENT_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -159,7 +190,9 @@ test.describe('Remote Proctoring — Phase 33', () => {
 
   // ── Visual regression ─────────────────────────────────────────────────────
 
-  test('proctoring overlay — inactive state visual regression', async ({ page }) => {
+  test('proctoring overlay — inactive state visual regression', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
     await page.waitForLoadState('domcontentloaded');
@@ -167,30 +200,43 @@ test.describe('Remote Proctoring — Phase 33', () => {
     await expect(page).toHaveScreenshot('proctoring-inactive.png');
   });
 
-  test('proctoring overlay — active state visual regression', async ({ page }) => {
+  test('proctoring overlay — active state visual regression', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
     await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
-    await expect(page.locator('[data-testid="proctoring-active-badge"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="proctoring-active-badge"]')
+    ).toBeVisible();
 
     await expect(page).toHaveScreenshot('proctoring-active.png');
   });
 
-  test('proctoring overlay — flagged state visual regression', async ({ page }) => {
+  test('proctoring overlay — flagged state visual regression', async ({
+    page,
+  }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);
     await page.waitForLoadState('domcontentloaded');
 
     await page.locator('[data-testid="proctoring-start-btn"]').click();
     await page.evaluate(() => {
-      Object.defineProperty(document, 'hidden', { value: true, writable: true, configurable: true });
+      Object.defineProperty(document, 'hidden', {
+        value: true,
+        writable: true,
+        configurable: true,
+      });
       document.dispatchEvent(new Event('visibilitychange'));
     });
 
     // Wait for flag count to appear
-    await page.locator('[data-testid="proctoring-flag-count"]').waitFor({ timeout: 5000 }).catch(() => {});
+    await page
+      .locator('[data-testid="proctoring-flag-count"]')
+      .waitFor({ timeout: 5000 })
+      .catch(() => {});
 
     await expect(page).toHaveScreenshot('proctoring-flagged.png');
   });

@@ -24,10 +24,24 @@ const { mockDb } = vi.hoisted(() => {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn().mockReturnValue(mockDb),
   schema: {
-    lesson_pipelines: { id: 'id', lesson_id: 'lesson_id', nodes: 'nodes', status: 'status' },
-    lesson_assets: { lesson_id: 'lesson_id', asset_type: 'asset_type', source_url: 'source_url', file_url: 'file_url' },
+    lesson_pipelines: {
+      id: 'id',
+      lesson_id: 'lesson_id',
+      nodes: 'nodes',
+      status: 'status',
+    },
+    lesson_assets: {
+      lesson_id: 'lesson_id',
+      asset_type: 'asset_type',
+      source_url: 'source_url',
+      file_url: 'file_url',
+    },
     lesson_pipeline_results: {},
-    lesson_pipeline_runs: { id: 'id', status: 'status', completed_at: 'completed_at' },
+    lesson_pipeline_runs: {
+      id: 'id',
+      status: 'status',
+      completed_at: 'completed_at',
+    },
     lessons: { id: 'id', status: 'status' },
   },
   eq: vi.fn((a: unknown, b: unknown) => ({ eq: [a, b] })),
@@ -64,7 +78,8 @@ vi.mock('nats', () => ({
 vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn().mockReturnValue({}),
   NatsSubjects: {
-    LESSON_PIPELINE_MODULE_COMPLETED: 'EDUSPHERE.lesson.pipeline.module.completed',
+    LESSON_PIPELINE_MODULE_COMPLETED:
+      'EDUSPHERE.lesson.pipeline.module.completed',
     LESSON_PIPELINE_COMPLETED: 'EDUSPHERE.lesson.pipeline.completed',
   },
 }));
@@ -97,7 +112,9 @@ const {
     keyPoints: ['Point A', 'Point B'],
   }),
   notesRun: vi.fn().mockResolvedValue({ outputMarkdown: '# Notes' }),
-  diagramRun: vi.fn().mockResolvedValue({ mermaidSrc: 'graph TD', svgOutput: '<svg/>' }),
+  diagramRun: vi
+    .fn()
+    .mockResolvedValue({ mermaidSrc: 'graph TD', svgOutput: '<svg/>' }),
   citationRun: vi.fn().mockResolvedValue({ matchReport: [] }),
   qaRun: vi.fn().mockResolvedValue({ overallScore: 9, fixList: [] }),
   mockPublishLesson: vi.fn().mockResolvedValue({
@@ -111,7 +128,9 @@ vi.mock('@edusphere/langgraph-workflows', () => ({
   createLessonIngestionWorkflow: vi.fn().mockReturnValue({ run: ingestionRun }),
   createHebrewNERWorkflow: vi.fn().mockReturnValue({ run: nerRun }),
   createContentCleaningWorkflow: vi.fn().mockReturnValue({ run: cleaningRun }),
-  createSummarizationWorkflow: vi.fn().mockReturnValue({ run: summarizationRun }),
+  createSummarizationWorkflow: vi
+    .fn()
+    .mockReturnValue({ run: summarizationRun }),
   createStructuredNotesWorkflow: vi.fn().mockReturnValue({ run: notesRun }),
   createDiagramGeneratorWorkflow: vi.fn().mockReturnValue({ run: diagramRun }),
   createCitationVerifierWorkflow: vi.fn().mockReturnValue({ run: citationRun }),
@@ -131,18 +150,64 @@ import type { LessonPublishService } from '../../lesson/lesson-publish.service';
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 't-1', userId: 'u-1', userRole: 'INSTRUCTOR' as const };
+const TENANT_CTX = {
+  tenantId: 't-1',
+  userId: 'u-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 const FULL_PIPELINE_NODES = [
   { id: 'n1', moduleType: 'INGESTION', config: {}, enabled: true, order: 1 },
-  { id: 'n2', moduleType: 'NER_SOURCE_LINKING', config: {}, enabled: true, order: 2 },
-  { id: 'n3', moduleType: 'CONTENT_CLEANING', config: {}, enabled: true, order: 3 },
-  { id: 'n4', moduleType: 'SUMMARIZATION', config: {}, enabled: true, order: 4 },
-  { id: 'n5', moduleType: 'STRUCTURED_NOTES', config: {}, enabled: true, order: 5 },
-  { id: 'n6', moduleType: 'DIAGRAM_GENERATOR', config: {}, enabled: true, order: 6 },
-  { id: 'n7', moduleType: 'CITATION_VERIFIER', config: {}, enabled: true, order: 7 },
+  {
+    id: 'n2',
+    moduleType: 'NER_SOURCE_LINKING',
+    config: {},
+    enabled: true,
+    order: 2,
+  },
+  {
+    id: 'n3',
+    moduleType: 'CONTENT_CLEANING',
+    config: {},
+    enabled: true,
+    order: 3,
+  },
+  {
+    id: 'n4',
+    moduleType: 'SUMMARIZATION',
+    config: {},
+    enabled: true,
+    order: 4,
+  },
+  {
+    id: 'n5',
+    moduleType: 'STRUCTURED_NOTES',
+    config: {},
+    enabled: true,
+    order: 5,
+  },
+  {
+    id: 'n6',
+    moduleType: 'DIAGRAM_GENERATOR',
+    config: {},
+    enabled: true,
+    order: 6,
+  },
+  {
+    id: 'n7',
+    moduleType: 'CITATION_VERIFIER',
+    config: {},
+    enabled: true,
+    order: 7,
+  },
   { id: 'n8', moduleType: 'QA_GATE', config: {}, enabled: true, order: 8 },
-  { id: 'n9', moduleType: 'PUBLISH_SHARE', config: {}, enabled: true, order: 9 },
+  {
+    id: 'n9',
+    moduleType: 'PUBLISH_SHARE',
+    config: {},
+    enabled: true,
+    order: 9,
+  },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -161,12 +226,14 @@ function setupDbForFullRun(): void {
       return {
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{
-              id: 'pipe-1',
-              lesson_id: 'l-1',
-              nodes: FULL_PIPELINE_NODES,
-              status: 'RUNNING',
-            }]),
+            limit: vi.fn().mockResolvedValue([
+              {
+                id: 'pipe-1',
+                lesson_id: 'l-1',
+                nodes: FULL_PIPELINE_NODES,
+                status: 'RUNNING',
+              },
+            ]),
           }),
         }),
       };
@@ -175,7 +242,11 @@ function setupDbForFullRun(): void {
     return {
       from: vi.fn().mockReturnValue({
         where: vi.fn().mockResolvedValue([
-          { asset_type: 'VIDEO', source_url: 'https://example.com/video.mp4', file_url: null },
+          {
+            asset_type: 'VIDEO',
+            source_url: 'https://example.com/video.mp4',
+            file_url: null,
+          },
         ]),
       }),
     };
@@ -225,7 +296,10 @@ describe('Pipeline Orchestrator Integration', () => {
       keyPoints: ['Point A', 'Point B'],
     });
     notesRun.mockResolvedValue({ outputMarkdown: '# Notes' });
-    diagramRun.mockResolvedValue({ mermaidSrc: 'graph TD', svgOutput: '<svg/>' });
+    diagramRun.mockResolvedValue({
+      mermaidSrc: 'graph TD',
+      svgOutput: '<svg/>',
+    });
     citationRun.mockResolvedValue({ matchReport: [] });
     qaRun.mockResolvedValue({ overallScore: 9, fixList: [] });
     mockPublishLesson.mockResolvedValue({
@@ -237,7 +311,9 @@ describe('Pipeline Orchestrator Integration', () => {
       publishedMessages.push({ subject, data: new TextDecoder().decode(data) });
     });
 
-    const publishService = { publishLesson: mockPublishLesson } as unknown as LessonPublishService;
+    const publishService = {
+      publishLesson: mockPublishLesson,
+    } as unknown as LessonPublishService;
     service = new LessonPipelineOrchestratorService(publishService);
   });
 
@@ -353,9 +429,7 @@ describe('Pipeline Orchestrator Integration', () => {
 
     await service.executeRun('run-1', 'pipe-1', TENANT_CTX);
 
-    const readyUpdates = updatedRows.filter(
-      (r) => r.set['status'] === 'READY'
-    );
+    const readyUpdates = updatedRows.filter((r) => r.set['status'] === 'READY');
     expect(readyUpdates.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -391,15 +465,29 @@ describe('Pipeline Orchestrator Integration', () => {
         return {
           from: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{
-                id: 'pipe-c',
-                lesson_id: 'l-c',
-                nodes: [
-                  { id: 'n1', moduleType: 'INGESTION', config: {}, enabled: true, order: 1 },
-                  { id: 'n2', moduleType: 'NER_SOURCE_LINKING', config: {}, enabled: true, order: 2 },
-                ],
-                status: 'RUNNING',
-              }]),
+              limit: vi.fn().mockResolvedValue([
+                {
+                  id: 'pipe-c',
+                  lesson_id: 'l-c',
+                  nodes: [
+                    {
+                      id: 'n1',
+                      moduleType: 'INGESTION',
+                      config: {},
+                      enabled: true,
+                      order: 1,
+                    },
+                    {
+                      id: 'n2',
+                      moduleType: 'NER_SOURCE_LINKING',
+                      config: {},
+                      enabled: true,
+                      order: 2,
+                    },
+                  ],
+                  status: 'RUNNING',
+                },
+              ]),
             }),
           }),
         };
@@ -436,15 +524,29 @@ describe('Pipeline Orchestrator Integration', () => {
         return {
           from: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{
-                id: 'pipe-d',
-                lesson_id: 'l-d',
-                nodes: [
-                  { id: 'n1', moduleType: 'INGESTION', config: {}, enabled: true, order: 1 },
-                  { id: 'n2', moduleType: 'NER_SOURCE_LINKING', config: {}, enabled: false, order: 2 },
-                ],
-                status: 'RUNNING',
-              }]),
+              limit: vi.fn().mockResolvedValue([
+                {
+                  id: 'pipe-d',
+                  lesson_id: 'l-d',
+                  nodes: [
+                    {
+                      id: 'n1',
+                      moduleType: 'INGESTION',
+                      config: {},
+                      enabled: true,
+                      order: 1,
+                    },
+                    {
+                      id: 'n2',
+                      moduleType: 'NER_SOURCE_LINKING',
+                      config: {},
+                      enabled: false,
+                      order: 2,
+                    },
+                  ],
+                  status: 'RUNNING',
+                },
+              ]),
             }),
           }),
         };
@@ -483,15 +585,29 @@ describe('Pipeline Orchestrator Integration', () => {
         return {
           from: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{
-                id: 'pipe-f',
-                lesson_id: 'l-f',
-                nodes: [
-                  { id: 'n1', moduleType: 'INGESTION', config: {}, enabled: true, order: 1 },
-                  { id: 'n2', moduleType: 'CONTENT_CLEANING', config: {}, enabled: true, order: 2 },
-                ],
-                status: 'RUNNING',
-              }]),
+              limit: vi.fn().mockResolvedValue([
+                {
+                  id: 'pipe-f',
+                  lesson_id: 'l-f',
+                  nodes: [
+                    {
+                      id: 'n1',
+                      moduleType: 'INGESTION',
+                      config: {},
+                      enabled: true,
+                      order: 1,
+                    },
+                    {
+                      id: 'n2',
+                      moduleType: 'CONTENT_CLEANING',
+                      config: {},
+                      enabled: true,
+                      order: 2,
+                    },
+                  ],
+                  status: 'RUNNING',
+                },
+              ]),
             }),
           }),
         };
@@ -522,7 +638,8 @@ describe('Pipeline Orchestrator Integration', () => {
 
     // One FAILED event published for INGESTION
     const failedEvents = publishedMessages.filter((m) => {
-      if (m.subject !== 'EDUSPHERE.lesson.pipeline.module.completed') return false;
+      if (m.subject !== 'EDUSPHERE.lesson.pipeline.module.completed')
+        return false;
       try {
         const p = JSON.parse(m.data);
         return p.status === 'FAILED';

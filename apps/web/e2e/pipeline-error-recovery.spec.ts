@@ -49,9 +49,30 @@ const PIPELINE_FAILED = {
   lessonId: LESSON_ID,
   templateName: 'THEMATIC',
   nodes: [
-    { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', enabled: true, order: 0, config: {} },
-    { id: 'n2', moduleType: 'ASR', label: 'Transcription', enabled: true, order: 1, config: {} },
-    { id: 'n3', moduleType: 'SUMMARIZATION', label: 'Summarization', enabled: true, order: 2, config: {} },
+    {
+      id: 'n1',
+      moduleType: 'INGESTION',
+      label: 'Ingestion',
+      enabled: true,
+      order: 0,
+      config: {},
+    },
+    {
+      id: 'n2',
+      moduleType: 'ASR',
+      label: 'Transcription',
+      enabled: true,
+      order: 1,
+      config: {},
+    },
+    {
+      id: 'n3',
+      moduleType: 'SUMMARIZATION',
+      label: 'Summarization',
+      enabled: true,
+      order: 2,
+      config: {},
+    },
   ],
   config: {},
   status: 'FAILED',
@@ -64,7 +85,11 @@ const PIPELINE_FAILED = {
     startedAt: '2025-03-01T09:00:00Z',
     completedAt: '2025-03-01T09:05:00Z',
     logs: [
-      { level: 'ERROR', message: 'ASR module failed: audio format unsupported', timestamp: '2025-03-01T09:04:00Z' },
+      {
+        level: 'ERROR',
+        message: 'ASR module failed: audio format unsupported',
+        timestamp: '2025-03-01T09:04:00Z',
+      },
     ],
     results: [
       {
@@ -118,13 +143,22 @@ async function setupErrorMocks(page: Page) {
     let op = '';
     let q = rawBody;
     try {
-      const parsed = JSON.parse(rawBody) as { query?: string; operationName?: string };
+      const parsed = JSON.parse(rawBody) as {
+        query?: string;
+        operationName?: string;
+      };
       op = parsed?.operationName ?? '';
       q = parsed?.query ?? rawBody;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     // Lesson query
-    if (op === 'Lesson' || q.includes('lesson(id:') || q.includes('query Lesson')) {
+    if (
+      op === 'Lesson' ||
+      q.includes('lesson(id:') ||
+      q.includes('query Lesson')
+    ) {
       const pipeline = retryTriggered ? PIPELINE_RETRIED : PIPELINE_FAILED;
       return route.fulfill({
         status: 200,
@@ -178,13 +212,22 @@ async function setupGraphQLErrorOnRetry(page: Page) {
     let op = '';
     let q = rawBody;
     try {
-      const parsed = JSON.parse(rawBody) as { query?: string; operationName?: string };
+      const parsed = JSON.parse(rawBody) as {
+        query?: string;
+        operationName?: string;
+      };
       op = parsed?.operationName ?? '';
       q = parsed?.query ?? rawBody;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     // Lesson query always returns failed pipeline
-    if (op === 'Lesson' || q.includes('lesson(id:') || q.includes('query Lesson')) {
+    if (
+      op === 'Lesson' ||
+      q.includes('lesson(id:') ||
+      q.includes('query Lesson')
+    ) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -272,10 +315,14 @@ test.describe('Pipeline Error Recovery — failed run display', () => {
 
     // After retry, status should change from FAILED to RUNNING
     const statusLabel = page.getByTestId('run-status-label');
-    await expect(statusLabel).toContainText(/מריץ|RUNNING/i, { timeout: 8_000 });
+    await expect(statusLabel).toContainText(/מריץ|RUNNING/i, {
+      timeout: 8_000,
+    });
   });
 
-  test('no raw error strings visible on failed pipeline page', async ({ page }) => {
+  test('no raw error strings visible on failed pipeline page', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
@@ -295,7 +342,9 @@ test.describe('Pipeline Error Recovery — retry error handling', () => {
     await login(page);
   });
 
-  test('retry mutation error shows friendly message, not raw GraphQL', async ({ page }) => {
+  test('retry mutation error shows friendly message, not raw GraphQL', async ({
+    page,
+  }) => {
     await setupGraphQLErrorOnRetry(page);
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
@@ -306,13 +355,15 @@ test.describe('Pipeline Error Recovery — retry error handling', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Raw server error must NOT be visible
-    await expect(
-      page.getByText('worker pod OOMKilled'),
-    ).not.toBeVisible({ timeout: 3_000 });
-    await expect(
-      page.getByText('Internal server error'),
-    ).not.toBeVisible({ timeout: 2_000 });
-    await expect(page.getByText('[GraphQL]')).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('worker pod OOMKilled')).not.toBeVisible({
+      timeout: 3_000,
+    });
+    await expect(page.getByText('Internal server error')).not.toBeVisible({
+      timeout: 2_000,
+    });
+    await expect(page.getByText('[GraphQL]')).not.toBeVisible({
+      timeout: 2_000,
+    });
   });
 
   test('failed pipeline page visual snapshot', async ({ page }) => {

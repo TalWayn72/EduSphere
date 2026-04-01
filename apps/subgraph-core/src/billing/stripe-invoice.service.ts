@@ -7,12 +7,14 @@
  *
  * SECURITY: Never log stripe secret keys. Validate webhook signatures.
  */
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import {
-  createStripeClient,
-  mapStripeStatus,
-} from './stripe-client.helper.js';
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { createStripeClient, mapStripeStatus } from './stripe-client.helper.js';
 import type { StripeClient } from './stripe-client.helper.js';
 
 export interface InvoiceResult {
@@ -36,12 +38,12 @@ export class StripeInvoiceService implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     if (this.stripe) {
       this.logger.log(
-        '[StripeInvoiceService] Stripe client initialized — billing features active',
+        '[StripeInvoiceService] Stripe client initialized — billing features active'
       );
     } else {
       this.logger.warn(
         '[StripeInvoiceService] STRIPE_SECRET_KEY not configured — billing running in STUB mode. ' +
-        'Set STRIPE_SECRET_KEY env var to enable real Stripe integration.',
+          'Set STRIPE_SECRET_KEY env var to enable real Stripe integration.'
       );
     }
   }
@@ -78,7 +80,10 @@ export class StripeInvoiceService implements OnModuleInit, OnModuleDestroy {
           : new Date(`${String(year)}-02-01`),
       };
     } catch (err) {
-      this.logger.error({ err, tenantId }, '[StripeInvoiceService] create failed');
+      this.logger.error(
+        { err, tenantId },
+        '[StripeInvoiceService] create failed'
+      );
       return this.stubInvoice(tenantId, planId, year);
     }
   }
@@ -96,8 +101,15 @@ export class StripeInvoiceService implements OnModuleInit, OnModuleDestroy {
     }
     const secret = process.env['STRIPE_WEBHOOK_SECRET'] ?? '';
     try {
-      const event = this.stripe.webhooks.constructEvent(payload, signature, secret);
-      this.logger.log({ eventType: event.type }, '[StripeInvoiceService] Webhook OK');
+      const event = this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        secret
+      );
+      this.logger.log(
+        { eventType: event.type },
+        '[StripeInvoiceService] Webhook OK'
+      );
       return { handled: true, eventType: event.type };
     } catch (err) {
       this.logger.error({ err }, '[StripeInvoiceService] Webhook sig failed');
@@ -105,13 +117,22 @@ export class StripeInvoiceService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async getInvoiceHistory(tenantId: string, limit = 10): Promise<InvoiceResult[]> {
+  async getInvoiceHistory(
+    tenantId: string,
+    limit = 10
+  ): Promise<InvoiceResult[]> {
     if (!this.stripe) {
-      this.logger.log({ tenantId, limit }, '[StripeInvoiceService] history (stub)');
+      this.logger.log(
+        { tenantId, limit },
+        '[StripeInvoiceService] history (stub)'
+      );
       return [];
     }
     try {
-      const res = await this.stripe.invoices.list({ customer: tenantId, limit });
+      const res = await this.stripe.invoices.list({
+        customer: tenantId,
+        limit,
+      });
       return res.data.map((inv) => ({
         invoiceId: inv.id,
         amount: inv.amount_due,
@@ -121,13 +142,23 @@ export class StripeInvoiceService implements OnModuleInit, OnModuleDestroy {
         dueDate: inv.due_date ? new Date(inv.due_date * 1000) : new Date(),
       }));
     } catch (err) {
-      this.logger.error({ err, tenantId }, '[StripeInvoiceService] list failed');
+      this.logger.error(
+        { err, tenantId },
+        '[StripeInvoiceService] list failed'
+      );
       return [];
     }
   }
 
-  private stubInvoice(tenantId: string, planId: string, year: number): InvoiceResult {
-    this.logger.log({ tenantId, planId, year }, '[StripeInvoiceService] stub invoice');
+  private stubInvoice(
+    tenantId: string,
+    planId: string,
+    year: number
+  ): InvoiceResult {
+    this.logger.log(
+      { tenantId, planId, year },
+      '[StripeInvoiceService] stub invoice'
+    );
     return {
       invoiceId: `inv_stub_${randomUUID()}`,
       amount: 0,

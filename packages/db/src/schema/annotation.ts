@@ -46,10 +46,9 @@ export const annotations = pgTable(
     text_start: integer('text_start'),
     text_end: integer('text_end'),
     range_type: text('range_type').default('character'),
-    parent_id: uuid('parent_id').references(
-      (): AnyPgColumn => annotations.id,
-      { onDelete: 'cascade' }
-    ),
+    parent_id: uuid('parent_id').references((): AnyPgColumn => annotations.id, {
+      onDelete: 'cascade',
+    }),
     is_resolved: boolean('is_resolved').notNull().default(false),
     ...timestamps,
     ...softDelete,
@@ -58,7 +57,11 @@ export const annotations = pgTable(
     index('idx_annotations_tenant').on(t.tenant_id),
     index('idx_annotations_tenant_user').on(t.tenant_id, t.user_id),
     index('idx_annotations_tenant_date').on(t.tenant_id, t.created_at),
-    index('idx_annotations_text_range').on(t.asset_id, t.text_start, t.text_end),
+    index('idx_annotations_text_range').on(
+      t.asset_id,
+      t.text_start,
+      t.text_end
+    ),
   ]
 );
 

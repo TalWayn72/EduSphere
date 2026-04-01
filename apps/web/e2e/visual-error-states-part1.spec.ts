@@ -18,7 +18,7 @@ function mockGraphQLError(page: import('@playwright/test').Page) {
       body: JSON.stringify({
         errors: [{ message: 'Internal Server Error' }],
       }),
-    }),
+    })
   );
 }
 
@@ -29,7 +29,7 @@ function mockGraphQLEmpty(page: import('@playwright/test').Page) {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ data: {} }),
-    }),
+    })
   );
 }
 
@@ -67,7 +67,7 @@ test.describe('Visual Regression — Error States', () => {
         await page.waitForTimeout(500);
         await expect(page).toHaveScreenshot(
           `error-graphql-${pg.name}.png`,
-          STABLE_OPTS,
+          STABLE_OPTS
         );
       });
     }
@@ -79,7 +79,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-dashboard.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-dashboard.png',
+        STABLE_OPTS
+      );
     });
 
     test('courses list with no courses', async ({ page }) => {
@@ -87,13 +90,18 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { courses: { edges: [], pageInfo: { hasNextPage: false } } } }),
-        }),
+          body: JSON.stringify({
+            data: { courses: { edges: [], pageInfo: { hasNextPage: false } } },
+          }),
+        })
       );
       await page.goto('/courses');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-courses.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-courses.png',
+        STABLE_OPTS
+      );
     });
 
     test('search with no results', async ({ page }) => {
@@ -101,13 +109,18 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { search: { results: [], totalCount: 0 } } }),
-        }),
+          body: JSON.stringify({
+            data: { search: { results: [], totalCount: 0 } },
+          }),
+        })
       );
       await page.goto('/search?q=zzzznonexistent');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-search.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-search.png',
+        STABLE_OPTS
+      );
     });
 
     test('exams with no exams', async ({ page }) => {
@@ -115,8 +128,10 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { exams: { edges: [], pageInfo: { hasNextPage: false } } } }),
-        }),
+          body: JSON.stringify({
+            data: { exams: { edges: [], pageInfo: { hasNextPage: false } } },
+          }),
+        })
       );
       await page.goto('/exams');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
@@ -129,13 +144,20 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { socialFeed: { edges: [], pageInfo: { hasNextPage: false } } } }),
-        }),
+          body: JSON.stringify({
+            data: {
+              socialFeed: { edges: [], pageInfo: { hasNextPage: false } },
+            },
+          }),
+        })
       );
       await page.goto('/social');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-social.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-social.png',
+        STABLE_OPTS
+      );
     });
   });
 
@@ -146,7 +168,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-dashboard.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-dashboard.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on courses', async ({ page }) => {
@@ -154,7 +179,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/courses');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-courses.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-courses.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on analytics', async ({ page }) => {
@@ -162,7 +190,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/analytics');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-analytics.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-analytics.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on knowledge graph', async ({ page }) => {
@@ -170,7 +201,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/graph');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-graph.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-graph.png',
+        STABLE_OPTS
+      );
     });
   });
 
@@ -188,14 +222,14 @@ test.describe('Visual Regression — Error States', () => {
             status: 500,
             contentType: 'application/json',
             body: JSON.stringify({ error: 'Internal Server Error' }),
-          }),
+          })
         );
         await page.goto(pg.path);
         await page.waitForLoadState('domcontentloaded');
         await page.waitForTimeout(1000);
         await expect(page).toHaveScreenshot(
           `error-500-${pg.name}.png`,
-          STABLE_OPTS,
+          STABLE_OPTS
         );
       });
     }

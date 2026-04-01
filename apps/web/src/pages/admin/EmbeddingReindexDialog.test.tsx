@@ -8,7 +8,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 // Mock react-i18next with interpolation support (same as EmbeddingDashboardPage.test.tsx)
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (k: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+    t: (
+      k: string,
+      fallbackOrOpts?: string | Record<string, unknown>,
+      opts?: Record<string, unknown>
+    ) => {
       const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : k;
       const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
       if (!vars) return fallback;
@@ -38,7 +42,9 @@ describe('EmbeddingReindexDialog', () => {
 
   it('does not render dialog content when open=false', () => {
     render(<EmbeddingReindexDialog {...defaultProps} open={false} />);
-    expect(screen.queryByTestId('reindex-confirm-dialog')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('reindex-confirm-dialog')
+    ).not.toBeInTheDocument();
   });
 
   it('shows the confirmation title', () => {
@@ -60,7 +66,9 @@ describe('EmbeddingReindexDialog', () => {
 
   it('calls onOpenChange(false) when Cancel is clicked', () => {
     const onOpenChange = vi.fn();
-    render(<EmbeddingReindexDialog {...defaultProps} onOpenChange={onOpenChange} />);
+    render(
+      <EmbeddingReindexDialog {...defaultProps} onOpenChange={onOpenChange} />
+    );
     fireEvent.click(screen.getByTestId('reindex-cancel-btn'));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
@@ -103,7 +111,7 @@ describe('EmbeddingReindexDialog', () => {
         {...defaultProps}
         totalSources={100}
         courseCount={10}
-      />,
+      />
     );
     expect(screen.getByText(/100 sources in 10 courses/)).toBeInTheDocument();
   });
@@ -114,7 +122,7 @@ describe('EmbeddingReindexDialog', () => {
         {...defaultProps}
         totalSources={0}
         courseCount={0}
-      />,
+      />
     );
     expect(screen.getByText(/0 sources in 0 courses/)).toBeInTheDocument();
   });
@@ -149,7 +157,10 @@ describe('EmbeddingReindexDialog — Accessibility', () => {
   it('confirm button has aria-describedby linking to dialog description', () => {
     render(<EmbeddingReindexDialog {...defaultProps} />);
     const confirmBtn = screen.getByTestId('reindex-confirm-btn');
-    expect(confirmBtn).toHaveAttribute('aria-describedby', 'reindex-dialog-description');
+    expect(confirmBtn).toHaveAttribute(
+      'aria-describedby',
+      'reindex-dialog-description'
+    );
   });
 
   it('loading spinner has aria-hidden="true"', () => {

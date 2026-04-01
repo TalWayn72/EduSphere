@@ -31,65 +31,93 @@ describe('Phase 45 — Social Learning Federation', () => {
     });
 
     it('publicProfile query exists in supergraph', () => {
-      expect(supergraph).toMatch(/publicProfile[^}]*@join__field\(graph: CORE\)/);
+      expect(supergraph).toMatch(
+        /publicProfile[^}]*@join__field\(graph: CORE\)/
+      );
     });
 
     it('myActivityFeed query exists in supergraph', () => {
-      expect(supergraph).toMatch(/myActivityFeed[^}]*@join__field\(graph: CORE\)/);
+      expect(supergraph).toMatch(
+        /myActivityFeed[^}]*@join__field\(graph: CORE\)/
+      );
     });
   });
 
   describe('Social feed queries wired (KNOWLEDGE subgraph)', () => {
     it('socialFeed query exists in supergraph', () => {
-      expect(supergraph).toMatch(/socialFeed[^}]*@join__field\(graph: KNOWLEDGE\)/);
+      expect(supergraph).toMatch(
+        /socialFeed[^}]*@join__field\(graph: KNOWLEDGE\)/
+      );
     });
 
     it('socialRecommendations query exists in supergraph', () => {
-      expect(supergraph).toMatch(/socialRecommendations[^}]*@join__field\(graph: KNOWLEDGE\)/);
+      expect(supergraph).toMatch(
+        /socialRecommendations[^}]*@join__field\(graph: KNOWLEDGE\)/
+      );
     });
   });
 
   describe('Discussion queries wired (COLLABORATION subgraph)', () => {
     it('discussion query exists in supergraph', () => {
-      expect(supergraph).toMatch(/discussion\(id[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /discussion\(id[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('discussions query exists in supergraph', () => {
-      expect(supergraph).toMatch(/discussions\(courseId[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /discussions\(courseId[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('myDiscussions query exists in supergraph', () => {
-      expect(supergraph).toMatch(/myDiscussions[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /myDiscussions[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('discussionMessages query exists in supergraph', () => {
-      expect(supergraph).toMatch(/discussionMessages[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /discussionMessages[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('messageAdded subscription exists in supergraph', () => {
-      expect(supergraph).toMatch(/messageAdded[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /messageAdded[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
   });
 
   describe('Discussion mutations wired (COLLABORATION subgraph)', () => {
     it('createDiscussion mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/createDiscussion[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /createDiscussion[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('addMessage mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/addMessage[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /addMessage[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('joinDiscussion mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/joinDiscussion[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /joinDiscussion[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('leaveDiscussion mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/leaveDiscussion[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /leaveDiscussion[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
 
     it('likeMessage mutation exists in supergraph routed to COLLABORATION', () => {
-      expect(supergraph).toMatch(/likeMessage[^}]*@join__field\(graph: COLLABORATION\)/);
+      expect(supergraph).toMatch(
+        /likeMessage[^}]*@join__field\(graph: COLLABORATION\)/
+      );
     });
   });
 
@@ -99,39 +127,55 @@ describe('Phase 45 — Social Learning Federation', () => {
     });
 
     it('unfollowUser mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/unfollowUser[^}]*@join__field\(graph: CORE\)/);
+      expect(supergraph).toMatch(
+        /unfollowUser[^}]*@join__field\(graph: CORE\)/
+      );
     });
   });
 
   describe('Assessment queries wired (CONTENT subgraph)', () => {
     it('myCampaigns query exists in supergraph', () => {
-      expect(supergraph).toMatch(/myCampaigns[^}]*@join__field\(graph: CONTENT\)/);
+      expect(supergraph).toMatch(
+        /myCampaigns[^}]*@join__field\(graph: CONTENT\)/
+      );
     });
 
     it('campaignsToRespond query exists in supergraph', () => {
-      expect(supergraph).toMatch(/campaignsToRespond[^}]*@join__field\(graph: CONTENT\)/);
+      expect(supergraph).toMatch(
+        /campaignsToRespond[^}]*@join__field\(graph: CONTENT\)/
+      );
     });
 
     it('assessmentResult query exists in supergraph', () => {
-      expect(supergraph).toMatch(/assessmentResult[^}]*@join__field\(graph: CONTENT\)/);
+      expect(supergraph).toMatch(
+        /assessmentResult[^}]*@join__field\(graph: CONTENT\)/
+      );
     });
   });
 
   describe('Assessment mutations wired (CONTENT subgraph)', () => {
     it('createAssessmentCampaign mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/createAssessmentCampaign[^}]*@join__field\(graph: CONTENT\)/);
+      expect(supergraph).toMatch(
+        /createAssessmentCampaign[^}]*@join__field\(graph: CONTENT\)/
+      );
     });
 
     it('submitAssessmentResponse mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/submitAssessmentResponse[^)]*campaignId[^}]*@join__field\(graph: CONTENT\)/s);
+      expect(supergraph).toMatch(
+        /submitAssessmentResponse[^)]*campaignId[^}]*@join__field\(graph: CONTENT\)/s
+      );
     });
 
     it('activateAssessmentCampaign mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/activateAssessmentCampaign[^}]*@join__field\(graph: CONTENT\)/);
+      expect(supergraph).toMatch(
+        /activateAssessmentCampaign[^}]*@join__field\(graph: CONTENT\)/
+      );
     });
 
     it('completeAssessmentCampaign mutation exists in supergraph', () => {
-      expect(supergraph).toMatch(/completeAssessmentCampaign[^}]*@join__field\(graph: CONTENT\)/);
+      expect(supergraph).toMatch(
+        /completeAssessmentCampaign[^}]*@join__field\(graph: CONTENT\)/
+      );
     });
   });
 

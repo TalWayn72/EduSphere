@@ -68,7 +68,9 @@ export function useOfflineAnchors(assetId: string) {
     [assetId]
   );
 
-  const loadCachedAnchors = useCallback(async (): Promise<VisualAnchor[] | null> => {
+  const loadCachedAnchors = useCallback(async (): Promise<
+    VisualAnchor[] | null
+  > => {
     if (dbRef.current) {
       const record = (await dbRef.current.get(STORE_NAME, assetId)) as
         | AnchorRecord

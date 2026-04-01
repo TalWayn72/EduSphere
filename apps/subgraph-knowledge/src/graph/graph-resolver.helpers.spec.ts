@@ -46,12 +46,16 @@ describe('getGraphAuthContext', () => {
 
   it('throws UnauthorizedException when userId is missing', () => {
     const ctx = { authContext: { tenantId: 't', userId: '', roles: [] } };
-    expect(() => getGraphAuthContext(ctx as any)).toThrow(UnauthorizedException);
+    expect(() => getGraphAuthContext(ctx as any)).toThrow(
+      UnauthorizedException
+    );
   });
 
   it('throws UnauthorizedException when tenantId is missing', () => {
     const ctx = { authContext: { tenantId: '', userId: 'u', roles: [] } };
-    expect(() => getGraphAuthContext(ctx as any)).toThrow(UnauthorizedException);
+    expect(() => getGraphAuthContext(ctx as any)).toThrow(
+      UnauthorizedException
+    );
   });
 
   it('throws UnauthorizedException when authContext is null', () => {

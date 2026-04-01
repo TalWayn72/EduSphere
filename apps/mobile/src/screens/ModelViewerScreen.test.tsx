@@ -54,12 +54,17 @@ describe('ModelViewerScreen — route params', () => {
   });
 
   it('modelUrl is optional', () => {
-    const params: { modelUrl?: string; modelTitle?: string } = { modelTitle: 'Atom' };
+    const params: { modelUrl?: string; modelTitle?: string } = {
+      modelTitle: 'Atom',
+    };
     expect(params.modelUrl).toBeUndefined();
   });
 
   it('modelUrl is accessible when provided', () => {
-    const params = { modelUrl: 'https://example.com/model.glb', modelTitle: 'Atom' };
+    const params = {
+      modelUrl: 'https://example.com/model.glb',
+      modelTitle: 'Atom',
+    };
     expect(params.modelUrl).toBe('https://example.com/model.glb');
   });
 });

@@ -37,11 +37,21 @@ export function HrisSyncHistory({ entries, fetching }: HrisSyncHistoryProps) {
           >
             <thead>
               <tr className="border-b text-left text-muted-foreground">
-                <th scope="col" className="pb-2 font-medium">Type</th>
-                <th scope="col" className="pb-2 font-medium">Timestamp</th>
-                <th scope="col" className="pb-2 font-medium">Users Synced</th>
-                <th scope="col" className="pb-2 font-medium">Errors</th>
-                <th scope="col" className="pb-2 font-medium">Status</th>
+                <th scope="col" className="pb-2 font-medium">
+                  Type
+                </th>
+                <th scope="col" className="pb-2 font-medium">
+                  Timestamp
+                </th>
+                <th scope="col" className="pb-2 font-medium">
+                  Users Synced
+                </th>
+                <th scope="col" className="pb-2 font-medium">
+                  Errors
+                </th>
+                <th scope="col" className="pb-2 font-medium">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -51,7 +61,8 @@ export function HrisSyncHistory({ entries, fetching }: HrisSyncHistoryProps) {
                     colSpan={5}
                     className="py-6 text-center text-muted-foreground"
                   >
-                    No sync history yet. Configure an HRIS connection and run a sync.
+                    No sync history yet. Configure an HRIS connection and run a
+                    sync.
                   </td>
                 </tr>
               ) : (

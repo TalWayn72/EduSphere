@@ -16,7 +16,9 @@ test.describe('Gamification Page — DEV_MODE guard', () => {
   });
 
   test('navigates to /gamification and shows 3 tabs', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByRole('tab', { name: /progress/i })).toBeVisible();
@@ -25,35 +27,49 @@ test.describe('Gamification Page — DEV_MODE guard', () => {
   });
 
   test('no MOCK_ sentinel strings in gamification DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('MOCK_');
   });
 
-  test('no [object Object] serialization in gamification DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+  test('no [object Object] serialization in gamification DOM', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
-  test('challenges tab shows challenge cards or empty state', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+  test('challenges tab shows challenge cards or empty state', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('tab', { name: /challenges/i }).click();
 
     // Either challenge cards OR empty state is visible — not a blank page
-    const hasCards = await page.locator('[data-testid="challenge-card"]').count();
+    const hasCards = await page
+      .locator('[data-testid="challenge-card"]')
+      .count();
     const hasEmpty = await page.getByText(/no active challenges/i).count();
     expect(hasCards + hasEmpty).toBeGreaterThan(0);
   });
 
   test('gamification page renders without crash overlay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
     });
@@ -70,7 +86,9 @@ test.describe('Gamification Page — Live backend', () => {
   });
 
   test('progress tab is visible on /gamification', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByRole('tab', { name: /progress/i })).toBeVisible();
@@ -79,13 +97,19 @@ test.describe('Gamification Page — Live backend', () => {
     });
   });
 
-  test('challenges tab shows challenge cards or empty state', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+  test('challenges tab shows challenge cards or empty state', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('tab', { name: /challenges/i }).click();
 
-    const hasCards = await page.locator('[data-testid="challenge-card"]').count();
+    const hasCards = await page
+      .locator('[data-testid="challenge-card"]')
+      .count();
     const hasEmpty = await page.getByText(/no active challenges/i).count();
     expect(hasCards + hasEmpty).toBeGreaterThan(0);
     await expect(page).toHaveScreenshot('gamification-challenges-tab.png', {
@@ -94,7 +118,9 @@ test.describe('Gamification Page — Live backend', () => {
   });
 
   test('leaderboard tab renders', async ({ page }) => {
-    await page.goto(`${BASE_URL}/gamification`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/gamification`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('tab', { name: /leaderboard/i }).click();

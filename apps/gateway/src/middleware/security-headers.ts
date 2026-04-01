@@ -27,15 +27,9 @@ const CSP_DIRECTIVES: readonly string[] = [
 ];
 
 const SECURITY_HEADERS: ReadonlyMap<string, string> = new Map([
-  [
-    'Content-Security-Policy',
-    CSP_DIRECTIVES.join('; '),
-  ],
+  ['Content-Security-Policy', CSP_DIRECTIVES.join('; ')],
   // HSTS — 1 year, include subdomains, eligible for browser preload list
-  [
-    'Strict-Transport-Security',
-    'max-age=31536000; includeSubDomains; preload',
-  ],
+  ['Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload'],
   // Deny embedding in iframes (also covered by CSP frame-ancestors, belt+braces)
   ['X-Frame-Options', 'DENY'],
   // Prevent MIME-type sniffing

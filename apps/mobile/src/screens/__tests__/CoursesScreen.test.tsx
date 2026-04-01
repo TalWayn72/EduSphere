@@ -42,19 +42,43 @@ interface Course {
 }
 
 const MOCK_COURSES: Course[] = [
-  { id: 'c1', title: 'TypeScript Fundamentals', description: 'TS basics', isPublished: true, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'c2', title: 'React Native Essentials', description: 'Mobile dev', isPublished: false, createdAt: '2024-02-01T00:00:00Z' },
-  { id: 'c3', title: 'GraphQL Federation', description: 'Distributed schemas', isPublished: true, createdAt: '2024-03-01T00:00:00Z' },
+  {
+    id: 'c1',
+    title: 'TypeScript Fundamentals',
+    description: 'TS basics',
+    isPublished: true,
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 'c2',
+    title: 'React Native Essentials',
+    description: 'Mobile dev',
+    isPublished: false,
+    createdAt: '2024-02-01T00:00:00Z',
+  },
+  {
+    id: 'c3',
+    title: 'GraphQL Federation',
+    description: 'Distributed schemas',
+    isPublished: true,
+    createdAt: '2024-03-01T00:00:00Z',
+  },
 ];
 
 function filterCourses(courses: Course[], search: string): Course[] {
   const term = search.trim().toLowerCase();
-  return term ? courses.filter(c => c.title.toLowerCase().includes(term)) : courses;
+  return term
+    ? courses.filter((c) => c.title.toLowerCase().includes(term))
+    : courses;
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockUseQuery.mockReturnValue({ data: { courses: MOCK_COURSES }, loading: false, error: undefined });
+  mockUseQuery.mockReturnValue({
+    data: { courses: MOCK_COURSES },
+    loading: false,
+    error: undefined,
+  });
 });
 
 describe('CoursesScreen — renders with mock data', () => {
@@ -75,13 +99,21 @@ describe('CoursesScreen — renders with mock data', () => {
 
 describe('CoursesScreen — empty state', () => {
   it('no courses from API yields empty list', () => {
-    mockUseQuery.mockReturnValue({ data: { courses: [] }, loading: false, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: { courses: [] },
+      loading: false,
+      error: undefined,
+    });
     const result = mockUseQuery();
     expect(result.data.courses).toHaveLength(0);
   });
 
   it('null data yields undefined courses', () => {
-    mockUseQuery.mockReturnValue({ data: undefined, loading: false, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: undefined,
+    });
     const result = mockUseQuery();
     const courses = result.data?.courses ?? [];
     expect(courses).toHaveLength(0);
@@ -90,7 +122,11 @@ describe('CoursesScreen — empty state', () => {
 
 describe('CoursesScreen — loading state', () => {
   it('loading=true with no data', () => {
-    mockUseQuery.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
     const result = mockUseQuery();
     expect(result.loading).toBe(true);
     expect(result.data).toBeUndefined();
@@ -134,7 +170,7 @@ describe('CoursesScreen — search filter', () => {
 
 describe('CoursesScreen — draft badge logic', () => {
   it('unpublished courses get draft badge', () => {
-    const drafts = MOCK_COURSES.filter(c => !c.isPublished);
+    const drafts = MOCK_COURSES.filter((c) => !c.isPublished);
     expect(drafts).toHaveLength(1);
     expect(drafts[0].id).toBe('c2');
   });
@@ -143,6 +179,8 @@ describe('CoursesScreen — draft badge logic', () => {
 describe('CoursesScreen — navigation', () => {
   it('pressing a course navigates to CourseDetail', () => {
     mockNavigate('CourseDetail', { courseId: 'c1' });
-    expect(mockNavigate).toHaveBeenCalledWith('CourseDetail', { courseId: 'c1' });
+    expect(mockNavigate).toHaveBeenCalledWith('CourseDetail', {
+      courseId: 'c1',
+    });
   });
 });

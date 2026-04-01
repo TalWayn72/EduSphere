@@ -41,7 +41,12 @@ describe('CypherConceptRelationService', () => {
       {},
       'edusphere_graph',
       expect.stringContaining('MERGE'),
-      expect.objectContaining({ fromName: 'React', toName: 'JavaScript', tenantId: 'tenant-1', strength: 0.9 }),
+      expect.objectContaining({
+        fromName: 'React',
+        toName: 'JavaScript',
+        tenantId: 'tenant-1',
+        strength: 0.9,
+      }),
       'tenant-1'
     );
   });
@@ -64,7 +69,13 @@ describe('CypherConceptRelationService', () => {
     const related = [{ id: 'c-2', name: 'TypeScript', strength: 0.8 }];
     mockFindRelatedConcepts.mockResolvedValue(related);
     const result = await service.findRelatedConcepts('c-1', 'tenant-1', 2, 10);
-    expect(mockFindRelatedConcepts).toHaveBeenCalledWith({}, 'c-1', 'tenant-1', 2, 10);
+    expect(mockFindRelatedConcepts).toHaveBeenCalledWith(
+      {},
+      'c-1',
+      'tenant-1',
+      2,
+      10
+    );
     expect(result).toBe(related);
   });
 
@@ -72,7 +83,9 @@ describe('CypherConceptRelationService', () => {
 
   it('delegates to createRelationship with ids and type', async () => {
     mockCreateRelationship.mockResolvedValue(undefined);
-    await service.linkConcepts('from-1', 'to-2', 'RELATED_TO', { strength: 0.5 });
+    await service.linkConcepts('from-1', 'to-2', 'RELATED_TO', {
+      strength: 0.5,
+    });
     expect(mockCreateRelationship).toHaveBeenCalledWith(
       {},
       'from-1',
@@ -102,7 +115,11 @@ describe('CypherConceptRelationService', () => {
   it('returns null nodes when result set is empty', async () => {
     mockExecuteCypher.mockResolvedValue([]);
     const result = await service.linkConceptsAndFetch(
-      'x', 'y', 'PREREQ', {}, 'tenant-1'
+      'x',
+      'y',
+      'PREREQ',
+      {},
+      'tenant-1'
     );
     expect(result.from).toBeNull();
     expect(result.to).toBeNull();

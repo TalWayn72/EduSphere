@@ -116,7 +116,9 @@ export class KMeansAlgorithmService {
 
       for (let ci = 0; ci < clampedK; ci++) {
         // eslint-disable-next-line security/detect-object-injection -- safe numeric index into assignments array
-        const clusterPoints = concepts.filter((_, i) => assignments[i] === ci).map((c) => c.embedding);
+        const clusterPoints = concepts
+          .filter((_, i) => assignments[i] === ci)
+          .map((c) => c.embedding);
         if (clusterPoints.length > 0) {
           // eslint-disable-next-line security/detect-object-injection -- safe numeric index into centroids array
           centroids[ci] = this.meanVector(clusterPoints);

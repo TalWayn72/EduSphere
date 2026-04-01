@@ -52,8 +52,16 @@ export { gradeExamItem } from './exam-item-grader';
 export { CatEngineService } from './cat-engine.service';
 export { CatItemLoader } from './cat-item-loader';
 export { estimateAbilityEAP } from './cat-eap-estimator';
-export { fisherInformation3PL, standardNormalCDF, passingProbability } from './cat-math';
-export type { CatState, TerminationResult, CatNextResult } from './cat-engine.types';
+export {
+  fisherInformation3PL,
+  standardNormalCDF,
+  passingProbability,
+} from './cat-math';
+export type {
+  CatState,
+  TerminationResult,
+  CatNextResult,
+} from './cat-engine.types';
 
 // Security
 export { ExamSecurityService } from './exam-security.service';

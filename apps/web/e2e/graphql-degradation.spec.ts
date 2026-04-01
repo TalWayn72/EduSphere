@@ -52,7 +52,7 @@ test.describe('GraphQL Graceful Degradation', () => {
         for (const forbidden of FORBIDDEN_ERROR_TEXT) {
           expect(
             bodyText,
-            `Found forbidden error text "${forbidden}" on ${route}`,
+            `Found forbidden error text "${forbidden}" on ${route}`
           ).not.toContain(forbidden);
         }
       });
@@ -67,12 +67,19 @@ test.describe('GraphQL Graceful Degradation', () => {
       });
       await page.waitForLoadState('networkidle').catch(() => {});
 
-      const anchors = ['ferpa', 'wcag', 'scorm', 'gdpr', 'air-gapped', 'security'];
+      const anchors = [
+        'ferpa',
+        'wcag',
+        'scorm',
+        'gdpr',
+        'air-gapped',
+        'security',
+      ];
       for (const id of anchors) {
         const el = page.locator(`#${id}`);
         await expect(
           el,
-          `Missing section anchor #${id} on /compliance`,
+          `Missing section anchor #${id} on /compliance`
         ).toBeAttached();
       }
     });

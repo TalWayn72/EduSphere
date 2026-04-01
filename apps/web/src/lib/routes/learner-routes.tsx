@@ -75,7 +75,9 @@ const SkillPathPage = lazy(() =>
   import('@/pages/SkillPathPage').then((m) => ({ default: m.SkillPathPage }))
 );
 const SkillGapDashboard = lazy(() =>
-  import('@/pages/SkillGapDashboard').then((m) => ({ default: m.SkillGapDashboard }))
+  import('@/pages/SkillGapDashboard').then((m) => ({
+    default: m.SkillGapDashboard,
+  }))
 );
 const SkillTreePage = lazy(() =>
   import('@/pages/SkillTreePage').then((m) => ({ default: m.SkillTreePage }))
@@ -123,7 +125,9 @@ const AgentsPage = lazy(() =>
   import('@/pages/AgentsPage').then((m) => ({ default: m.AgentsPage }))
 );
 const AgentStudioPage = lazy(() =>
-  import('@/pages/AgentStudioPage').then((m) => ({ default: m.AgentStudioPage }))
+  import('@/pages/AgentStudioPage').then((m) => ({
+    default: m.AgentStudioPage,
+  }))
 );
 const Model3DPage = lazy(() =>
   import('@/pages/Model3DPage').then((m) => ({ default: m.Model3DPage }))
@@ -169,7 +173,10 @@ export const learnerRoutes: RouteObject[] = [
   // Knowledge graph
   { path: '/graph', element: guarded(<KnowledgeGraph />) },
   { path: '/knowledge-graph', element: guarded(<KnowledgeGraphPage />) },
-  { path: '/knowledge-graph/:courseId', element: guarded(<KnowledgeGraphPage />) },
+  {
+    path: '/knowledge-graph/:courseId',
+    element: guarded(<KnowledgeGraphPage />),
+  },
   // Skills
   { path: '/skill-tree', element: guarded(<SkillTreePage />) },
   { path: '/skill-tree/:courseId', element: guarded(<SkillTreePage />) },

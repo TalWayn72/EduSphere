@@ -25,15 +25,21 @@ import { BASE_URL } from './env';
 // ─── GraphQL mock helper ───────────────────────────────────────────────────────
 
 /** Intercept all GraphQL requests and return empty/stub responses. */
-async function mockAllGraphQL(page: import('@playwright/test').Page): Promise<void> {
+async function mockAllGraphQL(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await page.route('**/graphql', async (route) => {
-    const body = (route.request().postDataJSON() ?? {}) as { operationName?: string };
+    const body = (route.request().postDataJSON() ?? {}) as {
+      operationName?: string;
+    };
 
     switch (body.operationName) {
       case 'SubmitPilotRequest':
         await route.fulfill({
           contentType: 'application/json',
-          body: JSON.stringify({ data: { submitPilotRequest: { id: 'mock-pilot-id' } } }),
+          body: JSON.stringify({
+            data: { submitPilotRequest: { id: 'mock-pilot-id' } },
+          }),
         });
         break;
       default:
@@ -183,8 +189,10 @@ test.describe('Landing Page — Visual Regression @visual', () => {
 
   // ── Anti-regression: no layout shifts from raw error strings ─────────────────
 
-  test('no raw error strings visible in any screenshot baseline', async ({ page }) => {
-    const body = await page.textContent('body') ?? '';
+  test('no raw error strings visible in any screenshot baseline', async ({
+    page,
+  }) => {
+    const body = (await page.textContent('body')) ?? '';
     expect(body).not.toContain('urql error');
     expect(body).not.toContain('GraphQL error');
     expect(body).not.toContain('Cannot read properties');

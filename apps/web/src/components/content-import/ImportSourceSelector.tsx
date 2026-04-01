@@ -7,31 +7,34 @@ interface Props {
   onSelect: (source: ImportSource) => void;
 }
 
-
 const SOURCES = [
   {
     id: 'youtube' as const,
     icon: Youtube,
     label: 'YouTube Playlist',
-    description: 'Import lessons from a public YouTube playlist via the Data API v3.',
+    description:
+      'Import lessons from a public YouTube playlist via the Data API v3.',
   },
   {
     id: 'website' as const,
     icon: Globe,
     label: 'Website / Blog',
-    description: 'Crawl a site and auto-extract lesson pages using Firecrawl AI.',
+    description:
+      'Crawl a site and auto-extract lesson pages using Firecrawl AI.',
   },
   {
     id: 'folder' as const,
     icon: FolderOpen,
     label: 'Upload Folder / ZIP',
-    description: 'Upload a local folder or ZIP archive — supports MP4, PDF, PPTX, DOCX, images.',
+    description:
+      'Upload a local folder or ZIP archive — supports MP4, PDF, PPTX, DOCX, images.',
   },
   {
     id: 'drive' as const,
     icon: HardDrive,
     label: 'Google Drive',
-    description: 'Import files directly from a Google Drive folder via OAuth 2.0.',
+    description:
+      'Import files directly from a Google Drive folder via OAuth 2.0.',
   },
 ] as const;
 

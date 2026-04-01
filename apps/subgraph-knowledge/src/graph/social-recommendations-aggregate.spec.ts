@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { aggregateActivity } from './social-recommendations-aggregate';
 import type { ActivityRow } from './social-recommendations-data.service';
 
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function makeRow(overrides: Partial<ActivityRow> = {}): ActivityRow {
   return {
@@ -70,10 +69,7 @@ describe('aggregateActivity', () => {
   });
 
   it('sets isMutualFollower to true if any contributor is mutual', () => {
-    const rows = [
-      makeRow({ userId: 'u1' }),
-      makeRow({ userId: 'u2' }),
-    ];
+    const rows = [makeRow({ userId: 'u1' }), makeRow({ userId: 'u2' })];
     const mutualSet = new Set(['u2']);
     const result = aggregateActivity(rows, new Set(), mutualSet);
     expect(result[0]!.isMutualFollower).toBe(true);

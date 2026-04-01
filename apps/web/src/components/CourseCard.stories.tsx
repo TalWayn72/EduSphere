@@ -77,7 +77,8 @@ export const DesignCategory: Story = {
 export const LongTitle: Story = {
   args: {
     id: 'c-6',
-    title: 'Complete Full-Stack Development with GraphQL Federation, NestJS, React 19 and PostgreSQL 16',
+    title:
+      'Complete Full-Stack Development with GraphQL Federation, NestJS, React 19 and PostgreSQL 16',
     instructor: 'Multiple Instructors',
     category: 'Programming',
     lessonCount: 60,

@@ -5,7 +5,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PilotSignupPage } from './PilotSignupPage';
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('urql', async () => {
@@ -71,15 +73,28 @@ describe('PilotSignupPage', () => {
 
   it('shows loading state when fetching is true', async () => {
     const { useMutation } = await import('urql');
-    vi.mocked(useMutation).mockReturnValue([{ fetching: true, error: undefined, data: undefined, stale: false, operation: undefined as never }, vi.fn()]);
+    vi.mocked(useMutation).mockReturnValue([
+      {
+        fetching: true,
+        error: undefined,
+        data: undefined,
+        stale: false,
+        operation: undefined as never,
+      },
+      vi.fn(),
+    ]);
     renderPage();
-    expect(screen.getByTestId('pilot-submit-btn')).toHaveTextContent(/submitting/i);
+    expect(screen.getByTestId('pilot-submit-btn')).toHaveTextContent(
+      /submitting/i
+    );
     expect(screen.getByTestId('pilot-submit-btn')).toBeDisabled();
   });
 
   it('does not show success message initially', () => {
     renderPage();
-    expect(screen.queryByTestId('pilot-success-message')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('pilot-success-message')
+    ).not.toBeInTheDocument();
   });
 
   it('does not show error message when no error', () => {

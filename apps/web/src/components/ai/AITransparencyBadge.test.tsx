@@ -110,7 +110,9 @@ describe('AITransparencyBadge', () => {
   it('has aria-describedby pointing to tooltip id', () => {
     render(<AITransparencyBadge type="chat" />);
     const badge = screen.getByTestId('ai-transparency-badge');
-    expect(badge.getAttribute('aria-describedby')).toContain('ai-badge-tooltip');
+    expect(badge.getAttribute('aria-describedby')).toContain(
+      'ai-badge-tooltip'
+    );
   });
 
   // Regression guard: EU AI Act compliance reference

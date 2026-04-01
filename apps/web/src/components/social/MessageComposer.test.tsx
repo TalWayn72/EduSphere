@@ -3,9 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import * as urql from 'urql';
 import MessageComposer from './MessageComposer';
 
-vi.mock('urql', async () => ({ ...await vi.importActual('urql'), useMutation: vi.fn() }));
+vi.mock('urql', async () => ({
+  ...(await vi.importActual('urql')),
+  useMutation: vi.fn(),
+}));
 
-const mockMutate = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+const mockMutate = vi
+  .fn()
+  .mockResolvedValue({ data: undefined, error: undefined });
 const NOOP_MUTATION = [{ fetching: false }, mockMutate] as never;
 
 describe('MessageComposer', () => {
@@ -29,8 +34,11 @@ describe('MessageComposer', () => {
     fireEvent.change(textarea, { target: { value: 'Hello world' } });
     fireEvent.click(screen.getByRole('button', { name: /Send/i }));
     expect(mockMutate).toHaveBeenCalledWith(
-      { discussionId: 'd1', input: { content: 'Hello world', parentMessageId: null } },
-      expect.anything(),
+      {
+        discussionId: 'd1',
+        input: { content: 'Hello world', parentMessageId: null },
+      },
+      expect.anything()
     );
   });
 
@@ -40,7 +48,7 @@ describe('MessageComposer', () => {
         discussionId="d1"
         replyToId="msg-1"
         replyToContent="Original message text"
-      />,
+      />
     );
     expect(screen.getByText(/Replying to:/i)).toBeInTheDocument();
     expect(screen.getByText(/Original message text/i)).toBeInTheDocument();
@@ -54,7 +62,7 @@ describe('MessageComposer', () => {
         replyToId="msg-1"
         replyToContent="Original message text"
         onReplyCleared={onReplyCleared}
-      />,
+      />
     );
     fireEvent.click(screen.getByRole('button', { name: /Clear reply/i }));
     expect(onReplyCleared).toHaveBeenCalledTimes(1);

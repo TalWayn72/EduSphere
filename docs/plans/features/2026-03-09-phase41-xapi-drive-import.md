@@ -9,27 +9,27 @@
 
 ### What's Already Built (do NOT rebuild)
 
-| Component | Location | Status |
-|-----------|----------|--------|
-| xAPI DB schema | `packages/db/src/schema/xapi.ts` | ✅ `xapi_tokens` + `xapi_statements` tables, RLS, indexes |
-| xAPI token service | `apps/subgraph-content/src/xapi/xapi-token.service.ts` | ✅ SHA-256 hashing, generate/revoke |
-| xAPI statement service | `apps/subgraph-content/src/xapi/xapi-statement.service.ts` | ✅ store + query statements |
-| LRS REST controller | `apps/subgraph-content/src/xapi/lrs.controller.ts` | ✅ `POST /xapi/statements`, `GET /xapi/about` |
-| GraphQL resolver | `apps/subgraph-content/src/xapi/xapi.resolver.ts` | ✅ `xapiTokens`, `xapiStatements`, `generateXapiToken` |
-| XapiSettingsPage | `apps/web/src/pages/XapiSettingsPage.tsx` | ✅ Admin token UI |
-| YouTube import | `apps/subgraph-content/src/content-import/` | ✅ PA1+PA2 (Phase 40) |
-| Website crawl import | same | ✅ Firecrawl (Phase 40) |
+| Component              | Location                                                   | Status                                                    |
+| ---------------------- | ---------------------------------------------------------- | --------------------------------------------------------- |
+| xAPI DB schema         | `packages/db/src/schema/xapi.ts`                           | ✅ `xapi_tokens` + `xapi_statements` tables, RLS, indexes |
+| xAPI token service     | `apps/subgraph-content/src/xapi/xapi-token.service.ts`     | ✅ SHA-256 hashing, generate/revoke                       |
+| xAPI statement service | `apps/subgraph-content/src/xapi/xapi-statement.service.ts` | ✅ store + query statements                               |
+| LRS REST controller    | `apps/subgraph-content/src/xapi/lrs.controller.ts`         | ✅ `POST /xapi/statements`, `GET /xapi/about`             |
+| GraphQL resolver       | `apps/subgraph-content/src/xapi/xapi.resolver.ts`          | ✅ `xapiTokens`, `xapiStatements`, `generateXapiToken`    |
+| XapiSettingsPage       | `apps/web/src/pages/XapiSettingsPage.tsx`                  | ✅ Admin token UI                                         |
+| YouTube import         | `apps/subgraph-content/src/content-import/`                | ✅ PA1+PA2 (Phase 40)                                     |
+| Website crawl import   | same                                                       | ✅ Firecrawl (Phase 40)                                   |
 
 ### Key NATS Events Already Published
 
-| Subject | Emitted by | xAPI Verb |
-|---------|-----------|-----------|
-| `EDUSPHERE.course.completed` | certificate.service, open-badge | `http://adlnet.gov/expapi/verbs/completed` |
-| `EDUSPHERE.course.enrolled` | marketplace.service | `http://adlnet.gov/expapi/verbs/registered` |
-| `EDUSPHERE.sessions.ended` | live-session.service | `http://adlnet.gov/expapi/verbs/attended` |
-| `EDUSPHERE.sessions.participant.joined` | live-session.service | `http://adlnet.gov/expapi/verbs/launched` |
-| `EDUSPHERE.submission.created` | plagiarism.service | `http://adlnet.gov/expapi/verbs/attempted` |
-| `EDUSPHERE.poll.voted` | poll.service | `http://adlnet.gov/expapi/verbs/responded` |
+| Subject                                 | Emitted by                      | xAPI Verb                                   |
+| --------------------------------------- | ------------------------------- | ------------------------------------------- |
+| `EDUSPHERE.course.completed`            | certificate.service, open-badge | `http://adlnet.gov/expapi/verbs/completed`  |
+| `EDUSPHERE.course.enrolled`             | marketplace.service             | `http://adlnet.gov/expapi/verbs/registered` |
+| `EDUSPHERE.sessions.ended`              | live-session.service            | `http://adlnet.gov/expapi/verbs/attended`   |
+| `EDUSPHERE.sessions.participant.joined` | live-session.service            | `http://adlnet.gov/expapi/verbs/launched`   |
+| `EDUSPHERE.submission.created`          | plagiarism.service              | `http://adlnet.gov/expapi/verbs/attempted`  |
+| `EDUSPHERE.poll.voted`                  | poll.service                    | `http://adlnet.gov/expapi/verbs/responded`  |
 
 ### Phase 41 Gaps
 
@@ -64,7 +64,12 @@ Purpose: Subscribe to all NATS learning events → map to xAPI statements → st
 Pattern (follow `certificate.service.ts` subscription pattern — `OnModuleInit` + `OnModuleDestroy`):
 
 ```typescript
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { InjectNats } from '@edusphere/nats-client';
 import type { NatsConnection, Subscription } from 'nats';
 import { XapiStatementService } from './xapi-statement.service.js';
@@ -86,7 +91,7 @@ export class XapiNatsBridgeService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @InjectNats() private readonly nc: NatsConnection,
-    private readonly statementService: XapiStatementService,
+    private readonly statementService: XapiStatementService
   ) {}
 
   async onModuleInit() {
@@ -113,7 +118,10 @@ export class XapiNatsBridgeService implements OnModuleInit, OnModuleDestroy {
         const stmt = natsToXapiStatement(subject, payload);
         await this.statementService.storeStatement(tenantId, stmt);
       } catch (err) {
-        this.logger.error({ subject, err }, 'Failed to process NATS→xAPI bridge');
+        this.logger.error(
+          { subject, err },
+          'Failed to process NATS→xAPI bridge'
+        );
       }
     }
   }
@@ -124,35 +132,63 @@ export class XapiNatsBridgeService implements OnModuleInit, OnModuleDestroy {
 
 ```typescript
 export const XAPI_VERBS = {
-  completed:   { id: 'http://adlnet.gov/expapi/verbs/completed',   display: { 'en-US': 'completed' } },
-  registered:  { id: 'http://adlnet.gov/expapi/verbs/registered',  display: { 'en-US': 'registered' } },
-  attended:    { id: 'http://adlnet.gov/expapi/verbs/attended',    display: { 'en-US': 'attended' } },
-  launched:    { id: 'http://adlnet.gov/expapi/verbs/launched',    display: { 'en-US': 'launched' } },
-  attempted:   { id: 'http://adlnet.gov/expapi/verbs/attempted',   display: { 'en-US': 'attempted' } },
-  responded:   { id: 'http://adlnet.gov/expapi/verbs/responded',   display: { 'en-US': 'responded' } },
+  completed: {
+    id: 'http://adlnet.gov/expapi/verbs/completed',
+    display: { 'en-US': 'completed' },
+  },
+  registered: {
+    id: 'http://adlnet.gov/expapi/verbs/registered',
+    display: { 'en-US': 'registered' },
+  },
+  attended: {
+    id: 'http://adlnet.gov/expapi/verbs/attended',
+    display: { 'en-US': 'attended' },
+  },
+  launched: {
+    id: 'http://adlnet.gov/expapi/verbs/launched',
+    display: { 'en-US': 'launched' },
+  },
+  attempted: {
+    id: 'http://adlnet.gov/expapi/verbs/attempted',
+    display: { 'en-US': 'attempted' },
+  },
+  responded: {
+    id: 'http://adlnet.gov/expapi/verbs/responded',
+    display: { 'en-US': 'responded' },
+  },
 } as const;
 
 const SUBJECT_TO_VERB: Record<string, keyof typeof XAPI_VERBS> = {
-  'EDUSPHERE.course.completed':            'completed',
-  'EDUSPHERE.course.enrolled':             'registered',
-  'EDUSPHERE.sessions.ended':              'attended',
+  'EDUSPHERE.course.completed': 'completed',
+  'EDUSPHERE.course.enrolled': 'registered',
+  'EDUSPHERE.sessions.ended': 'attended',
   'EDUSPHERE.sessions.participant.joined': 'launched',
-  'EDUSPHERE.submission.created':          'attempted',
-  'EDUSPHERE.poll.voted':                  'responded',
+  'EDUSPHERE.submission.created': 'attempted',
+  'EDUSPHERE.poll.voted': 'responded',
 };
 
-export function natsToXapiStatement(subject: string, payload: Record<string, unknown>) {
+export function natsToXapiStatement(
+  subject: string,
+  payload: Record<string, unknown>
+) {
   const verbKey = SUBJECT_TO_VERB[subject] ?? 'launched';
   return {
     actor: {
       objectType: 'Agent',
-      account: { homePage: 'https://edusphere.io', name: payload.userId as string },
+      account: {
+        homePage: 'https://edusphere.io',
+        name: payload.userId as string,
+      },
     },
     verb: XAPI_VERBS[verbKey],
     object: {
       objectType: 'Activity',
       id: `https://edusphere.io/activities/${(payload.courseId ?? payload.sessionId ?? payload.id) as string}`,
-      definition: { name: { 'en-US': (payload.courseName ?? payload.title ?? subject) as string } },
+      definition: {
+        name: {
+          'en-US': (payload.courseName ?? payload.title ?? subject) as string,
+        },
+      },
     },
     context: { platform: 'EduSphere', language: 'en-US' },
     timestamp: new Date().toISOString(),
@@ -161,9 +197,11 @@ export function natsToXapiStatement(subject: string, payload: Record<string, unk
 ```
 
 **Modify: `apps/subgraph-content/src/xapi/xapi.module.ts`**
+
 - Add `XapiNatsBridgeService` + `XapiVerbMappings` to providers
 
 **Test: `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.spec.ts`** (NEW, ~80 lines)
+
 - Test: `natsToXapiStatement` maps `EDUSPHERE.course.completed` → verb `completed`
 - Test: `natsToXapiStatement` maps `EDUSPHERE.course.enrolled` → verb `registered`
 - Test: `listen` skips payloads missing `tenantId` or `userId`
@@ -183,7 +221,10 @@ Purpose: Export all xAPI statements for a tenant as JSON-LD (LRS export for comp
 ```typescript
 @Injectable()
 export class XapiExportService {
-  async exportStatements(tenantId: string, sinceDate?: string): Promise<XapiStatementResult[]> {
+  async exportStatements(
+    tenantId: string,
+    sinceDate?: string
+  ): Promise<XapiStatementResult[]> {
     // calls statementService.queryStatements with limit=10000 + sinceDate filter
     // returns array of xAPI statements in spec-compliant JSON-LD format
   }
@@ -192,24 +233,34 @@ export class XapiExportService {
 
 **Modify: `apps/subgraph-content/src/xapi/xapi.graphql`**
 Add:
+
 ```graphql
 extend type Query {
-  xapiStatementCount(since: String): Int! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  xapiStatementCount(since: String): Int!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 extend type Mutation {
-  revokeXapiToken(tokenId: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
-  clearXapiStatements(olderThanDays: Int!): Int! @authenticated @requiresRole(roles: [SUPER_ADMIN])
+  revokeXapiToken(tokenId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
+  clearXapiStatements(olderThanDays: Int!): Int!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN])
 }
 ```
 
 **Modify: `apps/subgraph-content/src/xapi/xapi.resolver.ts`**
+
 - Add resolvers for `xapiStatementCount`, `revokeXapiToken`, `clearXapiStatements`
 
 **Modify: `apps/gateway/supergraph.graphql`**
+
 - Add new fields to Query + Mutation type (pattern from Phase 38/40)
 
 **Test: `apps/subgraph-content/src/xapi/xapi-export.service.spec.ts`** (3 tests)
+
 - returns all statements for tenant
 - `since` filter limits results
 - empty array when no statements
@@ -235,14 +286,22 @@ export class GoogleDriveClient {
   /**
    * Exchange OAuth code for access_token (used in import wizard OAuth flow)
    */
-  async exchangeCode(code: string): Promise<string> { /* ... */ }
+  async exchangeCode(code: string): Promise<string> {
+    /* ... */
+  }
 
   /**
    * List files in a Drive folder (video + PDF + PPTX + DOCX)
    * Returns: { id, name, mimeType, size, webContentLink }[]
    */
-  async listFolderContents(folderId: string, accessToken: string): Promise<DriveFile[]> {
-    const drive = google.drive({ version: 'v3', auth: this.buildAuth(accessToken) });
+  async listFolderContents(
+    folderId: string,
+    accessToken: string
+  ): Promise<DriveFile[]> {
+    const drive = google.drive({
+      version: 'v3',
+      auth: this.buildAuth(accessToken),
+    });
     const res = await drive.files.list({
       q: `'${folderId}' in parents and mimeType != 'application/vnd.google-apps.folder'`,
       fields: 'files(id,name,mimeType,size,webContentLink)',
@@ -252,12 +311,14 @@ export class GoogleDriveClient {
   }
 
   /** Download file buffer for ingestion pipeline */
-  async downloadFile(fileId: string, accessToken: string): Promise<Buffer> { /* ... */ }
+  async downloadFile(fileId: string, accessToken: string): Promise<Buffer> {
+    /* ... */
+  }
 
   private buildAuth(accessToken: string) {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_CLIENT_SECRET
     );
     oauth2Client.setCredentials({ access_token: accessToken });
     return oauth2Client;
@@ -267,12 +328,13 @@ export class GoogleDriveClient {
 
 **Modify: `apps/subgraph-content/src/content-import/content-import.graphql`**
 Add:
+
 ```graphql
 input DriveImportInput {
-  folderId:  String!
-  courseId:  ID!
-  moduleId:  ID!
-  accessToken: String!   # short-lived OAuth token from frontend
+  folderId: String!
+  courseId: ID!
+  moduleId: ID!
+  accessToken: String! # short-lived OAuth token from frontend
 }
 
 extend type Mutation {
@@ -283,15 +345,19 @@ extend type Mutation {
 ```
 
 **Modify: `apps/subgraph-content/src/content-import/content-import.service.ts`**
+
 - Add `importFromDrive(input, tenantId, userId)` method (pattern identical to `importFromYoutube`)
 
 **Modify: `apps/subgraph-content/src/content-import/content-import.resolver.ts`**
+
 - Add `@Mutation('importFromDrive')` resolver
 
 **Modify: `apps/subgraph-content/src/content-import/content-import.module.ts`**
+
 - Add `GoogleDriveClient` to providers
 
 **Environment variables (add to `.env.example` + `docker-compose.yml`):**
+
 ```
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
@@ -299,6 +365,7 @@ GOOGLE_REDIRECT_URI=http://localhost:5173/oauth/google/callback
 ```
 
 **Test: `apps/subgraph-content/src/content-import/google-drive.client.spec.ts`** (4 tests)
+
 - `listFolderContents` filters only non-folder files
 - `downloadFile` returns Buffer
 - handles 403 (insufficient permissions) gracefully
@@ -319,6 +386,7 @@ GOOGLE_REDIRECT_URI=http://localhost:5173/oauth/google/callback
 ```
 
 **File: `apps/web/src/pages/OAuthCallbackPage.tsx`** (NEW, ~30 lines)
+
 ```tsx
 // Route: /oauth/google/callback?code=xxx
 // Reads code from URL params → postMessage({ type: 'GOOGLE_OAUTH_CODE', code }) to opener
@@ -326,27 +394,34 @@ GOOGLE_REDIRECT_URI=http://localhost:5173/oauth/google/callback
 ```
 
 **Modify: `apps/web/src/components/content-import/ImportSourceSelector.tsx`**
+
 - Add "Google Drive" option alongside YouTube + Website + Folder
 
 **Modify: `apps/web/src/hooks/useContentImport.ts`**
+
 - Add `importFromDrive(folderId, courseId, moduleId, accessToken)` method
 
 **Modify: `apps/web/src/lib/graphql/content-import.queries.ts`**
+
 - Add `IMPORT_FROM_DRIVE_MUTATION`
 
 **Modify: `apps/web/src/lib/router.tsx`**
+
 - Add `/oauth/google/callback` lazy route
 
 **Modify: `apps/gateway/supergraph.graphql`**
+
 - Add `importFromDrive` to Mutation type with `@join__field(graph: CONTENT)`
 
 **Test: `apps/web/src/components/content-import/DriveImportCard.test.tsx`** (4 tests)
+
 - renders "Connect Google Drive" button
 - shows folder ID input after OAuth connected
 - import button disabled when folder ID empty
 - import button calls mutation with folderId
 
 **Test: `apps/web/src/pages/OAuthCallbackPage.test.tsx`** (2 tests)
+
 - posts code to opener window
 - renders loading text while posting
 
@@ -386,10 +461,12 @@ export function initXapiQueue() {
 
 export function enqueueStatement(tenantId: string, stmt: object) {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  db.runSync(
-    'INSERT INTO xapi_queue VALUES (?, ?, ?, ?)',
-    [id, tenantId, JSON.stringify(stmt), Date.now()]
-  );
+  db.runSync('INSERT INTO xapi_queue VALUES (?, ?, ?, ?)', [
+    id,
+    tenantId,
+    JSON.stringify(stmt),
+    Date.now(),
+  ]);
 }
 
 export function getPendingStatements(limit = 50): QueuedStatement[] {
@@ -420,7 +497,12 @@ export function evictOldStatements() {
 
 ```typescript
 import NetInfo from '@react-native-community/netinfo';
-import { enqueueStatement, getPendingStatements, deleteStatements, evictOldStatements } from '../services/XapiOfflineQueue';
+import {
+  enqueueStatement,
+  getPendingStatements,
+  deleteStatements,
+  evictOldStatements,
+} from '../services/XapiOfflineQueue';
 
 export function useXapiTracking(tenantId: string | null) {
   const flush = async (lrsEndpoint: string, token: string) => {
@@ -428,7 +510,10 @@ export function useXapiTracking(tenantId: string | null) {
     if (batch.length === 0) return;
     const res = await fetch(`${lrsEndpoint}/xapi/statements`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(batch.map((s) => JSON.parse(s.payload))),
     });
     if (res.ok) {
@@ -439,8 +524,14 @@ export function useXapiTracking(tenantId: string | null) {
   const track = (verb: string, activityId: string, activityName: string) => {
     if (!tenantId) return;
     enqueueStatement(tenantId, {
-      actor: { objectType: 'Agent', account: { homePage: 'https://edusphere.io', name: tenantId } },
-      verb: { id: `http://adlnet.gov/expapi/verbs/${verb}`, display: { 'en-US': verb } },
+      actor: {
+        objectType: 'Agent',
+        account: { homePage: 'https://edusphere.io', name: tenantId },
+      },
+      verb: {
+        id: `http://adlnet.gov/expapi/verbs/${verb}`,
+        display: { 'en-US': verb },
+      },
       object: {
         objectType: 'Activity',
         id: `https://edusphere.io/activities/${activityId}`,
@@ -455,7 +546,8 @@ export function useXapiTracking(tenantId: string | null) {
   useEffect(() => {
     const unsub = NetInfo.addEventListener((state) => {
       if (state.isConnected && state.isInternetReachable) {
-        const endpoint = process.env.EXPO_PUBLIC_LRS_ENDPOINT ?? 'http://localhost:4002';
+        const endpoint =
+          process.env.EXPO_PUBLIC_LRS_ENDPOINT ?? 'http://localhost:4002';
         const token = process.env.EXPO_PUBLIC_LRS_TOKEN ?? '';
         void flush(endpoint, token);
       }
@@ -468,10 +560,12 @@ export function useXapiTracking(tenantId: string | null) {
 ```
 
 **Modify: `apps/mobile/src/screens/CourseViewerScreen.tsx`**
+
 - Add `const { track } = useXapiTracking(userId)`
 - Call `track('progressed', lesson.id, lesson.title)` when video advances 50%
 
 **Test: `apps/mobile/src/services/__tests__/XapiOfflineQueue.test.ts`** (pure logic, NO React)
+
 - `enqueueStatement` increases row count by 1
 - `getPendingStatements` returns ordered by created_at
 - `deleteStatements` removes correct rows
@@ -485,6 +579,7 @@ export function useXapiTracking(tenantId: string | null) {
 ### Agent-D1: E2E + Security Tests
 
 **File: `apps/web/e2e/xapi-settings.spec.ts`** (NEW, ~40 tests)
+
 - Login as ORG_ADMIN → `/xapi-settings` heading visible
 - Generate token button visible
 - Token count shows (mocked 0)
@@ -492,12 +587,14 @@ export function useXapiTracking(tenantId: string | null) {
 - STUDENT cannot access xapi-settings (redirect)
 
 **File: `apps/web/e2e/drive-import.spec.ts`** (NEW, ~15 tests)
+
 - `/courses/xxx/import` → Drive option visible in ImportSourceSelector
 - "Connect Google Drive" button visible
 - OAuth callback page loads without error
 - Role gate: STUDENT cannot access import page
 
 **Security tests (add to `tests/security/api-security.spec.ts`):**
+
 ```typescript
 describe('Phase 41: xAPI Security', () => {
   it('xapiStatements query requires ORG_ADMIN role', () => {
@@ -514,7 +611,9 @@ describe('Phase 41: xAPI Security', () => {
   it('NATS bridge skips events with missing tenantId', () => {
     // test that natsToXapiStatement does not throw on empty payload
     // and that bridge skips if tenantId is falsy
-    const stmt = natsToXapiStatement('EDUSPHERE.course.completed', { userId: 'u1' }); // no tenantId
+    const stmt = natsToXapiStatement('EDUSPHERE.course.completed', {
+      userId: 'u1',
+    }); // no tenantId
     expect(stmt).toBeTruthy(); // mapping itself is pure - bridge guard is tested in unit tests
   });
   it('Google Drive accessToken not stored in DB', () => {
@@ -528,6 +627,7 @@ describe('Phase 41: xAPI Security', () => {
 ### Agent-D2: Documentation
 
 **Update: `API_CONTRACTS_GRAPHQL_FEDERATION.md`**
+
 - Add Section 28 — Phase 41: xAPI Bridge + Drive Import
   - New mutations: `importFromDrive`, `revokeXapiToken`, `clearXapiStatements`
   - New query: `xapiStatementCount`
@@ -535,13 +635,16 @@ describe('Phase 41: xAPI Security', () => {
   - Mobile offline queue architecture note
 
 **Update: `OPEN_ISSUES.md`**
+
 - Add `FEAT-PHASE41-XAPI-DRIVE | 🟡 In Progress | HIGH` entry
 - Close with E2E file paths after Sprint D passes
 
 **Update: `CHANGELOG.md`**
+
 - Add `[0.41.0]` section
 
 **Update: `README.md`**
+
 - Phase 41 row in phase table
 - Test count update
 
@@ -549,13 +652,13 @@ describe('Phase 41: xAPI Security', () => {
 
 ## Environment Variables Added (Phase 41)
 
-| Variable | Service | Description |
-|----------|---------|-------------|
-| `GOOGLE_CLIENT_ID` | subgraph-content | Google OAuth2 client ID |
-| `GOOGLE_CLIENT_SECRET` | subgraph-content | Google OAuth2 client secret |
-| `GOOGLE_REDIRECT_URI` | subgraph-content | `http://localhost:5173/oauth/google/callback` |
-| `EXPO_PUBLIC_LRS_ENDPOINT` | apps/mobile | LRS REST URL (e.g., `http://localhost:4002`) |
-| `EXPO_PUBLIC_LRS_TOKEN` | apps/mobile | Bearer token for mobile→LRS POST |
+| Variable                   | Service          | Description                                   |
+| -------------------------- | ---------------- | --------------------------------------------- |
+| `GOOGLE_CLIENT_ID`         | subgraph-content | Google OAuth2 client ID                       |
+| `GOOGLE_CLIENT_SECRET`     | subgraph-content | Google OAuth2 client secret                   |
+| `GOOGLE_REDIRECT_URI`      | subgraph-content | `http://localhost:5173/oauth/google/callback` |
+| `EXPO_PUBLIC_LRS_ENDPOINT` | apps/mobile      | LRS REST URL (e.g., `http://localhost:4002`)  |
+| `EXPO_PUBLIC_LRS_TOKEN`    | apps/mobile      | Bearer token for mobile→LRS POST              |
 
 ---
 
@@ -582,37 +685,38 @@ Sprint D (after A+B+C):
 
 ## Critical File Paths
 
-| File | Status |
-|------|--------|
-| `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.ts` | NEW |
-| `apps/subgraph-content/src/xapi/xapi-verb-mappings.ts` | NEW |
-| `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.spec.ts` | NEW |
-| `apps/subgraph-content/src/xapi/xapi-export.service.ts` | NEW |
-| `apps/subgraph-content/src/xapi/xapi.graphql` | MODIFY — add 3 new fields |
-| `apps/subgraph-content/src/xapi/xapi.resolver.ts` | MODIFY — add 3 resolvers |
-| `apps/subgraph-content/src/xapi/xapi.module.ts` | MODIFY — add bridge + export |
-| `apps/subgraph-content/src/content-import/google-drive.client.ts` | NEW |
-| `apps/subgraph-content/src/content-import/content-import.graphql` | MODIFY — add DriveImportInput + mutation |
-| `apps/subgraph-content/src/content-import/content-import.service.ts` | MODIFY — add importFromDrive |
-| `apps/subgraph-content/src/content-import/content-import.resolver.ts` | MODIFY — add importFromDrive resolver |
-| `apps/subgraph-content/src/content-import/content-import.module.ts` | MODIFY — add GoogleDriveClient |
-| `apps/web/src/components/content-import/DriveImportCard.tsx` | NEW |
-| `apps/web/src/pages/OAuthCallbackPage.tsx` | NEW |
-| `apps/web/src/hooks/useContentImport.ts` | MODIFY — add importFromDrive |
-| `apps/web/src/lib/graphql/content-import.queries.ts` | MODIFY — add IMPORT_FROM_DRIVE_MUTATION |
-| `apps/web/src/lib/router.tsx` | MODIFY — add /oauth/google/callback route |
-| `apps/gateway/supergraph.graphql` | MODIFY — add all new fields |
-| `apps/mobile/src/services/XapiOfflineQueue.ts` | NEW |
-| `apps/mobile/src/hooks/useXapiTracking.ts` | NEW |
-| `apps/mobile/src/services/__tests__/XapiOfflineQueue.test.ts` | NEW |
-| `apps/web/e2e/xapi-settings.spec.ts` | NEW |
-| `apps/web/e2e/drive-import.spec.ts` | NEW |
+| File                                                                  | Status                                    |
+| --------------------------------------------------------------------- | ----------------------------------------- |
+| `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.ts`          | NEW                                       |
+| `apps/subgraph-content/src/xapi/xapi-verb-mappings.ts`                | NEW                                       |
+| `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.spec.ts`     | NEW                                       |
+| `apps/subgraph-content/src/xapi/xapi-export.service.ts`               | NEW                                       |
+| `apps/subgraph-content/src/xapi/xapi.graphql`                         | MODIFY — add 3 new fields                 |
+| `apps/subgraph-content/src/xapi/xapi.resolver.ts`                     | MODIFY — add 3 resolvers                  |
+| `apps/subgraph-content/src/xapi/xapi.module.ts`                       | MODIFY — add bridge + export              |
+| `apps/subgraph-content/src/content-import/google-drive.client.ts`     | NEW                                       |
+| `apps/subgraph-content/src/content-import/content-import.graphql`     | MODIFY — add DriveImportInput + mutation  |
+| `apps/subgraph-content/src/content-import/content-import.service.ts`  | MODIFY — add importFromDrive              |
+| `apps/subgraph-content/src/content-import/content-import.resolver.ts` | MODIFY — add importFromDrive resolver     |
+| `apps/subgraph-content/src/content-import/content-import.module.ts`   | MODIFY — add GoogleDriveClient            |
+| `apps/web/src/components/content-import/DriveImportCard.tsx`          | NEW                                       |
+| `apps/web/src/pages/OAuthCallbackPage.tsx`                            | NEW                                       |
+| `apps/web/src/hooks/useContentImport.ts`                              | MODIFY — add importFromDrive              |
+| `apps/web/src/lib/graphql/content-import.queries.ts`                  | MODIFY — add IMPORT_FROM_DRIVE_MUTATION   |
+| `apps/web/src/lib/router.tsx`                                         | MODIFY — add /oauth/google/callback route |
+| `apps/gateway/supergraph.graphql`                                     | MODIFY — add all new fields               |
+| `apps/mobile/src/services/XapiOfflineQueue.ts`                        | NEW                                       |
+| `apps/mobile/src/hooks/useXapiTracking.ts`                            | NEW                                       |
+| `apps/mobile/src/services/__tests__/XapiOfflineQueue.test.ts`         | NEW                                       |
+| `apps/web/e2e/xapi-settings.spec.ts`                                  | NEW                                       |
+| `apps/web/e2e/drive-import.spec.ts`                                   | NEW                                       |
 
 ---
 
 ## Verification
 
 ### After Sprint A
+
 ```bash
 # NATS bridge in module:
 grep "XapiNatsBridgeService" apps/subgraph-content/src/xapi/xapi.module.ts  # → 1 match
@@ -625,6 +729,7 @@ grep "revokeXapiToken\|xapiStatementCount" apps/gateway/supergraph.graphql  # �
 ```
 
 ### After Sprint B
+
 ```bash
 # Drive mutation in supergraph:
 grep "importFromDrive" apps/gateway/supergraph.graphql  # → 1 match
@@ -637,6 +742,7 @@ grep -r "INSERT.*access" apps/subgraph-content/src/content-import/  # → 0 matc
 ```
 
 ### After Sprint C
+
 ```bash
 # Mobile offline queue tests:
 npx vitest run apps/mobile/src/services/__tests__/XapiOfflineQueue.test.ts  # → 5 pass
@@ -646,6 +752,7 @@ npx vitest run apps/mobile/src/services/__tests__/XapiOfflineQueue.test.ts  # �
 ```
 
 ### After Sprint D (Full Gate)
+
 ```bash
 pnpm turbo test           # all pass
 pnpm turbo typecheck      # 0 errors
@@ -658,32 +765,32 @@ pnpm test:security        # 970+ pass
 
 ## Expected Test Delta
 
-| Package | Before | After | Delta |
-|---------|--------|-------|-------|
-| Web unit | 3,924 | ~3,960+ | +36 (Drive import UI, OAuth callback) |
-| E2E specs | ~97 | ~109 | +12 (xapi-settings, drive-import) |
-| Security | 970 | ~975 | +5 (xAPI security checks) |
-| subgraph-content | 1,132 | ~1,165 | +33 (bridge, export, drive client) |
-| Mobile (pure logic) | existing | +5 | (xAPI offline queue logic) |
+| Package             | Before   | After   | Delta                                 |
+| ------------------- | -------- | ------- | ------------------------------------- |
+| Web unit            | 3,924    | ~3,960+ | +36 (Drive import UI, OAuth callback) |
+| E2E specs           | ~97      | ~109    | +12 (xapi-settings, drive-import)     |
+| Security            | 970      | ~975    | +5 (xAPI security checks)             |
+| subgraph-content    | 1,132    | ~1,165  | +33 (bridge, export, drive client)    |
+| Mobile (pure logic) | existing | +5      | (xAPI offline queue logic)            |
 
 ---
 
 ## Memory Safety Checklist
 
-| Component | Rule | Implementation |
-|-----------|------|----------------|
+| Component               | Rule                 | Implementation                                               |
+| ----------------------- | -------------------- | ------------------------------------------------------------ |
 | `XapiNatsBridgeService` | Subscription cleanup | `this.subs.map((s) => s.unsubscribe())` in `onModuleDestroy` |
-| `useXapiTracking` | NetInfo listener | `return () => unsub()` in `useEffect` cleanup |
-| `XapiOfflineQueue` | Max rows | `evictOldStatements()` caps at 500 after every insert |
-| `GoogleDriveClient` | No token storage | `accessToken` used in-flight only, never persisted |
+| `useXapiTracking`       | NetInfo listener     | `return () => unsub()` in `useEffect` cleanup                |
+| `XapiOfflineQueue`      | Max rows             | `evictOldStatements()` caps at 500 after every insert        |
+| `GoogleDriveClient`     | No token storage     | `accessToken` used in-flight only, never persisted           |
 
 ---
 
 ## Security Invariants
 
-| Check | Rule |
-|-------|------|
-| xAPI token hash | `createHash('sha256')` only — raw token never stored (SI-3) |
-| Drive accessToken | In-memory only, never inserted into DB, never logged |
-| NATS bridge: missing tenantId | `if (!tenantId) continue` — skip unauthenticated payloads |
-| xAPI admin routes | `@requiresRole(roles: [ORG_ADMIN])` on all xAPI management mutations |
+| Check                         | Rule                                                                 |
+| ----------------------------- | -------------------------------------------------------------------- |
+| xAPI token hash               | `createHash('sha256')` only — raw token never stored (SI-3)          |
+| Drive accessToken             | In-memory only, never inserted into DB, never logged                 |
+| NATS bridge: missing tenantId | `if (!tenantId) continue` — skip unauthenticated payloads            |
+| xAPI admin routes             | `@requiresRole(roles: [ORG_ADMIN])` on all xAPI management mutations |

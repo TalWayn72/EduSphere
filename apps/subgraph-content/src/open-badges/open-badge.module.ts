@@ -10,7 +10,12 @@ import { GraphGroundedCredentialService } from '../certificate/graph-credential.
 
 @Module({
   controllers: [OpenBadgeController],
-  providers: [OpenBadgeService, OpenBadgeQueryService, OpenBadgeResolver, GraphGroundedCredentialService],
+  providers: [
+    OpenBadgeService,
+    OpenBadgeQueryService,
+    OpenBadgeResolver,
+    GraphGroundedCredentialService,
+  ],
   exports: [OpenBadgeService, GraphGroundedCredentialService],
 })
 export class OpenBadgeModule {}

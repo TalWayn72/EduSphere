@@ -26,7 +26,12 @@ function maskKey(key: string): string {
   return `${key.slice(0, 8)}${'•'.repeat(Math.max(0, key.length - 8))}`;
 }
 
-export function ApiKeySection({ currentKey, showPlain, onRegenerate, regenerating }: Props) {
+export function ApiKeySection({
+  currentKey,
+  showPlain,
+  onRegenerate,
+  regenerating,
+}: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleConfirm = () => {
@@ -37,10 +42,15 @@ export function ApiKeySection({ currentKey, showPlain, onRegenerate, regeneratin
   return (
     <>
       <Card data-testid="api-key-section">
-        <CardHeader><CardTitle>Your API Key</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Your API Key</CardTitle>
+        </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3">
-            <code className="flex-1 rounded bg-muted px-4 py-2 font-mono text-sm" data-testid="api-key-display">
+            <code
+              className="flex-1 rounded bg-muted px-4 py-2 font-mono text-sm"
+              data-testid="api-key-display"
+            >
               {showPlain ? currentKey : maskKey(currentKey)}
             </code>
             <Button
@@ -54,15 +64,25 @@ export function ApiKeySection({ currentKey, showPlain, onRegenerate, regeneratin
             </Button>
           </div>
           {showPlain && (
-            <p className="mt-2 text-xs text-amber-600 font-medium dark:text-amber-400" data-testid="new-key-notice">
-              Copy this key now — it will not be shown again after you leave this page.
+            <p
+              className="mt-2 text-xs text-amber-600 font-medium dark:text-amber-400"
+              data-testid="new-key-notice"
+            >
+              Copy this key now — it will not be shown again after you leave
+              this page.
             </p>
           )}
           <div className="mt-4 flex gap-4 text-sm">
-            <a href="/api/v1/partner/usage" className="text-primary underline underline-offset-2">
+            <a
+              href="/api/v1/partner/usage"
+              className="text-primary underline underline-offset-2"
+            >
               /api/v1/partner/usage
             </a>
-            <Link to="/docs/partner-api" className="text-primary underline underline-offset-2">
+            <Link
+              to="/docs/partner-api"
+              className="text-primary underline underline-offset-2"
+            >
               API Documentation
             </Link>
           </div>
@@ -74,12 +94,19 @@ export function ApiKeySection({ currentKey, showPlain, onRegenerate, regeneratin
           <DialogHeader>
             <DialogTitle>Regenerate API Key?</DialogTitle>
             <DialogDescription>
-              This will permanently invalidate your current key. All integrations using the old key will stop working immediately.
+              This will permanently invalidate your current key. All
+              integrations using the old key will stop working immediately.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleConfirm} data-testid="confirm-regenerate-btn">
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              data-testid="confirm-regenerate-btn"
+            >
               Regenerate Key
             </Button>
           </DialogFooter>

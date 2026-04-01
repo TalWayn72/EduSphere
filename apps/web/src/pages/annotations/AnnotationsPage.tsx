@@ -85,7 +85,11 @@ export function AnnotationsPage() {
       removeOptimisticAnnotation(idToDelete);
       const { error: deleteErr } = await executeDelete({ id: idToDelete });
       if (deleteErr) {
-        console.error('[AnnotationsPage] delete annotation failed:', deleteErr.message, deleteErr);
+        console.error(
+          '[AnnotationsPage] delete annotation failed:',
+          deleteErr.message,
+          deleteErr
+        );
         toast.error(t('deleteError', 'Failed to delete annotation'));
         return;
       }
@@ -108,7 +112,9 @@ export function AnnotationsPage() {
     <Layout>
       <DeleteConfirmDialog
         open={pendingDeleteId !== null}
-        onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteId(null);
+        }}
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
       />
@@ -124,15 +130,27 @@ export function AnnotationsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">{t('title')}</h1>
-            <p className="text-sm text-muted-foreground">{t('subtitle', { count: total })}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('subtitle', { count: total })}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">{t('sort')}:</span>
-            <Button variant={sortBy === 'time' ? 'default' : 'ghost'} size="sm" className="h-7 text-xs" onClick={() => setSortBy('time')}>
+            <Button
+              variant={sortBy === 'time' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSortBy('time')}
+            >
               {t('sortByTime')}
             </Button>
-            <Button variant={sortBy === 'layer' ? 'default' : 'ghost'} size="sm" className="h-7 text-xs" onClick={() => setSortBy('layer')}>
+            <Button
+              variant={sortBy === 'layer' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSortBy('layer')}
+            >
               {t('sortByLayer')}
             </Button>
           </div>
@@ -143,10 +161,28 @@ export function AnnotationsPage() {
             const meta = ANNOTATION_LAYER_META[layer];
             const isSelected = activeTab === layer;
             return (
-              <Card key={layer} role="button" tabIndex={0} aria-pressed={isSelected} onClick={() => setActiveTab(layer)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActiveTab(layer); }} className={['border cursor-pointer transition-all select-none', meta.bg, isSelected ? 'ring-2 ring-offset-2 ring-primary shadow-md' : 'hover:shadow-sm hover:brightness-95'].join(' ')}>
+              <Card
+                key={layer}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
+                onClick={() => setActiveTab(layer)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') setActiveTab(layer);
+                }}
+                className={[
+                  'border cursor-pointer transition-all select-none',
+                  meta.bg,
+                  isSelected
+                    ? 'ring-2 ring-offset-2 ring-primary shadow-md'
+                    : 'hover:shadow-sm hover:brightness-95',
+                ].join(' ')}
+              >
                 <CardContent className="p-3 text-center">
                   <p className="text-2xl">{meta.icon}</p>
-                  <p className={`text-lg font-bold ${meta.color}`}>{counts[layer] ?? 0}</p>
+                  <p className={`text-lg font-bold ${meta.color}`}>
+                    {counts[layer] ?? 0}
+                  </p>
                   <p className="text-xs text-muted-foreground">{meta.label}</p>
                 </CardContent>
               </Card>
@@ -156,7 +192,9 @@ export function AnnotationsPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="all">{t('all')} ({total})</TabsTrigger>
+            <TabsTrigger value="all">
+              {t('all')} ({total})
+            </TabsTrigger>
             {ALL_LAYERS.map((layer) => (
               <TabsTrigger key={layer} value={layer}>
                 {ANNOTATION_LAYER_META[layer].icon}{' '}
@@ -167,11 +205,18 @@ export function AnnotationsPage() {
 
           <TabsContent value="all" className="mt-4">
             {sorted(annotations).length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground py-12">{t('noAnnotations')}</p>
+              <p className="text-center text-sm text-muted-foreground py-12">
+                {t('noAnnotations')}
+              </p>
             ) : (
               <div className="grid md:grid-cols-2 gap-3">
                 {sorted(annotations).map((ann) => (
-                  <AnnotationItem key={ann.id} ann={ann} onSeek={handleSeek} onDeleteRequest={(id) => setPendingDeleteId(id)} />
+                  <AnnotationItem
+                    key={ann.id}
+                    ann={ann}
+                    onSeek={handleSeek}
+                    onDeleteRequest={(id) => setPendingDeleteId(id)}
+                  />
                 ))}
               </div>
             )}
@@ -180,12 +225,21 @@ export function AnnotationsPage() {
           {ALL_LAYERS.map((layer) => (
             <TabsContent key={layer} value={layer} className="mt-4">
               <div className="grid md:grid-cols-2 gap-3">
-                {sorted(annotations.filter((a) => a.layer === layer)).map((ann) => (
-                  <AnnotationItem key={ann.id} ann={ann} onSeek={handleSeek} onDeleteRequest={(id) => setPendingDeleteId(id)} />
-                ))}
+                {sorted(annotations.filter((a) => a.layer === layer)).map(
+                  (ann) => (
+                    <AnnotationItem
+                      key={ann.id}
+                      ann={ann}
+                      onSeek={handleSeek}
+                      onDeleteRequest={(id) => setPendingDeleteId(id)}
+                    />
+                  )
+                )}
                 {annotations.filter((a) => a.layer === layer).length === 0 && (
                   <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
-                    {t('noLayerAnnotations', { layer: ANNOTATION_LAYER_META[layer].label.toLowerCase() })}
+                    {t('noLayerAnnotations', {
+                      layer: ANNOTATION_LAYER_META[layer].label.toLowerCase(),
+                    })}
                   </p>
                 )}
               </div>

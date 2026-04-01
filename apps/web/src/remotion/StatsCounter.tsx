@@ -1,4 +1,10 @@
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
+import {
+  AbsoluteFill,
+  useCurrentFrame,
+  useVideoConfig,
+  spring,
+  interpolate,
+} from 'remotion';
 
 interface StatsCounterProps {
   targetValue?: number;
@@ -20,7 +26,9 @@ export function StatsCounter({
     config: { damping: 20, stiffness: 80, mass: 1 },
   });
 
-  const displayValue = Math.round(interpolate(progress, [0, 1], [0, targetValue]));
+  const displayValue = Math.round(
+    interpolate(progress, [0, 1], [0, targetValue])
+  );
 
   const formatted = new Intl.NumberFormat('en-US').format(displayValue);
 

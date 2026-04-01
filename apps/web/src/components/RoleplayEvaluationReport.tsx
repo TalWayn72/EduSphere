@@ -61,7 +61,9 @@ function ScoreRing({ score }: { score: number }) {
         <span className="text-3xl font-bold text-white dark:text-white">
           {Math.round(score)}
         </span>
-        <span className="text-gray-300 text-xs block dark:text-gray-600">/ 100</span>
+        <span className="text-gray-300 text-xs block dark:text-gray-600">
+          / 100
+        </span>
       </div>
     </div>
   );
@@ -78,8 +80,12 @@ export function RoleplayEvaluationReport({
       <div className="max-w-2xl mx-auto px-6 py-10 space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h2 className="text-white text-2xl font-bold dark:text-white">Session Complete</h2>
-          <p className="text-gray-300 text-sm dark:text-gray-600">{scenarioTitle}</p>
+          <h2 className="text-white text-2xl font-bold dark:text-white">
+            Session Complete
+          </h2>
+          <p className="text-gray-300 text-sm dark:text-gray-600">
+            {scenarioTitle}
+          </p>
         </div>
 
         {/* Overall score */}
@@ -96,9 +102,14 @@ export function RoleplayEvaluationReport({
             Criteria Breakdown
           </h3>
           {evaluation.criteriaScores.map((c) => (
-            <div key={c.name} className="bg-gray-900 rounded-xl p-4 space-y-2 dark:bg-gray-100">
+            <div
+              key={c.name}
+              className="bg-gray-900 rounded-xl p-4 space-y-2 dark:bg-gray-100"
+            >
               <div className="flex items-center justify-between">
-                <span className="text-white text-sm font-medium dark:text-white">{c.name}</span>
+                <span className="text-white text-sm font-medium dark:text-white">
+                  {c.name}
+                </span>
                 <span className="text-gray-300 text-sm font-bold dark:text-gray-600">
                   {Math.round(c.score)}%
                 </span>
@@ -109,7 +120,9 @@ export function RoleplayEvaluationReport({
                   style={{ width: `${c.score}%` }}
                 />
               </div>
-              <p className="text-gray-300 text-xs dark:text-gray-600">{c.feedback}</p>
+              <p className="text-gray-300 text-xs dark:text-gray-600">
+                {c.feedback}
+              </p>
             </div>
           ))}
         </div>
@@ -118,7 +131,8 @@ export function RoleplayEvaluationReport({
         {evaluation.strengths.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-white font-semibold text-sm uppercase tracking-wide flex items-center gap-2 dark:text-white">
-              <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" /> Strengths
+              <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />{' '}
+              Strengths
             </h3>
             <ul className="space-y-1">
               {evaluation.strengths.map((s, i) => (
@@ -126,7 +140,10 @@ export function RoleplayEvaluationReport({
                   key={i}
                   className="text-gray-300 text-sm flex items-start gap-2 dark:text-gray-600"
                 >
-                  <span className="text-green-500 mt-0.5 dark:text-green-400">✓</span> {s}
+                  <span className="text-green-500 mt-0.5 dark:text-green-400">
+                    ✓
+                  </span>{' '}
+                  {s}
                 </li>
               ))}
             </ul>
@@ -137,8 +154,8 @@ export function RoleplayEvaluationReport({
         {evaluation.areasForImprovement.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-white font-semibold text-sm uppercase tracking-wide flex items-center gap-2 dark:text-white">
-              <TrendingUp className="h-4 w-4 text-orange-500 dark:text-orange-400" /> Areas for
-              Improvement
+              <TrendingUp className="h-4 w-4 text-orange-500 dark:text-orange-400" />{' '}
+              Areas for Improvement
             </h3>
             <ul className="space-y-1">
               {evaluation.areasForImprovement.map((a, i) => (
@@ -146,7 +163,10 @@ export function RoleplayEvaluationReport({
                   key={i}
                   className="text-gray-300 text-sm flex items-start gap-2 dark:text-gray-600"
                 >
-                  <span className="text-orange-400 mt-0.5 dark:text-orange-400">→</span> {a}
+                  <span className="text-orange-400 mt-0.5 dark:text-orange-400">
+                    →
+                  </span>{' '}
+                  {a}
                 </li>
               ))}
             </ul>

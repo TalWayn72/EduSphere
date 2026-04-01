@@ -8,12 +8,28 @@ import React from 'react';
 
 // ── Mock heavy dependencies so we don't need to render full React trees ──────
 vi.mock('@/components/ProtectedRoute', () => ({
-  ProtectedRoute: ({ children, requiredRoles }: { children: React.ReactNode; requiredRoles?: string[] }) =>
-    React.createElement('div', { 'data-testid': 'protected-route', 'data-roles': requiredRoles?.join(',') }, children),
+  ProtectedRoute: ({
+    children,
+    requiredRoles,
+  }: {
+    children: React.ReactNode;
+    requiredRoles?: string[];
+  }) =>
+    React.createElement(
+      'div',
+      {
+        'data-testid': 'protected-route',
+        'data-roles': requiredRoles?.join(','),
+      },
+      children
+    ),
 }));
 vi.mock('@/components/LoadingSpinner', () => ({
   LoadingSpinner: ({ containerHeight }: { containerHeight?: string }) =>
-    React.createElement('div', { 'data-testid': 'loading-spinner', 'data-height': containerHeight }),
+    React.createElement('div', {
+      'data-testid': 'loading-spinner',
+      'data-height': containerHeight,
+    }),
 }));
 vi.mock('@/components/ErrorBoundary', () => ({
   ErrorBoundary: ({ children }: { children: React.ReactNode }) =>
@@ -58,7 +74,9 @@ describe('helpers.tsx', () => {
 
     it('accepts options with requiredRoles', () => {
       const child = React.createElement('span', null, 'admin-page');
-      const result = guarded(child, { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] });
+      const result = guarded(child, {
+        requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
+      });
       expect(React.isValidElement(result)).toBe(true);
     });
 

@@ -68,7 +68,11 @@ export function AgentStudioPage() {
             data-testid="save-workflow-btn"
           >
             <Save className="h-4 w-4 mr-1" />
-            {saveStatus === 'saving' ? 'Saving\u2026' : saveStatus === 'saved' ? 'Saved \u2713' : t('save', 'Save')}
+            {saveStatus === 'saving'
+              ? 'Saving\u2026'
+              : saveStatus === 'saved'
+                ? 'Saved \u2713'
+                : t('save', 'Save')}
           </Button>
           <Button
             size="sm"

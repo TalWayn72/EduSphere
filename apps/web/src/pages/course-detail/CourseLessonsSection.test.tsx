@@ -16,8 +16,12 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 import React from 'react';
@@ -34,7 +38,11 @@ describe('CourseLessonsSection', () => {
   it('renders lesson titles', () => {
     render(
       <MemoryRouter>
-        <CourseLessonsSection courseId="c-1" lessons={lessons} canEdit={false} />
+        <CourseLessonsSection
+          courseId="c-1"
+          lessons={lessons}
+          canEdit={false}
+        />
       </MemoryRouter>
     );
     expect(screen.getByText('Lesson 1')).toBeInTheDocument();
@@ -44,7 +52,11 @@ describe('CourseLessonsSection', () => {
   it('renders status badges', () => {
     render(
       <MemoryRouter>
-        <CourseLessonsSection courseId="c-1" lessons={lessons} canEdit={false} />
+        <CourseLessonsSection
+          courseId="c-1"
+          lessons={lessons}
+          canEdit={false}
+        />
       </MemoryRouter>
     );
     expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
@@ -63,7 +75,11 @@ describe('CourseLessonsSection', () => {
   it('hides add lesson button when canEdit is false', () => {
     render(
       <MemoryRouter>
-        <CourseLessonsSection courseId="c-1" lessons={lessons} canEdit={false} />
+        <CourseLessonsSection
+          courseId="c-1"
+          lessons={lessons}
+          canEdit={false}
+        />
       </MemoryRouter>
     );
     expect(screen.queryByText(/addLesson/)).not.toBeInTheDocument();
@@ -90,7 +106,11 @@ describe('CourseLessonsSection', () => {
   it('navigates to lesson on click', () => {
     render(
       <MemoryRouter>
-        <CourseLessonsSection courseId="c-1" lessons={lessons} canEdit={false} />
+        <CourseLessonsSection
+          courseId="c-1"
+          lessons={lessons}
+          canEdit={false}
+        />
       </MemoryRouter>
     );
     fireEvent.click(screen.getByText('Lesson 1'));

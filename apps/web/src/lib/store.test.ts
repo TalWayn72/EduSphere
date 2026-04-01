@@ -102,10 +102,18 @@ describe('useDocumentUIStore', () => {
   });
 
   it('setDefaultAnnotationLayer updates defaultAnnotationLayer', () => {
-    useDocumentUIStore.getState().setDefaultAnnotationLayer(AnnotationLayer.INSTRUCTOR);
-    expect(useDocumentUIStore.getState().defaultAnnotationLayer).toBe(AnnotationLayer.INSTRUCTOR);
+    useDocumentUIStore
+      .getState()
+      .setDefaultAnnotationLayer(AnnotationLayer.INSTRUCTOR);
+    expect(useDocumentUIStore.getState().defaultAnnotationLayer).toBe(
+      AnnotationLayer.INSTRUCTOR
+    );
 
-    useDocumentUIStore.getState().setDefaultAnnotationLayer(AnnotationLayer.AI_GENERATED);
-    expect(useDocumentUIStore.getState().defaultAnnotationLayer).toBe(AnnotationLayer.AI_GENERATED);
+    useDocumentUIStore
+      .getState()
+      .setDefaultAnnotationLayer(AnnotationLayer.AI_GENERATED);
+    expect(useDocumentUIStore.getState().defaultAnnotationLayer).toBe(
+      AnnotationLayer.AI_GENERATED
+    );
   });
 });

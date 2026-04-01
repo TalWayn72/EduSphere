@@ -26,7 +26,9 @@ const UPDATE_LOCALE_MUTATION = gql`
   mutation UpdateUserPreferences($input: UpdateUserPreferencesInput!) {
     updateUserPreferences(input: $input) {
       id
-      preferences { locale }
+      preferences {
+        locale
+      }
     }
   }
 `;
@@ -49,7 +51,7 @@ export default function SettingsScreen() {
         setSyncing(false);
       }
     },
-    [updateLocale],
+    [updateLocale]
   );
 
   return (
@@ -57,7 +59,9 @@ export default function SettingsScreen() {
       <ScrollView>
         {/* Language section */}
         <Text style={styles.sectionTitle}>{t('language.title')}</Text>
-        <Text style={styles.sectionDescription}>{t('language.description')}</Text>
+        <Text style={styles.sectionDescription}>
+          {t('language.description')}
+        </Text>
         <FlatList
           data={[...SUPPORTED_LOCALES]}
           keyExtractor={(item) => item}
@@ -75,23 +79,38 @@ export default function SettingsScreen() {
               >
                 <Text style={styles.flag}>{info.flag}</Text>
                 <View style={styles.textContainer}>
-                  <Text style={[styles.nativeLabel, isSelected && styles.selectedText]}>
+                  <Text
+                    style={[
+                      styles.nativeLabel,
+                      isSelected && styles.selectedText,
+                    ]}
+                  >
                     {info.native}
                   </Text>
                   <Text style={styles.englishLabel}>{info.english}</Text>
                 </View>
                 {isSelected && syncing && (
-                  <ActivityIndicator size="small" color={COLORS.primary} style={styles.syncIndicator} />
+                  <ActivityIndicator
+                    size="small"
+                    color={COLORS.primary}
+                    style={styles.syncIndicator}
+                  />
                 )}
-                {isSelected && !syncing && <Text style={styles.checkmark}>&#x2713;</Text>}
+                {isSelected && !syncing && (
+                  <Text style={styles.checkmark}>&#x2713;</Text>
+                )}
               </TouchableOpacity>
             );
           }}
         />
 
         {/* Offline storage section */}
-        <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>{t('storage.title')}</Text>
-        <Text style={styles.sectionDescription}>{t('storage.description')}</Text>
+        <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
+          {t('storage.title')}
+        </Text>
+        <Text style={styles.sectionDescription}>
+          {t('storage.description')}
+        </Text>
         <StorageSection />
 
         {/* WiFi-only download section */}

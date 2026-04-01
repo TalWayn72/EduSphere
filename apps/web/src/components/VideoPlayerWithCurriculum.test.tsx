@@ -29,7 +29,9 @@ const MOCK_CURRICULUM = [
   },
 ];
 
-function renderComponent(overrides: Partial<Parameters<typeof VideoPlayerWithCurriculum>[0]> = {}) {
+function renderComponent(
+  overrides: Partial<Parameters<typeof VideoPlayerWithCurriculum>[0]> = {}
+) {
   const onLessonSelect = vi.fn();
   const props = {
     courseTitle: 'React Mastery',
@@ -81,14 +83,18 @@ describe('VideoPlayerWithCurriculum', () => {
   it('shows correct progress count in sidebar', () => {
     renderComponent();
     // 1 completed out of 3 total
-    expect(screen.getByTestId('progress-count')).toHaveTextContent('1 of 3 lessons completed');
+    expect(screen.getByTestId('progress-count')).toHaveTextContent(
+      '1 of 3 lessons completed'
+    );
   });
 
   it('renders completed icon for completed lessons', () => {
     renderComponent();
     // l1 is completed — should render CheckCircle2
     const l1Item = screen.getByTestId('lesson-item-l1');
-    expect(l1Item.querySelector('[data-testid="icon-check-circle"]')).toBeInTheDocument();
+    expect(
+      l1Item.querySelector('[data-testid="icon-check-circle"]')
+    ).toBeInTheDocument();
   });
 
   it('renders prev and next lesson buttons', () => {
@@ -99,7 +105,9 @@ describe('VideoPlayerWithCurriculum', () => {
 
   it('shows the course title in the sidebar', () => {
     renderComponent();
-    expect(screen.getByTestId('course-title')).toHaveTextContent('React Mastery');
+    expect(screen.getByTestId('course-title')).toHaveTextContent(
+      'React Mastery'
+    );
   });
 
   it('has all required data-testid attributes', () => {
@@ -117,7 +125,8 @@ describe('VideoPlayerWithCurriculum', () => {
 // ── Captions / WCAG 1.2.2 ─────────────────────────────────────────────────────
 
 describe('VideoPlayerWithCurriculum — captions (WCAG 1.2.2)', () => {
-  const CAPTIONS_URL = 'https://minio.example.com/captions/tenant/course/asset/en.vtt';
+  const CAPTIONS_URL =
+    'https://minio.example.com/captions/tenant/course/asset/en.vtt';
 
   function renderWithCaptions(captionsUrl?: string) {
     return render(
@@ -174,26 +183,38 @@ describe('VideoPlayerWithCurriculum — captions (WCAG 1.2.2)', () => {
   it('CC button aria-pressed toggles to false after click', () => {
     renderWithCaptions(CAPTIONS_URL);
     const btn = screen.getByTestId('cc-toggle-btn');
-    act(() => { fireEvent.click(btn); });
+    act(() => {
+      fireEvent.click(btn);
+    });
     expect(btn).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('CC button aria-pressed toggles back to true on second click', () => {
     renderWithCaptions(CAPTIONS_URL);
     const btn = screen.getByTestId('cc-toggle-btn');
-    act(() => { fireEvent.click(btn); });
-    act(() => { fireEvent.click(btn); });
+    act(() => {
+      fireEvent.click(btn);
+    });
+    act(() => {
+      fireEvent.click(btn);
+    });
     expect(btn).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('track has srcLang defaulting to "en"', () => {
     renderWithCaptions(CAPTIONS_URL);
-    expect(screen.getByTestId('captions-track')).toHaveAttribute('srclang', 'en');
+    expect(screen.getByTestId('captions-track')).toHaveAttribute(
+      'srclang',
+      'en'
+    );
   });
 
   it('track has label defaulting to "English"', () => {
     renderWithCaptions(CAPTIONS_URL);
-    expect(screen.getByTestId('captions-track')).toHaveAttribute('label', 'English');
+    expect(screen.getByTestId('captions-track')).toHaveAttribute(
+      'label',
+      'English'
+    );
   });
 
   it('video element has crossOrigin=anonymous when captionsUrl is provided', () => {

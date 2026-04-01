@@ -54,7 +54,9 @@ export async function runLangGraphDebate(
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createDebateWorkflow(undefined, locale);
   type DebateCompileOpts = Parameters<typeof workflow.compile>[0];
-  const compiled = workflow.compile({ checkpointer: cp } as unknown as DebateCompileOpts);
+  const compiled = workflow.compile({
+    checkpointer: cp,
+  } as unknown as DebateCompileOpts);
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -89,9 +91,9 @@ export async function runLangGraphQuiz(
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createQuizWorkflow(undefined, locale);
   type QuizCompileOpts = Parameters<typeof workflow.compile>[0];
-  const compiled = workflow.compile(
-    { checkpointer: cp } as unknown as QuizCompileOpts
-  );
+  const compiled = workflow.compile({
+    checkpointer: cp,
+  } as unknown as QuizCompileOpts);
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -132,9 +134,9 @@ export async function runLangGraphTutor(
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createTutorWorkflow(undefined, locale, tools);
   type TutorCompileOpts = Parameters<typeof workflow.compile>[0];
-  const compiled = workflow.compile(
-    { checkpointer: cp } as unknown as TutorCompileOpts
-  );
+  const compiled = workflow.compile({
+    checkpointer: cp,
+  } as unknown as TutorCompileOpts);
 
   const state = {
     question: message,
@@ -173,9 +175,9 @@ export async function runLangGraphAssessment(
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createAssessmentWorkflow(undefined, locale);
   type AssessmentCompileOpts = Parameters<typeof workflow.compile>[0];
-  const compiled = workflow.compile(
-    { checkpointer: cp } as unknown as AssessmentCompileOpts
-  );
+  const compiled = workflow.compile({
+    checkpointer: cp,
+  } as unknown as AssessmentCompileOpts);
 
   const submission = {
     questionId: 'q1',

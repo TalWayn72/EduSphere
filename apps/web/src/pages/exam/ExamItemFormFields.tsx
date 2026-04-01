@@ -45,7 +45,12 @@ const QUESTION_TYPES = [
 export interface ExamItemFormData {
   domain: string;
   bloomLevel: BloomLevel;
-  questionType: 'MULTIPLE_CHOICE' | 'DRAG_ORDER' | 'HOTSPOT' | 'MATCHING' | 'FILL_BLANK';
+  questionType:
+    | 'MULTIPLE_CHOICE'
+    | 'DRAG_ORDER'
+    | 'HOTSPOT'
+    | 'MATCHING'
+    | 'FILL_BLANK';
   questionText: string;
   difficulty: 'easy' | 'medium' | 'hard';
 }
@@ -60,11 +65,19 @@ interface ExamItemFormFieldsProps {
 }
 
 export function ExamItemFormFields({
-  form, bloomLevels, isEdit, onSubmit, onBack,
+  form,
+  bloomLevels,
+  isEdit,
+  onSubmit,
+  onBack,
 }: ExamItemFormFieldsProps) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6"
+        noValidate
+      >
         <FormField
           control={form.control}
           name="domain"
@@ -87,7 +100,9 @@ export function ExamItemFormFields({
               <FormLabel>Bloom Level</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {bloomLevels.map((b) => (
@@ -110,11 +125,15 @@ export function ExamItemFormFields({
               <FormLabel>Question Type</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {QUESTION_TYPES.map((qt) => (
-                    <SelectItem key={qt.value} value={qt.value}>{qt.label}</SelectItem>
+                    <SelectItem key={qt.value} value={qt.value}>
+                      {qt.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -130,7 +149,11 @@ export function ExamItemFormFields({
             <FormItem>
               <FormLabel>Question Text</FormLabel>
               <FormControl>
-                <Textarea rows={4} placeholder="Enter the question..." {...field} />
+                <Textarea
+                  rows={4}
+                  placeholder="Enter the question..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -145,7 +168,9 @@ export function ExamItemFormFields({
               <FormLabel>Difficulty Hint</FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="easy">Easy (IRT b ~ -1.0)</SelectItem>
@@ -159,9 +184,15 @@ export function ExamItemFormFields({
         />
 
         <div className="flex gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onBack}>Back</Button>
+          <Button type="button" variant="outline" onClick={onBack}>
+            Back
+          </Button>
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Saving...' : isEdit ? 'Update Item' : 'Create Item'}
+            {form.formState.isSubmitting
+              ? 'Saving...'
+              : isEdit
+                ? 'Update Item'
+                : 'Create Item'}
           </Button>
         </div>
       </form>

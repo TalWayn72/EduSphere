@@ -24,7 +24,11 @@ interface ShareBadgeDialogProps {
   badge: BadgeInfo;
 }
 
-export function ShareBadgeDialog({ open, onOpenChange, badge }: ShareBadgeDialogProps) {
+export function ShareBadgeDialog({
+  open,
+  onOpenChange,
+  badge,
+}: ShareBadgeDialogProps) {
   const vcJsonUrl = `${badge.shareUrl}.json`;
 
   return (
@@ -38,7 +42,10 @@ export function ShareBadgeDialog({ open, onOpenChange, badge }: ShareBadgeDialog
         </DialogHeader>
 
         {/* Badge Preview Card */}
-        <div className="rounded-lg border p-4 space-y-3" data-testid="badge-preview">
+        <div
+          className="rounded-lg border p-4 space-y-3"
+          data-testid="badge-preview"
+        >
           {badge.imageUrl && (
             <img
               src={badge.imageUrl}
@@ -55,7 +62,10 @@ export function ShareBadgeDialog({ open, onOpenChange, badge }: ShareBadgeDialog
 
         {/* Actions */}
         <div className="flex items-center gap-3 pt-2">
-          <SocialShareMenu url={badge.shareUrl} title={`I earned the ${badge.name} badge!`} />
+          <SocialShareMenu
+            url={badge.shareUrl}
+            title={`I earned the ${badge.name} badge!`}
+          />
           <Button variant="outline" asChild>
             <a href={vcJsonUrl} download aria-label="Download Credential">
               <Download className="h-4 w-4 mr-2" aria-hidden="true" />

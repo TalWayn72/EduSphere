@@ -29,7 +29,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 
 vi.mock('@/components/PageShell', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: any) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -106,11 +108,13 @@ const REAL_LEARNERS = [
   },
 ];
 
-function setupUrql(overrides: {
-  fetching?: boolean;
-  error?: { message: string } | null;
-  data?: { listAtRiskLearners: typeof REAL_LEARNERS } | null;
-} = {}) {
+function setupUrql(
+  overrides: {
+    fetching?: boolean;
+    error?: { message: string } | null;
+    data?: { listAtRiskLearners: typeof REAL_LEARNERS } | null;
+  } = {}
+) {
   vi.mocked(urql.useMutation).mockReturnValue([
     { fetching: false },
     MOCK_EXECUTE,
@@ -119,9 +123,10 @@ function setupUrql(overrides: {
     {
       fetching: overrides.fetching ?? false,
       error: overrides.error ?? null,
-      data: overrides.data !== undefined
-        ? overrides.data
-        : { listAtRiskLearners: [] },
+      data:
+        overrides.data !== undefined
+          ? overrides.data
+          : { listAtRiskLearners: [] },
       stale: false,
     },
     vi.fn(),
@@ -224,7 +229,9 @@ describe('AtRiskDashboardPage', () => {
     setupUrql({ data: { listAtRiskLearners: [] } });
     renderPage();
     expect(screen.getByTestId('empty-state')).toBeInTheDocument();
-    expect(screen.getByText(/no at-risk learners detected/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/no at-risk learners detected/i)
+    ).toBeInTheDocument();
   });
 
   it('does NOT show empty state when learners are present', () => {
@@ -243,9 +250,7 @@ describe('AtRiskDashboardPage', () => {
   it('shows error banner when query fails', () => {
     setupUrql({ error: { message: 'Network error' } });
     renderPage();
-    expect(
-      screen.getByRole('alert')
-    ).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(
       screen.getByText(/unable to load at-risk learners/i)
     ).toBeInTheDocument();

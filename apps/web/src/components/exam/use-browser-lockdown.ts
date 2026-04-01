@@ -25,8 +25,10 @@ export function useBrowserLockdown({ enabled, onViolation }: LockdownOptions) {
   const devToolsCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const reportViolation = useCallback(
-    (type: string) => { if (enabled) onViolation(type); },
-    [enabled, onViolation],
+    (type: string) => {
+      if (enabled) onViolation(type);
+    },
+    [enabled, onViolation]
   );
 
   useEffect(() => {
@@ -75,13 +77,13 @@ export function useBrowserLockdown({ enabled, onViolation }: LockdownOptions) {
 
     // Layer 7: Keyboard shortcuts
     const onKeyDown = (e: KeyboardEvent) => {
-      const blocked = (
-        (e.ctrlKey && ['c', 'v', 'a', 'p', 's'].includes(e.key.toLowerCase()))
-        || e.key === 'PrintScreen'
-        || (e.altKey && e.key === 'Tab')
-        || e.key === 'F12'
-        || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i')
-      );
+      const blocked =
+        (e.ctrlKey &&
+          ['c', 'v', 'a', 'p', 's'].includes(e.key.toLowerCase())) ||
+        e.key === 'PrintScreen' ||
+        (e.altKey && e.key === 'Tab') ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i');
       if (blocked) {
         e.preventDefault();
         e.stopPropagation();

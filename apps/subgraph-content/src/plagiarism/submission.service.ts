@@ -73,7 +73,10 @@ export class SubmissionService implements OnModuleDestroy {
           submittedAt: new Date(),
         })
         .returning();
-      if (!row) throw new InternalServerErrorException('Failed to insert text submission');
+      if (!row)
+        throw new InternalServerErrorException(
+          'Failed to insert text submission'
+        );
       return row;
     });
 

@@ -133,19 +133,33 @@ test.describe('Skill Paths — page renders with data', () => {
     page,
   }) => {
     // Only assert if the skills route is registered and renders the data
-    const hasTitle = await page.getByText('Full Stack Developer').isVisible().catch(() => false);
+    const hasTitle = await page
+      .getByText('Full Stack Developer')
+      .isVisible()
+      .catch(() => false);
     // If the page renders at all (not 404), and data is present, title must appear
-    const is404 = await page.getByText(/404|not found|page not found/i).isVisible().catch(() => false);
+    const is404 = await page
+      .getByText(/404|not found|page not found/i)
+      .isVisible()
+      .catch(() => false);
     if (!is404) {
       // Page is rendered — data should be visible
       expect(hasTitle || is404).toBeTruthy(); // Either data is shown or we're on 404
     }
   });
 
-  test('renders Data Analyst path title when data present', async ({ page }) => {
-    const is404 = await page.getByText(/404|not found/i).isVisible().catch(() => false);
+  test('renders Data Analyst path title when data present', async ({
+    page,
+  }) => {
+    const is404 = await page
+      .getByText(/404|not found/i)
+      .isVisible()
+      .catch(() => false);
     if (!is404) {
-      const hasTitle = await page.getByText('Data Analyst').isVisible().catch(() => false);
+      const hasTitle = await page
+        .getByText('Data Analyst')
+        .isVisible()
+        .catch(() => false);
       expect(hasTitle || true).toBe(true); // Permissive until Phase 45 wires route
     }
   });

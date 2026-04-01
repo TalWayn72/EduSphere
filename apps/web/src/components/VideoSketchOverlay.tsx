@@ -22,7 +22,10 @@ export interface ExistingSketch {
 
 interface Props {
   currentTime: number;
-  onSave: (paths: import('./useSketchCanvas').SketchPath[], timestamp: number) => Promise<void>;
+  onSave: (
+    paths: import('./useSketchCanvas').SketchPath[],
+    timestamp: number
+  ) => Promise<void>;
   existingSketches?: ExistingSketch[];
 }
 
@@ -30,17 +33,29 @@ const VISIBILITY_WINDOW = 3;
 const DEFAULT_COLOR = '#ef4444';
 const DEFAULT_WIDTH = 3;
 
-export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] }: Props) {
+export function VideoSketchOverlay({
+  currentTime,
+  onSave,
+  existingSketches = [],
+}: Props) {
   const [active, setActive] = useState(false);
   const [saving, setSaving] = useState(false);
   const [tool, setTool] = useState<DrawingTool>('freehand');
   const [color, setColor] = useState(DEFAULT_COLOR);
-  const [textInput, setTextInput] = useState<{ x: number; y: number } | null>(null);
+  const [textInput, setTextInput] = useState<{ x: number; y: number } | null>(
+    null
+  );
   const textInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { startDraw, continueDraw, endDraw, clearPaths, getPaths, addTextPath } =
-    useSketchCanvas({ canvasRef, tool, color, strokeWidth: DEFAULT_WIDTH });
+  const {
+    startDraw,
+    continueDraw,
+    endDraw,
+    clearPaths,
+    getPaths,
+    addTextPath,
+  } = useSketchCanvas({ canvasRef, tool, color, strokeWidth: DEFAULT_WIDTH });
 
   // Attach native canvas event listeners (skipped for text tool — handled via onClick)
   useEffect(() => {
@@ -65,23 +80,29 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
   }, [active, tool, startDraw, continueDraw, endDraw]);
 
   // Text tool: click on canvas → show positioned <input>
-  const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (tool !== 'text') return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    setTextInput({ x, y });
-    setTimeout(() => textInputRef.current?.focus(), 0);
-  }, [tool]);
+  const handleCanvasClick = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (tool !== 'text') return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      setTextInput({ x, y });
+      setTimeout(() => textInputRef.current?.focus(), 0);
+    },
+    [tool]
+  );
 
-  const commitText = useCallback((text: string) => {
-    if (text.trim() && textInput) {
-      addTextPath(text.trim(), textInput.x, textInput.y);
-    }
-    setTextInput(null);
-  }, [textInput, addTextPath]);
+  const commitText = useCallback(
+    (text: string) => {
+      if (text.trim() && textInput) {
+        addTextPath(text.trim(), textInput.x, textInput.y);
+      }
+      setTextInput(null);
+    },
+    [textInput, addTextPath]
+  );
 
   const handleSave = async () => {
     const paths = getPaths();
@@ -156,8 +177,13 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
               ref={textInputRef}
               type="text"
               className="absolute bg-transparent border-b border-white text-white outline-none text-sm min-w-[4rem] dark:border-gray-700 dark:text-white"
-              style={{ left: `${textInput.x * 100}%`, top: `${textInput.y * 100}%` }}
-              onKeyDown={(e) => { if (e.key === 'Enter') commitText(e.currentTarget.value); }}
+              style={{
+                left: `${textInput.x * 100}%`,
+                top: `${textInput.y * 100}%`,
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') commitText(e.currentTarget.value);
+              }}
               onBlur={(e) => commitText(e.currentTarget.value)}
               data-testid="sketch-text-input"
               aria-label="Type text annotation"

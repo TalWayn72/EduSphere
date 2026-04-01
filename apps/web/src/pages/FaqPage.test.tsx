@@ -25,11 +25,15 @@ import { FaqPage } from './FaqPage';
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('react-helmet-async', () => ({
-  HelmetProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  HelmetProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
   Helmet: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
@@ -65,14 +69,20 @@ describe('FaqPage', () => {
 
   it('renders the search input with placeholder text', () => {
     renderFaqPage();
-    expect(screen.getByPlaceholderText(/Search questions/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Search questions/i)
+    ).toBeInTheDocument();
   });
 
   it('renders category tabs with correct ARIA roles', () => {
     renderFaqPage();
-    expect(screen.getByRole('tab', { name: /All Questions/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /All Questions/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Pricing/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /Enterprise/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /Enterprise/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Technical/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Platform/i })).toBeInTheDocument();
   });
@@ -106,7 +116,9 @@ describe('FaqPage', () => {
     if (!isOpen) {
       fireEvent.click(button);
     }
-    expect(screen.getByText(/AI-powered learning management system/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/AI-powered learning management system/i)
+    ).toBeInTheDocument();
   });
 
   it('search input filters FAQ items — SCORM query shows SCORM-related result', () => {
@@ -139,12 +151,16 @@ describe('FaqPage', () => {
   it('does NOT render raw localhost or port number strings (internal leak guard)', () => {
     renderFaqPage();
     expect(screen.queryByText(/localhost/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/4001|4002|4003|4004|4005|4006|5432/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/4001|4002|4003|4004|4005|4006|5432/)
+    ).not.toBeInTheDocument();
   });
 
   it('does NOT render stack trace or error object patterns', () => {
     renderFaqPage();
-    expect(screen.queryByText(/at \w+\.\w+ \(.*:\d+:\d+\)/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/at \w+\.\w+ \(.*:\d+:\d+\)/)
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/TypeError:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Error:/)).not.toBeInTheDocument();
   });

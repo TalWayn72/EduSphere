@@ -21,20 +21,33 @@ import React from 'react';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (k: string, opts?: Record<string, unknown>) => {
-      if (opts?.defaultValue) return String(opts.defaultValue).replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(opts[key] ?? `{{${key}}}`));
+      if (opts?.defaultValue)
+        return String(opts.defaultValue).replace(
+          /\{\{(\w+)\}\}/g,
+          (_, key: string) => String(opts[key] ?? `{{${key}}}`)
+        );
       return k;
     },
   }),
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className}>{children}</div>,
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -51,7 +64,9 @@ import type { AiChatPanelProps, SourceAttribution } from './AiChatPanel';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function renderPanel(overrides: Partial<AiChatPanelProps> = {}) {
-  const chatEndRef = { current: null } as React.RefObject<HTMLDivElement | null>;
+  const chatEndRef = {
+    current: null,
+  } as React.RefObject<HTMLDivElement | null>;
   const defaults: AiChatPanelProps = {
     chatMessages: [],
     chatInput: '',
@@ -214,7 +229,9 @@ describe('AiChatPanel', () => {
 
   it('displays chatInput value in input field', () => {
     renderPanel({ chatInput: 'existing text' });
-    const input = screen.getByPlaceholderText('content:askOrDebate') as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      'content:askOrDebate'
+    ) as HTMLInputElement;
     expect(input.value).toBe('existing text');
   });
 
@@ -231,9 +248,7 @@ describe('AiChatPanel', () => {
 
     it('does not show source toggle for messages without sources', () => {
       renderPanel({
-        chatMessages: [
-          { id: 'm1', role: 'assistant', content: 'Answer' },
-        ],
+        chatMessages: [{ id: 'm1', role: 'assistant', content: 'Answer' }],
       });
       expect(screen.queryByTestId('sources-toggle-m1')).not.toBeInTheDocument();
     });
@@ -296,7 +311,9 @@ describe('AiChatPanel', () => {
         ],
       });
       fireEvent.click(screen.getByTestId('sources-toggle-m1'));
-      expect(() => fireEvent.click(screen.getByText('Talmud Bavli'))).not.toThrow();
+      expect(() =>
+        fireEvent.click(screen.getByText('Talmud Bavli'))
+      ).not.toThrow();
     });
   });
 
@@ -315,7 +332,11 @@ describe('AiChatPanel', () => {
       renderPanel();
       // The t() mock returns defaultValue when provided via opts
       const groups = document.querySelectorAll('[role="group"]');
-      const chatModeGroup = Array.from(groups).find(g => g.getAttribute('aria-label')?.includes('Chat modes') || g.getAttribute('aria-label')?.includes('content:chatModes'));
+      const chatModeGroup = Array.from(groups).find(
+        (g) =>
+          g.getAttribute('aria-label')?.includes('Chat modes') ||
+          g.getAttribute('aria-label')?.includes('content:chatModes')
+      );
       expect(chatModeGroup).toBeInTheDocument();
     });
 
@@ -378,16 +399,30 @@ describe('AiChatPanel', () => {
       });
       fireEvent.click(screen.getByTestId('sources-toggle-m1'));
       const srcBtn = screen.getByText('Talmud Bavli');
-      expect(srcBtn).toHaveAttribute('aria-label', expect.stringContaining('Talmud Bavli'));
-      expect(srcBtn).toHaveAttribute('aria-label', expect.stringContaining('92%'));
+      expect(srcBtn).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining('Talmud Bavli')
+      );
+      expect(srcBtn).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining('92%')
+      );
     });
 
     it('quick prompt buttons have descriptive aria-label', () => {
       renderPanel();
-      const prompts = ['Debate free will', 'Quiz me', 'Summarize', 'Explain Rambam'];
+      const prompts = [
+        'Debate free will',
+        'Quiz me',
+        'Summarize',
+        'Explain Rambam',
+      ];
       for (const prompt of prompts) {
         const btn = screen.getByText(prompt);
-        expect(btn).toHaveAttribute('aria-label', expect.stringContaining(prompt));
+        expect(btn).toHaveAttribute(
+          'aria-label',
+          expect.stringContaining(prompt)
+        );
       }
     });
 
@@ -395,8 +430,10 @@ describe('AiChatPanel', () => {
       renderPanel();
       // t() mock with string fallback returns key, but actual role="group" is set
       const groups = document.querySelectorAll('[role="group"]');
-      const quickPromptsGroup = Array.from(groups).find(g =>
-        g.getAttribute('aria-label')?.includes('quickPrompts') || g.getAttribute('aria-label')?.includes('Quick prompts')
+      const quickPromptsGroup = Array.from(groups).find(
+        (g) =>
+          g.getAttribute('aria-label')?.includes('quickPrompts') ||
+          g.getAttribute('aria-label')?.includes('Quick prompts')
       );
       expect(quickPromptsGroup).toBeInTheDocument();
     });

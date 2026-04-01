@@ -9,7 +9,11 @@ import { PageShell } from './PageShell';
 
 describe('PageShell', () => {
   it('renders children', () => {
-    render(<PageShell><div data-testid="child">Content</div></PageShell>);
+    render(
+      <PageShell>
+        <div data-testid="child">Content</div>
+      </PageShell>
+    );
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 

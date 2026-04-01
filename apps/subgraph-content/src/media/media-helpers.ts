@@ -71,10 +71,14 @@ export function detectMediaType(
 
 export function contentTypeForModelFormat(format: ModelFormat): string {
   switch (format) {
-    case 'gltf': return 'model/gltf+json';
-    case 'glb':  return 'model/gltf-binary';
-    case 'obj':  return 'model/obj';
-    case 'fbx':  return 'application/octet-stream';
+    case 'gltf':
+      return 'model/gltf+json';
+    case 'glb':
+      return 'model/gltf-binary';
+    case 'obj':
+      return 'model/obj';
+    case 'fbx':
+      return 'application/octet-stream';
   }
 }
 

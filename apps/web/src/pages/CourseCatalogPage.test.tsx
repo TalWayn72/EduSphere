@@ -6,7 +6,9 @@ import React from 'react';
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/seo', () => ({
@@ -37,12 +39,16 @@ describe('CourseCatalogPage', () => {
 
   it('renders header description text', () => {
     renderPage();
-    expect(screen.getByText(/curated courses designed for modern professionals/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/curated courses designed for modern professionals/i)
+    ).toBeInTheDocument();
   });
 
   it('renders featured courses list with aria-label', () => {
     renderPage();
-    expect(screen.getByRole('list', { name: /featured courses/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('list', { name: /featured courses/i })
+    ).toBeInTheDocument();
   });
 
   it('renders all 6 featured courses', () => {
@@ -54,7 +60,9 @@ describe('CourseCatalogPage', () => {
 
   it('renders Introduction to Machine Learning course', () => {
     renderPage();
-    expect(screen.getByText('Introduction to Machine Learning')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Machine Learning')
+    ).toBeInTheDocument();
   });
 
   it('renders Advanced Knowledge Graphs course', () => {
@@ -64,7 +72,9 @@ describe('CourseCatalogPage', () => {
 
   it('renders Corporate Leadership Excellence course', () => {
     renderPage();
-    expect(screen.getByText('Corporate Leadership Excellence')).toBeInTheDocument();
+    expect(
+      screen.getByText('Corporate Leadership Excellence')
+    ).toBeInTheDocument();
   });
 
   it('renders Python for Data Science course', () => {
@@ -74,18 +84,26 @@ describe('CourseCatalogPage', () => {
 
   it('renders AI Ethics and Responsible AI course', () => {
     renderPage();
-    expect(screen.getByText('AI Ethics and Responsible AI')).toBeInTheDocument();
+    expect(
+      screen.getByText('AI Ethics and Responsible AI')
+    ).toBeInTheDocument();
   });
 
   it('renders Organizational Learning Design course', () => {
     renderPage();
-    expect(screen.getByText('Organizational Learning Design')).toBeInTheDocument();
+    expect(
+      screen.getByText('Organizational Learning Design')
+    ).toBeInTheDocument();
   });
 
   it('each course card has aria-label with course title', () => {
     renderPage();
-    expect(screen.getByLabelText(/Course: Introduction to Machine Learning/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Course: Advanced Knowledge Graphs/)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Course: Introduction to Machine Learning/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Course: Advanced Knowledge Graphs/)
+    ).toBeInTheDocument();
   });
 
   it('renders level badges (Beginner, Intermediate, Advanced)', () => {
@@ -125,7 +143,9 @@ describe('CourseCatalogPage', () => {
 
   it('renders CTA section', () => {
     renderPage();
-    expect(screen.getByText(/Ready to transform your organization/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Ready to transform your organization/i)
+    ).toBeInTheDocument();
   });
 
   it('renders Request a Pilot link', () => {
@@ -135,9 +155,9 @@ describe('CourseCatalogPage', () => {
 
   it('all enroll links point to /pilot', () => {
     renderPage();
-    const pilotLinks = screen.getAllByRole('link').filter(
-      (link) => link.getAttribute('href') === '/pilot'
-    );
+    const pilotLinks = screen
+      .getAllByRole('link')
+      .filter((link) => link.getAttribute('href') === '/pilot');
     expect(pilotLinks.length).toBeGreaterThanOrEqual(7);
   });
 

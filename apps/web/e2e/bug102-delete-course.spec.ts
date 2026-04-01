@@ -57,17 +57,28 @@ function makeCourseHandler(opts: {
     }
 
     // GetCourseModules / CourseLessons — empty is fine
-    if (operationName === 'GetCourseModules' || operationName === 'CourseLessons') {
-      return JSON.stringify({ data: { course: { ...MOCK_COURSE_INSTRUCTOR, modules: [] } } });
+    if (
+      operationName === 'GetCourseModules' ||
+      operationName === 'CourseLessons'
+    ) {
+      return JSON.stringify({
+        data: { course: { ...MOCK_COURSE_INSTRUCTOR, modules: [] } },
+      });
     }
 
     // Enrollment status — not enrolled
-    if (operationName === 'GetEnrollmentStatus' || operationName === 'MyEnrollment') {
+    if (
+      operationName === 'GetEnrollmentStatus' ||
+      operationName === 'MyEnrollment'
+    ) {
       return JSON.stringify({ data: { myEnrollment: null } });
     }
 
     // Progress
-    if (operationName === 'GetCourseProgress' || operationName === 'MyCourseProgress') {
+    if (
+      operationName === 'GetCourseProgress' ||
+      operationName === 'MyCourseProgress'
+    ) {
       return JSON.stringify({ data: { myCourseProgress: null } });
     }
 
@@ -100,7 +111,9 @@ function makeCourseHandler(opts: {
         });
       } else {
         return JSON.stringify({
-          errors: [{ message: 'permission denied', extensions: { code: 'FORBIDDEN' } }],
+          errors: [
+            { message: 'permission denied', extensions: { code: 'FORBIDDEN' } },
+          ],
           data: null,
         });
       }
@@ -114,7 +127,9 @@ function makeCourseHandler(opts: {
 // ─── T-1: Delete button IS visible for INSTRUCTOR ────────────────────────────
 
 test.describe('bug102-delete-course — T-1: Delete button visible for INSTRUCTOR', () => {
-  test('delete-course-btn is rendered when canEdit=true (INSTRUCTOR role)', async ({ page }) => {
+  test('delete-course-btn is rendered when canEdit=true (INSTRUCTOR role)', async ({
+    page,
+  }) => {
     await loginInDevMode(page);
     await routeGraphQL(page, makeCourseHandler({ userRole: 'INSTRUCTOR' }));
 
@@ -134,7 +149,9 @@ test.describe('bug102-delete-course — T-1: Delete button visible for INSTRUCTO
 // ─── T-2: Clicking delete button opens confirmation dialog ───────────────────
 
 test.describe('bug102-delete-course — T-2: Dialog opens on click', () => {
-  test('clicking delete-course-btn opens DeleteCourseDialog', async ({ page }) => {
+  test('clicking delete-course-btn opens DeleteCourseDialog', async ({
+    page,
+  }) => {
     await loginInDevMode(page);
     await routeGraphQL(page, makeCourseHandler({ userRole: 'INSTRUCTOR' }));
 
@@ -200,9 +217,12 @@ test.describe('bug102-delete-course — T-3: Deletion triggers mutation + redire
     await confirmBtn.click();
 
     // Should navigate away from the course detail page
-    await page.waitForURL((url) => !url.toString().includes(`/courses/${COURSE_ID}`), {
-      timeout: 10_000,
-    });
+    await page.waitForURL(
+      (url) => !url.toString().includes(`/courses/${COURSE_ID}`),
+      {
+        timeout: 10_000,
+      }
+    );
 
     // Verify the DeleteCourse mutation was actually called
     expect(deleteMutationCalled).toBe(true);
@@ -221,7 +241,9 @@ test.describe('bug102-delete-course — T-4: Delete button absent for STUDENT', 
     await page.goto(`/courses/${COURSE_ID}`, { waitUntil: 'domcontentloaded' });
 
     // Wait for page to settle (enroll button must appear so we know course loaded)
-    await expect(page.getByTestId('enroll-button')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('enroll-button')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Regression guard: student must NOT see delete button
     await expect(page.getByTestId('delete-course-btn')).not.toBeVisible();

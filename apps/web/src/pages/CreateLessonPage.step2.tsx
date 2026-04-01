@@ -32,7 +32,9 @@ export function CreateLessonStep2({
   const handleAddVideo = async () => {
     const parsed = youtubeUrlSchema.safeParse(videoUrl);
     if (!parsed.success) {
-      setVideoError(parsed.error.issues[0]?.message ?? t('createLesson.invalidUrl'));
+      setVideoError(
+        parsed.error.issues[0]?.message ?? t('createLesson.invalidUrl')
+      );
       return;
     }
     setVideoError('');
@@ -46,7 +48,9 @@ export function CreateLessonStep2({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">{t('createLesson.step2Title')}</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {t('createLesson.step2Title')}
+      </h2>
       <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
         {t('createLesson.step2Hint')}
       </p>
@@ -71,7 +75,9 @@ export function CreateLessonStep2({
             )}
           </div>
           {videoError && (
-            <p className="text-red-500 text-xs mt-1 dark:text-red-400">{videoError}</p>
+            <p className="text-red-500 text-xs mt-1 dark:text-red-400">
+              {videoError}
+            </p>
           )}
           {!lessonId && (
             <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">

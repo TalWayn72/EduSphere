@@ -39,11 +39,9 @@ interface BrandedLoginQueryResult {
 }
 
 function buildKeycloakUrl(slug: string, idpHint?: string): string {
-  const base =
-    import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080';
+  const base = import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080';
   const realm = import.meta.env.VITE_KEYCLOAK_REALM || 'edusphere';
-  const clientId =
-    import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'edusphere-web';
+  const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'edusphere-web';
   const redirectUri = encodeURIComponent(
     `${window.location.origin}/oauth/google/callback`
   );
@@ -103,7 +101,10 @@ export function BrandedLoginPage() {
           <CardHeader className="text-center">
             <CardTitle>{t('orgNotFound', 'Organization not found')}</CardTitle>
             <CardDescription>
-              {t('orgNotFoundDesc', 'The organization slug is invalid or does not exist.')}
+              {t(
+                'orgNotFoundDesc',
+                'The organization slug is invalid or does not exist.'
+              )}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -133,7 +134,9 @@ export function BrandedLoginPage() {
               </div>
             )}
           </div>
-          <h1 className="text-3xl font-semibold leading-none tracking-tight">{branding.orgName}</h1>
+          <h1 className="text-3xl font-semibold leading-none tracking-tight">
+            {branding.orgName}
+          </h1>
           {branding.welcomeMessage && (
             <CardDescription data-testid="branded-welcome-message">
               {branding.welcomeMessage}

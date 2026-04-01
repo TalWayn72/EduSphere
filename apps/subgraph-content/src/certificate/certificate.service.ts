@@ -113,7 +113,10 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
         .returning()
     );
 
-    if (!cert) throw new InternalServerErrorException('Certificate insert returned no record');
+    if (!cert)
+      throw new InternalServerErrorException(
+        'Certificate insert returned no record'
+      );
 
     // Step 2: Generate PDF with correct verification code, then update record
     const pdfKey = await this.pdfService.generateAndUpload({

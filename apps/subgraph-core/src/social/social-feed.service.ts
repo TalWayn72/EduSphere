@@ -2,10 +2,7 @@
  * SocialFeedService — Feed generation, recommendations, NATS subscriptions.
  * Extracted from SocialService for file-size compliance (<300 lines).
  */
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   schema,
   eq,
@@ -16,10 +13,11 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { Subscription, NatsConnection } from 'nats';
+import type { CourseCompletedPayload } from '@edusphere/nats-client';
 import type {
-  CourseCompletedPayload,
-} from '@edusphere/nats-client';
-import type { SocialFeedItemDto, SocialRecommendationDto } from './social.service';
+  SocialFeedItemDto,
+  SocialRecommendationDto,
+} from './social.service';
 import { SocialFollowService } from './social-follow.service';
 
 @Injectable()
@@ -33,7 +31,11 @@ export class SocialFeedService {
     tenantId: string,
     limit = 20
   ): Promise<SocialFeedItemDto[]> {
-    const followingIds = await this.followService.getFollowing(userId, tenantId, 100);
+    const followingIds = await this.followService.getFollowing(
+      userId,
+      tenantId,
+      100
+    );
     if (followingIds.length === 0) return [];
 
     const ctx = this.followService.tenantCtx(tenantId, userId);
@@ -43,7 +45,10 @@ export class SocialFeedService {
           id: schema.socialFeedItems.id,
           tenantId: schema.socialFeedItems.tenantId,
           actorId: schema.socialFeedItems.actorId,
-          actorDisplayName: sql<string>`COALESCE(${schema.users.display_name}, 'Unknown User')`.as('actor_display_name'),
+          actorDisplayName:
+            sql<string>`COALESCE(${schema.users.display_name}, 'Unknown User')`.as(
+              'actor_display_name'
+            ),
           verb: schema.socialFeedItems.verb,
           objectType: schema.socialFeedItems.objectType,
           objectId: schema.socialFeedItems.objectId,
@@ -51,7 +56,10 @@ export class SocialFeedService {
           createdAt: schema.socialFeedItems.createdAt,
         })
         .from(schema.socialFeedItems)
-        .leftJoin(schema.users, eq(schema.socialFeedItems.actorId, schema.users.id))
+        .leftJoin(
+          schema.users,
+          eq(schema.socialFeedItems.actorId, schema.users.id)
+        )
         .where(
           and(
             eq(schema.socialFeedItems.tenantId, tenantId),
@@ -69,7 +77,11 @@ export class SocialFeedService {
     tenantId: string,
     limit = 10
   ): Promise<SocialRecommendationDto[]> {
-    const followingIds = await this.followService.getFollowing(userId, tenantId, 100);
+    const followingIds = await this.followService.getFollowing(
+      userId,
+      tenantId,
+      100
+    );
     if (followingIds.length === 0) return [];
 
     const ctx = this.followService.tenantCtx(tenantId, userId);
@@ -78,8 +90,13 @@ export class SocialFeedService {
         .select({
           contentItemId: schema.socialFeedItems.objectId,
           contentTitle: schema.socialFeedItems.objectTitle,
-          followersCount: sql<number>`count(distinct ${schema.socialFeedItems.actorId})`.as('followers_count'),
-          lastActivity: sql<Date>`max(${schema.socialFeedItems.createdAt})`.as('last_activity'),
+          followersCount:
+            sql<number>`count(distinct ${schema.socialFeedItems.actorId})`.as(
+              'followers_count'
+            ),
+          lastActivity: sql<Date>`max(${schema.socialFeedItems.createdAt})`.as(
+            'last_activity'
+          ),
         })
         .from(schema.socialFeedItems)
         .where(
@@ -123,7 +140,9 @@ export class SocialFeedService {
     const sc = new TextDecoder();
     for await (const msg of sub) {
       try {
-        const payload = JSON.parse(sc.decode(msg.data)) as CourseCompletedPayload;
+        const payload = JSON.parse(
+          sc.decode(msg.data)
+        ) as CourseCompletedPayload;
         await this.writeFeedItem({
           actorId: payload.userId,
           tenantId: payload.tenantId,

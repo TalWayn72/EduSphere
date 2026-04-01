@@ -50,7 +50,10 @@ export class ScormExportService implements OnModuleDestroy {
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
     const downloadUrl = `/api/v1/scorm-export/${token}/download`;
 
-    this.logger.log({ courseId, tenantId, estimatedBytes }, 'SCORM 2004 export generated');
+    this.logger.log(
+      { courseId, tenantId, estimatedBytes },
+      'SCORM 2004 export generated'
+    );
 
     return {
       downloadUrl,

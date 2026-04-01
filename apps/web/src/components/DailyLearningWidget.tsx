@@ -51,7 +51,9 @@ export function DailyLearningWidget() {
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching, error }] = useQuery<DailyMicrolessonQueryResult>({
     query: DAILY_MICROLESSON_QUERY,
@@ -86,11 +88,7 @@ export function DailyLearningWidget() {
             Loading today's lesson...
           </p>
         )}
-        {error && (
-          <p className="text-sm text-destructive">
-            {t('loadFailed')}
-          </p>
-        )}
+        {error && <p className="text-sm text-destructive">{t('loadFailed')}</p>}
         {completed && (
           <div className="text-center py-6">
             <p className="text-2xl mb-2">All done for today!</p>

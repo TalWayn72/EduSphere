@@ -4,7 +4,11 @@ import { LiveSessionsService } from './live-sessions.service';
 import { LiveSessionsEventsService } from './live-sessions-events.service';
 
 @Module({
-  providers: [LiveSessionsResolver, LiveSessionsService, LiveSessionsEventsService],
+  providers: [
+    LiveSessionsResolver,
+    LiveSessionsService,
+    LiveSessionsEventsService,
+  ],
   exports: [LiveSessionsService, LiveSessionsEventsService],
 })
 export class LiveSessionsModule {}

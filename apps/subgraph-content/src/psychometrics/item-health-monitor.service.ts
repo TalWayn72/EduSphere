@@ -19,9 +19,9 @@ import type { HealthCheckReport } from './psychometrics.types.js';
 
 /** Thresholds for item health evaluation. */
 const THRESHOLDS = {
-  minP: 0.20,
-  maxP: 0.90,
-  minD: 0.20,
+  minP: 0.2,
+  maxP: 0.9,
+  minD: 0.2,
   minRpbis: 0.15,
   maxExposure: 500,
   flagCountToRetire: 3,
@@ -37,9 +37,7 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
   private readonly logger = new Logger(ItemHealthMonitorService.name);
   private readonly db = createDatabaseConnection();
 
-  constructor(
-    private readonly classicalService: ClassicalAnalysisService,
-  ) {}
+  constructor(private readonly classicalService: ClassicalAnalysisService) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
@@ -64,19 +62,16 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.examItems.tenantId, tenantId),
-            eq(schema.examItems.calibrationStatus, 'CALIBRATED'),
-          ),
-        ),
+            eq(schema.examItems.calibrationStatus, 'CALIBRATED')
+          )
+        )
     );
 
     const flaggedItemIds: string[] = [];
     const retiredItemIds: string[] = [];
 
     for (const item of items) {
-      const stats = await this.classicalService.analyzeItem(
-        item.id,
-        tenantId,
-      );
+      const stats = await this.classicalService.analyzeItem(item.id, tenantId);
       if (stats.totalResponses === 0) continue;
 
       const poor =
@@ -119,7 +114,7 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
         flagged: flaggedItemIds.length,
         retired: retiredItemIds.length,
       },
-      '[ItemHealthMonitorService] Health check complete',
+      '[ItemHealthMonitorService] Health check complete'
     );
 
     return report;
@@ -136,19 +131,16 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
     return count;
   }
 
-  private async retireItem(
-    itemId: string,
-    ctx: TenantContext,
-  ): Promise<void> {
+  private async retireItem(itemId: string, ctx: TenantContext): Promise<void> {
     await withTenantContext(this.db, ctx, (tx) =>
       tx
         .update(schema.examItems)
         .set({ calibrationStatus: 'RETIRED' })
-        .where(eq(schema.examItems.id, itemId)),
+        .where(eq(schema.examItems.id, itemId))
     );
     this.logger.warn(
       { itemId },
-      '[ItemHealthMonitorService] Item auto-retired after 3+ failures',
+      '[ItemHealthMonitorService] Item auto-retired after 3+ failures'
     );
   }
 
@@ -156,7 +148,7 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
     itemId: string,
     currentFlags: string[],
     ctx: TenantContext,
-    downgrade = false,
+    downgrade = false
   ): Promise<void> {
     const updatedFlags = [...currentFlags, 'HEALTH_CHECK_FAIL'];
     const set: Record<string, unknown> = {
@@ -168,7 +160,7 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
       tx
         .update(schema.examItems)
         .set(set)
-        .where(eq(schema.examItems.id, itemId)),
+        .where(eq(schema.examItems.id, itemId))
     );
   }
 }

@@ -61,7 +61,9 @@ export function AutoGradingResultsPage() {
   const submissionId = searchParams.get('submissionId') ?? '';
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery<{ autoGradingResults: GradingResult[] }>({
     query: AUTO_GRADING_RESULTS_QUERY,
@@ -72,7 +74,10 @@ export function AutoGradingResultsPage() {
   if (!role || !ALLOWED_ROLES.has(role)) {
     navigate('/dashboard');
     return (
-      <div data-testid="access-denied" className="p-8 text-center text-destructive">
+      <div
+        data-testid="access-denied"
+        className="p-8 text-center text-destructive"
+      >
         Access Denied — insufficient permissions.
       </div>
     );
@@ -112,7 +117,9 @@ export function AutoGradingResultsPage() {
         {!fetching && !error && results.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              <p className="text-sm" data-testid="empty-state">No grading results yet.</p>
+              <p className="text-sm" data-testid="empty-state">
+                No grading results yet.
+              </p>
             </CardContent>
           </Card>
         )}
@@ -120,38 +127,55 @@ export function AutoGradingResultsPage() {
         {!fetching && results.length > 0 && (
           <>
             <Card data-testid="overall-score-summary">
-              <CardHeader><CardTitle>Overall Score</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle>Overall Score</CardTitle>
+              </CardHeader>
               <CardContent>
                 <div aria-live="polite" aria-atomic="true">
-                  <p className={`text-4xl font-bold ${overall >= 80 ? 'text-green-700' : overall >= 60 ? 'text-yellow-700' : 'text-red-700'}`}>
+                  <p
+                    className={`text-4xl font-bold ${overall >= 80 ? 'text-green-700' : overall >= 60 ? 'text-yellow-700' : 'text-red-700'}`}
+                  >
                     <span aria-hidden="true">{scoreLabel(overall).icon} </span>
                     {overall}%
-                    <span className="ml-2 text-lg font-semibold">{scoreLabel(overall).text}</span>
+                    <span className="ml-2 text-lg font-semibold">
+                      {scoreLabel(overall).text}
+                    </span>
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {results.reduce((a, r) => a + r.score, 0)} / {results.reduce((a, r) => a + r.maxScore, 0)} points
+                    {results.reduce((a, r) => a + r.score, 0)} /{' '}
+                    {results.reduce((a, r) => a + r.maxScore, 0)} points
                   </p>
                 </div>
               </CardContent>
             </Card>
 
             {results.map((r) => {
-              const pct = r.maxScore > 0 ? Math.round((r.score / r.maxScore) * 100) : 0;
+              const pct =
+                r.maxScore > 0 ? Math.round((r.score / r.maxScore) * 100) : 0;
               const label = scoreLabel(pct);
               return (
-                <Card key={r.questionId} data-testid={`grading-result-${r.questionId}`} className={`border ${scoreColor(pct)}`}>
+                <Card
+                  key={r.questionId}
+                  data-testid={`grading-result-${r.questionId}`}
+                  className={`border ${scoreColor(pct)}`}
+                >
                   <CardHeader>
                     <CardTitle className="text-base">
                       <span aria-hidden="true">{label.icon} </span>
-                      Question {r.questionId.toUpperCase()} — {r.score}/{r.maxScore} ({pct}%)
-                      <span className="ml-2 text-sm font-medium">({label.text})</span>
+                      Question {r.questionId.toUpperCase()} — {r.score}/
+                      {r.maxScore} ({pct}%)
+                      <span className="ml-2 text-sm font-medium">
+                        ({label.text})
+                      </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <p className="text-sm">{r.explanation}</p>
                     {r.suggestions.length > 0 && (
                       <ul className="list-disc list-inside text-sm text-muted-foreground">
-                        {r.suggestions.map((s) => <li key={s}>{s}</li>)}
+                        {r.suggestions.map((s) => (
+                          <li key={s}>{s}</li>
+                        ))}
                       </ul>
                     )}
                   </CardContent>
@@ -161,14 +185,22 @@ export function AutoGradingResultsPage() {
 
             <Card>
               <CardContent className="py-4">
-                <p data-testid="privacy-notice" className="text-sm text-muted-foreground">
-                  AI grading uses local Ollama — student data never leaves your servers
+                <p
+                  data-testid="privacy-notice"
+                  className="text-sm text-muted-foreground"
+                >
+                  AI grading uses local Ollama — student data never leaves your
+                  servers
                 </p>
               </CardContent>
             </Card>
 
             <div className="flex justify-end">
-              <Button data-testid="export-grading-btn" variant="outline" onClick={() => window.print()}>
+              <Button
+                data-testid="export-grading-btn"
+                variant="outline"
+                onClick={() => window.print()}
+              >
                 Export Results
               </Button>
             </div>

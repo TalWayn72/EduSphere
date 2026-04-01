@@ -8,7 +8,9 @@ import type { DrizzleDB } from '../index';
  * performs a single, well-documented type assertion in one place rather
  * than scattering `as unknown as DrizzleDB` across the codebase.
  */
-function txAsDb(tx: Parameters<Parameters<DrizzleDB['transaction']>[0]>[0]): DrizzleDB {
+function txAsDb(
+  tx: Parameters<Parameters<DrizzleDB['transaction']>[0]>[0]
+): DrizzleDB {
   // The transaction object implements the same query interface as the parent db.
   return tx as unknown as DrizzleDB;
 }

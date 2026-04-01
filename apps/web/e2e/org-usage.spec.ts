@@ -44,7 +44,7 @@ interface UsageOverride {
  */
 async function mockUsageResponse(
   page: Page,
-  override: UsageOverride,
+  override: UsageOverride
 ): Promise<void> {
   const payload = {
     data: {
@@ -72,7 +72,7 @@ async function mockUsageResponse(
 // ─── Anti-regression helpers ──────────────────────────────────────────────────
 
 async function assertNoRawErrors(page: Page): Promise<void> {
-  const body = await page.textContent('body') ?? '';
+  const body = (await page.textContent('body')) ?? '';
   expect(body).not.toContain('urql error');
   expect(body).not.toContain('GraphQL error');
   expect(body).not.toContain('Cannot read properties');
@@ -95,21 +95,27 @@ test.describe('Org Usage Page — Page Load', () => {
       monthlyActiveUsers: 87,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
   });
 
   test('org-usage page container is rendered', async ({ page }) => {
-    await expect(page.locator('[data-testid="org-usage-page"]')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('[data-testid="org-usage-page"]')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('page title is "Usage & Seats"', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: /Usage & Seats/i }).first(),
+      page.getByRole('heading', { name: /Usage & Seats/i }).first()
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('no raw technical error strings visible', async ({ page }) => {
-    await page.locator('[data-testid="org-usage-page"]').waitFor({ timeout: 10_000 });
+    await page
+      .locator('[data-testid="org-usage-page"]')
+      .waitFor({ timeout: 10_000 });
     await assertNoRawErrors(page);
   });
 });
@@ -125,8 +131,12 @@ test.describe('Org Usage Page — UsageMeter SVG', () => {
       overageUsers: 0,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('UsageMeter SVG element is visible', async ({ page }) => {
@@ -152,10 +162,15 @@ test.describe('Org Usage Page — UsageMeter SVG', () => {
 
   test('utilization percentage stat card shows "68%"', async ({ page }) => {
     // The stats row card shows seatUtilizationPct
-    await expect(page.locator('[data-testid="usage-meter-pct"]')).toContainText('68%', { timeout: 10_000 });
+    await expect(page.locator('[data-testid="usage-meter-pct"]')).toContainText(
+      '68%',
+      { timeout: 10_000 }
+    );
   });
 
-  test('MAU stat card is visible with mocked monthly value', async ({ page }) => {
+  test('MAU stat card is visible with mocked monthly value', async ({
+    page,
+  }) => {
     // "Monthly Active" label in the stats grid
     const mauLabel = page.getByText(/Monthly Active/i).first();
     await expect(mauLabel).toBeVisible({ timeout: 10_000 });
@@ -165,7 +180,9 @@ test.describe('Org Usage Page — UsageMeter SVG', () => {
 // ─── Suite 3: Color States ────────────────────────────────────────────────────
 
 test.describe('Org Usage Page — Utilization Color States', () => {
-  test('stroke is green (#22c55e) when utilization is below 80%', async ({ page }) => {
+  test('stroke is green (#22c55e) when utilization is below 80%', async ({
+    page,
+  }) => {
     await mockUsageResponse(page, {
       yearlyActiveUsers: 300,
       seatLimit: 500,
@@ -173,8 +190,12 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       overageUsers: 0,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
 
     // The progress arc is the second <circle> within the SVG
     const progressArc = page
@@ -185,7 +206,9 @@ test.describe('Org Usage Page — Utilization Color States', () => {
     expect(strokeColor).toBe('#22c55e');
   });
 
-  test('stroke is yellow (#eab308) when utilization is 95%', async ({ page }) => {
+  test('stroke is yellow (#eab308) when utilization is 95%', async ({
+    page,
+  }) => {
     await mockUsageResponse(page, {
       yearlyActiveUsers: 475,
       seatLimit: 500,
@@ -193,8 +216,12 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       overageUsers: 0,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
 
     const progressArc = page
       .locator('[data-testid="usage-meter"] svg circle')
@@ -204,7 +231,9 @@ test.describe('Org Usage Page — Utilization Color States', () => {
     expect(strokeColor).toBe('#eab308');
   });
 
-  test('stroke is red (#ef4444) when utilization exceeds 100%', async ({ page }) => {
+  test('stroke is red (#ef4444) when utilization exceeds 100%', async ({
+    page,
+  }) => {
     await mockUsageResponse(page, {
       yearlyActiveUsers: 510,
       seatLimit: 500,
@@ -212,8 +241,12 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       overageUsers: 10,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
 
     const progressArc = page
       .locator('[data-testid="usage-meter"] svg circle')
@@ -231,8 +264,12 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       overageUsers: 10,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="overage-callout"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="overage-callout"]')
+      .waitFor({ timeout: 15_000 });
 
     const callout = page.locator('[data-testid="overage-callout"]');
     await expect(callout).toBeVisible({ timeout: 5_000 });
@@ -241,7 +278,9 @@ test.describe('Org Usage Page — Utilization Color States', () => {
     await expect(callout).toContainText(/over your/i);
   });
 
-  test('overage callout is NOT shown when utilization is below 100%', async ({ page }) => {
+  test('overage callout is NOT shown when utilization is below 100%', async ({
+    page,
+  }) => {
     await mockUsageResponse(page, {
       yearlyActiveUsers: 342,
       seatLimit: 500,
@@ -249,17 +288,25 @@ test.describe('Org Usage Page — Utilization Color States', () => {
       overageUsers: 0,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
 
-    await expect(page.locator('[data-testid="overage-callout"]')).not.toBeVisible();
+    await expect(
+      page.locator('[data-testid="overage-callout"]')
+    ).not.toBeVisible();
   });
 });
 
 // ─── Suite 4: Visual Regression ───────────────────────────────────────────────
 
 test.describe('Org Usage Page — Visual Regression', () => {
-  test('visual screenshot — normal state (68% utilization, green)', async ({ page }) => {
+  test('visual screenshot — normal state (68% utilization, green)', async ({
+    page,
+  }) => {
     await mockUsageResponse(page, {
       yearlyActiveUsers: 342,
       seatLimit: 500,
@@ -268,8 +315,12 @@ test.describe('Org Usage Page — Visual Regression', () => {
       monthlyActiveUsers: 87,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
 
     // Allow SVG transition to settle (0.4s ease in UsageMeter)
     await page.waitForLoadState('networkidle').catch(() => {});
@@ -280,7 +331,9 @@ test.describe('Org Usage Page — Visual Regression', () => {
     });
   });
 
-  test('visual screenshot — overage state (102% utilization, red + callout)', async ({ page }) => {
+  test('visual screenshot — overage state (102% utilization, red + callout)', async ({
+    page,
+  }) => {
     await mockUsageResponse(page, {
       yearlyActiveUsers: 510,
       seatLimit: 500,
@@ -289,11 +342,17 @@ test.describe('Org Usage Page — Visual Regression', () => {
       monthlyActiveUsers: 112,
     });
     await login(page);
-    await page.goto(`${BASE_URL}/admin/usage`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/usage`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // Wait for both the meter and the overage callout to render
-    await page.locator('[data-testid="usage-meter"]').waitFor({ timeout: 15_000 });
-    await page.locator('[data-testid="overage-callout"]').waitFor({ timeout: 5_000 });
+    await page
+      .locator('[data-testid="usage-meter"]')
+      .waitFor({ timeout: 15_000 });
+    await page
+      .locator('[data-testid="overage-callout"]')
+      .waitFor({ timeout: 5_000 });
 
     await page.waitForLoadState('networkidle').catch(() => {});
 

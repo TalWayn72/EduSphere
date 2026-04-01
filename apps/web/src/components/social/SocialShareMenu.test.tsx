@@ -3,17 +3,26 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SocialShareMenu } from './SocialShareMenu';
 
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_, name) => {
-    if (name === '__esModule') return true;
-    return function MockIcon(props: Record<string, unknown>) {
-      return <span data-testid={`icon-${String(name)}`} {...props} />;
-    };
-  },
-}));
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
+);
 
 describe('SocialShareMenu', () => {
-  beforeEach(() => { vi.restoreAllMocks(); });
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it('renders trigger button with default label', () => {
     render(<SocialShareMenu url="https://example.com" title="Test" />);
@@ -21,8 +30,16 @@ describe('SocialShareMenu', () => {
   });
 
   it('renders trigger with custom label', () => {
-    render(<SocialShareMenu url="https://example.com" title="Test" triggerLabel="Share Badge" />);
-    expect(screen.getByRole('button', { name: /share badge/i })).toBeInTheDocument();
+    render(
+      <SocialShareMenu
+        url="https://example.com"
+        title="Test"
+        triggerLabel="Share Badge"
+      />
+    );
+    expect(
+      screen.getByRole('button', { name: /share badge/i })
+    ).toBeInTheDocument();
   });
 
   it('shows menu items when clicked', async () => {
@@ -46,7 +63,7 @@ describe('SocialShareMenu', () => {
     expect(openSpy).toHaveBeenCalledWith(
       expect.stringContaining('linkedin.com'),
       '_blank',
-      expect.any(String),
+      expect.any(String)
     );
   });
 
@@ -58,6 +75,8 @@ describe('SocialShareMenu', () => {
     await waitFor(() => screen.getByText('Copy Link'));
     fireEvent.click(screen.getByText('Copy Link'));
     expect(writeText).toHaveBeenCalledWith('https://example.com');
-    await waitFor(() => expect(screen.getByText('Copied!')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('Copied!')).toBeInTheDocument()
+    );
   });
 });

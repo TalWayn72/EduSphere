@@ -22,7 +22,9 @@ export const cpdCreditTypes = pgTable('cpd_credit_types', {
     .notNull()
     .default('1.00'),
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // Table 2: CPD credits assigned to specific courses by admins
@@ -33,7 +35,9 @@ export const courseCpdCredits = pgTable('course_cpd_credits', {
   creditTypeId: uuid('credit_type_id').notNull(),
   creditHours: decimal('credit_hours', { precision: 6, scale: 2 }).notNull(),
   approvedAt: timestamp('approved_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // Table 3: User CPD log - one record per completion
@@ -46,9 +50,13 @@ export const userCpdLog = pgTable(
     courseId: uuid('course_id').notNull(),
     creditTypeId: uuid('credit_type_id').notNull(),
     earnedHours: decimal('earned_hours', { precision: 6, scale: 2 }).notNull(),
-    completionDate: timestamp('completion_date', { withTimezone: true }).notNull(),
+    completionDate: timestamp('completion_date', {
+      withTimezone: true,
+    }).notNull(),
     certificateId: uuid('certificate_id'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => ({
     userIdx: index('user_cpd_log_user_idx').on(t.userId),

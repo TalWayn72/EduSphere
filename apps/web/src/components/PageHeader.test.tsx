@@ -30,7 +30,9 @@ describe('PageHeader', () => {
 
   it('renders h1 heading', () => {
     renderWithRouter(<PageHeader title="Courses" />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Courses');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Courses'
+    );
   });
 
   it('renders description when provided', () => {
@@ -40,7 +42,10 @@ describe('PageHeader', () => {
 
   it('renders breadcrumbs navigation', () => {
     renderWithRouter(
-      <PageHeader title="T" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Current' }]} />,
+      <PageHeader
+        title="T"
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Current' }]}
+      />
     );
     expect(screen.getByLabelText('Breadcrumb')).toBeInTheDocument();
   });
@@ -52,7 +57,10 @@ describe('PageHeader', () => {
 
   it('renders actions slot', () => {
     renderWithRouter(
-      <PageHeader title="T" actions={<button data-testid="action-btn">Action</button>} />,
+      <PageHeader
+        title="T"
+        actions={<button data-testid="action-btn">Action</button>}
+      />
     );
     expect(screen.getByTestId('action-btn')).toBeInTheDocument();
   });

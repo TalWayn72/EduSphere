@@ -195,7 +195,10 @@ export const CREATE_PIPELINE_TEMPLATE_MUTATION = gql`
 `;
 
 export const UPDATE_PIPELINE_TEMPLATE_MUTATION = gql`
-  mutation UpdatePipelineTemplate($id: ID!, $input: UpdatePipelineTemplateInput!) {
+  mutation UpdatePipelineTemplate(
+    $id: ID!
+    $input: UpdatePipelineTemplateInput!
+  ) {
     updatePipelineTemplate(id: $id, input: $input) {
       id
       name

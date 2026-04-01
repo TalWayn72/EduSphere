@@ -56,7 +56,11 @@ describe('DropdownMenuShortcut', () => {
   });
 
   it('forwards className', () => {
-    render(<DropdownMenuShortcut className="ml-4" data-testid="sc">K</DropdownMenuShortcut>);
+    render(
+      <DropdownMenuShortcut className="ml-4" data-testid="sc">
+        K
+      </DropdownMenuShortcut>
+    );
     expect(screen.getByTestId('sc')).toHaveClass('ml-4');
   });
 

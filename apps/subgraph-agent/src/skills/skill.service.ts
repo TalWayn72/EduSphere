@@ -51,10 +51,7 @@ export class SkillService implements OnModuleDestroy {
   }
 
   async getSkill(id: string) {
-    const rows = await this.db
-      .select()
-      .from(skills)
-      .where(eq(skills.id, id));
+    const rows = await this.db.select().from(skills).where(eq(skills.id, id));
     return rows[0] ?? null;
   }
 
@@ -163,19 +160,20 @@ export class SkillService implements OnModuleDestroy {
     const ctx = toTenantContext(auth);
 
     // 1. Load the skill path (all paths for this tenant, then filter in memory)
-    const paths = await withTenantContext(this.db, ctx, (tx) =>
-      tx
-        .select()
-        .from(skillPaths)
-        .where(eq(skillPaths.tenantId, ctx.tenantId))
-    ) as Array<{ id: string; tenantId: string; skillIds: unknown }>;
-    const path = (paths as Array<{ id: string; skillIds: unknown }>).find((p) => p.id === pathId);
+    const paths = (await withTenantContext(this.db, ctx, (tx) =>
+      tx.select().from(skillPaths).where(eq(skillPaths.tenantId, ctx.tenantId))
+    )) as Array<{ id: string; tenantId: string; skillIds: unknown }>;
+    const path = (paths as Array<{ id: string; skillIds: unknown }>).find(
+      (p) => p.id === pathId
+    );
     if (!path) return null;
 
-    const requiredIds: string[] = Array.isArray(path.skillIds) ? (path.skillIds as string[]) : [];
+    const requiredIds: string[] = Array.isArray(path.skillIds)
+      ? (path.skillIds as string[])
+      : [];
 
     // 2. Load learner progress
-    const progress = await withTenantContext(this.db, ctx, (tx) =>
+    const progress = (await withTenantContext(this.db, ctx, (tx) =>
       tx
         .select()
         .from(learnerSkillProgress)
@@ -185,17 +183,25 @@ export class SkillService implements OnModuleDestroy {
             eq(learnerSkillProgress.userId, ctx.userId)
           )
         )
-    ) as Array<{ skillId: string; masteryLevel: string }>;
+    )) as Array<{ skillId: string; masteryLevel: string }>;
 
     const masteredSet = new Set(
       progress
-        .filter((p) => p.masteryLevel === 'MASTERED' || p.masteryLevel === 'PROFICIENT')
+        .filter(
+          (p) =>
+            p.masteryLevel === 'MASTERED' || p.masteryLevel === 'PROFICIENT'
+        )
         .map((p) => p.skillId)
     );
 
-    const masteredSkills = requiredIds.filter((id) => masteredSet.has(id)).length;
+    const masteredSkills = requiredIds.filter((id) =>
+      masteredSet.has(id)
+    ).length;
     const gapSkills = requiredIds.filter((id) => !masteredSet.has(id));
-    const completionPct = requiredIds.length === 0 ? 100 : Math.round((masteredSkills / requiredIds.length) * 100);
+    const completionPct =
+      requiredIds.length === 0
+        ? 100
+        : Math.round((masteredSkills / requiredIds.length) * 100);
 
     return { pathId, completionPct, masteredSkills, gapSkills };
   }

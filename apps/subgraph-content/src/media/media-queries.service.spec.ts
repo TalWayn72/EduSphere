@@ -81,9 +81,7 @@ describe('MediaQueriesService', () => {
     });
 
     it('skips tracks where vttKey is null', async () => {
-      const chain = makeSelectChainNoLimit([
-        { language: 'he', vttKey: null },
-      ]);
+      const chain = makeSelectChainNoLimit([{ language: 'he', vttKey: null }]);
       mockSelect.mockReturnValue({ from: chain.from });
 
       const tracks = await service.getSubtitleTracks('a1', downloadUrlFn);
@@ -129,7 +127,10 @@ describe('MediaQueriesService', () => {
       downloadUrlFn.mockResolvedValue('https://cdn/vid.mp4');
 
       const result = await service.updateAltText(
-        'm1', 'A video about Torah', 't1', downloadUrlFn,
+        'm1',
+        'A video about Torah',
+        't1',
+        downloadUrlFn
       );
       expect(result.id).toBe('m1');
       expect(result.altText).toBe('A video about Torah');
@@ -144,14 +145,17 @@ describe('MediaQueriesService', () => {
       mockUpdate.mockReturnValue({ set });
 
       await expect(
-        service.updateAltText('bad-id', 'text', 't1', downloadUrlFn),
+        service.updateAltText('bad-id', 'text', 't1', downloadUrlFn)
       ).rejects.toThrow(NotFoundException);
     });
 
     it('returns null downloadUrl when download URL generation fails', async () => {
       const updated = {
-        id: 'm1', course_id: 'c1', file_url: 'f.mp4',
-        title: 'V', alt_text: 'alt',
+        id: 'm1',
+        course_id: 'c1',
+        file_url: 'f.mp4',
+        title: 'V',
+        alt_text: 'alt',
       };
       const returning = vi.fn().mockResolvedValue([updated]);
       const where = vi.fn().mockReturnValue({ returning });
@@ -160,7 +164,10 @@ describe('MediaQueriesService', () => {
       downloadUrlFn.mockRejectedValue(new Error('fail'));
 
       const result = await service.updateAltText(
-        'm1', 'alt', 't1', downloadUrlFn,
+        'm1',
+        'alt',
+        't1',
+        downloadUrlFn
       );
       expect(result.downloadUrl).toBeNull();
     });

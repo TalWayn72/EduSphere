@@ -12,12 +12,7 @@ import { buildSchema, type GraphQLSchema } from 'graphql';
 
 // ── Load & parse the SDL ─────────────────────────────────────────────────────
 
-const SDL_PATH = resolve(
-  __dirname,
-  '..',
-  'lesson',
-  'lesson.graphql'
-);
+const SDL_PATH = resolve(__dirname, '..', 'lesson', 'lesson.graphql');
 
 // The lesson.graphql uses federation directives — stub them so buildSchema works
 const FEDERATION_STUBS = `
@@ -79,25 +74,33 @@ describe('Pipeline Schema Contract (Phase 65)', () => {
     });
 
     it('has runNumber field (Int!)', () => {
-      const type = schema.getType('LessonPipelineRun') as import('graphql').GraphQLObjectType;
+      const type = schema.getType(
+        'LessonPipelineRun'
+      ) as import('graphql').GraphQLObjectType;
       const fields = type.getFields();
       expect(fields['runNumber']).toBeDefined();
     });
 
     it('has triggeredBy field (String!)', () => {
-      const type = schema.getType('LessonPipelineRun') as import('graphql').GraphQLObjectType;
+      const type = schema.getType(
+        'LessonPipelineRun'
+      ) as import('graphql').GraphQLObjectType;
       const fields = type.getFields();
       expect(fields['triggeredBy']).toBeDefined();
     });
 
     it('has status field', () => {
-      const type = schema.getType('LessonPipelineRun') as import('graphql').GraphQLObjectType;
+      const type = schema.getType(
+        'LessonPipelineRun'
+      ) as import('graphql').GraphQLObjectType;
       const fields = type.getFields();
       expect(fields['status']).toBeDefined();
     });
 
     it('has results field', () => {
-      const type = schema.getType('LessonPipelineRun') as import('graphql').GraphQLObjectType;
+      const type = schema.getType(
+        'LessonPipelineRun'
+      ) as import('graphql').GraphQLObjectType;
       const fields = type.getFields();
       expect(fields['results']).toBeDefined();
     });
@@ -246,7 +249,9 @@ describe('Pipeline Schema Contract (Phase 65)', () => {
     });
 
     it('has required fields', () => {
-      const type = schema.getType('LessonPipelineTemplate') as import('graphql').GraphQLObjectType;
+      const type = schema.getType(
+        'LessonPipelineTemplate'
+      ) as import('graphql').GraphQLObjectType;
       const fields = type.getFields();
       expect(fields['id']).toBeDefined();
       expect(fields['name']).toBeDefined();
@@ -261,7 +266,9 @@ describe('Pipeline Schema Contract (Phase 65)', () => {
 
   describe('LessonPipelineResult type', () => {
     it('exists with required fields', () => {
-      const type = schema.getType('LessonPipelineResult') as import('graphql').GraphQLObjectType;
+      const type = schema.getType(
+        'LessonPipelineResult'
+      ) as import('graphql').GraphQLObjectType;
       expect(type).toBeDefined();
       const fields = type.getFields();
       expect(fields['moduleName']).toBeDefined();

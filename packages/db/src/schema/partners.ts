@@ -54,7 +54,9 @@ export const partners = pgTable(
     /** pending | active | suspended */
     status: text('status').notNull().default('pending'),
     notes: text('notes'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow()
@@ -93,10 +95,15 @@ export const partnerRevenue = pgTable(
     /** pending | paid */
     status: text('status').notNull().default('pending'),
     paidAt: timestamp('paid_at', { withTimezone: true }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
-    uniqueIndex('partner_revenue_partner_month_unique').on(t.partnerId, t.month),
+    uniqueIndex('partner_revenue_partner_month_unique').on(
+      t.partnerId,
+      t.month
+    ),
     index('idx_partner_revenue_partner').on(t.partnerId),
     index('idx_partner_revenue_month').on(t.month),
     pgPolicy('partner_revenue_superadmin', {

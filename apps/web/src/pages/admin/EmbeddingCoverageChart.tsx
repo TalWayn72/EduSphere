@@ -25,7 +25,9 @@ interface EmbeddingCoverageChartProps {
   courses: CourseBreakdown[];
 }
 
-export function EmbeddingCoverageChart({ courses }: EmbeddingCoverageChartProps) {
+export function EmbeddingCoverageChart({
+  courses,
+}: EmbeddingCoverageChartProps) {
   const { t } = useTranslation('admin');
 
   if (courses.length === 0) {
@@ -46,11 +48,19 @@ export function EmbeddingCoverageChart({ courses }: EmbeddingCoverageChartProps)
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3" role="list" aria-label={t('embeddings.coverageLabel', 'Course embedding coverage')}>
+        <div
+          className="space-y-3"
+          role="list"
+          aria-label={t(
+            'embeddings.coverageLabel',
+            'Course embedding coverage'
+          )}
+        >
           {courses.map((course) => {
-            const pct = course.sourceCount > 0
-              ? Math.round((course.indexedCount / course.sourceCount) * 100)
-              : 0;
+            const pct =
+              course.sourceCount > 0
+                ? Math.round((course.indexedCount / course.sourceCount) * 100)
+                : 0;
 
             return (
               <div
@@ -63,7 +73,9 @@ export function EmbeddingCoverageChart({ courses }: EmbeddingCoverageChartProps)
                   <span className="truncate max-w-[200px] font-medium text-foreground">
                     {course.courseTitle}
                   </span>
-                  <span className={`font-semibold tabular-nums ${getCoverageTextColor(pct)}`}>
+                  <span
+                    className={`font-semibold tabular-nums ${getCoverageTextColor(pct)}`}
+                  >
                     {pct}%
                   </span>
                 </div>

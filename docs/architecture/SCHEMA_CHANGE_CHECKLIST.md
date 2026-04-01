@@ -8,6 +8,7 @@
 ## When to Use This Checklist
 
 Use this checklist for ANY change to `packages/db/src/schema/*.ts` that affects:
+
 - Column additions, renames, or removals
 - Type changes (e.g., `text` → `varchar`, `integer` → `bigint`)
 - New tables or dropped tables
@@ -88,13 +89,13 @@ Use this checklist for ANY change to `packages/db/src/schema/*.ts` that affects:
 
 ## Common Failure Modes
 
-| Failure | Root Cause | Prevention |
-|---------|-----------|-----------|
-| `column "old_name" does not exist` | Resolver references old column name | Step 3: update resolver |
-| `Cannot query field "x" on type "Y"` | SDL not updated after schema change | Step 2: update SDL |
-| `Type 'X' is not assignable to type 'Y'` | Codegen not re-run after SDL change | Step 5: run codegen |
-| `Federation composition failed` | `@key` stub references removed field | Step 2: update stubs |
-| `RLS violation` | New table missing RLS policy | Step 1: add withRLS() |
+| Failure                                  | Root Cause                           | Prevention              |
+| ---------------------------------------- | ------------------------------------ | ----------------------- |
+| `column "old_name" does not exist`       | Resolver references old column name  | Step 3: update resolver |
+| `Cannot query field "x" on type "Y"`     | SDL not updated after schema change  | Step 2: update SDL      |
+| `Type 'X' is not assignable to type 'Y'` | Codegen not re-run after SDL change  | Step 5: run codegen     |
+| `Federation composition failed`          | `@key` stub references removed field | Step 2: update stubs    |
+| `RLS violation`                          | New table missing RLS policy         | Step 1: add withRLS()   |
 
 ---
 
@@ -110,4 +111,4 @@ If a schema change causes issues after deployment:
 
 ---
 
-*Last updated: March 2026 — Enterprise Audit Wave 6*
+_Last updated: March 2026 — Enterprise Audit Wave 6_

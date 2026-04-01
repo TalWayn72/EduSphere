@@ -23,6 +23,11 @@ import { AtRiskResolver } from './at-risk.resolver.js';
     AtRiskService,
     AtRiskResolver,
   ],
-  exports: [AnalyticsService, AiUsageService, TenantAnalyticsService, AtRiskService],
+  exports: [
+    AnalyticsService,
+    AiUsageService,
+    TenantAnalyticsService,
+    AtRiskService,
+  ],
 })
 export class AnalyticsModule {}

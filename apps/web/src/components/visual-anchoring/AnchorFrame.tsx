@@ -30,9 +30,7 @@ export default function AnchorFrame({
   // Announce active anchor change to screen readers
   useEffect(() => {
     if (announceRef.current) {
-      announceRef.current.textContent = activeAnchorId
-        ? `עוגן פעיל השתנה`
-        : '';
+      announceRef.current.textContent = activeAnchorId ? `עוגן פעיל השתנה` : '';
     }
   }, [activeAnchorId]);
 
@@ -70,14 +68,15 @@ export default function AnchorFrame({
     };
   }, [activeAnchorId, updateFrame, containerRef]);
 
-  if (!frameRect || !activeAnchorId) return (
-    <div
-      ref={announceRef}
-      className="sr-only"
-      aria-live="polite"
-      aria-atomic="true"
-    />
-  );
+  if (!frameRect || !activeAnchorId)
+    return (
+      <div
+        ref={announceRef}
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+      />
+    );
 
   return (
     <>
@@ -96,7 +95,8 @@ export default function AnchorFrame({
           width: frameRect.width + 4,
           height: frameRect.height + 4,
           border: '1.5px solid hsl(var(--primary) / 0.6)',
-          transition: 'top 150ms ease, left 150ms ease, width 150ms ease, height 150ms ease',
+          transition:
+            'top 150ms ease, left 150ms ease, width 150ms ease, height 150ms ease',
           zIndex: 10,
           background: 'hsl(var(--primary) / 0.05)',
         }}
@@ -106,7 +106,8 @@ export default function AnchorFrame({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') onFrameClick?.(activeAnchorId);
+          if (e.key === 'Enter' || e.key === ' ')
+            onFrameClick?.(activeAnchorId);
         }}
       />
     </>

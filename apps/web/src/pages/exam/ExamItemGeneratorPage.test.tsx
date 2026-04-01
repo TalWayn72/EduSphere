@@ -5,7 +5,11 @@ import React from 'react';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useParams: () => ({ courseId: 'c-1' }), Navigate: ({ to }: { to: string }) => <div>redirect {to}</div> };
+  return {
+    ...actual,
+    useParams: () => ({ courseId: 'c-1' }),
+    Navigate: ({ to }: { to: string }) => <div>redirect {to}</div>,
+  };
 });
 
 vi.mock('sonner', () => ({
@@ -23,11 +27,15 @@ vi.mock('@/hooks/useExamApi', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -46,7 +54,11 @@ import { ExamItemGeneratorPage } from './ExamItemGeneratorPage';
 
 describe('ExamItemGeneratorPage', () => {
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><ExamItemGeneratorPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <ExamItemGeneratorPage />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

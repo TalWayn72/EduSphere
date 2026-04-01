@@ -10,15 +10,20 @@ const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-    fn({ execute: mockExecute })
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({ execute: mockExecute })
   ),
   sql: Object.assign(vi.fn(), { raw: vi.fn() }),
 }));
 
 import { OrgLicensingService } from './org-licensing.service';
 
-const ctx = { tenantId: 't1', userId: 'admin1', userRole: 'ORG_ADMIN' as const };
+const ctx = {
+  tenantId: 't1',
+  userId: 'admin1',
+  userRole: 'ORG_ADMIN' as const,
+};
 
 describe('OrgLicensingService', () => {
   let service: OrgLicensingService;
@@ -33,15 +38,23 @@ describe('OrgLicensingService', () => {
       mockExecute
         .mockResolvedValueOnce({ rows: [] }) // no existing
         .mockResolvedValueOnce({
-          rows: [{
-            id: 'lic1', course_id: 'c1', license_type: 'UNLIMITED',
-            max_seats: null, used_seats: 0, status: 'ACTIVE',
-            licensed_at: new Date(), expires_at: null,
-          }],
+          rows: [
+            {
+              id: 'lic1',
+              course_id: 'c1',
+              license_type: 'UNLIMITED',
+              max_seats: null,
+              used_seats: 0,
+              status: 'ACTIVE',
+              licensed_at: new Date(),
+              expires_at: null,
+            },
+          ],
         });
 
       const result = await service.licenseCourse(
-        { courseId: 'c1', licenseType: 'UNLIMITED' }, ctx
+        { courseId: 'c1', licenseType: 'UNLIMITED' },
+        ctx
       );
       expect(result.id).toBe('lic1');
       expect(result.status).toBe('ACTIVE');
@@ -63,18 +76,24 @@ describe('OrgLicensingService', () => {
     });
 
     it('should set expiresAt for TIME_LIMITED with durationMonths', async () => {
-      mockExecute
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({
-          rows: [{
-            id: 'lic2', course_id: 'c2', license_type: 'TIME_LIMITED',
-            max_seats: null, used_seats: 0, status: 'ACTIVE',
-            licensed_at: new Date(), expires_at: new Date('2026-06-01'),
-          }],
-        });
+      mockExecute.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'lic2',
+            course_id: 'c2',
+            license_type: 'TIME_LIMITED',
+            max_seats: null,
+            used_seats: 0,
+            status: 'ACTIVE',
+            licensed_at: new Date(),
+            expires_at: new Date('2026-06-01'),
+          },
+        ],
+      });
 
       const result = await service.licenseCourse(
-        { courseId: 'c2', licenseType: 'TIME_LIMITED', durationMonths: 3 }, ctx
+        { courseId: 'c2', licenseType: 'TIME_LIMITED', durationMonths: 3 },
+        ctx
       );
       expect(result.expiresAt).toBeInstanceOf(Date);
     });
@@ -94,9 +113,14 @@ describe('OrgLicensingService', () => {
       mockExecute.mockResolvedValue({
         rows: [
           {
-            id: 'lic1', course_id: 'c1', license_type: 'UNLIMITED',
-            max_seats: null, used_seats: 0, status: 'ACTIVE',
-            licensed_at: new Date(), expires_at: null,
+            id: 'lic1',
+            course_id: 'c1',
+            license_type: 'UNLIMITED',
+            max_seats: null,
+            used_seats: 0,
+            status: 'ACTIVE',
+            licensed_at: new Date(),
+            expires_at: null,
           },
         ],
       });

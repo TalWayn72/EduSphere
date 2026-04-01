@@ -16,7 +16,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockDrain, _mockPublish, mockConnect } = vi.hoisted(() => {
   const mockDrain = vi.fn().mockResolvedValue(undefined);
   const _mockPublish = vi.fn();
-  const mockConnect = vi.fn().mockResolvedValue({ drain: mockDrain, publish: _mockPublish });
+  const mockConnect = vi
+    .fn()
+    .mockResolvedValue({ drain: mockDrain, publish: _mockPublish });
   return { mockDrain, _mockPublish, mockConnect };
 });
 
@@ -28,7 +30,9 @@ vi.mock('nats', () => ({
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
-  buildNatsOptions: vi.fn().mockReturnValue({ servers: 'nats://localhost:4222' }),
+  buildNatsOptions: vi
+    .fn()
+    .mockReturnValue({ servers: 'nats://localhost:4222' }),
 }));
 
 // ── Mock @edusphere/db to avoid real DB connections ───────────────────────────
@@ -39,18 +43,16 @@ const DEFAULT_EMBEDDING_ROWS = [
 ];
 
 // Track what the mockLocalDb.select chain returns so tests can override
-let embeddingRowsToReturn: typeof DEFAULT_EMBEDDING_ROWS = DEFAULT_EMBEDDING_ROWS;
+let embeddingRowsToReturn: typeof DEFAULT_EMBEDDING_ROWS =
+  DEFAULT_EMBEDDING_ROWS;
 
 const mockLocalDb = {
   select: vi.fn(() => ({
     from: vi.fn(() =>
-      Object.assign(
-        Promise.resolve(embeddingRowsToReturn),
-        {
-          catch: (fn: (e: unknown) => unknown) =>
-            Promise.resolve(embeddingRowsToReturn).catch(fn),
-        }
-      )
+      Object.assign(Promise.resolve(embeddingRowsToReturn), {
+        catch: (fn: (e: unknown) => unknown) =>
+          Promise.resolve(embeddingRowsToReturn).catch(fn),
+      })
     ),
   })),
 };
@@ -79,7 +81,9 @@ vi.mock('@edusphere/config', () => ({
 
 function makeCypherTopicClusterService() {
   return {
-    createTopicCluster: vi.fn().mockResolvedValue({ id: 'tc-1', name: 'Cluster A' }),
+    createTopicCluster: vi
+      .fn()
+      .mockResolvedValue({ id: 'tc-1', name: 'Cluster A' }),
   };
 }
 
@@ -87,10 +91,11 @@ import { TopicClusterKMeansService } from './topic-cluster-kmeans.service.js';
 import type { CypherTopicClusterService } from './cypher-topic-cluster.service.js';
 
 function makeService(
-  cypher?: ReturnType<typeof makeCypherTopicClusterService>,
+  cypher?: ReturnType<typeof makeCypherTopicClusterService>
 ): TopicClusterKMeansService {
   return new TopicClusterKMeansService(
-    (cypher ?? makeCypherTopicClusterService()) as unknown as CypherTopicClusterService,
+    (cypher ??
+      makeCypherTopicClusterService()) as unknown as CypherTopicClusterService
   );
 }
 
@@ -101,13 +106,10 @@ describe('TopicClusterKMeansService — memory safety', () => {
     // Re-wire the select mock after clearAllMocks
     mockLocalDb.select.mockImplementation(() => ({
       from: vi.fn(() =>
-        Object.assign(
-          Promise.resolve(embeddingRowsToReturn),
-          {
-            catch: (fn: (e: unknown) => unknown) =>
-              Promise.resolve(embeddingRowsToReturn).catch(fn),
-          }
-        )
+        Object.assign(Promise.resolve(embeddingRowsToReturn), {
+          catch: (fn: (e: unknown) => unknown) =>
+            Promise.resolve(embeddingRowsToReturn).catch(fn),
+        })
       ),
     }));
   });

@@ -36,18 +36,27 @@ export class OrgOnboardingResolver {
 
   @Mutation('createOrganization')
   async createOrganization(
-    @Args('input') input: {
-      name: string; slug: string; adminEmail: string;
-      adminFirstName: string; adminLastName: string; idempotencyKey: string;
+    @Args('input')
+    input: {
+      name: string;
+      slug: string;
+      adminEmail: string;
+      adminFirstName: string;
+      adminLastName: string;
+      idempotencyKey: string;
     }
   ) {
     const result = await this.provisioningService.createOrganization(input);
     return {
-      ...result, memberCount: 1,
+      ...result,
+      memberCount: 1,
       onboardingChecklist: {
-        brandingConfigured: false, firstUserInvited: false,
-        firstCourseCreated: false, domainConfigured: false,
-        ssoConfigured: false, completionPercentage: 0,
+        brandingConfigured: false,
+        firstUserInvited: false,
+        firstCourseCreated: false,
+        domainConfigured: false,
+        ssoConfigured: false,
+        completionPercentage: 0,
       },
     };
   }
@@ -58,11 +67,16 @@ export class OrgOnboardingResolver {
     const tenant = await this.tenantService.findById(tenantCtx.tenantId);
     const settings = (tenant?.settings as Record<string, unknown>) ?? {};
     return {
-      id: tenantCtx.tenantId, name: tenant?.name ?? '', slug: tenant?.slug ?? '',
+      id: tenantCtx.tenantId,
+      name: tenant?.name ?? '',
+      slug: tenant?.slug ?? '',
       plan: tenant?.plan ?? 'FREE',
       provisioningStatus: (settings.provisioningStatus as string) ?? 'ACTIVE',
-      trialEndsAt: settings.trialEndsAt ? new Date(settings.trialEndsAt as string) : null,
-      memberCount: 0, createdAt: tenant?.created_at ?? new Date(),
+      trialEndsAt: settings.trialEndsAt
+        ? new Date(settings.trialEndsAt as string)
+        : null,
+      memberCount: 0,
+      createdAt: tenant?.created_at ?? new Date(),
       onboardingChecklist: null,
     };
   }
@@ -96,14 +110,18 @@ export class OrgOnboardingResolver {
   }
 
   @Query('orgInvitations')
-  async getOrgInvitations(@Args('status') status: string | undefined, @Context() ctx: GqlContext) {
+  async getOrgInvitations(
+    @Args('status') status: string | undefined,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.invitationService.getInvitations(tenantCtx, status);
   }
 
   @Query('orgMembers')
   async getOrgMembers(
-    @Args('limit') _limit: number, @Args('offset') _offset: number,
+    @Args('limit') _limit: number,
+    @Args('offset') _offset: number,
     @Context() ctx: GqlContext
   ) {
     requireAuth(ctx);
@@ -112,15 +130,26 @@ export class OrgOnboardingResolver {
 
   @Mutation('updateMemberRole')
   async updateMemberRole(
-    @Args('userId') _userId: string, @Args('role') _role: string,
+    @Args('userId') _userId: string,
+    @Args('role') _role: string,
     @Context() ctx: GqlContext
   ) {
     requireAuth(ctx);
-    return { id: _userId, email: '', name: null, role: _role, joinedAt: new Date(), lastActiveAt: null };
+    return {
+      id: _userId,
+      email: '',
+      name: null,
+      role: _role,
+      joinedAt: new Date(),
+      lastActiveAt: null,
+    };
   }
 
   @Mutation('removeMember')
-  async removeMember(@Args('userId') _userId: string, @Context() ctx: GqlContext) {
+  async removeMember(
+    @Args('userId') _userId: string,
+    @Context() ctx: GqlContext
+  ) {
     requireAuth(ctx);
     return true;
   }
@@ -135,7 +164,8 @@ export class OrgOnboardingResolver {
 
   @Mutation('updateGamificationConfig')
   async updateGamificationConfig(
-    @Args('input') input: Record<string, unknown>, @Context() ctx: GqlContext
+    @Args('input') input: Record<string, unknown>,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.gamificationService.updateConfig(tenantCtx, input);
@@ -151,19 +181,27 @@ export class OrgOnboardingResolver {
 
   @Mutation('createOrgBadge')
   async createOrgBadge(
-    @Args('input') input: {
-      name: string; description?: string; iconUrl?: string;
-      xpRequired: number; autoAwardCriteria?: unknown;
+    @Args('input')
+    input: {
+      name: string;
+      description?: string;
+      iconUrl?: string;
+      xpRequired: number;
+      autoAwardCriteria?: unknown;
     },
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    return this.orgBadgeService.createBadge(tenantCtx, input as CreateOrgBadgeInput);
+    return this.orgBadgeService.createBadge(
+      tenantCtx,
+      input as CreateOrgBadgeInput
+    );
   }
 
   @Mutation('updateOrgBadge')
   async updateOrgBadge(
-    @Args('id') id: string, @Args('input') input: Record<string, unknown>,
+    @Args('id') id: string,
+    @Args('input') input: Record<string, unknown>,
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
@@ -185,28 +223,38 @@ export class OrgOnboardingResolver {
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.analyticsService.getOrgAnalytics(tenantCtx, {
-      from: new Date(dateRange.from), to: new Date(dateRange.to),
+      from: new Date(dateRange.from),
+      to: new Date(dateRange.to),
     });
   }
 
   @Query('orgAtRiskLearners')
   async getAtRiskLearners(
-    @Args('limit') limit: number, @Args('offset') offset: number,
+    @Args('limit') limit: number,
+    @Args('offset') offset: number,
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    return this.atRiskService.getAtRiskLearners(tenantCtx, limit ?? 20, offset ?? 0);
+    return this.atRiskService.getAtRiskLearners(
+      tenantCtx,
+      limit ?? 20,
+      offset ?? 0
+    );
   }
 
   @Query('learnerDetail')
-  async getLearnerDetail(@Args('userId') userId: string, @Context() ctx: GqlContext) {
+  async getLearnerDetail(
+    @Args('userId') userId: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.atRiskService.getLearnerDetail(tenantCtx, userId);
   }
 
   @Mutation('exportAnalytics')
   async exportAnalytics(
-    @Args('input') input: { format: string; dateRange: { from: string; to: string } },
+    @Args('input')
+    input: { format: string; dateRange: { from: string; to: string } },
     @Context() ctx: GqlContext
   ) {
     requireAuth(ctx);

@@ -70,7 +70,10 @@ describe('AnnotationDemo', () => {
   it('renders AnnotationPanel with correct props', () => {
     render(<AnnotationDemo />);
     const panel = screen.getByTestId('annotation-panel');
-    expect(panel).toHaveAttribute('data-content-id', 'b0000000-0000-0000-0000-000000000001');
+    expect(panel).toHaveAttribute(
+      'data-content-id',
+      'b0000000-0000-0000-0000-000000000001'
+    );
     expect(panel).toHaveAttribute('data-role', 'student');
   });
 

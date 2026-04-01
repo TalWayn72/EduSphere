@@ -39,7 +39,7 @@ function sleep(ms: number): Promise<void> {
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  opts?: RetryOptions,
+  opts?: RetryOptions
 ): Promise<T> {
   const { maxAttempts, initialDelayMs, backoffFactor, maxDelayMs } = {
     ...DEFAULT_RETRY,
@@ -55,7 +55,10 @@ export async function withRetry<T>(
     } catch (e) {
       lastError = e;
       if (attempt < maxAttempts) {
-        logError('retry', `Attempt ${attempt}/${maxAttempts} failed, retrying in ${delay}ms`);
+        logError(
+          'retry',
+          `Attempt ${attempt}/${maxAttempts} failed, retrying in ${delay}ms`
+        );
         await sleep(delay);
         delay = Math.min(delay * backoffFactor, maxDelayMs);
       }
@@ -76,7 +79,10 @@ export async function isChromaAvailable(timeoutMs = 2000): Promise<boolean> {
     const client = getClient();
     const heartbeat = client.heartbeat();
     const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('ChromaDB heartbeat timeout')), timeoutMs),
+      setTimeout(
+        () => reject(new Error('ChromaDB heartbeat timeout')),
+        timeoutMs
+      )
     );
     await Promise.race([heartbeat, timeout]);
     return true;

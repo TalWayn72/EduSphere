@@ -18,7 +18,10 @@ export interface BackendAnnotation {
   updatedAt: string;
 }
 
-export function toAnnotation(a: BackendAnnotation, userName: string): Annotation {
+export function toAnnotation(
+  a: BackendAnnotation,
+  userName: string
+): Annotation {
   const rawContent = a.content;
   const textContent =
     typeof rawContent === 'string'

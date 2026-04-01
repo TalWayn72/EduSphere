@@ -6,7 +6,13 @@ import { SoftwareApplicationSchema } from './SoftwareApplicationSchema';
 
 describe('SoftwareApplicationSchema', () => {
   it('renders without throwing', () => {
-    expect(() => render(<HelmetProvider><SoftwareApplicationSchema /></HelmetProvider>)).not.toThrow();
+    expect(() =>
+      render(
+        <HelmetProvider>
+          <SoftwareApplicationSchema />
+        </HelmetProvider>
+      )
+    ).not.toThrow();
   });
 
   it('type is SoftwareApplication', () => {

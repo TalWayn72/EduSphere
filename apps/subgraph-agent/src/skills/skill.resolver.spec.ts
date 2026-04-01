@@ -6,12 +6,18 @@ const mockListSkills = vi.hoisted(() => vi.fn().mockResolvedValue([]));
 const mockGetSkill = vi.hoisted(() => vi.fn().mockResolvedValue(null));
 const mockListSkillPaths = vi.hoisted(() => vi.fn().mockResolvedValue([]));
 const mockGetMySkillProgress = vi.hoisted(() => vi.fn().mockResolvedValue([]));
-const mockCreateSkillPath = vi.hoisted(() => vi.fn().mockResolvedValue({ id: 'path-1' }));
+const mockCreateSkillPath = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ id: 'path-1' })
+);
 const mockUpdateMySkillProgress = vi.hoisted(() =>
   vi.fn().mockResolvedValue({ skillId: 'skill-1', masteryLevel: 'PROFICIENT' })
 );
-const mockGetSkillPrerequisites = vi.hoisted(() => vi.fn().mockResolvedValue([]));
-const mockGetSkillGapAnalysis = vi.hoisted(() => vi.fn().mockResolvedValue(null));
+const mockGetSkillPrerequisites = vi.hoisted(() =>
+  vi.fn().mockResolvedValue([])
+);
+const mockGetSkillGapAnalysis = vi.hoisted(() =>
+  vi.fn().mockResolvedValue(null)
+);
 
 // ── Module mocks ──────────────────────────────────────────────────────────────
 
@@ -83,7 +89,11 @@ describe('SkillResolver', () => {
 
     it('calls listSkills with no args', async () => {
       await resolver.listSkills(undefined, undefined, undefined);
-      expect(mockListSkills).toHaveBeenCalledWith(undefined, undefined, undefined);
+      expect(mockListSkills).toHaveBeenCalledWith(
+        undefined,
+        undefined,
+        undefined
+      );
     });
   });
 

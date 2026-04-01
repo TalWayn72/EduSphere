@@ -27,7 +27,9 @@ describe('GraphGroundedCredentialService', () => {
   let service: GraphGroundedCredentialService;
 
   beforeEach(() => {
-    mockCreateDb.mockReturnValue({} as ReturnType<typeof db.createDatabaseConnection>);
+    mockCreateDb.mockReturnValue(
+      {} as ReturnType<typeof db.createDatabaseConnection>
+    );
     service = new GraphGroundedCredentialService();
   });
 
@@ -39,7 +41,11 @@ describe('GraphGroundedCredentialService', () => {
         select: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ status: 'COMPLETED', completedAt: new Date() }]),
+        limit: vi
+          .fn()
+          .mockResolvedValue([
+            { status: 'COMPLETED', completedAt: new Date() },
+          ]),
       } as unknown as db.DrizzleDB;
       return operation(fakeTx);
     });
@@ -48,7 +54,7 @@ describe('GraphGroundedCredentialService', () => {
       'user-1',
       'tenant-1',
       'course-1',
-      requiredConcepts,
+      requiredConcepts
     );
 
     expect(result.covered).toBe(true);
@@ -75,7 +81,7 @@ describe('GraphGroundedCredentialService', () => {
       'user-x',
       'tenant-x',
       'course-x',
-      requiredConcepts,
+      requiredConcepts
     );
 
     expect(result.covered).toBe(false);
@@ -90,7 +96,9 @@ describe('GraphGroundedCredentialService', () => {
         select: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ status: 'ACTIVE', completedAt: null }]),
+        limit: vi
+          .fn()
+          .mockResolvedValue([{ status: 'ACTIVE', completedAt: null }]),
       } as unknown as db.DrizzleDB;
       return operation(fakeTx);
     });
@@ -99,7 +107,7 @@ describe('GraphGroundedCredentialService', () => {
       'user-2',
       'tenant-2',
       'course-2',
-      ['c1', 'c2', 'c3', 'c4'],
+      ['c1', 'c2', 'c3', 'c4']
     );
 
     expect(result.covered).toBe(false);
@@ -128,7 +136,7 @@ describe('GraphGroundedCredentialService', () => {
       'user-1',
       'tenant-1',
       'assertion-1',
-      coverage,
+      coverage
     );
 
     expect(result.credentialId).toBe('cred-uuid-1');

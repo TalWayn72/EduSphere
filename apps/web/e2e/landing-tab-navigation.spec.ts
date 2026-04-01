@@ -97,12 +97,17 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
       const permLabel = perm.map((t) => t.name).join(' -> ');
 
       test(`Permutation ${i + 1}/24: ${permLabel}`, async ({ page }) => {
-        await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+        await page.goto(`${BASE_URL}/landing`, {
+          waitUntil: 'domcontentloaded',
+        });
+        await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+          timeout: 10_000,
+        });
 
         // Mark initial navigation count to detect full-page reloads
         await page.evaluate(() => {
-          (window as unknown as Record<string, number>).__navCount = performance.getEntriesByType('navigation').length;
+          (window as unknown as Record<string, number>).__navCount =
+            performance.getEntriesByType('navigation').length;
         });
 
         for (const tab of perm) {
@@ -122,9 +127,13 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
   // ─── Suite 2: Compliance regression guard (BUG-070 core fix) ──────────────
 
   test.describe('Compliance tab regression guard - BUG-070', () => {
-    test('clicking Compliance does NOT navigate to /compliance route', async ({ page }) => {
+    test('clicking Compliance does NOT navigate to /compliance route', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
 
       const nav = page.locator('[data-testid="public-nav"]');
       const complianceLink = nav.locator('a:text-is("Compliance")').first();
@@ -139,9 +148,13 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
       await expect(page.locator('#compliance')).toBeAttached();
     });
 
-    test('after clicking Compliance, Features tab still works', async ({ page }) => {
+    test('after clicking Compliance, Features tab still works', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
 
       // Click Compliance first
       await clickTabAndVerify(page, TABS[2]); // Compliance
@@ -150,25 +163,37 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
       await clickTabAndVerify(page, TABS[0]); // Features
     });
 
-    test('after clicking Compliance, Pricing tab still works', async ({ page }) => {
+    test('after clicking Compliance, Pricing tab still works', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
 
       await clickTabAndVerify(page, TABS[2]); // Compliance
       await clickTabAndVerify(page, TABS[1]); // Pricing
     });
 
-    test('after clicking Compliance, Pilot tab still works', async ({ page }) => {
+    test('after clicking Compliance, Pilot tab still works', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
 
       await clickTabAndVerify(page, TABS[2]); // Compliance
       await clickTabAndVerify(page, TABS[3]); // Pilot
     });
 
-    test('Compliance tab works after cycling through all other tabs', async ({ page }) => {
+    test('Compliance tab works after cycling through all other tabs', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
 
       await clickTabAndVerify(page, TABS[0]); // Features
       await clickTabAndVerify(page, TABS[1]); // Pricing
@@ -182,9 +207,13 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
   test.describe('Visual regression — screenshot per tab click', () => {
     test.use({ reducedMotion: 'reduce' });
 
-    test('screenshot after each tab click (Features -> Pricing -> Compliance -> Pilot)', async ({ page }) => {
+    test('screenshot after each tab click (Features -> Pricing -> Compliance -> Pilot)', async ({
+      page,
+    }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
       // Allow initial animations to settle
       await page.waitForLoadState('domcontentloaded');
 
@@ -199,7 +228,7 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
             fullPage: false,
             maxDiffPixels: 250,
             animations: 'disabled',
-          },
+          }
         );
       }
     });
@@ -209,9 +238,15 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
 
   test.describe('URL integrity', () => {
     for (const tab of TABS) {
-      test(`clicking ${tab.name} keeps URL on /landing (no route change)`, async ({ page }) => {
-        await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      test(`clicking ${tab.name} keeps URL on /landing (no route change)`, async ({
+        page,
+      }) => {
+        await page.goto(`${BASE_URL}/landing`, {
+          waitUntil: 'domcontentloaded',
+        });
+        await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+          timeout: 10_000,
+        });
 
         const nav = page.locator('[data-testid="public-nav"]');
         const link = nav.locator(`a:text-is("${tab.name}")`).first();
@@ -230,7 +265,9 @@ test.describe('Landing Page Tab Navigation - BUG-070', () => {
 
     test('rapid tab switching does not cause navigation', async ({ page }) => {
       await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-testid="public-nav"]')).toBeVisible({
+        timeout: 10_000,
+      });
 
       const nav = page.locator('[data-testid="public-nav"]');
 

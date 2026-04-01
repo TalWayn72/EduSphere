@@ -77,14 +77,20 @@ export function CertificatesPage() {
             {t('certificates.title', 'Certificates')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {t('certificates.description', 'Your earned course completion certificates.')}
+            {t(
+              'certificates.description',
+              'Your earned course completion certificates.'
+            )}
           </p>
         </div>
 
         {error && (
           <Card className="p-4 border-destructive/30 bg-destructive/5">
             <p className="text-sm text-destructive" data-testid="error-message">
-              {t('certificates.errorLoading', 'Failed to load certificates. Please try again later.')}
+              {t(
+                'certificates.errorLoading',
+                'Failed to load certificates. Please try again later.'
+              )}
             </p>
           </Card>
         )}
@@ -107,7 +113,10 @@ export function CertificatesPage() {
           >
             <Award className="h-16 w-16 text-muted-foreground/30 mb-4" />
             <p className="text-base font-medium text-muted-foreground">
-              {t('certificates.empty', 'No certificates yet — complete a course to earn one!')}
+              {t(
+                'certificates.empty',
+                'No certificates yet — complete a course to earn one!'
+              )}
             </p>
           </div>
         )}

@@ -34,7 +34,9 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <h2 className="text-xl font-semibold mb-4">{t('createLesson.step1Title')}</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {t('createLesson.step1Title')}
+      </h2>
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -46,15 +48,22 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.title && (
-            <p className="text-red-500 text-xs mt-1 dark:text-red-400">{errors.title.message}</p>
+            <p className="text-red-500 text-xs mt-1 dark:text-red-400">
+              {errors.title.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('createLesson.lessonType')}</label>
+          <label className="block text-sm font-medium mb-2">
+            {t('createLesson.lessonType')}
+          </label>
           <div className="flex gap-3">
             {(['THEMATIC', 'SEQUENTIAL'] as const).map((lessonType) => (
-              <label key={lessonType} className="flex items-center gap-2 cursor-pointer">
+              <label
+                key={lessonType}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="radio"
                   value={lessonType}
@@ -73,7 +82,9 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">{t('createLesson.lessonDate')}</label>
+          <label className="block text-sm font-medium mb-1">
+            {t('createLesson.lessonDate')}
+          </label>
           <input
             type="date"
             {...register('lessonDate')}

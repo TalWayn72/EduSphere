@@ -23,11 +23,17 @@ export const tenantAnalyticsSnapshots = pgTable('tenant_analytics_snapshots', {
   snapshotDate: date('snapshot_date').notNull(),
   activeLearners: integer('active_learners').notNull().default(0),
   completions: integer('completions').notNull().default(0),
-  avgCompletionRate: doublePrecision('avg_completion_rate').notNull().default(0),
+  avgCompletionRate: doublePrecision('avg_completion_rate')
+    .notNull()
+    .default(0),
   totalLearningMinutes: integer('total_learning_minutes').notNull().default(0),
   newEnrollments: integer('new_enrollments').notNull().default(0),
-  snapshotType: analyticsSnapshotTypeEnum('snapshot_type').notNull().default('daily'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  snapshotType: analyticsSnapshotTypeEnum('snapshot_type')
+    .notNull()
+    .default('daily'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const tenantAnalyticsSnapshotsRLS = sql`
@@ -44,5 +50,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_analytics_snapshots_unique
   ON tenant_analytics_snapshots(tenant_id, snapshot_date, snapshot_type);
 `;
 
-export type TenantAnalyticsSnapshot = typeof tenantAnalyticsSnapshots.$inferSelect;
-export type NewTenantAnalyticsSnapshot = typeof tenantAnalyticsSnapshots.$inferInsert;
+export type TenantAnalyticsSnapshot =
+  typeof tenantAnalyticsSnapshots.$inferSelect;
+export type NewTenantAnalyticsSnapshot =
+  typeof tenantAnalyticsSnapshots.$inferInsert;

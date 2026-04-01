@@ -28,7 +28,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resolver = new ContentIngestionResolver(
-      mockOcrService as TesseractOcrService,
+      mockOcrService as TesseractOcrService
     );
   });
 
@@ -36,25 +36,23 @@ describe('ContentIngestionResolver — reindex mutation', () => {
     it('throws UnauthorizedException when tenantId is missing', async () => {
       const ctx = { authContext: { tenantId: null, userId: 'u-1' } } as any;
       await expect(
-        resolver.ingestContent('http://example.com/file.pdf', 'course-1', ctx),
+        resolver.ingestContent('http://example.com/file.pdf', 'course-1', ctx)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when authContext is missing', async () => {
       const ctx = {} as any;
       await expect(
-        resolver.ingestContent('http://example.com/file.pdf', 'course-1', ctx),
+        resolver.ingestContent('http://example.com/file.pdf', 'course-1', ctx)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('succeeds with valid tenant context', async () => {
       // Mock fetch to return a valid response
-      const mockFetch = vi
-        .spyOn(global, 'fetch')
-        .mockResolvedValue({
-          ok: true,
-          arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
-        } as any);
+      const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+      } as any);
 
       const ctx = {
         authContext: { tenantId: 'tenant-1', userId: 'user-1' },
@@ -62,7 +60,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         'http://example.com/file.png',
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.contentItemId).toBeDefined();
       expect(typeof result.contentItemId).toBe('string');
@@ -97,7 +95,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       } as any;
       const result = await resolver.ingestContent(null as any, 'course-1', ctx);
       expect(result.contentItemId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
       );
     });
   });
@@ -119,7 +117,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       } as any;
       const result = await resolver.ingestContent(null as any, 'course-1', ctx);
       expect(result.warnings).toContain(
-        'No file URL provided for OCR extraction',
+        'No file URL provided for OCR extraction'
       );
     });
 
@@ -127,11 +125,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const ctx = {
         authContext: { tenantId: 'tenant-1', userId: 'user-1' },
       } as any;
-      const result = await resolver.ingestContent(
-        {} as any,
-        'course-1',
-        ctx,
-      );
+      const result = await resolver.ingestContent({} as any, 'course-1', ctx);
       expect(result.extractedText).toBe('');
       expect(result.warnings.length).toBeGreaterThan(0);
     });
@@ -139,9 +133,11 @@ describe('ContentIngestionResolver — reindex mutation', () => {
 
   describe('download failure', () => {
     it('returns empty result when download fails', async () => {
-      const mockFetch = vi
-        .spyOn(global, 'fetch')
-        .mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found' } as any);
+      const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+      } as any);
 
       const ctx = {
         authContext: { tenantId: 'tenant-1', userId: 'user-1' },
@@ -149,7 +145,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         'http://example.com/missing.pdf',
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.extractedText).toBe('');
       expect(result.ocrConfidence).toBe(0);
@@ -168,7 +164,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         'http://example.com/slow.pdf',
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.extractedText).toBe('');
       expect(result.warnings[0]).toContain('File download failed');
@@ -179,7 +175,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
   describe('OCR failure', () => {
     it('returns partial result when OCR extraction fails', async () => {
       vi.mocked(mockOcrService.extractText!).mockRejectedValue(
-        new Error('Tesseract binary not found'),
+        new Error('Tesseract binary not found')
       );
 
       const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
@@ -193,13 +189,13 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         'http://example.com/scan.png',
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.extractedText).toBe('');
       expect(result.warnings).toEqual(
         expect.arrayContaining([
           expect.stringContaining('OCR extraction failed'),
-        ]),
+        ])
       );
       mockFetch.mockRestore();
     });
@@ -223,7 +219,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         'http://example.com/doc.png',
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.extractedText).toBe('Hello from OCR');
       expect(result.ocrMethod).toBe('TESSERACT');
@@ -248,7 +244,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         'http://minio:9000/bucket/file.jpg',
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.extractedText).toBe('Direct URL text');
       mockFetch.mockRestore();
@@ -271,7 +267,7 @@ describe('ContentIngestionResolver — reindex mutation', () => {
       const result = await resolver.ingestContent(
         { url: 'http://minio:9000/bucket/file.jpg' } as any,
         'course-1',
-        ctx,
+        ctx
       );
       expect(result.extractedText).toBe('Object URL text');
       mockFetch.mockRestore();

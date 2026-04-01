@@ -23,8 +23,16 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: mockCloseAllPools,
   db: {},
   withTenantContext: vi.fn().mockResolvedValue([]),
-  userFollows: { followingId: 'followingId', followerId: 'followerId', tenantId: 'tenantId' },
-  userProgress: { userId: 'userId', contentItemId: 'contentItemId', isCompleted: 'isCompleted' },
+  userFollows: {
+    followingId: 'followingId',
+    followerId: 'followerId',
+    tenantId: 'tenantId',
+  },
+  userProgress: {
+    userId: 'userId',
+    contentItemId: 'contentItemId',
+    isCompleted: 'isCompleted',
+  },
   eq: vi.fn(),
   and: vi.fn(),
   sql: vi.fn(),

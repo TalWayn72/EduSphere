@@ -55,7 +55,9 @@ export function RoleManagementPage() {
   >();
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [rolesResult, reexecuteRoles] = useQuery<{ roles: BackendRole[] }>({
     query: LIST_ROLES_QUERY,
     pause: !mounted,
@@ -160,68 +162,71 @@ export function RoleManagementPage() {
         <PageHeader
           title="Roles & Permissions"
           description="Define roles and control access across the platform"
-          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Roles & Permissions' }]}
+          breadcrumbs={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Roles & Permissions' },
+          ]}
         />
-      <div className="flex gap-4 h-[calc(100vh-160px)]">
-        {/* Sidebar */}
-        <aside className="w-64 flex-none flex flex-col gap-2">
-          <Button size="sm" className="w-full" onClick={openCreateModal}>
-            <Plus className="h-4 w-4 mr-1.5" />
-            New Custom Role
-          </Button>
-          <ScrollArea className="flex-1 border rounded-lg p-1">
-            {roles.map((role) => (
-              <button
-                key={role.id}
-                onClick={() => setSelectedId(role.id)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors
+        <div className="flex gap-4 h-[calc(100vh-160px)]">
+          {/* Sidebar */}
+          <aside className="w-64 flex-none flex flex-col gap-2">
+            <Button size="sm" className="w-full" onClick={openCreateModal}>
+              <Plus className="h-4 w-4 mr-1.5" />
+              New Custom Role
+            </Button>
+            <ScrollArea className="flex-1 border rounded-lg p-1">
+              {roles.map((role) => (
+                <button
+                  key={role.id}
+                  onClick={() => setSelectedId(role.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors
                   ${selectedId === role.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
-              >
-                <span className="flex items-center gap-1.5 font-medium truncate">
-                  {role.isSystem ? (
-                    <Lock className="h-3.5 w-3.5 flex-none opacity-60" />
-                  ) : (
-                    <ShieldCheck className="h-3.5 w-3.5 flex-none opacity-60" />
-                  )}
-                  {role.name}
-                </span>
-                <Badge
-                  variant={selectedId === role.id ? 'outline' : 'secondary'}
-                  className="ml-1 text-xs"
                 >
-                  {role.userCount}
-                </Badge>
-              </button>
-            ))}
-            {rolesResult.fetching && (
-              <p className="px-3 py-2 text-xs text-muted-foreground">
-                Loading…
-              </p>
-            )}
-          </ScrollArea>
-          <Separator />
-          <p className="text-xs text-muted-foreground px-1">
-            {customRoleCount} custom role{customRoleCount !== 1 ? 's' : ''}
-          </p>
-        </aside>
+                  <span className="flex items-center gap-1.5 font-medium truncate">
+                    {role.isSystem ? (
+                      <Lock className="h-3.5 w-3.5 flex-none opacity-60" />
+                    ) : (
+                      <ShieldCheck className="h-3.5 w-3.5 flex-none opacity-60" />
+                    )}
+                    {role.name}
+                  </span>
+                  <Badge
+                    variant={selectedId === role.id ? 'outline' : 'secondary'}
+                    className="ml-1 text-xs"
+                  >
+                    {role.userCount}
+                  </Badge>
+                </button>
+              ))}
+              {rolesResult.fetching && (
+                <p className="px-3 py-2 text-xs text-muted-foreground">
+                  Loading…
+                </p>
+              )}
+            </ScrollArea>
+            <Separator />
+            <p className="text-xs text-muted-foreground px-1">
+              {customRoleCount} custom role{customRoleCount !== 1 ? 's' : ''}
+            </p>
+          </aside>
 
-        {/* Detail panel */}
-        <div className="flex-1 min-w-0">
-          <RoleDetailPanel
-            role={selectedRole}
-            onDuplicate={handleDuplicate}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          {/* Detail panel */}
+          <div className="flex-1 min-w-0">
+            <RoleDetailPanel
+              role={selectedRole}
+              onDuplicate={handleDuplicate}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
         </div>
-      </div>
 
-      <RoleFormModal
-        open={modalOpen}
-        initialRole={editingRole}
-        onClose={() => setModalOpen(false)}
-        onSave={handleSave}
-      />
+        <RoleFormModal
+          open={modalOpen}
+          initialRole={editingRole}
+          onClose={() => setModalOpen(false)}
+          onSave={handleSave}
+        />
       </PageShell>
     </AdminLayout>
   );

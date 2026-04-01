@@ -4,11 +4,7 @@
  * Handles the session-ended NATS subscription, recording retrieval from
  * BBB, and recording URL persistence.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   connect,
   StringCodec,
@@ -75,7 +71,9 @@ export class LiveSessionRecordingService implements OnModuleDestroy {
       this.natsConn.publish(subject, this.sc.encode(JSON.stringify(payload)));
       this.logger.debug(`[LiveSessionRecordingService] Published ${subject}`);
     } catch (err) {
-      this.logger.warn(`[LiveSessionRecordingService] NATS publish failed (non-fatal): ${err}`);
+      this.logger.warn(
+        `[LiveSessionRecordingService] NATS publish failed (non-fatal): ${err}`
+      );
     }
   }
 

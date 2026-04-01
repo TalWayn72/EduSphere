@@ -20,7 +20,10 @@ import {
   desc,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
-import { isCourseCompletedEvent, buildNatsOptions } from '@edusphere/nats-client';
+import {
+  isCourseCompletedEvent,
+  buildNatsOptions,
+} from '@edusphere/nats-client';
 import { SalesforceClient } from './salesforce.client.js';
 import { CrmEncryptionService } from './crm-encryption.service.js';
 import type { CrmConnection, CrmSyncLog } from '@edusphere/db';

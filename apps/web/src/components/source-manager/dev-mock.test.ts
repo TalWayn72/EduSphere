@@ -34,7 +34,11 @@ describe('dev-mock', () => {
 
   it('devAddSource creates a new source and appends it', () => {
     const beforeCount = getDevSources().length;
-    const newSource = devAddSource('URL', 'New Test Source', 'https://example.com');
+    const newSource = devAddSource(
+      'URL',
+      'New Test Source',
+      'https://example.com'
+    );
 
     expect(newSource.id).toContain('dev-src-');
     expect(newSource.title).toBe('New Test Source');
@@ -64,7 +68,11 @@ describe('dev-mock', () => {
   });
 
   it('devRemoveSource removes source by id', () => {
-    const newSource = devAddSource('YOUTUBE', 'YT Source', 'https://youtube.com/watch');
+    const newSource = devAddSource(
+      'YOUTUBE',
+      'YT Source',
+      'https://youtube.com/watch'
+    );
     const beforeCount = getDevSources().length;
 
     devRemoveSource(newSource.id);

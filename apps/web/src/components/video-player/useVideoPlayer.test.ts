@@ -27,13 +27,10 @@ vi.mock('hls.js', () => {
     on: vi.fn(),
     currentLevel: -1,
   };
-  const MockHls = Object.assign(
-    vi.fn().mockReturnValue(instance),
-    {
-      isSupported: vi.fn(() => false),
-      Events: { MANIFEST_PARSED: 'hlsManifestParsed' },
-    },
-  );
+  const MockHls = Object.assign(vi.fn().mockReturnValue(instance), {
+    isSupported: vi.fn(() => false),
+    Events: { MANIFEST_PARSED: 'hlsManifestParsed' },
+  });
   return { default: MockHls };
 });
 
@@ -42,10 +39,12 @@ import { useVideoPlayer } from './useVideoPlayer';
 // ── HTMLMediaElement stubs ───────────────────────────────────────────────────
 beforeAll(() => {
   Object.defineProperty(window.HTMLMediaElement.prototype, 'play', {
-    writable: true, value: vi.fn().mockResolvedValue(undefined),
+    writable: true,
+    value: vi.fn().mockResolvedValue(undefined),
   });
   Object.defineProperty(window.HTMLMediaElement.prototype, 'pause', {
-    writable: true, value: vi.fn(),
+    writable: true,
+    value: vi.fn(),
   });
 });
 
@@ -80,7 +79,7 @@ describe('useVideoPlayer', () => {
   it('handleTimeUpdate updates currentTime and fires callback', () => {
     const onTimeUpdate = vi.fn();
     const { result } = renderHook(() =>
-      useVideoPlayer({ ...defaultOpts, onTimeUpdate }),
+      useVideoPlayer({ ...defaultOpts, onTimeUpdate })
     );
     const fakeEvent = {
       currentTarget: { currentTime: 42.5 },
@@ -94,7 +93,7 @@ describe('useVideoPlayer', () => {
   it('handleLoadedMetadata sets duration and fires callback', () => {
     const onDurationChange = vi.fn();
     const { result } = renderHook(() =>
-      useVideoPlayer({ ...defaultOpts, onDurationChange }),
+      useVideoPlayer({ ...defaultOpts, onDurationChange })
     );
     const fakeEvent = {
       currentTarget: { duration: 120 },
@@ -177,9 +176,7 @@ describe('useVideoPlayer', () => {
   it('keyboard Space key calls togglePlay', () => {
     const { result } = renderHook(() => useVideoPlayer(defaultOpts));
     act(() => {
-      window.dispatchEvent(
-        new KeyboardEvent('keydown', { code: 'Space' }),
-      );
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
     });
     // togglePlay is called but videoRef is null, so no error
     expect(result.current.isPlaying).toBe(false);
@@ -201,7 +198,8 @@ describe('useVideoPlayer', () => {
     input.focus();
     // Dispatch on window but target is input — handler should bail
     const event = new KeyboardEvent('keydown', {
-      code: 'Space', bubbles: true,
+      code: 'Space',
+      bubbles: true,
     });
     Object.defineProperty(event, 'target', { value: input });
     window.dispatchEvent(event);

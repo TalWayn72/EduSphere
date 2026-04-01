@@ -108,7 +108,10 @@ describe('RLS tenant-isolation variable (SI-1)', () => {
 
 describe('RLS: lesson_pipeline_templates table (Phase 65)', () => {
   const TEMPLATES_FILE = resolve(
-    join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')
+    join(
+      import.meta.dirname,
+      '../../packages/db/src/schema/lesson-templates.ts'
+    )
   );
 
   it('lesson-templates.ts schema file exists', () => {
@@ -146,8 +149,13 @@ describe('RLS policy expectations: lesson_pipeline_templates access control', ()
 
   it('schema defines is_system boolean field with default false', () => {
     const content = readFileSync(
-      resolve(join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')),
-      'utf-8',
+      resolve(
+        join(
+          import.meta.dirname,
+          '../../packages/db/src/schema/lesson-templates.ts'
+        )
+      ),
+      'utf-8'
     );
     // is_system should default to false — user-created templates are NOT system templates
     expect(content).toContain("boolean('is_system')");
@@ -156,8 +164,13 @@ describe('RLS policy expectations: lesson_pipeline_templates access control', ()
 
   it('schema defines created_by uuid field for ownership tracking', () => {
     const content = readFileSync(
-      resolve(join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')),
-      'utf-8',
+      resolve(
+        join(
+          import.meta.dirname,
+          '../../packages/db/src/schema/lesson-templates.ts'
+        )
+      ),
+      'utf-8'
     );
     expect(content).toContain("uuid('created_by')");
     expect(content).toContain('users.id');
@@ -165,8 +178,13 @@ describe('RLS policy expectations: lesson_pipeline_templates access control', ()
 
   it('template table uses tenantId helper for consistent RLS column naming', () => {
     const content = readFileSync(
-      resolve(join(import.meta.dirname, '../../packages/db/src/schema/lesson-templates.ts')),
-      'utf-8',
+      resolve(
+        join(
+          import.meta.dirname,
+          '../../packages/db/src/schema/lesson-templates.ts'
+        )
+      ),
+      'utf-8'
     );
     // Should use the shared tenantId() helper, not a raw column definition
     expect(content).toContain('tenantId()');

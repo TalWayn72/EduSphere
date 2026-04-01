@@ -7,8 +7,14 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: React.ReactNode; variant?: string; size?: string }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children?: React.ReactNode;
+    variant?: string;
+    size?: string;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -21,7 +27,12 @@ import { SavedSearchesPanel } from './SavedSearchesPanel';
 describe('SavedSearchesPanel', () => {
   it('renders without crash with empty list', () => {
     const { container } = render(
-      <SavedSearchesPanel savedSearches={[]} onLoad={vi.fn()} onDelete={vi.fn()} onClose={vi.fn()} />
+      <SavedSearchesPanel
+        savedSearches={[]}
+        onLoad={vi.fn()}
+        onDelete={vi.fn()}
+        onClose={vi.fn()}
+      />
     );
     expect(container).toBeTruthy();
   });

@@ -5,17 +5,14 @@
  * participant joined.
  */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import {
-  connect,
-  StringCodec,
-  type NatsConnection,
-} from 'nats';
+import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 
 const NATS_SESSIONS_STARTED = 'EDUSPHERE.sessions.started';
 const NATS_SESSIONS_CREATED = 'EDUSPHERE.sessions.created';
 const NATS_SESSIONS_ENDED = 'EDUSPHERE.sessions.ended';
-const NATS_SESSIONS_PARTICIPANT_JOINED = 'EDUSPHERE.sessions.participant.joined';
+const NATS_SESSIONS_PARTICIPANT_JOINED =
+  'EDUSPHERE.sessions.participant.joined';
 
 @Injectable()
 export class LiveSessionsEventsService implements OnModuleDestroy {

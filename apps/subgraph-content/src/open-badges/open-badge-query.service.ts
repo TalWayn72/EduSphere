@@ -84,7 +84,11 @@ export class OpenBadgeQueryService {
   async getBadgeDefinitions(
     tenantId: string
   ): Promise<(typeof schema.openBadgeDefinitions.$inferSelect)[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     return withTenantContext(this.db, ctx, async (tx) =>
       tx
         .select()
@@ -95,7 +99,10 @@ export class OpenBadgeQueryService {
 
   buildCredentialBody(
     def: typeof schema.openBadgeDefinitions.$inferSelect,
-    input: Pick<IssueCredentialInput, 'userId' | 'badgeDefinitionId' | 'tenantId' | 'expiresAt'>,
+    input: Pick<
+      IssueCredentialInput,
+      'userId' | 'badgeDefinitionId' | 'tenantId' | 'expiresAt'
+    >,
     keyPair: Ed25519KeyPair
   ): Ob3CredentialBody {
     return {

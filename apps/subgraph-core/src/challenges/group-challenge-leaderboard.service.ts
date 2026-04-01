@@ -48,7 +48,10 @@ export class GroupChallengeLeaderboardService {
         .select()
         .from(challengeParticipants)
         .where(eq(challengeParticipants.challengeId, challengeId))
-        .orderBy(desc(challengeParticipants.score), asc(challengeParticipants.joinedAt));
+        .orderBy(
+          desc(challengeParticipants.score),
+          asc(challengeParticipants.joinedAt)
+        );
 
       return participants.map((p, idx) => ({ ...p, rank: idx + 1 }));
     });
@@ -77,7 +80,9 @@ export class GroupChallengeLeaderboardService {
           .limit(1);
 
         if (!participant) {
-          throw new BadRequestException('You are not a participant in this challenge');
+          throw new BadRequestException(
+            'You are not a participant in this challenge'
+          );
         }
 
         const [updated] = await tx
@@ -106,7 +111,12 @@ export class GroupChallengeLeaderboardService {
     );
 
     // Publish NATS event after successful score submission
-    await this.challengeService.publishScoreEvent(tenantId, userId, challengeId, score);
+    await this.challengeService.publishScoreEvent(
+      tenantId,
+      userId,
+      challengeId,
+      score
+    );
 
     this.logger.log(
       { tenantId, userId, challengeId, score },

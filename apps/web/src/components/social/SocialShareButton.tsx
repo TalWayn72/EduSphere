@@ -1,6 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Linkedin, Facebook, Twitter, MessageCircle, Copy, Check } from 'lucide-react';
+import {
+  Linkedin,
+  Facebook,
+  Twitter,
+  MessageCircle,
+  Copy,
+  Check,
+} from 'lucide-react';
 
 type Platform = 'linkedin' | 'facebook' | 'twitter' | 'whatsapp' | 'copy';
 
@@ -12,7 +19,10 @@ interface SocialShareButtonProps {
   variant?: 'icon' | 'full';
 }
 
-const PLATFORM_CONFIG: Record<Platform, { label: string; icon: React.ElementType }> = {
+const PLATFORM_CONFIG: Record<
+  Platform,
+  { label: string; icon: React.ElementType }
+> = {
   linkedin: { label: 'LinkedIn', icon: Linkedin },
   facebook: { label: 'Facebook', icon: Facebook },
   twitter: { label: 'X (Twitter)', icon: Twitter },
@@ -20,7 +30,11 @@ const PLATFORM_CONFIG: Record<Platform, { label: string; icon: React.ElementType
   copy: { label: 'Copy Link', icon: Copy },
 };
 
-function buildShareUrl(platform: Platform, url: string, title: string): string | null {
+function buildShareUrl(
+  platform: Platform,
+  url: string,
+  title: string
+): string | null {
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
   switch (platform) {
@@ -37,7 +51,12 @@ function buildShareUrl(platform: Platform, url: string, title: string): string |
   }
 }
 
-export function SocialShareButton({ platform, url, title, variant = 'icon' }: SocialShareButtonProps) {
+export function SocialShareButton({
+  platform,
+  url,
+  title,
+  variant = 'icon',
+}: SocialShareButtonProps) {
   const [copied, setCopied] = useState(false);
   const config = PLATFORM_CONFIG[platform];
   const Icon = copied && platform === 'copy' ? Check : config.icon;
@@ -52,7 +71,11 @@ export function SocialShareButton({ platform, url, title, variant = 'icon' }: So
     }
     const shareUrl = buildShareUrl(platform, url, title);
     if (shareUrl) {
-      window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
+      window.open(
+        shareUrl,
+        '_blank',
+        'noopener,noreferrer,width=600,height=400'
+      );
     }
   }, [platform, url, title]);
 

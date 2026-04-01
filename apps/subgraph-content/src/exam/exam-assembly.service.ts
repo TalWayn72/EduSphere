@@ -77,13 +77,13 @@ export class ExamAssemblyService implements OnModuleDestroy {
 
     const eligible = allItems.filter(
       (i) =>
-        i.calibrationStatus === 'CALIBRATED' ||
-        i.calibrationStatus === 'PILOT'
+        i.calibrationStatus === 'CALIBRATED' || i.calibrationStatus === 'PILOT'
     );
 
     const domainDist = (blueprint.domainDistribution ?? {}) as DomainDist;
     const bloomDist = (blueprint.bloomDistribution ?? {}) as BloomDist;
-    const diffRange = (blueprint.difficultyRange ?? null) as DifficultyRange | null;
+    const diffRange = (blueprint.difficultyRange ??
+      null) as DifficultyRange | null;
 
     const selected = this.stratifiedSample(
       eligible,
@@ -134,8 +134,7 @@ export class ExamAssemblyService implements OnModuleDestroy {
 
     const eligible = allItems.filter(
       (i) =>
-        i.calibrationStatus === 'CALIBRATED' ||
-        i.calibrationStatus === 'PILOT'
+        i.calibrationStatus === 'CALIBRATED' || i.calibrationStatus === 'PILOT'
     );
 
     const issues: string[] = [];

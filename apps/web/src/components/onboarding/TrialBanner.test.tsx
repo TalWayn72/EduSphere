@@ -46,7 +46,9 @@ describe('TrialBanner', () => {
   });
 
   it('returns null when not trialing', () => {
-    mockQueryResult = { data: { trialStatus: { ...mockTrialData, isTrialing: false } } };
+    mockQueryResult = {
+      data: { trialStatus: { ...mockTrialData, isTrialing: false } },
+    };
     const { container } = render(<TrialBanner />);
     expect(container.firstChild).toBeNull();
   });
@@ -79,21 +81,27 @@ describe('TrialBanner', () => {
   });
 
   it('shows yellow styling for ≤7 days', () => {
-    mockQueryResult = { data: { trialStatus: { ...mockTrialData, daysRemaining: 5 } } };
+    mockQueryResult = {
+      data: { trialStatus: { ...mockTrialData, daysRemaining: 5 } },
+    };
     render(<TrialBanner />);
     const banner = screen.getByTestId('trial-banner');
     expect(banner.className).toContain('yellow');
   });
 
   it('shows red styling for ≤3 days', () => {
-    mockQueryResult = { data: { trialStatus: { ...mockTrialData, daysRemaining: 2 } } };
+    mockQueryResult = {
+      data: { trialStatus: { ...mockTrialData, daysRemaining: 2 } },
+    };
     render(<TrialBanner />);
     const banner = screen.getByTestId('trial-banner');
     expect(banner.className).toContain('red');
   });
 
   it('shows expired text for 0 days', () => {
-    mockQueryResult = { data: { trialStatus: { ...mockTrialData, daysRemaining: 0 } } };
+    mockQueryResult = {
+      data: { trialStatus: { ...mockTrialData, daysRemaining: 0 } },
+    };
     render(<TrialBanner />);
     expect(screen.getByText('Your trial has expired')).toBeInTheDocument();
   });

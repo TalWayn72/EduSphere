@@ -61,7 +61,7 @@ export function CatExamTimer({
         isLow
           ? 'bg-destructive/10 text-destructive animate-pulse'
           : 'bg-muted text-muted-foreground',
-        className,
+        className
       )}
       role="timer"
       aria-label={`${minutes} minutes ${seconds} seconds remaining`}

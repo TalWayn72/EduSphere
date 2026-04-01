@@ -27,16 +27,28 @@ export const Default: Story = {
         <Button onClick={() => toast('Default notification')}>
           Default Toast
         </Button>
-        <Button variant="outline" onClick={() => toast.success('Course published successfully!')}>
+        <Button
+          variant="outline"
+          onClick={() => toast.success('Course published successfully!')}
+        >
           Success
         </Button>
-        <Button variant="outline" onClick={() => toast.error('Failed to save changes')}>
+        <Button
+          variant="outline"
+          onClick={() => toast.error('Failed to save changes')}
+        >
           Error
         </Button>
-        <Button variant="outline" onClick={() => toast.info('Your session expires in 5 minutes')}>
+        <Button
+          variant="outline"
+          onClick={() => toast.info('Your session expires in 5 minutes')}
+        >
           Info
         </Button>
-        <Button variant="outline" onClick={() => toast.warning('Unsaved changes detected')}>
+        <Button
+          variant="outline"
+          onClick={() => toast.warning('Unsaved changes detected')}
+        >
           Warning
         </Button>
       </div>
@@ -51,7 +63,8 @@ export const WithDescription: Story = {
       <Button
         onClick={() =>
           toast('Course Created', {
-            description: 'Introduction to AI Ethics has been added to your catalog.',
+            description:
+              'Introduction to AI Ethics has been added to your catalog.',
           })
         }
       >
@@ -68,7 +81,10 @@ export const WithAction: Story = {
       <Button
         onClick={() =>
           toast('Lesson deleted', {
-            action: { label: 'Undo', onClick: () => toast.success('Restored!') },
+            action: {
+              label: 'Undo',
+              onClick: () => toast.success('Restored!'),
+            },
           })
         }
       >

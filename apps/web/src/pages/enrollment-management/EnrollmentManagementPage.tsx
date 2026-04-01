@@ -57,7 +57,7 @@ export function EnrollmentManagementPage() {
     () => () => {
       if (successTimerRef.current) clearTimeout(successTimerRef.current);
     },
-    [],
+    []
   );
 
   if (!role || !ADMIN_ROLES.has(role)) {
@@ -74,7 +74,9 @@ export function EnrollmentManagementPage() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [enrollmentsResult, reexecuteEnrollments] = useQuery<{
     adminCourseEnrollments: AdminEnrollmentRecord[];
@@ -97,7 +99,10 @@ export function EnrollmentManagementPage() {
   const showSuccess = (msg: string) => {
     setSuccessMessage(msg);
     if (successTimerRef.current) clearTimeout(successTimerRef.current);
-    successTimerRef.current = setTimeout(() => setSuccessMessage(''), SAVED_CONFIRMATION_MS);
+    successTimerRef.current = setTimeout(
+      () => setSuccessMessage(''),
+      SAVED_CONFIRMATION_MS
+    );
   };
 
   const handleEnrollSuccess = () => {
@@ -132,14 +137,18 @@ export function EnrollmentManagementPage() {
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
             <SelectTrigger className="w-72">
-              <SelectValue placeholder={t('enrollment.selectCoursePlaceholder')} />
+              <SelectValue
+                placeholder={t('enrollment.selectCoursePlaceholder')}
+              />
             </SelectTrigger>
             <SelectContent>
               {courses.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.title}
                   {!c.isPublished && (
-                    <span className="ml-2 text-xs text-muted-foreground">{t('enrollment.draft')}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {t('enrollment.draft')}
+                    </span>
                   )}
                 </SelectItem>
               ))}
@@ -148,55 +157,110 @@ export function EnrollmentManagementPage() {
 
           {selectedCourseId && (
             <>
-              <Button onClick={() => setShowEnroll(true)} size="sm">{t('enrollment.enrollUser')}</Button>
-              <Button variant="outline" onClick={() => setShowBulk(true)} size="sm">{t('enrollment.bulkEnroll')}</Button>
+              <Button onClick={() => setShowEnroll(true)} size="sm">
+                {t('enrollment.enrollUser')}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowBulk(true)}
+                size="sm"
+              >
+                {t('enrollment.bulkEnroll')}
+              </Button>
             </>
           )}
 
           {successMessage && (
-            <span className="text-sm text-green-600 font-medium dark:text-green-400">{successMessage}</span>
+            <span className="text-sm text-green-600 font-medium dark:text-green-400">
+              {successMessage}
+            </span>
           )}
         </div>
 
         {/* Stats bar */}
         {selectedCourseId && !enrollmentsResult.fetching && (
           <div className="flex gap-6 mb-4 text-sm text-muted-foreground">
-            <span><strong className="text-foreground">{enrollments.length}</strong> {t('enrollment.enrolledCount')}</span>
-            <span><strong className="text-foreground">{completedCount}</strong> {t('enrollment.completedCount')}</span>
-            <span><strong className="text-foreground">{completionRate}%</strong> {t('enrollment.completionRate')}</span>
+            <span>
+              <strong className="text-foreground">{enrollments.length}</strong>{' '}
+              {t('enrollment.enrolledCount')}
+            </span>
+            <span>
+              <strong className="text-foreground">{completedCount}</strong>{' '}
+              {t('enrollment.completedCount')}
+            </span>
+            <span>
+              <strong className="text-foreground">{completionRate}%</strong>{' '}
+              {t('enrollment.completionRate')}
+            </span>
           </div>
         )}
 
         {/* Enrollments table */}
         {!selectedCourseId ? (
-          <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">{t('enrollment.selectCoursePrompt')}</div>
+          <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
+            {t('enrollment.selectCoursePrompt')}
+          </div>
         ) : enrollmentsResult.fetching ? (
-          <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">{t('enrollment.loadingEnrollments')}</div>
+          <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
+            {t('enrollment.loadingEnrollments')}
+          </div>
         ) : enrollmentsResult.error ? (
-          <div className="flex items-center justify-center h-48 text-destructive text-sm">{t('enrollment.loadError')}</div>
+          <div className="flex items-center justify-center h-48 text-destructive text-sm">
+            {t('enrollment.loadError')}
+          </div>
         ) : enrollments.length === 0 ? (
-          <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">{t('enrollment.noEnrollments')}</div>
+          <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
+            {t('enrollment.noEnrollments')}
+          </div>
         ) : (
           <EnrollmentTable
             enrollments={enrollments}
-            onUnenroll={(userId, courseId) => setConfirmUnenroll({ userId, courseId })}
+            onUnenroll={(userId, courseId) =>
+              setConfirmUnenroll({ userId, courseId })
+            }
           />
         )}
 
-        <EnrollUserDialog open={showEnroll} courseId={selectedCourseId} onClose={() => setShowEnroll(false)} onSuccess={handleEnrollSuccess} />
-        <BulkEnrollDialog open={showBulk} courseId={selectedCourseId} onClose={() => setShowBulk(false)} onSuccess={handleBulkSuccess} />
+        <EnrollUserDialog
+          open={showEnroll}
+          courseId={selectedCourseId}
+          onClose={() => setShowEnroll(false)}
+          onSuccess={handleEnrollSuccess}
+        />
+        <BulkEnrollDialog
+          open={showBulk}
+          courseId={selectedCourseId}
+          onClose={() => setShowBulk(false)}
+          onSuccess={handleBulkSuccess}
+        />
 
         {/* Confirm unenroll dialog */}
-        <Dialog open={!!confirmUnenroll} onOpenChange={(v) => { if (!v) setConfirmUnenroll(null); }}>
+        <Dialog
+          open={!!confirmUnenroll}
+          onOpenChange={(v) => {
+            if (!v) setConfirmUnenroll(null);
+          }}
+        >
           <DialogContent className="max-w-sm">
             <DialogHeader>
               <DialogTitle>{t('enrollment.confirmUnenrollTitle')}</DialogTitle>
-              <DialogDescription className="sr-only">Confirm removing enrollment for this user.</DialogDescription>
+              <DialogDescription className="sr-only">
+                Confirm removing enrollment for this user.
+              </DialogDescription>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground py-2">{t('enrollment.confirmUnenrollDesc')}</p>
+            <p className="text-sm text-muted-foreground py-2">
+              {t('enrollment.confirmUnenrollDesc')}
+            </p>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setConfirmUnenroll(null)}>{t('enrollment.cancel')}</Button>
-              <Button variant="destructive" onClick={handleUnenroll}>{t('enrollment.unenroll')}</Button>
+              <Button
+                variant="outline"
+                onClick={() => setConfirmUnenroll(null)}
+              >
+                {t('enrollment.cancel')}
+              </Button>
+              <Button variant="destructive" onClick={handleUnenroll}>
+                {t('enrollment.unenroll')}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

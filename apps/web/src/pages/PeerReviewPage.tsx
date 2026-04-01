@@ -78,16 +78,16 @@ export function PeerReviewPage() {
     <Layout>
       <div className="container mx-auto p-6 space-y-8">
         <div className="flex items-center gap-3">
-          <Star className="h-8 w-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+          <Star
+            className="h-8 w-8 text-indigo-500 dark:text-indigo-400"
+            aria-hidden="true"
+          />
           <h1 className="text-3xl font-bold">{t('peerReview')}</h1>
         </div>
 
         {/* ── Assignments to Review ──────────────────────────────────────── */}
         <section aria-labelledby="assignments-heading">
-          <h2
-            id="assignments-heading"
-            className="text-xl font-semibold mb-4"
-          >
+          <h2 id="assignments-heading" className="text-xl font-semibold mb-4">
             {t('assignmentsToReview')}
           </h2>
 
@@ -109,13 +109,17 @@ export function PeerReviewPage() {
                 <Card key={a.id}>
                   <CardContent className="flex items-center justify-between py-4">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">{a.contentItemTitle}</p>
+                      <p className="text-sm font-medium">
+                        {a.contentItemTitle}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {t('by')}: {a.submitterDisplayName ?? t('anonymous')}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={statusVariant(a.status)}>{a.status}</Badge>
+                      <Badge variant={statusVariant(a.status)}>
+                        {a.status}
+                      </Badge>
                       <Link
                         to={`/peer-review/${a.id}`}
                         className="text-sm font-medium text-primary underline-offset-2 hover:underline"
@@ -132,10 +136,7 @@ export function PeerReviewPage() {
 
         {/* ── My Submissions ────────────────────────────────────────────── */}
         <section aria-labelledby="submissions-heading">
-          <h2
-            id="submissions-heading"
-            className="text-xl font-semibold mb-4"
-          >
+          <h2 id="submissions-heading" className="text-xl font-semibold mb-4">
             {t('mySubmissions')}
           </h2>
 
@@ -157,14 +158,19 @@ export function PeerReviewPage() {
                 <Card key={s.id}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm">{s.contentItemTitle}</CardTitle>
-                      <Badge variant={statusVariant(s.status)}>{s.status}</Badge>
+                      <CardTitle className="text-sm">
+                        {s.contentItemTitle}
+                      </CardTitle>
+                      <Badge variant={statusVariant(s.status)}>
+                        {s.status}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     {s.score !== undefined && s.score !== null && (
                       <p className="text-xs text-muted-foreground">
-                        {t('scoreLabel')}: <span className="font-semibold">{s.score}</span>
+                        {t('scoreLabel')}:{' '}
+                        <span className="font-semibold">{s.score}</span>
                       </p>
                     )}
                   </CardContent>

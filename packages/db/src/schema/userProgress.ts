@@ -20,7 +20,9 @@ export const userProgress = pgTable('user_progress', {
   isCompleted: boolean('is_completed').notNull().default(false),
   progress: integer('progress').notNull().default(0),
   timeSpent: integer('time_spent').notNull().default(0),
-  lastAccessedAt: timestamp('last_accessed_at', { withTimezone: true }).notNull().defaultNow(),
+  lastAccessedAt: timestamp('last_accessed_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   completedAt: timestamp('completed_at', { withTimezone: true }),
 });
 

@@ -8,7 +8,8 @@ const mockSelect = vi.fn();
 const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -18,8 +19,9 @@ function makeChain(rows: unknown[] = []) {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-    fn({ select: mockSelect })
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({ select: mockSelect })
   ),
   schema: {
     users: { tenant_id: 'tenant_id' },
@@ -46,9 +48,9 @@ describe('TenantUsageService', () => {
     it('should return aggregated usage metrics', async () => {
       // Promise.all in source calls select 3 times
       mockSelect
-        .mockReturnValueOnce(makeChain([{ value: 42 }]))   // users
-        .mockReturnValueOnce(makeChain([{ value: 10 }]))   // courses
-        .mockReturnValueOnce(makeChain([{ value: 5 }]));   // yau
+        .mockReturnValueOnce(makeChain([{ value: 42 }])) // users
+        .mockReturnValueOnce(makeChain([{ value: 10 }])) // courses
+        .mockReturnValueOnce(makeChain([{ value: 5 }])); // yau
 
       const result = await service.getTenantUsage(ctx);
       expect(result.activeUsers).toBe(42);

@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import type {
-  ResultType,
-  SavedSearch,
-  SearchResult,
-} from './search.types';
+import type { ResultType, SavedSearch, SearchResult } from './search.types';
 
 describe('search/search.types', () => {
   it('ResultType accepts valid values', () => {
-    const types: ResultType[] = ['transcript', 'annotation', 'concept', 'course'];
+    const types: ResultType[] = [
+      'transcript',
+      'annotation',
+      'concept',
+      'course',
+    ];
     expect(types).toHaveLength(4);
   });
 

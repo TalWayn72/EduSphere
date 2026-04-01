@@ -112,7 +112,8 @@ export class GraphSearchService {
               similarity: computeTextSimilarity(seg.text, query),
               entityType: 'transcript_segment',
               entityId: seg.transcript_id,
-              startTime: seg.start_time != null ? parseFloat(seg.start_time) : null,
+              startTime:
+                seg.start_time != null ? parseFloat(seg.start_time) : null,
             }));
         }
 

@@ -7,11 +7,7 @@
  *
  * Memory safety: implements OnModuleDestroy for DB pool cleanup.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,

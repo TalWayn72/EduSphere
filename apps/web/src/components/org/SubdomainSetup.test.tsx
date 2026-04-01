@@ -90,7 +90,10 @@ describe('SubdomainSetup', () => {
     vi.mocked(useSubdomainProvisioning).mockReturnValue({
       subdomain: 'ab',
       setSubdomain: mockSetSubdomain,
-      validation: { isValid: false, error: 'Subdomain must be at least 3 characters' },
+      validation: {
+        isValid: false,
+        error: 'Subdomain must be at least 3 characters',
+      },
       dnsStatus: 'idle',
       provisioningStatus: 'idle',
       previewUrl: 'https://ab.edusphere.app',

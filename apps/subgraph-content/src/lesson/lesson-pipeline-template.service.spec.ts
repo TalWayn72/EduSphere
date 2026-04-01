@@ -242,7 +242,10 @@ describe('LessonPipelineTemplateService', () => {
     });
 
     it('accepts description up to 500 characters', async () => {
-      setupInsertChain({ ...TENANT_TEMPLATE_ROW, description: 'A'.repeat(500) });
+      setupInsertChain({
+        ...TENANT_TEMPLATE_ROW,
+        description: 'A'.repeat(500),
+      });
 
       const result = await service.create(
         {
@@ -291,9 +294,16 @@ describe('LessonPipelineTemplateService', () => {
 
     it('accepts all valid module types', async () => {
       const allTypes = [
-        'INGESTION', 'ASR', 'NER_SOURCE_LINKING', 'CONTENT_CLEANING',
-        'SUMMARIZATION', 'STRUCTURED_NOTES', 'DIAGRAM_GENERATOR',
-        'CITATION_VERIFIER', 'QA_GATE', 'PUBLISH_SHARE',
+        'INGESTION',
+        'ASR',
+        'NER_SOURCE_LINKING',
+        'CONTENT_CLEANING',
+        'SUMMARIZATION',
+        'STRUCTURED_NOTES',
+        'DIAGRAM_GENERATOR',
+        'CITATION_VERIFIER',
+        'QA_GATE',
+        'PUBLISH_SHARE',
       ];
 
       setupInsertChain({
@@ -304,7 +314,9 @@ describe('LessonPipelineTemplateService', () => {
       const result = await service.create(
         {
           name: 'All Modules',
-          nodes: allTypes.map((moduleType) => ({ moduleType: moduleType as never })),
+          nodes: allTypes.map((moduleType) => ({
+            moduleType: moduleType as never,
+          })),
         },
         'tenant-1',
         'user-1'
@@ -323,7 +335,11 @@ describe('LessonPipelineTemplateService', () => {
       mockSelect.mockReturnValue({ from: findByIdFrom });
 
       // update chain
-      const updReturning = vi.fn().mockResolvedValue([{ ...TENANT_TEMPLATE_ROW, name: 'Updated Pipeline' }]);
+      const updReturning = vi
+        .fn()
+        .mockResolvedValue([
+          { ...TENANT_TEMPLATE_ROW, name: 'Updated Pipeline' },
+        ]);
       const updWhere = vi.fn().mockReturnValue({ returning: updReturning });
       const updSet = vi.fn().mockReturnValue({ where: updWhere });
       mockUpdate.mockReturnValue({ set: updSet });
@@ -387,17 +403,17 @@ describe('LessonPipelineTemplateService', () => {
     it('blocks deletion of system templates', async () => {
       setupSelectSingleChain([SYSTEM_TEMPLATE_ROW]);
 
-      await expect(
-        service.delete('tpl-system', 'tenant-1')
-      ).rejects.toThrow('Cannot delete system templates');
+      await expect(service.delete('tpl-system', 'tenant-1')).rejects.toThrow(
+        'Cannot delete system templates'
+      );
     });
 
     it('throws NotFoundException when template not found', async () => {
       setupSelectSingleChain([]);
 
-      await expect(
-        service.delete('nonexistent', 'tenant-1')
-      ).rejects.toThrow('not found');
+      await expect(service.delete('nonexistent', 'tenant-1')).rejects.toThrow(
+        'not found'
+      );
     });
 
     it('throws NotFoundException when delete returns empty', async () => {
@@ -410,9 +426,9 @@ describe('LessonPipelineTemplateService', () => {
       const delWhere = vi.fn().mockReturnValue({ returning: delReturning });
       mockDelete.mockReturnValue({ where: delWhere });
 
-      await expect(
-        service.delete('tpl-tenant', 'tenant-1')
-      ).rejects.toThrow('not found');
+      await expect(service.delete('tpl-tenant', 'tenant-1')).rejects.toThrow(
+        'not found'
+      );
     });
   });
 });

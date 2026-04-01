@@ -26,9 +26,27 @@ const mockLicense = vi.fn();
 vi.mock('@/hooks/useMarketplace', () => ({
   useMarketplace: vi.fn(() => ({
     listings: [
-      { id: 'l1', title: 'Introduction to AI', category: 'Technology', priceUsdCents: 9900, instructor: 'Dr. Smith' },
-      { id: 'l2', title: 'Data Science Basics', category: 'Technology', priceUsdCents: 7900, instructor: 'Prof. Jones' },
-      { id: 'l3', title: 'Business Writing', category: 'Business', priceUsdCents: 4900, instructor: 'Jane Doe' },
+      {
+        id: 'l1',
+        title: 'Introduction to AI',
+        category: 'Technology',
+        priceUsdCents: 9900,
+        instructor: 'Dr. Smith',
+      },
+      {
+        id: 'l2',
+        title: 'Data Science Basics',
+        category: 'Technology',
+        priceUsdCents: 7900,
+        instructor: 'Prof. Jones',
+      },
+      {
+        id: 'l3',
+        title: 'Business Writing',
+        category: 'Business',
+        priceUsdCents: 4900,
+        instructor: 'Jane Doe',
+      },
     ],
     isLoading: false,
     totalCount: 3,
@@ -45,9 +63,27 @@ describe('MarketplaceBrowse', () => {
     vi.clearAllMocks();
     vi.mocked(useMarketplace).mockReturnValue({
       listings: [
-        { id: 'l1', title: 'Introduction to AI', category: 'Technology', priceUsdCents: 9900, instructor: 'Dr. Smith' },
-        { id: 'l2', title: 'Data Science Basics', category: 'Technology', priceUsdCents: 7900, instructor: 'Prof. Jones' },
-        { id: 'l3', title: 'Business Writing', category: 'Business', priceUsdCents: 4900, instructor: 'Jane Doe' },
+        {
+          id: 'l1',
+          title: 'Introduction to AI',
+          category: 'Technology',
+          priceUsdCents: 9900,
+          instructor: 'Dr. Smith',
+        },
+        {
+          id: 'l2',
+          title: 'Data Science Basics',
+          category: 'Technology',
+          priceUsdCents: 7900,
+          instructor: 'Prof. Jones',
+        },
+        {
+          id: 'l3',
+          title: 'Business Writing',
+          category: 'Business',
+          priceUsdCents: 4900,
+          instructor: 'Jane Doe',
+        },
       ],
       isLoading: false,
       totalCount: 3,
@@ -71,7 +107,9 @@ describe('MarketplaceBrowse', () => {
 
   it('renders category filter dropdown', () => {
     render(<MarketplaceBrowse />);
-    expect(screen.getByRole('combobox', { name: /category/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: /category/i })
+    ).toBeInTheDocument();
   });
 
   it('renders search input', () => {
@@ -93,7 +131,6 @@ describe('MarketplaceBrowse', () => {
   });
 
   it('shows empty state when no listings', () => {
-
     vi.mocked(useMarketplace).mockReturnValue({
       listings: [],
       isLoading: false,
@@ -107,7 +144,6 @@ describe('MarketplaceBrowse', () => {
   });
 
   it('shows loading skeleton while fetching', () => {
-
     vi.mocked(useMarketplace).mockReturnValue({
       listings: [],
       isLoading: true,

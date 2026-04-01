@@ -13,7 +13,9 @@ import { PageShell } from '@/components/PageShell';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import {
-  useExamItem, useCreateExamItem, useUpdateExamItem,
+  useExamItem,
+  useCreateExamItem,
+  useUpdateExamItem,
 } from '@/hooks/useExamApi';
 import { ExamItemFormFields } from './ExamItemFormFields';
 import { ExamItemIrtDisplay } from './ExamItemIrtDisplay';
@@ -22,14 +24,30 @@ import type { BloomLevel } from '@/types/exam';
 const ALLOWED_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
 
 const BLOOM_LEVELS: BloomLevel[] = [
-  'REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'EVALUATE', 'CREATE',
+  'REMEMBER',
+  'UNDERSTAND',
+  'APPLY',
+  'ANALYZE',
+  'EVALUATE',
+  'CREATE',
 ];
 
 const schema = z.object({
   domain: z.string().min(1, 'Domain is required'),
-  bloomLevel: z.enum(['REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'EVALUATE', 'CREATE']),
+  bloomLevel: z.enum([
+    'REMEMBER',
+    'UNDERSTAND',
+    'APPLY',
+    'ANALYZE',
+    'EVALUATE',
+    'CREATE',
+  ]),
   questionType: z.enum([
-    'MULTIPLE_CHOICE', 'DRAG_ORDER', 'HOTSPOT', 'MATCHING', 'FILL_BLANK',
+    'MULTIPLE_CHOICE',
+    'DRAG_ORDER',
+    'HOTSPOT',
+    'MATCHING',
+    'FILL_BLANK',
   ] as const),
   questionText: z.string().min(1, 'Question text is required'),
   difficulty: z.enum(['easy', 'medium', 'hard']),
@@ -38,13 +56,18 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function ExamItemEditorPage() {
-  const { courseId, itemId } = useParams<{ courseId: string; itemId: string }>();
+  const { courseId, itemId } = useParams<{
+    courseId: string;
+    itemId: string;
+  }>();
   const navigate = useNavigate();
   const role = useAuthRole();
   const isEdit = Boolean(itemId);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { item, fetching } = useExamItem(itemId);
   const createItem = useCreateExamItem();
@@ -65,16 +88,25 @@ export function ExamItemEditorPage() {
   useEffect(() => {
     if (item) {
       const qd = item.questionData;
-      const text = typeof qd === 'object' && qd !== null && 'question' in qd
-        ? (qd as { question: string }).question : '';
-      const qType = typeof qd === 'object' && qd !== null && 'type' in qd
-        ? (qd as { type: string }).type : 'MULTIPLE_CHOICE';
+      const text =
+        typeof qd === 'object' && qd !== null && 'question' in qd
+          ? (qd as { question: string }).question
+          : '';
+      const qType =
+        typeof qd === 'object' && qd !== null && 'type' in qd
+          ? (qd as { type: string }).type
+          : 'MULTIPLE_CHOICE';
       form.reset({
         domain: item.domainTag,
         bloomLevel: item.bloomLevel,
         questionType: qType as FormData['questionType'],
         questionText: text,
-        difficulty: (item.irtB ?? 0) <= -0.5 ? 'easy' : (item.irtB ?? 0) >= 1.0 ? 'hard' : 'medium',
+        difficulty:
+          (item.irtB ?? 0) <= -0.5
+            ? 'easy'
+            : (item.irtB ?? 0) >= 1.0
+              ? 'hard'
+              : 'medium',
       });
     }
   }, [item, form]);
@@ -97,7 +129,10 @@ export function ExamItemEditorPage() {
         bloomLevel: data.bloomLevel,
         questionData: questionData as never,
       });
-      if (result.error) { toast.error('Failed to update item'); return; }
+      if (result.error) {
+        toast.error('Failed to update item');
+        return;
+      }
       toast.success('Item updated');
     } else {
       const result = await createItem({
@@ -106,7 +141,10 @@ export function ExamItemEditorPage() {
         bloomLevel: data.bloomLevel,
         questionData: questionData as never,
       });
-      if (result.error) { toast.error('Failed to create item'); return; }
+      if (result.error) {
+        toast.error('Failed to create item');
+        return;
+      }
       toast.success('Item created');
     }
     void navigate(`/courses/${courseId}/exams/items`);

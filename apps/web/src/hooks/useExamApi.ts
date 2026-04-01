@@ -41,10 +41,12 @@ export function useExamItemBank(
   courseId: string,
   filters?: ExamItemFilterInput,
   first = 20,
-  after?: string,
+  after?: string
 ): ItemBankResult {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_ITEM_BANK_QUERY,
@@ -62,7 +64,9 @@ export function useExamItemBank(
 
 export function useExamItem(itemId: string | undefined) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_ITEM_QUERY,
@@ -71,7 +75,7 @@ export function useExamItem(itemId: string | undefined) {
   });
 
   return {
-    item: result.data?.examItem as ExamItem | null ?? null,
+    item: (result.data?.examItem as ExamItem | null) ?? null,
     fetching: result.fetching,
     error: result.error?.message ?? null,
   };
@@ -83,7 +87,7 @@ export function useCreateExamItem() {
   const [, execute] = useMutation(CREATE_EXAM_ITEM_MUTATION);
   return useCallback(
     (input: CreateExamItemInput) => execute({ input }),
-    [execute],
+    [execute]
   );
 }
 
@@ -91,7 +95,7 @@ export function useUpdateExamItem() {
   const [, execute] = useMutation(UPDATE_EXAM_ITEM_MUTATION);
   return useCallback(
     (id: string, input: UpdateExamItemInput) => execute({ id, input }),
-    [execute],
+    [execute]
   );
 }
 
@@ -104,12 +108,19 @@ export function useGenerateExamItems() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mountedRef = useRef(true);
-  useEffect(() => () => { mountedRef.current = false; }, []);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    []
+  );
 
   const [, execute] = useMutation(GENERATE_EXAM_ITEMS_MUTATION);
 
   const generate = useCallback(
-    async (input: GenerateExamItemsInput): Promise<ExamItemGenerationResult | null> => {
+    async (
+      input: GenerateExamItemsInput
+    ): Promise<ExamItemGenerationResult | null> => {
       setLoading(true);
       setError(null);
       try {
@@ -129,7 +140,7 @@ export function useGenerateExamItems() {
         if (mountedRef.current) setLoading(false);
       }
     },
-    [execute],
+    [execute]
   );
 
   return { generate, loading, error };
@@ -139,7 +150,9 @@ export function useGenerateExamItems() {
 
 export function useExamBlueprints(courseId: string) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_BLUEPRINTS_QUERY,
@@ -156,7 +169,9 @@ export function useExamBlueprints(courseId: string) {
 
 export function useExamBlueprint(blueprintId: string | undefined) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_BLUEPRINT_QUERY,
@@ -165,7 +180,7 @@ export function useExamBlueprint(blueprintId: string | undefined) {
   });
 
   return {
-    blueprint: result.data?.examBlueprint as ExamBlueprint | null ?? null,
+    blueprint: (result.data?.examBlueprint as ExamBlueprint | null) ?? null,
     fetching: result.fetching,
     error: result.error?.message ?? null,
   };
@@ -175,7 +190,7 @@ export function useCreateExamBlueprint() {
   const [, execute] = useMutation(CREATE_EXAM_BLUEPRINT_MUTATION);
   return useCallback(
     (input: CreateExamBlueprintInput) => execute({ input }),
-    [execute],
+    [execute]
   );
 }
 
@@ -183,17 +198,23 @@ export function useUpdateExamBlueprint() {
   const [, execute] = useMutation(UPDATE_EXAM_BLUEPRINT_MUTATION);
   return useCallback(
     (id: string, input: UpdateExamBlueprintInput) => execute({ id, input }),
-    [execute],
+    [execute]
   );
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-interface CourseModule { id: string; title: string; orderIndex: number }
+interface CourseModule {
+  id: string;
+  title: string;
+  orderIndex: number;
+}
 
 export function useCourseModules(courseId: string) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: COURSE_MODULES_QUERY,

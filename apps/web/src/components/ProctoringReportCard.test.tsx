@@ -10,7 +10,11 @@ const SESSION = {
   endedAt: '2026-03-10T11:00:00Z',
   flagCount: 2,
   flags: [
-    { type: 'TAB_SWITCH', timestamp: '2026-03-10T10:15:00Z', detail: 'Switched to another tab' },
+    {
+      type: 'TAB_SWITCH',
+      timestamp: '2026-03-10T10:15:00Z',
+      detail: 'Switched to another tab',
+    },
     { type: 'FACE_NOT_DETECTED', timestamp: '2026-03-10T10:30:00Z' },
   ],
 };
@@ -28,7 +32,9 @@ describe('ProctoringReportCard', () => {
 
   it('shows status badge', () => {
     render(<ProctoringReportCard session={SESSION} />);
-    expect(screen.getByTestId('proctoring-report-status')).toHaveTextContent('COMPLETED');
+    expect(screen.getByTestId('proctoring-report-status')).toHaveTextContent(
+      'COMPLETED'
+    );
   });
 
   it('shows flag count', () => {
@@ -56,12 +62,16 @@ describe('ProctoringReportCard', () => {
   it('does not render flags list when no flags', () => {
     const noFlagSession = { ...SESSION, flagCount: 0, flags: [] };
     render(<ProctoringReportCard session={noFlagSession} />);
-    expect(screen.queryByTestId('proctoring-flag-item-0')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('proctoring-flag-item-0')
+    ).not.toBeInTheDocument();
   });
 
   it('applies correct status badge color for FLAGGED', () => {
     const flaggedSession = { ...SESSION, status: 'FLAGGED' };
     render(<ProctoringReportCard session={flaggedSession} />);
-    expect(screen.getByTestId('proctoring-report-status').className).toContain('bg-red-100');
+    expect(screen.getByTestId('proctoring-report-status').className).toContain(
+      'bg-red-100'
+    );
   });
 });

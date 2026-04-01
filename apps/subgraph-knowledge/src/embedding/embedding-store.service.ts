@@ -126,7 +126,10 @@ export class EmbeddingStoreService implements OnModuleDestroy {
       DO UPDATE SET embedding = EXCLUDED.embedding
       RETURNING id, segment_id, embedding, created_at
     `)) as unknown as ContentRow[];
-    if (!row) throw new InternalServerErrorException('Failed to upsert content embedding');
+    if (!row)
+      throw new InternalServerErrorException(
+        'Failed to upsert content embedding'
+      );
     return mapContent(row);
   }
 

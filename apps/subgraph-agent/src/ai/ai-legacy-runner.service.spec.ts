@@ -25,7 +25,9 @@ vi.mock('@ai-sdk/openai', () => ({
 }));
 
 vi.mock('ollama-ai-provider', () => ({
-  createOllama: vi.fn().mockReturnValue(vi.fn().mockReturnValue({ modelId: 'llama3.2' })),
+  createOllama: vi
+    .fn()
+    .mockReturnValue(vi.fn().mockReturnValue({ modelId: 'llama3.2' })),
 }));
 
 const mockChavrutaStep = vi.fn().mockResolvedValue({
@@ -56,7 +58,12 @@ vi.mock('../workflows/quiz.workflow.js', () => ({
 
 vi.mock('../workflows/summarizer.workflow.js', () => ({
   createSummarizerWorkflow: vi.fn().mockReturnValue({
-    step: vi.fn().mockResolvedValue({ text: 'summary', nextState: 'DONE', summary: 'x', isComplete: true }),
+    step: vi.fn().mockResolvedValue({
+      text: 'summary',
+      nextState: 'DONE',
+      summary: 'x',
+      isComplete: true,
+    }),
     stream: vi.fn().mockReturnValue({ stream: {} }),
   }),
 }));
@@ -139,7 +146,10 @@ describe('AiLegacyRunnerService', () => {
 
   it('runChavruta delegates to chavruta workflow', async () => {
     const model = service.getModel();
-    const result = await service.runChavruta(model, { sessionId: 's1', message: 'hi' });
+    const result = await service.runChavruta(model, {
+      sessionId: 's1',
+      message: 'hi',
+    });
     expect(result.text).toBe('chavruta');
     expect(result.workflowResult?.nextState).toBe('ASSESS');
   });

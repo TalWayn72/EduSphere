@@ -31,7 +31,9 @@ function makeService(
 }
 
 function makeCtx(auth?: Record<string, unknown>) {
-  return { authContext: auth } as Parameters<SavedSearchResolver['getSavedSearches']>[0];
+  return { authContext: auth } as Parameters<
+    SavedSearchResolver['getSavedSearches']
+  >[0];
 }
 
 describe('SavedSearchResolver', () => {
@@ -47,9 +49,9 @@ describe('SavedSearchResolver', () => {
   // ── getSavedSearches ──────────────────────────────────────────────────────
 
   it('getSavedSearches throws UnauthorizedException when no auth', async () => {
-    await expect(resolver.getSavedSearches(makeCtx(undefined))).rejects.toBeInstanceOf(
-      UnauthorizedException
-    );
+    await expect(
+      resolver.getSavedSearches(makeCtx(undefined))
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
   it('getSavedSearches calls service with userId + tenantId', async () => {
@@ -58,7 +60,9 @@ describe('SavedSearchResolver', () => {
   });
 
   it('getSavedSearches returns the service result', async () => {
-    const result = await resolver.getSavedSearches(makeCtx({ userId: 'u1', tenantId: 't1' }));
+    const result = await resolver.getSavedSearches(
+      makeCtx({ userId: 'u1', tenantId: 't1' })
+    );
     expect(result).toBe(SEARCHES);
   });
 
@@ -76,7 +80,12 @@ describe('SavedSearchResolver', () => {
       makeCtx({ userId: 'u1', tenantId: 't1' })
     );
     expect(svc.createSavedSearch).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Search1', query: 'graphql', userId: 'u1', tenantId: 't1' })
+      expect.objectContaining({
+        name: 'Search1',
+        query: 'graphql',
+        userId: 'u1',
+        tenantId: 't1',
+      })
     );
   });
 
@@ -99,7 +108,10 @@ describe('SavedSearchResolver', () => {
   });
 
   it('deleteSavedSearch calls service with id + userId + tenantId', async () => {
-    await resolver.deleteSavedSearch('ss-1', makeCtx({ userId: 'u1', tenantId: 't1' }));
+    await resolver.deleteSavedSearch(
+      'ss-1',
+      makeCtx({ userId: 'u1', tenantId: 't1' })
+    );
     expect(svc.deleteSavedSearch).toHaveBeenCalledWith('ss-1', 'u1', 't1');
   });
 

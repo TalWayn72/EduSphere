@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useFileUpload, type UseFileUploadOptions, type ConfirmResult, type PresignResult } from './useFileUpload';
+import {
+  useFileUpload,
+  type UseFileUploadOptions,
+  type ConfirmResult,
+  type PresignResult,
+} from './useFileUpload';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -19,7 +24,9 @@ const defaultConfirmResult: ConfirmResult = {
   status: 'READY',
 };
 
-function makeOptions(overrides: Partial<UseFileUploadOptions> = {}): UseFileUploadOptions {
+function makeOptions(
+  overrides: Partial<UseFileUploadOptions> = {}
+): UseFileUploadOptions {
   return {
     presign: vi.fn().mockResolvedValue(defaultPresignResult),
     confirm: vi.fn().mockResolvedValue(defaultConfirmResult),
@@ -86,16 +93,16 @@ describe('useFileUpload', () => {
           method: 'PUT',
           body: file,
           headers: { 'Content-Type': 'image/png' },
-        }),
+        })
       );
 
       // Verify confirm was called with fileKey and file
       expect(confirm).toHaveBeenCalledWith(defaultPresignResult.fileKey, file);
 
       // Verify progress was reported
-      expect(onProgress).toHaveBeenCalledWith(10);  // presigning
-      expect(onProgress).toHaveBeenCalledWith(30);  // uploading
-      expect(onProgress).toHaveBeenCalledWith(80);  // confirming
+      expect(onProgress).toHaveBeenCalledWith(10); // presigning
+      expect(onProgress).toHaveBeenCalledWith(30); // uploading
+      expect(onProgress).toHaveBeenCalledWith(80); // confirming
       expect(onProgress).toHaveBeenCalledWith(100); // done
     });
 
@@ -112,7 +119,7 @@ describe('useFileUpload', () => {
         expect.any(String),
         expect.objectContaining({
           headers: { 'Content-Type': 'application/octet-stream' },
-        }),
+        })
       );
     });
   });
@@ -121,7 +128,8 @@ describe('useFileUpload', () => {
     it('retries with exponential backoff on presign failure', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const presign = vi.fn()
+      const presign = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Network error'))
         .mockRejectedValueOnce(new Error('Timeout'))
         .mockResolvedValueOnce(defaultPresignResult);
@@ -145,7 +153,11 @@ describe('useFileUpload', () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
       fetchSpy
-        .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          statusText: 'Internal Server Error',
+        })
         .mockResolvedValueOnce({ ok: true, status: 200, statusText: 'OK' });
 
       const presign = vi.fn().mockResolvedValue(defaultPresignResult);
@@ -168,7 +180,8 @@ describe('useFileUpload', () => {
     it('retries on confirm failure', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const confirm = vi.fn()
+      const confirm = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Confirm timeout'))
         .mockResolvedValueOnce(defaultConfirmResult);
       const opts = makeOptions({ confirm, maxRetries: 3 });
@@ -190,7 +203,9 @@ describe('useFileUpload', () => {
     it('sets error state when all retries are exhausted', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const presign = vi.fn().mockRejectedValue(new Error('Persistent failure'));
+      const presign = vi
+        .fn()
+        .mockRejectedValue(new Error('Persistent failure'));
       const opts = makeOptions({ presign, maxRetries: 2 });
 
       const { result } = renderHook(() => useFileUpload(opts));
@@ -221,7 +236,8 @@ describe('useFileUpload', () => {
 
       const { result } = renderHook(() => useFileUpload(opts));
 
-      let uploadResult: ConfirmResult | null = 'not-null' as unknown as ConfirmResult;
+      let uploadResult: ConfirmResult | null =
+        'not-null' as unknown as ConfirmResult;
       await act(async () => {
         uploadResult = await result.current.upload(makeFile());
       });
@@ -237,8 +253,7 @@ describe('useFileUpload', () => {
     it('retries the last failed upload', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const presign = vi.fn()
-        .mockRejectedValue(new Error('fail'));
+      const presign = vi.fn().mockRejectedValue(new Error('fail'));
       const opts = makeOptions({ presign, maxRetries: 0 });
 
       const { result } = renderHook(() => useFileUpload(opts));
@@ -266,7 +281,8 @@ describe('useFileUpload', () => {
       const opts = makeOptions();
       const { result } = renderHook(() => useFileUpload(opts));
 
-      let retryResult: ConfirmResult | null = 'not-null' as unknown as ConfirmResult;
+      let retryResult: ConfirmResult | null =
+        'not-null' as unknown as ConfirmResult;
       await act(async () => {
         retryResult = await result.current.retry();
       });
@@ -307,7 +323,9 @@ describe('useFileUpload', () => {
     it('does not update state after unmount', async () => {
       let resolvePresign!: (v: PresignResult) => void;
       const presign = vi.fn().mockReturnValue(
-        new Promise<PresignResult>((res) => { resolvePresign = res; }),
+        new Promise<PresignResult>((res) => {
+          resolvePresign = res;
+        })
       );
       const opts = makeOptions({ presign });
 
@@ -366,13 +384,13 @@ describe('useFileUpload', () => {
       });
 
       const progressValues = onProgress.mock.calls.map(
-        (call: [number]) => call[0],
+        (call: [number]) => call[0]
       );
 
       // Should include key milestones
-      expect(progressValues).toContain(10);  // presigning
-      expect(progressValues).toContain(30);  // uploading
-      expect(progressValues).toContain(80);  // confirming
+      expect(progressValues).toContain(10); // presigning
+      expect(progressValues).toContain(30); // uploading
+      expect(progressValues).toContain(80); // confirming
       expect(progressValues).toContain(100); // done
 
       // Progress should be monotonically increasing
@@ -384,7 +402,9 @@ describe('useFileUpload', () => {
 
   describe('structured logging', () => {
     it('logs with [useFileUpload] prefix on success', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const errorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
       const opts = makeOptions();
 
       const { result } = renderHook(() => useFileUpload(opts));
@@ -394,7 +414,9 @@ describe('useFileUpload', () => {
       });
 
       const logMessages = errorSpy.mock.calls.map((c) => String(c[0]));
-      const prefixedLogs = logMessages.filter((m) => m.startsWith('[useFileUpload]'));
+      const prefixedLogs = logMessages.filter((m) =>
+        m.startsWith('[useFileUpload]')
+      );
 
       expect(prefixedLogs.length).toBeGreaterThanOrEqual(3);
       expect(prefixedLogs.some((m) => m.includes('presign OK'))).toBe(true);
@@ -404,9 +426,12 @@ describe('useFileUpload', () => {
 
     it('logs retry attempts with [useFileUpload] prefix', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const errorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
 
-      const presign = vi.fn()
+      const presign = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce(defaultPresignResult);
       const opts = makeOptions({ presign, maxRetries: 2 });
@@ -419,7 +444,7 @@ describe('useFileUpload', () => {
 
       const logMessages = errorSpy.mock.calls.map((c) => String(c[0]));
       const retryLogs = logMessages.filter(
-        (m) => m.startsWith('[useFileUpload]') && m.includes('retrying'),
+        (m) => m.startsWith('[useFileUpload]') && m.includes('retrying')
       );
       expect(retryLogs.length).toBeGreaterThanOrEqual(1);
 

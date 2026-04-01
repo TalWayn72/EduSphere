@@ -35,17 +35,18 @@ export function AgentsPage() {
   // recreating the array (and breaking React.memo on AgentModeSelector) on
   // every render triggered by chat input changes.
   const translatedModes = useMemo(
-    () => AGENT_MODES.map((m) => ({
-      ...m,
-      label: t(`modes.${m.id}.label`),
-      description: t(`modes.${m.id}.description`),
-    })),
-    [t],
+    () =>
+      AGENT_MODES.map((m) => ({
+        ...m,
+        label: t(`modes.${m.id}.label`),
+        description: t(`modes.${m.id}.description`),
+      })),
+    [t]
   );
 
   const translatedMode = useMemo(
     () => translatedModes.find((m) => m.id === activeMode)!,
-    [translatedModes, activeMode],
+    [translatedModes, activeMode]
   );
 
   return (

@@ -20,7 +20,9 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
     await login(page);
   });
 
-  test('mastery overview section shows content and never becomes empty', async ({ page }) => {
+  test('mastery overview section shows content and never becomes empty', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
 
     const masterySection = page.getByTestId('mastery-overview');
@@ -33,7 +35,9 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
 
     // At least one mastery topic must be rendered inside the section
     // (mock fallback has 5 items, real data would have 1+)
-    const masteryItems = masterySection.locator('[data-testid^="mastery-badge-"]');
+    const masteryItems = masterySection.locator(
+      '[data-testid^="mastery-badge-"]'
+    );
     await expect(masteryItems.first()).toBeVisible({ timeout: 5_000 });
 
     // Wait for any queries to settle (the bug manifested after query resolution)
@@ -44,7 +48,9 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('continue learning section shows content and never becomes empty', async ({ page }) => {
+  test('continue learning section shows content and never becomes empty', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
 
     const section = page.getByTestId('continue-learning-section');
@@ -58,7 +64,9 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
     await expect(heading).toBeVisible();
   });
 
-  test('recent activity section shows content and never becomes empty', async ({ page }) => {
+  test('recent activity section shows content and never becomes empty', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
 
     const section = page.getByTestId('recent-activity');
@@ -73,7 +81,9 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('recommendations section shows content and never becomes empty', async ({ page }) => {
+  test('recommendations section shows content and never becomes empty', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
 
     const section = page.getByTestId('recommendations');
@@ -88,7 +98,9 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('mastery section with intercepted empty GraphQL response still shows content', async ({ page }) => {
+  test('mastery section with intercepted empty GraphQL response still shows content', async ({
+    page,
+  }) => {
     // Intercept the mastery query and return empty data — simulates the exact bug scenario
     await page.route('**/graphql', async (route) => {
       const postData = route.request().postData();
@@ -115,12 +127,16 @@ test.describe('BUG-084 — Dashboard sections never show blank/empty', () => {
     await page.waitForTimeout(2_000);
 
     // Mastery items must still show (mock fallback) — NOT empty
-    const masteryItems = masterySection.locator('[data-testid^="mastery-badge-"]');
+    const masteryItems = masterySection.locator(
+      '[data-testid^="mastery-badge-"]'
+    );
     const count = await masteryItems.count();
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('visual snapshot — dashboard sections remain populated', async ({ page }) => {
+  test('visual snapshot — dashboard sections remain populated', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
 
     // Wait for everything to settle

@@ -49,9 +49,15 @@ interface ImportJob {
   estimatedMinutes: number | null;
 }
 
-interface ImportYoutubeResult { importFromYoutube: ImportJob }
-interface ImportWebsiteResult { importFromWebsite: ImportJob }
-interface ImportFromDriveResult { importFromDrive: ImportJob }
+interface ImportYoutubeResult {
+  importFromYoutube: ImportJob;
+}
+interface ImportWebsiteResult {
+  importFromWebsite: ImportJob;
+}
+interface ImportFromDriveResult {
+  importFromDrive: ImportJob;
+}
 
 export function useContentImport(courseId: string) {
   const [importJob, setImportJob] = useState<ImportJob | null>(null);
@@ -76,7 +82,13 @@ export function useContentImport(courseId: string) {
   });
 
   const driveMutation = useMutation({
-    mutationFn: ({ folderId, accessToken }: { folderId: string; accessToken: string }) =>
+    mutationFn: ({
+      folderId,
+      accessToken,
+    }: {
+      folderId: string;
+      accessToken: string;
+    }) =>
       request<ImportFromDriveResult>(GRAPHQL_URL, IMPORT_FROM_DRIVE_MUTATION, {
         input: { folderId, accessToken, courseId, moduleId: '' },
       }),
@@ -90,13 +102,18 @@ export function useContentImport(courseId: string) {
   });
 
   return {
-    importFromYoutube: (playlistUrl: string) => youtubeMutation.mutateAsync(playlistUrl),
-    importFromWebsite: (siteUrl: string) => websiteMutation.mutateAsync(siteUrl),
+    importFromYoutube: (playlistUrl: string) =>
+      youtubeMutation.mutateAsync(playlistUrl),
+    importFromWebsite: (siteUrl: string) =>
+      websiteMutation.mutateAsync(siteUrl),
     importFromDrive: (folderId: string, accessToken: string) =>
       driveMutation.mutateAsync({ folderId, accessToken }),
     cancelImport: (jobId: string) => cancelMutation.mutateAsync(jobId),
     importJob,
-    isImporting: youtubeMutation.isPending || websiteMutation.isPending || driveMutation.isPending,
+    isImporting:
+      youtubeMutation.isPending ||
+      websiteMutation.isPending ||
+      driveMutation.isPending,
     error,
   };
 }

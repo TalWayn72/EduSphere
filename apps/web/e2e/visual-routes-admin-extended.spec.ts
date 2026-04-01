@@ -31,7 +31,7 @@ async function screenshotWithFallback(
   page: import('@playwright/test').Page,
   selector: string,
   altSelector: string,
-  name: string,
+  name: string
 ) {
   const el = page.locator(selector).or(page.locator(altSelector)).first();
   if (await el.isVisible({ timeout: 3000 }).catch(() => false)) {
@@ -48,7 +48,7 @@ for (const route of ADMIN_ROUTES) {
       await page.waitForTimeout(500);
       await expect(page).toHaveScreenshot(
         `routes-admin-${route}-full.png`,
-        LOOSE_OPTS,
+        LOOSE_OPTS
       );
     });
 
@@ -59,7 +59,7 @@ for (const route of ADMIN_ROUTES) {
         page,
         'header',
         'h1',
-        `routes-admin-${route}-header.png`,
+        `routes-admin-${route}-header.png`
       );
     });
 
@@ -70,7 +70,7 @@ for (const route of ADMIN_ROUTES) {
         page,
         'main',
         '[role="main"]',
-        `routes-admin-${route}-content.png`,
+        `routes-admin-${route}-content.png`
       );
     });
 
@@ -81,7 +81,7 @@ for (const route of ADMIN_ROUTES) {
         page,
         'aside',
         'nav',
-        `routes-admin-${route}-sidebar.png`,
+        `routes-admin-${route}-sidebar.png`
       );
     });
 
@@ -92,7 +92,7 @@ for (const route of ADMIN_ROUTES) {
         page,
         '[data-testid="action-bar"]',
         '.actions',
-        `routes-admin-${route}-actions.png`,
+        `routes-admin-${route}-actions.png`
       );
     });
   });

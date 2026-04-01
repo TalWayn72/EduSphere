@@ -51,17 +51,29 @@ function ContentTypeIcon({ type }: { type: string }) {
     case 'VIDEO':
       return <Play className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />;
     case 'AUDIO':
-      return <Headphones className="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" />;
+      return (
+        <Headphones className="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" />
+      );
     case 'PDF':
-      return <FileText className="h-3.5 w-3.5 text-red-500 dark:text-red-400" />;
+      return (
+        <FileText className="h-3.5 w-3.5 text-red-500 dark:text-red-400" />
+      );
     case 'MARKDOWN':
-      return <BookOpen className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />;
+      return (
+        <BookOpen className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />
+      );
     case 'QUIZ':
-      return <HelpCircle className="h-3.5 w-3.5 text-orange-500 dark:text-orange-400" />;
+      return (
+        <HelpCircle className="h-3.5 w-3.5 text-orange-500 dark:text-orange-400" />
+      );
     case 'EXAM':
-      return <ClipboardCheck className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />;
+      return (
+        <ClipboardCheck className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
+      );
     case 'ASSIGNMENT':
-      return <PenSquare className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400" />;
+      return (
+        <PenSquare className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400" />
+      );
     case 'LINK':
       return <Link className="h-3.5 w-3.5 text-cyan-500 dark:text-cyan-400" />;
     default:

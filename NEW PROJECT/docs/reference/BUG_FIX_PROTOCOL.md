@@ -58,16 +58,19 @@ flowchart TD
 
 **Skills loaded:** `systematic-debugging` + `discovery-wave-automator` + domain skill
 
-| Agent | Role |
-|-------|------|
+| Agent              | Role                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
 | Agent-Investigator | Read logs → reproduce → root cause (use interactive debugger, NOT console.log) |
-| Agent-Scanner | 3-wave parallel search |
+| Agent-Scanner      | 3-wave parallel search                                                         |
 
 ### Wave 1 — Exact Match
+
 Grep for the exact broken pattern (string, function, API call) across entire codebase.
 
 ### Wave 2 — Similarity Search (NEVER SKIP)
+
 Check ALL relevant directories for variations of the same anti-pattern:
+
 - [ ] `{FRONTEND_PAGES_DIR}`
 - [ ] `{FRONTEND_HOOKS_DIR}`
 - [ ] `{FRONTEND_COMPONENTS_DIR}`
@@ -80,12 +83,15 @@ Check ALL relevant directories for variations of the same anti-pattern:
 - [ ] `.env*` files + config directories — if env-var or config-related bug
 
 ### Wave 3 — Pattern Class
+
 Search all usages of the same API or pattern class. Examples:
+
 - "no cleanup on unmount" → grep ALL `setInterval`/`setTimeout`/`useSubscription`
 - "raw error in UI" → grep ALL `.message` rendered to user
 - "missing try/catch" → grep ALL async service methods
 
 ### Output
+
 **Numbered Discovery List** — every affected file + the exact issue.
 Report to user before proceeding.
 
@@ -137,6 +143,7 @@ graph LR
 ## Stage 1.5 — Containment (P0/P1 only)
 
 **Before writing fix code, stop the bleeding:**
+
 - Feature flag off
 - Emergency rollback to last known good
 - Circuit breaker / rate limit
@@ -150,20 +157,22 @@ Document containment action in OPEN_ISSUES.md.
 
 **Agents per round (parallel):**
 
-| Agent | Role |
-|-------|------|
-| Agent-FE | Frontend fixes |
-| Agent-BE | Backend fixes |
-| Agent-QA | Unit + E2E regression tests |
+| Agent          | Role                                                |
+| -------------- | --------------------------------------------------- |
+| Agent-FE       | Frontend fixes                                      |
+| Agent-BE       | Backend fixes                                       |
+| Agent-QA       | Unit + E2E regression tests                         |
 | Agent-Security | Security invariant compliance check on changed code |
 
 ### Round Structure
+
 - **Round 1:** Original bug + structured logging added
 - **Round 2:** All Wave 2 findings (variations)
 - **Round 3:** All Wave 3 findings (pattern class)
 - **Round N:** Continue until Discovery List is 100% empty
 
 ### Round Gate (MANDATORY after EVERY round)
+
 ```
 [] {CONTAINER_ORCHESTRATION} ps — all containers healthy (if any went down during round, restore NOW)
 [] ./scripts/health-check.sh — ALL services responding
@@ -211,6 +220,7 @@ Document containment action in OPEN_ISSUES.md.
 ## Stage 5 — Rollback Readiness
 
 **Document before deploying:**
+
 ```
 [] Rollback command: [exact git revert / container image tag]
 [] Database impact: [migration included? backwards-compatible?]
@@ -219,11 +229,12 @@ Document containment action in OPEN_ISSUES.md.
 ```
 
 ### Decision Framework
-| Condition | Action |
-|-----------|--------|
-| Fix verified in <30 min | Fix-forward |
-| Fix takes >30 min | Rollback now, fix in new cycle |
-| Data integrity at risk | Rollback immediately (no fix-forward) |
+
+| Condition                 | Action                                  |
+| ------------------------- | --------------------------------------- |
+| Fix verified in <30 min   | Fix-forward                             |
+| Fix takes >30 min         | Rollback now, fix in new cycle          |
+| Data integrity at risk    | Rollback immediately (no fix-forward)   |
 | Fix includes DB migration | Evaluate data safety before fix-forward |
 
 ---
@@ -231,11 +242,13 @@ Document containment action in OPEN_ISSUES.md.
 ## Stage 6 — Container Deployment & Live Verification
 
 ### Deployment (Blue-Green)
+
 1. `{CONTAINER_ORCHESTRATION} build --no-cache` — old container stays running
 2. Verify build succeeds (exit 0) BEFORE touching running container
 3. `{CONTAINER_ORCHESTRATION} down && {CONTAINER_ORCHESTRATION} up -d`
 
 ### Verification Checklist
+
 ```
 [] {CONTAINER_ORCHESTRATION} ps — all containers healthy
 [] ./scripts/health-check.sh — ALL services PASS
@@ -247,15 +260,16 @@ Document containment action in OPEN_ISSUES.md.
 
 ### Multi-User Authentication Test
 
-| User | Role | Password |
-|------|------|----------|
+| User                     | Role        | Password   |
+| ------------------------ | ----------- | ---------- |
 | admin@{PROJECT_NAME}.dev | SUPER_ADMIN | [password] |
-| instructor@example.com | INSTRUCTOR | [password] |
-| org.admin@example.com | ORG_ADMIN | [password] |
-| researcher@example.com | RESEARCHER | [password] |
-| student@example.com | STUDENT | [password] |
+| instructor@example.com   | INSTRUCTOR  | [password] |
+| org.admin@example.com    | ORG_ADMIN   | [password] |
+| researcher@example.com   | RESEARCHER  | [password] |
+| student@example.com      | STUDENT     | [password] |
 
 ### Live Bug Reproduction
+
 - Reproduce the original bug scenario in the live container
 - Confirm it is fixed
 - **If ANY check fails** → fix → back to Stage 4
@@ -287,6 +301,7 @@ Document containment action in OPEN_ISSUES.md.
 
 ```markdown
 ## BUG-NNN: [Title]
+
 - **Status:** Fixed
 - **Severity:** P1
 - **Root Cause:** [layer: code/test/deploy/env] → exact issue
@@ -300,6 +315,7 @@ Document containment action in OPEN_ISSUES.md.
 ```
 
 ### Additional Doc Updates
+
 - README.md if stats changed
 - API contracts if schema changed
 - CHANGELOG.md entry
@@ -332,14 +348,14 @@ Rollback plan: documented
 
 ## Skills Loaded per Stage
 
-| Stage | Skills |
-|-------|--------|
-| 1 (Discovery) | `systematic-debugging`, `discovery-wave-automator`, domain skill |
-| 1.5 (Containment) | `incident-runbook-templates` |
-| 2 (Fix Rounds) | `debugging-code` (interactive debugger), `parallel-debugging`, domain skill |
-| 3 (Visual) | `{E2E_FRAMEWORK}-e2e-tester`, `fix` |
-| 4-6 (Verification) | `session-completion-gate` |
-| 8 (Documentation) | `postmortem-writing` (P0/P1 only) |
+| Stage              | Skills                                                                      |
+| ------------------ | --------------------------------------------------------------------------- |
+| 1 (Discovery)      | `systematic-debugging`, `discovery-wave-automator`, domain skill            |
+| 1.5 (Containment)  | `incident-runbook-templates`                                                |
+| 2 (Fix Rounds)     | `debugging-code` (interactive debugger), `parallel-debugging`, domain skill |
+| 3 (Visual)         | `{E2E_FRAMEWORK}-e2e-tester`, `fix`                                         |
+| 4-6 (Verification) | `session-completion-gate`                                                   |
+| 8 (Documentation)  | `postmortem-writing` (P0/P1 only)                                           |
 
 ---
 

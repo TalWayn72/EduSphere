@@ -5,7 +5,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { BlogListPage } from './BlogListPage';
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/seo', () => ({
@@ -14,8 +16,12 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('react-helmet-async', () => ({
-  Helmet: vi.fn(({ children }: { children: React.ReactNode }) => <>{children}</>),
-  HelmetProvider: vi.fn(({ children }: { children: React.ReactNode }) => <>{children}</>),
+  Helmet: vi.fn(({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  )),
+  HelmetProvider: vi.fn(({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  )),
 }));
 
 function renderPage() {
@@ -48,10 +54,14 @@ describe('BlogListPage', () => {
 
   it('renders all 4 post titles', () => {
     renderPage();
-    expect(screen.getByText(/Knowledge Graphs Are the Future/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Knowledge Graphs Are the Future/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Chavruta Method/i)).toBeInTheDocument();
     expect(screen.getByText(/Is SCORM Dead/i)).toBeInTheDocument();
-    expect(screen.getByText(/Automating Compliance Training/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Automating Compliance Training/i)
+    ).toBeInTheDocument();
   });
 
   it('renders category badges', () => {

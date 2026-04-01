@@ -61,7 +61,9 @@ describe('LessonPipelineTemplateService — memory safety', () => {
 
   it('onModuleDestroy does not throw when closeAllPools rejects', async () => {
     mockCloseAllPools.mockRejectedValueOnce(new Error('pool close failed'));
-    await expect(service.onModuleDestroy()).rejects.toThrow('pool close failed');
+    await expect(service.onModuleDestroy()).rejects.toThrow(
+      'pool close failed'
+    );
   });
 
   it('multiple onModuleDestroy calls each invoke closeAllPools', async () => {

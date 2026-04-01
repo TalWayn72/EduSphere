@@ -8,7 +8,11 @@
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from './env';
 import { login } from './auth.helpers';
-import { STABLE_OPTS, LOOSE_OPTS, dynamicMasks } from './helpers/visual-test-utils';
+import {
+  STABLE_OPTS,
+  LOOSE_OPTS,
+  dynamicMasks,
+} from './helpers/visual-test-utils';
 test.use({ reducedMotion: 'reduce' });
 
 test.describe('Visual A11y -- High Contrast Mode (Part 1) @visual @a11y', () => {
@@ -21,7 +25,10 @@ test.describe('Visual A11y -- High Contrast Mode (Part 1) @visual @a11y', () => 
   test('login -- full page high contrast', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('a11y-contrast-login-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'a11y-contrast-login-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('login -- form area high contrast', async ({ page }) => {
@@ -85,15 +92,24 @@ test.describe('Visual A11y -- High Contrast Mode (Part 1) @visual @a11y', () => 
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const sidebar = page.getByTestId('app-sidebar').or(page.locator('aside')).first();
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside'))
+      .first();
     if (await sidebar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sidebar).toHaveScreenshot('a11y-contrast-dashboard-sidebar.png', {
-        animations: 'disabled',
-      });
+      await expect(sidebar).toHaveScreenshot(
+        'a11y-contrast-dashboard-sidebar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('a11y-contrast-dashboard-sidebar.png', {
-        animations: 'disabled',
-      });
+      await expect(page).toHaveScreenshot(
+        'a11y-contrast-dashboard-sidebar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     }
   });
 
@@ -119,15 +135,24 @@ test.describe('Visual A11y -- High Contrast Mode (Part 1) @visual @a11y', () => 
     await login(page);
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const topbar = page.getByTestId('topbar').or(page.locator('header')).first();
+    const topbar = page
+      .getByTestId('topbar')
+      .or(page.locator('header'))
+      .first();
     if (await topbar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(topbar).toHaveScreenshot('a11y-contrast-dashboard-topbar.png', {
-        animations: 'disabled',
-      });
+      await expect(topbar).toHaveScreenshot(
+        'a11y-contrast-dashboard-topbar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('a11y-contrast-dashboard-topbar.png', {
-        animations: 'disabled',
-      });
+      await expect(page).toHaveScreenshot(
+        'a11y-contrast-dashboard-topbar.png',
+        {
+          animations: 'disabled',
+        }
+      );
     }
   });
 
@@ -165,11 +190,17 @@ test.describe('Visual A11y -- High Contrast Mode (Part 1) @visual @a11y', () => 
     await login(page);
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    const search = page.locator('input[type="search"]').or(page.locator('[data-testid="search-input"]')).first();
+    const search = page
+      .locator('input[type="search"]')
+      .or(page.locator('[data-testid="search-input"]'))
+      .first();
     if (await search.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(search).toHaveScreenshot('a11y-contrast-courses-search.png', {
-        animations: 'disabled',
-      });
+      await expect(search).toHaveScreenshot(
+        'a11y-contrast-courses-search.png',
+        {
+          animations: 'disabled',
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('a11y-contrast-courses-search.png', {
         animations: 'disabled',

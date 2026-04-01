@@ -194,7 +194,7 @@ describe('agent-worker — cleanup pattern', () => {
   it('null guard prevents double-clear', () => {
     let cpuTimer: ReturnType<typeof setInterval> | null = setInterval(
       () => {},
-      5_000,
+      5_000
     );
 
     // Replicate cleanup() logic
@@ -212,14 +212,14 @@ describe('agent-worker — cleanup pattern', () => {
   });
 
   it('disconnect handler should call cleanup and exit', () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(
-      () => undefined as never,
-    );
+    const exitSpy = vi
+      .spyOn(process, 'exit')
+      .mockImplementation(() => undefined as never);
 
     // Replicate disconnect handler logic
     let cpuTimer: ReturnType<typeof setInterval> | null = setInterval(
       () => {},
-      5_000,
+      5_000
     );
     if (cpuTimer !== null) {
       clearInterval(cpuTimer);

@@ -43,7 +43,12 @@ const FEATURED_COURSES: FeaturedCourse[] = [
     level: 'Intermediate',
     duration: '6 hours',
     category: 'Leadership',
-    keywords: ['leadership', 'management', 'strategy', 'organizational development'],
+    keywords: [
+      'leadership',
+      'management',
+      'strategy',
+      'organizational development',
+    ],
   },
   {
     id: 'python-data-science',
@@ -63,7 +68,13 @@ const FEATURED_COURSES: FeaturedCourse[] = [
     level: 'Intermediate',
     duration: '4 hours',
     category: 'AI/ML',
-    keywords: ['AI ethics', 'responsible AI', 'bias', 'fairness', 'transparency'],
+    keywords: [
+      'AI ethics',
+      'responsible AI',
+      'bias',
+      'fairness',
+      'transparency',
+    ],
   },
   {
     id: 'org-learning-design',
@@ -73,13 +84,20 @@ const FEATURED_COURSES: FeaturedCourse[] = [
     level: 'Advanced',
     duration: '8 hours',
     category: 'L&D',
-    keywords: ['learning design', 'instructional design', 'L&D', 'corporate training'],
+    keywords: [
+      'learning design',
+      'instructional design',
+      'L&D',
+      'corporate training',
+    ],
   },
 ];
 
 const LEVEL_COLORS: Record<string, string> = {
-  Beginner: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  Intermediate: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  Beginner:
+    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  Intermediate:
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   Advanced: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 };
 
@@ -157,59 +175,60 @@ export function CourseCatalogPage() {
       />
 
       <PublicLayout>
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-        {/* Header */}
-        <div className="bg-indigo-700 text-white py-16 dark:bg-indigo-400 dark:text-white">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
-              Featured Learning Programs
-            </h1>
-            <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto dark:text-indigo-300">
-              Explore our curated courses designed for modern professionals. AI-powered
-              personalization adapts every course to your learning pace.
-            </p>
-            <a
-              href="/pilot"
-              className="inline-flex items-center px-6 py-3 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition-colors dark:bg-gray-900 dark:text-indigo-300"
-              aria-label="Start your free EduSphere pilot"
-            >
-              Start Free Trial
-            </a>
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+          {/* Header */}
+          <div className="bg-indigo-700 text-white py-16 dark:bg-indigo-400 dark:text-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h1 className="text-3xl sm:text-4xl font-extrabold mb-4">
+                Featured Learning Programs
+              </h1>
+              <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto dark:text-indigo-300">
+                Explore our curated courses designed for modern professionals.
+                AI-powered personalization adapts every course to your learning
+                pace.
+              </p>
+              <a
+                href="/pilot"
+                className="inline-flex items-center px-6 py-3 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition-colors dark:bg-gray-900 dark:text-indigo-300"
+                aria-label="Start your free EduSphere pilot"
+              >
+                Start Free Trial
+              </a>
+            </div>
           </div>
+
+          <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <ul
+              role="list"
+              aria-label="Featured courses"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {FEATURED_COURSES.map((course) => (
+                <li key={course.id}>
+                  <CourseCard course={course} />
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA Section */}
+            <div className="mt-14 p-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl text-center">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Ready to transform your organization&apos;s learning?
+              </h2>
+              <p className="text-gray-600 dark:text-slate-300 mb-6 max-w-xl mx-auto">
+                EduSphere supports 100,000+ concurrent learners with AI-powered
+                tutoring, knowledge graphs, and enterprise-grade compliance.
+              </p>
+              <a
+                href="/pilot"
+                className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:text-white"
+                aria-label="Request an EduSphere pilot program"
+              >
+                Request a Pilot
+              </a>
+            </div>
+          </main>
         </div>
-
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <ul
-            role="list"
-            aria-label="Featured courses"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {FEATURED_COURSES.map((course) => (
-              <li key={course.id}>
-                <CourseCard course={course} />
-              </li>
-            ))}
-          </ul>
-
-          {/* CTA Section */}
-          <div className="mt-14 p-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl text-center">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Ready to transform your organization&apos;s learning?
-            </h2>
-            <p className="text-gray-600 dark:text-slate-300 mb-6 max-w-xl mx-auto">
-              EduSphere supports 100,000+ concurrent learners with AI-powered tutoring,
-              knowledge graphs, and enterprise-grade compliance.
-            </p>
-            <a
-              href="/pilot"
-              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:text-white"
-              aria-label="Request an EduSphere pilot program"
-            >
-              Request a Pilot
-            </a>
-          </div>
-        </main>
-      </div>
       </PublicLayout>
     </>
   );

@@ -3,8 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PrivacyConsentCard } from './PrivacyConsentCard';
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{}, vi.fn().mockResolvedValue({ data: {}, error: undefined })]),
-  gql: (strings: TemplateStringsArray, ..._values: unknown[]) => strings.join(''),
+  useMutation: vi.fn(() => [
+    {},
+    vi.fn().mockResolvedValue({ data: {}, error: undefined }),
+  ]),
+  gql: (strings: TemplateStringsArray, ..._values: unknown[]) =>
+    strings.join(''),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -31,8 +35,15 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/components/ui/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children }: { children: React.ReactNode; asChild?: boolean }) => <>{children}</>,
-  TooltipContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  TooltipTrigger: ({
+    children,
+  }: {
+    children: React.ReactNode;
+    asChild?: boolean;
+  }) => <>{children}</>,
+  TooltipContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 const defaultHighlight = {
@@ -50,7 +61,9 @@ describe('PrivacyConsentCard', () => {
   it('renders card title and description', () => {
     render(<PrivacyConsentCard highlight={defaultHighlight} />);
     expect(screen.getByText('Privacy & AI')).toBeInTheDocument();
-    expect(screen.getByText('Manage how your data is used')).toBeInTheDocument();
+    expect(
+      screen.getByText('Manage how your data is used')
+    ).toBeInTheDocument();
   });
 
   it('renders both toggle rows', () => {
@@ -71,7 +84,9 @@ describe('PrivacyConsentCard', () => {
     render(<PrivacyConsentCard highlight={defaultHighlight} />);
     const switches = screen.getAllByRole('switch');
     fireEvent.click(switches[0]!);
-    expect(localStorage.getItem('edusphere_consent_AI_PROCESSING')).toBe('true');
+    expect(localStorage.getItem('edusphere_consent_AI_PROCESSING')).toBe(
+      'true'
+    );
   });
 
   it('applies highlight class when targeted', () => {

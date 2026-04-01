@@ -4,15 +4,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_, name) => {
+        if (name === '__esModule') return true;
+        return function MockIcon(props: Record<string, unknown>) {
+          return <span data-testid={`icon-${String(name)}`} {...props} />;
+        };
+      },
+    })
 );
 
 vi.mock('@/components/seo', () => ({
@@ -20,7 +22,9 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 import { ContactPage } from './ContactPage';
@@ -79,7 +83,9 @@ describe('ContactPage', () => {
     fireEvent.change(screen.getByLabelText('Message'), {
       target: { value: 'Hello world' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Send Message' }).closest('form')!);
+    fireEvent.submit(
+      screen.getByRole('button', { name: 'Send Message' }).closest('form')!
+    );
 
     expect(
       screen.getByText(/Thank you! We'll be in touch soon./i)

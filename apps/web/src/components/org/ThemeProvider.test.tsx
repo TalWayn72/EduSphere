@@ -58,7 +58,7 @@ describe('OrgThemeProvider', () => {
     render(
       <OrgThemeProvider slug="acme-university">
         <ThemeConsumer />
-      </OrgThemeProvider>,
+      </OrgThemeProvider>
     );
 
     expect(screen.getByTestId('primary').textContent).toBe('#1a73e8');
@@ -67,7 +67,6 @@ describe('OrgThemeProvider', () => {
   });
 
   it('renders children while loading', () => {
-
     vi.mocked(useTenantBranding).mockReturnValue({
       branding: null,
       isLoading: true,
@@ -76,7 +75,7 @@ describe('OrgThemeProvider', () => {
     render(
       <OrgThemeProvider slug="acme-university">
         <div data-testid="child">Content</div>
-      </OrgThemeProvider>,
+      </OrgThemeProvider>
     );
 
     expect(screen.getByTestId('child')).toBeInTheDocument();
@@ -86,7 +85,7 @@ describe('OrgThemeProvider', () => {
     render(
       <OrgThemeProvider slug="acme-university">
         <div>Content</div>
-      </OrgThemeProvider>,
+      </OrgThemeProvider>
     );
 
     // CSS variables should be set on the wrapper div or :root
@@ -98,7 +97,6 @@ describe('OrgThemeProvider', () => {
   });
 
   it('uses default theme when branding is null', () => {
-
     vi.mocked(useTenantBranding).mockReturnValue({
       branding: null,
       isLoading: false,
@@ -107,7 +105,7 @@ describe('OrgThemeProvider', () => {
     render(
       <OrgThemeProvider slug="new-org">
         <ThemeConsumer />
-      </OrgThemeProvider>,
+      </OrgThemeProvider>
     );
 
     // Default theme should be applied (not null/undefined)
@@ -119,7 +117,7 @@ describe('OrgThemeProvider', () => {
     render(
       <OrgThemeProvider slug="acme-university">
         <ThemeConsumer />
-      </OrgThemeProvider>,
+      </OrgThemeProvider>
     );
 
     expect(screen.getByTestId('font').textContent).toBe('Inter');

@@ -2,11 +2,7 @@
  * DriveIngestionService — downloads Google Drive files, uploads to MinIO,
  * creates content records, and publishes NATS events.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { connect, StringCodec } from 'nats';
@@ -42,7 +38,7 @@ export class DriveIngestionService implements OnModuleDestroy {
 
   constructor(
     private readonly driveClient: GoogleDriveClient,
-    private readonly clamav: ClamavService,
+    private readonly clamav: ClamavService
   ) {
     this.bucket = minioConfig.bucket;
     this.s3 = new S3Client({
@@ -59,11 +55,21 @@ export class DriveIngestionService implements OnModuleDestroy {
   }
 
   async startImport(
-    input: DriveImportInput, tenantId: string, userId: string,
-  ): Promise<{ id: string; status: string; lessonCount: number; estimatedMinutes: number | null }> {
+    input: DriveImportInput,
+    tenantId: string,
+    userId: string
+  ): Promise<{
+    id: string;
+    status: string;
+    lessonCount: number;
+    estimatedMinutes: number | null;
+  }> {
     const jobId = `drive-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const abort = new AbortController();
-    this.logger.log({ jobId, folderId: input.folderId, tenantId, userId }, 'Starting Drive import');
+    this.logger.log(
+      { jobId, folderId: input.folderId, tenantId, userId },
+      'Starting Drive import'
+    );
 
     if (this.activeJobs.size >= this.MAX_ACTIVE_JOBS) {
       const oldest = this.activeJobs.keys().next().value;
@@ -71,15 +77,28 @@ export class DriveIngestionService implements OnModuleDestroy {
     }
     this.activeJobs.set(jobId, abort);
 
-    const task = this.processFiles(jobId, input, tenantId, userId, abort.signal);
+    const task = this.processFiles(
+      jobId,
+      input,
+      tenantId,
+      userId,
+      abort.signal
+    );
     const timeout = new Promise<void>((_, reject) =>
-      setTimeout(() => reject(new Error('Drive import timeout')), 5 * 60 * 1000),
+      setTimeout(() => reject(new Error('Drive import timeout')), 5 * 60 * 1000)
     );
     void Promise.race([task, timeout])
-      .catch((err: unknown) => this.logger.error({ jobId, err }, 'Drive import failed'))
+      .catch((err: unknown) =>
+        this.logger.error({ jobId, err }, 'Drive import failed')
+      )
       .finally(() => this.activeJobs.delete(jobId));
 
-    return { id: jobId, status: 'PENDING', lessonCount: 0, estimatedMinutes: 5 };
+    return {
+      id: jobId,
+      status: 'PENDING',
+      lessonCount: 0,
+      estimatedMinutes: 5,
+    };
   }
 
   cancelJob(jobId: string): boolean {
@@ -95,40 +114,70 @@ export class DriveIngestionService implements OnModuleDestroy {
   }
 
   private async processFiles(
-    jobId: string, input: DriveImportInput, tenantId: string, userId: string, signal: AbortSignal,
+    jobId: string,
+    input: DriveImportInput,
+    tenantId: string,
+    userId: string,
+    signal: AbortSignal
   ): Promise<void> {
-    const files = await this.driveClient.listFolderContents(input.folderId, input.accessToken);
+    const files = await this.driveClient.listFolderContents(
+      input.folderId,
+      input.accessToken
+    );
     this.logger.log({ jobId, fileCount: files.length }, 'Drive files listed');
     for (const file of files) {
-      if (signal.aborted) { this.logger.log({ jobId }, 'Drive import cancelled'); return; }
+      if (signal.aborted) {
+        this.logger.log({ jobId }, 'Drive import cancelled');
+        return;
+      }
       await this.ingestFile(jobId, file, input, tenantId, userId);
     }
   }
 
   private async ingestFile(
-    jobId: string, file: DriveFile, input: DriveImportInput, tenantId: string, userId: string,
+    jobId: string,
+    file: DriveFile,
+    input: DriveImportInput,
+    tenantId: string,
+    userId: string
   ): Promise<void> {
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const fileKey = `${tenantId}/${input.courseId}/${randomUUID()}-${sanitizedName}`;
-    const buffer = await this.driveClient.downloadFile(file.id, input.accessToken);
+    const buffer = await this.driveClient.downloadFile(
+      file.id,
+      input.accessToken
+    );
 
     // ClamAV scan — reject infected files, graceful degradation if scanner unavailable
     const scanResult = await this.clamav.scanBuffer(buffer, sanitizedName);
     if (scanResult.isInfected) {
       this.logger.error(
-        { jobId, fileName: sanitizedName, tenantId, userId, viruses: scanResult.viruses },
-        '[DriveIngestion] INFECTED file rejected — skipping import',
+        {
+          jobId,
+          fileName: sanitizedName,
+          tenantId,
+          userId,
+          viruses: scanResult.viruses,
+        },
+        '[DriveIngestion] INFECTED file rejected — skipping import'
       );
       return;
     }
     if (scanResult.hasError) {
       this.logger.warn(
         { jobId, fileName: sanitizedName, tenantId },
-        '[DriveIngestion] ClamAV unavailable — proceeding without scan',
+        '[DriveIngestion] ClamAV unavailable — proceeding without scan'
       );
     }
 
-    await this.s3.send(new PutObjectCommand({ Bucket: this.bucket, Key: fileKey, Body: buffer, ContentType: file.mimeType }));
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: fileKey,
+        Body: buffer,
+        ContentType: file.mimeType,
+      })
+    );
 
     const ctx: TenantContext = { tenantId, userId, userRole: 'INSTRUCTOR' };
     await withTenantContext(this.db, ctx, (tx) =>
@@ -137,10 +186,13 @@ export class DriveIngestionService implements OnModuleDestroy {
         title: file.name,
         type: this.mapMime(file.mimeType),
         content: fileKey,
-      }),
+      })
     );
     await this.publishEvent(tenantId, jobId, file.name, fileKey);
-    this.logger.log({ jobId, fileName: file.name, fileKey }, 'Drive file ingested');
+    this.logger.log(
+      { jobId, fileName: file.name, fileKey },
+      'Drive file ingested'
+    );
   }
 
   private mapMime(mime: string): 'VIDEO' | 'AUDIO' | 'PDF' | 'LINK' {
@@ -150,11 +202,19 @@ export class DriveIngestionService implements OnModuleDestroy {
     return 'LINK';
   }
 
-  private async publishEvent(tenantId: string, jobId: string, fileName: string, fileKey: string): Promise<void> {
+  private async publishEvent(
+    tenantId: string,
+    jobId: string,
+    fileName: string,
+    fileKey: string
+  ): Promise<void> {
     let nc;
     try {
       nc = await connect(buildNatsOptions());
-      nc.publish('EDUSPHERE.content.import.completed', this.sc.encode(JSON.stringify({ tenantId, jobId, fileName, fileKey })));
+      nc.publish(
+        'EDUSPHERE.content.import.completed',
+        this.sc.encode(JSON.stringify({ tenantId, jobId, fileName, fileKey }))
+      );
       await nc.flush();
     } catch (err) {
       this.logger.error({ jobId, err }, 'Failed to publish import.completed');

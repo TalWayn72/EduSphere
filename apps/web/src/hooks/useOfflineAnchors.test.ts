@@ -31,7 +31,11 @@ vi.mock('idb', () => ({
 }));
 
 vi.mock('./useOfflineStatus', () => ({
-  useOfflineStatus: () => ({ isOnline: true, isOffline: false, lastOnlineAt: null }),
+  useOfflineStatus: () => ({
+    isOnline: true,
+    isOffline: false,
+    lastOnlineAt: null,
+  }),
 }));
 
 // ── constants ─────────────────────────────────────────────────────────────────
@@ -72,7 +76,9 @@ describe('useOfflineAnchors', () => {
 
   it('storeAnchors stores to IndexedDB when available', async () => {
     const { result } = renderHook(() => useOfflineAnchors(ASSET_ID));
-    await waitFor(() => expect(typeof result.current.storeAnchors).toBe('function'));
+    await waitFor(() =>
+      expect(typeof result.current.storeAnchors).toBe('function')
+    );
 
     await act(async () => {
       await result.current.storeAnchors(SAMPLE_ANCHORS);
@@ -86,7 +92,9 @@ describe('useOfflineAnchors', () => {
 
   it('loadCachedAnchors retrieves stored anchors from IndexedDB', async () => {
     const { result } = renderHook(() => useOfflineAnchors(ASSET_ID));
-    await waitFor(() => expect(typeof result.current.storeAnchors).toBe('function'));
+    await waitFor(() =>
+      expect(typeof result.current.storeAnchors).toBe('function')
+    );
 
     await act(async () => {
       await result.current.storeAnchors(SAMPLE_ANCHORS);
@@ -102,7 +110,9 @@ describe('useOfflineAnchors', () => {
 
   it('loadCachedAnchors returns null when nothing stored', async () => {
     const { result } = renderHook(() => useOfflineAnchors('no-such-asset'));
-    await waitFor(() => expect(typeof result.current.loadCachedAnchors).toBe('function'));
+    await waitFor(() =>
+      expect(typeof result.current.loadCachedAnchors).toBe('function')
+    );
 
     let loaded: VisualAnchor[] | null = null;
     await act(async () => {

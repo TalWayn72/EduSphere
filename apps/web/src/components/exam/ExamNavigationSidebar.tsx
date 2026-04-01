@@ -68,7 +68,7 @@ export function ExamNavigationSidebar({
                   !isAnswered && !isFlagged && 'bg-muted text-muted-foreground',
                   isAnswered && !isFlagged && 'bg-green-500 text-white',
                   isFlagged && 'bg-orange-500 text-white',
-                  isCurrent && 'ring-2 ring-primary ring-offset-1',
+                  isCurrent && 'ring-2 ring-primary ring-offset-1'
                 )}
               >
                 {i + 1}

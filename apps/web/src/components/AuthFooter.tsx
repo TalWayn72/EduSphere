@@ -16,7 +16,10 @@ export function AuthFooter() {
           Terms
         </Link>
         <span aria-hidden="true">&middot;</span>
-        <Link to="/accessibility" className="hover:text-foreground transition-colors">
+        <Link
+          to="/accessibility"
+          className="hover:text-foreground transition-colors"
+        >
           Accessibility
         </Link>
       </nav>

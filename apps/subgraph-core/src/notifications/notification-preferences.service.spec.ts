@@ -9,7 +9,8 @@ const mockInsert = vi.fn();
 const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -22,8 +23,9 @@ function makeChain(rows: unknown[] = []) {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-    fn({ select: mockSelect, insert: mockInsert })
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({ select: mockSelect, insert: mockInsert })
   ),
   schema: {
     notificationPreferences: {
@@ -55,15 +57,30 @@ describe('NotificationPreferencesService', () => {
 
   describe('getPreferences', () => {
     it('should return mapped user preferences', async () => {
-      mockSelect.mockReturnValue(makeChain([
-        { id: 'p1', notificationType: 'badge', channel: 'email', enabled: true },
-        { id: 'p2', notificationType: 'course', channel: 'push', enabled: false },
-      ]));
+      mockSelect.mockReturnValue(
+        makeChain([
+          {
+            id: 'p1',
+            notificationType: 'badge',
+            channel: 'email',
+            enabled: true,
+          },
+          {
+            id: 'p2',
+            notificationType: 'course',
+            channel: 'push',
+            enabled: false,
+          },
+        ])
+      );
 
       const result = await service.getPreferences('u1', 't1');
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
-        id: 'p1', notificationType: 'badge', channel: 'email', enabled: true,
+        id: 'p1',
+        notificationType: 'badge',
+        channel: 'email',
+        enabled: true,
       });
     });
 
@@ -76,11 +93,24 @@ describe('NotificationPreferencesService', () => {
 
   describe('updatePreference', () => {
     it('should upsert and return preference', async () => {
-      mockInsert.mockReturnValue(makeChain([
-        { id: 'p1', notificationType: 'badge', channel: 'email', enabled: false },
-      ]));
+      mockInsert.mockReturnValue(
+        makeChain([
+          {
+            id: 'p1',
+            notificationType: 'badge',
+            channel: 'email',
+            enabled: false,
+          },
+        ])
+      );
 
-      const result = await service.updatePreference('u1', 't1', 'badge', 'email', false);
+      const result = await service.updatePreference(
+        'u1',
+        't1',
+        'badge',
+        'email',
+        false
+      );
       expect(result.enabled).toBe(false);
       expect(result.notificationType).toBe('badge');
     });
@@ -89,13 +119,23 @@ describe('NotificationPreferencesService', () => {
   describe('isChannelEnabled', () => {
     it('should return true when user preference says enabled', async () => {
       mockSelect.mockReturnValue(makeChain([{ enabled: true }]));
-      const result = await service.isChannelEnabled('u1', 't1', 'badge', 'email');
+      const result = await service.isChannelEnabled(
+        'u1',
+        't1',
+        'badge',
+        'email'
+      );
       expect(result).toBe(true);
     });
 
     it('should return false when user preference says disabled', async () => {
       mockSelect.mockReturnValue(makeChain([{ enabled: false }]));
-      const result = await service.isChannelEnabled('u1', 't1', 'badge', 'email');
+      const result = await service.isChannelEnabled(
+        'u1',
+        't1',
+        'badge',
+        'email'
+      );
       expect(result).toBe(false);
     });
 
@@ -105,7 +145,12 @@ describe('NotificationPreferencesService', () => {
         .mockReturnValueOnce(makeChain([]))
         .mockReturnValueOnce(makeChain([{ enabled: true }]));
 
-      const result = await service.isChannelEnabled('u1', 't1', 'badge', 'push');
+      const result = await service.isChannelEnabled(
+        'u1',
+        't1',
+        'badge',
+        'push'
+      );
       expect(result).toBe(true);
     });
 

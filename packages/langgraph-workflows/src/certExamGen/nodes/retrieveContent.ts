@@ -7,7 +7,9 @@ import type { CitationSearchFn } from '../types';
 const MAX_SEARCH_RESULTS = 20;
 
 export function retrieveContentNode(searchFn?: CitationSearchFn) {
-  return async (state: CertExamGenState): Promise<Partial<CertExamGenState>> => {
+  return async (
+    state: CertExamGenState
+  ): Promise<Partial<CertExamGenState>> => {
     if (!searchFn) {
       return {
         courseContent: `Module ${state.moduleId} content (no search fn provided)`,
@@ -30,7 +32,10 @@ export function retrieveContentNode(searchFn?: CitationSearchFn) {
       return {
         courseContent: '',
         knowledgeGraphConcepts: [],
-        errors: [...state.errors, 'Content retrieval failed — proceeding with empty context'],
+        errors: [
+          ...state.errors,
+          'Content retrieval failed — proceeding with empty context',
+        ],
       };
     }
   };

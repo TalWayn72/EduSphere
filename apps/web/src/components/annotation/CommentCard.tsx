@@ -3,7 +3,14 @@
  * Shows author, layer badge, comment text with expand/collapse, and threaded replies.
  */
 import { useState } from 'react';
-import { MessageSquare, Check, ChevronDown, ChevronUp, Zap, ArrowUpCircle } from 'lucide-react';
+import {
+  MessageSquare,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Zap,
+  ArrowUpCircle,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -158,24 +165,29 @@ export function CommentCard({
             {flashcardSaved ? 'Saved!' : 'Flashcard'}
           </Button>
         )}
-        {onPromote && depth === 0 && !promoted && annotation.layer !== AnnotationLayer.INSTRUCTOR && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 px-1.5 text-[10px] text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-            aria-label="Promote to instructor layer"
-            onClick={async (e) => {
-              e.stopPropagation();
-              const ok = await onPromote(annotation.id);
-              if (ok) setPromoted(true);
-            }}
-          >
-            <ArrowUpCircle className="h-3 w-3 mr-0.5" />
-            {promoted ? 'Promoted!' : 'Promote'}
-          </Button>
-        )}
+        {onPromote &&
+          depth === 0 &&
+          !promoted &&
+          annotation.layer !== AnnotationLayer.INSTRUCTOR && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-1.5 text-[10px] text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+              aria-label="Promote to instructor layer"
+              onClick={async (e) => {
+                e.stopPropagation();
+                const ok = await onPromote(annotation.id);
+                if (ok) setPromoted(true);
+              }}
+            >
+              <ArrowUpCircle className="h-3 w-3 mr-0.5" />
+              {promoted ? 'Promoted!' : 'Promote'}
+            </Button>
+          )}
         {promoted && annotation.layer !== AnnotationLayer.INSTRUCTOR && (
-          <span className="text-[10px] text-indigo-500 px-1 dark:text-indigo-400">Promoted!</span>
+          <span className="text-[10px] text-indigo-500 px-1 dark:text-indigo-400">
+            Promoted!
+          </span>
         )}
         {onResolve && (
           <Button

@@ -11,7 +11,13 @@
 import { Controller, Get, Header, Logger, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { AeoService } from './aeo.service';
-import type { PublicCourse, FeatureItem, FaqItem, CatalogCourse, InstructorProfile } from './aeo.service';
+import type {
+  PublicCourse,
+  FeatureItem,
+  FaqItem,
+  CatalogCourse,
+  InstructorProfile,
+} from './aeo.service';
 import { OgImageService } from './og-image.service';
 
 // Rate limiting is enforced at the gateway level (Hive Gateway / nginx).
@@ -21,7 +27,7 @@ export class AeoController {
 
   constructor(
     private readonly aeoService: AeoService,
-    private readonly ogImageService: OgImageService,
+    private readonly ogImageService: OgImageService
   ) {}
 
   @Get('sitemap.xml')
@@ -81,7 +87,7 @@ export class AeoController {
     @Query('title') rawTitle: string = 'EduSphere',
     @Query('description') rawDesc: string = '',
     @Query('type') rawType: string = 'default',
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     const title = (rawTitle ?? 'EduSphere').slice(0, 80);
     const description = (rawDesc ?? '').slice(0, 160);
@@ -93,12 +99,12 @@ export class AeoController {
 
     const maxAge = type === 'course' ? 3600 : 86400;
     this.logger.debug(
-      `[AeoController] og image requested — title="${title}" type="${type}"`,
+      `[AeoController] og image requested — title="${title}" type="${type}"`
     );
     const buffer = await this.ogImageService.generateOgImage(
       title,
       description,
-      type,
+      type
     );
 
     res.set({

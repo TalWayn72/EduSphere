@@ -81,8 +81,7 @@ export class LessonNERConsumer implements OnModuleInit, OnModuleDestroy {
   private async ensureStream(): Promise<void> {
     if (!this.connection) return;
     try {
-      const jsm: JetStreamManager =
-        await this.connection.jetstreamManager();
+      const jsm: JetStreamManager = await this.connection.jetstreamManager();
       try {
         await jsm.streams.info(STREAM_NAME);
       } catch {
@@ -106,9 +105,7 @@ export class LessonNERConsumer implements OnModuleInit, OnModuleDestroy {
       queue: QUEUE_GROUP,
     });
 
-    this.logger.log(
-      `Subscribed to ${SUBJECT} (queue: ${QUEUE_GROUP})`
-    );
+    this.logger.log(`Subscribed to ${SUBJECT} (queue: ${QUEUE_GROUP})`);
 
     this.consumeLoop().catch((err) => {
       this.logger.error({ err }, 'LessonNERConsumer loop crashed');

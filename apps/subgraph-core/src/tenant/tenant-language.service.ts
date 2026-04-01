@@ -58,7 +58,9 @@ export class TenantLanguageService implements OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     this.cache.clear();
     await closeAllPools();
-    this.logger.log('[TenantLanguageService] onModuleDestroy: cache cleared, DB pools closed');
+    this.logger.log(
+      '[TenantLanguageService] onModuleDestroy: cache cleared, DB pools closed'
+    );
   }
 
   private setCached(

@@ -36,7 +36,7 @@ import { Scorm2004Player } from './Scorm2004Player';
 
 function dispatchScormMessage(
   action: string,
-  extra: Record<string, unknown> = {},
+  extra: Record<string, unknown> = {}
 ): ReturnType<typeof vi.fn> {
   const postMessageMock = vi.fn();
   const event = new MessageEvent('message', {
@@ -115,7 +115,7 @@ describe('Scorm2004Player', () => {
     });
     expect(reply!).toHaveBeenCalledWith(
       { action: 'InitializeResult', result: 'true' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -138,7 +138,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'SetValueResult', result: 'true' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
     expect(onProgress).toHaveBeenCalledWith({ 'cmi.location': 'page-5' });
   });
@@ -174,7 +174,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'SetValueResult', result: 'false' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -195,7 +195,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'SetValueResult', result: 'false' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -211,7 +211,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'GetValueResult', result: 'learner-1' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -227,7 +227,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'GetValueResult', result: '' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -241,7 +241,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'CommitResult', result: 'true' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -259,7 +259,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'TerminateResult', result: 'true' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -271,7 +271,7 @@ describe('Scorm2004Player', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: { element: 'cmi.location', value: 'page-1' },
-        }),
+        })
       );
     });
 
@@ -305,7 +305,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'SetValueResult', result: 'false' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 
@@ -319,7 +319,7 @@ describe('Scorm2004Player', () => {
 
     expect(reply!).toHaveBeenCalledWith(
       { action: 'GetValueResult', result: '' },
-      { targetOrigin: '*' },
+      { targetOrigin: '*' }
     );
   });
 

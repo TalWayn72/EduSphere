@@ -12,12 +12,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
-import {
-  BASE_URL,
-  TEST_USERS,
-  KEYCLOAK_REALM_URL,
-  IS_DEV_MODE,
-} from './env';
+import { BASE_URL, TEST_USERS, KEYCLOAK_REALM_URL, IS_DEV_MODE } from './env';
 
 // ─── Auth helpers (Keycloak-only) ────────────────────────────────────────────
 
@@ -36,7 +31,9 @@ async function loginViaKeycloak(
     )
     .catch(() => {});
 
-  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  const signInBtn = page.getByRole('button', {
+    name: /sign in with keycloak/i,
+  });
   await signInBtn.waitFor({ timeout: 10_000 });
   await signInBtn.click();
 
@@ -49,11 +46,18 @@ async function loginViaKeycloak(
   await page.fill('#password', password);
   await page.click('#kc-login');
 
-  const pat = BASE_URL.replace(/^https?:\/\//, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pat = BASE_URL.replace(/^https?:\/\//, '').replace(
+    /[.*+?^${}()|[\]\\]/g,
+    '\\$&'
+  );
   await page.waitForURL(new RegExp(pat), { timeout: 60_000 });
-  await page.waitForLoadState('domcontentloaded', { timeout: 30_000 }).catch(() => {});
   await page
-    .waitForFunction(() => !document.body.textContent?.includes('Loading'), { timeout: 30_000 })
+    .waitForLoadState('domcontentloaded', { timeout: 30_000 })
+    .catch(() => {});
+  await page
+    .waitForFunction(() => !document.body.textContent?.includes('Loading'), {
+      timeout: 30_000,
+    })
     .catch(() => {});
 }
 
@@ -65,7 +69,9 @@ async function logoutViaUI(page: Page): Promise<void> {
   await logoutItem.waitFor({ timeout: 5_000 });
   await logoutItem.click();
   await page.waitForURL(/\/(login)?$/, { timeout: 30_000 }).catch(() => {});
-  await page.waitForLoadState('domcontentloaded', { timeout: 15_000 }).catch(() => {});
+  await page
+    .waitForLoadState('domcontentloaded', { timeout: 15_000 })
+    .catch(() => {});
 }
 
 // ─── Group 1: Success toast (no error toast) ──────────────────────────────────
@@ -82,7 +88,9 @@ test.describe('language-save-regression — success toast guard', () => {
     await loginViaKeycloak(page);
   });
 
-  test('selecting Hebrew shows success toast, NOT error toast', async ({ page }) => {
+  test('selecting Hebrew shows success toast, NOT error toast', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/settings`);
     await page.waitForLoadState('domcontentloaded');
 
@@ -94,7 +102,9 @@ test.describe('language-save-regression — success toast guard', () => {
       page.getByText(/שמירת העדפות שפה נכשלה|language.*error|failed to save/i)
     ).not.toBeVisible({ timeout: 5_000 });
 
-    await expect(page.getByText(/העדפת השפה נשמרה/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/העדפת השפה נשמרה/)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('error toast text absent after Spanish save', async ({ page }) => {
@@ -104,9 +114,9 @@ test.describe('language-save-regression — success toast guard', () => {
     await page.getByRole('option', { name: /Espa/i }).first().click();
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.getByText('שמירת העדפות שפה נכשלה')
-    ).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('שמירת העדפות שפה נכשלה')).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('locale selector shows updated value immediately', async ({ page }) => {
@@ -125,7 +135,9 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
   test.describe.configure({ mode: 'serial', timeout: 90_000 });
   test.skip(IS_DEV_MODE, 'Requires live Keycloak (VITE_DEV_MODE=false)');
 
-  test('locale persists through full Keycloak logout/login cycle', async ({ page }) => {
+  test('locale persists through full Keycloak logout/login cycle', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'en');
       localStorage.setItem('edusphere-sidebar-collapsed', 'true');
@@ -137,29 +149,43 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText(/העדפת השפה נשמרה/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/העדפת השפה נשמרה/)).toBeVisible({
+      timeout: 10_000,
+    });
 
     await logoutViaUI(page);
-    expect(await page.evaluate(() => localStorage.getItem('edusphere_locale'))).toBe('he');
+    expect(
+      await page.evaluate(() => localStorage.getItem('edusphere_locale'))
+    ).toBe('he');
 
     await loginViaKeycloak(page);
     await page.goto(`${BASE_URL}/settings`);
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByRole('heading', { name: /הגדרות/ })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: /הגדרות/ })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByRole('combobox').first()).toContainText('עברית');
-    await expect(page.getByText('שמירת העדפות שפה נכשלה')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('שמירת העדפות שפה נכשלה')).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
-  test('login page uses persisted locale before re-authentication', async ({ page }) => {
+  test('login page uses persisted locale before re-authentication', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'he');
       localStorage.setItem('edusphere-sidebar-collapsed', 'true');
     });
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/ברוכים הבאים/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/ברוכים הבאים/)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('localStorage edusphere_locale is NOT cleared on logout', async ({ page }) => {
+  test('localStorage edusphere_locale is NOT cleared on logout', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
       localStorage.setItem('edusphere_locale', 'en');
       localStorage.setItem('edusphere-sidebar-collapsed', 'true');
@@ -170,9 +196,13 @@ test.describe('language-save-regression — Keycloak logout/login persistence', 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /Fran/i }).first().click();
     await page.waitForLoadState('domcontentloaded');
-    expect(await page.evaluate(() => localStorage.getItem('edusphere_locale'))).toBe('fr');
+    expect(
+      await page.evaluate(() => localStorage.getItem('edusphere_locale'))
+    ).toBe('fr');
     await logoutViaUI(page);
-    expect(await page.evaluate(() => localStorage.getItem('edusphere_locale'))).toBe('fr');
+    expect(
+      await page.evaluate(() => localStorage.getItem('edusphere_locale'))
+    ).toBe('fr');
   });
 });
 
@@ -196,7 +226,9 @@ test.describe('language-save-regression — visual regression', () => {
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /עברית/ }).first().click();
     await page.waitForLoadState('domcontentloaded');
-    await page.getByRole('heading', { name: /הגדרות/ }).waitFor({ timeout: 10_000 });
+    await page
+      .getByRole('heading', { name: /הגדרות/ })
+      .waitFor({ timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('settings-page-hebrew.png', {
       fullPage: false,

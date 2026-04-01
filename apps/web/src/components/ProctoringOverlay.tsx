@@ -19,7 +19,9 @@ export function ProctoringOverlay({ assessmentId, onFlagCountChange }: Props) {
     useProctoringSession(assessmentId);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<{ getTracks: () => { stop: () => void }[] } | null>(null);
+  const streamRef = useRef<{ getTracks: () => { stop: () => void }[] } | null>(
+    null
+  );
 
   // Notify parent when flagCount changes
   useEffect(() => {
@@ -90,7 +92,10 @@ export function ProctoringOverlay({ assessmentId, onFlagCountChange }: Props) {
           data-testid="proctoring-active-badge"
           className="flex items-center gap-1.5 rounded-full bg-destructive/90 px-3 py-1 text-xs font-semibold text-destructive-foreground"
         >
-          <span className="h-2 w-2 rounded-full bg-white animate-pulse dark:bg-gray-900" aria-hidden="true" />
+          <span
+            className="h-2 w-2 rounded-full bg-white animate-pulse dark:bg-gray-900"
+            aria-hidden="true"
+          />
           Proctoring Active
         </div>
       )}

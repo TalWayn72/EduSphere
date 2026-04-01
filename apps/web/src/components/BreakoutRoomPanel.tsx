@@ -143,7 +143,9 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
               />
             </div>
           ))}
-          {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+          {error && (
+            <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+          )}
           <div className="flex gap-2">
             <Button
               variant="outline"

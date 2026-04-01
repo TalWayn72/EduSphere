@@ -19,11 +19,7 @@ import type {
   DistractorReport,
   DistractorStat,
 } from './psychometrics.types.js';
-import {
-  computeDIndex,
-  computeRpbis,
-  computeOptionRpbis,
-} from './ctt-math.js';
+import { computeDIndex, computeRpbis, computeOptionRpbis } from './ctt-math.js';
 
 function sysCtx(tenantId: string): TenantContext {
   return { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
@@ -42,7 +38,7 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
   /** Full CTT analysis for a single item: p-value, D-index, r_pbis. */
   async analyzeItem(
     itemId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<ClassicalItemStats> {
     const ctx = sysCtx(tenantId);
     const responses = await withTenantContext(this.db, ctx, (tx) =>
@@ -52,9 +48,9 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.itemResponseLog.itemId, itemId),
-            eq(schema.itemResponseLog.tenantId, tenantId),
-          ),
-        ),
+            eq(schema.itemResponseLog.tenantId, tenantId)
+          )
+        )
     );
 
     const total = responses.length;
@@ -74,7 +70,7 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
   /** Distractor analysis — selection rate + r_pbis per option. */
   async analyzeDistractors(
     itemId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<DistractorReport> {
     const ctx = sysCtx(tenantId);
     const responses = await withTenantContext(this.db, ctx, (tx) =>
@@ -84,9 +80,9 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.itemResponseLog.itemId, itemId),
-            eq(schema.itemResponseLog.tenantId, tenantId),
-          ),
-        ),
+            eq(schema.itemResponseLog.tenantId, tenantId)
+          )
+        )
     );
 
     const total = responses.length;
@@ -125,24 +121,26 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.examItems.courseId, courseId),
-            eq(schema.examItems.tenantId, tenantId),
-          ),
-        ),
+            eq(schema.examItems.tenantId, tenantId)
+          )
+        )
     );
 
     const flagged: string[] = [];
     for (const item of items) {
       const stats = await this.analyzeItem(item.id, tenantId);
       if (
-        stats.pValue < 0.20 || stats.pValue > 0.90 ||
-        stats.dIndex < 0.20 || stats.rpbis < 0.15
+        stats.pValue < 0.2 ||
+        stats.pValue > 0.9 ||
+        stats.dIndex < 0.2 ||
+        stats.rpbis < 0.15
       ) {
         flagged.push(item.id);
       }
     }
     this.logger.log(
       { courseId, tenantId, flaggedCount: flagged.length },
-      '[ClassicalAnalysisService] flagPoorItems complete',
+      '[ClassicalAnalysisService] flagPoorItems complete'
     );
     return flagged;
   }
@@ -150,7 +148,7 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
   /** Compute total exam score for each unique user in the response set. */
   async computeUserTotalScores(
     responses: { userId: string; isCorrect: boolean }[],
-    tenantId: string,
+    tenantId: string
   ): Promise<Map<string, number>> {
     const userIds = [...new Set(responses.map((r) => r.userId))];
     const scores = new Map<string, number>();
@@ -164,9 +162,9 @@ export class ClassicalAnalysisService implements OnModuleDestroy {
           .where(
             and(
               eq(schema.itemResponseLog.userId, uid),
-              eq(schema.itemResponseLog.tenantId, tenantId),
-            ),
-          ),
+              eq(schema.itemResponseLog.tenantId, tenantId)
+            )
+          )
       );
       scores.set(uid, all.filter((r) => r.isCorrect).length);
     }

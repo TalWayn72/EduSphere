@@ -60,7 +60,11 @@ export class LiveSessionsResolver {
       `[LiveSessionsResolver] joinLiveSession sessionId=${sessionId} userId=${userId}`
     );
 
-    return this.liveSessionsService.joinLiveSession(sessionId, userId, tenantId);
+    return this.liveSessionsService.joinLiveSession(
+      sessionId,
+      userId,
+      tenantId
+    );
   }
 
   @Mutation('cancelLiveSession')
@@ -76,7 +80,11 @@ export class LiveSessionsResolver {
       `[LiveSessionsResolver] cancelLiveSession sessionId=${sessionId} userId=${userId}`
     );
 
-    return this.liveSessionsService.cancelLiveSession(sessionId, userId, tenantId);
+    return this.liveSessionsService.cancelLiveSession(
+      sessionId,
+      userId,
+      tenantId
+    );
   }
 
   @Query('sessionAttendees')

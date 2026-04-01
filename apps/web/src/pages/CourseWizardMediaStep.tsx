@@ -36,7 +36,11 @@ interface Props {
   onChange: (updates: Partial<CourseFormData>) => void;
 }
 
-export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) {
+export function CourseWizardMediaStep({
+  courseId,
+  mediaList,
+  onChange,
+}: Props) {
   const {
     inputRef,
     entries,
@@ -67,7 +71,9 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
             <Card key={m.id} className="p-3 flex items-center gap-3 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 dark:text-green-400" />
               <span className="flex-1 truncate font-medium">{m.title}</span>
-              <span className="text-muted-foreground text-xs">{m.contentType}</span>
+              <span className="text-muted-foreground text-xs">
+                {m.contentType}
+              </span>
             </Card>
           ))}
         </div>
@@ -89,7 +95,9 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
       >
         <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
         <p className="text-sm font-medium">{t('wizard.clickToSelect')}</p>
-        <p className="text-xs text-muted-foreground mt-1">{t('wizard.supportedFormats')}</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {t('wizard.supportedFormats')}
+        </p>
         <input
           ref={inputRef}
           type="file"

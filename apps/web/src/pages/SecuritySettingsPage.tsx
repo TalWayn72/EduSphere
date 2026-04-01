@@ -68,20 +68,27 @@ export function SecuritySettingsPage() {
   const role = useAuthRole();
   const [form, setForm] = useState<SecurityFormValues>(DEFAULTS);
   const [saved, setSaved] = useState(false);
-  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     return () => {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[SecuritySettingsPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[SecuritySettingsPage] cleanup: saved timer cleared on unmount'
+          );
       }
     };
   }, []);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data, fetching }] = useQuery({
     query: SECURITY_SETTINGS_QUERY,
     pause: !mounted,
@@ -122,7 +129,10 @@ export function SecuritySettingsPage() {
     });
     setSaved(true);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = setTimeout(() => setSaved(false), SAVED_CONFIRMATION_MS);
+    savedTimerRef.current = setTimeout(
+      () => setSaved(false),
+      SAVED_CONFIRMATION_MS
+    );
   };
 
   const props = { values: form, onChange: setForm };
@@ -133,30 +143,35 @@ export function SecuritySettingsPage() {
         <PageHeader
           title="Security Settings"
           description="Configure authentication and access policies"
-          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Security Settings' }]}
+          breadcrumbs={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Security Settings' },
+          ]}
         />
-      {fetching ? (
-        <p className="text-sm text-muted-foreground">Loading settings...</p>
-      ) : (
-        <div className="space-y-6 max-w-2xl">
-          <MfaSection {...props} />
-          <SessionSection {...props} />
-          <PasswordSection {...props} />
-          <AccessControlSection {...props} />
+        {fetching ? (
+          <p className="text-sm text-muted-foreground">Loading settings...</p>
+        ) : (
+          <div className="space-y-6 max-w-2xl">
+            <MfaSection {...props} />
+            <SessionSection {...props} />
+            <PasswordSection {...props} />
+            <AccessControlSection {...props} />
 
-          <div className="flex items-center gap-3">
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Settings'}
-            </Button>
-            {saved && (
-              <span className="text-sm text-green-600 dark:text-green-400">Settings saved.</span>
-            )}
+            <div className="flex items-center gap-3">
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? 'Saving...' : 'Save Settings'}
+              </Button>
+              {saved && (
+                <span className="text-sm text-green-600 dark:text-green-400">
+                  Settings saved.
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Settings will take effect for new sessions.
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Settings will take effect for new sessions.
-          </p>
-        </div>
-      )}
+        )}
       </PageShell>
     </AdminLayout>
   );

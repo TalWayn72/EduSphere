@@ -44,7 +44,11 @@ export function useProgressStatus({
 
   // Jump to phaseIndex when it changes
   useEffect(() => {
-    if (phaseIndex !== undefined && phaseIndex >= 0 && phaseIndex < messages.length) {
+    if (
+      phaseIndex !== undefined &&
+      phaseIndex >= 0 &&
+      phaseIndex < messages.length
+    ) {
       setIndex(phaseIndex);
     }
   }, [phaseIndex, messages.length]);
@@ -56,7 +60,10 @@ export function useProgressStatus({
       setIndex(0);
       return;
     }
-    if (phaseIndex !== undefined) { clearTimer(); return; }
+    if (phaseIndex !== undefined) {
+      clearTimer();
+      return;
+    }
 
     intervalRef.current = setInterval(() => {
       if (mountedRef.current) {
@@ -69,10 +76,16 @@ export function useProgressStatus({
   // Cleanup on unmount
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; clearTimer(); };
+    return () => {
+      mountedRef.current = false;
+      clearTimer();
+    };
   }, [clearTimer]);
 
   const safeIndex = messages.length > 0 ? index % messages.length : 0;
   const currentKey = messages[safeIndex] ?? '';
-  return { currentMessage: currentKey ? t(currentKey) : '', currentIndex: safeIndex };
+  return {
+    currentMessage: currentKey ? t(currentKey) : '',
+    currentIndex: safeIndex,
+  };
 }

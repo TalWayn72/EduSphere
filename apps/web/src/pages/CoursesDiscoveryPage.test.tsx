@@ -60,9 +60,7 @@ const NOOP_QUERY = [
 ] as never;
 
 function makeQueryResult(data: Record<string, unknown>, fetching = false) {
-  return [
-    { fetching, data, error: undefined, stale: false },
-  ] as never;
+  return [{ fetching, data, error: undefined, stale: false }] as never;
 }
 
 /** Extract the query operation name from a DocumentNode or string.
@@ -72,9 +70,13 @@ function getQueryName(query: unknown): string {
   if (typeof query === 'string') return query;
   if (query && typeof query === 'object') {
     // DocumentNode has loc.source.body with the full SDL string
-    const doc = query as { loc?: { source?: { body?: string } }; definitions?: Array<{ name?: { value?: string } }> };
+    const doc = query as {
+      loc?: { source?: { body?: string } };
+      definitions?: Array<{ name?: { value?: string } }>;
+    };
     if (doc.loc?.source?.body) return doc.loc.source.body;
-    if (doc.definitions?.[0]?.name?.value) return doc.definitions[0].name.value ?? '';
+    if (doc.definitions?.[0]?.name?.value)
+      return doc.definitions[0].name.value ?? '';
   }
   return '';
 }
@@ -85,7 +87,10 @@ function getQueryName(query: unknown): string {
 function setupDefaultMocks() {
   vi.mocked(urql.useQuery).mockImplementation((args) => {
     const queryName = getQueryName(args.query);
-    if (queryName.includes('SearchCourses') || queryName.includes('searchCourses')) {
+    if (
+      queryName.includes('SearchCourses') ||
+      queryName.includes('searchCourses')
+    ) {
       if (args.pause) return NOOP_QUERY;
       return makeQueryResult({ searchCourses: MOCK_COURSES_DATA });
     }
@@ -165,8 +170,12 @@ describe('CoursesDiscoveryPage', () => {
 
   it('renders grid and list view toggle buttons', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /grid view/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /list view/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /grid view/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /list view/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the courses grid container with the correct data-testid', () => {
@@ -177,18 +186,18 @@ describe('CoursesDiscoveryPage', () => {
   // ── Loading state ───────────────────────────────────────────────────────────
 
   it('shows skeleton cards when fetching=true', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(
-      [{ fetching: true, data: undefined, error: undefined, stale: false }] as never
-    );
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { fetching: true, data: undefined, error: undefined, stale: false },
+    ] as never);
     renderPage();
     const skeletons = screen.getAllByTestId('skeleton-card');
     expect(skeletons.length).toBeGreaterThanOrEqual(6);
   });
 
   it('does NOT show course cards when fetching=true', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(
-      [{ fetching: true, data: undefined, error: undefined, stale: false }] as never
-    );
+    vi.mocked(urql.useQuery).mockReturnValue([
+      { fetching: true, data: undefined, error: undefined, stale: false },
+    ] as never);
     renderPage();
     expect(screen.queryByRole('article')).not.toBeInTheDocument();
   });
@@ -196,16 +205,18 @@ describe('CoursesDiscoveryPage', () => {
   // ── Error state ─────────────────────────────────────────────────────────────
 
   it('shows error banner when query returns an error', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(
-      [
-        {
-          fetching: false,
-          data: undefined,
-          error: { message: 'Network error', graphQLErrors: [], networkError: null },
-          stale: false,
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        fetching: false,
+        data: undefined,
+        error: {
+          message: 'Network error',
+          graphQLErrors: [],
+          networkError: null,
         },
-      ] as never
-    );
+        stale: false,
+      },
+    ] as never);
     renderPage();
     expect(screen.getByTestId('courses-error-banner')).toBeInTheDocument();
     expect(
@@ -214,20 +225,18 @@ describe('CoursesDiscoveryPage', () => {
   });
 
   it('error banner does NOT expose raw error.message to the user', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(
-      [
-        {
-          fetching: false,
-          data: undefined,
-          error: {
-            message: 'Internal server error: pg_stat_activity query failed',
-            graphQLErrors: [],
-            networkError: null,
-          },
-          stale: false,
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        fetching: false,
+        data: undefined,
+        error: {
+          message: 'Internal server error: pg_stat_activity query failed',
+          graphQLErrors: [],
+          networkError: null,
         },
-      ] as never
-    );
+        stale: false,
+      },
+    ] as never);
     renderPage();
     expect(document.body.textContent).not.toContain('pg_stat_activity');
     expect(document.body.textContent).not.toContain('Internal server error');
@@ -254,7 +263,10 @@ describe('CoursesDiscoveryPage', () => {
   it('shows the empty state when search returns no results', () => {
     vi.mocked(urql.useQuery).mockImplementation((args) => {
       const qName = getQueryName(args.query);
-      if ((qName.includes('SearchCourses') || qName.includes('searchCourses')) && !args.pause) {
+      if (
+        (qName.includes('SearchCourses') || qName.includes('searchCourses')) &&
+        !args.pause
+      ) {
         return makeQueryResult({ searchCourses: [] });
       }
       return NOOP_QUERY;
@@ -264,7 +276,9 @@ describe('CoursesDiscoveryPage', () => {
     const input = screen.getByTestId('course-search-input');
 
     fireEvent.change(input, { target: { value: 'xyzzy-no-match-12345' } });
-    act(() => { vi.advanceTimersByTime(350); });
+    act(() => {
+      vi.advanceTimersByTime(350);
+    });
 
     expect(screen.getByTestId('courses-empty-state')).toBeInTheDocument();
     expect(screen.getByText(/No courses found/i)).toBeInTheDocument();
@@ -284,7 +298,10 @@ describe('CoursesDiscoveryPage', () => {
     }));
     vi.mocked(urql.useQuery).mockImplementation((args) => {
       const qName = getQueryName(args.query);
-      if (!qName.includes('SearchCourses') && !qName.includes('searchCourses')) {
+      if (
+        !qName.includes('SearchCourses') &&
+        !qName.includes('searchCourses')
+      ) {
         return makeQueryResult({ courses: manyCourses });
       }
       return NOOP_QUERY;
@@ -296,7 +313,10 @@ describe('CoursesDiscoveryPage', () => {
   it('empty state message does not contain raw technical strings', () => {
     vi.mocked(urql.useQuery).mockImplementation((args) => {
       const qName = getQueryName(args.query);
-      if ((qName.includes('SearchCourses') || qName.includes('searchCourses')) && !args.pause) {
+      if (
+        (qName.includes('SearchCourses') || qName.includes('searchCourses')) &&
+        !args.pause
+      ) {
         return makeQueryResult({ searchCourses: [] });
       }
       return NOOP_QUERY;
@@ -304,7 +324,9 @@ describe('CoursesDiscoveryPage', () => {
     renderPage();
     const input = screen.getByTestId('course-search-input');
     fireEvent.change(input, { target: { value: 'zzzznotfound' } });
-    act(() => { vi.advanceTimersByTime(350); });
+    act(() => {
+      vi.advanceTimersByTime(350);
+    });
 
     const emptyState = screen.getByTestId('courses-empty-state');
     expect(emptyState.textContent).not.toContain('undefined');
@@ -315,9 +337,9 @@ describe('CoursesDiscoveryPage', () => {
   it('category filter pill updates selection when clicked', () => {
     renderPage();
     const filterBar = screen.getByTestId('filter-bar');
-    const designBtn = Array.from(
-      filterBar.querySelectorAll('button')
-    ).find((b) => b.textContent?.trim() === 'Design');
+    const designBtn = Array.from(filterBar.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === 'Design'
+    );
     expect(designBtn).toBeDefined();
     if (designBtn) {
       fireEvent.click(designBtn);
@@ -397,9 +419,9 @@ describe('CoursesDiscoveryPage', () => {
       levelGroup.querySelectorAll('button')
     ).find((b) => b.textContent?.trim() === 'Intermediate');
     if (intermediateBtn) fireEvent.click(intermediateBtn);
-    const anyBtn = Array.from(
-      levelGroup.querySelectorAll('button')
-    ).find((b) => b.textContent?.trim() === 'Any Level');
+    const anyBtn = Array.from(levelGroup.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === 'Any Level'
+    );
     if (anyBtn) fireEvent.click(anyBtn);
     expect(document.body.textContent).toContain(
       'Complete TypeScript Bootcamp: From Zero to Advanced'
@@ -416,10 +438,16 @@ describe('CoursesDiscoveryPage', () => {
     it('enrolled course shows "Continue" not "Enroll Free" (regression guard: enrolled:false hardcoded)', () => {
       vi.mocked(urql.useQuery).mockImplementation((args) => {
         const queryName = getQueryName(args.query);
-        if (queryName.includes('MyEnrollments') || queryName.includes('myEnrollments')) {
+        if (
+          queryName.includes('MyEnrollments') ||
+          queryName.includes('myEnrollments')
+        ) {
           return makeQueryResult({ myEnrollments: [{ courseId: 'c-1' }] });
         }
-        if (queryName.includes('SearchCourses') || queryName.includes('searchCourses')) {
+        if (
+          queryName.includes('SearchCourses') ||
+          queryName.includes('searchCourses')
+        ) {
           if (args.pause) return NOOP_QUERY;
           return makeQueryResult({ searchCourses: MOCK_COURSES_DATA });
         }
@@ -430,21 +458,31 @@ describe('CoursesDiscoveryPage', () => {
 
       // Course c-1 is enrolled → CourseCard should render "Continue" (not "Enroll Free")
       // BAD STATE: "Enroll Free" would appear for ALL courses with hardcoded enrolled:false
-      const continueButtons = screen.getAllByRole('button', { name: /continue/i });
+      const continueButtons = screen.getAllByRole('button', {
+        name: /continue/i,
+      });
       expect(continueButtons.length).toBe(1);
 
       // Non-enrolled courses (c-2, c-3) still show "Enroll Free"
-      const enrollButtons = screen.getAllByRole('button', { name: /enroll in/i });
+      const enrollButtons = screen.getAllByRole('button', {
+        name: /enroll in/i,
+      });
       expect(enrollButtons.length).toBe(2);
     });
 
     it('no course shows "Continue" when myEnrollments is empty (non-enrolled user)', () => {
       vi.mocked(urql.useQuery).mockImplementation((args) => {
         const queryName = getQueryName(args.query);
-        if (queryName.includes('MyEnrollments') || queryName.includes('myEnrollments')) {
+        if (
+          queryName.includes('MyEnrollments') ||
+          queryName.includes('myEnrollments')
+        ) {
           return makeQueryResult({ myEnrollments: [] });
         }
-        if (queryName.includes('SearchCourses') || queryName.includes('searchCourses')) {
+        if (
+          queryName.includes('SearchCourses') ||
+          queryName.includes('searchCourses')
+        ) {
           if (args.pause) return NOOP_QUERY;
           return makeQueryResult({ searchCourses: MOCK_COURSES_DATA });
         }
@@ -454,7 +492,9 @@ describe('CoursesDiscoveryPage', () => {
       renderPage();
 
       // No enrolled courses → no "Continue" buttons
-      expect(screen.queryByRole('button', { name: /continue/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /continue/i })
+      ).not.toBeInTheDocument();
     });
   });
 });

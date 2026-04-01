@@ -106,7 +106,9 @@ export function CourseAnalyticsPage() {
   const role = useAuthRole();
   const [resolving, setResolving] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching, error }] = useQuery<CourseAnalyticsResult>({
     query: COURSE_ANALYTICS_QUERY,

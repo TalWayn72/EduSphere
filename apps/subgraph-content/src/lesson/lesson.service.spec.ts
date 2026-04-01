@@ -32,7 +32,9 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   closeAllPools: vi.fn(),
   withTenantContext: (...args: unknown[]) =>
-    mockWithTenantContext(...(args as [unknown, unknown, (db: unknown) => Promise<unknown>])),
+    mockWithTenantContext(
+      ...(args as [unknown, unknown, (db: unknown) => Promise<unknown>])
+    ),
   schema: {
     lessons: {
       id: 'id',
@@ -119,8 +121,12 @@ function setupPreValidation(opts: {
     // Call 1: course check, Call 2: instructor check
     const result =
       selectCallCount === 1
-        ? opts.courseRow ? [opts.courseRow] : []
-        : opts.instructorRow ? [opts.instructorRow] : [];
+        ? opts.courseRow
+          ? [opts.courseRow]
+          : []
+        : opts.instructorRow
+          ? [opts.instructorRow]
+          : [];
 
     return {
       from: vi.fn().mockReturnValue({
@@ -408,7 +414,9 @@ describe('LessonService', () => {
 
     it('DB error message does NOT contain raw SQL (regression guard)', async () => {
       mockReturning.mockRejectedValue(
-        new Error('insert violates foreign key constraint "lessons_course_id_fkey"')
+        new Error(
+          'insert violates foreign key constraint "lessons_course_id_fkey"'
+        )
       );
       try {
         await service.create(

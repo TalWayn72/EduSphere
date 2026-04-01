@@ -15,12 +15,12 @@ export interface Event {
 export function publish(
   channel: string,
   agentId: string,
-  payload: string,
+  payload: string
 ): { id: number } {
   const db = getDb();
   const now = Date.now() / 1000;
   const stmt = db.prepare(
-    'INSERT INTO events (channel, agent_id, payload, ts) VALUES (?, ?, ?, ?)',
+    'INSERT INTO events (channel, agent_id, payload, ts) VALUES (?, ?, ?, ?)'
   );
   const result = stmt.run(channel, agentId, payload, now);
 
@@ -37,13 +37,13 @@ export function subscribe(channel: string, since?: number): Event[] {
 
   if (since !== undefined) {
     const stmt = db.prepare(
-      'SELECT id, channel, agent_id, payload, ts FROM events WHERE channel = ? AND ts > ? ORDER BY ts ASC',
+      'SELECT id, channel, agent_id, payload, ts FROM events WHERE channel = ? AND ts > ? ORDER BY ts ASC'
     );
     return stmt.all(channel, since) as Event[];
   }
 
   const stmt = db.prepare(
-    'SELECT id, channel, agent_id, payload, ts FROM events WHERE channel = ? ORDER BY ts ASC',
+    'SELECT id, channel, agent_id, payload, ts FROM events WHERE channel = ? ORDER BY ts ASC'
   );
   return stmt.all(channel) as Event[];
 }

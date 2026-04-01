@@ -32,7 +32,11 @@ import { OrgCatalog } from './OrgCatalog';
 
 function setupMocks(items?: unknown[], fetching = false) {
   vi.mocked(urql.useQuery).mockReturnValue([
-    { data: items ? { orgCatalog: items } : undefined, fetching, error: undefined },
+    {
+      data: items ? { orgCatalog: items } : undefined,
+      fetching,
+      error: undefined,
+    },
   ] as never);
 }
 
@@ -64,7 +68,15 @@ describe('OrgCatalog', () => {
 
   it('renders catalog items in table', () => {
     setupMocks([
-      { id: '1', title: 'React Basics', category: 'tech', licensedAt: '2026-01-15', expiresAt: null, enrollmentCount: 42, status: 'active' },
+      {
+        id: '1',
+        title: 'React Basics',
+        category: 'tech',
+        licensedAt: '2026-01-15',
+        expiresAt: null,
+        enrollmentCount: 42,
+        status: 'active',
+      },
     ]);
     render(<OrgCatalog />);
     expect(screen.getByText('React Basics')).toBeInTheDocument();

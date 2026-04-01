@@ -49,7 +49,9 @@ export function CPDSettingsPage() {
   const [creditHours, setCreditHours] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }] = useQuery<{ cpdCreditTypes: CpdCreditType[] }>({
     query: CPD_CREDIT_TYPES_QUERY,
@@ -130,8 +132,12 @@ export function CPDSettingsPage() {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>{t('cpd.createCreditTypeTitle')}</DialogTitle>
-                      <DialogDescription className="sr-only">Define a new CPD credit type and regulatory body.</DialogDescription>
+                      <DialogTitle>
+                        {t('cpd.createCreditTypeTitle')}
+                      </DialogTitle>
+                      <DialogDescription className="sr-only">
+                        Define a new CPD credit type and regulatory body.
+                      </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCreate} className="space-y-4">
                       <div>
@@ -145,7 +151,9 @@ export function CPDSettingsPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="regBody">{t('cpd.regulatoryBodyLabel')}</Label>
+                        <Label htmlFor="regBody">
+                          {t('cpd.regulatoryBodyLabel')}
+                        </Label>
                         <Input
                           id="regBody"
                           value={regulatoryBody}
@@ -155,7 +163,9 @@ export function CPDSettingsPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="ratio">{t('cpd.creditHoursPerHourLabel')}</Label>
+                        <Label htmlFor="ratio">
+                          {t('cpd.creditHoursPerHourLabel')}
+                        </Label>
                         <Input
                           id="ratio"
                           type="number"
@@ -191,11 +201,15 @@ export function CPDSettingsPage() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{t('cpd.assignCpdTitle')}</DialogTitle>
-                      <DialogDescription className="sr-only">Assign CPD credits to a course.</DialogDescription>
+                      <DialogDescription className="sr-only">
+                        Assign CPD credits to a course.
+                      </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleAssign} className="space-y-4">
                       <div>
-                        <Label htmlFor="courseId">{t('cpd.courseIdLabel')}</Label>
+                        <Label htmlFor="courseId">
+                          {t('cpd.courseIdLabel')}
+                        </Label>
                         <Input
                           id="courseId"
                           value={courseId}
@@ -205,7 +219,9 @@ export function CPDSettingsPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="creditType">{t('cpd.creditTypeLabel')}</Label>
+                        <Label htmlFor="creditType">
+                          {t('cpd.creditTypeLabel')}
+                        </Label>
                         <select
                           id="creditType"
                           value={selectedCreditTypeId}
@@ -224,7 +240,9 @@ export function CPDSettingsPage() {
                         </select>
                       </div>
                       <div>
-                        <Label htmlFor="hours">{t('cpd.creditHoursLabel')}</Label>
+                        <Label htmlFor="hours">
+                          {t('cpd.creditHoursLabel')}
+                        </Label>
                         <Input
                           id="hours"
                           type="number"
@@ -264,12 +282,18 @@ export function CPDSettingsPage() {
               <table className="w-full text-sm">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left p-2 font-medium">{t('cpd.colName')}</th>
+                    <th className="text-left p-2 font-medium">
+                      {t('cpd.colName')}
+                    </th>
                     <th className="text-left p-2 font-medium">
                       {t('cpd.colRegulatoryBody')}
                     </th>
-                    <th className="text-left p-2 font-medium">{t('cpd.colHoursPerHour')}</th>
-                    <th className="text-left p-2 font-medium">{t('cpd.colStatus')}</th>
+                    <th className="text-left p-2 font-medium">
+                      {t('cpd.colHoursPerHour')}
+                    </th>
+                    <th className="text-left p-2 font-medium">
+                      {t('cpd.colStatus')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -284,7 +308,9 @@ export function CPDSettingsPage() {
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full ${ct.isActive ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}
                         >
-                          {ct.isActive ? t('cpd.statusActive') : t('cpd.statusInactive')}
+                          {ct.isActive
+                            ? t('cpd.statusActive')
+                            : t('cpd.statusInactive')}
                         </span>
                       </td>
                     </tr>

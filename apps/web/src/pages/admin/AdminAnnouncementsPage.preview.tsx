@@ -22,12 +22,16 @@ export function AnnouncementPreview({ data }: AnnouncementPreviewProps) {
         <h3 className="text-xl font-bold" data-testid="preview-title">
           {data.title || t('announcements.untitled')}
         </h3>
-        <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="preview-body">
+        <p
+          className="text-sm text-muted-foreground whitespace-pre-wrap"
+          data-testid="preview-body"
+        >
           {data.body || t('announcements.noContent')}
         </p>
         {data.scheduleDate && (
           <p className="text-xs text-muted-foreground">
-            {t('announcements.scheduled')}: {new Date(data.scheduleDate).toLocaleString()}
+            {t('announcements.scheduled')}:{' '}
+            {new Date(data.scheduleDate).toLocaleString()}
           </p>
         )}
         <div className="flex gap-1 flex-wrap">

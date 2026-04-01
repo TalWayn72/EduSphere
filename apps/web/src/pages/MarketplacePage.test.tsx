@@ -205,11 +205,7 @@ describe('MarketplacePage', () => {
 
   it('renders search input and price filter select', () => {
     render(<MarketplacePage />);
-    expect(
-      screen.getByPlaceholderText(/search courses/i)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('combobox')
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/search courses/i)).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 });

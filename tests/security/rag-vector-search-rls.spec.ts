@@ -53,9 +53,10 @@ describe('SI-9: EmbeddingStoreService RLS on vector queries', () => {
     // Extract searchByVector method body
     const searchIdx = src.indexOf('async searchByVector');
     const nextMethodIdx = src.indexOf('\n  async ', searchIdx + 1);
-    const body = nextMethodIdx > 0
-      ? src.slice(searchIdx, nextMethodIdx)
-      : src.slice(searchIdx);
+    const body =
+      nextMethodIdx > 0
+        ? src.slice(searchIdx, nextMethodIdx)
+        : src.slice(searchIdx);
     // Must use tx.execute, not this.db.execute
     expect(body).toContain('tx.execute');
     expect(body).not.toMatch(/this\.db\.execute/);
@@ -68,7 +69,9 @@ describe('SI-9: EmbeddingStoreService RLS on vector queries', () => {
   });
 
   it('searchByVector SQL includes ma.tenant_id = current_setting filter', () => {
-    expect(src).toMatch(/ma\.tenant_id\s*=\s*current_setting\s*\(\s*'app\.current_tenant'/);
+    expect(src).toMatch(
+      /ma\.tenant_id\s*=\s*current_setting\s*\(\s*'app\.current_tenant'/
+    );
   });
 
   it('ilikeFallback wraps query in withTenantContext', () => {
@@ -157,7 +160,9 @@ describe('SI-9: GraphSearchService HybridRAG uses withTenantContext', () => {
 
   it('withTenantContext receives tenantId, userId, and userRole', () => {
     // Pattern: withTenantContext(db, { tenantId, userId, userRole: ... }, ...)
-    expect(src).toMatch(/withTenantContext\s*\(\s*\w+\s*,\s*\{\s*tenantId\s*,\s*userId\s*,\s*userRole/);
+    expect(src).toMatch(
+      /withTenantContext\s*\(\s*\w+\s*,\s*\{\s*tenantId\s*,\s*userId\s*,\s*userRole/
+    );
   });
 
   it('concept search uses tenantId for tenant-scoped queries', () => {
@@ -191,14 +196,18 @@ describe('SI-9: EmbeddingResolver extracts TenantContext from GraphQL context', 
 
   it('semanticSearch query calls requireTenantCtx before service call', () => {
     const searchFn = src.slice(src.indexOf("@Query('semanticSearch')"));
-    const serviceCall = searchFn.indexOf('embeddingService.semanticSearchByVector');
+    const serviceCall = searchFn.indexOf(
+      'embeddingService.semanticSearchByVector'
+    );
     const ctxCall = searchFn.indexOf('requireTenantCtx');
     expect(ctxCall).toBeLessThan(serviceCall);
     expect(ctxCall).toBeGreaterThanOrEqual(0);
   });
 
   it('semanticSearchByContentItem also calls requireTenantCtx', () => {
-    const searchFn = src.slice(src.indexOf("@Query('semanticSearchByContentItem')"));
+    const searchFn = src.slice(
+      src.indexOf("@Query('semanticSearchByContentItem')")
+    );
     expect(searchFn).toContain('requireTenantCtx');
   });
 });
@@ -214,14 +223,20 @@ describe('SI-9: EmbeddingService fallback paths (security gap tracking)', () => 
 
   it('fallbackVectorSearch does NOT use withTenantContext (known gap - unit-test path only)', () => {
     const fallbackIdx = src.indexOf('fallbackVectorSearch');
-    const body = src.slice(fallbackIdx, src.indexOf('\n  private ', fallbackIdx + 10));
+    const body = src.slice(
+      fallbackIdx,
+      src.indexOf('\n  private ', fallbackIdx + 10)
+    );
     // This is expected to NOT have withTenantContext — it's the unit-test fallback
     expect(body).not.toContain('withTenantContext');
   });
 
   it('fallbackIlike does NOT use withTenantContext (known gap - unit-test path only)', () => {
     const fallbackIdx = src.indexOf('fallbackIlike');
-    const body = src.slice(fallbackIdx, src.indexOf('\n  private ', fallbackIdx + 10));
+    const body = src.slice(
+      fallbackIdx,
+      src.indexOf('\n  private ', fallbackIdx + 10)
+    );
     expect(body).not.toContain('withTenantContext');
   });
 
@@ -237,7 +252,9 @@ describe('SI-9: EmbeddingService fallback paths (security gap tracking)', () => 
 
 describe('SI-9: Cross-tenant embedding isolation (static verification)', () => {
   it('content_embeddings table has RLS-enforcing JOIN chain in search queries', () => {
-    const storeSrc = read(`${KNOWLEDGE_SRC}/embedding/embedding-store.service.ts`);
+    const storeSrc = read(
+      `${KNOWLEDGE_SRC}/embedding/embedding-store.service.ts`
+    );
     // The JOIN chain: content_embeddings -> transcript_segments -> transcripts -> media_assets
     // ensures tenant_id filter is applied via media_assets.tenant_id
     const searchSection = storeSrc.slice(storeSrc.indexOf('searchByVector'));
@@ -249,7 +266,9 @@ describe('SI-9: Cross-tenant embedding isolation (static verification)', () => {
   });
 
   it('no direct content_embeddings query without tenant filter exists in store', () => {
-    const storeSrc = read(`${KNOWLEDGE_SRC}/embedding/embedding-store.service.ts`);
+    const storeSrc = read(
+      `${KNOWLEDGE_SRC}/embedding/embedding-store.service.ts`
+    );
     // searchByVector and ilikeFallback both use withTenantContext
     // Count occurrences of withTenantContext - should be at least 2 (search + ilike)
     const matches = storeSrc.match(/withTenantContext/g) ?? [];

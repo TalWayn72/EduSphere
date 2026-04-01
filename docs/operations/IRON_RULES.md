@@ -95,14 +95,14 @@ These are non-negotiable. Any code violating these invariants must be rejected i
 
 ### Frontend Rules
 
-| Rule                                                                                                | Pattern                                                                                   |
-| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Every `setInterval` in component/hook MUST have `clearInterval` in `useEffect` cleanup return       | `const ref = useRef(); useEffect(() => () => clearInterval(ref.current), [])`             |
-| Every `setTimeout` inside a component MUST be stored in `useRef` and cleared in `useEffect` cleanup | Same pattern                                                                              |
-| NEVER `return () => cleanup()` inside `useCallback` — the return value is **discarded** by React    | Use `useEffect` for cleanup instead                                                       |
-| GraphQL subscriptions (`useSubscription`) MUST use `pause: true` flag tied to component mount state | `const [paused, setPaused] = useState(false); useEffect(() => () => setPaused(true), [])` |
+| Rule                                                                                                | Pattern                                                                                                                    |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Every `setInterval` in component/hook MUST have `clearInterval` in `useEffect` cleanup return       | `const ref = useRef(); useEffect(() => () => clearInterval(ref.current), [])`                                              |
+| Every `setTimeout` inside a component MUST be stored in `useRef` and cleared in `useEffect` cleanup | Same pattern                                                                                                               |
+| NEVER `return () => cleanup()` inside `useCallback` — the return value is **discarded** by React    | Use `useEffect` for cleanup instead                                                                                        |
+| GraphQL subscriptions (`useSubscription`) MUST use `pause: true` flag tied to component mount state | `const [paused, setPaused] = useState(false); useEffect(() => () => setPaused(true), [])`                                  |
 | `useQuery` in React Router sibling routes sharing a query MUST use mounted guard                    | `const [mounted, setMounted] = useState(false); useEffect(() => { setMounted(true); }, []); useQuery({ pause: !mounted })` |
-| Module-level WebSocket clients MUST be disposed on `window.beforeunload`                            | `window.addEventListener('beforeunload', () => client.dispose())`                         |
+| Module-level WebSocket clients MUST be disposed on `window.beforeunload`                            | `window.addEventListener('beforeunload', () => client.dispose())`                                                          |
 
 ### Infrastructure Rules
 
@@ -125,10 +125,10 @@ These are non-negotiable. Any code violating these invariants must be rejected i
 
 ### OOM Response Protocol
 
-| Event                            | Action                                                                               |
-| -------------------------------- | ------------------------------------------------------------------------------------ |
-| Container OOM-killed             | Check `docker stats`, identify service, increase `mem_limit` OR fix the leak         |
-| Node.js heap OOM                 | Run with `--expose-gc` + `--heap-prof`, analyze `.heapprofile` in Chrome DevTools    |
-| NATS memory pressure             | Check stream sizes: `nats stream ls` + `nats stream info <name>`, enforce retention  |
-| PostgreSQL connection exhaustion | Check `pg_stat_activity`, verify `closeAllPools()` is called on service destroy      |
-| First OOM in CI                  | Reduce parallel agents by 20% (see Parallel Execution section)                       |
+| Event                            | Action                                                                              |
+| -------------------------------- | ----------------------------------------------------------------------------------- |
+| Container OOM-killed             | Check `docker stats`, identify service, increase `mem_limit` OR fix the leak        |
+| Node.js heap OOM                 | Run with `--expose-gc` + `--heap-prof`, analyze `.heapprofile` in Chrome DevTools   |
+| NATS memory pressure             | Check stream sizes: `nats stream ls` + `nats stream info <name>`, enforce retention |
+| PostgreSQL connection exhaustion | Check `pg_stat_activity`, verify `closeAllPools()` is called on service destroy     |
+| First OOM in CI                  | Reduce parallel agents by 20% (see Parallel Execution section)                      |

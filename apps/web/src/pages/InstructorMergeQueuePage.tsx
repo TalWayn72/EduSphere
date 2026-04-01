@@ -16,7 +16,10 @@ import { GitPullRequest } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { MergeRequestCard } from '@/components/merge-queue/MergeRequestCard';
 import { RejectDialog } from '@/components/merge-queue/RejectDialog';
-import { StatsBar, ResolvedList } from '@/components/merge-queue/MergeQueueStats';
+import {
+  StatsBar,
+  ResolvedList,
+} from '@/components/merge-queue/MergeQueueStats';
 
 const PENDING_PROPOSALS_QUERY = `
   query PendingAnnotationProposals($courseId: ID!) {
@@ -58,9 +61,13 @@ export function InstructorMergeQueuePage() {
   const [mounted, setMounted] = useState(false);
   const [rejectTarget, setRejectTarget] = useState<string | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [result, reexecute] = useQuery<{ pendingAnnotationProposals: MergeRequest[] }>({
+  const [result, reexecute] = useQuery<{
+    pendingAnnotationProposals: MergeRequest[];
+  }>({
     query: PENDING_PROPOSALS_QUERY,
     variables: { courseId },
     pause: !mounted || !courseId,
@@ -100,7 +107,8 @@ export function InstructorMergeQueuePage() {
             <h1 className="text-2xl font-bold">Annotation Proposals</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Review student proposals to promote personal annotations to official course content.
+            Review student proposals to promote personal annotations to official
+            course content.
           </p>
         </div>
 
@@ -127,7 +135,9 @@ export function InstructorMergeQueuePage() {
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
                   <GitPullRequest className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm" data-testid="empty-state">No pending proposals.</p>
+                  <p className="text-sm" data-testid="empty-state">
+                    No pending proposals.
+                  </p>
                 </CardContent>
               </Card>
             ) : (
@@ -150,7 +160,9 @@ export function InstructorMergeQueuePage() {
         <RejectDialog
           open={rejectTarget !== null}
           onClose={() => setRejectTarget(null)}
-          onConfirm={(reason) => rejectTarget && void handleReject(rejectTarget, reason)}
+          onConfirm={(reason) =>
+            rejectTarget && void handleReject(rejectTarget, reason)
+          }
         />
       </PageShell>
     </Layout>

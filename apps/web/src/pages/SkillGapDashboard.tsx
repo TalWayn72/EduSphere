@@ -57,7 +57,10 @@ export function SkillGapDashboard() {
   const completionPct = analysis?.completionPct ?? 0;
   const gapSkills = analysis?.gapSkills ?? [];
   const masteredSkillsCount = masteredCount;
-  const masteredSkillsList = Array.from({ length: masteredSkillsCount }, (_, i) => i);
+  const masteredSkillsList = Array.from(
+    { length: masteredSkillsCount },
+    (_, i) => i
+  );
 
   return (
     <Layout>
@@ -81,7 +84,11 @@ export function SkillGapDashboard() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="space-y-4" aria-busy="true" aria-label="Loading gap analysis">
+          <div
+            className="space-y-4"
+            aria-busy="true"
+            aria-label="Loading gap analysis"
+          >
             <Skeleton className="h-8 w-1/3" />
             <Skeleton className="h-4 w-full" />
             <div className="grid grid-cols-2 gap-4">
@@ -107,7 +114,9 @@ export function SkillGapDashboard() {
                 <p className="font-medium">
                   {masteredCount} of {totalCount} skills mastered
                 </p>
-                <span className="text-2xl font-bold text-primary">{completionPct}%</span>
+                <span className="text-2xl font-bold text-primary">
+                  {completionPct}%
+                </span>
               </div>
               <Progress
                 value={completionPct}
@@ -121,14 +130,20 @@ export function SkillGapDashboard() {
               {/* Mastered skills */}
               <div className="rounded-lg border p-4 space-y-2">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" aria-hidden />
+                  <CheckCircle2
+                    className="h-4 w-4 text-green-500 dark:text-green-400"
+                    aria-hidden
+                  />
                   Mastered Skills ({masteredCount})
                 </h2>
                 {masteredSkillsList.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No skills mastered yet.</p>
+                  <p className="text-xs text-muted-foreground">
+                    No skills mastered yet.
+                  </p>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    {masteredCount} skill{masteredCount !== 1 ? 's' : ''} completed.
+                    {masteredCount} skill{masteredCount !== 1 ? 's' : ''}{' '}
+                    completed.
                   </p>
                 )}
               </div>
@@ -136,18 +151,29 @@ export function SkillGapDashboard() {
               {/* Gap skills */}
               <div className="rounded-lg border p-4 space-y-2">
                 <h2 className="font-semibold text-sm flex items-center gap-2">
-                  <Circle className="h-4 w-4 text-muted-foreground" aria-hidden />
+                  <Circle
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden
+                  />
                   Skills to Learn ({gapSkills.length})
                 </h2>
                 {gapSkills.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">All skills mastered!</p>
+                  <p className="text-xs text-muted-foreground">
+                    All skills mastered!
+                  </p>
                 ) : (
                   <ul className="space-y-1.5">
                     {gapSkills.map((skill) => (
                       <li key={skill.id} className="flex items-center gap-2">
-                        <Circle className="h-3 w-3 text-muted-foreground shrink-0" aria-hidden />
+                        <Circle
+                          className="h-3 w-3 text-muted-foreground shrink-0"
+                          aria-hidden
+                        />
                         <span className="text-sm">{skill.name}</span>
-                        <Badge variant="outline" className="text-xs ml-auto shrink-0">
+                        <Badge
+                          variant="outline"
+                          className="text-xs ml-auto shrink-0"
+                        >
                           {skill.category}
                         </Badge>
                       </li>
@@ -169,7 +195,9 @@ export function SkillGapDashboard() {
 
         {/* No data fallback */}
         {!isLoading && !error && !analysis && (
-          <p className="text-muted-foreground">No gap analysis data available for this path.</p>
+          <p className="text-muted-foreground">
+            No gap analysis data available for this path.
+          </p>
         )}
       </PageShell>
     </Layout>

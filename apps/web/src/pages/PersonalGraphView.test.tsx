@@ -3,7 +3,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { PersonalGraphView } from './PersonalGraphView';
-import { mockPersonalNodes, mockPersonalEdges } from '@/lib/mock-personal-graph';
+import {
+  mockPersonalNodes,
+  mockPersonalEdges,
+} from '@/lib/mock-personal-graph';
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => (
@@ -45,9 +48,7 @@ describe('PersonalGraphView', () => {
       firstNode.label.length > 18
         ? firstNode.label.slice(0, 16) + '…'
         : firstNode.label;
-    expect(document.body.textContent).toContain(
-      expectedLabel.slice(0, 10)
-    );
+    expect(document.body.textContent).toContain(expectedLabel.slice(0, 10));
   });
 
   it('shows detail panel with course name and excerpt when a node is clicked', () => {
@@ -58,9 +59,7 @@ describe('PersonalGraphView', () => {
     const firstNode = mockPersonalNodes[0];
     // Course name appears in both legend and detail panel — just verify body text
     expect(document.body.textContent).toContain(firstNode.courseName);
-    expect(
-      document.body.textContent
-    ).toContain(firstNode.excerpt.slice(0, 20));
+    expect(document.body.textContent).toContain(firstNode.excerpt.slice(0, 20));
   });
 
   it('shows connected concepts after clicking a node with edges', () => {

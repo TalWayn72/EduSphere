@@ -82,7 +82,14 @@ describe('scoreCoursesForUser', () => {
   it('assigns freshness reason for newly added course with no gap match', () => {
     // Use a course added very recently with no gap overlap
     const freshOnly: CourseCandidate[] = [
-      { courseId: 'cf', title: 'New Course', instructorName: 'Dave', tags: ['xyz'], enrollmentCount: 1, addedAt: now },
+      {
+        courseId: 'cf',
+        title: 'New Course',
+        instructorName: 'Dave',
+        tags: ['xyz'],
+        enrollmentCount: 1,
+        addedAt: now,
+      },
     ];
     const results = scoreCoursesForUser(freshOnly, emptySignals);
     expect(results[0].reason).toMatch(/new/i);
@@ -90,7 +97,14 @@ describe('scoreCoursesForUser', () => {
 
   it('assigns trending reason when no gap match and no freshness', () => {
     const oldCandidates: CourseCandidate[] = [
-      { courseId: 'co', title: 'Old Course', instructorName: 'Eve', tags: ['legacy'], enrollmentCount: 500, addedAt: oldDate },
+      {
+        courseId: 'co',
+        title: 'Old Course',
+        instructorName: 'Eve',
+        tags: ['legacy'],
+        enrollmentCount: 500,
+        addedAt: oldDate,
+      },
     ];
     const results = scoreCoursesForUser(oldCandidates, emptySignals);
     expect(results[0].reason).toMatch(/trending/i);
@@ -98,19 +112,45 @@ describe('scoreCoursesForUser', () => {
 
   it('higher velocity produces higher scores (all else equal)', () => {
     const candidate: CourseCandidate[] = [
-      { courseId: 'cv', title: 'Velocity Course', instructorName: 'F', tags: [], enrollmentCount: 10, addedAt: oldDate },
+      {
+        courseId: 'cv',
+        title: 'Velocity Course',
+        instructorName: 'F',
+        tags: [],
+        enrollmentCount: 10,
+        addedAt: oldDate,
+      },
     ];
-    const lowVelocity = scoreCoursesForUser(candidate, { ...emptySignals, learningVelocity: { lessonsPerWeek: 0 } });
-    const highVelocity = scoreCoursesForUser(candidate, { ...emptySignals, learningVelocity: { lessonsPerWeek: 10 } });
+    const lowVelocity = scoreCoursesForUser(candidate, {
+      ...emptySignals,
+      learningVelocity: { lessonsPerWeek: 0 },
+    });
+    const highVelocity = scoreCoursesForUser(candidate, {
+      ...emptySignals,
+      learningVelocity: { lessonsPerWeek: 10 },
+    });
     expect(highVelocity[0].score).toBeGreaterThan(lowVelocity[0].score);
   });
 
   it('velocity boost is capped at 0.1', () => {
     const candidate: CourseCandidate[] = [
-      { courseId: 'cv2', title: 'Cap Course', instructorName: 'G', tags: [], enrollmentCount: 0, addedAt: oldDate },
+      {
+        courseId: 'cv2',
+        title: 'Cap Course',
+        instructorName: 'G',
+        tags: [],
+        enrollmentCount: 0,
+        addedAt: oldDate,
+      },
     ];
-    const veryHighVelocity = scoreCoursesForUser(candidate, { ...emptySignals, learningVelocity: { lessonsPerWeek: 100 } });
-    const normalHighVelocity = scoreCoursesForUser(candidate, { ...emptySignals, learningVelocity: { lessonsPerWeek: 10 } });
+    const veryHighVelocity = scoreCoursesForUser(candidate, {
+      ...emptySignals,
+      learningVelocity: { lessonsPerWeek: 100 },
+    });
+    const normalHighVelocity = scoreCoursesForUser(candidate, {
+      ...emptySignals,
+      learningVelocity: { lessonsPerWeek: 10 },
+    });
     // Both should be same score (capped at 0.1)
     expect(veryHighVelocity[0].score).toBe(normalHighVelocity[0].score);
   });
@@ -129,7 +169,14 @@ describe('scoreCoursesForUser', () => {
 
   it('handles case-insensitive tag matching', () => {
     const candidates: CourseCandidate[] = [
-      { courseId: 'ci1', title: 'Mixed Case', instructorName: 'H', tags: ['GraphQL', 'REST'], enrollmentCount: 10, addedAt: oldDate },
+      {
+        courseId: 'ci1',
+        title: 'Mixed Case',
+        instructorName: 'H',
+        tags: ['GraphQL', 'REST'],
+        enrollmentCount: 10,
+        addedAt: oldDate,
+      },
     ];
     const signals: ScoringSignals = {
       ...emptySignals,

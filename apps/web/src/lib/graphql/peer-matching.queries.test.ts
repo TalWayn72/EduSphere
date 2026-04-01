@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { PEER_MATCHES_QUERY, MY_MATCH_REQUESTS_QUERY, REQUEST_PEER_MATCH_MUTATION, RESPOND_PEER_MATCH_MUTATION } from './peer-matching.queries';
+import {
+  PEER_MATCHES_QUERY,
+  MY_MATCH_REQUESTS_QUERY,
+  REQUEST_PEER_MATCH_MUTATION,
+  RESPOND_PEER_MATCH_MUTATION,
+} from './peer-matching.queries';
 
 describe('peer-matching.queries', () => {
   it('exports PEER_MATCHES_QUERY as a query string', () => {
@@ -23,7 +28,8 @@ describe('peer-matching.queries', () => {
   it('exports RESPOND_PEER_MATCH_MUTATION as a mutation string', () => {
     expect(RESPOND_PEER_MATCH_MUTATION).toBeDefined();
     expect(typeof RESPOND_PEER_MATCH_MUTATION).toBe('string');
-    expect(RESPOND_PEER_MATCH_MUTATION).toContain('mutation RespondToPeerMatch');
+    expect(RESPOND_PEER_MATCH_MUTATION).toContain(
+      'mutation RespondToPeerMatch'
+    );
   });
-
 });

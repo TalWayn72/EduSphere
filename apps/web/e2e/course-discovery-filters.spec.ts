@@ -43,9 +43,9 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
   test('level filter group is rendered with all four options', async ({
     page,
   }) => {
-    const group = page.locator('[data-testid="level-filter-group"]').or(
-      page.locator('[role="group"][aria-label*="level" i]')
-    );
+    const group = page
+      .locator('[data-testid="level-filter-group"]')
+      .or(page.locator('[role="group"][aria-label*="level" i]'));
     await expect(group.first()).toBeVisible({ timeout: 10_000 });
 
     // All four level options from LEVEL_FILTERS constant
@@ -74,9 +74,9 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     });
 
     // Advanced courses must NOT be visible: Complete TypeScript Bootcamp (Advanced), Quantum Computing (Advanced)
-    await expect(
-      page.getByText(/Quantum Computing/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Quantum Computing/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   // ── Level filter "Intermediate" ──────────────────────────────────────────────
@@ -97,9 +97,9 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     ).toBeVisible({ timeout: 5_000 });
 
     // Beginner courses must NOT appear
-    await expect(
-      page.getByText(/Digital Photography/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Digital Photography/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
 
     // Advanced courses must NOT appear
     await expect(
@@ -112,25 +112,23 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
   test('Level filter "Advanced" shows only advanced courses', async ({
     page,
   }) => {
-    const advancedBtn = page
-      .getByRole('button', { name: 'Advanced' })
-      .first();
+    const advancedBtn = page.getByRole('button', { name: 'Advanced' }).first();
     await advancedBtn.waitFor({ timeout: 10_000 });
     await advancedBtn.click();
     await page.waitForLoadState('domcontentloaded');
 
     // Advanced courses: Complete TypeScript Bootcamp, Quantum Computing
-    await expect(
-      page.getByText(/Complete TypeScript Bootcamp/i)
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/Complete TypeScript Bootcamp/i)).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText(/Quantum Computing/i)).toBeVisible({
       timeout: 5_000,
     });
 
     // Non-advanced must NOT appear
-    await expect(
-      page.getByText(/UI\/UX Design Fundamentals/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/UI\/UX Design Fundamentals/i)).not.toBeVisible(
+      { timeout: 3_000 }
+    );
   });
 
   // ── Level filter "Any Level" resets to show all ──────────────────────────────
@@ -145,21 +143,19 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Confirm filtering applied
-    await expect(
-      page.getByText(/Quantum Computing/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Quantum Computing/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
 
     // Reset to "Any Level"
-    const anyLevelBtn = page
-      .getByRole('button', { name: 'Any Level' })
-      .first();
+    const anyLevelBtn = page.getByRole('button', { name: 'Any Level' }).first();
     await anyLevelBtn.click();
     await page.waitForLoadState('domcontentloaded');
 
     // All courses should appear again
-    await expect(
-      page.getByText(/Complete TypeScript Bootcamp/i)
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/Complete TypeScript Bootcamp/i)).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText(/Quantum Computing/i)).toBeVisible({
       timeout: 5_000,
     });
@@ -178,18 +174,16 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     await expect(intermediateBtn).toHaveAttribute('aria-pressed', 'true');
 
     // Other level pills should have aria-pressed="false"
-    const anyLevelBtn = page
-      .getByRole('button', { name: 'Any Level' })
-      .first();
+    const anyLevelBtn = page.getByRole('button', { name: 'Any Level' }).first();
     await expect(anyLevelBtn).toHaveAttribute('aria-pressed', 'false');
   });
 
   // ── Sort "Highest Rated" reorders results ────────────────────────────────────
 
   test('Sort "Highest Rated" reorders courses by rating', async ({ page }) => {
-    const sortTrigger = page.locator('[data-testid="sort-select"]').or(
-      page.locator('#sort-select')
-    );
+    const sortTrigger = page
+      .locator('[data-testid="sort-select"]')
+      .or(page.locator('#sort-select'));
     await sortTrigger.first().waitFor({ timeout: 10_000 });
 
     // Open the select
@@ -208,7 +202,10 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
       await highestRatedOption.click();
     } else {
       // Radix Select uses a listbox; try SelectItem text
-      await page.getByText(/Highest Rated/i).first().click();
+      await page
+        .getByText(/Highest Rated/i)
+        .first()
+        .click();
     }
 
     await page.waitForLoadState('domcontentloaded');
@@ -228,9 +225,9 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
   test('Sort "Newest" option is selectable and renders courses', async ({
     page,
   }) => {
-    const sortTrigger = page.locator('[data-testid="sort-select"]').or(
-      page.locator('#sort-select')
-    );
+    const sortTrigger = page
+      .locator('[data-testid="sort-select"]')
+      .or(page.locator('#sort-select'));
     await sortTrigger.first().waitFor({ timeout: 10_000 });
     await sortTrigger.first().click();
     await page.waitForLoadState('domcontentloaded');
@@ -243,7 +240,10 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     if (optionVisible) {
       await newestOption.click();
     } else {
-      await page.getByText(/Newest/i).first().click();
+      await page
+        .getByText(/Newest/i)
+        .first()
+        .click();
     }
 
     await page.waitForLoadState('domcontentloaded');
@@ -266,9 +266,9 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Then change sort
-    const sortTrigger = page.locator('[data-testid="sort-select"]').or(
-      page.locator('#sort-select')
-    );
+    const sortTrigger = page
+      .locator('[data-testid="sort-select"]')
+      .or(page.locator('#sort-select'));
     await sortTrigger.first().click();
     await page.waitForLoadState('domcontentloaded');
 
@@ -279,7 +279,10 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     if (optionVisible) {
       await newestOption.click();
     } else {
-      await page.getByText(/Newest/i).first().click();
+      await page
+        .getByText(/Newest/i)
+        .first()
+        .click();
     }
 
     await page.waitForLoadState('domcontentloaded');
@@ -290,9 +293,9 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
     expect(body).not.toContain('[object Object]');
 
     // Advanced/Beginner courses should remain hidden
-    await expect(
-      page.getByText(/Quantum Computing/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Quantum Computing/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   // ── ARIA: level filter group has role="group" and aria-label ─────────────────
@@ -300,9 +303,7 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
   test('level filter group has role="group" and aria-label="Filter by level"', async ({
     page,
   }) => {
-    const group = page.locator(
-      '[role="group"][aria-label="Filter by level"]'
-    );
+    const group = page.locator('[role="group"][aria-label="Filter by level"]');
     await expect(group).toBeVisible({ timeout: 10_000 });
   });
 
@@ -310,15 +311,15 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
 
   test('sort select has an accessible label', async ({ page }) => {
     // The label element is associated via htmlFor="sort-select"
-    const label = page.locator('label[for="sort-select"]').or(
-      page.locator('label', { hasText: /Sort by/i })
-    );
+    const label = page
+      .locator('label[for="sort-select"]')
+      .or(page.locator('label', { hasText: /Sort by/i }));
     await expect(label.first()).toBeVisible({ timeout: 10_000 });
 
     // The trigger itself has aria-label="Sort courses"
-    const trigger = page.locator('[data-testid="sort-select"]').or(
-      page.locator('#sort-select')
-    );
+    const trigger = page
+      .locator('[data-testid="sort-select"]')
+      .or(page.locator('#sort-select'));
     const ariaLabel = await trigger.first().getAttribute('aria-label');
     const labelText = await label.first().textContent();
     // At least one of these must provide an accessible name
@@ -374,11 +375,14 @@ test.describe('CoursesDiscovery — Level and Sort Filters', () => {
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
-    await expect(page).toHaveScreenshot('course-discovery-filters-default.png', {
-      fullPage: false,
-      maxDiffPixelRatio: 0.05,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'course-discovery-filters-default.png',
+      {
+        fullPage: false,
+        maxDiffPixelRatio: 0.05,
+        animations: 'disabled',
+      }
+    );
   });
 
   test('visual: course discovery with Intermediate level filter active', async ({

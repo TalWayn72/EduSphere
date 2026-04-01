@@ -91,7 +91,10 @@ describe('CourseGeneratorService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new CourseGeneratorService(mockConsentGuard as never, executionPubSub);
+    service = new CourseGeneratorService(
+      mockConsentGuard as never,
+      executionPubSub
+    );
 
     // Default DB mock chain: select().from().where().limit() for ensureAgentDefinition
     const mockLimit = vi.fn().mockResolvedValue([{ id: 'agent-def-1' }]);

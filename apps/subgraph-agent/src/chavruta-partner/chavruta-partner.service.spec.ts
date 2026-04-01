@@ -17,8 +17,9 @@ const mockTx = vi.hoisted(() => ({
   })),
 }));
 const mockWithTenantContext = vi.hoisted(() =>
-  vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
-    fn(mockTx)
+  vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
+      fn(mockTx)
   )
 );
 
@@ -96,7 +97,9 @@ describe('ChavrutaPartnerMatchService', () => {
     expect(result[0].partnerId).toBe(USER_B);
     expect(result[0].topic).toBe('Philosophy of Mind');
     expect(result[0].compatibilityScore).toBeGreaterThanOrEqual(0.7);
-    expect(result[1].compatibilityScore).toBeGreaterThan(result[0].compatibilityScore);
+    expect(result[1].compatibilityScore).toBeGreaterThan(
+      result[0].compatibilityScore
+    );
   });
 
   it('findPartnerForDebate — uses default topic when none provided', async () => {

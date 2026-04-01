@@ -6,7 +6,10 @@ import { Resolver, Query, Args, Context } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { GraphService } from './graph.service';
-import { getGraphAuthContext, type GraphQLContext } from './graph-resolver.helpers.js';
+import {
+  getGraphAuthContext,
+  type GraphQLContext,
+} from './graph-resolver.helpers.js';
 
 const tracer = trace.getTracer('subgraph-knowledge');
 
@@ -23,13 +26,19 @@ export class GraphQueryResolver {
   }
 
   @Query()
-  async conceptByName(@Args('name') name: string, @Context() context: GraphQLContext) {
+  async conceptByName(
+    @Args('name') name: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.findConceptByName(name, tenantId, userId, role);
   }
 
   @Query()
-  async concepts(@Args('limit') limit: number = 20, @Context() context: GraphQLContext) {
+  async concepts(
+    @Args('limit') limit: number = 20,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.findAllConcepts(tenantId, userId, role, limit);
   }
@@ -42,7 +51,14 @@ export class GraphQueryResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
-    return this.graphService.findRelatedConcepts(conceptId, depth, limit, tenantId, userId, role);
+    return this.graphService.findRelatedConcepts(
+      conceptId,
+      depth,
+      limit,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Query()
@@ -52,7 +68,10 @@ export class GraphQueryResolver {
   }
 
   @Query()
-  async personByName(@Args('name') name: string, @Context() context: GraphQLContext) {
+  async personByName(
+    @Args('name') name: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.findPersonByName(name, tenantId, userId, role);
   }
@@ -64,7 +83,10 @@ export class GraphQueryResolver {
   }
 
   @Query()
-  async termByName(@Args('name') name: string, @Context() context: GraphQLContext) {
+  async termByName(
+    @Args('name') name: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.findTermByName(name, tenantId, userId, role);
   }
@@ -76,15 +98,26 @@ export class GraphQueryResolver {
   }
 
   @Query()
-  async topicCluster(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async topicCluster(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     return this.graphService.findTopicClusterById(id, tenantId, userId, role);
   }
 
   @Query()
-  async topicClustersByCourse(@Args('courseId') courseId: string, @Context() context: GraphQLContext) {
+  async topicClustersByCourse(
+    @Args('courseId') courseId: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
-    return this.graphService.findTopicClustersByCourse(courseId, tenantId, userId, role);
+    return this.graphService.findTopicClustersByCourse(
+      courseId,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Query()
@@ -96,13 +129,24 @@ export class GraphQueryResolver {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     const span = tracer.startSpan('knowledge.semanticSearch', {
       attributes: {
-        'search.query.length': query.length, 'search.limit': limit,
-        'tenant.id': tenantId, 'user.id': userId,
+        'search.query.length': query.length,
+        'search.limit': limit,
+        'tenant.id': tenantId,
+        'user.id': userId,
       },
     });
     try {
-      const results = await this.graphService.semanticSearch(query, limit, tenantId, userId, role);
-      span.setAttribute('search.results.count', Array.isArray(results) ? results.length : 0);
+      const results = await this.graphService.semanticSearch(
+        query,
+        limit,
+        tenantId,
+        userId,
+        role
+      );
+      span.setAttribute(
+        'search.results.count',
+        Array.isArray(results) ? results.length : 0
+      );
       span.setStatus({ code: SpanStatusCode.OK });
       return results;
     } catch (err) {
@@ -115,7 +159,11 @@ export class GraphQueryResolver {
   }
 
   @Query()
-  async learningPath(@Args('from') from: string, @Args('to') to: string, @Context() context: GraphQLContext) {
+  async learningPath(
+    @Args('from') from: string,
+    @Args('to') to: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     this.logger.debug({ from, to }, 'learningPath query');
     return this.graphService.getLearningPath(from, to, tenantId, userId, role);
@@ -129,13 +177,27 @@ export class GraphQueryResolver {
   ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     this.logger.debug({ conceptName, depth }, 'relatedConceptsByName query');
-    return this.graphService.getRelatedConceptsByName(conceptName, depth, tenantId, userId, role);
+    return this.graphService.getRelatedConceptsByName(
+      conceptName,
+      depth,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Query()
-  async prerequisiteChain(@Args('conceptName') conceptName: string, @Context() context: GraphQLContext) {
+  async prerequisiteChain(
+    @Args('conceptName') conceptName: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = getGraphAuthContext(context);
     this.logger.debug({ conceptName }, 'prerequisiteChain query');
-    return this.graphService.getPrerequisiteChain(conceptName, tenantId, userId, role);
+    return this.graphService.getPrerequisiteChain(
+      conceptName,
+      tenantId,
+      userId,
+      role
+    );
   }
 }

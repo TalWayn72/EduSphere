@@ -28,7 +28,10 @@ describe('Separator', () => {
 
   it('sets aria-orientation', () => {
     render(<Separator orientation="vertical" data-testid="sep" />);
-    expect(screen.getByTestId('sep')).toHaveAttribute('aria-orientation', 'vertical');
+    expect(screen.getByTestId('sep')).toHaveAttribute(
+      'aria-orientation',
+      'vertical'
+    );
   });
 
   it('forwards className', () => {

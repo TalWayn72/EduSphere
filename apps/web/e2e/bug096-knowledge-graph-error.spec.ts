@@ -52,13 +52,15 @@ test.describe('BUG-096: Knowledge Graph error banner regression', () => {
 
     // BUG-096: regression guard — the old generic error banner must NOT appear
     // In DEV_MODE the error banner is gated by `!DEV_MODE`, so it must be absent.
-    await expect(
-      page.getByTestId('graph-error-banner')
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByTestId('graph-error-banner')).not.toBeVisible({
+      timeout: 3_000,
+    });
 
     // The old Hebrew "server not accessible" text must not appear anywhere
     const bodyText = await page.textContent('body');
-    expect(bodyText).not.toContain('\u05E9\u05E8\u05EA \u05DC\u05D0 \u05E0\u05D2\u05D9\u05E9');
+    expect(bodyText).not.toContain(
+      '\u05E9\u05E8\u05EA \u05DC\u05D0 \u05E0\u05D2\u05D9\u05E9'
+    );
   });
 
   // BUG-096: regression guard — no mock data nodes when there is an error
@@ -70,9 +72,9 @@ test.describe('BUG-096: Knowledge Graph error banner regression', () => {
 
     // In DEV_MODE the graph uses mock data (which is expected and fine).
     // The key assertion is that the page loads without error banners.
-    await expect(
-      page.getByTestId('graph-error-banner')
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByTestId('graph-error-banner')).not.toBeVisible({
+      timeout: 3_000,
+    });
 
     // SVG graph element should be present (either real data or DEV_MODE mock)
     await expect(page.locator('svg').first()).toBeVisible({ timeout: 10_000 });
@@ -89,7 +91,9 @@ test.describe('BUG-096: Network error shows correct "network" message', () => {
     await login(page);
 
     // Block ALL GraphQL requests to simulate network failure
-    await page.route('**/graphql', (route) => route.abort('internetdisconnected'));
+    await page.route('**/graphql', (route) =>
+      route.abort('internetdisconnected')
+    );
 
     await page.goto(`${BASE_URL}/graph`, { waitUntil: 'domcontentloaded' });
 
@@ -103,9 +107,9 @@ test.describe('BUG-096: Network error shows correct "network" message', () => {
 
     if (isDev) {
       // DEV_MODE: banner should NOT appear (query is paused)
-      await expect(
-        page.getByTestId('graph-error-banner')
-      ).not.toBeVisible({ timeout: 5_000 });
+      await expect(page.getByTestId('graph-error-banner')).not.toBeVisible({
+        timeout: 5_000,
+      });
 
       // Page should still render the graph heading
       await expect(
@@ -126,7 +130,9 @@ test.describe('BUG-096: Network error shows correct "network" message', () => {
       expect(messageText).not.toContain('Authentication');
 
       // Should NOT contain the old generic "server not accessible" Hebrew text
-      expect(messageText).not.toContain('\u05E9\u05E8\u05EA \u05DC\u05D0 \u05E0\u05D2\u05D9\u05E9');
+      expect(messageText).not.toContain(
+        '\u05E9\u05E8\u05EA \u05DC\u05D0 \u05E0\u05D2\u05D9\u05E9'
+      );
 
       // Retry button must be present
       await expect(page.getByTestId('graph-error-retry')).toBeVisible();
@@ -142,7 +148,10 @@ test.describe('BUG-096: Network error shows correct "network" message', () => {
           .locator('p.text-lg');
         const countText = await nodeCountEl.textContent().catch(() => '0');
         const count = parseInt(countText ?? '0', 10);
-        expect(count, 'BUG-096: error state must show 0 nodes, not mock data').toBe(0);
+        expect(
+          count,
+          'BUG-096: error state must show 0 nodes, not mock data'
+        ).toBe(0);
       }
     }
 
@@ -184,9 +193,9 @@ test.describe('BUG-096: Network error shows correct "network" message', () => {
 
     if (isDev) {
       // DEV_MODE: query is paused, so no error banner expected
-      await expect(
-        page.getByTestId('graph-error-banner')
-      ).not.toBeVisible({ timeout: 3_000 });
+      await expect(page.getByTestId('graph-error-banner')).not.toBeVisible({
+        timeout: 3_000,
+      });
     } else {
       // Live mode: should show graphql-specific error (not network or auth)
       const banner = page.getByTestId('graph-error-banner');
@@ -204,7 +213,9 @@ test.describe('BUG-096: Network error shows correct "network" message', () => {
 
     // No raw internal error strings should leak to the UI
     const bodyText = await page.textContent('body');
-    expect(bodyText).not.toContain('Internal server error in concepts resolver');
+    expect(bodyText).not.toContain(
+      'Internal server error in concepts resolver'
+    );
     expect(bodyText).not.toContain('[GraphQL]');
   });
 });
@@ -226,9 +237,15 @@ test.describe('BUG-096: Visual regression', () => {
     ).toBeVisible({ timeout: 10_000 });
 
     // Save screenshot to docs/screenshots/
-    const screenshotPath = path.join(SCREENSHOTS_DIR, 'bug096-knowledge-graph-normal.png');
+    const screenshotPath = path.join(
+      SCREENSHOTS_DIR,
+      'bug096-knowledge-graph-normal.png'
+    );
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    expect(fs.existsSync(screenshotPath), `Screenshot missing: ${screenshotPath}`).toBe(true);
+    expect(
+      fs.existsSync(screenshotPath),
+      `Screenshot missing: ${screenshotPath}`
+    ).toBe(true);
 
     // Playwright built-in visual comparison
     await expect(page).toHaveScreenshot('bug096-knowledge-graph-normal.png', {
@@ -252,8 +269,14 @@ test.describe('BUG-096: Visual regression', () => {
     await page.waitForTimeout(2_000);
 
     // Save screenshot to docs/screenshots/
-    const screenshotPath = path.join(SCREENSHOTS_DIR, 'bug096-knowledge-graph-error.png');
+    const screenshotPath = path.join(
+      SCREENSHOTS_DIR,
+      'bug096-knowledge-graph-error.png'
+    );
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    expect(fs.existsSync(screenshotPath), `Screenshot missing: ${screenshotPath}`).toBe(true);
+    expect(
+      fs.existsSync(screenshotPath),
+      `Screenshot missing: ${screenshotPath}`
+    ).toBe(true);
   });
 });

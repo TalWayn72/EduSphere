@@ -60,7 +60,7 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly parser: DocumentParserService,
     private readonly embeddings: EmbeddingService,
-    private readonly conceptPublisher: ConceptExtractionPublisherService,
+    private readonly conceptPublisher: ConceptExtractionPublisherService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -72,7 +72,7 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
     } catch (err) {
       this.logger.error(
         { err },
-        '[TranscriptBridgeConsumer] NATS connection failed — bridge inactive',
+        '[TranscriptBridgeConsumer] NATS connection failed — bridge inactive'
       );
     }
   }
@@ -134,17 +134,18 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
 
         if (!payload.transcriptId || !payload.tenantId || !payload.courseId) {
           this.logger.warn(
-            '[TranscriptBridgeConsumer] Invalid payload — missing required fields',
+            '[TranscriptBridgeConsumer] Invalid payload — missing required fields'
           );
           continue;
         }
 
         // Validate tenantId is a UUID to prevent injection via crafted NATS messages
-        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const uuidPattern =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         if (!uuidPattern.test(payload.tenantId)) {
           this.logger.error(
             { tenantId: payload.tenantId },
-            '[TranscriptBridgeConsumer] Invalid tenantId format — rejecting',
+            '[TranscriptBridgeConsumer] Invalid tenantId format — rejecting'
           );
           continue;
         }
@@ -153,14 +154,14 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
       } catch (err) {
         this.logger.error(
           { err },
-          '[TranscriptBridgeConsumer] Failed to process transcription.completed',
+          '[TranscriptBridgeConsumer] Failed to process transcription.completed'
         );
       }
     }
   }
 
   private async bridgeTranscript(
-    payload: TranscriptionCompletedPayload,
+    payload: TranscriptionCompletedPayload
   ): Promise<void> {
     const { transcriptId, courseId, tenantId, assetId } = payload;
 
@@ -174,7 +175,7 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
     if (!transcript) {
       this.logger.error(
         { transcriptId, tenantId },
-        '[TranscriptBridgeConsumer] Transcript not found in DB — skipping',
+        '[TranscriptBridgeConsumer] Transcript not found in DB — skipping'
       );
       return;
     }
@@ -183,7 +184,7 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
     if (fullText.trim().length === 0) {
       this.logger.warn(
         { transcriptId, tenantId },
-        '[TranscriptBridgeConsumer] Empty transcript text — skipping',
+        '[TranscriptBridgeConsumer] Empty transcript text — skipping'
       );
       return;
     }
@@ -205,14 +206,14 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
     if (!source) {
       this.logger.error(
         { transcriptId, tenantId },
-        '[TranscriptBridgeConsumer] Failed to create KnowledgeSource',
+        '[TranscriptBridgeConsumer] Failed to create KnowledgeSource'
       );
       return;
     }
 
     this.logger.log(
       { sourceId: source.id, transcriptId, tenantId },
-      '[TranscriptBridgeConsumer] KnowledgeSource created — starting chunking',
+      '[TranscriptBridgeConsumer] KnowledgeSource created — starting chunking'
     );
 
     // 3. Chunk + embed
@@ -227,7 +228,7 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
           embeddedCount++;
         } catch (err) {
           this.logger.warn(
-            `[TranscriptBridgeConsumer] Embedding failed for chunk ${chunk.index}: ${err}`,
+            `[TranscriptBridgeConsumer] Embedding failed for chunk ${chunk.index}: ${err}`
           );
         }
       }
@@ -244,7 +245,7 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
 
       this.logger.log(
         { sourceId: source.id, embeddedCount, totalChunks: chunks.length },
-        '[TranscriptBridgeConsumer] KnowledgeSource READY',
+        '[TranscriptBridgeConsumer] KnowledgeSource READY'
       );
 
       // 4. Publish concepts (non-blocking)
@@ -253,14 +254,14 @@ export class TranscriptBridgeConsumer implements OnModuleInit, OnModuleDestroy {
         .catch((err) =>
           this.logger.error(
             { err, sourceId: source.id },
-            '[TranscriptBridgeConsumer] Concept extraction failed (non-fatal)',
-          ),
+            '[TranscriptBridgeConsumer] Concept extraction failed (non-fatal)'
+          )
         );
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       this.logger.error(
         { err, sourceId: source.id },
-        `[TranscriptBridgeConsumer] Processing failed: ${errorMessage}`,
+        `[TranscriptBridgeConsumer] Processing failed: ${errorMessage}`
       );
 
       await this.db

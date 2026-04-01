@@ -8,19 +8,29 @@ describe('Push Notifications Security (SI-3, SI-8, SI-9)', () => {
   const pushTokenService = (() => {
     try {
       return readFileSync(
-        join(ROOT, 'apps/subgraph-core/src/notifications/push-token.service.ts'),
+        join(
+          ROOT,
+          'apps/subgraph-core/src/notifications/push-token.service.ts'
+        ),
         'utf-8'
       );
-    } catch { return ''; }
+    } catch {
+      return '';
+    }
   })();
 
   const pushDispatchService = (() => {
     try {
       return readFileSync(
-        join(ROOT, 'apps/subgraph-core/src/notifications/push-dispatch.service.ts'),
+        join(
+          ROOT,
+          'apps/subgraph-core/src/notifications/push-dispatch.service.ts'
+        ),
         'utf-8'
       );
-    } catch { return ''; }
+    } catch {
+      return '';
+    }
   })();
 
   it('push-token.service does not call new Pool() directly (SI-8)', () => {
@@ -46,8 +56,12 @@ describe('Push Notifications Security (SI-3, SI-8, SI-9)', () => {
     // directly inside a logger call. The service should log platform/userId only.
     // Look for patterns where the token *variable name* itself is interpolated into a log call.
     // Acceptable: logging `t.platform`, userId — NOT `t.expoPushToken` or `t.webPushSubscription`.
-    expect(pushDispatchService).not.toMatch(/this\.logger\.[a-z]+\([^)]*expoPushToken[^)]*\)/);
-    expect(pushDispatchService).not.toMatch(/this\.logger\.[a-z]+\([^)]*webPushSubscription[^)]*\)/);
+    expect(pushDispatchService).not.toMatch(
+      /this\.logger\.[a-z]+\([^)]*expoPushToken[^)]*\)/
+    );
+    expect(pushDispatchService).not.toMatch(
+      /this\.logger\.[a-z]+\([^)]*webPushSubscription[^)]*\)/
+    );
   });
 
   it('push-dispatch uses Promise.race timeout', () => {
@@ -80,10 +94,15 @@ describe('Push Notifications Security (SI-3, SI-8, SI-9)', () => {
     const exportService = (() => {
       try {
         return readFileSync(
-          join(ROOT, 'apps/subgraph-content/src/analytics/tenant-analytics-export.service.ts'),
+          join(
+            ROOT,
+            'apps/subgraph-content/src/analytics/tenant-analytics-export.service.ts'
+          ),
           'utf-8'
         );
-      } catch { return ''; }
+      } catch {
+        return '';
+      }
     })();
     if (!exportService) return;
     // CSV should use displayName not userId UUID pattern in headers
@@ -95,10 +114,15 @@ describe('Push Notifications Security (SI-3, SI-8, SI-9)', () => {
     const analyticsService = (() => {
       try {
         return readFileSync(
-          join(ROOT, 'apps/subgraph-content/src/analytics/tenant-analytics.service.ts'),
+          join(
+            ROOT,
+            'apps/subgraph-content/src/analytics/tenant-analytics.service.ts'
+          ),
           'utf-8'
         );
-      } catch { return ''; }
+      } catch {
+        return '';
+      }
     })();
     if (!analyticsService) return;
     expect(analyticsService).toContain('withTenantContext');
@@ -107,14 +131,15 @@ describe('Push Notifications Security (SI-3, SI-8, SI-9)', () => {
   it('webPushSubscription token not logged', () => {
     const webPushTs = (() => {
       try {
-        return readFileSync(
-          join(ROOT, 'apps/web/src/lib/webPush.ts'),
-          'utf-8'
-        );
-      } catch { return ''; }
+        return readFileSync(join(ROOT, 'apps/web/src/lib/webPush.ts'), 'utf-8');
+      } catch {
+        return '';
+      }
     })();
     if (!webPushTs) return;
     // No console.log of subscription data
-    expect(webPushTs).not.toMatch(/console\.(log|info|debug)\([^)]*subscription[^)]*\)/);
+    expect(webPushTs).not.toMatch(
+      /console\.(log|info|debug)\([^)]*subscription[^)]*\)/
+    );
   });
 });

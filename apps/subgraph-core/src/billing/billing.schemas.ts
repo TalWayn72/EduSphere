@@ -13,7 +13,11 @@ import { z } from 'zod';
  * Equivalent to server-side DOMPurify with allowedTags: [].
  */
 const stripHtml = (val: string): string =>
-  val.replace(/<[^>]*>/g, '').replace(/</g, '').replace(/>/g, '').trim();
+  val
+    .replace(/<[^>]*>/g, '')
+    .replace(/</g, '')
+    .replace(/>/g, '')
+    .trim();
 
 export const OrgTypeEnum = z.enum([
   'UNIVERSITY',
@@ -29,7 +33,11 @@ export const PilotRequestSchema = z.object({
   orgType: OrgTypeEnum,
   contactName: z.string().min(2).max(255).transform(stripHtml),
   contactEmail: z.string().email().max(255),
-  contactPhone: z.string().max(50).optional().transform((v) => (v ? stripHtml(v) : v)),
+  contactPhone: z
+    .string()
+    .max(50)
+    .optional()
+    .transform((v) => (v ? stripHtml(v) : v)),
   estimatedUsers: z.number().int().min(1).max(1_000_000),
   // SC-02: max 2000 chars + strip HTML (T-01, T-15)
   useCase: z.string().min(10).max(2000).transform(stripHtml),

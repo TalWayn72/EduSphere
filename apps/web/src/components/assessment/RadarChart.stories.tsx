@@ -31,13 +31,19 @@ export const Default: Story = {
 
 export const HighScores: Story = {
   args: {
-    criteria: SAMPLE_CRITERIA.map((c) => ({ ...c, score: Math.min(c.maxScore, c.score + 10) })),
+    criteria: SAMPLE_CRITERIA.map((c) => ({
+      ...c,
+      score: Math.min(c.maxScore, c.score + 10),
+    })),
   },
 };
 
 export const LowScores: Story = {
   args: {
-    criteria: SAMPLE_CRITERIA.map((c) => ({ ...c, score: Math.max(10, c.score - 40) })),
+    criteria: SAMPLE_CRITERIA.map((c) => ({
+      ...c,
+      score: Math.max(10, c.score - 40),
+    })),
   },
 };
 

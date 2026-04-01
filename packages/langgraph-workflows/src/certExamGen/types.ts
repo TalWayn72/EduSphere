@@ -24,4 +24,6 @@ export interface GeneratedItem {
 export type CitationSearchFn = (
   query: string,
   limit: number
-) => Promise<{ id: string; text: string; similarity: number; source?: string }[]>;
+) => Promise<
+  { id: string; text: string; similarity: number; source?: string }[]
+>;

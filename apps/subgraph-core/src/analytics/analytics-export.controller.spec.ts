@@ -75,14 +75,16 @@ describe('AnalyticsExportController', () => {
       const testKey = 'esk_live_test1234567890123456789012';
       const _keyHash = createHash('sha256').update(testKey).digest('hex');
       mockExecute.mockResolvedValueOnce({
-        rows: [{
-          id: 'key-1',
-          tenant_id: 'tenant-1',
-          scopes: ['analytics:read'],
-          rate_limit_per_minute: 60,
-          is_active: false,
-          expires_at: null,
-        }],
+        rows: [
+          {
+            id: 'key-1',
+            tenant_id: 'tenant-1',
+            scopes: ['analytics:read'],
+            rate_limit_per_minute: 60,
+            is_active: false,
+            expires_at: null,
+          },
+        ],
       });
       const mockRes = { setHeader: vi.fn(), json: vi.fn(), send: vi.fn() };
       await expect(
@@ -99,14 +101,16 @@ describe('AnalyticsExportController', () => {
     it('should reject expired API key', async () => {
       const testKey = 'esk_live_test1234567890123456789012';
       mockExecute.mockResolvedValueOnce({
-        rows: [{
-          id: 'key-1',
-          tenant_id: 'tenant-1',
-          scopes: ['analytics:read'],
-          rate_limit_per_minute: 60,
-          is_active: true,
-          expires_at: new Date('2020-01-01'),
-        }],
+        rows: [
+          {
+            id: 'key-1',
+            tenant_id: 'tenant-1',
+            scopes: ['analytics:read'],
+            rate_limit_per_minute: 60,
+            is_active: true,
+            expires_at: new Date('2020-01-01'),
+          },
+        ],
       });
       const mockRes = { setHeader: vi.fn(), json: vi.fn(), send: vi.fn() };
       await expect(
@@ -123,14 +127,16 @@ describe('AnalyticsExportController', () => {
     it('should reject API key without analytics:read scope', async () => {
       const testKey = 'esk_live_test1234567890123456789012';
       mockExecute.mockResolvedValueOnce({
-        rows: [{
-          id: 'key-1',
-          tenant_id: 'tenant-1',
-          scopes: ['courses:read'],
-          rate_limit_per_minute: 60,
-          is_active: true,
-          expires_at: null,
-        }],
+        rows: [
+          {
+            id: 'key-1',
+            tenant_id: 'tenant-1',
+            scopes: ['courses:read'],
+            rate_limit_per_minute: 60,
+            is_active: true,
+            expires_at: null,
+          },
+        ],
       });
       const mockRes = { setHeader: vi.fn(), json: vi.fn(), send: vi.fn() };
       await expect(
@@ -147,14 +153,16 @@ describe('AnalyticsExportController', () => {
     it('should reject invalid format parameter', async () => {
       const testKey = 'esk_live_test1234567890123456789012';
       mockExecute.mockResolvedValueOnce({
-        rows: [{
-          id: 'key-1',
-          tenant_id: 'tenant-1',
-          scopes: ['analytics:read'],
-          rate_limit_per_minute: 60,
-          is_active: true,
-          expires_at: null,
-        }],
+        rows: [
+          {
+            id: 'key-1',
+            tenant_id: 'tenant-1',
+            scopes: ['analytics:read'],
+            rate_limit_per_minute: 60,
+            is_active: true,
+            expires_at: null,
+          },
+        ],
       });
       const mockRes = { setHeader: vi.fn(), json: vi.fn(), send: vi.fn() };
       await expect(
@@ -172,14 +180,16 @@ describe('AnalyticsExportController', () => {
       const testKey = 'esk_live_test1234567890123456789012';
       // First call: validateApiKey
       mockExecute.mockResolvedValueOnce({
-        rows: [{
-          id: 'key-1',
-          tenant_id: 'tenant-1',
-          scopes: ['analytics:read'],
-          rate_limit_per_minute: 60,
-          is_active: true,
-          expires_at: null,
-        }],
+        rows: [
+          {
+            id: 'key-1',
+            tenant_id: 'tenant-1',
+            scopes: ['analytics:read'],
+            rate_limit_per_minute: 60,
+            is_active: true,
+            expires_at: null,
+          },
+        ],
       });
       // Second call: updateLastUsed
       mockExecute.mockResolvedValueOnce({ rows: [] });
@@ -198,7 +208,10 @@ describe('AnalyticsExportController', () => {
         mockRes as never
       );
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'application/json');
+      expect(mockRes.setHeader).toHaveBeenCalledWith(
+        'Content-Type',
+        'application/json'
+      );
       expect(mockRes.json).toHaveBeenCalled();
     });
   });
@@ -228,17 +241,29 @@ describe('AnalyticsExportController', () => {
       };
 
       await controller.exportAnalytics(
-        `Bearer ${testKey}`, 'json', undefined, undefined, mockRes as never
+        `Bearer ${testKey}`,
+        'json',
+        undefined,
+        undefined,
+        mockRes as never
       );
       await controller.exportAnalytics(
-        `Bearer ${testKey}`, 'json', undefined, undefined, mockRes as never
+        `Bearer ${testKey}`,
+        'json',
+        undefined,
+        undefined,
+        mockRes as never
       );
 
       // Third request should be rate limited
       mockExecute.mockResolvedValueOnce({ rows: [keyRecord] });
       await expect(
         controller.exportAnalytics(
-          `Bearer ${testKey}`, 'json', undefined, undefined, mockRes as never
+          `Bearer ${testKey}`,
+          'json',
+          undefined,
+          undefined,
+          mockRes as never
         )
       ).rejects.toThrow('Rate limit exceeded');
     });

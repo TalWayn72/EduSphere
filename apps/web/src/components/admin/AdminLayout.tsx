@@ -24,7 +24,9 @@ export function AdminLayout({
         <div className="flex-1 min-w-0">
           {title && (
             <div className="mb-6" data-testid="admin-page-header">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                {title}
+              </h1>
               {description && (
                 <p className="mt-1 text-sm text-muted-foreground">
                   {description}

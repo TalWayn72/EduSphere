@@ -85,7 +85,9 @@ export class CertificateDownloadService implements OnModuleDestroy {
       this.logger.warn(
         `[CertificateDownloadService] PDF not yet generated: certId=${certId} userId=${userId}`
       );
-      throw new BadRequestException('PDF not yet generated for this certificate');
+      throw new BadRequestException(
+        'PDF not yet generated for this certificate'
+      );
     }
 
     const command = new GetObjectCommand({

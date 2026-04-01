@@ -33,8 +33,9 @@ export class CrdtCompactionService implements OnModuleDestroy {
   constructor() {
     this.db = createDatabaseConnection();
     this.thresholdDays = parseInt(
-      process.env.CRDT_COMPACTION_THRESHOLD_DAYS ?? String(DEFAULT_THRESHOLD_DAYS),
-      10,
+      process.env.CRDT_COMPACTION_THRESHOLD_DAYS ??
+        String(DEFAULT_THRESHOLD_DAYS),
+      10
     );
   }
 
@@ -48,9 +49,10 @@ export class CrdtCompactionService implements OnModuleDestroy {
     this.logger.log('[CrdtCompaction] Starting daily CRDT compaction');
     try {
       const cutoff = new Date(
-        Date.now() - this.thresholdDays * 24 * 60 * 60 * 1000,
+        Date.now() - this.thresholdDays * 24 * 60 * 60 * 1000
       );
-      const documentsWithOldUpdates = await this.findDocumentsWithOldUpdates(cutoff);
+      const documentsWithOldUpdates =
+        await this.findDocumentsWithOldUpdates(cutoff);
 
       let totalCompacted = 0;
       for (const doc of documentsWithOldUpdates) {
@@ -59,12 +61,10 @@ export class CrdtCompactionService implements OnModuleDestroy {
       }
 
       this.logger.log(
-        `[CrdtCompaction] Compaction complete: ${documentsWithOldUpdates.length} document(s), ${totalCompacted} update(s) compacted`,
+        `[CrdtCompaction] Compaction complete: ${documentsWithOldUpdates.length} document(s), ${totalCompacted} update(s) compacted`
       );
     } catch (err) {
-      this.logger.error(
-        `[CrdtCompaction] Compaction failed: ${String(err)}`,
-      );
+      this.logger.error(`[CrdtCompaction] Compaction failed: ${String(err)}`);
     }
   }
 
@@ -72,7 +72,7 @@ export class CrdtCompactionService implements OnModuleDestroy {
    * Find distinct document IDs that have crdt_updates older than cutoff.
    */
   private async findDocumentsWithOldUpdates(
-    cutoff: Date,
+    cutoff: Date
   ): Promise<Array<{ documentId: string }>> {
     const rows = await this.db
       .selectDistinct({ documentId: schema.crdt_updates.document_id })
@@ -104,7 +104,7 @@ export class CrdtCompactionService implements OnModuleDestroy {
 
     if (!docRow) {
       this.logger.warn(
-        `[CrdtCompaction] Document ${documentId} not found — skipping`,
+        `[CrdtCompaction] Document ${documentId} not found — skipping`
       );
       return 0;
     }
@@ -117,7 +117,7 @@ export class CrdtCompactionService implements OnModuleDestroy {
       })
       .from(schema.crdt_updates)
       .where(
-        sql`${schema.crdt_updates.document_id} = ${documentId} AND ${schema.crdt_updates.created_at} <= ${cutoff}`,
+        sql`${schema.crdt_updates.document_id} = ${documentId} AND ${schema.crdt_updates.created_at} <= ${cutoff}`
       );
 
     if (oldUpdates.length === 0) {
@@ -150,12 +150,12 @@ export class CrdtCompactionService implements OnModuleDestroy {
     await this.db
       .delete(schema.crdt_updates)
       .where(
-        sql`${schema.crdt_updates.document_id} = ${documentId} AND ${schema.crdt_updates.created_at} <= ${cutoff}`,
+        sql`${schema.crdt_updates.document_id} = ${documentId} AND ${schema.crdt_updates.created_at} <= ${cutoff}`
       );
 
     const deletedCount = oldUpdates.length;
     this.logger.debug(
-      `[CrdtCompaction] Document ${documentId}: merged ${deletedCount} update(s) into snapshot (${mergedSnapshot.length} bytes)`,
+      `[CrdtCompaction] Document ${documentId}: merged ${deletedCount} update(s) into snapshot (${mergedSnapshot.length} bytes)`
     );
 
     return deletedCount;

@@ -80,9 +80,7 @@ export const LearningPathPanel = React.memo(function LearningPathPanel({
           )}
         </Button>
 
-        {pathError && (
-          <p className="text-xs text-destructive">{pathError}</p>
-        )}
+        {pathError && <p className="text-xs text-destructive">{pathError}</p>}
 
         {!DEV_MODE && learningPathError && (
           <p

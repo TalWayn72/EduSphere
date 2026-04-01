@@ -31,6 +31,7 @@ Co-Authored-By: <name> <email>
 **Scopes:** `core` | `content` | `annotation` | `collab` | `agent` | `knowledge` | `gateway` | `web` | `mobile` | `db` | `infra`
 
 **Examples:**
+
 - `feat(agent): add Chavruta debate agent template`
 - `fix(db): RLS policy for annotations layer filtering`
 - `refactor(knowledge): optimize HybridRAG fusion algorithm`
@@ -47,14 +48,14 @@ Co-Authored-By: <name> <email>
 
 Every change must include appropriate tests:
 
-| Change Type | Required Tests |
-|-------------|---------------|
-| New GraphQL type/field | Unit test for resolvers + integration test |
-| New mutation | Unit + RLS validation + E2E test |
-| Bug fix | Regression test + root cause in OPEN_ISSUES.md |
-| Database schema change | Migration test + RLS policy test |
-| New subgraph | Federation composition + health check test |
-| UI component | Unit test + Playwright E2E + visual regression |
+| Change Type            | Required Tests                                 |
+| ---------------------- | ---------------------------------------------- |
+| New GraphQL type/field | Unit test for resolvers + integration test     |
+| New mutation           | Unit + RLS validation + E2E test               |
+| Bug fix                | Regression test + root cause in OPEN_ISSUES.md |
+| Database schema change | Migration test + RLS policy test               |
+| New subgraph           | Federation composition + health check test     |
+| UI component           | Unit test + Playwright E2E + visual regression |
 
 **Coverage targets:** Backend >90%, Frontend >80%, RLS policies 100%.
 
@@ -97,18 +98,18 @@ pnpm test:security         # Security invariant tests
 
 All contributions must comply with these invariants (see [CLAUDE.md](CLAUDE.md) for full details):
 
-| # | Rule |
-|---|------|
-| SI-1 | RLS session variable: `current_setting('app.current_user_id', TRUE)` |
-| SI-2 | No wildcard CORS (`origin: '*'`) in production |
-| SI-3 | PII fields encrypted with `encryptField()` before write |
-| SI-4 | Keycloak brute-force protection enabled |
-| SI-5 | No `--insecure` or SSL bypass in Docker |
-| SI-6 | mTLS or HTTPS for inter-service communication in production |
-| SI-7 | NATS connections require TLS + auth |
-| SI-8 | Database access only via `getOrCreatePool()` from `@edusphere/db` |
-| SI-9 | All tenant-scoped queries wrapped in `withTenantContext()` |
-| SI-10 | Third-party LLM calls require user consent check |
+| #     | Rule                                                                 |
+| ----- | -------------------------------------------------------------------- |
+| SI-1  | RLS session variable: `current_setting('app.current_user_id', TRUE)` |
+| SI-2  | No wildcard CORS (`origin: '*'`) in production                       |
+| SI-3  | PII fields encrypted with `encryptField()` before write              |
+| SI-4  | Keycloak brute-force protection enabled                              |
+| SI-5  | No `--insecure` or SSL bypass in Docker                              |
+| SI-6  | mTLS or HTTPS for inter-service communication in production          |
+| SI-7  | NATS connections require TLS + auth                                  |
+| SI-8  | Database access only via `getOrCreatePool()` from `@edusphere/db`    |
+| SI-9  | All tenant-scoped queries wrapped in `withTenantContext()`           |
+| SI-10 | Third-party LLM calls require user consent check                     |
 
 **Pre-commit hooks** run ESLint auto-fix and TypeScript type checking automatically.
 

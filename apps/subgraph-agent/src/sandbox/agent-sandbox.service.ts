@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { fork, type ChildProcess } from 'child_process';
 import { join } from 'path';
 import type {
@@ -222,10 +218,7 @@ export class AgentSandboxService implements OnModuleDestroy {
   }
 
   private incrementTenant(tenantId: string): void {
-    this.tenantCounts.set(
-      tenantId,
-      (this.tenantCounts.get(tenantId) ?? 0) + 1
-    );
+    this.tenantCounts.set(tenantId, (this.tenantCounts.get(tenantId) ?? 0) + 1);
   }
 
   private decrementTenant(tenantId: string): void {

@@ -1,7 +1,12 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getBlogPost } from '@/lib/blog-data';
-import { PageMeta, ArticleSchema, BreadcrumbSchema, PersonSchema } from '@/components/seo';
+import {
+  PageMeta,
+  ArticleSchema,
+  BreadcrumbSchema,
+  PersonSchema,
+} from '@/components/seo';
 import { PublicLayout } from '@/components/PublicLayout';
 
 const BASE_URL = 'https://app.edusphere.dev';
@@ -27,7 +32,10 @@ function renderBody(markdown: string) {
       );
     }
     return (
-      <p key={i} className="text-gray-700 dark:text-slate-300 leading-relaxed mb-4">
+      <p
+        key={i}
+        className="text-gray-700 dark:text-slate-300 leading-relaxed mb-4"
+      >
         {paragraph}
       </p>
     );
@@ -98,12 +106,16 @@ export function BlogPostPage() {
           </h1>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-slate-400 mb-8 pb-6 border-b border-gray-200 dark:border-slate-700">
-            <span className="font-medium text-gray-700 dark:text-white">{post.author}</span>
+            <span className="font-medium text-gray-700 dark:text-white">
+              {post.author}
+            </span>
             <span>{formatDate(post.datePublished)}</span>
             <span>{post.readingTimeMinutes} min read</span>
           </div>
 
-          <article className="prose-sm">{renderBody(post.bodyMarkdown)}</article>
+          <article className="prose-sm">
+            {renderBody(post.bodyMarkdown)}
+          </article>
         </main>
       </div>
     </PublicLayout>

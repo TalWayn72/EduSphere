@@ -4,7 +4,11 @@
  * approvePilotRequest role guard, rejectPilotRequest happy path.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 
 // ── DB mock ───────────────────────────────────────────────────────────────────
 
@@ -14,7 +18,8 @@ const mockUpdate = vi.fn();
 const _mockReturning = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -33,7 +38,9 @@ vi.mock('@edusphere/db', () => ({
     transaction: vi.fn(),
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db, _ctx, fn) => fn({ insert: mockInsert, select: mockSelect })),
+  withTenantContext: vi.fn(async (_db, _ctx, fn) =>
+    fn({ insert: mockInsert, select: mockSelect })
+  ),
   schema: {
     pilotRequests: {
       id: 'id',
@@ -123,7 +130,13 @@ describe('PilotService', () => {
   it('submitPilotRequest inserts and returns new pilot request', async () => {
     // No duplicate found
     mockSelect.mockReturnValueOnce(makeChain([]));
-    const newRow = { ...VALID_INPUT, id: 'req-1', status: 'pending', orgType: 'university', created_at: new Date() };
+    const newRow = {
+      ...VALID_INPUT,
+      id: 'req-1',
+      status: 'pending',
+      orgType: 'university',
+      created_at: new Date(),
+    };
     mockInsert.mockReturnValueOnce({
       values: vi.fn().mockReturnValue({
         returning: vi.fn().mockResolvedValue([newRow]),
@@ -152,7 +165,9 @@ describe('PilotService', () => {
   });
 
   it('approvePilotRequest throws BadRequestException when already approved', async () => {
-    mockSelect.mockReturnValueOnce(makeChain([{ id: 'req-1', status: 'approved', orgName: 'Acme' }]));
+    mockSelect.mockReturnValueOnce(
+      makeChain([{ id: 'req-1', status: 'approved', orgName: 'Acme' }])
+    );
     await expect(
       service.approvePilotRequest('req-1', 'admin-1', SUPER_CTX)
     ).rejects.toBeInstanceOf(BadRequestException);

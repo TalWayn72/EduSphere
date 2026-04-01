@@ -51,9 +51,7 @@ export async function clearOldCache(
   maxAgeMs: number = DEFAULT_MAX_AGE_MS
 ): Promise<number> {
   const allKeys = await keys<string>();
-  const lessonKeys = allKeys.filter((k) =>
-    String(k).startsWith(KEY_PREFIX)
-  );
+  const lessonKeys = allKeys.filter((k) => String(k).startsWith(KEY_PREFIX));
   const cutoff = Date.now() - maxAgeMs;
   let removed = 0;
 

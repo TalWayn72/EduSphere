@@ -37,10 +37,18 @@ export const WithCheckbox: Story = {
 export const Disabled: Story = {
   render: () => (
     <div className="grid w-full max-w-sm gap-1.5">
-      <Label htmlFor="disabled-input" className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+      <Label
+        htmlFor="disabled-input"
+        className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      >
         Disabled Field
       </Label>
-      <Input id="disabled-input" disabled placeholder="Cannot edit" className="peer" />
+      <Input
+        id="disabled-input"
+        disabled
+        placeholder="Cannot edit"
+        className="peer"
+      />
     </div>
   ),
 };

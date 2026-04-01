@@ -37,10 +37,7 @@ const ERROR_PATTERNS = [
 ];
 
 // Allowlisted text that matches error patterns but is legitimate
-const ALLOWLIST_PATTERNS = [
-  'Error Handling',
-  'Error Boundary',
-];
+const ALLOWLIST_PATTERNS = ['Error Handling', 'Error Boundary'];
 
 test.describe('Route Smoke Tests — Public Routes', () => {
   test.describe.configure({ mode: 'parallel' });
@@ -84,10 +81,14 @@ test.describe('Route Smoke Tests — Public Routes', () => {
       for (const pattern of ERROR_PATTERNS) {
         const hasError = bodyText.includes(pattern);
         if (hasError) {
-          const isAllowed = ALLOWLIST_PATTERNS.some((a) => bodyText.includes(a));
+          const isAllowed = ALLOWLIST_PATTERNS.some((a) =>
+            bodyText.includes(a)
+          );
           if (!isAllowed) {
             // Only fail on genuine errors, not on pages that discuss errors
-            expect(hasError, `Found error text "${pattern}" on ${route}`).toBe(false);
+            expect(hasError, `Found error text "${pattern}" on ${route}`).toBe(
+              false
+            );
           }
         }
       }
@@ -113,7 +114,9 @@ test.describe('Route Smoke Tests — Protected Routes (mocked auth)', () => {
   ];
 
   for (const route of PROTECTED_SAMPLE_ROUTES) {
-    test(`protected route ${route} redirects to login when unauthenticated`, async ({ page }) => {
+    test(`protected route ${route} redirects to login when unauthenticated`, async ({
+      page,
+    }) => {
       await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
       // Should either redirect to login or show the landing page (SmartRoot behavior)
@@ -123,7 +126,8 @@ test.describe('Route Smoke Tests — Protected Routes (mocked auth)', () => {
 
       // Either redirected to login, or shows landing page, or shows the page with auth prompt
       const isLoginPage = url.includes('/login') || url.includes('keycloak');
-      const isLandingPage = bodyText.includes('EduSphere') && bodyText.includes('Features');
+      const isLandingPage =
+        bodyText.includes('EduSphere') && bodyText.includes('Features');
       const hasContent = bodyText.trim().length > 10;
 
       expect(isLoginPage || isLandingPage || hasContent).toBe(true);

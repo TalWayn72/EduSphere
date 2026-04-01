@@ -61,8 +61,10 @@ const KEYCLOAK_INIT_TIMEOUT_MS = 10_000;
 export function initKeycloak(): Promise<boolean> {
   if (DEV_MODE) {
     // eslint-disable-next-line no-console -- DEV-only auth mode indicator
-    if (import.meta.env.DEV) console.debug('[Auth] DEV MODE: Running without Keycloak authentication');
-    devAuthenticated = window.sessionStorage.getItem(DEV_LOGGED_IN_KEY) === 'true';
+    if (import.meta.env.DEV)
+      console.debug('[Auth] DEV MODE: Running without Keycloak authentication');
+    devAuthenticated =
+      window.sessionStorage.getItem(DEV_LOGGED_IN_KEY) === 'true';
     return Promise.resolve(devAuthenticated);
   }
 
@@ -116,17 +118,21 @@ export function initKeycloak(): Promise<boolean> {
 
   // Late-auth recovery: if the timeout won but Keycloak eventually succeeds,
   // set up token refresh and notify the app so it can re-render as authenticated.
-  kcInitPromise.then((authenticated) => {
-    if (didTimeout && authenticated) {
-      // eslint-disable-next-line no-console -- late-auth recovery logging
-      console.info('[Auth] Keycloak authenticated after timeout — recovering session.');
-      setupTokenRefresh();
-      window.dispatchEvent(new Event('keycloak-late-auth'));
-    }
-  }).catch(() => {
-    // kcInitPromise rejection is already handled above (line 121-125).
-    // Nothing to do here — avoid unhandled rejection.
-  });
+  kcInitPromise
+    .then((authenticated) => {
+      if (didTimeout && authenticated) {
+        // eslint-disable-next-line no-console -- late-auth recovery logging
+        console.info(
+          '[Auth] Keycloak authenticated after timeout — recovering session.'
+        );
+        setupTokenRefresh();
+        window.dispatchEvent(new Event('keycloak-late-auth'));
+      }
+    })
+    .catch(() => {
+      // kcInitPromise rejection is already handled above (line 121-125).
+      // Nothing to do here — avoid unhandled rejection.
+    });
 
   return initPromise;
 }
@@ -279,7 +285,9 @@ function setupTokenRefresh(): void {
         // FE-2: Do NOT call logout() here — the useTokenExpiryWatcher hook
         // will detect the expired token and show a re-auth dialog instead
         // of abruptly redirecting the user to the login page.
-        console.error('[Auth] Silent token refresh failed — session may expire soon.');
+        console.error(
+          '[Auth] Silent token refresh failed — session may expire soon.'
+        );
       });
   }, 60000);
 }

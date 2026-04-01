@@ -15,7 +15,11 @@ vi.mock('urql', () => ({
   useQuery: vi.fn(),
 }));
 
-import { useExamBlueprint, useExamSession, useExamResult } from './useExamQueries';
+import {
+  useExamBlueprint,
+  useExamSession,
+  useExamResult,
+} from './useExamQueries';
 import * as urql from 'urql';
 
 const defaultQueryResult = {
@@ -94,7 +98,12 @@ describe('useExamQueries', () => {
 
   describe('useExamResult', () => {
     it('returns result data on success', () => {
-      const examResult = { id: 'r-1', sessionId: 's-1', passed: true, rawScore: 85 };
+      const examResult = {
+        id: 'r-1',
+        sessionId: 's-1',
+        passed: true,
+        rawScore: 85,
+      };
       vi.mocked(urql.useQuery).mockReturnValue([
         { ...defaultQueryResult, data: { examResult } },
         vi.fn(),

@@ -5,7 +5,10 @@ import { JsonLd } from './JsonLd';
 
 describe('JsonLd', () => {
   it('renders wrapper with data-testid="json-ld-script"', () => {
-    const schema = { '@context': 'https://schema.org', '@type': 'Organization' };
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+    };
     render(<JsonLd schema={schema} />);
     expect(screen.getByTestId('json-ld-script')).toBeInTheDocument();
   });
@@ -17,7 +20,9 @@ describe('JsonLd', () => {
       description: '</script><script>alert(1)</script>',
     };
     const { container } = render(<JsonLd schema={malicious} />);
-    const script = container.querySelector('script[type="application/ld+json"]');
+    const script = container.querySelector(
+      'script[type="application/ld+json"]'
+    );
     expect(script).toBeInTheDocument();
     // safeJsonLd escapes </ → <\/ in the JSON string
     // The textContent (the raw JSON payload) must NOT contain an unescaped </
@@ -35,7 +40,9 @@ describe('JsonLd', () => {
       name: 'EduSphere Starter Plan',
     };
     const { container } = render(<JsonLd schema={schema} />);
-    const script = container.querySelector('script[type="application/ld+json"]');
+    const script = container.querySelector(
+      'script[type="application/ld+json"]'
+    );
     expect(script).toBeInTheDocument();
     expect(script?.textContent).toContain('PriceSpecification');
     expect(script?.textContent).toContain('EduSphere Starter Plan');

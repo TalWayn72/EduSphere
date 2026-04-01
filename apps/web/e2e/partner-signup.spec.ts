@@ -64,7 +64,12 @@ async function mockPartnerMutationError(page: Page): Promise<void> {
     const q = (body.query as string | undefined) ?? '';
     if (q.includes('requestPartner') || op === 'RequestPartner') {
       return JSON.stringify({
-        errors: [{ message: 'Internal server error', extensions: { code: 'INTERNAL_ERROR' } }],
+        errors: [
+          {
+            message: 'Internal server error',
+            extensions: { code: 'INTERNAL_ERROR' },
+          },
+        ],
         data: null,
       });
     }
@@ -79,7 +84,10 @@ async function fillValidPartnerForm(page: Page): Promise<void> {
   await page.fill('#contactName', 'Jane Smith');
   await page.fill('#contactEmail', 'jane@acme.com');
   await page.fill('#expectedLearners', '500');
-  await page.fill('#description', 'We plan to deliver corporate AI training using EduSphere white-label to our 500 enterprise clients across EMEA.');
+  await page.fill(
+    '#description',
+    'We plan to deliver corporate AI training using EduSphere white-label to our 500 enterprise clients across EMEA.'
+  );
 
   // Radix UI Select: locator.press('ArrowDown') opens the dropdown reliably on all
   // device types (including mobile-chrome with hasTouch:true). Then we click the
@@ -87,12 +95,12 @@ async function fillValidPartnerForm(page: Page): Promise<void> {
   // level delegation, so option.click() fires onValueChange which calls setValue with
   // { shouldValidate: true } to re-run Zod validation and enable the submit button.
   const trigger = page.locator('[id="partnerType"]');
-  await trigger.press('ArrowDown');                // open dropdown + focus first item
+  await trigger.press('ArrowDown'); // open dropdown + focus first item
   const listbox = page.locator('[role="listbox"]');
-  await listbox.waitFor({ timeout: 5_000 });       // confirm dropdown rendered
+  await listbox.waitFor({ timeout: 5_000 }); // confirm dropdown rendered
   const trainingOption = page.getByRole('option', { name: 'Training Company' });
   await trainingOption.waitFor({ timeout: 3_000 });
-  await trainingOption.click();                    // select Training Company → fires onValueChange
+  await trainingOption.click(); // select Training Company → fires onValueChange
   await page.waitForLoadState('domcontentloaded');
 }
 
@@ -177,7 +185,9 @@ test.describe('Partner Signup — Partner Type Cards', () => {
     });
   });
 
-  test('all four partner type cards are rendered (≥4 type entries)', async ({ page }) => {
+  test('all four partner type cards are rendered (≥4 type entries)', async ({
+    page,
+  }) => {
     // Each partner type card contains the type name in a bold <p>
     const typeNames = [
       'TRAINING COMPANY',
@@ -265,7 +275,9 @@ test.describe('Partner Signup — Validation Errors', () => {
     await expect(btn).toBeDisabled();
   });
 
-  test('entering invalid email shows email validation error', async ({ page }) => {
+  test('entering invalid email shows email validation error', async ({
+    page,
+  }) => {
     await page.fill('#contactEmail', 'not-an-email');
     await page.fill('#organizationName', 'x'); // trigger blur on email
     // Allow Zod/RHF to run onChange validations
@@ -275,14 +287,18 @@ test.describe('Partner Signup — Validation Errors', () => {
     await expect(alerts.first()).toBeVisible({ timeout: 8_000 });
   });
 
-  test('short organization name (1 char) triggers validation message', async ({ page }) => {
+  test('short organization name (1 char) triggers validation message', async ({
+    page,
+  }) => {
     await page.fill('#organizationName', 'A');
     await page.locator('#organizationName').blur();
     const alert = page.locator('[role="alert"]').first();
     await expect(alert).toBeVisible({ timeout: 8_000 });
   });
 
-  test('short description (< 20 chars) keeps submit disabled', async ({ page }) => {
+  test('short description (< 20 chars) keeps submit disabled', async ({
+    page,
+  }) => {
     await page.fill('#organizationName', 'Acme Corp');
     await page.fill('#contactName', 'Jane Smith');
     await page.fill('#contactEmail', 'jane@acme.com');
@@ -301,7 +317,9 @@ test.describe('Partner Signup — Success State', () => {
     await page.goto(`${BASE_URL}/partners`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('filling and submitting a valid form shows success state', async ({ page }) => {
+  test('filling and submitting a valid form shows success state', async ({
+    page,
+  }) => {
     await fillValidPartnerForm(page);
 
     const btn = page.locator('[data-testid="partner-submit-btn"]');
@@ -322,7 +340,9 @@ test.describe('Partner Signup — Success State', () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test('success state confirms review within 3 business days', async ({ page }) => {
+  test('success state confirms review within 3 business days', async ({
+    page,
+  }) => {
     await fillValidPartnerForm(page);
     await page.locator('[data-testid="partner-submit-btn"]').click();
 
@@ -387,7 +407,9 @@ test.describe('Partner Signup — GraphQL Error State', () => {
     await page.goto(`${BASE_URL}/partners`, { waitUntil: 'domcontentloaded' });
   });
 
-  test('GraphQL mutation error shows friendly error message (not raw stack)', async ({ page }) => {
+  test('GraphQL mutation error shows friendly error message (not raw stack)', async ({
+    page,
+  }) => {
     await fillValidPartnerForm(page);
     await page.locator('[data-testid="partner-submit-btn"]').click();
 

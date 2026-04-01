@@ -86,6 +86,7 @@ Phase 6 validates the full pipeline end-to-end.
 ## 3. Phase 1 — HNSW Index Migration
 
 ### Problem
+
 The HNSW index SQL is defined in `packages/db/src/schema/embeddings.ts` (lines 48-64) but no Drizzle migration applies it. All pgvector searches use sequential O(n) scans.
 
 ### Solution
@@ -118,28 +119,29 @@ DROP INDEX IF EXISTS idx_concept_embeddings_hnsw;
 
 ### Index Parameters
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| `m` | 32 | Connections per node. 32 balances recall vs memory for 768-dim vectors. Default 16 is too low for production. |
-| `ef_construction` | 128 | Build-time search depth. 128 gives >95% recall at build time. Higher values slow migration but improve quality. |
-| `operator` | `vector_cosine_ops` | Matches all existing `<=>` (cosine distance) queries in `embedding-store.service.ts` and `graph-search.service.ts`. |
+| Parameter         | Value               | Rationale                                                                                                           |
+| ----------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `m`               | 32                  | Connections per node. 32 balances recall vs memory for 768-dim vectors. Default 16 is too low for production.       |
+| `ef_construction` | 128                 | Build-time search depth. 128 gives >95% recall at build time. Higher values slow migration but improve quality.     |
+| `operator`        | `vector_cosine_ops` | Matches all existing `<=>` (cosine distance) queries in `embedding-store.service.ts` and `graph-search.service.ts`. |
 
 ### Performance Budget
 
-| Metric | Without HNSW (current) | With HNSW (target) |
-|--------|----------------------|-------------------|
-| Search latency (10K embeddings) | ~50ms O(n) scan | <5ms ANN |
-| Search latency (100K embeddings) | ~500ms O(n) scan | <10ms ANN |
-| Search latency (1M embeddings) | ~5s O(n) scan | <15ms ANN |
-| Index build time (10K rows) | N/A | ~30s |
-| Memory overhead per index | 0 | ~2x row count × m × sizeof(float32) ≈ 200MB at 1M rows |
-| Recall@10 | 100% (exact) | >95% (approximate) |
+| Metric                           | Without HNSW (current) | With HNSW (target)                                     |
+| -------------------------------- | ---------------------- | ------------------------------------------------------ |
+| Search latency (10K embeddings)  | ~50ms O(n) scan        | <5ms ANN                                               |
+| Search latency (100K embeddings) | ~500ms O(n) scan       | <10ms ANN                                              |
+| Search latency (1M embeddings)   | ~5s O(n) scan          | <15ms ANN                                              |
+| Index build time (10K rows)      | N/A                    | ~30s                                                   |
+| Memory overhead per index        | 0                      | ~2x row count × m × sizeof(float32) ≈ 200MB at 1M rows |
+| Recall@10                        | 100% (exact)           | >95% (approximate)                                     |
 
 ### Query-time `ef_search` Tuning
 
 Add `SET LOCAL hnsw.ef_search = 64` before search queries in `EmbeddingStoreService.searchByVector()` for query-time recall tuning. Default is 40; 64 gives ~98% recall with minimal latency increase.
 
 ### Files Affected
+
 - `packages/db/src/migrations/0013_hnsw_vector_indexes.ts` — NEW
 - `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` — add `SET LOCAL hnsw.ef_search = 64`
 
@@ -148,7 +150,9 @@ Add `SET LOCAL hnsw.ef_search = 64` before search queries in `EmbeddingStoreServ
 ## 4. Phase 2 — Transcript-to-KnowledgeSource Bridge
 
 ### Problem
+
 `transcripts` and `knowledge_sources` are completely separate systems:
+
 - `transcripts` → linked to `media_assets` → linked to `courses` (via `asset_id`)
 - `knowledge_sources` → linked directly to `courses` (via `course_id`)
 
@@ -180,6 +184,7 @@ ALTER TABLE knowledge_sources DROP COLUMN IF EXISTS transcript_id;
 ### Schema Change
 
 Update `packages/db/src/schema/knowledge-sources.ts`:
+
 ```typescript
 transcript_id: uuid('transcript_id').references(() => transcripts.id, {
   onDelete: 'set null',
@@ -209,6 +214,7 @@ sequenceDiagram
 ```
 
 **Key design decisions:**
+
 1. `SET NULL` on transcript delete — the KnowledgeSource remains useful even if the original video is removed.
 2. `sourceType: 'TEXT'` — the full_text is already extracted, no need for file-based parsing.
 3. Idempotent: check `WHERE transcript_id = $1` before creating to prevent duplicates on redelivery.
@@ -218,6 +224,7 @@ sequenceDiagram
 ## 5. Phase 3 — Seed Embedding Generation
 
 ### Problem
+
 The seed pipeline (`packages/db/src/seed/nahar-shalom-source.ts`) creates a KnowledgeSource with `status: 'PENDING'` and `raw_content: ''`. No embeddings are generated. The seed comment says "the running service embeds on demand" but there is no trigger mechanism.
 
 ### Solution
@@ -234,6 +241,7 @@ Create `packages/db/src/seed/generate-seed-embeddings.ts`:
 **New command:** `pnpm --filter @edusphere/db seed:embeddings`
 
 Add to `packages/db/package.json`:
+
 ```json
 "seed:embeddings": "tsx src/seed/generate-seed-embeddings.ts"
 ```
@@ -259,33 +267,35 @@ flowchart LR
 
 ### Throughput Budget
 
-| Provider | Throughput | 50 chunks | 500 chunks |
-|----------|-----------|-----------|------------|
-| Ollama (local, nomic-embed-text) | ~20 chunks/s | ~2.5s | ~25s |
-| OpenAI (text-embedding-3-small) | ~100 chunks/s (batch API) | ~0.5s | ~5s |
-| Fixture (pre-computed) | Instant | 0s | N/A (only 10 vectors) |
+| Provider                         | Throughput                | 50 chunks | 500 chunks            |
+| -------------------------------- | ------------------------- | --------- | --------------------- |
+| Ollama (local, nomic-embed-text) | ~20 chunks/s              | ~2.5s     | ~25s                  |
+| OpenAI (text-embedding-3-small)  | ~100 chunks/s (batch API) | ~0.5s     | ~5s                   |
+| Fixture (pre-computed)           | Instant                   | 0s        | N/A (only 10 vectors) |
 
 ---
 
 ## 6. Phase 4 — Content Ingestion Pipeline Activation
 
 ### Problem
+
 `ContentIngestionPipelineService` has real ZIP handling but stubs for PDF, Image, Video, Office, and Text types. All stubs return `extractedText: ''` with warning messages like `'PDF processing: stub implementation'`.
 
 ### Activation Plan
 
-| Handler | Current | Target Implementation | External Dependency |
-|---------|---------|----------------------|---------------------|
-| `handlePdf` | Stub → empty text | `pdf-parse` (npm) → extract text + page count | None (pure JS) |
-| `handleImage` | Stub → no OCR | `TesseractOcrService` (already exists) + `ImageUnderstandingService` (already exists) | Tesseract.js (already imported) |
-| `handleVideo` | Stub → no action | Dispatch to transcription worker via NATS `EDUSPHERE.media.uploaded` | Transcription worker running |
-| `handleText` | **WORKING** | No change needed | None |
-| `handleOfficeDocument` | Stub → no action | `mammoth` for DOCX (already used in seed), `libreoffice-convert` for PPTX/XLSX | mammoth (already dep) |
-| `handleZip` | **WORKING** | No change needed (security validated) | unzipper (already dep) |
+| Handler                | Current           | Target Implementation                                                                 | External Dependency             |
+| ---------------------- | ----------------- | ------------------------------------------------------------------------------------- | ------------------------------- |
+| `handlePdf`            | Stub → empty text | `pdf-parse` (npm) → extract text + page count                                         | None (pure JS)                  |
+| `handleImage`          | Stub → no OCR     | `TesseractOcrService` (already exists) + `ImageUnderstandingService` (already exists) | Tesseract.js (already imported) |
+| `handleVideo`          | Stub → no action  | Dispatch to transcription worker via NATS `EDUSPHERE.media.uploaded`                  | Transcription worker running    |
+| `handleText`           | **WORKING**       | No change needed                                                                      | None                            |
+| `handleOfficeDocument` | Stub → no action  | `mammoth` for DOCX (already used in seed), `libreoffice-convert` for PPTX/XLSX        | mammoth (already dep)           |
+| `handleZip`            | **WORKING**       | No change needed (security validated)                                                 | unzipper (already dep)          |
 
 ### Implementation Details
 
 **handlePdf — Replace stub:**
+
 ```typescript
 private async handlePdf(buffer: Buffer, filename: string): Promise<IngestionResult> {
   const pdfParse = (await import('pdf-parse')).default;
@@ -312,6 +322,7 @@ private async handlePdf(buffer: Buffer, filename: string): Promise<IngestionResu
 **handleVideo — Dispatch via NATS:**
 
 Videos should NOT be processed inline. Instead:
+
 1. Upload buffer to MinIO via the existing `MediaService.generatePresignedUrl` flow
 2. Publish `EDUSPHERE.media.uploaded` event (same event MediaService already publishes)
 3. The transcription worker picks it up, transcribes, and publishes `EDUSPHERE.media.transcription.completed`
@@ -338,6 +349,7 @@ sequenceDiagram
 ```
 
 ### Files Affected
+
 - `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` — replace stubs
 - `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.module.ts` — add DI for TesseractOcrService, ImageUnderstandingService
 - `package.json` — add `pdf-parse` dependency (if not already present)
@@ -347,7 +359,9 @@ sequenceDiagram
 ## 7. Phase 5 — NATS Concept Publisher
 
 ### Problem
+
 The `NatsConsumer` in subgraph-knowledge subscribes to `knowledge.concepts.extracted` and persists concepts to Apache AGE. The transcription worker's `GraphBuilder` publishes to this subject. But there is NO publisher for:
+
 1. **Content created/updated events** — when a course gets new content, concepts should be extracted
 2. **KnowledgeSource processed events** — when a KnowledgeSource reaches READY, its text should be analyzed for concepts
 
@@ -390,7 +404,7 @@ The existing `ConceptsExtractedPayload` (in `nats.types.ts`) is the target:
 
 ```typescript
 interface ConceptsExtractedPayload {
-  concepts: ExtractedConcept[];  // { name, definition, relatedTerms[] }
+  concepts: ExtractedConcept[]; // { name, definition, relatedTerms[] }
   courseId: string;
   tenantId: string;
 }
@@ -423,11 +437,13 @@ Use Vercel AI SDK v6 with a structured prompt:
 const { object } = await generateObject({
   model: ollama('llama3.1'), // or openai('gpt-4o-mini') in prod
   schema: z.object({
-    concepts: z.array(z.object({
-      name: z.string(),
-      definition: z.string(),
-      relatedTerms: z.array(z.string()),
-    })),
+    concepts: z.array(
+      z.object({
+        name: z.string(),
+        definition: z.string(),
+        relatedTerms: z.array(z.string()),
+      })
+    ),
   }),
   prompt: `Extract key educational concepts from the following text.
            For each concept, provide a clear definition and list related terms.
@@ -454,11 +470,13 @@ for (const concept of concepts) {
 ```
 
 This requires:
+
 1. Inject `EmbeddingService` into `NatsConsumer`
 2. Add `generateConceptEmbedding()` method to `EmbeddingService` (upserts to `concept_embeddings` table)
 3. Look up concept ID from AGE after creation (CypherService already returns it)
 
 ### Files Affected
+
 - `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts` — NEW
 - `apps/subgraph-knowledge/src/nats/nats.consumer.ts` — add embedding generation after concept persist
 - `apps/subgraph-knowledge/src/nats/nats.module.ts` — register new service
@@ -521,34 +539,35 @@ sequenceDiagram
 
 ## 9. Performance Budget Summary
 
-| Operation | Target Latency | Target Throughput |
-|-----------|---------------|-------------------|
-| HNSW vector search (10K rows) | <5ms | 200 qps |
-| HNSW vector search (100K rows) | <10ms | 150 qps |
-| Embedding generation (single) | <100ms (Ollama) / <50ms (OpenAI) | 20/s (Ollama) / 100/s (OpenAI) |
-| Batch embedding (20 chunks) | <2s (Ollama) / <500ms (OpenAI) | 1 batch/2s |
-| Concept extraction (LLM) | <5s per source | 12/min |
-| HybridRAG search (full) | <200ms | 50 qps |
-| Content ingestion (PDF, 50 pages) | <30s (parse+chunk+embed) | 2/min |
-| Content ingestion (Video, 1hr) | <10min (transcription async) | 6/hr |
+| Operation                         | Target Latency                   | Target Throughput              |
+| --------------------------------- | -------------------------------- | ------------------------------ |
+| HNSW vector search (10K rows)     | <5ms                             | 200 qps                        |
+| HNSW vector search (100K rows)    | <10ms                            | 150 qps                        |
+| Embedding generation (single)     | <100ms (Ollama) / <50ms (OpenAI) | 20/s (Ollama) / 100/s (OpenAI) |
+| Batch embedding (20 chunks)       | <2s (Ollama) / <500ms (OpenAI)   | 1 batch/2s                     |
+| Concept extraction (LLM)          | <5s per source                   | 12/min                         |
+| HybridRAG search (full)           | <200ms                           | 50 qps                         |
+| Content ingestion (PDF, 50 pages) | <30s (parse+chunk+embed)         | 2/min                          |
+| Content ingestion (Video, 1hr)    | <10min (transcription async)     | 6/hr                           |
 
 ---
 
 ## 10. Risk Matrix
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
-| HNSW index build locks table | HIGH — blocks writes during build | LOW — `CREATE INDEX IF NOT EXISTS` is non-blocking by default in PG | Use `CREATE INDEX CONCURRENTLY` in production migration |
-| Ollama unavailable during seed | MEDIUM — no demo embeddings | MEDIUM — dev environments may not have Ollama | Option B fallback: pre-computed fixture vectors |
-| Concept extraction LLM hallucination | LOW — wrong concepts in graph | MEDIUM — LLMs can generate plausible but incorrect concepts | Confidence thresholds + human review flag |
-| NATS message loss | MEDIUM — missed concept extraction | LOW — JetStream provides at-least-once delivery | Idempotent consumers + DLQ pattern (already implemented) |
-| Embedding dimension mismatch | HIGH — search fails entirely | LOW — all code uses 768-dim | Validation check in EmbeddingProviderService |
+| Risk                                 | Impact                             | Likelihood                                                          | Mitigation                                               |
+| ------------------------------------ | ---------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------- |
+| HNSW index build locks table         | HIGH — blocks writes during build  | LOW — `CREATE INDEX IF NOT EXISTS` is non-blocking by default in PG | Use `CREATE INDEX CONCURRENTLY` in production migration  |
+| Ollama unavailable during seed       | MEDIUM — no demo embeddings        | MEDIUM — dev environments may not have Ollama                       | Option B fallback: pre-computed fixture vectors          |
+| Concept extraction LLM hallucination | LOW — wrong concepts in graph      | MEDIUM — LLMs can generate plausible but incorrect concepts         | Confidence thresholds + human review flag                |
+| NATS message loss                    | MEDIUM — missed concept extraction | LOW — JetStream provides at-least-once delivery                     | Idempotent consumers + DLQ pattern (already implemented) |
+| Embedding dimension mismatch         | HIGH — search fails entirely       | LOW — all code uses 768-dim                                         | Validation check in EmbeddingProviderService             |
 
 ---
 
 ## 11. Implementation Checklist
 
 ### Phase 1 — HNSW Migration (Day 1)
+
 - [ ] Create `packages/db/src/migrations/0013_hnsw_vector_indexes.ts`
 - [ ] Add `SET LOCAL hnsw.ef_search = 64` to `EmbeddingStoreService.searchByVector()`
 - [ ] Run migration: `pnpm --filter @edusphere/db migrate`
@@ -556,6 +575,7 @@ sequenceDiagram
 - [ ] Benchmark: compare search latency before/after
 
 ### Phase 2 — Transcript↔KnowledgeSource FK (Day 1, parallel with Phase 1)
+
 - [ ] Create `packages/db/src/migrations/0014_transcript_knowledge_source_fk.ts`
 - [ ] Update `packages/db/src/schema/knowledge-sources.ts` — add `transcript_id` column
 - [ ] Create `apps/subgraph-knowledge/src/nats/transcript-completed.consumer.ts`
@@ -563,6 +583,7 @@ sequenceDiagram
 - [ ] Test: verify transcript completion auto-creates KnowledgeSource
 
 ### Phase 3 — Seed Embeddings (Day 2)
+
 - [ ] Create `packages/db/src/seed/generate-seed-embeddings.ts`
 - [ ] Create pre-computed fixture at `packages/db/src/seed/fixtures/demo-embeddings.json`
 - [ ] Add `seed:embeddings` script to `packages/db/package.json`
@@ -570,6 +591,7 @@ sequenceDiagram
 - [ ] Verify: `SELECT count(*) FROM content_embeddings` > 0 after seed
 
 ### Phase 4 — Content Ingestion Pipeline (Day 2-3)
+
 - [ ] Replace `handlePdf` stub with `pdf-parse` implementation
 - [ ] Wire `handleImage` to `TesseractOcrService` + `ImageUnderstandingService`
 - [ ] Wire `handleVideo` to MinIO upload + NATS dispatch
@@ -578,6 +600,7 @@ sequenceDiagram
 - [ ] Test each handler with real files
 
 ### Phase 5 — NATS Concept Publisher (Day 3-4)
+
 - [ ] Create `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts`
 - [ ] Add concept extraction call to `KnowledgeSourceService.processSource()` after READY
 - [ ] Add concept embedding generation to `NatsConsumer.processConcepts()`
@@ -586,6 +609,7 @@ sequenceDiagram
 - [ ] Test: upload source → verify concepts appear in AGE + embeddings in pgvector
 
 ### Phase 6 — End-to-End Validation (Day 4)
+
 - [ ] Upload a PDF → verify chunks embedded + concepts extracted + graph populated
 - [ ] Upload a video → verify transcript → auto-source → embeddings + concepts
 - [ ] Run `semanticSearch` query → verify HybridRAG returns results from both pgvector and AGE
@@ -597,35 +621,35 @@ sequenceDiagram
 
 ## 12. Security Considerations
 
-| Concern | Control |
-|---------|---------|
-| SI-9: Cross-tenant embedding access | All vector searches wrapped in `withTenantContext()` (already enforced in `EmbeddingStoreService`) |
-| SI-10: LLM consent for concept extraction | Check `THIRD_PARTY_LLM` consent before calling OpenAI; Ollama (local) is exempt |
-| SI-3: PII in embeddings | Content text may contain PII; embeddings are one-way (cannot reconstruct text), but chunked text in `raw_content` must be encrypted per SI-3 |
-| NATS SI-7: TLS | All new NATS connections use `buildNatsOptions()` which enforces TLS/NKey auth |
-| Zip bomb (content ingestion) | Already handled: 5GB uncompressed limit + path traversal check in `handleZip()` |
-| PDF bomb (malicious PDF) | `pdf-parse` has no native protection; add `maxPages: 1000` and `timeout: 30s` guards |
+| Concern                                   | Control                                                                                                                                      |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| SI-9: Cross-tenant embedding access       | All vector searches wrapped in `withTenantContext()` (already enforced in `EmbeddingStoreService`)                                           |
+| SI-10: LLM consent for concept extraction | Check `THIRD_PARTY_LLM` consent before calling OpenAI; Ollama (local) is exempt                                                              |
+| SI-3: PII in embeddings                   | Content text may contain PII; embeddings are one-way (cannot reconstruct text), but chunked text in `raw_content` must be encrypted per SI-3 |
+| NATS SI-7: TLS                            | All new NATS connections use `buildNatsOptions()` which enforces TLS/NKey auth                                                               |
+| Zip bomb (content ingestion)              | Already handled: 5GB uncompressed limit + path traversal check in `handleZip()`                                                              |
+| PDF bomb (malicious PDF)                  | `pdf-parse` has no native protection; add `maxPages: 1000` and `timeout: 30s` guards                                                         |
 
 ---
 
 ## Appendix A — File Inventory
 
-| File | Status | Change Type |
-|------|--------|-------------|
-| `packages/db/src/migrations/0013_hnsw_vector_indexes.ts` | NEW | Migration |
-| `packages/db/src/migrations/0014_transcript_knowledge_source_fk.ts` | NEW | Migration |
-| `packages/db/src/schema/knowledge-sources.ts` | MODIFY | Add transcript_id column |
-| `packages/db/src/schema/embeddings.ts` | NO CHANGE | SQL already defined |
-| `packages/db/src/seed/generate-seed-embeddings.ts` | NEW | Seed script |
-| `packages/db/src/seed/fixtures/demo-embeddings.json` | NEW | Fallback fixture |
-| `packages/db/package.json` | MODIFY | Add seed:embeddings script |
-| `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` | MODIFY | Replace stubs |
-| `apps/subgraph-knowledge/src/nats/transcript-completed.consumer.ts` | NEW | NATS consumer |
-| `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts` | NEW | NATS publisher |
-| `apps/subgraph-knowledge/src/nats/nats.consumer.ts` | MODIFY | Add concept embeddings |
-| `apps/subgraph-knowledge/src/nats/nats.module.ts` | MODIFY | Register new services |
-| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts` | MODIFY | Call concept publisher |
-| `apps/subgraph-knowledge/src/embedding/embedding.service.ts` | MODIFY | Add generateConceptEmbedding |
-| `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` | MODIFY | Add ef_search tuning |
+| File                                                                         | Status    | Change Type                  |
+| ---------------------------------------------------------------------------- | --------- | ---------------------------- |
+| `packages/db/src/migrations/0013_hnsw_vector_indexes.ts`                     | NEW       | Migration                    |
+| `packages/db/src/migrations/0014_transcript_knowledge_source_fk.ts`          | NEW       | Migration                    |
+| `packages/db/src/schema/knowledge-sources.ts`                                | MODIFY    | Add transcript_id column     |
+| `packages/db/src/schema/embeddings.ts`                                       | NO CHANGE | SQL already defined          |
+| `packages/db/src/seed/generate-seed-embeddings.ts`                           | NEW       | Seed script                  |
+| `packages/db/src/seed/fixtures/demo-embeddings.json`                         | NEW       | Fallback fixture             |
+| `packages/db/package.json`                                                   | MODIFY    | Add seed:embeddings script   |
+| `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` | MODIFY    | Replace stubs                |
+| `apps/subgraph-knowledge/src/nats/transcript-completed.consumer.ts`          | NEW       | NATS consumer                |
+| `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts`   | NEW       | NATS publisher               |
+| `apps/subgraph-knowledge/src/nats/nats.consumer.ts`                          | MODIFY    | Add concept embeddings       |
+| `apps/subgraph-knowledge/src/nats/nats.module.ts`                            | MODIFY    | Register new services        |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts`            | MODIFY    | Call concept publisher       |
+| `apps/subgraph-knowledge/src/embedding/embedding.service.ts`                 | MODIFY    | Add generateConceptEmbedding |
+| `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts`           | MODIFY    | Add ef_search tuning         |
 
 **Total: 8 new files, 7 modified files**

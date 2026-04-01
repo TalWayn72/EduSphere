@@ -27,7 +27,9 @@ describe('CohortInsightsService', () => {
   let service: CohortInsightsService;
 
   beforeEach(() => {
-    mockCreateDb.mockReturnValue({} as ReturnType<typeof db.createDatabaseConnection>);
+    mockCreateDb.mockReturnValue(
+      {} as ReturnType<typeof db.createDatabaseConnection>
+    );
     service = new CohortInsightsService();
   });
 
@@ -61,7 +63,7 @@ describe('CohortInsightsService', () => {
       'course-1',
       'tenant-1',
       'user-1',
-      5,
+      5
     );
 
     expect(result.conceptId).toBe('concept-1');
@@ -90,7 +92,7 @@ describe('CohortInsightsService', () => {
       'concept-x',
       'course-x',
       'tenant-x',
-      'user-x',
+      'user-x'
     );
 
     expect(result.insights).toHaveLength(0);

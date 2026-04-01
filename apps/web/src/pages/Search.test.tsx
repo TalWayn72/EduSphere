@@ -797,7 +797,9 @@ describe('SearchPage', () => {
       await userEvent.click(toggleBtn);
       expect(screen.getByTestId('saved-searches-panel')).toBeInTheDocument();
       await userEvent.click(toggleBtn);
-      expect(screen.queryByTestId('saved-searches-panel')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('saved-searches-panel')
+      ).not.toBeInTheDocument();
     });
 
     it('closes saved searches panel when close (X) button is clicked', async () => {
@@ -809,12 +811,14 @@ describe('SearchPage', () => {
       // Find the button with X icon inside the panel header
       const panelButtons = panel.querySelectorAll('button');
       // Last button in header area closes the panel (has X icon)
-      const closePanelBtn = Array.from(panelButtons).find((btn) =>
-        btn.closest('.border-b') !== null
+      const closePanelBtn = Array.from(panelButtons).find(
+        (btn) => btn.closest('.border-b') !== null
       ) as HTMLElement | undefined;
       if (closePanelBtn) {
         await userEvent.click(closePanelBtn);
-        expect(screen.queryByTestId('saved-searches-panel')).not.toBeInTheDocument();
+        expect(
+          screen.queryByTestId('saved-searches-panel')
+        ).not.toBeInTheDocument();
       }
     });
 
@@ -928,7 +932,9 @@ describe('SearchPage', () => {
     });
 
     it('calls deleteSavedSearch mutation when delete button is clicked', async () => {
-      const mockMutationFn = vi.fn().mockResolvedValue({ data: null, error: null });
+      const mockMutationFn = vi
+        .fn()
+        .mockResolvedValue({ data: null, error: null });
       vi.mocked(useMutation).mockReturnValue([
         { data: undefined, fetching: false, error: undefined },
         mockMutationFn,
@@ -968,7 +974,8 @@ describe('SearchPage', () => {
       await userEvent.click(screen.getByTestId('delete-saved-search-btn'));
 
       await waitFor(
-        () => expect(mockMutationFn).toHaveBeenCalledWith({ id: 'ss-delete-1' }),
+        () =>
+          expect(mockMutationFn).toHaveBeenCalledWith({ id: 'ss-delete-1' }),
         { timeout: 2000 }
       );
     });
@@ -1005,7 +1012,10 @@ describe('SearchPage', () => {
     });
 
     it('calls createSavedSearch mutation when confirm button is clicked', async () => {
-      const mockCreateFn = vi.fn().mockResolvedValue({ data: { createSavedSearch: { id: 'new-ss' } }, error: null });
+      const mockCreateFn = vi.fn().mockResolvedValue({
+        data: { createSavedSearch: { id: 'new-ss' } },
+        error: null,
+      });
       vi.mocked(useMutation).mockReturnValue([
         { data: undefined, fetching: false, error: undefined },
         mockCreateFn,
@@ -1123,10 +1133,9 @@ describe('SearchPage', () => {
       );
 
       // Meta should be formatted time (2:05) instead of similarity %
-      await waitFor(
-        () => expect(document.body.textContent).toContain('2:05'),
-        { timeout: 2000 }
-      );
+      await waitFor(() => expect(document.body.textContent).toContain('2:05'), {
+        timeout: 2000,
+      });
     });
 
     it('shows similarity % as meta for concept result (no startTime)', async () => {
@@ -1240,9 +1249,7 @@ describe('SearchPage', () => {
       // useQuery receives { query, variables, pause } options object.
       // opts.query is the gql string (returned by the gql mock above).
       vi.mocked(useQuery).mockImplementation((opts) => {
-        const queryStr = String(
-          (opts as { query?: unknown })?.query ?? ''
-        );
+        const queryStr = String((opts as { query?: unknown })?.query ?? '');
         if (queryStr.includes('searchCourses')) {
           return [
             {
@@ -1266,7 +1273,10 @@ describe('SearchPage', () => {
       // Note: Highlight component splits matching text into <mark>/<span> nodes,
       // so document.body.textContent is used for reliable full-title matching.
       renderSearch();
-      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Test');
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses/i),
+        'Test'
+      );
 
       await waitFor(
         () => expect(document.body.textContent).toContain('Test Fix Course'),
@@ -1276,7 +1286,10 @@ describe('SearchPage', () => {
 
     it('renders the "Courses" section heading when searchCourses returns data', async () => {
       renderSearch();
-      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Te');
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses/i),
+        'Te'
+      );
 
       await waitFor(
         () => expect(screen.getByText('Courses')).toBeInTheDocument(),
@@ -1286,7 +1299,10 @@ describe('SearchPage', () => {
 
     it('course result card links to /courses/:id (not /courses)', async () => {
       renderSearch();
-      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Test');
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses/i),
+        'Test'
+      );
 
       // Highlight splits text into <mark>/<span> nodes; use textContent check.
       await waitFor(
@@ -1316,8 +1332,8 @@ describe('SearchPage', () => {
         () => {
           const sections = document.querySelectorAll('h3');
           // The first section heading must be "Courses" (case insensitive)
-          const sectionTexts = Array.from(sections).map((s) =>
-            s.textContent?.toLowerCase() ?? ''
+          const sectionTexts = Array.from(sections).map(
+            (s) => s.textContent?.toLowerCase() ?? ''
           );
           const courseIdx = sectionTexts.findIndex((t) => t.includes('course'));
           const transcriptIdx = sectionTexts.findIndex((t) =>
@@ -1334,12 +1350,12 @@ describe('SearchPage', () => {
     });
 
     it('logs console.error when course search query fails', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       vi.mocked(useQuery).mockImplementation((opts) => {
-        const queryStr = String(
-          (opts as { query?: unknown })?.query ?? ''
-        );
+        const queryStr = String((opts as { query?: unknown })?.query ?? '');
         if (queryStr.includes('searchCourses')) {
           return [
             {
@@ -1377,7 +1393,10 @@ describe('SearchPage', () => {
       // must NOT appear when real DB results are returned.
       // Highlight splits matching text into <mark>/<span> nodes; use textContent.
       renderSearch();
-      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Te');
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses/i),
+        'Te'
+      );
 
       await waitFor(
         () => expect(document.body.textContent).toContain('Test Fix Course'),
@@ -1385,7 +1404,9 @@ describe('SearchPage', () => {
       );
 
       // Hardcoded mock course title must NOT be visible
-      expect(document.body.textContent).not.toContain('Introduction to Talmud Study');
+      expect(document.body.textContent).not.toContain(
+        'Introduction to Talmud Study'
+      );
     });
   });
 });

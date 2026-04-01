@@ -12,7 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { UserTableRow } from './AdminUserManagementPage.row';
 
@@ -35,7 +40,14 @@ export interface AdminUser {
   lastLogin: string | null;
 }
 
-const ROLES = ['ALL', 'STUDENT', 'INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN', 'RESEARCHER'];
+const ROLES = [
+  'ALL',
+  'STUDENT',
+  'INSTRUCTOR',
+  'ORG_ADMIN',
+  'SUPER_ADMIN',
+  'RESEARCHER',
+];
 
 export function AdminUserManagementPage() {
   const { t } = useTranslation('admin');
@@ -44,13 +56,23 @@ export function AdminUserManagementPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery<{
-    adminUsers: { nodes: AdminUser[]; totalCount: number; pageInfo: { hasNextPage: boolean; hasPreviousPage: boolean } };
+    adminUsers: {
+      nodes: AdminUser[];
+      totalCount: number;
+      pageInfo: { hasNextPage: boolean; hasPreviousPage: boolean };
+    };
   }>({
     query: USERS_QUERY,
-    variables: { search: search || undefined, role: roleFilter === 'ALL' ? undefined : roleFilter, page },
+    variables: {
+      search: search || undefined,
+      role: roleFilter === 'ALL' ? undefined : roleFilter,
+      page,
+    },
     pause: !mounted,
   });
 
@@ -60,7 +82,8 @@ export function AdminUserManagementPage() {
   const toggleSelect = useCallback((id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }, []);
@@ -68,30 +91,49 @@ export function AdminUserManagementPage() {
   return (
     <AdminLayout title={t('users.title')} description={t('users.description')}>
       <div data-testid="admin-user-management-page" className="space-y-4">
-        <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300">BETA</Badge>
+        <Badge
+          variant="outline"
+          className="border-yellow-400 text-yellow-700 dark:border-yellow-500 dark:text-yellow-300"
+        >
+          BETA
+        </Badge>
 
         <div className="flex gap-3 items-center">
           <Input
             data-testid="user-search-input"
             placeholder={t('users.searchPlaceholder')}
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="max-w-sm"
           />
           <select
             data-testid="role-filter-select"
             value={roleFilter}
-            onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setRoleFilter(e.target.value);
+              setPage(1);
+            }}
             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
           >
-            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
           {selected.size > 0 && (
             <div className="flex gap-2">
               <Button size="sm" variant="outline" data-testid="bulk-enroll-btn">
                 {t('users.enroll', { count: selected.size })}
               </Button>
-              <Button size="sm" variant="destructive" data-testid="bulk-deactivate-btn">
+              <Button
+                size="sm"
+                variant="destructive"
+                data-testid="bulk-deactivate-btn"
+              >
                 {t('users.deactivate', { count: selected.size })}
               </Button>
             </div>
@@ -100,19 +142,29 @@ export function AdminUserManagementPage() {
 
         {fetching && (
           <div data-testid="user-table-skeleton" className="space-y-2">
-            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
           </div>
         )}
 
         {error && !fetching && (
-          <Card><CardContent className="py-8 text-center text-destructive text-sm">
-            {t('users.loadError')}
-          </CardContent></Card>
+          <Card>
+            <CardContent className="py-8 text-center text-destructive text-sm">
+              {t('users.loadError')}
+            </CardContent>
+          </Card>
         )}
 
         {!fetching && !error && (
           <Card>
-            <CardHeader><CardTitle>{t('users.usersCount', { count: data?.adminUsers?.totalCount ?? 0 })}</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>
+                {t('users.usersCount', {
+                  count: data?.adminUsers?.totalCount ?? 0,
+                })}
+              </CardTitle>
+            </CardHeader>
             <CardContent>
               <Table data-testid="user-management-table">
                 <TableHeader>
@@ -136,7 +188,10 @@ export function AdminUserManagementPage() {
                   ))}
                   {users.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         {t('users.noUsers')}
                       </TableCell>
                     </TableRow>
@@ -144,11 +199,23 @@ export function AdminUserManagementPage() {
                 </TableBody>
               </Table>
               <div className="flex justify-between mt-4">
-                <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
                   {t('users.previous')}
                 </Button>
-                <span className="text-sm text-muted-foreground">{t('users.page', { page })}</span>
-                <Button size="sm" variant="outline" disabled={!data?.adminUsers?.pageInfo?.hasNextPage} onClick={() => setPage((p) => p + 1)}>
+                <span className="text-sm text-muted-foreground">
+                  {t('users.page', { page })}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={!data?.adminUsers?.pageInfo?.hasNextPage}
+                  onClick={() => setPage((p) => p + 1)}
+                >
                   {t('users.next')}
                 </Button>
               </div>

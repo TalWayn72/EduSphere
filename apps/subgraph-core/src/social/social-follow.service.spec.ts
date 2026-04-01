@@ -65,9 +65,9 @@ describe('SocialFollowService', () => {
     });
 
     it('throws BadRequestException when following yourself', async () => {
-      await expect(
-        service.followUser('u1', 'u1', 'tenant-1')
-      ).rejects.toThrow('Cannot follow yourself');
+      await expect(service.followUser('u1', 'u1', 'tenant-1')).rejects.toThrow(
+        'Cannot follow yourself'
+      );
     });
 
     it('uses onConflictDoNothing for idempotency', async () => {
@@ -140,7 +140,11 @@ describe('SocialFollowService', () => {
 
   describe('getFollowersCount', () => {
     it('returns the count of followers', async () => {
-      setupSelect([{ followerId: 'a' }, { followerId: 'b' }, { followerId: 'c' }]);
+      setupSelect([
+        { followerId: 'a' },
+        { followerId: 'b' },
+        { followerId: 'c' },
+      ]);
       const count = await service.getFollowersCount('user-1', 'tenant-1');
       expect(count).toBe(3);
     });
@@ -163,8 +167,16 @@ describe('SocialFollowService', () => {
             limit: vi.fn().mockImplementation(async () => {
               callCount++;
               return callCount === 1
-                ? [{ followerId: 'a' }, { followerId: 'b' }, { followerId: 'c' }]
-                : [{ followerId: 'b' }, { followerId: 'c' }, { followerId: 'd' }];
+                ? [
+                    { followerId: 'a' },
+                    { followerId: 'b' },
+                    { followerId: 'c' },
+                  ]
+                : [
+                    { followerId: 'b' },
+                    { followerId: 'c' },
+                    { followerId: 'd' },
+                  ];
             }),
           }),
         }),
@@ -188,9 +200,9 @@ describe('SocialFollowService', () => {
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { id: 'u1', display_name: 'Alice Smith' },
-            ]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([{ id: 'u1', display_name: 'Alice Smith' }]),
           }),
         }),
       });

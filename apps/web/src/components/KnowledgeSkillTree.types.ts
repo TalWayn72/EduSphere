@@ -1,4 +1,9 @@
-export type MasteryLevel = 'none' | 'attempted' | 'familiar' | 'proficient' | 'mastered';
+export type MasteryLevel =
+  | 'none'
+  | 'attempted'
+  | 'familiar'
+  | 'proficient'
+  | 'mastered';
 
 export interface SkillNode {
   id: string;

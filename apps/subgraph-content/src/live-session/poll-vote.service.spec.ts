@@ -92,7 +92,7 @@ describe('PollVoteService', () => {
       await service.vote('p1', 'u1', 2, 't1');
 
       expect(insertValues).toHaveBeenCalledWith(
-        expect.objectContaining({ pollId: 'p1', userId: 'u1', optionIndex: 2 }),
+        expect.objectContaining({ pollId: 'p1', userId: 'u1', optionIndex: 2 })
       );
     });
 
@@ -113,7 +113,7 @@ describe('PollVoteService', () => {
       await service.vote('p1', 'u1', 1, 't1');
 
       expect(set).toHaveBeenCalledWith(
-        expect.objectContaining({ optionIndex: 1 }),
+        expect.objectContaining({ optionIndex: 1 })
       );
     });
   });
@@ -121,7 +121,12 @@ describe('PollVoteService', () => {
   describe('getPollResults()', () => {
     it('returns aggregated poll results', async () => {
       const pollChain = makeSelectChain([
-        { id: 'p1', question: 'Favorite color?', options: ['Red', 'Blue', 'Green'], tenantId: 't1' },
+        {
+          id: 'p1',
+          question: 'Favorite color?',
+          options: ['Red', 'Blue', 'Green'],
+          tenantId: 't1',
+        },
       ]);
       const votesChain = makeSelectChainNoLimit([
         { optionIndex: 0 },
@@ -138,9 +143,21 @@ describe('PollVoteService', () => {
       expect(result.totalVotes).toBe(4);
       expect(result.question).toBe('Favorite color?');
       expect(result.options).toHaveLength(3);
-      expect(result.options[0]).toMatchObject({ text: 'Red', count: 2, percentage: 50 });
-      expect(result.options[1]).toMatchObject({ text: 'Blue', count: 1, percentage: 25 });
-      expect(result.options[2]).toMatchObject({ text: 'Green', count: 1, percentage: 25 });
+      expect(result.options[0]).toMatchObject({
+        text: 'Red',
+        count: 2,
+        percentage: 50,
+      });
+      expect(result.options[1]).toMatchObject({
+        text: 'Blue',
+        count: 1,
+        percentage: 25,
+      });
+      expect(result.options[2]).toMatchObject({
+        text: 'Green',
+        count: 1,
+        percentage: 25,
+      });
     });
 
     it('throws NotFoundException when poll not found', async () => {
@@ -148,7 +165,7 @@ describe('PollVoteService', () => {
       mockTx.select.mockReturnValueOnce({ from: pollChain.from });
 
       await expect(
-        service.getPollResults('missing', 't1', 'u1'),
+        service.getPollResults('missing', 't1', 'u1')
       ).rejects.toThrow(NotFoundException);
     });
 

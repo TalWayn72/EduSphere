@@ -63,11 +63,12 @@
 **Data Categories:** User queries, annotations, learning content (anonymized where possible)
 **Retention Period:** Processing logs 90 days; models not trained on individual user data
 **Subprocessors:**
-  - Ollama (self-hosted, development) — no data transfer
-  - OpenAI (production, US) — Standard Contractual Clauses (SCCs) in place, Data Processing Agreement signed
-  - Anthropic (production, US) — Standard Contractual Clauses (SCCs) in place, Data Processing Agreement signed
-**Transfers:** US transfer with SCCs for AI providers (OpenAI, Anthropic) per Art. 46(2)(c)
-**Data Controller Role:** Controller (Data Processor relationship with OpenAI/Anthropic)
+
+- Ollama (self-hosted, development) — no data transfer
+- OpenAI (production, US) — Standard Contractual Clauses (SCCs) in place, Data Processing Agreement signed
+- Anthropic (production, US) — Standard Contractual Clauses (SCCs) in place, Data Processing Agreement signed
+  **Transfers:** US transfer with SCCs for AI providers (OpenAI, Anthropic) per Art. 46(2)(c)
+  **Data Controller Role:** Controller (Data Processor relationship with OpenAI/Anthropic)
 
 ---
 
@@ -98,13 +99,13 @@
 
 ## Subprocessor Register
 
-| Subprocessor | Purpose | Location | Transfer Mechanism | DPA Status |
-|---|---|---|---|---|
-| Keycloak | Identity & Authentication | Self-hosted EEA | N/A | N/A |
-| PostgreSQL | Primary Database | Self-hosted EEA | N/A | N/A |
-| MinIO | Object Storage | Self-hosted EEA | N/A | N/A |
-| OpenAI | AI Processing (prod, with consent) | US | SCCs Art. 46(2)(c) | Signed |
-| Anthropic | AI Processing (prod, with consent) | US | SCCs Art. 46(2)(c) | Signed |
+| Subprocessor | Purpose                            | Location        | Transfer Mechanism | DPA Status |
+| ------------ | ---------------------------------- | --------------- | ------------------ | ---------- |
+| Keycloak     | Identity & Authentication          | Self-hosted EEA | N/A                | N/A        |
+| PostgreSQL   | Primary Database                   | Self-hosted EEA | N/A                | N/A        |
+| MinIO        | Object Storage                     | Self-hosted EEA | N/A                | N/A        |
+| OpenAI       | AI Processing (prod, with consent) | US              | SCCs Art. 46(2)(c) | Signed     |
+| Anthropic    | AI Processing (prod, with consent) | US              | SCCs Art. 46(2)(c) | Signed     |
 
 ---
 

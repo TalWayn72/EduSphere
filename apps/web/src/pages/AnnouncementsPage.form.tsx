@@ -48,7 +48,9 @@ export function AnnouncementForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">{t('announcementForm.newAnnouncement')}</CardTitle>
+        <CardTitle className="text-base">
+          {t('announcementForm.newAnnouncement')}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
@@ -73,7 +75,9 @@ export function AnnouncementForm({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <Label htmlFor="ann-priority">{t('announcementForm.priorityLabel')}</Label>
+            <Label htmlFor="ann-priority">
+              {t('announcementForm.priorityLabel')}
+            </Label>
             <select
               id="ann-priority"
               value={values.priority}
@@ -88,7 +92,9 @@ export function AnnouncementForm({
             </select>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="ann-audience">{t('announcementForm.targetAudienceLabel')}</Label>
+            <Label htmlFor="ann-audience">
+              {t('announcementForm.targetAudienceLabel')}
+            </Label>
             <select
               id="ann-audience"
               value={values.targetAudience}
@@ -103,7 +109,9 @@ export function AnnouncementForm({
             </select>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="ann-publish">{t('announcementForm.publishAtLabel')}</Label>
+            <Label htmlFor="ann-publish">
+              {t('announcementForm.publishAtLabel')}
+            </Label>
             <Input
               id="ann-publish"
               type="datetime-local"
@@ -112,7 +120,9 @@ export function AnnouncementForm({
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="ann-expires">{t('announcementForm.expiresAtLabel')}</Label>
+            <Label htmlFor="ann-expires">
+              {t('announcementForm.expiresAtLabel')}
+            </Label>
             <Input
               id="ann-expires"
               type="datetime-local"
@@ -131,7 +141,9 @@ export function AnnouncementForm({
             onClick={onSubmit}
             disabled={submitting || !values.title.trim()}
           >
-            {submitting ? t('announcementForm.creating') : t('announcementForm.createAnnouncement')}
+            {submitting
+              ? t('announcementForm.creating')
+              : t('announcementForm.createAnnouncement')}
           </Button>
         </div>
       </CardContent>

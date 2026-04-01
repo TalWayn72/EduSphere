@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { useQuery } from 'urql';
 import { TENANT_BRANDING_QUERY } from '@/lib/graphql/branding.queries';
-import { applyTenantBranding, DEFAULT_BRANDING, type TenantBrandingData } from '@/lib/branding';
+import {
+  applyTenantBranding,
+  DEFAULT_BRANDING,
+  type TenantBrandingData,
+} from '@/lib/branding';
 
 export interface TenantBrandingExtended extends TenantBrandingData {
   customCss?: string | null;
@@ -41,7 +45,8 @@ export function useTenantBranding() {
   }, [data]);
 
   return {
-    branding: (data?.myTenantBranding ?? DEFAULT_BRANDING) as TenantBrandingExtended,
+    branding: (data?.myTenantBranding ??
+      DEFAULT_BRANDING) as TenantBrandingExtended,
     fetching,
   };
 }

@@ -13,7 +13,10 @@ export function layoutNodes(nodes: SkillNode[]): LayoutNode[] {
 
   // BFS level assignment
   const levelMap = new Map<string, number>();
-  const queue: { id: string; level: number }[] = roots.map((r) => ({ id: r.id, level: 0 }));
+  const queue: { id: string; level: number }[] = roots.map((r) => ({
+    id: r.id,
+    level: 0,
+  }));
   while (queue.length) {
     const { id, level } = queue.shift()!;
     if (levelMap.has(id)) continue;
@@ -21,7 +24,9 @@ export function layoutNodes(nodes: SkillNode[]): LayoutNode[] {
     const node = idMap.get(id);
     node?.children.forEach((cid) => queue.push({ id: cid, level: level + 1 }));
   }
-  nodes.forEach((n) => { if (!levelMap.has(n.id)) levelMap.set(n.id, 0); });
+  nodes.forEach((n) => {
+    if (!levelMap.has(n.id)) levelMap.set(n.id, 0);
+  });
 
   const maxLevel = Math.max(...levelMap.values());
   const byLevel: string[][] = Array.from({ length: maxLevel + 1 }, () => []);

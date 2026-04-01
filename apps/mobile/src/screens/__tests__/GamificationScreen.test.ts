@@ -23,7 +23,9 @@ function computeXpProgress(totalXp: number): number {
   const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 100)) + 1);
   const levelStartXp = (level - 1) * (level - 1) * 100;
   const levelEndXp = level * level * 100;
-  return Math.round(((totalXp - levelStartXp) / (levelEndXp - levelStartXp)) * 100);
+  return Math.round(
+    ((totalXp - levelStartXp) / (levelEndXp - levelStartXp)) * 100
+  );
 }
 
 // ---------------------------------------------------------------------------

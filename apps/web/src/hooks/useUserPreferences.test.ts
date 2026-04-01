@@ -192,14 +192,20 @@ describe('useUserPreferences', () => {
     setupMocks({ dbLocale: 'en', i18nLanguage: 'en' });
 
     // Override mutation to return a GraphQL error
-    const fakeError = { message: 'Network error', graphQLErrors: [], networkError: null };
+    const fakeError = {
+      message: 'Network error',
+      graphQLErrors: [],
+      networkError: null,
+    };
     mockUpdatePreferences.mockResolvedValue({ error: fakeError });
     vi.mocked(urql.useMutation).mockReturnValue([
       { fetching: false },
       mockUpdatePreferences,
     ] as ReturnType<typeof urql.useMutation>);
 
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
     const { result } = renderHook(() => useUserPreferences());
 
     // Catch the thrown error INSIDE act() so act() resolves normally and
@@ -351,7 +357,10 @@ describe('useUserPreferences', () => {
     vi.resetAllMocks();
     vi.mocked(urql.useMutation).mockReturnValue([
       { fetching: false },
-      vi.fn().mockResolvedValue({ data: { updateUserPreferences: { id: 'u-1' } }, error: undefined }),
+      vi.fn().mockResolvedValue({
+        data: { updateUserPreferences: { id: 'u-1' } },
+        error: undefined,
+      }),
     ] as ReturnType<typeof urql.useMutation>);
 
     const pauseValues: boolean[] = [];

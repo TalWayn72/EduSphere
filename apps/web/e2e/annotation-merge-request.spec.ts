@@ -6,7 +6,9 @@ import { loginInDevMode } from './auth.helpers';
 test.describe('KnowledgeGraph — Personal Wiki View', () => {
   test.beforeEach(async ({ page }) => {
     await loginInDevMode(page);
-    await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/knowledge-graph`, {
+      waitUntil: 'domcontentloaded',
+    });
   });
 
   test('shows Global and My Wiki tabs', async ({ page }) => {
@@ -25,9 +27,9 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
     page,
   }) => {
     await page.getByTestId('kg-tab-personal').click();
-    await expect(
-      page.getByText('Personal Knowledge Wiki')
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Personal Knowledge Wiki')).toBeVisible({
+      timeout: 5000,
+    });
   });
 
   test('My Wiki shows annotation nodes from multiple courses', async ({
@@ -59,9 +61,9 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
     await page.getByTestId('kg-tab-personal').click();
     await expect(page.getByText('Personal Knowledge Wiki')).toBeVisible();
     await page.getByTestId('kg-tab-global').click();
-    await expect(
-      page.getByText('Personal Knowledge Wiki')
-    ).not.toBeVisible({ timeout: 3000 });
+    await expect(page.getByText('Personal Knowledge Wiki')).not.toBeVisible({
+      timeout: 3000,
+    });
   });
 
   test('personal graph does not expose raw errors or stack traces', async ({
@@ -118,9 +120,7 @@ test.describe('InstructorMergeQueuePage', () => {
     await expect(approveBtn).toBeVisible();
     await approveBtn.click();
     await expect(page.getByTestId('resolved-mr-1')).toBeVisible();
-    await expect(
-      page.getByTestId('resolved-mr-1')
-    ).toContainText('approved');
+    await expect(page.getByTestId('resolved-mr-1')).toContainText('approved');
   });
 
   test('Reject button moves request to resolved section', async ({ page }) => {
@@ -128,9 +128,7 @@ test.describe('InstructorMergeQueuePage', () => {
     await expect(rejectBtn).toBeVisible();
     await rejectBtn.click();
     await expect(page.getByTestId('resolved-mr-2')).toBeVisible();
-    await expect(
-      page.getByTestId('resolved-mr-2')
-    ).toContainText('rejected');
+    await expect(page.getByTestId('resolved-mr-2')).toContainText('rejected');
   });
 
   test('no raw errors or stack traces in page', async ({ page }) => {
@@ -147,9 +145,12 @@ test.describe('InstructorMergeQueuePage', () => {
   test('visual regression — Merge Queue after approval', async ({ page }) => {
     await page.getByTestId('approve-btn-mr-1').click();
     await page.waitForLoadState('domcontentloaded');
-    await expect(page).toHaveScreenshot('instructor-merge-queue-after-approve.png', {
-      fullPage: false,
-    });
+    await expect(page).toHaveScreenshot(
+      'instructor-merge-queue-after-approve.png',
+      {
+        fullPage: false,
+      }
+    );
   });
 });
 
@@ -159,7 +160,9 @@ test.describe('AnnotationPanel — Propose to Official', () => {
     await loginInDevMode(page);
     // Annotations panel is accessible via /learn/:lessonId (UnifiedLearningPage)
     // or /annotations. Use the annotations page for simplicity.
-    await page.goto(`${BASE_URL}/annotations`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/annotations`, {
+      waitUntil: 'domcontentloaded',
+    });
   });
 
   test('Propose to Official button is present for personal annotations', async ({
@@ -188,9 +191,9 @@ test.describe('AnnotationPanel — Propose to Official', () => {
     const btnCount = await proposeBtn.count();
     if (btnCount > 0) {
       await proposeBtn.click();
-      await expect(
-        page.getByTestId('merge-request-modal')
-      ).toBeVisible({ timeout: 3000 });
+      await expect(page.getByTestId('merge-request-modal')).toBeVisible({
+        timeout: 3000,
+      });
     }
   });
 });

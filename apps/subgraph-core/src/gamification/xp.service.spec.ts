@@ -32,7 +32,9 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
   withTenantContext: (...args: unknown[]) =>
-    mockWithTenantContext(...(args as Parameters<typeof mockWithTenantContext>)),
+    mockWithTenantContext(
+      ...(args as Parameters<typeof mockWithTenantContext>)
+    ),
   sql: Object.assign(
     (strings: TemplateStringsArray, ...values: unknown[]) => ({
       _sql: strings,

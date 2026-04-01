@@ -18,9 +18,15 @@ import { routeGraphQL } from './graphql-mock.helpers';
 
 const ANALYTICS_ROUTE = '/admin/analytics';
 
-async function mockAnalyticsAPIs(page: import('@playwright/test').Page): Promise<void> {
+async function mockAnalyticsAPIs(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
-    if (op === 'GetOrgKPIs' || op.toLowerCase().includes('kpi') || op.toLowerCase().includes('analytics')) {
+    if (
+      op === 'GetOrgKPIs' ||
+      op.toLowerCase().includes('kpi') ||
+      op.toLowerCase().includes('analytics')
+    ) {
       return JSON.stringify({
         data: {
           orgKPIs: {
@@ -41,7 +47,9 @@ async function mockAnalyticsAPIs(page: import('@playwright/test').Page): Promise
     }
     if (op === 'Me' || op.toLowerCase().includes('me')) {
       return JSON.stringify({
-        data: { me: { id: 'user-001', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' } },
+        data: {
+          me: { id: 'user-001', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' },
+        },
       });
     }
     return null;
@@ -51,28 +59,44 @@ async function mockAnalyticsAPIs(page: import('@playwright/test').Page): Promise
 test.describe('Analytics Dashboard — KPI Cards', () => {
   test.beforeEach(async ({ page }) => {
     await mockAnalyticsAPIs(page);
-    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="analytics-dashboard"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('displays total users KPI', async ({ page }) => {
-    await expect(page.locator('[data-testid="kpi-total-users"]')).toContainText('250', { timeout: 10_000 });
+    await expect(page.locator('[data-testid="kpi-total-users"]')).toContainText(
+      '250',
+      { timeout: 10_000 }
+    );
   });
 
   test('displays active users KPI', async ({ page }) => {
-    await expect(page.locator('[data-testid="kpi-active-users"]')).toContainText('180', { timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="kpi-active-users"]')
+    ).toContainText('180', { timeout: 10_000 });
   });
 
   test('displays total courses KPI', async ({ page }) => {
-    await expect(page.locator('[data-testid="kpi-total-courses"]')).toContainText('45', { timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="kpi-total-courses"]')
+    ).toContainText('45', { timeout: 10_000 });
   });
 
   test('displays storage usage', async ({ page }) => {
-    await expect(page.locator('[data-testid="kpi-storage"]')).toContainText('12.5', { timeout: 10_000 });
+    await expect(page.locator('[data-testid="kpi-storage"]')).toContainText(
+      '12.5',
+      { timeout: 10_000 }
+    );
   });
 
   test('displays completion rate percentage', async ({ page }) => {
-    await expect(page.locator('[data-testid="kpi-completion-rate"]')).toContainText('72%', { timeout: 10_000 });
+    await expect(
+      page.locator('[data-testid="kpi-completion-rate"]')
+    ).toContainText('72%', { timeout: 10_000 });
   });
 
   test('no raw error strings visible', async ({ page }) => {
@@ -85,32 +109,50 @@ test.describe('Analytics Dashboard — KPI Cards', () => {
 test.describe('Analytics Dashboard — Charts', () => {
   test.beforeEach(async ({ page }) => {
     await mockAnalyticsAPIs(page);
-    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="analytics-dashboard"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('date range selector is visible', async ({ page }) => {
-    await expect(page.locator('[data-testid="date-range-picker"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="date-range-picker"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   test('chart container is rendered', async ({ page }) => {
-    await expect(page.locator('[data-testid="analytics-chart"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="analytics-chart"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
 test.describe('Analytics Dashboard — Export', () => {
   test('export CSV button is visible', async ({ page }) => {
     await mockAnalyticsAPIs(page);
-    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 15_000 });
-    await expect(page.locator('[data-testid="btn-export-csv"]')).toBeVisible({ timeout: 10_000 });
+    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="analytics-dashboard"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page.locator('[data-testid="btn-export-csv"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('export triggers download', async ({ page }) => {
     test.skip(!RUN_WRITE_TESTS, 'Write tests disabled');
     await mockAnalyticsAPIs(page);
-    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="analytics-dashboard"]')
+      .waitFor({ timeout: 15_000 });
 
     const downloadPromise = page.waitForEvent('download', { timeout: 10_000 });
     await page.locator('[data-testid="btn-export-csv"]').click();
@@ -121,16 +163,28 @@ test.describe('Analytics Dashboard — Export', () => {
 test.describe('Analytics Dashboard — Visual', () => {
   test('visual regression — dashboard desktop', async ({ page }) => {
     await mockAnalyticsAPIs(page);
-    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 15_000 });
-    await expect(page).toHaveScreenshot('analytics-dashboard-desktop.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="analytics-dashboard"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page).toHaveScreenshot('analytics-dashboard-desktop.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 
   test('visual regression — dashboard mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await mockAnalyticsAPIs(page);
-    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="analytics-dashboard"]').waitFor({ timeout: 15_000 });
-    await expect(page).toHaveScreenshot('analytics-dashboard-mobile.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}${ANALYTICS_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="analytics-dashboard"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page).toHaveScreenshot('analytics-dashboard-mobile.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });

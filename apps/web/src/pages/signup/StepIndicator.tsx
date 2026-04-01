@@ -33,7 +33,9 @@ export function StepIndicator({ current, total }: StepIndicatorProps) {
               >
                 {isDone ? '\u2713' : i + 1}
               </div>
-              <span className={`text-sm hidden sm:inline ${isActive ? 'font-medium' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-sm hidden sm:inline ${isActive ? 'font-medium' : 'text-muted-foreground'}`}
+              >
                 {t(`wizard.steps.${key}`)}
               </span>
               {i < total - 1 && (

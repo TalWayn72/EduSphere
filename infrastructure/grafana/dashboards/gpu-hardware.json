@@ -22,7 +22,7 @@
       "id": 1,
       "title": "GPU Utilization %",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "targets": [
         {
           "expr": "nvidia_gpu_duty_cycle{job=\"nvidia-gpu-exporter\"}",
@@ -42,7 +42,7 @@
       "id": 2,
       "title": "GPU VRAM Used (MB)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "targets": [
         {
           "expr": "nvidia_gpu_memory_used_bytes{job=\"nvidia-gpu-exporter\"} / 1048576",
@@ -65,7 +65,7 @@
       "id": 3,
       "title": "GPU Temperature (°C)",
       "type": "gauge",
-      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8},
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 8 },
       "targets": [
         {
           "expr": "nvidia_gpu_temperature_celsius{job=\"nvidia-gpu-exporter\"}",
@@ -80,9 +80,9 @@
           "max": 100,
           "thresholds": {
             "steps": [
-              {"value": 0, "color": "green"},
-              {"value": 70, "color": "yellow"},
-              {"value": 85, "color": "red"}
+              { "value": 0, "color": "green" },
+              { "value": 70, "color": "yellow" },
+              { "value": 85, "color": "red" }
             ]
           }
         }
@@ -92,11 +92,11 @@
       "id": 4,
       "title": "Whisper Server — Inference Device",
       "type": "stat",
-      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8},
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 8 },
       "description": "Check /health endpoint of whisper-server for current device mode",
       "targets": [],
       "options": {
-        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "reduceOptions": { "calcs": ["lastNotNull"] },
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "background"
@@ -106,8 +106,8 @@
   "refresh": "30s",
   "schemaVersion": 38,
   "tags": ["edusphere", "gpu", "hardware", "ai"],
-  "templating": {"list": []},
-  "time": {"from": "now-1h", "to": "now"},
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "EduSphere GPU Hardware",

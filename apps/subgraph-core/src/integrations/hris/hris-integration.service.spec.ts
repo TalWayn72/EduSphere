@@ -7,7 +7,10 @@ import { NotFoundException } from '@nestjs/common';
 // Mock credential helpers to avoid ENCRYPTION_MASTER_KEY requirement
 vi.mock('./hris-credential.helper.js', () => ({
   decryptHrisCredentials: vi.fn((config: unknown) => config),
-  redactHrisConfig: vi.fn((config: Record<string, unknown>) => ({ ...config, clientSecret: '***' })),
+  redactHrisConfig: vi.fn((config: Record<string, unknown>) => ({
+    ...config,
+    clientSecret: '***',
+  })),
 }));
 
 import { HrisIntegrationService } from './hris-integration.service.js';
@@ -79,7 +82,12 @@ describe('HrisIntegrationService', () => {
 
   it('syncTenant delegates to adapter syncUsers', async () => {
     const { service, scim } = makeService();
-    const mockResult = { usersUpserted: 5, usersDeactivated: 1, groupsSynced: 2, errors: [] };
+    const mockResult = {
+      usersUpserted: 5,
+      usersDeactivated: 1,
+      groupsSynced: 2,
+      errors: [],
+    };
     vi.spyOn(scim, 'syncUsers').mockResolvedValueOnce(mockResult);
 
     const config: HrisConfig = {

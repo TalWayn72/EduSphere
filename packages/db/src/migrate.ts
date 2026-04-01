@@ -37,14 +37,18 @@ async function runCustomMigrations(pool: Pool): Promise<void> {
       [file]
     );
     if (rows.length > 0) {
-      process.stderr.write(`[migrate] custom: ${file} — already applied, skipping\n`);
+      process.stderr.write(
+        `[migrate] custom: ${file} — already applied, skipping\n`
+      );
       continue;
     }
 
     const sql = readFileSync(join(migrationsDir, file), 'utf-8');
     process.stderr.write(`[migrate] custom: applying ${file}...\n`);
     await pool.query(sql);
-    await pool.query('INSERT INTO custom_migrations (filename) VALUES ($1)', [file]);
+    await pool.query('INSERT INTO custom_migrations (filename) VALUES ($1)', [
+      file,
+    ]);
     process.stderr.write(`[migrate] custom: ${file} — done\n`);
   }
 }
@@ -61,7 +65,9 @@ async function runMigrations(): Promise<void> {
   await migrate(db, { migrationsFolder: './migrations' });
   process.stderr.write('[migrate] Drizzle migrations complete.\n');
 
-  process.stderr.write('[migrate] Running custom SQL migrations (src/migrations/)...\n');
+  process.stderr.write(
+    '[migrate] Running custom SQL migrations (src/migrations/)...\n'
+  );
   await runCustomMigrations(pool);
   process.stderr.write('[migrate] Custom migrations complete.\n');
 

@@ -10,7 +10,10 @@ import { PilotApprovalService } from './pilot-approval.service.js';
 import { TenantUsageService } from './tenant-usage.service.js';
 import { PlatformStatsService } from './platform-stats.service.js';
 import { StripeInvoiceService } from './stripe-invoice.service.js';
-import { BillingQueryResolver, BillingMutationResolver } from './billing.resolver.js';
+import {
+  BillingQueryResolver,
+  BillingMutationResolver,
+} from './billing.resolver.js';
 
 @Module({
   providers: [
@@ -25,6 +28,11 @@ import { BillingQueryResolver, BillingMutationResolver } from './billing.resolve
     BillingQueryResolver,
     BillingMutationResolver,
   ],
-  exports: [YauCounterService, YauEnforcementService, SubscriptionService, StripeInvoiceService],
+  exports: [
+    YauCounterService,
+    YauEnforcementService,
+    SubscriptionService,
+    StripeInvoiceService,
+  ],
 })
 export class BillingModule {}

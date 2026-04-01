@@ -1,5 +1,12 @@
 /* eslint-disable edusphere-design-system/require-page-header -- sub-component embedded in CourseWizardMediaStep, not a standalone page */
-import { FileVideo, FileAudio, FileText, X, AlertCircle, Upload } from 'lucide-react';
+import {
+  FileVideo,
+  FileAudio,
+  FileText,
+  X,
+  AlertCircle,
+  Upload,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -47,7 +54,9 @@ export function MediaUploadEntries({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor={`title-${i}`} className="text-xs">{t('wizard.displayTitle')}</Label>
+            <Label htmlFor={`title-${i}`} className="text-xs">
+              {t('wizard.displayTitle')}
+            </Label>
             <Input
               id={`title-${i}`}
               value={entry.title}
@@ -62,7 +71,9 @@ export function MediaUploadEntries({
               <div className="w-full bg-muted rounded-full h-1.5">
                 <div
                   className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                  style={{ width: `${entry.state === 'done' ? 100 : entry.progress}%` }}
+                  style={{
+                    width: `${entry.state === 'done' ? 100 : entry.progress}%`,
+                  }}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
@@ -83,7 +94,13 @@ export function MediaUploadEntries({
                 variant="outline"
                 size="sm"
                 className="h-6 px-2 text-xs"
-                onClick={() => onUpdateEntry(i, { state: 'idle', progress: 0, error: undefined })}
+                onClick={() =>
+                  onUpdateEntry(i, {
+                    state: 'idle',
+                    progress: 0,
+                    error: undefined,
+                  })
+                }
               >
                 {t('wizard.retryUpload')}
               </Button>

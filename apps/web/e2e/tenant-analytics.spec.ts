@@ -38,15 +38,11 @@ test.describe('Tenant Analytics — DEV_MODE tab UI', () => {
     });
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.locator('[data-testid="period-tab-7d"]')
-    ).toBeVisible({ timeout: 8_000 });
-    await expect(
-      page.locator('[data-testid="period-tab-30d"]')
-    ).toBeVisible();
-    await expect(
-      page.locator('[data-testid="period-tab-90d"]')
-    ).toBeVisible();
+    await expect(page.locator('[data-testid="period-tab-7d"]')).toBeVisible({
+      timeout: 8_000,
+    });
+    await expect(page.locator('[data-testid="period-tab-30d"]')).toBeVisible();
+    await expect(page.locator('[data-testid="period-tab-90d"]')).toBeVisible();
   });
 
   test('switching to 90d tab does not crash', async ({ page }) => {
@@ -77,15 +73,11 @@ test.describe('Tenant Analytics — Live backend', () => {
     await page.goto(`${BASE_URL}/admin/analytics`);
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.locator('[data-testid="period-tab-7d"]')
-    ).toBeVisible({ timeout: 10_000 });
-    await expect(
-      page.locator('[data-testid="period-tab-30d"]')
-    ).toBeVisible();
-    await expect(
-      page.locator('[data-testid="period-tab-90d"]')
-    ).toBeVisible();
+    await expect(page.locator('[data-testid="period-tab-7d"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.locator('[data-testid="period-tab-30d"]')).toBeVisible();
+    await expect(page.locator('[data-testid="period-tab-90d"]')).toBeVisible();
 
     await expect(page).toHaveScreenshot(
       'admin-analytics-30d-chromium-win32.png',

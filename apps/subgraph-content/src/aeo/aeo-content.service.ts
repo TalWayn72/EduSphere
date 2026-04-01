@@ -3,7 +3,12 @@
  * Extracted from AeoService for file-size compliance (<300 lines).
  */
 import { Injectable } from '@nestjs/common';
-import type { CatalogCourse, InstructorProfile, FeatureItem, FaqItem } from './aeo.service';
+import type {
+  CatalogCourse,
+  InstructorProfile,
+  FeatureItem,
+  FaqItem,
+} from './aeo.service';
 
 @Injectable()
 export class AeoContentService {
@@ -12,7 +17,8 @@ export class AeoContentService {
       {
         id: 'cat-001',
         name: 'Introduction to Artificial Intelligence',
-        description: 'Master AI fundamentals including machine learning, neural networks, and practical applications.',
+        description:
+          'Master AI fundamentals including machine learning, neural networks, and practical applications.',
         level: 'beginner',
         duration: '8 weeks',
         category: 'Artificial Intelligence',
@@ -21,7 +27,8 @@ export class AeoContentService {
       {
         id: 'cat-002',
         name: 'Advanced Knowledge Graphs',
-        description: 'Build and query knowledge graphs using Apache AGE and Cypher with real-world datasets.',
+        description:
+          'Build and query knowledge graphs using Apache AGE and Cypher with real-world datasets.',
         level: 'advanced',
         duration: '10 weeks',
         category: 'Data Engineering',
@@ -30,7 +37,8 @@ export class AeoContentService {
       {
         id: 'cat-003',
         name: 'Full-Stack Development with NestJS',
-        description: 'Build production-grade APIs with NestJS, GraphQL Federation, and PostgreSQL.',
+        description:
+          'Build production-grade APIs with NestJS, GraphQL Federation, and PostgreSQL.',
         level: 'intermediate',
         duration: '12 weeks',
         category: 'Software Engineering',
@@ -39,7 +47,8 @@ export class AeoContentService {
       {
         id: 'cat-004',
         name: 'Data Science Essentials',
-        description: 'Hands-on data analysis, visualization, and predictive modelling with Python.',
+        description:
+          'Hands-on data analysis, visualization, and predictive modelling with Python.',
         level: 'beginner',
         duration: '6 weeks',
         category: 'Data Science',
@@ -48,7 +57,8 @@ export class AeoContentService {
       {
         id: 'cat-005',
         name: 'Cybersecurity Fundamentals',
-        description: 'Learn threat modelling, penetration testing, and secure-by-design principles.',
+        description:
+          'Learn threat modelling, penetration testing, and secure-by-design principles.',
         level: 'intermediate',
         duration: '8 weeks',
         category: 'Security',
@@ -57,7 +67,8 @@ export class AeoContentService {
       {
         id: 'cat-006',
         name: 'Cloud Architecture on AWS',
-        description: 'Design scalable, resilient cloud architectures using AWS services and Infrastructure as Code.',
+        description:
+          'Design scalable, resilient cloud architectures using AWS services and Infrastructure as Code.',
         level: 'advanced',
         duration: '10 weeks',
         category: 'Cloud Computing',
@@ -73,7 +84,8 @@ export class AeoContentService {
         name: 'Dr. Sarah Cohen',
         jobTitle: 'Professor of Computer Science',
         university: 'Hebrew University of Jerusalem',
-        description: 'Leading researcher in AI-assisted education and adaptive learning systems with 15 years of teaching experience.',
+        description:
+          'Leading researcher in AI-assisted education and adaptive learning systems with 15 years of teaching experience.',
         specialization: 'Artificial Intelligence & Machine Learning',
       },
       {
@@ -81,7 +93,8 @@ export class AeoContentService {
         name: 'Prof. Ariel Ben-David',
         jobTitle: 'Associate Professor',
         university: 'Technion — Israel Institute of Technology',
-        description: 'Specializes in distributed systems and cloud-native architectures. Author of three textbooks on microservices.',
+        description:
+          'Specializes in distributed systems and cloud-native architectures. Author of three textbooks on microservices.',
         specialization: 'Distributed Systems & Cloud Architecture',
       },
       {
@@ -89,7 +102,8 @@ export class AeoContentService {
         name: 'Dr. Miriam Levi',
         jobTitle: 'Senior Data Scientist',
         university: 'Tel Aviv University',
-        description: 'Expert in knowledge graph construction and semantic search. Former research lead at a Fortune 500 company.',
+        description:
+          'Expert in knowledge graph construction and semantic search. Former research lead at a Fortune 500 company.',
         specialization: 'Knowledge Graphs & Semantic Search',
       },
       {
@@ -97,7 +111,8 @@ export class AeoContentService {
         name: 'Yonatan Shapiro',
         jobTitle: 'Principal Security Engineer',
         university: 'Ben-Gurion University of the Negev',
-        description: 'Cybersecurity practitioner and educator with deep expertise in penetration testing and secure software design.',
+        description:
+          'Cybersecurity practitioner and educator with deep expertise in penetration testing and secure software design.',
         specialization: 'Cybersecurity & Secure Software Design',
       },
     ];
@@ -143,7 +158,8 @@ export class AeoContentService {
       {
         id: 'multilingual',
         title: 'Multi-Language',
-        description: '50+ languages with full RTL support for Hebrew and Arabic.',
+        description:
+          '50+ languages with full RTL support for Hebrew and Arabic.',
         category: 'accessibility',
       },
     ];

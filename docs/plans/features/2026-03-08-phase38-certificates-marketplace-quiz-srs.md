@@ -28,18 +28,18 @@ Phase 37 is complete at commit `f350ca5`. Exploration of the Phase 38 scope (Ass
 
 ## Open Items Inventory
 
-| # | Severity | Item | Sprint |
-|---|----------|------|--------|
-| P38-1 | 🔴 | Certificate presigned URL: `certificate.service.ts` + SDL + `CertificatesPage` | A+B |
-| P38-2 | 🔴 | CourseListing JOIN: courses + users table JOIN in `marketplace.service.ts` | A |
-| P38-3 | 🔴 | MarketplacePage: show real title/instructorName + filter UI | B |
-| P38-4 | 🟡 | Marketplace filters: WHERE clauses in `marketplace.service.ts` | A |
-| P38-5 | 🟡 | QuizBuilderPage: instructor quiz creation UI | B |
-| P38-6 | 🟡 | InstructorEarningsPage: remove `enabled: false`, use mounted guard | B |
-| P38-7 | 🟡 | Mobile SrsReviewScreen + CertificatesScreen | B |
-| P38-8 | ⚪ | Supergraph: add `certificateDownloadUrl` query | A+B |
-| P38-9 | ⚪ | AppSidebar: add Certificates + SRS Review nav items | B |
-| P38-10 | ⚪ | API_CONTRACTS Section 25 + OPEN_ISSUES.md + README sync | C |
+| #      | Severity | Item                                                                           | Sprint |
+| ------ | -------- | ------------------------------------------------------------------------------ | ------ |
+| P38-1  | 🔴       | Certificate presigned URL: `certificate.service.ts` + SDL + `CertificatesPage` | A+B    |
+| P38-2  | 🔴       | CourseListing JOIN: courses + users table JOIN in `marketplace.service.ts`     | A      |
+| P38-3  | 🔴       | MarketplacePage: show real title/instructorName + filter UI                    | B      |
+| P38-4  | 🟡       | Marketplace filters: WHERE clauses in `marketplace.service.ts`                 | A      |
+| P38-5  | 🟡       | QuizBuilderPage: instructor quiz creation UI                                   | B      |
+| P38-6  | 🟡       | InstructorEarningsPage: remove `enabled: false`, use mounted guard             | B      |
+| P38-7  | 🟡       | Mobile SrsReviewScreen + CertificatesScreen                                    | B      |
+| P38-8  | ⚪       | Supergraph: add `certificateDownloadUrl` query                                 | A+B    |
+| P38-9  | ⚪       | AppSidebar: add Certificates + SRS Review nav items                            | B      |
+| P38-10 | ⚪       | API_CONTRACTS Section 25 + OPEN_ISSUES.md + README sync                        | C      |
 
 ---
 
@@ -73,6 +73,7 @@ Sprint C — Sequential QA gate
 (uses `@aws-sdk/s3-request-presigner` + `getSignedUrl` + `GetObjectCommand`, PRESIGNED_URL_EXPIRY = 900s)
 
 **File: `apps/subgraph-content/src/certificate/certificate.service.ts`**
+
 - Add private `s3: S3Client` field
 - Initialize in constructor (after existing injections):
   ```typescript
@@ -83,7 +84,10 @@ Sprint C — Sequential QA gate
   this.s3 = new S3Client({
     endpoint: `${scheme}://${minioConfig.endpoint}:${minioConfig.port}`,
     region: minioConfig.region,
-    credentials: { accessKeyId: minioConfig.accessKey, secretAccessKey: minioConfig.secretKey },
+    credentials: {
+      accessKeyId: minioConfig.accessKey,
+      secretAccessKey: minioConfig.secretKey,
+    },
     forcePathStyle: true,
     requestChecksumCalculation: 'WHEN_REQUIRED',
     responseChecksumValidation: 'WHEN_REQUIRED',
@@ -98,18 +102,22 @@ Sprint C — Sequential QA gate
 - Add to `onModuleDestroy()`: `this.s3.destroy()` (S3Client has a `.destroy()` method)
 
 **File: `apps/subgraph-content/src/certificate/certificate.graphql`**
+
 - Add to `extend type Query`:
   ```graphql
   certificateDownloadUrl(certId: ID!): String! @authenticated
   ```
 
 **File: `apps/subgraph-content/src/certificate/certificate.resolver.ts`**
+
 - Add `@Query('certificateDownloadUrl')` method calling `certificateService.getCertificateDownloadUrl(certId, ctx.userId, ctx.tenantId)`
 
 **File: `apps/gateway/supergraph.graphql`**
+
 - Add to Query type: `certificateDownloadUrl(certId: ID!): String! @join__field(graph: CONTENT) @authenticated`
 
 **Tests:**
+
 - `certificate.service.spec.ts`: add 3 tests: returns presigned URL; throws NotFoundException for wrong user; throws BadRequestException when pdfUrl is null
 - `certificate.resolver.spec.ts`: add test: delegates to service with JWT userId (not arg userId)
 
@@ -120,6 +128,7 @@ Sprint C — Sequential QA gate
 **File: `apps/subgraph-content/src/marketplace/marketplace.service.ts`**
 
 Rewrite `getListings(tenantId, filters?)` method using Drizzle JOINs:
+
 ```typescript
 // JOIN chain:
 tx.select({
@@ -135,19 +144,31 @@ tx.select({
   instructorName: sql<string>`COALESCE(${schema.users.firstName} || ' ' || ${schema.users.lastName}, ${schema.users.username})`,
   enrollmentCount: sql<number>`(SELECT COUNT(*) FROM purchases p WHERE p.course_id = ${schema.courses.id} AND p.status = 'COMPLETE')`,
 })
-.from(schema.courseListings)
-.innerJoin(schema.courses, eq(schema.courseListings.courseId, schema.courses.id))
-.innerJoin(schema.users, eq(schema.courses.instructorId, schema.users.id))
-.where(
-  and(
-    eq(schema.courseListings.tenantId, tenantId),
-    eq(schema.courseListings.isPublished, true),
-    // conditional filters:
-    filters?.search ? ilike(schema.courses.title, `%${filters.search}%`) : undefined,
-    filters?.priceMax !== undefined ? lte(schema.courseListings.priceCents, Math.round(filters.priceMax * 100)) : undefined,
-    filters?.instructorName ? ilike(sql<string>`COALESCE(...)`, `%${filters.instructorName}%`) : undefined,
+  .from(schema.courseListings)
+  .innerJoin(
+    schema.courses,
+    eq(schema.courseListings.courseId, schema.courses.id)
   )
-)
+  .innerJoin(schema.users, eq(schema.courses.instructorId, schema.users.id))
+  .where(
+    and(
+      eq(schema.courseListings.tenantId, tenantId),
+      eq(schema.courseListings.isPublished, true),
+      // conditional filters:
+      filters?.search
+        ? ilike(schema.courses.title, `%${filters.search}%`)
+        : undefined,
+      filters?.priceMax !== undefined
+        ? lte(
+            schema.courseListings.priceCents,
+            Math.round(filters.priceMax * 100)
+          )
+        : undefined,
+      filters?.instructorName
+        ? ilike(sql<string>`COALESCE(...)`, `%${filters.instructorName}%`)
+        : undefined
+    )
+  );
 ```
 
 - Return `tags: []` for now (no course_tags table; document in OPEN_ISSUES.md)
@@ -155,15 +176,18 @@ tx.select({
 - Signature: `getListings(tenantId: string, limit?: number, offset?: number, filters?: CourseListingFiltersInput): Promise<CourseListingMapped[]>`
 
 **File: `apps/subgraph-content/src/marketplace/marketplace.graphql`**
+
 - Update `CourseListing` type to include all new fields (title, description, instructorName, thumbnailUrl, price, currency, tags, enrollmentCount, rating, totalLessons)
 - Add `CourseListingFiltersInput` input type
 - Update `courseListings` query signature: `courseListings(tenantId: ID, limit: Int, offset: Int, filters: CourseListingFiltersInput): [CourseListing!]!`
 
 **File: `apps/subgraph-content/src/marketplace/marketplace.resolver.ts`**
+
 - Update `getCourseListings` to accept `@Args('filters') filters?: CourseListingFiltersInput` and pass to service
 - Note: `tenantId` arg must be ignored in favor of JWT tenantId (SI-9)
 
 **Tests:**
+
 - `marketplace.service.spec.ts`: add tests: returns title from courses JOIN; search filter applied; priceMax filter applied; empty filters returns all
 
 ---
@@ -171,21 +195,26 @@ tx.select({
 ### Agent-A3: InstructorEarnings Fix + AppSidebar Nav
 
 **File: `apps/web/src/pages/InstructorEarningsPage.tsx`**
+
 - Find `enabled: false` placeholder guard
 - Replace with mounted guard:
   ```typescript
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   // In query options: enabled: mounted
   ```
 
 **File: `apps/web/src/components/AppSidebar.tsx`**
+
 - Add nav items (follow existing pattern of conditional role-gated items):
   - Certificates: `{ to: '/certificates', icon: Award, labelKey: 'nav.certificates' }` — all authenticated users
   - SRS Review: `{ to: '/srs-review', icon: Brain, labelKey: 'nav.srsReview' }` — all authenticated users
   - Quiz Builder: `{ to: '/quiz-builder', icon: FileQuestion, labelKey: 'nav.quizBuilder' }` — INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN only
 
 **File: `apps/web/src/locales/en/nav.json` (and other 7 locales)**
+
 - Add keys: `certificates`, `srsReview`, `quizBuilder`
 - For non-English locales use English as fallback if translation not available (mark as `[TODO]`)
 
@@ -194,26 +223,33 @@ tx.select({
 ### Agent-A4: Documentation Skeleton
 
 **File: `OPEN_ISSUES.md`**
+
 - Add Phase 38 tracking entry with P38-1 through P38-10 in 🟡 In Progress status
 
 **File: `API_CONTRACTS_GRAPHQL_FEDERATION.md`**
+
 - Add Section 25 at end of file:
+
   ```markdown
   ## Section 25 — Phase 37+38: Gamification, Manager Dashboard, Onboarding, Certificates (March 2026)
 
   ### New Query: certificateDownloadUrl(certId: ID!): String!
+
   Returns a 15-minute presigned MinIO URL for secure PDF download.
   Auth: @authenticated — user can only download their own certificates (server-side userId validation).
 
   ### Updated Type: CourseListing
+
   Added fields: title, description, instructorName, thumbnailUrl, price (Float), currency,
   tags ([String!]!), enrollmentCount (Int!), rating (Float), totalLessons (Int!)
 
   ### New Input: CourseListingFiltersInput
+
   Fields: tags ([String!]), priceMax (Float), instructorName (String), search (String)
   Applied as server-side WHERE clauses in marketplace resolver.
 
   ### Phase 37 types (Gamification)
+
   GamificationStats, UserChallenge, LeaderboardEntry: see gamification.graphql in subgraph-core
   TeamOverview, TeamMemberProgress: see manager.graphql in subgraph-core
   OnboardingState, UpdateOnboardingStepInput: see onboarding.graphql in subgraph-core
@@ -226,6 +262,7 @@ tx.select({
 ### Agent-B1: CertificatesPage
 
 **New file:** `apps/web/src/pages/CertificatesPage.tsx`
+
 - Route: `/certificates`
 - Uses urql `useQuery` + mounted guard (`pause: !mounted`)
 - Queries: `MY_CERTIFICATES_QUERY` + lazy `CERTIFICATE_DOWNLOAD_URL_QUERY`
@@ -235,12 +272,20 @@ tx.select({
 - States: skeleton loading, empty state ("No certificates yet — complete a course to earn one!"), cards, error
 
 **New file:** `apps/web/src/lib/graphql/certificate.queries.ts`
+
 ```typescript
 export const MY_CERTIFICATES_QUERY = gql`
   query MyCertificates {
     myCertificates {
-      id courseId issuedAt verificationCode pdfUrl
-      metadata { learnerName courseName }
+      id
+      courseId
+      issuedAt
+      verificationCode
+      pdfUrl
+      metadata {
+        learnerName
+        courseName
+      }
     }
   }
 `;
@@ -257,6 +302,7 @@ export const CERTIFICATE_DOWNLOAD_URL_QUERY = gql`
 **Security invariant:** the raw `pdfUrl` (MinIO key string) must NEVER be rendered in the DOM. Only the presigned URL (fetched on button click) is used, and only via `window.open`, not rendered as visible text.
 
 **New file:** `apps/web/src/pages/CertificatesPage.test.tsx`
+
 - Tests: heading visible; empty state renders; certificate card with course name; download button present; raw pdfUrl NOT in DOM text (regression guard)
 
 ---
@@ -264,28 +310,32 @@ export const CERTIFICATE_DOWNLOAD_URL_QUERY = gql`
 ### Agent-B2: QuizBuilderPage
 
 **Architecture:** Split into 3 files (to stay under 150-line limit):
+
 - `apps/web/src/pages/QuizBuilderPage.tsx` — main shell, route params, submit handler (~80 lines)
 - `apps/web/src/components/quiz-builder/QuizBuilderForm.tsx` — question list + add/remove logic (~100 lines)
 - `apps/web/src/components/quiz-builder/QuizQuestion.tsx` — individual question form (~80 lines)
 
 **Route:** `/courses/:courseId/modules/:moduleId/quiz/new`
+
 - Role gate: redirect to `/dashboard` if role is not INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN
 - Submit: calls `createContentItem` mutation with `contentType: QUIZ` and `body: JSON.stringify(quizContent)`
 
 **Quiz content structure (Phase 38 scope: MULTIPLE_CHOICE only):**
+
 ```typescript
 interface QuizContent {
   passingScore: number; // 0-100
   items: Array<{
     type: 'MULTIPLE_CHOICE';
     question: string;
-    choices: string[];      // 4 choices
-    correctIndex: number;   // 0-3
+    choices: string[]; // 4 choices
+    correctIndex: number; // 0-3
   }>;
 }
 ```
 
 **UI:**
+
 1. Quiz title input (for ContentItem.title)
 2. Passing score slider (0-100, default 70)
 3. "Add Question" button → appends empty question to list
@@ -296,6 +346,7 @@ interface QuizContent {
 **Modify:** Add `CREATE_CONTENT_ITEM_MUTATION` to `apps/web/src/lib/graphql/content.queries.ts` if not already present
 
 **Tests:**
+
 - `QuizBuilderPage.test.tsx`: renders heading; add question button works; remove question decrements count; submit validates empty; submit calls mutation with correct JSON body
 
 ---
@@ -305,6 +356,7 @@ interface QuizContent {
 **Modify:** `apps/web/src/pages/MarketplacePage.tsx`
 
 Changes:
+
 1. Update GraphQL query to request all new fields: `title, description, instructorName, thumbnailUrl, price, currency, tags, enrollmentCount, rating, totalLessons`
 2. Add TypeScript interface update for `CourseListing` to include new fields
 3. Add filter bar above course grid:
@@ -319,6 +371,7 @@ Changes:
 6. Memory safety: debounce `clearTimeout` on effect cleanup
 
 **Modify:** `apps/web/src/pages/MarketplacePage.test.tsx`
+
 - Update mock to include new fields (title, instructorName)
 - Add test: renders `'React Fundamentals'` (real title) not `'Course aabb...'` (UUID truncation)
 - Add regression test: DOM text must NOT match `/Course [0-9a-f]{8}/`
@@ -330,6 +383,7 @@ Changes:
 **Approach:** Pure logic extraction → mobile screen component
 
 **New file:** `apps/mobile/src/screens/srs.logic.ts`
+
 ```typescript
 // Pure functions extracted for testability
 export function computeSessionStats(cards: SrsCard[], ratings: Rating[]): SessionStats { ... }
@@ -338,6 +392,7 @@ export function formatDueDate(dueDate: string): string { ... }
 ```
 
 **New file:** `apps/mobile/src/screens/SrsReviewScreen.tsx`
+
 - Apollo Client: `useQuery(SRS_REVIEW_QUERY, { skip: !userId })`
 - Card flip animation via `Animated.Value` + `interpolate` (no CSS)
 - 4 rating buttons: Again (1) / Hard (2) / Good (3) / Easy (5)
@@ -346,15 +401,18 @@ export function formatDueDate(dueDate: string): string { ... }
 - `useFocusEffect` (React Navigation) as pause guard
 
 **New file:** `apps/mobile/src/screens/CertificatesScreen.tsx`
+
 - Apollo Client `useQuery(MY_CERTIFICATES_QUERY)`
 - `FlatList` of certificate cards
 - Download button → `Linking.openURL(presignedUrl)` after fetching `certificateDownloadUrl` query
 - Empty state: "No certificates yet"
 
 **New file:** `apps/mobile/src/screens/__tests__/SrsReviewScreen.test.ts`
+
 - Pure logic tests: `computeSessionStats` correct counts; `advanceCard` returns null at end; `formatDueDate` formatting
 
 **New file:** `apps/mobile/src/screens/__tests__/CertificatesScreen.test.ts`
+
 - Pure logic tests: certificate date formatting; verification code masking
 
 **Modify:** `apps/mobile/src/navigation/MainTabNavigator.tsx` — if tabs not full, add SRS Review tab (Brain icon) and Certificates tab (Award icon)
@@ -364,6 +422,7 @@ export function formatDueDate(dueDate: string): string { ... }
 ### Agent-B5: Supergraph Compose Verify
 
 **Modify:** `apps/gateway/supergraph.graphql`
+
 - Verify `certificateDownloadUrl` field is in Query type (may have been added by A1)
 - Verify `CourseListing` type matches the updated local SDL from A2 (title, description, instructorName, etc.)
 - Verify `CourseListingFiltersInput` is present
@@ -379,69 +438,73 @@ export function formatDueDate(dueDate: string): string { ... }
 
 **New E2E specs:**
 
-| File | Assertions |
-|------|-----------|
-| `apps/web/e2e/certificates.spec.ts` | Login → /certificates → heading visible; empty/cards state; no raw MinIO key in DOM; `toHaveScreenshot` |
+| File                                    | Assertions                                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/e2e/certificates.spec.ts`     | Login → /certificates → heading visible; empty/cards state; no raw MinIO key in DOM; `toHaveScreenshot`                         |
 | `apps/web/e2e/marketplace-data.spec.ts` | Mock courseListings with title field → assert real title appears, UUID pattern absent; filter input visible; `toHaveScreenshot` |
-| `apps/web/e2e/quiz-builder.spec.ts` | Instructor login → /courses/.../quiz/new → heading visible; add question; submit form; `toHaveScreenshot` |
-| `apps/web/e2e/srs-review.spec.ts` | Login → /srs-review → flashcard OR no-cards state visible; no `[object Object]` in DOM; `toHaveScreenshot` |
+| `apps/web/e2e/quiz-builder.spec.ts`     | Instructor login → /courses/.../quiz/new → heading visible; add question; submit form; `toHaveScreenshot`                       |
+| `apps/web/e2e/srs-review.spec.ts`       | Login → /srs-review → flashcard OR no-cards state visible; no `[object Object]` in DOM; `toHaveScreenshot`                      |
 
 **Security tests (`tests/security/api-security.spec.ts`):**
+
 - `certificateDownloadUrl` with another user's certId → expect `NotFoundException` (not 200 OK)
 - `courseListings` filter with SQL injection string → Drizzle parameterized query returns empty/normal result (no 500)
 
 **Final OPEN_ISSUES.md update:**
+
 - Mark all P38 items as ✅ Fixed, listing exact E2E spec files
 - Update Phase 38 entry to ✅ Complete
 
 **README.md update:**
+
 - Update test counts with new Phase 38 test additions
 
 ---
 
 ## Memory Safety Checklist
 
-| Service / Component | Rule | Implementation |
-|---------------------|------|----------------|
-| `certificate.service.ts` | S3Client destroy | `this.s3.destroy()` in `onModuleDestroy()` |
-| `CertificatesPage.tsx` | Download query cleanup | `pause: activeCertId === null` clears on unmount |
-| `MarketplacePage.tsx` | Debounce cleanup | `clearTimeout(debounceRef.current)` in useEffect cleanup |
-| `SrsReviewScreen.tsx` | Query pause | `useFocusEffect` sets `skip: true` when screen unfocuses |
+| Service / Component      | Rule                   | Implementation                                           |
+| ------------------------ | ---------------------- | -------------------------------------------------------- |
+| `certificate.service.ts` | S3Client destroy       | `this.s3.destroy()` in `onModuleDestroy()`               |
+| `CertificatesPage.tsx`   | Download query cleanup | `pause: activeCertId === null` clears on unmount         |
+| `MarketplacePage.tsx`    | Debounce cleanup       | `clearTimeout(debounceRef.current)` in useEffect cleanup |
+| `SrsReviewScreen.tsx`    | Query pause            | `useFocusEffect` sets `skip: true` when screen unfocuses |
 
 ---
 
 ## Security Invariants
 
-| Check | Implementation |
-|-------|---------------|
-| Certificate download: user can only download their own cert | `WHERE cert.user_id = jwt.userId` before presigned URL generation |
-| Marketplace filter: no SQL injection | Drizzle parameterized queries via `ilike()`, `lte()` (never raw string interpolation) |
-| No PII in leaderboard | Confirmed from Phase 37: `displayName` only, no email |
+| Check                                                       | Implementation                                                                        |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Certificate download: user can only download their own cert | `WHERE cert.user_id = jwt.userId` before presigned URL generation                     |
+| Marketplace filter: no SQL injection                        | Drizzle parameterized queries via `ilike()`, `lte()` (never raw string interpolation) |
+| No PII in leaderboard                                       | Confirmed from Phase 37: `displayName` only, no email                                 |
 
 ---
 
 ## Critical Files
 
-| File | Change |
-|------|--------|
-| `apps/subgraph-content/src/certificate/certificate.service.ts` | Add S3Client + `getCertificateDownloadUrl()` |
-| `apps/subgraph-content/src/certificate/certificate.graphql` | Add `certificateDownloadUrl` query |
-| `apps/subgraph-content/src/marketplace/marketplace.service.ts` | Rewrite `getListings()` with JOIN + filters |
-| `apps/subgraph-content/src/marketplace/marketplace.graphql` | Update CourseListing type + add filters input |
-| `apps/gateway/supergraph.graphql` | Add certificateDownloadUrl + verify CourseListing |
-| `apps/web/src/pages/CertificatesPage.tsx` | NEW — certificate list + download UI |
-| `apps/web/src/pages/QuizBuilderPage.tsx` | NEW — instructor quiz creation |
-| `apps/web/src/pages/InstructorEarningsPage.tsx` | Fix `enabled: false` → mounted guard |
-| `apps/web/src/pages/MarketplacePage.tsx` | Real fields + filter bar |
-| `apps/web/src/components/AppSidebar.tsx` | Add Certificates + SRS Review + QuizBuilder nav items |
-| `apps/mobile/src/screens/SrsReviewScreen.tsx` | NEW |
-| `apps/mobile/src/screens/CertificatesScreen.tsx` | NEW |
+| File                                                           | Change                                                |
+| -------------------------------------------------------------- | ----------------------------------------------------- |
+| `apps/subgraph-content/src/certificate/certificate.service.ts` | Add S3Client + `getCertificateDownloadUrl()`          |
+| `apps/subgraph-content/src/certificate/certificate.graphql`    | Add `certificateDownloadUrl` query                    |
+| `apps/subgraph-content/src/marketplace/marketplace.service.ts` | Rewrite `getListings()` with JOIN + filters           |
+| `apps/subgraph-content/src/marketplace/marketplace.graphql`    | Update CourseListing type + add filters input         |
+| `apps/gateway/supergraph.graphql`                              | Add certificateDownloadUrl + verify CourseListing     |
+| `apps/web/src/pages/CertificatesPage.tsx`                      | NEW — certificate list + download UI                  |
+| `apps/web/src/pages/QuizBuilderPage.tsx`                       | NEW — instructor quiz creation                        |
+| `apps/web/src/pages/InstructorEarningsPage.tsx`                | Fix `enabled: false` → mounted guard                  |
+| `apps/web/src/pages/MarketplacePage.tsx`                       | Real fields + filter bar                              |
+| `apps/web/src/components/AppSidebar.tsx`                       | Add Certificates + SRS Review + QuizBuilder nav items |
+| `apps/mobile/src/screens/SrsReviewScreen.tsx`                  | NEW                                                   |
+| `apps/mobile/src/screens/CertificatesScreen.tsx`               | NEW                                                   |
 
 ---
 
 ## Verification Steps
 
 ### After Sprint A
+
 ```bash
 # CourseListing JOIN works:
 # mcp__graphql__query-graphql: { courseListings { title instructorName description } }
@@ -453,6 +516,7 @@ grep "certificateDownloadUrl" apps/subgraph-content/src/certificate/certificate.
 ```
 
 ### After Sprint B
+
 ```bash
 # CertificatesPage exists and renders
 grep -r "CertificatesPage" apps/web/src/lib/router.tsx  # → 1 match
@@ -465,6 +529,7 @@ ls apps/web/src/pages/QuizBuilderPage.tsx  # → exists
 ```
 
 ### After Sprint C (Full QA Gate)
+
 ```bash
 pnpm turbo test               # all pass
 pnpm turbo typecheck          # 0 TypeScript errors

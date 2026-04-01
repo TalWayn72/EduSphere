@@ -16,12 +16,18 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/AiCourseCreatorModal', () => ({
@@ -69,32 +75,56 @@ describe('CourseListPage', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('renders inside Layout', () => {
-    render(<MemoryRouter><CourseList /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
   it('renders course title heading', () => {
-    render(<MemoryRouter><CourseList /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
     expect(screen.getByText('title')).toBeInTheDocument();
   });
 
   it('renders course filters', () => {
-    render(<MemoryRouter><CourseList /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('course-filters')).toBeInTheDocument();
   });
 
   it('renders course grid', () => {
-    render(<MemoryRouter><CourseList /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId('course-grid')).toBeInTheDocument();
   });
 
   it('shows new course button for instructor', () => {
-    render(<MemoryRouter><CourseList /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
     expect(screen.getByText('newCourse')).toBeInTheDocument();
   });
 
   it('shows AI creator button for instructor', () => {
-    render(<MemoryRouter><CourseList /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
     expect(screen.getByText('aiCreator.aiCreateCourse')).toBeInTheDocument();
   });
 });

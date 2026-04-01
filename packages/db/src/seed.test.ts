@@ -5,7 +5,7 @@ import path from 'node:path';
 describe('seed.ts — instructor locale preference', () => {
   const seedSource = fs.readFileSync(
     path.resolve(__dirname, 'seed.ts'),
-    'utf-8',
+    'utf-8'
   );
 
   it('instructor user entry contains locale: he', () => {
@@ -17,7 +17,7 @@ describe('seed.ts — instructor locale preference', () => {
     // Extract the preferences block for the instructor user.
     // The instructor is identified by email 'instructor@example.com'.
     const instructorBlockMatch = seedSource.match(
-      /email:\s*'instructor@example\.com'[\s\S]*?preferences:\s*\{([\s\S]*?)\}/,
+      /email:\s*'instructor@example\.com'[\s\S]*?preferences:\s*\{([\s\S]*?)\}/
     );
     expect(instructorBlockMatch).not.toBeNull();
 

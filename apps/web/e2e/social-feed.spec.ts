@@ -38,9 +38,7 @@ test.describe('Social Feed — DEV_MODE guard', () => {
     await page.goto(`${BASE_URL}/people`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.getByPlaceholder(/Search people/i)
-    ).toBeVisible();
+    await expect(page.getByPlaceholder(/Search people/i)).toBeVisible();
   });
 
   test('social feed page has no crash overlay', async ({ page }) => {
@@ -83,9 +81,7 @@ test.describe('Social Feed — Live backend', () => {
     await page.goto(`${BASE_URL}/people`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(
-      page.getByPlaceholder(/Search people/i)
-    ).toBeVisible();
+    await expect(page.getByPlaceholder(/Search people/i)).toBeVisible();
     await expect(page).toHaveScreenshot('people-search-page.png', {
       maxDiffPixels: 200,
     });
@@ -102,9 +98,7 @@ test.describe('Social Feed — Live backend', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const hasResults = await page.locator('[data-testid="user-card"]').count();
-    const hasEmpty = await page
-      .getByText(/No users found|No results/i)
-      .count();
+    const hasEmpty = await page.getByText(/No users found|No results/i).count();
     expect(hasResults + hasEmpty).toBeGreaterThan(0);
   });
 });

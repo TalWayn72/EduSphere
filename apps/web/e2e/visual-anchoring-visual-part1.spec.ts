@@ -51,7 +51,11 @@ const MOCK_ANCHOR_WITH_IMAGE = {
     mimeType: 'image/png',
     filename: 'epistemology-diagram.png',
     scanStatus: 'CLEAN',
-    metadata: { width: 280, height: 200, altText: 'Epistemology concept diagram' },
+    metadata: {
+      width: 280,
+      height: 200,
+      altText: 'Epistemology concept diagram',
+    },
   },
 };
 
@@ -78,7 +82,10 @@ async function mockGraphQL(
 
 async function mockAnchors(page: Page, anchors: object[]): Promise<void> {
   await mockGraphQL(page, (body) => {
-    if (body.includes('GetVisualAnchors') || body.includes('getVisualAnchors')) {
+    if (
+      body.includes('GetVisualAnchors') ||
+      body.includes('getVisualAnchors')
+    ) {
       return { data: { getVisualAnchors: anchors } };
     }
     return null;
@@ -87,7 +94,10 @@ async function mockAnchors(page: Page, anchors: object[]): Promise<void> {
 
 async function mockEmptyAnchors(page: Page): Promise<void> {
   await mockGraphQL(page, (body) => {
-    if (body.includes('GetVisualAnchors') || body.includes('getVisualAnchors')) {
+    if (
+      body.includes('GetVisualAnchors') ||
+      body.includes('getVisualAnchors')
+    ) {
       return { data: { getVisualAnchors: [] } };
     }
     return null;
@@ -105,7 +115,6 @@ async function loginAndGoto(page: Page, path: string): Promise<void> {
 // ─── Suite: Visual Anchoring — Part 1 ───────────────────────────────────────
 
 test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
-
   test('VisualSidebar — empty state (no anchors)', async ({ page }) => {
     await mockEmptyAnchors(page);
     await loginAndGoto(page, `${BASE_URL}/learn/empty-doc-vis`);
@@ -121,7 +130,9 @@ test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
-    const sidebarLocator = page.locator('[data-testid="visual-sidebar"]').first();
+    const sidebarLocator = page
+      .locator('[data-testid="visual-sidebar"]')
+      .first();
     const sidebarVisible = await sidebarLocator.isVisible().catch(() => false);
 
     if (sidebarVisible) {
@@ -135,10 +146,13 @@ test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
         .first();
       const compVisible = await complementary.isVisible().catch(() => false);
       if (compVisible) {
-        await expect(complementary).toHaveScreenshot('sidebar-empty-state.png', {
-          maxDiffPixels: 200,
-          animations: 'disabled',
-        });
+        await expect(complementary).toHaveScreenshot(
+          'sidebar-empty-state.png',
+          {
+            maxDiffPixels: 200,
+            animations: 'disabled',
+          }
+        );
       } else {
         await expect(page).toHaveScreenshot('sidebar-empty-state.png', {
           fullPage: false,
@@ -164,7 +178,9 @@ test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
     await page.waitForLoadState('domcontentloaded').catch(() => {});
     await page.waitForTimeout(500);
 
-    const sidebarLocator = page.locator('[data-testid="visual-sidebar"]').first();
+    const sidebarLocator = page
+      .locator('[data-testid="visual-sidebar"]')
+      .first();
     const sidebarVisible = await sidebarLocator.isVisible().catch(() => false);
 
     if (sidebarVisible) {
@@ -173,9 +189,7 @@ test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
         animations: 'disabled',
       });
     } else {
-      const complementary = page
-        .locator('[role="complementary"]')
-        .first();
+      const complementary = page.locator('[role="complementary"]').first();
       const compVisible = await complementary.isVisible().catch(() => false);
       if (compVisible) {
         await expect(complementary).toHaveScreenshot('sidebar-with-image.png', {
@@ -264,10 +278,13 @@ test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
         .first();
       const panelVisible = await instructorArea.isVisible().catch(() => false);
       if (panelVisible) {
-        await expect(instructorArea).toHaveScreenshot('asset-uploader-idle.png', {
-          maxDiffPixels: 200,
-          animations: 'disabled',
-        });
+        await expect(instructorArea).toHaveScreenshot(
+          'asset-uploader-idle.png',
+          {
+            maxDiffPixels: 200,
+            animations: 'disabled',
+          }
+        );
       } else {
         await expect(page).toHaveScreenshot('asset-uploader-idle.png', {
           fullPage: false,
@@ -277,5 +294,4 @@ test.describe('Visual Anchoring — Visual Regression (Part 1)', () => {
       }
     }
   });
-
 });

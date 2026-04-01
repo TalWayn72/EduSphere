@@ -9,7 +9,9 @@ vi.mock('urql', () => ({
 
 import * as urql from 'urql';
 
-const EMPTY_QUERY_RESULT = [{ data: undefined, fetching: false, error: undefined }] as never;
+const EMPTY_QUERY_RESULT = [
+  { data: undefined, fetching: false, error: undefined },
+] as never;
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -34,7 +36,13 @@ describe('CohortInsightsWidget', () => {
   it('renders nothing when no insights available', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
       {
-        data: { cohortInsights: { conceptId: 'concept-001', totalPastDiscussions: 0, insights: [] } },
+        data: {
+          cohortInsights: {
+            conceptId: 'concept-001',
+            totalPastDiscussions: 0,
+            insights: [],
+          },
+        },
         fetching: false,
         error: undefined,
       },
@@ -79,7 +87,9 @@ describe('CohortInsightsWidget', () => {
 
     expect(screen.getByText('Past Cohort Insights')).toBeInTheDocument();
     expect(screen.getByText('12 discussions')).toBeInTheDocument();
-    expect(screen.getByText('This concept connects to graph traversal.')).toBeInTheDocument();
+    expect(
+      screen.getByText('This concept connects to graph traversal.')
+    ).toBeInTheDocument();
     expect(screen.getByText('Spring 2025 Cohort')).toBeInTheDocument();
   });
 
@@ -120,11 +130,36 @@ describe('CohortInsightsWidget', () => {
             conceptId: 'concept-001',
             totalPastDiscussions: 5,
             insights: [
-              { annotationId: 'a1', content: 'Insight one', authorCohortLabel: 'Cohort A', relevanceScore: 1 },
-              { annotationId: 'a2', content: 'Insight two', authorCohortLabel: 'Cohort B', relevanceScore: 0.9 },
-              { annotationId: 'a3', content: 'Insight three', authorCohortLabel: 'Cohort C', relevanceScore: 0.8 },
-              { annotationId: 'a4', content: 'Insight four', authorCohortLabel: 'Cohort D', relevanceScore: 0.7 },
-              { annotationId: 'a5', content: 'Insight five', authorCohortLabel: 'Cohort E', relevanceScore: 0.6 },
+              {
+                annotationId: 'a1',
+                content: 'Insight one',
+                authorCohortLabel: 'Cohort A',
+                relevanceScore: 1,
+              },
+              {
+                annotationId: 'a2',
+                content: 'Insight two',
+                authorCohortLabel: 'Cohort B',
+                relevanceScore: 0.9,
+              },
+              {
+                annotationId: 'a3',
+                content: 'Insight three',
+                authorCohortLabel: 'Cohort C',
+                relevanceScore: 0.8,
+              },
+              {
+                annotationId: 'a4',
+                content: 'Insight four',
+                authorCohortLabel: 'Cohort D',
+                relevanceScore: 0.7,
+              },
+              {
+                annotationId: 'a5',
+                content: 'Insight five',
+                authorCohortLabel: 'Cohort E',
+                relevanceScore: 0.6,
+              },
             ],
           },
         },

@@ -59,7 +59,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getTotalEnrollments(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toBe(42);
     });
@@ -69,7 +72,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getTotalEnrollments(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toBe(0);
     });
@@ -79,7 +85,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getTotalEnrollments(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toBe(0);
     });
@@ -94,7 +103,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getActiveLearnersTrend(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({ date: '2026-01-05', value: 15 });
@@ -105,7 +117,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getActiveLearnersTrend(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toEqual([]);
     });
@@ -119,7 +134,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getCompletionRateTrend(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result[0]?.value).toBe(75);
     });
@@ -131,7 +149,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getCompletionRateTrend(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result[0]?.value).toBe(0);
     });
@@ -143,17 +164,25 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getAvgLearningVelocity(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toBe(3.5);
     });
 
     it('returns 0 when table not available (error)', async () => {
       const { withTenantContext } = await import('@edusphere/db');
-      (withTenantContext as any).mockRejectedValueOnce(new Error('relation does not exist'));
+      (withTenantContext as any).mockRejectedValueOnce(
+        new Error('relation does not exist')
+      );
 
       const result = await service.getAvgLearningVelocity(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toBe(0);
     });
@@ -168,7 +197,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getTopCourses(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       // Sorted by enrollmentCount desc
       expect(result[0]?.courseId).toBe('c2');
@@ -181,7 +213,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getTopCourses(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toEqual([]);
     });
@@ -196,7 +231,10 @@ describe('TenantAnalyticsAggregationService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const result = await service.getTopCourses(
-        mockDb, TENANT_ID, USER_ID, CUTOFF,
+        mockDb,
+        TENANT_ID,
+        USER_ID,
+        CUTOFF
       );
       expect(result).toHaveLength(10);
     });

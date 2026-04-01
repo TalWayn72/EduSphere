@@ -56,12 +56,12 @@ function buildReason(
   hasGapMatch: boolean,
   freshnessScore: number,
   tags: string[],
-  skillGaps: Array<{ conceptName: string; level: string }>,
+  skillGaps: Array<{ conceptName: string; level: string }>
 ): string {
   // Gap match takes priority — any tag overlap with user gaps triggers gap reason
   if (hasGapMatch) {
     const topGap = skillGaps.find((g) =>
-      tags.some((t) => t.toLowerCase() === g.conceptName.toLowerCase()),
+      tags.some((t) => t.toLowerCase() === g.conceptName.toLowerCase())
     );
     return topGap
       ? `Based on your gap in ${topGap.conceptName}`
@@ -75,21 +75,29 @@ function scoreCandidates(
   candidates: CourseCandidate[],
   skillGaps: Array<{ conceptName: string; level: string }>,
   lessonsPerWeek: number,
-  enrolledIds: Set<string>,
+  enrolledIds: Set<string>
 ): RecommendedCourseDto[] {
   if (candidates.length === 0) return [];
 
-  const maxEnrollment = Math.max(...candidates.map((c) => c.enrollmentCount), 1);
+  const maxEnrollment = Math.max(
+    ...candidates.map((c) => c.enrollmentCount),
+    1
+  );
   const freshnessCutoff = new Date(Date.now() - THIRTY_DAYS_MS);
-  const gapConceptNames = new Set(skillGaps.map((g) => g.conceptName.toLowerCase()));
+  const gapConceptNames = new Set(
+    skillGaps.map((g) => g.conceptName.toLowerCase())
+  );
   const velocityBoost = Math.min(lessonsPerWeek / 10, MAX_VELOCITY_BOOST);
 
   return candidates
     .filter((c) => !enrolledIds.has(c.courseId))
     .map((c) => {
-      const tagOverlap = c.tags.filter((t) => gapConceptNames.has(t.toLowerCase())).length;
+      const tagOverlap = c.tags.filter((t) =>
+        gapConceptNames.has(t.toLowerCase())
+      ).length;
       const gapScore =
-        Math.min(tagOverlap / Math.max(gapConceptNames.size, 1), 1.0) * GAP_WEIGHT;
+        Math.min(tagOverlap / Math.max(gapConceptNames.size, 1), 1.0) *
+        GAP_WEIGHT;
       const freshnessScore = c.addedAt > freshnessCutoff ? FRESHNESS_BOOST : 0;
       const collabScore = (c.enrollmentCount / maxEnrollment) * COLLAB_WEIGHT;
       const score = gapScore + freshnessScore + collabScore + velocityBoost;
@@ -123,7 +131,7 @@ export class RecommendedCoursesService implements OnModuleDestroy {
   async getRecommendedCourses(
     userId: string,
     tenantId: string,
-    limit = 5,
+    limit = 5
   ): Promise<RecommendedCourseDto[]> {
     const safeLimit = Math.min(limit, 20);
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
@@ -193,7 +201,7 @@ export class RecommendedCoursesService implements OnModuleDestroy {
         (r) => ({
           conceptName: r.concept_name ?? r.concept_id,
           level: r.mastery_level as 'NONE' | 'ATTEMPTED' | 'FAMILIAR',
-        }),
+        })
       );
 
       const velocityResult = velocityRows.rows as unknown as RawVelocityRow[];
@@ -203,8 +211,8 @@ export class RecommendedCoursesService implements OnModuleDestroy {
 
       const enrolledIds = new Set<string>(
         (enrolledRows.rows as unknown as Array<{ course_id: string }>).map(
-          (r) => r.course_id,
-        ),
+          (r) => r.course_id
+        )
       );
 
       const candidates: CourseCandidate[] = (
@@ -218,7 +226,12 @@ export class RecommendedCoursesService implements OnModuleDestroy {
         addedAt: r.added_at ? new Date(r.added_at) : new Date(0),
       }));
 
-      const scored = scoreCandidates(candidates, skillGaps, lessonsPerWeek, enrolledIds);
+      const scored = scoreCandidates(
+        candidates,
+        skillGaps,
+        lessonsPerWeek,
+        enrolledIds
+      );
       const results = scored.slice(0, safeLimit);
 
       this.logger.debug(
@@ -228,9 +241,10 @@ export class RecommendedCoursesService implements OnModuleDestroy {
           count: results.length,
           gapCount: skillGaps.length,
           lessonsPerWeek,
-          source: skillGaps.length > 0 ? 'multi-signal-scorer' : 'trending-fallback',
+          source:
+            skillGaps.length > 0 ? 'multi-signal-scorer' : 'trending-fallback',
         },
-        'recommendedCourses fetched',
+        'recommendedCourses fetched'
       );
 
       return results;

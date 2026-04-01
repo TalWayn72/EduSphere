@@ -64,7 +64,8 @@ export const NoMetadata: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Falls back to "Course Certificate" when metadata.courseName is absent.',
+        story:
+          'Falls back to "Course Certificate" when metadata.courseName is absent.',
       },
     },
   },

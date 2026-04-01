@@ -19,15 +19,16 @@ import path from 'node:path';
 // ---------------------------------------------------------------------------
 const viteConfigSource = fs.readFileSync(
   path.resolve(__dirname, '../../vite.config.ts'),
-  'utf-8',
+  'utf-8'
 );
 
 function extractManualChunks(): (id: string) => string | undefined {
   // Grab the function body between `manualChunks(id) {` and its closing `},`
   const fnMatch = viteConfigSource.match(
-    /manualChunks\(id\)\s*\{([\s\S]*?)\n {8}\}/,
+    /manualChunks\(id\)\s*\{([\s\S]*?)\n {8}\}/
   );
-  if (!fnMatch) throw new Error('Could not extract manualChunks from vite.config.ts');
+  if (!fnMatch)
+    throw new Error('Could not extract manualChunks from vite.config.ts');
 
   const fnBody = fnMatch[1];
   return new Function('id', fnBody) as (id: string) => string | undefined;
@@ -42,19 +43,22 @@ const manualChunks = extractManualChunks();
 describe('vite manualChunks — vendor-collab before vendor-tiptap', () => {
   describe('collaboration packages route to vendor-collab', () => {
     const collabCases: [string, string][] = [
-      ['@tiptap/extension-collaboration', 'node_modules/@tiptap/extension-collaboration/dist/index.js'],
+      [
+        '@tiptap/extension-collaboration',
+        'node_modules/@tiptap/extension-collaboration/dist/index.js',
+      ],
       ['@tiptap/y-tiptap', 'node_modules/@tiptap/y-tiptap/dist/index.js'],
       ['yjs', 'node_modules/yjs/dist/yjs.mjs'],
       ['lib0', 'node_modules/lib0/dist/index.js'],
-      ['@hocuspocus/provider', 'node_modules/@hocuspocus/provider/dist/index.js'],
+      [
+        '@hocuspocus/provider',
+        'node_modules/@hocuspocus/provider/dist/index.js',
+      ],
     ];
 
-    it.each(collabCases)(
-      '%s -> vendor-collab',
-      (_label, id) => {
-        expect(manualChunks(id)).toBe('vendor-collab');
-      },
-    );
+    it.each(collabCases)('%s -> vendor-collab', (_label, id) => {
+      expect(manualChunks(id)).toBe('vendor-collab');
+    });
   });
 
   describe('general tiptap/prosemirror packages route to vendor-tiptap (NOT vendor-collab)', () => {
@@ -64,12 +68,9 @@ describe('vite manualChunks — vendor-collab before vendor-tiptap', () => {
       ['prosemirror-state', 'node_modules/prosemirror-state/dist/index.js'],
     ];
 
-    it.each(tiptapCases)(
-      '%s -> vendor-tiptap',
-      (_label, id) => {
-        expect(manualChunks(id)).toBe('vendor-tiptap');
-      },
-    );
+    it.each(tiptapCases)('%s -> vendor-tiptap', (_label, id) => {
+      expect(manualChunks(id)).toBe('vendor-tiptap');
+    });
   });
 
   it('vendor-collab rule appears BEFORE vendor-tiptap rule in source order', () => {
@@ -82,7 +83,7 @@ describe('vite manualChunks — vendor-collab before vendor-tiptap', () => {
 
   it('source contains the explanatory comment about ordering', () => {
     expect(viteConfigSource).toContain(
-      'MUST be checked BEFORE general @tiptap/ rule',
+      'MUST be checked BEFORE general @tiptap/ rule'
     );
   });
 });

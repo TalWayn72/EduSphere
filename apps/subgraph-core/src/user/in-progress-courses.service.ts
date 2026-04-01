@@ -75,8 +75,7 @@ export class InProgressCoursesService implements OnModuleDestroy {
       const result = (rows.rows as unknown as RawInProgressRow[]).map((row) => {
         const completed = Number(row.completed_items ?? 0);
         const total = Number(row.total_items ?? 0);
-        const progress =
-          total > 0 ? Math.round((completed / total) * 100) : 0;
+        const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
         return {
           id: row.id,

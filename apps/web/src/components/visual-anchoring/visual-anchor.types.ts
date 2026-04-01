@@ -7,7 +7,11 @@ export interface VisualAsset {
   storageUrl: string;
   webpUrl?: string | null;
   scanStatus: 'PENDING' | 'SCANNING' | 'CLEAN' | 'INFECTED' | 'ERROR';
-  metadata: { width?: number | null; height?: number | null; altText?: string | null };
+  metadata: {
+    width?: number | null;
+    height?: number | null;
+    altText?: string | null;
+  };
   createdAt: string;
 }
 
@@ -41,4 +45,10 @@ export interface SelectionInfo {
   containerRect: DOMRect;
 }
 
-export type UploadStatus = 'idle' | 'uploading' | 'scanning' | 'success' | 'infected' | 'error';
+export type UploadStatus =
+  | 'idle'
+  | 'uploading'
+  | 'scanning'
+  | 'success'
+  | 'infected'
+  | 'error';

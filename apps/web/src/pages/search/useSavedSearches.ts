@@ -13,7 +13,9 @@ export function useSavedSearches(query: string) {
 
   // Mounted guard
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data: savedSearchesData }, refetchSavedSearches] = useQuery({
     query: SAVED_SEARCHES_QUERY,
@@ -21,8 +23,12 @@ export function useSavedSearches(query: string) {
     requestPolicy: 'network-only',
   });
 
-  const [, createSavedSearchMutation] = useMutation(CREATE_SAVED_SEARCH_MUTATION);
-  const [, deleteSavedSearchMutation] = useMutation(DELETE_SAVED_SEARCH_MUTATION);
+  const [, createSavedSearchMutation] = useMutation(
+    CREATE_SAVED_SEARCH_MUTATION
+  );
+  const [, deleteSavedSearchMutation] = useMutation(
+    DELETE_SAVED_SEARCH_MUTATION
+  );
 
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [savedSearchName, setSavedSearchName] = useState('');
@@ -31,7 +37,8 @@ export function useSavedSearches(query: string) {
   const [showSavedPanel, setShowSavedPanel] = useState(false);
 
   const savedSearches: SavedSearch[] =
-    (savedSearchesData as { savedSearches?: SavedSearch[] })?.savedSearches ?? [];
+    (savedSearchesData as { savedSearches?: SavedSearch[] })?.savedSearches ??
+    [];
 
   const handleSaveSearch = async () => {
     if (!savedSearchName.trim() || !query.trim()) return;

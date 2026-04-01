@@ -68,7 +68,9 @@ export function CourseEditPage() {
   // Mounted guard: prevent urql cache dispatch during sibling route render
   // (CourseDetailPage / CourseEditPage / CourseAnalyticsPage share /courses/:courseId).
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching, error }, refetch] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,
@@ -127,7 +129,9 @@ export function CourseEditPage() {
       const { error: err } = await executeUnpublish({ id: courseId });
       if (err) {
         showToast(
-          t('failedToUnpublish', { message: err.graphQLErrors?.[0]?.message ?? err.message })
+          t('failedToUnpublish', {
+            message: err.graphQLErrors?.[0]?.message ?? err.message,
+          })
         );
       } else {
         setPublished(false);
@@ -137,7 +141,9 @@ export function CourseEditPage() {
       const { error: err } = await executePublish({ id: courseId });
       if (err) {
         showToast(
-          t('failedToPublish', { message: err.graphQLErrors?.[0]?.message ?? err.message })
+          t('failedToPublish', {
+            message: err.graphQLErrors?.[0]?.message ?? err.message,
+          })
         );
       } else {
         setPublished(true);
@@ -213,10 +219,15 @@ export function CourseEditPage() {
               courseId={courseId}
               courseTitle={course.title}
               isPublished={isCurrentlyPublished}
-              onDeleted={() => navigate('/courses', {
-                replace: true,
-                state: { deleted: true, message: t('courseDeletedSuccess', { title: course.title }) },
-              })}
+              onDeleted={() =>
+                navigate('/courses', {
+                  replace: true,
+                  state: {
+                    deleted: true,
+                    message: t('courseDeletedSuccess', { title: course.title }),
+                  },
+                })
+              }
             />
             <Button
               variant="outline"

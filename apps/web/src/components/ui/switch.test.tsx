@@ -12,7 +12,10 @@ describe('Switch', () => {
   it('is unchecked by default (no aria-checked when undefined)', () => {
     render(<Switch />);
     // When checked prop is undefined, aria-checked is not set
-    expect(screen.getByRole('switch')).not.toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('switch')).not.toHaveAttribute(
+      'aria-checked',
+      'true'
+    );
   });
 
   it('shows checked state via aria-checked', () => {

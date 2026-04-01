@@ -154,14 +154,38 @@ export const LANDING_FOOTER_LINKS = [
   // Product column
   { text: 'Features', href: '#features', column: 'Product' },
   { text: 'Pricing', href: '#pricing', column: 'Product' },
-  { text: 'AI Course Builder', href: '/features/ai-course-builder', column: 'Product' },
-  { text: 'Visual Anchoring', href: '/features/visual-anchoring', column: 'Product' },
-  { text: 'Knowledge Graph', href: '/features/knowledge-graph', column: 'Product' },
+  {
+    text: 'AI Course Builder',
+    href: '/features/ai-course-builder',
+    column: 'Product',
+  },
+  {
+    text: 'Visual Anchoring',
+    href: '/features/visual-anchoring',
+    column: 'Product',
+  },
+  {
+    text: 'Knowledge Graph',
+    href: '/features/knowledge-graph',
+    column: 'Product',
+  },
   // Solutions column
-  { text: 'Universities', href: '/solutions/universities', column: 'Solutions' },
+  {
+    text: 'Universities',
+    href: '/solutions/universities',
+    column: 'Solutions',
+  },
   { text: 'Enterprises', href: '/solutions/enterprises', column: 'Solutions' },
-  { text: 'Government & Defense', href: '/solutions/government', column: 'Solutions' },
-  { text: 'Training Companies', href: '/solutions/training', column: 'Solutions' },
+  {
+    text: 'Government & Defense',
+    href: '/solutions/government',
+    column: 'Solutions',
+  },
+  {
+    text: 'Training Companies',
+    href: '/solutions/training',
+    column: 'Solutions',
+  },
   // Compliance column
   { text: 'FERPA', href: '/compliance#ferpa', column: 'Compliance' },
   { text: 'WCAG 2.2 AA', href: '/compliance#wcag', column: 'Compliance' },
@@ -176,7 +200,11 @@ export const LANDING_FOOTER_LINKS = [
   { text: 'Contact', href: '/contact', column: 'Company' },
   { text: 'Privacy Policy', href: '/privacy', column: 'Company' },
   { text: 'Terms', href: '/terms', column: 'Company' },
-  { text: 'Accessibility Statement', href: '/accessibility', column: 'Company' },
+  {
+    text: 'Accessibility Statement',
+    href: '/accessibility',
+    column: 'Company',
+  },
 ];
 
 export const ALL_ANCHOR_LINKS = [

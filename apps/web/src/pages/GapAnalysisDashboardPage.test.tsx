@@ -11,7 +11,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -29,7 +31,12 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 const MOCK_PROFILES = [
-  { id: 'role-1', roleName: 'Data Scientist', description: null, requiredConceptsCount: 5 },
+  {
+    id: 'role-1',
+    roleName: 'Data Scientist',
+    description: null,
+    requiredConceptsCount: 5,
+  },
 ];
 
 const MOCK_REPORT = {
@@ -40,9 +47,27 @@ const MOCK_REPORT = {
   gapCount: 3,
   completionPercentage: 40,
   gaps: [
-    { conceptName: 'Advanced GraphRAG', isMastered: false, recommendedContentItems: ['c1'], recommendedContentTitles: ['GraphRAG Fundamentals'], relevanceScore: 0.9 },
-    { conceptName: 'Knowledge Graph Design', isMastered: false, recommendedContentItems: ['c2'], recommendedContentTitles: ['Workshop session'], relevanceScore: 0.6 },
-    { conceptName: 'Vector Embeddings', isMastered: false, recommendedContentItems: ['c3'], recommendedContentTitles: ['Linear Algebra prerequisite'], relevanceScore: 0.95 },
+    {
+      conceptName: 'Advanced GraphRAG',
+      isMastered: false,
+      recommendedContentItems: ['c1'],
+      recommendedContentTitles: ['GraphRAG Fundamentals'],
+      relevanceScore: 0.9,
+    },
+    {
+      conceptName: 'Knowledge Graph Design',
+      isMastered: false,
+      recommendedContentItems: ['c2'],
+      recommendedContentTitles: ['Workshop session'],
+      relevanceScore: 0.6,
+    },
+    {
+      conceptName: 'Vector Embeddings',
+      isMastered: false,
+      recommendedContentItems: ['c3'],
+      recommendedContentTitles: ['Linear Algebra prerequisite'],
+      relevanceScore: 0.95,
+    },
   ],
 };
 
@@ -56,9 +81,15 @@ vi.mock('urql', async (importOriginal) => {
     useQuery: vi.fn(() => {
       queryCallCount++;
       if (queryCallCount % 2 === 1) {
-        return [{ fetching: false, data: { skillProfiles: MOCK_PROFILES } }, vi.fn()];
+        return [
+          { fetching: false, data: { skillProfiles: MOCK_PROFILES } },
+          vi.fn(),
+        ];
       }
-      return [{ fetching: false, data: { skillGapReport: MOCK_REPORT } }, vi.fn()];
+      return [
+        { fetching: false, data: { skillGapReport: MOCK_REPORT } },
+        vi.fn(),
+      ];
     }),
   };
 });

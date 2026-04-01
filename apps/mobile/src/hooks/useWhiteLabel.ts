@@ -5,7 +5,10 @@
  * Pure logic — no React Native UI dependencies.
  */
 import { useMemo } from 'react';
-import { useMobileTheme, type MobileBrandingData } from '../providers/MobileThemeProvider';
+import {
+  useMobileTheme,
+  type MobileBrandingData,
+} from '../providers/MobileThemeProvider';
 
 export interface WhiteLabelConfig {
   /** Current branding data */
@@ -68,7 +71,7 @@ export function contrastColor(bgHex: string): string {
 
 /** Build splash screen config from branding data. */
 export function buildSplashConfig(
-  branding: MobileBrandingData,
+  branding: MobileBrandingData
 ): SplashScreenConfig {
   return {
     backgroundColor: branding.primaryColor,
@@ -112,23 +115,14 @@ export function useWhiteLabel(): WhiteLabelConfig {
     () =>
       branding.organizationName !== DEFAULT_ORG_NAME ||
       branding.primaryColor !== DEFAULT_PRIMARY,
-    [branding.organizationName, branding.primaryColor],
+    [branding.organizationName, branding.primaryColor]
   );
 
-  const splashConfig = useMemo(
-    () => buildSplashConfig(branding),
-    [branding],
-  );
+  const splashConfig = useMemo(() => buildSplashConfig(branding), [branding]);
 
-  const navBarStyle = useMemo(
-    () => buildNavBarStyle(branding),
-    [branding],
-  );
+  const navBarStyle = useMemo(() => buildNavBarStyle(branding), [branding]);
 
-  const appBarStyle = useMemo(
-    () => buildAppBarStyle(branding),
-    [branding],
-  );
+  const appBarStyle = useMemo(() => buildAppBarStyle(branding), [branding]);
 
   return {
     branding,

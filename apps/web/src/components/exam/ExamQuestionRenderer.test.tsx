@@ -19,7 +19,7 @@ vi.mock('@/components/quiz/MultipleChoiceQuestion', () => ({
       <div data-testid="mc-question">
         <button onClick={() => onChange(['opt-a'])}>Pick A</button>
       </div>
-    ),
+    )
   ),
 }));
 
@@ -69,7 +69,7 @@ describe('ExamQuestionRenderer', () => {
         onAnswer={vi.fn()}
         flagged={false}
         onToggleFlag={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByTestId('mc-question')).toBeInTheDocument();
   });
@@ -84,7 +84,7 @@ describe('ExamQuestionRenderer', () => {
         onAnswer={vi.fn()}
         flagged={false}
         onToggleFlag={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('Question 3 of 10')).toBeInTheDocument();
   });
@@ -99,7 +99,7 @@ describe('ExamQuestionRenderer', () => {
         onAnswer={vi.fn()}
         flagged={false}
         onToggleFlag={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('Flag for Review')).toBeInTheDocument();
   });
@@ -114,7 +114,7 @@ describe('ExamQuestionRenderer', () => {
         onAnswer={vi.fn()}
         flagged={true}
         onToggleFlag={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('Flagged')).toBeInTheDocument();
   });
@@ -130,7 +130,7 @@ describe('ExamQuestionRenderer', () => {
         onAnswer={vi.fn()}
         flagged={false}
         onToggleFlag={onToggleFlag}
-      />,
+      />
     );
     fireEvent.click(screen.getByText('Flag for Review'));
     expect(onToggleFlag).toHaveBeenCalledTimes(1);
@@ -147,7 +147,7 @@ describe('ExamQuestionRenderer', () => {
         onAnswer={onAnswer}
         flagged={false}
         onToggleFlag={vi.fn()}
-      />,
+      />
     );
     fireEvent.click(screen.getByText('Pick A'));
     expect(onAnswer).toHaveBeenCalledWith(['opt-a']);

@@ -12,8 +12,14 @@ import { gql, useMutation } from 'urql';
 import { subscribeWebPush, unsubscribeWebPush } from '@/lib/webPush';
 
 const REGISTER_PUSH_TOKEN_MUTATION = gql`
-  mutation RegisterPushToken($platform: PushPlatform!, $webPushSubscription: String) {
-    registerPushToken(platform: $platform, webPushSubscription: $webPushSubscription) {
+  mutation RegisterPushToken(
+    $platform: PushPlatform!
+    $webPushSubscription: String
+  ) {
+    registerPushToken(
+      platform: $platform
+      webPushSubscription: $webPushSubscription
+    ) {
       id
       platform
       createdAt
@@ -63,7 +69,10 @@ export function usePushNotifications(): PushNotificationsState {
     try {
       const subscriptionJson = await subscribeWebPush();
       if (subscriptionJson) {
-        await registerToken({ platform: 'WEB', webPushSubscription: subscriptionJson });
+        await registerToken({
+          platform: 'WEB',
+          webPushSubscription: subscriptionJson,
+        });
         setIsEnabled(true);
       }
     } finally {

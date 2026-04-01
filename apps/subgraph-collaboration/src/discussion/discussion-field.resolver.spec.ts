@@ -37,9 +37,7 @@ describe('DiscussionMessageResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionMessageResolver(
-      new DiscussionService() as never
-    );
+    resolver = new DiscussionMessageResolver(new DiscussionService() as never);
   });
 
   const message = {
@@ -58,7 +56,8 @@ describe('DiscussionMessageResolver', () => {
       const result = await resolver.resolveDiscussion(message, contextWith);
       expect(result).toEqual(disc);
       expect(mockFindDiscussionById).toHaveBeenCalledWith(
-        'disc-1', authContext
+        'disc-1',
+        authContext
       );
     });
 
@@ -80,9 +79,7 @@ describe('DiscussionMessageResolver', () => {
   // ── resolveParentMessage ──────────────────────────────────────────────
   describe('resolveParentMessage', () => {
     it('returns null when no parent', async () => {
-      const result = await resolver.resolveParentMessage(
-        message, contextWith
-      );
+      const result = await resolver.resolveParentMessage(message, contextWith);
       expect(result).toBeNull();
     });
 
@@ -92,12 +89,11 @@ describe('DiscussionMessageResolver', () => {
 
       const msgWithParent = { ...message, parent_message_id: 'parent-1' };
       const result = await resolver.resolveParentMessage(
-        msgWithParent, contextWith
+        msgWithParent,
+        contextWith
       );
       expect(result).toEqual(parent);
-      expect(mockFindMessageById).toHaveBeenCalledWith(
-        'parent-1', authContext
-      );
+      expect(mockFindMessageById).toHaveBeenCalledWith('parent-1', authContext);
     });
 
     it('throws when unauthenticated and parent exists', async () => {
@@ -114,12 +110,13 @@ describe('DiscussionMessageResolver', () => {
       const replies = [{ id: 'reply-1' }];
       mockFindRepliesByParent.mockResolvedValue(replies);
 
-      const result = await resolver.resolveReplies(
-        message, 20, 0, contextWith
-      );
+      const result = await resolver.resolveReplies(message, 20, 0, contextWith);
       expect(result).toEqual(replies);
       expect(mockFindRepliesByParent).toHaveBeenCalledWith(
-        'msg-1', 20, 0, authContext
+        'msg-1',
+        20,
+        0,
+        authContext
       );
     });
 
@@ -167,9 +164,7 @@ describe('DiscussionParticipantResolver', () => {
       const disc = { id: 'disc-1' };
       mockFindDiscussionById.mockResolvedValue(disc);
 
-      const result = await resolver.resolveDiscussion(
-        participant, contextWith
-      );
+      const result = await resolver.resolveDiscussion(participant, contextWith);
       expect(result).toEqual(disc);
     });
 

@@ -29,13 +29,13 @@
 
 ## Design Principles
 
-| Principle | Description |
-|-----------|-------------|
+| Principle                  | Description                                                                       |
+| -------------------------- | --------------------------------------------------------------------------------- |
 | **Progressive Disclosure** | Show only what's needed at each step; advanced options behind expandable sections |
-| **Immediate Feedback** | Real-time validation, live previews, optimistic UI updates |
-| **Minimal Time-to-Value** | Org admin sees branded portal within 5 minutes of signup |
-| **Mobile-First** | All flows usable on mobile; admin tasks optimized for desktop |
-| **Consistency** | Use existing shadcn/ui components; no custom UI unless required |
+| **Immediate Feedback**     | Real-time validation, live previews, optimistic UI updates                        |
+| **Minimal Time-to-Value**  | Org admin sees branded portal within 5 minutes of signup                          |
+| **Mobile-First**           | All flows usable on mobile; admin tasks optimized for desktop                     |
+| **Consistency**            | Use existing shadcn/ui components; no custom UI unless required                   |
 
 ---
 
@@ -132,6 +132,7 @@ States:
 ```
 
 **Interactions:**
+
 - Email: debounced validation (300ms), checks format + availability via API
 - Password: real-time strength meter updates on each keystroke
 - Strength meter colors: red (weak) → orange (fair) → yellow (good) → green (strong)
@@ -192,6 +193,7 @@ States:
 ```
 
 **Interactions:**
+
 - Org name → slug auto-generation: `"Acme Corporation"` → `acme-corporation`
 - Slug: debounced availability check (500ms) via `GET /api/orgs/slug-check/:slug`
 - Slug field editable — user can customize, re-checks availability on change
@@ -201,6 +203,7 @@ States:
 - Country: searchable dropdown with flag emojis, auto-detected from browser locale
 
 **Slug Generation Rules:**
+
 ```
 Input: "Acme Corporation & Partners"
 1. toLowerCase()        → "acme corporation & partners"
@@ -257,6 +260,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Interactions:**
+
 - Logo upload: drag & drop zone, click to open file picker, preview thumbnail after upload
 - Logo validation: max 2MB, accepted formats: PNG, SVG, JPEG; shows error toast if invalid
 - Color presets: 8 curated palettes (Indigo, Emerald, Violet, Rose, Amber, Slate, Brown, Pink)
@@ -338,17 +342,20 @@ Input: "Acme Corporation & Partners"
 | Trial Days (if trial) | Days remaining | Urgency color | `Clock` | Yellow→Red |
 
 **Recent Activity Feed:**
+
 - Max 10 items, newest first
 - Event types: user_joined, course_completed, invitation_pending, badge_earned, course_published, user_removed
 - Each item: colored dot (green=positive, yellow=info, red=alert) + description + relative time
 - "View All" link at bottom → navigates to full activity log
 
 **Quick Actions Grid:**
+
 - 5 action cards, each navigates to respective admin page
 - Icons match sidebar nav for consistency
 - Tooltip on hover shows description
 
 **Sidebar:**
+
 - Collapsible (chevron toggle at bottom)
 - Collapsed state: icons only with tooltips
 - Active item: highlighted background + bold text
@@ -398,6 +405,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Colors Tab:**
+
 ```
 ┌──────────────────────────────────────┐
 │  ── Colors Tab ──                     │
@@ -431,6 +439,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Fonts Tab:**
+
 ```
 ┌───────────────────────────────────────┐
 │  ── Fonts Tab ──                       │
@@ -460,6 +469,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Advanced Tab:**
+
 ```
 ┌───────────────────────────────────────┐
 │  ── Advanced Tab ──                    │
@@ -546,6 +556,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Course Card Anatomy:**
+
 ```
 ┌────────────────────────┐
 │ ┌────────────────────┐ │
@@ -645,6 +656,7 @@ Input: "Acme Corporation & Partners"
 | Action | No | "View" link → user detail page |
 
 **Mobile Layout:**
+
 - KPI cards: 2×2 grid, swipeable
 - Charts: full width, stacked vertically, swipeable between chart types
 - Table: replaced with card list (one card per user), sortable header dropdown
@@ -686,6 +698,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Invitations Tab:**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ── Invitations Tab ──                                                       │
@@ -716,6 +729,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **CSV Import Tab:**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ── CSV Import Tab ──                                                        │
@@ -794,6 +808,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Custom Badges Tab:**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ── Custom Badges Tab ──                                      [Create Badge]│
@@ -812,6 +827,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Badge Editor Modal:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │  Create Custom Badge                    [✕] │
@@ -850,6 +866,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Leaderboard Tab:**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ── Leaderboard Preview ──                                                   │
@@ -909,6 +926,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Key Generation Modal:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │  Generate API Key                       [✕] │
@@ -937,6 +955,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Key Display (shown ONCE after generation):**
+
 ```
 ┌─────────────────────────────────────────────┐
 │  🔑 API Key Generated                  [✕] │
@@ -960,6 +979,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Webhooks Tab:**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ── Webhooks Tab ──                                       [Add Endpoint]    │
@@ -991,6 +1011,7 @@ Input: "Acme Corporation & Partners"
 **Components:** Card, Progress (ring), Button, Checkbox
 
 ### Collapsed State
+
 ```
                                     ┌──────────────────────┐
                                     │  ◔ 3/6   Setup Guide │
@@ -998,6 +1019,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 ### Expanded State
+
 ```
                         ┌─────────────────────────────────────────┐
                         │  Setup Guide                     [─ ✕] │
@@ -1041,6 +1063,7 @@ Input: "Acme Corporation & Partners"
 | Set Up Billing | `/admin/billing` | `org.subscription IS NOT NULL` |
 
 **Behavior:**
+
 - Widget persists across all admin pages until all 6 steps complete
 - Clicking a pending step navigates to the relevant admin page
 - Steps auto-check when the corresponding action is completed
@@ -1057,6 +1080,7 @@ Input: "Acme Corporation & Partners"
 ### States by Time Remaining
 
 **7+ days (informational — blue):**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ ℹ  14 days remaining in your free trial.  [Explore Plans]           [✕]     │
@@ -1064,6 +1088,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **3-7 days (warning — yellow/amber):**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ ⚠  5 days remaining in your free trial. Upgrade to keep your data & users. │
@@ -1072,6 +1097,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **<3 days (urgent — red):**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ 🔴 Your trial expires in 2 days! Your org data will be archived.            │
@@ -1080,6 +1106,7 @@ Input: "Acme Corporation & Partners"
 ```
 
 **Expired (critical — dark red, non-dismissible):**
+
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ ⛔ Your trial has expired. Your organization is in read-only mode.           │
@@ -1101,17 +1128,18 @@ Input: "Acme Corporation & Partners"
 
 ### Global Patterns
 
-| Pattern | Implementation |
-|---------|---------------|
-| Skip to main content | Hidden link, first focusable element, visible on focus |
-| Focus indicators | 2px solid outline, offset 2px, primary color, visible on all interactive elements |
-| Focus trap | Dialogs/modals trap focus; Escape closes |
-| Live regions | Toast notifications use `role="status" aria-live="polite"` |
-| Error announcements | Form errors use `aria-describedby` linked to error message, `aria-invalid="true"` |
+| Pattern              | Implementation                                                                    |
+| -------------------- | --------------------------------------------------------------------------------- |
+| Skip to main content | Hidden link, first focusable element, visible on focus                            |
+| Focus indicators     | 2px solid outline, offset 2px, primary color, visible on all interactive elements |
+| Focus trap           | Dialogs/modals trap focus; Escape closes                                          |
+| Live regions         | Toast notifications use `role="status" aria-live="polite"`                        |
+| Error announcements  | Form errors use `aria-describedby` linked to error message, `aria-invalid="true"` |
 
 ### Per-Page Keyboard Navigation
 
 **Signup Wizard:**
+
 ```
 Tab Order: Name → Email → Password → Show/Hide toggle → ToS checkbox → GDPR checkbox → Next button → Social login buttons
 - Enter on "Next" submits step
@@ -1121,6 +1149,7 @@ Tab Order: Name → Email → Password → Show/Hide toggle → ToS checkbox →
 ```
 
 **Admin Dashboard:**
+
 ```
 Tab Order: Skip link → Sidebar items (top to bottom) → KPI cards (left to right) → Activity feed items → Quick action buttons
 - Sidebar: Arrow keys navigate items, Enter activates
@@ -1129,6 +1158,7 @@ Tab Order: Skip link → Sidebar items (top to bottom) → KPI cards (left to ri
 ```
 
 **Branding Editor:**
+
 ```
 Tab Order: Tab bar → Config panel fields → Preview device toggle → Save → Reset
 - Color picker: aria-label="Primary color picker", value announced as hex
@@ -1137,6 +1167,7 @@ Tab Order: Tab bar → Config panel fields → Preview device toggle → Save �
 ```
 
 **Team Management:**
+
 ```
 Tab Order: Tab bar → Search field → Table headers (sortable) → Table rows → Pagination
 - Sortable columns: aria-sort="ascending|descending|none"
@@ -1146,6 +1177,7 @@ Tab Order: Tab bar → Search field → Table headers (sortable) → Table rows 
 ```
 
 **Analytics Dashboard:**
+
 ```
 Tab Order: Date range → Department filter → Export buttons → KPI cards → Charts → Table
 - Charts: aria-label with summary text (e.g., "Completion trend chart showing 73% average over 6 weeks")
@@ -1154,27 +1186,27 @@ Tab Order: Date range → Department filter → Export buttons → KPI cards →
 
 ### Color Contrast Requirements
 
-| Element | Foreground | Background | Ratio | Passes |
-|---------|-----------|------------|-------|--------|
-| Body text | `#1E293B` (slate-800) | `#FFFFFF` | 12.6:1 | AAA |
-| Primary button text | `#FFFFFF` | `#4F46E5` (indigo) | 7.2:1 | AAA |
-| Secondary text | `#64748B` (slate-500) | `#FFFFFF` | 4.6:1 | AA |
-| Error text | `#DC2626` (red-600) | `#FFFFFF` | 4.6:1 | AA |
-| Success text | `#059669` (emerald-600) | `#FFFFFF` | 4.8:1 | AA |
-| Disabled text | `#94A3B8` (slate-400) | `#FFFFFF` | 3.0:1 | Fail → use `#64748B` |
+| Element             | Foreground              | Background         | Ratio  | Passes               |
+| ------------------- | ----------------------- | ------------------ | ------ | -------------------- |
+| Body text           | `#1E293B` (slate-800)   | `#FFFFFF`          | 12.6:1 | AAA                  |
+| Primary button text | `#FFFFFF`               | `#4F46E5` (indigo) | 7.2:1  | AAA                  |
+| Secondary text      | `#64748B` (slate-500)   | `#FFFFFF`          | 4.6:1  | AA                   |
+| Error text          | `#DC2626` (red-600)     | `#FFFFFF`          | 4.6:1  | AA                   |
+| Success text        | `#059669` (emerald-600) | `#FFFFFF`          | 4.8:1  | AA                   |
+| Disabled text       | `#94A3B8` (slate-400)   | `#FFFFFF`          | 3.0:1  | Fail → use `#64748B` |
 
 ### Screen Reader Labels
 
-| Element | aria-label / aria-labelledby |
-|---------|------------------------------|
-| Sidebar toggle | "Toggle navigation sidebar" |
-| Notification bell | "Notifications, 3 unread" |
-| KPI card | "Active learners: 127, up 12 percent from last period" |
-| Star rating | "Rating: 4.2 out of 5 stars, based on 1247 reviews" |
-| Progress bar | "Course completion: 73 percent" |
-| Trial banner | "Trial notification: 14 days remaining" |
-| Onboarding widget | "Setup guide: 3 of 6 steps complete" |
-| Color swatch | "Color preset: Indigo, hex 4F46E5" |
+| Element           | aria-label / aria-labelledby                           |
+| ----------------- | ------------------------------------------------------ |
+| Sidebar toggle    | "Toggle navigation sidebar"                            |
+| Notification bell | "Notifications, 3 unread"                              |
+| KPI card          | "Active learners: 127, up 12 percent from last period" |
+| Star rating       | "Rating: 4.2 out of 5 stars, based on 1247 reviews"    |
+| Progress bar      | "Course completion: 73 percent"                        |
+| Trial banner      | "Trial notification: 14 days remaining"                |
+| Onboarding widget | "Setup guide: 3 of 6 steps complete"                   |
+| Color swatch      | "Color preset: Indigo, hex 4F46E5"                     |
 
 ---
 
@@ -1182,11 +1214,11 @@ Tab Order: Date range → Department filter → Export buttons → KPI cards →
 
 ### Breakpoint Definitions
 
-| Name | Range | Layout Strategy |
-|------|-------|-----------------|
-| Desktop | ≥1024px | Sidebar + content + preview (3-column where applicable) |
-| Tablet | 768–1023px | Collapsible sidebar, stacked preview below config |
-| Mobile | <768px | Bottom tab nav, single column, swipeable cards |
+| Name    | Range      | Layout Strategy                                         |
+| ------- | ---------- | ------------------------------------------------------- |
+| Desktop | ≥1024px    | Sidebar + content + preview (3-column where applicable) |
+| Tablet  | 768–1023px | Collapsible sidebar, stacked preview below config       |
+| Mobile  | <768px     | Bottom tab nav, single column, swipeable cards          |
 
 ### Per-Page Responsive Behavior
 
@@ -1242,28 +1274,29 @@ All UI text uses i18n keys from a dedicated namespace. No hardcoded strings anyw
 
 **New namespace:** `orgOnboarding`
 
-| Key Pattern | Example | Usage |
-|-------------|---------|-------|
-| `orgOnboarding.signup.step1.title` | "Create Your Account" | Step 1 heading |
-| `orgOnboarding.signup.step2.slugAvailable` | "Available" | Slug check result |
-| `orgOnboarding.dashboard.kpi.activeLearners` | "Active Learners" | KPI card title |
-| `orgOnboarding.team.invite.sendButton` | "Send Invitation" | Button text |
-| `orgOnboarding.trial.daysRemaining` | "{{count}} days remaining in your free trial" | Pluralized trial banner |
-| `orgOnboarding.branding.colors.primary` | "Primary Color" | Color picker label |
+| Key Pattern                                  | Example                                       | Usage                   |
+| -------------------------------------------- | --------------------------------------------- | ----------------------- |
+| `orgOnboarding.signup.step1.title`           | "Create Your Account"                         | Step 1 heading          |
+| `orgOnboarding.signup.step2.slugAvailable`   | "Available"                                   | Slug check result       |
+| `orgOnboarding.dashboard.kpi.activeLearners` | "Active Learners"                             | KPI card title          |
+| `orgOnboarding.team.invite.sendButton`       | "Send Invitation"                             | Button text             |
+| `orgOnboarding.trial.daysRemaining`          | "{{count}} days remaining in your free trial" | Pluralized trial banner |
+| `orgOnboarding.branding.colors.primary`      | "Primary Color"                               | Color picker label      |
 
 ### RTL Layout Support (Hebrew)
 
-| Element | LTR (English) | RTL (Hebrew) |
-|---------|---------------|--------------|
-| Sidebar | Left side | Right side |
-| Progress stepper | Left → Right | Right → Left |
-| Text alignment | Left-aligned | Right-aligned |
-| Icons before text | Icon on left | Icon on right |
-| Arrows | → (next) ← (back) | ← (next) → (back) |
-| Charts | Y-axis left | Y-axis right |
-| Tables | Left-aligned columns | Right-aligned columns |
+| Element           | LTR (English)        | RTL (Hebrew)          |
+| ----------------- | -------------------- | --------------------- |
+| Sidebar           | Left side            | Right side            |
+| Progress stepper  | Left → Right         | Right → Left          |
+| Text alignment    | Left-aligned         | Right-aligned         |
+| Icons before text | Icon on left         | Icon on right         |
+| Arrows            | → (next) ← (back)    | ← (next) → (back)     |
+| Charts            | Y-axis left          | Y-axis right          |
+| Tables            | Left-aligned columns | Right-aligned columns |
 
 **Implementation:**
+
 ```
 dir="auto" on root element
 Tailwind: use `rtl:` prefix variants (e.g., `rtl:flex-row-reverse`)
@@ -1272,13 +1305,13 @@ Logical properties: use `ms-*` / `me-*` instead of `ml-*` / `mr-*`
 
 ### Date & Number Formatting
 
-| Locale | Date Format | Number Format | Currency |
-|--------|-------------|---------------|----------|
-| en-US | Mar 22, 2026 | 1,234.56 | $49.00 |
-| he-IL | 22 במרץ 2026 | 1,234.56 | ₪49.00 |
-| es-ES | 22 mar 2026 | 1.234,56 | €49.00 |
-| pt-BR | 22 de mar de 2026 | 1.234,56 | R$49,00 |
-| zh-CN | 2026年3月22日 | 1,234.56 | ¥49.00 |
+| Locale | Date Format       | Number Format | Currency |
+| ------ | ----------------- | ------------- | -------- |
+| en-US  | Mar 22, 2026      | 1,234.56      | $49.00   |
+| he-IL  | 22 במרץ 2026      | 1,234.56      | ₪49.00   |
+| es-ES  | 22 mar 2026       | 1.234,56      | €49.00   |
+| pt-BR  | 22 de mar de 2026 | 1.234,56      | R$49,00  |
+| zh-CN  | 2026年3月22日     | 1,234.56      | ¥49.00   |
 
 **Implementation:** Use `Intl.DateTimeFormat` and `Intl.NumberFormat` with locale from user context. Never format dates/numbers manually.
 
@@ -1288,69 +1321,69 @@ Logical properties: use `ms-*` / `me-*` instead of `ml-*` / `mr-*`
 
 ### Existing shadcn/ui Components Used
 
-| Component | Usage in Feature |
-|-----------|-----------------|
-| `Button` | All CTAs, form submits, nav actions |
-| `Input` | Text fields, search bars, hex color input |
-| `Select` | Dropdowns (industry, country, role, font, etc.) |
-| `Checkbox` | ToS, GDPR, scope selection |
-| `Switch` | Gamification toggle, "Powered by" toggle |
-| `Card` | KPI cards, course cards, badge cards |
-| `Table` | Members, invitations, analytics, API keys |
-| `Tabs` | Branding editor, team management, gamification, API |
-| `Dialog` | Badge editor, key generation, confirmation modals |
-| `Badge` | Role chips, scope chips, status indicators |
-| `Tooltip` | Sidebar collapsed labels, info icons |
-| `DropdownMenu` | User menu, member actions, sort options |
-| `Avatar` | User avatars in tables and activity feed |
-| `Progress` | Trial banner, onboarding checklist, completion bars |
-| `ScrollArea` | Activity feed, long tables |
-| `Alert` | Trial banner, validation errors, info notices |
-| `Separator` | Section dividers |
-| `Textarea` | Custom CSS, badge description |
-| `Skeleton` | Loading states for cards, tables, charts |
-| `Form` | All form layouts (React Hook Form integration) |
-| `Label` | Form field labels (accessible) |
+| Component      | Usage in Feature                                    |
+| -------------- | --------------------------------------------------- |
+| `Button`       | All CTAs, form submits, nav actions                 |
+| `Input`        | Text fields, search bars, hex color input           |
+| `Select`       | Dropdowns (industry, country, role, font, etc.)     |
+| `Checkbox`     | ToS, GDPR, scope selection                          |
+| `Switch`       | Gamification toggle, "Powered by" toggle            |
+| `Card`         | KPI cards, course cards, badge cards                |
+| `Table`        | Members, invitations, analytics, API keys           |
+| `Tabs`         | Branding editor, team management, gamification, API |
+| `Dialog`       | Badge editor, key generation, confirmation modals   |
+| `Badge`        | Role chips, scope chips, status indicators          |
+| `Tooltip`      | Sidebar collapsed labels, info icons                |
+| `DropdownMenu` | User menu, member actions, sort options             |
+| `Avatar`       | User avatars in tables and activity feed            |
+| `Progress`     | Trial banner, onboarding checklist, completion bars |
+| `ScrollArea`   | Activity feed, long tables                          |
+| `Alert`        | Trial banner, validation errors, info notices       |
+| `Separator`    | Section dividers                                    |
+| `Textarea`     | Custom CSS, badge description                       |
+| `Skeleton`     | Loading states for cards, tables, charts            |
+| `Form`         | All form layouts (React Hook Form integration)      |
+| `Label`        | Form field labels (accessible)                      |
 
 ### New Components to Build
 
-| Component | Description | Built With |
-|-----------|-------------|------------|
-| `Stepper` | Horizontal progress stepper (3 steps) | `div` + `Progress` + custom styles |
-| `ColorPicker` | Hex color input + swatch presets | `Input` + `Button` + `Popover` |
-| `FileDropzone` | Drag & drop file upload zone | Native drag events + `Button` fallback |
-| `LivePreview` | Device-framed preview panel | `Card` + responsive iframe or render |
-| `OnboardingWidget` | Floating checklist (collapsed/expanded) | `Card` + `Checkbox` + `Progress` |
-| `TrialBanner` | Top banner with urgency levels | `Alert` variant + `Button` |
-| `StrengthMeter` | Password strength indicator | `Progress` + Zod validation |
-| `SlugInput` | Auto-slug with availability check | `Input` + debounced API call + `Badge` |
+| Component          | Description                             | Built With                             |
+| ------------------ | --------------------------------------- | -------------------------------------- |
+| `Stepper`          | Horizontal progress stepper (3 steps)   | `div` + `Progress` + custom styles     |
+| `ColorPicker`      | Hex color input + swatch presets        | `Input` + `Button` + `Popover`         |
+| `FileDropzone`     | Drag & drop file upload zone            | Native drag events + `Button` fallback |
+| `LivePreview`      | Device-framed preview panel             | `Card` + responsive iframe or render   |
+| `OnboardingWidget` | Floating checklist (collapsed/expanded) | `Card` + `Checkbox` + `Progress`       |
+| `TrialBanner`      | Top banner with urgency levels          | `Alert` variant + `Button`             |
+| `StrengthMeter`    | Password strength indicator             | `Progress` + Zod validation            |
+| `SlugInput`        | Auto-slug with availability check       | `Input` + debounced API call + `Badge` |
 
 ### Chart Components (Recharts)
 
-| Chart | Recharts Components | Data Shape |
-|-------|---------------------|------------|
-| Completion Trend | `LineChart`, `Line`, `XAxis`, `YAxis`, `Tooltip`, `ResponsiveContainer` | `[{ week: 'W1', rate: 45 }, ...]` |
-| Enrollments by Dept | `BarChart`, `Bar`, `XAxis`, `YAxis`, `Tooltip`, `ResponsiveContainer` | `[{ dept: 'Eng', count: 45 }, ...]` |
-| Progress Ring (widget) | Custom SVG circle | `{ completed: 3, total: 6 }` |
+| Chart                  | Recharts Components                                                     | Data Shape                          |
+| ---------------------- | ----------------------------------------------------------------------- | ----------------------------------- |
+| Completion Trend       | `LineChart`, `Line`, `XAxis`, `YAxis`, `Tooltip`, `ResponsiveContainer` | `[{ week: 'W1', rate: 45 }, ...]`   |
+| Enrollments by Dept    | `BarChart`, `Bar`, `XAxis`, `YAxis`, `Tooltip`, `ResponsiveContainer`   | `[{ dept: 'Eng', count: 45 }, ...]` |
+| Progress Ring (widget) | Custom SVG circle                                                       | `{ completed: 3, total: 6 }`        |
 
 ---
 
 ## Competitor Feature Comparison
 
-| Feature | Docebo | TalentLMS | Thinkific | Canvas | Udemy Business | EduSphere |
-|---------|--------|-----------|-----------|--------|----------------|-----------|
-| Self-service signup | ✓ | ✓ | ✓ | ✗ (sales) | ✗ (sales) | ✓ |
-| Live branding preview | ✓ | Basic | ✓ | ✗ | ✗ | ✓ |
-| Custom subdomain | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ |
-| CSV user import | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Onboarding checklist | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
-| API key management | ✓ | Limited | ✓ | ✓ | ✗ | ✓ |
-| Gamification config | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ |
-| Trial with urgency banners | ✓ | ✓ | ✓ | N/A | N/A | ✓ |
-| Content marketplace | ✓ | ✗ | ✗ | ✗ | ✓ | ✓ |
-| Webhook management | ✓ | ✗ | ✓ | ✓ | ✗ | ✓ |
-| RTL / Hebrew support | ✗ | Partial | ✗ | ✗ | ✗ | ✓ |
-| Knowledge graph integration | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
+| Feature                     | Docebo | TalentLMS | Thinkific | Canvas    | Udemy Business | EduSphere |
+| --------------------------- | ------ | --------- | --------- | --------- | -------------- | --------- |
+| Self-service signup         | ✓      | ✓         | ✓         | ✗ (sales) | ✗ (sales)      | ✓         |
+| Live branding preview       | ✓      | Basic     | ✓         | ✗         | ✗              | ✓         |
+| Custom subdomain            | ✓      | ✓         | ✓         | ✗         | ✗              | ✓         |
+| CSV user import             | ✓      | ✓         | ✓         | ✓         | ✓              | ✓         |
+| Onboarding checklist        | ✓      | ✗         | ✓         | ✗         | ✗              | ✓         |
+| API key management          | ✓      | Limited   | ✓         | ✓         | ✗              | ✓         |
+| Gamification config         | ✗      | ✓         | ✗         | ✗         | ✗              | ✓         |
+| Trial with urgency banners  | ✓      | ✓         | ✓         | N/A       | N/A            | ✓         |
+| Content marketplace         | ✓      | ✗         | ✗         | ✗         | ✓              | ✓         |
+| Webhook management          | ✓      | ✗         | ✓         | ✓         | ✗              | ✓         |
+| RTL / Hebrew support        | ✗      | Partial   | ✗         | ✗         | ✗              | ✓         |
+| Knowledge graph integration | ✗      | ✗         | ✗         | ✗         | ✗              | ✓         |
 
 ---
 
@@ -1381,13 +1414,13 @@ graph TD
     style E fill:#fef3c7,stroke:#d97706
 ```
 
-| Data Type | Storage | Rationale |
-|-----------|---------|-----------|
-| Signup wizard in-progress | Zustand (persisted to sessionStorage) | Survives page refresh during 3-step flow |
-| Branding editor config | Zustand (in-memory) | Real-time preview needs instant reactivity |
-| Org profile, members, analytics | TanStack Query cache | Server state, stale-while-revalidate pattern |
-| Trial status | TanStack Query + polling (1h) | Server-authoritative, cached client-side |
-| Onboarding checklist | TanStack Query | Derived from org state, auto-invalidated on changes |
+| Data Type                       | Storage                               | Rationale                                           |
+| ------------------------------- | ------------------------------------- | --------------------------------------------------- |
+| Signup wizard in-progress       | Zustand (persisted to sessionStorage) | Survives page refresh during 3-step flow            |
+| Branding editor config          | Zustand (in-memory)                   | Real-time preview needs instant reactivity          |
+| Org profile, members, analytics | TanStack Query cache                  | Server state, stale-while-revalidate pattern        |
+| Trial status                    | TanStack Query + polling (1h)         | Server-authoritative, cached client-side            |
+| Onboarding checklist            | TanStack Query                        | Derived from org state, auto-invalidated on changes |
 
 ---
 
@@ -1395,47 +1428,47 @@ graph TD
 
 ### Per-Page Error Handling
 
-| Page | Error Scenario | UI Response |
-|------|----------------|-------------|
-| Signup Step 1 | Email already registered | Inline error below email field + suggest login link |
-| Signup Step 2 | Slug taken | Red X + auto-suggest alternative slug |
-| Signup Step 3 | Logo upload fails | Toast error + file stays in dropzone for retry |
-| Admin Dashboard | API timeout | Skeleton cards with "Retry" button overlay |
-| Branding Editor | Save fails | Toast error + form stays dirty, no data loss |
-| Marketplace | Search returns 0 | Empty state illustration + "Try different keywords" |
-| Team Management | CSV has all invalid rows | Error summary + "Fix and re-upload" CTA |
-| API Keys | Generation fails | Dialog stays open with error banner |
-| Analytics | Chart data unavailable | Chart area shows "No data for this period" |
+| Page            | Error Scenario           | UI Response                                         |
+| --------------- | ------------------------ | --------------------------------------------------- |
+| Signup Step 1   | Email already registered | Inline error below email field + suggest login link |
+| Signup Step 2   | Slug taken               | Red X + auto-suggest alternative slug               |
+| Signup Step 3   | Logo upload fails        | Toast error + file stays in dropzone for retry      |
+| Admin Dashboard | API timeout              | Skeleton cards with "Retry" button overlay          |
+| Branding Editor | Save fails               | Toast error + form stays dirty, no data loss        |
+| Marketplace     | Search returns 0         | Empty state illustration + "Try different keywords" |
+| Team Management | CSV has all invalid rows | Error summary + "Fix and re-upload" CTA             |
+| API Keys        | Generation fails         | Dialog stays open with error banner                 |
+| Analytics       | Chart data unavailable   | Chart area shows "No data for this period"          |
 
 ### Empty States
 
-| Page | Empty State Message | CTA |
-|------|---------------------|-----|
-| Dashboard (new org) | "Welcome! Let's set up your learning portal." | "Start Setup Guide" |
-| Members (no members) | "You're the only one here. Invite your team!" | "Invite Members" |
-| Courses (no courses) | "No courses yet. Create or license from marketplace." | "Browse Marketplace" / "Create Course" |
-| Analytics (no data) | "Analytics will appear once learners start using courses." | "Invite Learners" |
-| API Keys (none) | "No API keys yet. Generate one to integrate with your tools." | "Generate Key" |
-| Webhooks (none) | "No webhooks configured. Add one to receive event notifications." | "Add Endpoint" |
+| Page                 | Empty State Message                                               | CTA                                    |
+| -------------------- | ----------------------------------------------------------------- | -------------------------------------- |
+| Dashboard (new org)  | "Welcome! Let's set up your learning portal."                     | "Start Setup Guide"                    |
+| Members (no members) | "You're the only one here. Invite your team!"                     | "Invite Members"                       |
+| Courses (no courses) | "No courses yet. Create or license from marketplace."             | "Browse Marketplace" / "Create Course" |
+| Analytics (no data)  | "Analytics will appear once learners start using courses."        | "Invite Learners"                      |
+| API Keys (none)      | "No API keys yet. Generate one to integrate with your tools."     | "Generate Key"                         |
+| Webhooks (none)      | "No webhooks configured. Add one to receive event notifications." | "Add Endpoint"                         |
 
 ---
 
 ## Animation & Transition Specs
 
-| Element | Animation | Duration | Easing |
-|---------|-----------|----------|--------|
-| Step transition | Slide left/right + fade | 300ms | ease-in-out |
-| Live preview update | Cross-fade | 200ms | ease-out |
-| Onboarding widget expand | Scale + fade from bottom-right | 250ms | spring(1, 100, 10) |
-| Trial banner appear | Slide down from top | 300ms | ease-out |
-| Toast notification | Slide in from right + fade | 200ms | ease-out |
-| Card hover | Subtle lift (translateY -2px) + shadow | 150ms | ease-out |
-| KPI card number change | Count-up animation | 500ms | ease-out |
-| Confetti (setup complete) | Particle burst | 2000ms | gravity sim |
-| Skeleton loading | Pulse shimmer | 1500ms loop | ease-in-out |
+| Element                   | Animation                              | Duration    | Easing             |
+| ------------------------- | -------------------------------------- | ----------- | ------------------ |
+| Step transition           | Slide left/right + fade                | 300ms       | ease-in-out        |
+| Live preview update       | Cross-fade                             | 200ms       | ease-out           |
+| Onboarding widget expand  | Scale + fade from bottom-right         | 250ms       | spring(1, 100, 10) |
+| Trial banner appear       | Slide down from top                    | 300ms       | ease-out           |
+| Toast notification        | Slide in from right + fade             | 200ms       | ease-out           |
+| Card hover                | Subtle lift (translateY -2px) + shadow | 150ms       | ease-out           |
+| KPI card number change    | Count-up animation                     | 500ms       | ease-out           |
+| Confetti (setup complete) | Particle burst                         | 2000ms      | gravity sim        |
+| Skeleton loading          | Pulse shimmer                          | 1500ms loop | ease-in-out        |
 
 **Reduced motion:** All animations respect `prefers-reduced-motion: reduce` — replaced with instant transitions (0ms).
 
 ---
 
-*End of UX Design Document*
+_End of UX Design Document_

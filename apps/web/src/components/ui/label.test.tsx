@@ -11,7 +11,11 @@ describe('Label', () => {
   });
 
   it('forwards className', () => {
-    render(<Label className="mt-2" data-testid="lbl">L</Label>);
+    render(
+      <Label className="mt-2" data-testid="lbl">
+        L
+      </Label>
+    );
     expect(screen.getByTestId('lbl')).toHaveClass('mt-2');
   });
 
@@ -36,7 +40,14 @@ describe('Label', () => {
   });
 
   it('spreads additional HTML attributes', () => {
-    render(<Label data-testid="lbl" aria-describedby="help">L</Label>);
-    expect(screen.getByTestId('lbl')).toHaveAttribute('aria-describedby', 'help');
+    render(
+      <Label data-testid="lbl" aria-describedby="help">
+        L
+      </Label>
+    );
+    expect(screen.getByTestId('lbl')).toHaveAttribute(
+      'aria-describedby',
+      'help'
+    );
   });
 });

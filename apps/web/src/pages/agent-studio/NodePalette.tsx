@@ -6,7 +6,13 @@ import { cn } from '@/lib/utils';
 import type { NodeType } from './agent-studio.types';
 import { NODE_META } from './agent-studio.types';
 
-function PaletteItem({ type, onAdd }: { type: NodeType; onAdd: (t: NodeType) => void }) {
+function PaletteItem({
+  type,
+  onAdd,
+}: {
+  type: NodeType;
+  onAdd: (t: NodeType) => void;
+}) {
   const meta = NODE_META[type];
   return (
     <button
@@ -35,7 +41,10 @@ interface NodePaletteProps {
 
 export function NodePalette({ onAdd }: NodePaletteProps) {
   return (
-    <Card className="w-24 flex-shrink-0 p-2 overflow-y-auto" data-testid="node-palette">
+    <Card
+      className="w-24 flex-shrink-0 p-2 overflow-y-auto"
+      data-testid="node-palette"
+    >
       <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 text-center">
         Nodes
       </p>

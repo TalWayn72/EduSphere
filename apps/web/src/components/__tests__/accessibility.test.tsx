@@ -31,7 +31,9 @@ describe('Accessibility — ARIA roles and landmarks', () => {
         </ul>
       </nav>
     );
-    expect(getByRole('navigation', { name: /main navigation/i })).toBeInTheDocument();
+    expect(
+      getByRole('navigation', { name: /main navigation/i })
+    ).toBeInTheDocument();
   });
 
   it('main landmark is present and unique', () => {
@@ -45,16 +47,14 @@ describe('Accessibility — ARIA roles and landmarks', () => {
 
   it('dialog has accessible name via aria-labelledby', () => {
     const { getByRole } = render(
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="dialog-title"
-      >
+      <div role="dialog" aria-modal="true" aria-labelledby="dialog-title">
         <h2 id="dialog-title">Confirm action</h2>
         <p>Are you sure?</p>
       </div>
     );
-    expect(getByRole('dialog', { name: /confirm action/i })).toBeInTheDocument();
+    expect(
+      getByRole('dialog', { name: /confirm action/i })
+    ).toBeInTheDocument();
   });
 
   it('alert region has role="alert" for important messages', () => {
@@ -72,9 +72,14 @@ describe('Accessibility — ARIA roles and landmarks', () => {
 describe('Accessibility — Images and non-text content', () => {
   it('informative images have descriptive alt text', () => {
     const { getByAltText } = render(
-      <img src="/course-thumbnail.png" alt="Introduction to Machine Learning course thumbnail" />
+      <img
+        src="/course-thumbnail.png"
+        alt="Introduction to Machine Learning course thumbnail"
+      />
     );
-    expect(getByAltText('Introduction to Machine Learning course thumbnail')).toBeInTheDocument();
+    expect(
+      getByAltText('Introduction to Machine Learning course thumbnail')
+    ).toBeInTheDocument();
   });
 
   it('decorative images have empty alt attribute', () => {
@@ -137,8 +142,7 @@ describe('Accessibility — Form inputs have associated labels', () => {
     const { getByLabelText } = render(
       <form>
         <label>
-          <input type="checkbox" name="terms" />
-          I agree to the terms of service
+          <input type="checkbox" name="terms" />I agree to the terms of service
         </label>
       </form>
     );
@@ -184,9 +188,7 @@ describe('Accessibility — Form inputs have associated labels', () => {
 
 describe('Accessibility — Buttons and interactive elements', () => {
   it('submit buttons have descriptive text (not just "Submit")', () => {
-    const { getByRole } = render(
-      <button type="submit">Create course</button>
-    );
+    const { getByRole } = render(<button type="submit">Create course</button>);
     // Verifies a concrete action name rather than generic "Submit"
     expect(getByRole('button', { name: /create course/i })).toBeInTheDocument();
   });
@@ -263,8 +265,8 @@ describe('Accessibility — SC 2.4.11 Focus Not Obscured (scroll-margin-top)', (
         return [];
       }
     });
-    const hasHeaderHeight = rules.some(
-      (r) => r.cssText.includes('--header-height')
+    const hasHeaderHeight = rules.some((r) =>
+      r.cssText.includes('--header-height')
     );
     expect(hasHeaderHeight).toBe(true);
 
@@ -366,7 +368,9 @@ describe('Accessibility — Live regions for dynamic content', () => {
         aria-label="Course completion: 65%"
       />
     );
-    const progressbar = getByRole('progressbar', { name: /course completion/i });
+    const progressbar = getByRole('progressbar', {
+      name: /course completion/i,
+    });
     expect(progressbar).toHaveAttribute('aria-valuenow', '65');
   });
 });
@@ -451,8 +455,11 @@ describe('Accessibility — Heading hierarchy', () => {
     const headings = screen.getAllByRole('heading');
     const levels = headings.map((h) => parseInt(h.tagName.slice(1)));
     for (let i = 1; i < levels.length; i++) {
-      const skip = (levels[i]! - levels[i - 1]!) > 1;
-      expect(skip, `Heading level skipped from h${levels[i - 1]} to h${levels[i]}`).toBe(false);
+      const skip = levels[i]! - levels[i - 1]! > 1;
+      expect(
+        skip,
+        `Heading level skipped from h${levels[i - 1]} to h${levels[i]}`
+      ).toBe(false);
     }
   });
 });

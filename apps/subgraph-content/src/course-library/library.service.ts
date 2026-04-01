@@ -187,7 +187,9 @@ export class LibraryService implements OnModuleDestroy {
     );
 
     if (!activation)
-      throw new InternalServerErrorException('Failed to create library activation record');
+      throw new InternalServerErrorException(
+        'Failed to create library activation record'
+      );
 
     this.logger.log(
       `Library course activated: tenantId=${tenantId} libraryCourseId=${libraryCourseId} courseId=${courseId}`

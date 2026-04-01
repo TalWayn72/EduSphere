@@ -87,7 +87,8 @@ function App() {
       }
     }
     window.addEventListener('keycloak-late-auth', handleLateAuth);
-    return () => window.removeEventListener('keycloak-late-auth', handleLateAuth);
+    return () =>
+      window.removeEventListener('keycloak-late-auth', handleLateAuth);
   }, []);
 
   useEffect(() => {
@@ -160,7 +161,10 @@ function App() {
                 <GlobalLocaleSync />
                 <StorageWarningBanner />
                 <Toaster />
-                <SessionExpiryDialog open={sessionExpired} onReLogin={handleReLogin} />
+                <SessionExpiryDialog
+                  open={sessionExpired}
+                  onReLogin={handleReLogin}
+                />
                 <ErrorBoundary pageName="App">
                   <RouterProvider router={router} />
                 </ErrorBoundary>

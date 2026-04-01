@@ -25,39 +25,67 @@ test.describe('Video Sketch Overlay — tool selector', () => {
   });
 
   test('all 6 tool buttons are present', async ({ page }) => {
-    for (const tool of ['freehand', 'eraser', 'rect', 'arrow', 'ellipse', 'text']) {
+    for (const tool of [
+      'freehand',
+      'eraser',
+      'rect',
+      'arrow',
+      'ellipse',
+      'text',
+    ]) {
       await expect(page.getByTestId(`sketch-tool-${tool}`)).toBeVisible();
     }
   });
 
   test('freehand is selected by default', async ({ page }) => {
-    await expect(page.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   test('clicking eraser sets it as active tool', async ({ page }) => {
     await page.getByTestId('sketch-tool-eraser').click();
-    await expect(page.getByTestId('sketch-tool-eraser')).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByTestId('sketch-tool-eraser')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    await expect(page.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   test('clicking rect tool sets it as active tool', async ({ page }) => {
     await page.getByTestId('sketch-tool-rect').click();
-    await expect(page.getByTestId('sketch-tool-rect')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('sketch-tool-rect')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   test('clicking arrow tool sets it as active tool', async ({ page }) => {
     await page.getByTestId('sketch-tool-arrow').click();
-    await expect(page.getByTestId('sketch-tool-arrow')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('sketch-tool-arrow')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   test('clicking ellipse tool sets it as active tool', async ({ page }) => {
     await page.getByTestId('sketch-tool-ellipse').click();
-    await expect(page.getByTestId('sketch-tool-ellipse')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('sketch-tool-ellipse')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   test('clicking text tool sets it as active tool', async ({ page }) => {
     await page.getByTestId('sketch-tool-text').click();
-    await expect(page.getByTestId('sketch-tool-text')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('sketch-tool-text')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 });
 
@@ -76,7 +104,9 @@ test.describe('Video Sketch Overlay — color picker', () => {
   test('color swatch shows default red color', async ({ page }) => {
     const swatch = page.getByTestId('sketch-color-swatch');
     await expect(swatch).toBeVisible();
-    const bg = await swatch.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const bg = await swatch.evaluate(
+      (el) => getComputedStyle(el).backgroundColor
+    );
     // #ef4444 = rgb(239, 68, 68)
     expect(bg).toBe('rgb(239, 68, 68)');
   });
@@ -90,7 +120,9 @@ test.describe('Video Sketch Overlay — text tool', () => {
     if (await toggle.isVisible()) await toggle.click();
   });
 
-  test('selecting text tool then clicking canvas shows text input', async ({ page }) => {
+  test('selecting text tool then clicking canvas shows text input', async ({
+    page,
+  }) => {
     await page.getByTestId('sketch-tool-text').click();
     const canvas = page.locator('canvas[aria-label*="Sketch canvas"]');
     if (await canvas.isVisible()) {
@@ -108,20 +140,29 @@ test.describe('Video Sketch Overlay — cancel and save', () => {
     if (await toggle.isVisible()) await toggle.click();
   });
 
-  test('Cancel returns to inactive state with toggle button', async ({ page }) => {
+  test('Cancel returns to inactive state with toggle button', async ({
+    page,
+  }) => {
     await page.getByTestId('sketch-cancel-btn').click();
     await expect(page.getByTestId('sketch-toggle-btn')).toBeVisible();
     await expect(page.getByTestId('sketch-toolbar')).not.toBeVisible();
   });
 
-  test('Cancel resets selected tool to freehand on re-open', async ({ page }) => {
+  test('Cancel resets selected tool to freehand on re-open', async ({
+    page,
+  }) => {
     await page.getByTestId('sketch-tool-eraser').click();
     await page.getByTestId('sketch-cancel-btn').click();
     await page.getByTestId('sketch-toggle-btn').click();
-    await expect(page.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
-  test('Save button is present and not disabled initially', async ({ page }) => {
+  test('Save button is present and not disabled initially', async ({
+    page,
+  }) => {
     await expect(page.getByTestId('sketch-save-btn')).toBeVisible();
   });
 });

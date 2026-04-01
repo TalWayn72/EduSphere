@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { applySecurityHeaders, getSecurityHeadersMap } from './security-headers';
+import {
+  applySecurityHeaders,
+  getSecurityHeadersMap,
+} from './security-headers';
 import type { ServerResponse } from 'node:http';
 
 function createMockResponse(): ServerResponse {
@@ -96,7 +99,8 @@ describe('security-headers', () => {
       const res = createMockResponse();
       // Simulate a pre-existing header
       (res.getHeader as ReturnType<typeof vi.fn>).mockImplementation(
-        (name: string) => (name === 'X-Frame-Options' ? 'SAMEORIGIN' : undefined)
+        (name: string) =>
+          name === 'X-Frame-Options' ? 'SAMEORIGIN' : undefined
       );
       applySecurityHeaders(res);
       const calls = (res.setHeader as ReturnType<typeof vi.fn>).mock.calls;
@@ -132,7 +136,9 @@ describe('security-headers', () => {
 
     it('CSP contains frame-ancestors none', () => {
       const map = getSecurityHeadersMap();
-      expect(map['Content-Security-Policy']).toContain("frame-ancestors 'none'");
+      expect(map['Content-Security-Policy']).toContain(
+        "frame-ancestors 'none'"
+      );
     });
 
     it('CSP contains object-src none', () => {

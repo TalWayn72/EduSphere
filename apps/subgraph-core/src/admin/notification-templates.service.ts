@@ -2,7 +2,13 @@
  * NotificationTemplatesService — CRUD for admin-configurable notification templates.
  * Templates are stored in DB; defaults are seeded once on first access.
  */
-import { Injectable, Logger, OnModuleDestroy, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { db, notificationTemplates, closeAllPools } from '@edusphere/db';
 import { sql, eq, and } from 'drizzle-orm';
 
@@ -89,9 +95,10 @@ function mapRow(row: typeof notificationTemplates.$inferSelect): TemplateRow {
     bodyHtml: row.bodyHtml,
     variables: Array.isArray(row.variables) ? (row.variables as string[]) : [],
     isActive: row.isActive,
-    updatedAt: row.updatedAt instanceof Date
-      ? row.updatedAt.toISOString()
-      : String(row.updatedAt),
+    updatedAt:
+      row.updatedAt instanceof Date
+        ? row.updatedAt.toISOString()
+        : String(row.updatedAt),
   };
 }
 
@@ -114,7 +121,10 @@ export class NotificationTemplatesService implements OnModuleDestroy {
         .orderBy(notificationTemplates.name);
       return rows.map(mapRow);
     } catch (err) {
-      this.logger.error({ tenantId, err }, 'Failed to fetch notification templates');
+      this.logger.error(
+        { tenantId, err },
+        'Failed to fetch notification templates'
+      );
       throw err;
     }
   }
@@ -141,7 +151,8 @@ export class NotificationTemplatesService implements OnModuleDestroy {
         )
       )
       .returning();
-    if (!row) throw new NotFoundException(`Notification template ${id} not found`);
+    if (!row)
+      throw new NotFoundException(`Notification template ${id} not found`);
     this.logger.log({ id, tenantId }, 'Notification template updated');
     return mapRow(row);
   }
@@ -158,10 +169,12 @@ export class NotificationTemplatesService implements OnModuleDestroy {
       )
       .limit(1);
     const templateKey = currentRow[0]?.key;
-    if (!templateKey) throw new NotFoundException(`Notification template ${id} not found`);
+    if (!templateKey)
+      throw new NotFoundException(`Notification template ${id} not found`);
 
     const defaults = PLATFORM_DEFAULTS.find((d) => d.key === templateKey);
-    if (!defaults) throw new NotFoundException(`No defaults found for key ${templateKey}`);
+    if (!defaults)
+      throw new NotFoundException(`No defaults found for key ${templateKey}`);
 
     const [row] = await db
       .update(notificationTemplates)
@@ -178,8 +191,12 @@ export class NotificationTemplatesService implements OnModuleDestroy {
         )
       )
       .returning();
-    if (!row) throw new InternalServerErrorException(`Reset failed for template ${id}`);
-    this.logger.log({ id, tenantId, key: templateKey }, 'Notification template reset to defaults');
+    if (!row)
+      throw new InternalServerErrorException(`Reset failed for template ${id}`);
+    this.logger.log(
+      { id, tenantId, key: templateKey },
+      'Notification template reset to defaults'
+    );
     return mapRow(row);
   }
 

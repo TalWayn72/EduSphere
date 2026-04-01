@@ -37,9 +37,7 @@ describe('useDocumentScrollMemory', () => {
 
   it('returns isReturning=false when no saved data', () => {
     getItemSpy.mockReturnValue(null);
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
     expect(result.current.isReturning).toBe(false);
     expect(result.current.savedScrollY).toBe(0);
   });
@@ -48,9 +46,7 @@ describe('useDocumentScrollMemory', () => {
     const saved = { scrollY: 500, savedAt: Date.now() };
     getItemSpy.mockReturnValue(JSON.stringify(saved));
 
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
     expect(result.current.isReturning).toBe(true);
     expect(result.current.savedScrollY).toBe(500);
   });
@@ -59,9 +55,7 @@ describe('useDocumentScrollMemory', () => {
     const saved = { scrollY: 30, savedAt: Date.now() };
     getItemSpy.mockReturnValue(JSON.stringify(saved));
 
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
     expect(result.current.isReturning).toBe(false);
     expect(result.current.savedScrollY).toBe(0);
   });
@@ -71,20 +65,14 @@ describe('useDocumentScrollMemory', () => {
     const saved = { scrollY: 500, savedAt: thirtyOneDaysAgo };
     getItemSpy.mockReturnValue(JSON.stringify(saved));
 
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
     expect(result.current.isReturning).toBe(false);
-    expect(removeItemSpy).toHaveBeenCalledWith(
-      `${KEY_PREFIX}${CONTENT_ID}`
-    );
+    expect(removeItemSpy).toHaveBeenCalledWith(`${KEY_PREFIX}${CONTENT_ID}`);
   });
 
   it('saveScrollPosition debounces writes to localStorage', () => {
     getItemSpy.mockReturnValue(null);
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
 
     act(() => {
       result.current.saveScrollPosition(100);
@@ -101,9 +89,7 @@ describe('useDocumentScrollMemory', () => {
 
     // Only the last value should be saved
     expect(setItemSpy).toHaveBeenCalledTimes(1);
-    const writtenValue = JSON.parse(
-      setItemSpy.mock.calls[0]![1] as string
-    );
+    const writtenValue = JSON.parse(setItemSpy.mock.calls[0]![1] as string);
     expect(writtenValue.scrollY).toBe(300);
   });
 
@@ -112,9 +98,7 @@ describe('useDocumentScrollMemory', () => {
       throw new Error('Storage unavailable');
     });
 
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
     expect(result.current.isReturning).toBe(false);
     expect(result.current.savedScrollY).toBe(0);
   });
@@ -125,9 +109,7 @@ describe('useDocumentScrollMemory', () => {
       throw new Error('QuotaExceeded');
     });
 
-    const { result } = renderHook(() =>
-      useDocumentScrollMemory(CONTENT_ID)
-    );
+    const { result } = renderHook(() => useDocumentScrollMemory(CONTENT_ID));
 
     act(() => {
       result.current.saveScrollPosition(500);

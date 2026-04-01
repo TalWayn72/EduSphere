@@ -2,7 +2,13 @@
  * ProctoringService — Remote Proctoring session lifecycle (PRD §7.2 G-4).
  * Memory safety: implements OnModuleDestroy + closes DB pool.
  */
-import { Injectable, Logger, NotFoundException, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -46,15 +52,29 @@ export class ProctoringService implements OnModuleDestroy {
   ): Promise<MappedProctoringSession> {
     const [row] = await this.db
       .insert(proctoring_sessions)
-      .values({ assessment_id: assessmentId, tenant_id: tenantId, user_id: userId, status: 'PENDING', flags: [] })
+      .values({
+        assessment_id: assessmentId,
+        tenant_id: tenantId,
+        user_id: userId,
+        status: 'PENDING',
+        flags: [],
+      })
       .returning();
 
     if (!row) {
-      this.logger.error({ assessmentId, tenantId, userId }, '[ProctoringService] startSession: insert failed');
-      throw new InternalServerErrorException('Failed to create proctoring session');
+      this.logger.error(
+        { assessmentId, tenantId, userId },
+        '[ProctoringService] startSession: insert failed'
+      );
+      throw new InternalServerErrorException(
+        'Failed to create proctoring session'
+      );
     }
 
-    this.logger.log({ sessionId: row.id, assessmentId, tenantId, userId }, '[ProctoringService] session created');
+    this.logger.log(
+      { sessionId: row.id, assessmentId, tenantId, userId },
+      '[ProctoringService] session created'
+    );
     return this.mapSession(row);
   }
 
@@ -66,65 +86,115 @@ export class ProctoringService implements OnModuleDestroy {
   ): Promise<MappedProctoringSession> {
     const existing = await this.getSessionRow(sessionId, tenantId);
     if (!existing) {
-      this.logger.error({ sessionId, tenantId }, '[ProctoringService] flagEvent: session not found');
+      this.logger.error(
+        { sessionId, tenantId },
+        '[ProctoringService] flagEvent: session not found'
+      );
       throw new NotFoundException(`ProctoringSession ${sessionId} not found`);
     }
 
     const currentFlags = (existing.flags as ProctoringFlagEntry[]) ?? [];
-    const newFlag: ProctoringFlagEntry = { type, timestamp: new Date().toISOString(), detail: detail ?? null };
+    const newFlag: ProctoringFlagEntry = {
+      type,
+      timestamp: new Date().toISOString(),
+      detail: detail ?? null,
+    };
     const updatedFlags = [...currentFlags, newFlag];
     const newStatus = 'FLAGGED';
 
     const [updated] = await this.db
       .update(proctoring_sessions)
       .set({ flags: updatedFlags, status: newStatus })
-      .where(and(eq(proctoring_sessions.id, sessionId), eq(proctoring_sessions.tenant_id, tenantId)))
+      .where(
+        and(
+          eq(proctoring_sessions.id, sessionId),
+          eq(proctoring_sessions.tenant_id, tenantId)
+        )
+      )
       .returning();
 
-    if (!updated) throw new NotFoundException(`ProctoringSession ${sessionId} not found`);
+    if (!updated)
+      throw new NotFoundException(`ProctoringSession ${sessionId} not found`);
 
-    this.logger.log({ sessionId, tenantId, type }, '[ProctoringService] flagEvent recorded');
+    this.logger.log(
+      { sessionId, tenantId, type },
+      '[ProctoringService] flagEvent recorded'
+    );
     return this.mapSession(updated);
   }
 
-  async endSession(sessionId: string, tenantId: string): Promise<MappedProctoringSession> {
+  async endSession(
+    sessionId: string,
+    tenantId: string
+  ): Promise<MappedProctoringSession> {
     const existing = await this.getSessionRow(sessionId, tenantId);
     if (!existing) {
-      this.logger.error({ sessionId, tenantId }, '[ProctoringService] endSession: session not found');
+      this.logger.error(
+        { sessionId, tenantId },
+        '[ProctoringService] endSession: session not found'
+      );
       throw new NotFoundException(`ProctoringSession ${sessionId} not found`);
     }
 
     const [updated] = await this.db
       .update(proctoring_sessions)
       .set({ status: 'COMPLETED', ended_at: new Date() })
-      .where(and(eq(proctoring_sessions.id, sessionId), eq(proctoring_sessions.tenant_id, tenantId)))
+      .where(
+        and(
+          eq(proctoring_sessions.id, sessionId),
+          eq(proctoring_sessions.tenant_id, tenantId)
+        )
+      )
       .returning();
 
-    if (!updated) throw new NotFoundException(`ProctoringSession ${sessionId} not found`);
+    if (!updated)
+      throw new NotFoundException(`ProctoringSession ${sessionId} not found`);
 
-    this.logger.log({ sessionId, tenantId }, '[ProctoringService] session ended');
+    this.logger.log(
+      { sessionId, tenantId },
+      '[ProctoringService] session ended'
+    );
     return this.mapSession(updated);
   }
 
-  async getSession(sessionId: string, tenantId: string): Promise<MappedProctoringSession | null> {
+  async getSession(
+    sessionId: string,
+    tenantId: string
+  ): Promise<MappedProctoringSession | null> {
     const row = await this.getSessionRow(sessionId, tenantId);
     return row ? this.mapSession(row) : null;
   }
 
-  async getReport(assessmentId: string, tenantId: string): Promise<MappedProctoringSession[]> {
+  async getReport(
+    assessmentId: string,
+    tenantId: string
+  ): Promise<MappedProctoringSession[]> {
     const rows = await this.db
       .select()
       .from(proctoring_sessions)
-      .where(and(eq(proctoring_sessions.assessment_id, assessmentId), eq(proctoring_sessions.tenant_id, tenantId)));
+      .where(
+        and(
+          eq(proctoring_sessions.assessment_id, assessmentId),
+          eq(proctoring_sessions.tenant_id, tenantId)
+        )
+      );
 
     return rows.map((r) => this.mapSession(r));
   }
 
-  private async getSessionRow(sessionId: string, tenantId: string): Promise<SessionRow | null> {
+  private async getSessionRow(
+    sessionId: string,
+    tenantId: string
+  ): Promise<SessionRow | null> {
     const [row] = await this.db
       .select()
       .from(proctoring_sessions)
-      .where(and(eq(proctoring_sessions.id, sessionId), eq(proctoring_sessions.tenant_id, tenantId)))
+      .where(
+        and(
+          eq(proctoring_sessions.id, sessionId),
+          eq(proctoring_sessions.tenant_id, tenantId)
+        )
+      )
       .limit(1);
     return row ?? null;
   }

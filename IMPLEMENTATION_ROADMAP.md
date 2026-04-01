@@ -1566,9 +1566,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 18 — Admin Dashboard Upgrade + LessonResults (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 18–21 | **Date:** 2026-03-02 to 2026-03-05
 
 ### What Was Built
+
 - `LessonResultsPage` with all 10 pipeline output types (transcript, summary, quiz, flashcards, annotations, embeddings, entities, topics, video chapters, SCORM)
 - Admin Phase 1–3: User Management CRUD with role confirm modal + toasts, Org Settings, Analytics dashboard
 - Custom Pipeline Builder ("Build from Scratch") — visual node editor
@@ -1576,6 +1578,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - OpenBadges federation moved from Core → Content subgraph
 
 ### Acceptance Criteria
+
 - [x] `LessonResultsPage` renders all 10 pipeline output types (E2E 28/28)
 - [x] Admin User Management CRUD works for all 5 roles
 - [x] Custom Pipeline Builder saves and runs custom workflows
@@ -1583,6 +1586,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] TypeScript: 0 errors
 
 ### Key Files
+
 - `apps/web/src/pages/LessonResultsPage.tsx`
 - `apps/web/src/pages/AdminDashboardPage.tsx`
 - `apps/web/src/pages/PipelineBuilderPage.tsx`
@@ -1591,9 +1595,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 19 — Media Upload + i18n Infrastructure (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 18–19 | **Date:** 2026-03-02
 
 ### What Was Built
+
 - MinIO media upload pipeline: bucket auto-creation, presigned URL generation, S3 CRC32 fix, `.doc` content-type
 - 15 i18n namespaces (EN + HE): added `srs` namespace, translated AdminSidebar, LTI/SCIM nav labels
 - Lighthouse CI Core Web Vitals gate + bundle-size-check
@@ -1601,6 +1607,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - pnpm security overrides: `tar >=7.5.10`, `rollup >=4.59.0`, `minimatch >=9.0.7`, `serialize-javascript >=7.0.3`
 
 ### Acceptance Criteria
+
 - [x] Media upload end-to-end: file → MinIO → lesson asset → video player
 - [x] 15 i18n namespaces pass assertion test
 - [x] Lighthouse Performance score gate in CI
@@ -1608,6 +1615,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] pnpm lockfile consistent across all packages
 
 ### Key Files
+
 - `apps/subgraph-content/src/media/media.service.ts`
 - `packages/i18n/src/locales/en/` (15 namespace files)
 - `packages/i18n/src/locales/he/` (15 namespace files)
@@ -1616,9 +1624,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 20 — Security Compliance (G-01 to G-22) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 19–20 | **Date:** 2026-03-03
 
 ### What Was Built
+
 - CQI-003: Eliminated all `no-explicit-any` from production code across all 6 subgraphs, web, and mobile
 - CodeQL critical/high vulnerability fixes (12 issues resolved)
 - Keycloak UUID alignment: all 5 demo users have consistent UUIDs across Keycloak + DB
@@ -1627,6 +1637,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - Visual QA: 53/53 routes verified zero-error across all 5 user roles
 
 ### Acceptance Criteria
+
 - [x] `pnpm test:security` passes all 813 security tests
 - [x] CodeQL: 0 critical/high alerts
 - [x] `no-explicit-any`: 0 violations in production code
@@ -1634,6 +1645,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] Hive CI gate blocks breaking schema changes
 
 ### Key Files
+
 - `tests/security/` (32 spec files, 813 tests)
 - `infrastructure/keycloak/realm-export.json`
 - `apps/subgraph-knowledge/src/source/source.service.ts`
@@ -1642,9 +1654,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 21 — Memory Safety (OnModuleDestroy + Frontend Timers) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 20–21 | **Date:** 2026-03-05
 
 ### What Was Built
+
 - `OnModuleDestroy` implemented on all 20+ NestJS services with DB/NATS connections
 - `clearInterval`/`clearTimeout` in all React hooks and components using timers
 - `useOfflineQueue` precursor: max-size eviction for unbounded Maps and arrays
@@ -1652,12 +1666,14 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - Memory testing: `*.memory.spec.ts` and `*.memory.test.ts` for all new services and hooks
 
 ### Acceptance Criteria
+
 - [x] All 20+ services implement `OnModuleDestroy` with `closeAllPools()` / `close()` calls
 - [x] All `setInterval` usages in components have corresponding `clearInterval` in `useEffect` cleanup
 - [x] `*.memory.spec.ts` tests verify cleanup is called on `onModuleDestroy()`
 - [x] No unbounded Maps or Arrays (all have max-size eviction or `slice(-N)` guards)
 
 ### Key Files
+
 - `apps/subgraph-agent/src/agent/agent.service.ts` (`implements OnModuleDestroy`)
 - `apps/subgraph-knowledge/src/knowledge/knowledge.service.ts`
 - `apps/web/src/hooks/useOfflineQueue.ts`
@@ -1666,9 +1682,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 22 — i18n Completion + Admin Phase 7 + Gateway v2.5 (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 22 | **Date:** 2026-03-05
 
 ### What Was Built
+
 - Hive Gateway upgraded to v2.5.1: improved performance, federation v2.7 compliance
 - Admin Phase 7 — Notification Templates: template editor with variable interpolation, preview, channel selector
 - Code Quality Initiative (CQI): T2 (no-explicit-any), T4 (file splitting <150 lines), T6 (barrel files), T8 (service extraction), T9 (test isolation), T11 (memory safety hooks)
@@ -1678,6 +1696,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - BUG-052: React concurrent-mode `useUserPreferences` + `SRSWidget` — `mounted` guard added
 
 ### Acceptance Criteria
+
 - [x] Hive Gateway v2.5.1 composes supergraph without errors
 - [x] Admin Notification Templates — create, edit, preview, delete
 - [x] Language setting (HE/EN) persists across page refreshes
@@ -1685,6 +1704,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] TypeScript: 0 errors across 26 packages
 
 ### Key Files
+
 - `apps/gateway/` (v2.5.1 config)
 - `apps/web/src/pages/NotificationTemplatesPage.tsx`
 - `apps/web/src/hooks/useUserPreferences.ts`
@@ -1693,9 +1713,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 23 — Mobile Polish + LoggerModule + TIME Constants (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 23 | **Date:** 2026-03-05
 
 ### What Was Built
+
 - `LoggerModule` extraction: shared NestJS Pino logger module — consistent structured logging across all 6 subgraphs
 - `TIME` constants (`packages/config`): `SECONDS`, `MINUTES`, `HOURS` — replaces magic number durations
 - Mobile TypeScript hardening: all remaining `any` types replaced with proper interfaces in mobile screens and services
@@ -1704,12 +1726,14 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - `apps/mobile/src/lib/stats-utils.ts`: learning statistics utility functions
 
 ### Acceptance Criteria
+
 - [x] All 6 subgraphs use `LoggerModule` for structured Pino logging (no `console.log`)
 - [x] `TIME` constants used for all duration magic numbers
 - [x] Mobile TypeScript: 0 `no-explicit-any` violations
 - [x] `pnpm turbo typecheck` — 0 errors across all 26 packages
 
 ### Key Files
+
 - `packages/config/src/time.ts`
 - `apps/mobile/src/lib/ai-consent.ts`
 - `apps/mobile/src/lib/stats-utils.ts`
@@ -1718,9 +1742,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 24 — PRD Gap Closure G1+G2+G3+G5+G6+G8 (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 24 | **Date:** 2026-03-05
 
 ### What Was Built
+
 - **G1 — Context Panel**: Debounced HybridRAG sidebar inside `UnifiedLearningPage` — shows Related Concepts (amber) + Related Segments (green) from active transcript segment
 - **G2 — Video Sketch Overlay**: HTML5 Canvas freehand annotation over video; normalized coordinate paths saved as `SketchPath[]`; SVG overlay shows sketches within ±3s window
 - **G3 — Annotation Promote**: `promoteAnnotation` mutation (backend + frontend); INSTRUCTOR-layer promotion button in `CommentCard`
@@ -1729,6 +1755,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - **G8 — Auto-Flashcards**: Annotation → SRS one-click flashcard creation (reuses `createReviewCard` mutation)
 
 ### Acceptance Criteria
+
 - [x] Context Panel shows semantic results for current video segment
 - [x] Video Sketch overlay canvas draws, saves, and displays paths at correct timestamps
 - [x] `promoteAnnotation` mutation passes unit + integration tests
@@ -1738,6 +1765,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] Playwright E2E specs for all 6 features pass
 
 ### Key Files
+
 - `apps/web/src/components/ContextPanel.tsx`
 - `apps/web/src/components/VideoSketchOverlay.tsx`
 - `apps/web/src/pages/AgentStudioPage.tsx`
@@ -1748,15 +1776,18 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 25 — UI/UX Revolution (Design System + Accessibility + Learning Experience) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 25 Phases 1–4 | **Date:** 2026-03-05 to 2026-03-06
 
 ### What Was Built
+
 - **Phase 25.1 — Design System**: Indigo `#6366F1` primary palette, mastery level tokens, `ThemeProvider` (3-tier: globals → tenant → user), `LandingPage`, `MasteryBadge`
 - **Phase 25.2 — Navigation + Dashboard**: `AppSidebar` (240px/64px collapsible, 6 nav groups, hover tooltips), `DashboardPage` (5 sections), `CoursesDiscoveryPage`, `CourseCard`; tenant-themes DB migration (`0010`)
 - **Phase 25.3 — Learning Experience**: `VideoPlayerWithCurriculum` (320px sidebar), `KnowledgeSkillTree` (BFS + SVG bezier edges)
 - **Phase 25.4 — Accessibility (WCAG 2.2 AAA)**: `SkipLinks`, `useFocusTrap`, `useAnnounce` (dual live region), `useReducedMotion`, `ThemeSettingsPage`; FOUC prevention script in `index.html`
 
 ### Acceptance Criteria
+
 - [x] `ThemeProvider` renders without flash of unstyled content (FOUC prevention)
 - [x] `AppSidebar` collapses to 64px icon-only; expands to 240px on hover/click
 - [x] `VideoPlayerWithCurriculum` curriculum sidebar scrolls independently
@@ -1768,6 +1799,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] TypeScript: 0 errors | Lint: 0 warnings | Tests: 100% pass
 
 ### Key Files
+
 - `apps/web/src/lib/theme.ts`
 - `apps/web/src/components/ThemeProvider.tsx`
 - `apps/web/src/components/AppSidebar.tsx`
@@ -1782,9 +1814,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 26 — Mobile Design System Alignment + SkillTree Backend (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 25 Phase 5 | **Date:** 2026-03-06
 
 ### What Was Built
+
 - `apps/mobile/src/lib/theme.ts`: unified design tokens (`COLORS.primary = #6366F1`, `SPACING`, `RADIUS`, `FONT`, `SHADOW`)
 - Mobile `MasteryBadge` component: 5-level badge with semantic colors, `testID` for test targeting
 - Mobile screens redesigned with `COLORS.primary`: `HomeScreen` (streak row, 4 stat cards), `CoursesScreen` (search + left-accent cards), `ProfileScreen`, `SettingsScreen`
@@ -1793,6 +1827,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - DB migration `0011_user_skill_mastery.sql`: `user_skill_mastery` table with RLS, mastery level enum, timestamps
 
 ### Acceptance Criteria
+
 - [x] All mobile screens use `COLORS.primary` from `theme.ts` (no hardcoded `#007AFF` or `#2563EB`)
 - [x] `MasteryBadge` renders all 5 levels with correct colors (unit test with `testID`)
 - [x] `skill-tree.service` returns skill tree from DB (Drizzle mock in spec)
@@ -1800,6 +1835,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] Mobile vitest: `__DEV__: true` define prevents `ReferenceError`
 
 ### Key Files
+
 - `apps/mobile/src/lib/theme.ts`
 - `apps/mobile/src/screens/HomeScreen.tsx`
 - `apps/mobile/src/screens/CoursesScreen.tsx`
@@ -1816,6 +1852,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 **Goal:** Wire live session CRUD, add offline web PWA capabilities, build CoursesDiscovery UI, and connect KnowledgeGraph to courseId context.
 
 **Tasks:**
+
 1. Route fix: /explore, /discover, /courses/discover
 2. Live Sessions FE + BE + NATS (startLiveSession, LiveSessionsPage, NATS events)
 3. Offline Web: ServiceWorker + IndexedDB + OfflineBanner
@@ -1824,6 +1861,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 **Acceptance Criteria:** All tests pass, E2E Playwright for live sessions + offline scenarios.
 
 ### What Was Built
+
 - `LiveSessionsPage` + `LiveSessionDetailPage` with NATS JetStream event integration
 - `OfflineLessonCache` (IndexedDB), `OfflineBanner`, `useOfflineStatus`, `useOfflineQueue` (100-item LRU)
 - `AdminActivityFeed` with 30-second auto-refresh and `clearInterval` cleanup
@@ -1834,6 +1872,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - 175 new tests (109 unit + 66 E2E), 44 visual regression screenshots
 
 ### Key Files
+
 - `apps/web/src/pages/LiveSessionsPage.tsx`
 - `apps/web/src/pages/LiveSessionDetailPage.tsx`
 - `apps/web/src/services/OfflineLessonCache.ts`
@@ -1847,9 +1886,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 28 — Live Sessions Mutations + Offline Sync + PWA + SI-3 Fix (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commits:** `fddb6c0`, `1cc2469`, `a94a5d6`
 
 ### What Was Built
+
 - Live Session mutations: end/join/cancel/start fully implemented with `useLiveSessionActions` hook
 - SI-3 security fix: `encryptField()`/`decryptField()` in `live-session.service.ts` (plaintext never stored)
 - `useOfflineQueue`: online-event flush + 48h TTL + 100-item LRU + onFlush callback
@@ -1860,6 +1901,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - Husky v10 pre-commit hook fix
 
 ### Acceptance Criteria
+
 - [x] All 4 Live Session mutations working with role-based guards
 - [x] SI-3: no plaintext passwords ever written to DB
 - [x] Offline queue flushes automatically on reconnect
@@ -1867,6 +1909,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] `pnpm turbo test` 100% pass
 
 ### Key Files
+
 - `apps/subgraph-agent/src/live-sessions/live-sessions.service.ts`
 - `apps/web/src/hooks/useLiveSessionActions.ts`
 - `apps/web/src/hooks/useOfflineQueue.ts`
@@ -1876,21 +1919,25 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 29 — Stripe Checkout Flow (PRD §8.4) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `be3705a`
 
 ### What Was Built
+
 - `CheckoutPage.tsx`: Stripe Elements with `clientSecret` from URL, success redirect, graceful fallbacks
 - `PurchaseCourseButton`: URL-based secret passing, `/checkout` route (lazy-loaded, guarded)
 - Packages: `@stripe/stripe-js`, `@stripe/react-stripe-js`
 - Security: `clientSecret` never stored in `localStorage` or exposed in DOM
 
 ### Acceptance Criteria
+
 - [x] Stripe checkout page renders with Elements
 - [x] Success redirect after payment
 - [x] `clientSecret` never in localStorage or DOM text
 - [x] 8 unit + 8 E2E tests pass
 
 ### Key Files
+
 - `apps/web/src/pages/CheckoutPage.tsx`
 - `apps/web/src/components/PurchaseCourseButton.tsx`
 - `apps/web/e2e/checkout-flow.spec.ts`
@@ -1898,9 +1945,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 30 — Personal Knowledge Graph Wiki + Annotation Merge Request (PRD §4.3+§4.4) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `4ae6614`
 
 ### What Was Built
+
 - `PersonalGraphView.tsx`: SVG wiki of personal annotations across all courses (6 nodes, 7 edges, course colour legend, detail panel)
 - `KnowledgeGraph.tsx`: Global / My Wiki tab toggle with `viewMode: 'global' | 'personal'`
 - `AnnotationMergeRequestModal.tsx`: propose annotation to official knowledge base (0/500 char counter)
@@ -1908,6 +1957,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - `InstructorMergeQueuePage.tsx`: diff view, approve/reject, resolved section; route `/instructor/merge-queue`
 
 ### Acceptance Criteria
+
 - [x] Personal graph shows annotations linked across courses
 - [x] Tab toggle between global and personal views
 - [x] Annotation merge request modal with char counter
@@ -1915,6 +1965,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] 44 unit + 15 E2E tests pass
 
 ### Key Files
+
 - `apps/web/src/components/PersonalGraphView.tsx`
 - `apps/web/src/components/AnnotationMergeRequestModal.tsx`
 - `apps/web/src/pages/InstructorMergeQueuePage.tsx`
@@ -1923,9 +1974,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 31 — Video Sketch Overlay Enhancement (PRD §4.2 P-1) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `2c9d178`
 
 ### What Was Built
+
 - `useSketchCanvas.ts`: 6 drawing tools — freehand, eraser (destination-out), rect, arrow, ellipse, text
 - `VideoSketchToolbar.tsx`: tool buttons with `aria-pressed`, color picker swatch, Save/Clear/Cancel
 - Text tool: positioned `<input>` on canvas click, commits on Enter/blur
@@ -1933,6 +1986,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - Backward-compatible `SketchPath` re-export preserved
 
 ### Acceptance Criteria
+
 - [x] All 6 tools functional with canvas rendering
 - [x] Color picker changes tool color
 - [x] Text tool creates canvas text
@@ -1940,6 +1994,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] 34 total sketch tests pass (21 new + 13 existing)
 
 ### Key Files
+
 - `apps/web/src/hooks/useSketchCanvas.ts`
 - `apps/web/src/components/VideoSketchToolbar.tsx`
 - `apps/web/src/components/VideoSketchOverlay.tsx`
@@ -1948,9 +2003,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 32 — Real-time AI Subtitle Translation (PRD §3.4 G-2) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `720b7c9`
 
 ### What Was Built
+
 - `TranslationService`: LibreTranslate HTTP client, VTT generation, MinIO upload, NATS event
 - `SubtitleTrack` GraphQL type; `subtitleTracks` field on `MediaAsset`
 - `VideoSubtitleSelector`: CC button, language dropdown, Off option, ARIA attributes
@@ -1959,6 +2016,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - Env vars: `TRANSLATION_TARGETS`, `LIBRE_TRANSLATE_URL`
 
 ### Acceptance Criteria
+
 - [x] Translation runs after transcription (non-blocking)
 - [x] VTT files stored in MinIO with presigned URLs
 - [x] Video player shows CC button + language selector
@@ -1966,6 +2024,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] 11 + 9 unit + 10 E2E + 3 visual tests pass
 
 ### Key Files
+
 - `apps/subgraph-content/src/translation/translation.service.ts`
 - `apps/web/src/components/VideoSubtitleSelector.tsx`
 - `packages/db/src/migrations/0013_transcripts_vtt_key.sql`
@@ -1973,9 +2032,11 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 33 — Remote Proctoring (PRD §7.2 G-4) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `0d51873`
 
 ### What Was Built
+
 - `ProctoringOverlay.tsx`: WebRTC webcam preview, tab-switch detection via `visibilitychange`, flag badge
 - `ProctoringReportCard.tsx`: status badge + flag timeline list
 - `ProctoringSession`, `ProctoringFlag`, `ProctoringFlagType` enum (GraphQL + DB)
@@ -1985,6 +2046,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - Memory safety: `visibilitychange` listener removed + `MediaStream.getTracks().stop()` on unmount
 
 ### Acceptance Criteria
+
 - [x] Webcam preview starts on session start
 - [x] Tab-switch triggers flag automatically
 - [x] Session lifecycle (start → flag → end) fully testable
@@ -1992,6 +2054,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 - [x] 16 service + 23 component + 6 E2E + 3 visual tests pass
 
 ### Key Files
+
 - `apps/subgraph-agent/src/proctoring/proctoring.service.ts`
 - `apps/web/src/components/ProctoringOverlay.tsx`
 - `packages/db/src/migrations/0014_proctoring_sessions.sql`
@@ -2000,11 +2063,13 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ---
 
 ## Phase 34 — 3D Models & Simulations (PRD §3.3 G-1) (✅ Complete)
+
 **Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `1e3314b`
 
 This phase closes the last remaining PRD gap — ALL G and P items are now complete.
 
 ### What Was Built
+
 - `Model3DViewer.tsx`: Three.js WebGL viewer via dynamic `import()`, OrbitControls, loading/error/unavailable states
 - Full memory safety: `renderer.dispose()`, geometry/material/texture dispose, `OrbitControls.dispose()`, `cancelAnimationFrame()`, `ResizeObserver.disconnect()` in `useEffect` cleanup
 - `Model3DInfo` type, `ModelAnimation` type, `AssetType.MODEL_3D` enum value
@@ -2014,6 +2079,7 @@ This phase closes the last remaining PRD gap — ALL G and P items are now compl
 - Package: `three` added to web dependencies
 
 ### Acceptance Criteria
+
 - [x] 3D model renders in WebGL with orbit controls
 - [x] Upload validates format (gltf/glb/obj/fbx only)
 - [x] Memory fully cleaned up on component unmount (4 memory-safety tests)
@@ -2021,6 +2087,7 @@ This phase closes the last remaining PRD gap — ALL G and P items are now compl
 - [x] 14 service + 18 component + 5 E2E + 2 visual tests pass
 
 ### Key Files
+
 - `apps/web/src/components/Model3DViewer.tsx`
 - `apps/subgraph-content/src/media/media.service.ts` (uploadModel3D)
 - `packages/db/src/migrations/0015_model3d.sql`
@@ -2029,9 +2096,11 @@ This phase closes the last remaining PRD gap — ALL G and P items are now compl
 ---
 
 ## Phase 35 — Performance, Analytics & Mobile Parity (✅ Complete — Mar 2026)
+
 **Status:** 🔵 Planned | **Target Session:** Session 29
 
 ### Planned Scope
+
 - **Performance:** Lighthouse score >= 90 on all major pages (code splitting, lazy loading, image optimization)
 - **PWA:** Install prompt, push notifications (Keycloak events -> NATS -> mobile)
 - **Mobile parity:** Live Sessions + SkillTree + Offline + 3D viewer on Expo SDK 54
@@ -2039,6 +2108,7 @@ This phase closes the last remaining PRD gap — ALL G and P items are now compl
 - **AI recommendations:** Personalized learning paths from `UserSkillMastery` graph traversal
 
 ### Acceptance Criteria
+
 - [ ] Lighthouse Performance >= 90 on Dashboard + Courses + Lesson pages
 - [ ] PWA installable on Chrome, Safari, Firefox
 - [ ] Mobile app: Live Sessions screen, SkillTree screen, Offline sync
@@ -2046,6 +2116,7 @@ This phase closes the last remaining PRD gap — ALL G and P items are now compl
 - [ ] AI recommendations: skill gap identification + suggested next courses
 
 ### Prerequisites
+
 - All PRD gaps closed (Phases 28-34) ✅
 - UserSkillMastery data model (migration 0011) ✅
 - Offline queue + ServiceWorker (Phase 28) ✅
@@ -2215,6 +2286,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-12
 
 ### What Was Built
+
 - YAU (Yearly Active Users) pricing model with 4 tiers (Starter/Professional/Enterprise/Unlimited)
 - Air-gap deployment mode: offline license validation, local asset bundling, Zarf integration
 - Stripe webhook handlers for subscription lifecycle events
@@ -2227,6 +2299,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-12
 
 ### What Was Built
+
 - Partner API: white-label course embedding, OAuth2 token exchange, revenue sharing
 - Auto-grading engine: rubric-based AI scoring with human override
 - Marketplace listing approval workflow (ORG_ADMIN review queue)
@@ -2239,6 +2312,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-12
 
 ### What Was Built
+
 - SCORM 2004 export: package courses as SCORM-compliant ZIP with imsmanifest.xml
 - Content pipeline: media transcoding queue (video → HLS adaptive streaming)
 - xAPI statement storage: LRS-compatible endpoint for activity tracking
@@ -2251,6 +2325,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-12
 
 ### What Was Built
+
 - 8 new Playwright E2E specs covering critical user journeys
 - Admin page routing + permission guards wired end-to-end
 - Course creation wizard E2E with file upload mock
@@ -2263,6 +2338,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-13
 
 ### What Was Built
+
 - HRIS config page: Connect BambooHR, Workday, SAP SuccessFactors
 - User sync via scheduled NATS jobs (daily + on-demand)
 - Adaptive Engine Orchestrator: personalized learning paths from gap analysis
@@ -2275,6 +2351,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-13
 
 ### What Was Built
+
 - i18next integration across all web pages and components
 - 9 language packs: English, Hebrew, Arabic, Spanish, French, German, Portuguese, Russian, Chinese
 - RTL support for Hebrew and Arabic (dir="rtl" auto-detection)
@@ -2287,6 +2364,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-13
 
 ### What Was Built
+
 - Drag-and-drop workflow builder for learning pipelines
 - Node types: Content, Quiz, AI Agent, Approval Gate, Notification
 - Conditional routing (if-then-else on quiz scores)
@@ -2299,6 +2377,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-14
 
 ### What Was Built
+
 - Instructor payout system: Stripe Connect integration
 - Revenue dashboard: earnings by course, month, region
 - Payout schedule: monthly automatic transfers with minimum threshold
@@ -2311,6 +2390,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-14
 
 ### What Was Built
+
 - Assessment campaigns: 360° multi-rater feedback collection
 - Rubric builder: criteria, performance levels, weight allocation
 - Assessment dashboard: aggregated scores across raters
@@ -2323,6 +2403,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-14
 
 ### What Was Built
+
 - Open Badges 3.0 compliant credential issuance
 - W3C Verifiable Credentials format with Ed25519 signing
 - Badge designer: custom badge artwork + criteria definition
@@ -2335,7 +2416,8 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-15
 
 ### What Was Built
-- SCORM 2004 runtime API: cmi.core.*, cmi.interactions.*, cmi.objectives.*
+
+- SCORM 2004 runtime API: cmi.core._, cmi.interactions._, cmi.objectives.\*
 - xAPI statement forwarding to external LRS
 - SCORM player: iframe-based with postMessage bridge
 - Completion tracking: map SCORM completion_status to EduSphere progress
@@ -2347,6 +2429,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-15
 
 ### What Was Built
+
 - Block-based page editor for learning portals
 - Block types: Hero, Feature Grid, Course Carousel, Testimonial, CTA, Video
 - Drag-and-drop reordering with keyboard accessibility
@@ -2360,6 +2443,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-16
 
 ### What Was Built
+
 - Compliance template library: pre-built training program templates
 - Template categories: OSHA, HIPAA, GDPR, SOX, industry-specific
 - Auto-enrollment rules: assign compliance programs by role/department
@@ -2373,6 +2457,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 **Status:** ✅ Complete | **Date:** 2026-03-17
 
 ### What Was Built
+
 - 11 Enterprise Division audit across all system layers
 - 110 recommendations categorized: 33 Critical, 42 Important, 35 Strategic
 - 8-wave remediation plan with dependency graph
@@ -2388,6 +2473,7 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 ### What Was Built
 
 **Round 1 (P0 — Critical Infrastructure):**
+
 - Real-time pipeline progress via GraphQL subscriptions replacing setTimeout polling (BUG-074)
 - `LessonPublishService` with real publish logic replacing hardcoded stub (BUG-075)
 - `LessonNERConsumer` in subgraph-knowledge for NER-to-Knowledge-Graph pipeline (BUG-076)
@@ -2395,16 +2481,19 @@ pnpm test:security  # ai-compliance.spec.ts ✅
 - Module retry with `retryPipelineModule` mutation and exponential backoff
 
 **Round 2 (P1 — Validation & Templates):**
+
 - `checkCourseReadiness()` with 5 validation checks + `course:publish` scope (BUG-077)
 - `CourseReadiness` GraphQL type with `courseReadiness(courseId)` query
 - `LessonPipelineTemplate` CRUD with `pipelineTemplates` query
 
 **Round 3 (P2/P3 — Accessibility & Mobile):**
+
 - `PipelineStepper` with `aria-live="polite"`, `aria-current="step"` (BUG-078)
 - Breadcrumb 4th segment with lesson title link (BUG-079)
 - Responsive mobile layout with bottom sheet palette (BUG-080)
 
 **Round 4 (Subscription Implementation):**
+
 - `lessonPipelineProgress` GraphQL subscription (NATS → PubSub bridge)
 - Feature flag `ENABLE_PIPELINE_SUBSCRIPTIONS` for safe rollback
 
@@ -2442,6 +2531,7 @@ pnpm turbo typecheck  # 0 errors
 ### What Was Built
 
 **Wave A — Notification Infrastructure:**
+
 - `notification_deliveries` schema — persistent delivery log with status tracking (pending/sent/delivered/failed/bounced)
 - `notification_preferences` + `tenant_notification_defaults` schemas — per-user, per-type, per-channel opt-in/out
 - `NotificationDispatcherService` — central orchestrator routing to 5 channels (in_app, push_web, push_mobile, email, whatsapp)
@@ -2449,11 +2539,13 @@ pnpm turbo typecheck  # 0 errors
 - `NotificationPreferencesService` + `NotificationDeliveriesService` — CRUD + query history
 
 **Wave B — Email Channel:**
+
 - Provider-agnostic `EmailChannel` with `EmailProvider` interface
 - `ResendEmailProvider` (default) + `SmtpEmailProvider` (air-gapped fallback via Nodemailer)
 - `NotificationRetryWorker` — exponential backoff (1m/5m/30m), max 3 retries
 
 **Wave C — Social Sharing + Social Links:**
+
 - `SocialShareButton`, `SocialShareMenu`, `ShareBadgeDialog` — client-side URL generation for LinkedIn/Facebook/X/WhatsApp
 - `SocialLinksBar` — 7-platform icon row (LinkedIn, Facebook, Twitter, YouTube, Instagram, WhatsApp, GitHub)
 - `tenant_social_links` schema — per-tenant social media URLs
@@ -2461,6 +2553,7 @@ pnpm turbo typecheck  # 0 errors
 - `NotificationPreferencesPage`, `AdminNotificationAnalyticsPage` — frontend pages
 
 **Wave D — WhatsApp Channel:**
+
 - `user_whatsapp_contacts` schema — encrypted phone (SI-3), consent tracking
 - `WhatsAppChannel` + `MetaCloudApiProvider` — Meta Cloud API integration
 - `WhatsAppRegistrationService` + resolver — OTP verification flow
@@ -2468,6 +2561,7 @@ pnpm turbo typecheck  # 0 errors
 - `WhatsAppSetupPage` — phone registration + consent UI
 
 **Wave E — Testing + Security:**
+
 - 24 RLS security tests for all 4 new schema files (`notification-rls.spec.ts`)
 - NATS notification events tests (`notification-events.test.ts`)
 - Component tests for SocialLinksBar, SocialShareMenu, ShareBadgeDialog
@@ -2486,11 +2580,13 @@ pnpm turbo typecheck  # 0 errors
 **Problem:** 8 locations showed plain-text "AI consent required" warnings with no navigation — users had no idea where to go to enable AI features.
 
 **3 new reusable components:**
+
 - `RequirementLink` — renders warning with clickable `<Link to="/settings?highlight=ai-consent">`
 - `useSettingsHighlight` — reads `?highlight` param, auto-scrolls, applies 3× pulse animation + tooltip
 - `PrivacyConsentCard` — new Settings card with AI Processing + Third-Party LLM consent toggles
 
 **8 consent warning locations fixed:**
+
 - `AiCourseCreatorModal` — `<RequirementLink variant="alert">`
 - `AIChatPanel` (×2) — consent-required message type in chat
 - `ChatMessage` — renders `<RequirementLink variant="inline">` for consent messages
@@ -2502,6 +2598,7 @@ pnpm turbo typecheck  # 0 errors
 **i18n:** Full EN + HE translations for all new UI strings
 
 ### Tests
+
 - 5 unit tests: `RequirementLink.test.tsx`
 - 5 unit tests: `useSettingsHighlight.test.ts`
 - 7 unit tests: `PrivacyConsentCard.test.tsx`
@@ -2538,40 +2635,47 @@ pnpm turbo typecheck  # 0 errors
 ### What Was Built
 
 **Wave A — Item Bank & Blueprints:**
+
 - `exam_items` schema — IRT 3PL calibration (a, b, c parameters), calibration lifecycle (DRAFT → PILOT → CALIBRATED → RETIRED), quality tiers (AI_GENERATED → SME_REVIEWED → PILOT_TESTED → CALIBRATED)
 - `exam_blueprints` schema — domain/bloom distribution constraints, passing methods (PERCENTAGE, SCALED_SCORE, IRT_THETA), CAT configuration (min/max items), retake policy (cooldown hours, max retakes)
 - Exam Assembly Engine — stratified sampling by domain/bloom, Fisher-Yates shuffle, exposure control
 - 7 enums: `BloomLevel`, `CalibrationStatus`, `ExamItemSource`, `QualityTier`, `BlueprintStatus`, `PassingMethod`, `ExamSessionStatus`
 
 **Wave B — Exam Delivery & Scoring:**
+
 - `exam_sessions` schema — server-authoritative timer, attempt tracking, question ordering, adaptive mode flag
 - `exam_responses` schema — per-item answer recording, flag support, time-spent tracking
 - `exam_results` schema — raw/scaled scores (0-1000), theta estimates, SEM, confidence intervals, domain/bloom subscores
 - Score calculation pipeline: raw → scaled 0-1000 → domain breakdown → bloom breakdown → pass/fail determination
 
 **Wave C — Psychometric Engine:**
+
 - Classical Test Theory (CTT): p-value, discrimination index (D-index), point-biserial correlation (r_pbis), distractor analysis
 - Item Response Theory (IRT): 3PL model, EM calibration algorithm
 - Reliability: KR-20, Cronbach's alpha, Standard Error of Measurement (SEM)
 - Blueprint analytics: pass rate, average score, average time, domain breakdown
 
 **Wave D — AI Question Generation:**
+
 - LangGraph 7-node pipeline: retrieve → generate → validateBloom → detectIWF (item writing flaws) → enhanceDistractors → verifyAnswers
 - `generateExamItems` mutation with domain/bloom targeting and difficulty control
 - Quality validation: Bloom taxonomy alignment, distractor plausibility, answer key verification
 
 **Wave E — Computer Adaptive Testing (CAT):**
+
 - Maximum Fisher Information (MFI) item selection algorithm
 - EAP/MLE ability estimation with iterative refinement
 - 3 termination criteria: max items reached, SEM threshold met, minimum items completed
 - Adaptive session flow: start → select next item → update ability estimate → check termination → repeat
 
 **Wave F — Browser Lockdown & Security:**
+
 - 7 security layers: fullscreen enforcement, tab/window detection, clipboard blocking, DevTools detection, right-click prevention, keyboard shortcut blocking, copy/paste prevention
 - `voidExamSession` mutation for admin override on security violations
 - RLS on all 8 tables — tenant isolation enforced
 
 **Wave G — Frontend UI:**
+
 - Exam item bank management page (CRUD, filtering, pagination)
 - Blueprint editor with domain/bloom distribution configuration
 - Exam delivery interface with timer, question navigation, flagging
@@ -2630,11 +2734,13 @@ pnpm turbo typecheck  # 0 errors
 ### What Was Built
 
 **WI-1 — HNSW Index Migration:**
+
 - Drizzle migration `0013_hnsw_vector_indexes.ts` applying HNSW indexes on `content_embeddings`, `annotation_embeddings`, `concept_embeddings` with `m=32, ef_construction=128, vector_cosine_ops`
 - `SET LOCAL hnsw.ef_search = 64` added to `EmbeddingStoreService.searchByVector()` for query-time recall tuning
 - Performance: sub-5ms search at 10K vectors, sub-10ms at 100K vectors (vs 500ms+ sequential scan)
 
 **WI-2 — Content Indexing Pipeline Activation:**
+
 - PDF handler activated via `pdf-parse` (replaced stub in `ContentIngestionPipelineService`)
 - Image handler wired to existing `TesseractOcrService` + `ImageUnderstandingService`
 - Video handler dispatches to transcription worker via NATS `EDUSPHERE.media.uploaded`
@@ -2642,6 +2748,7 @@ pnpm turbo typecheck  # 0 errors
 - All handlers set `knowledge_sources.status` through PENDING -> PROCESSING -> READY/FAILED lifecycle
 
 **WI-3 — NATS Concept Publisher:**
+
 - New `ConceptExtractionPublisherService` bridges content uploads to concept extraction pipeline
 - Subscribes to KnowledgeSource READY status changes + `content.created` NATS events
 - Uses Vercel AI SDK v6 structured output for concept extraction (Ollama dev / OpenAI prod)
@@ -2649,12 +2756,14 @@ pnpm turbo typecheck  # 0 errors
 - Concept embeddings generated after graph persistence in `NatsConsumer.processConcepts()`
 
 **WI-4 — Seed Data with Embeddings:**
+
 - `packages/db/src/seed/generate-seed-embeddings.ts` — runtime embedding generation script
 - `packages/db/src/seed/fixtures/demo-embeddings.json` — pre-computed 768-dim fallback vectors (~500 chunks)
 - New command: `pnpm --filter @edusphere/db seed:embeddings`
 - Fallback chain: Ollama -> OpenAI -> pre-computed fixtures (works without any LLM provider)
 
 **WI-5 — Transcript-to-KnowledgeSource Bridge + Graph Traversal:**
+
 - New `transcript_id` FK column on `knowledge_sources` (migration `0014_transcript_knowledge_source_fk.ts`)
 - `TranscriptCompletedConsumer` auto-creates KnowledgeSource from completed transcriptions
 - `findRelatedConcepts()` implemented with Apache AGE 2-hop Cypher traversal
@@ -2662,14 +2771,14 @@ pnpm turbo typecheck  # 0 errors
 
 ### Files Affected
 
-| Category | Files |
-|----------|-------|
-| Migrations | `packages/db/src/migrations/0013_hnsw_vector_indexes.ts`, `0014_transcript_knowledge_source_fk.ts` |
-| Schema | `packages/db/src/schema/knowledge-sources.ts` |
-| Seed | `packages/db/src/seed/generate-seed-embeddings.ts`, `fixtures/demo-embeddings.json` |
-| Backend | `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` |
-| NATS | `apps/subgraph-knowledge/src/nats/transcript-completed.consumer.ts`, `concept-extraction-publisher.service.ts`, `nats.consumer.ts` |
-| RAG | `packages/rag/src/hybridSearch.ts`, `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` |
+| Category   | Files                                                                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Migrations | `packages/db/src/migrations/0013_hnsw_vector_indexes.ts`, `0014_transcript_knowledge_source_fk.ts`                                 |
+| Schema     | `packages/db/src/schema/knowledge-sources.ts`                                                                                      |
+| Seed       | `packages/db/src/seed/generate-seed-embeddings.ts`, `fixtures/demo-embeddings.json`                                                |
+| Backend    | `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts`                                                       |
+| NATS       | `apps/subgraph-knowledge/src/nats/transcript-completed.consumer.ts`, `concept-extraction-publisher.service.ts`, `nats.consumer.ts` |
+| RAG        | `packages/rag/src/hybridSearch.ts`, `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts`                             |
 
 ### Acceptance Criteria
 
@@ -2706,6 +2815,7 @@ pnpm turbo typecheck  # 0 errors
 ### What Was Built
 
 **In-Browser PDF Rendering:**
+
 - `PdfViewer` component using `pdfjs-dist` (Mozilla PDF.js) for canvas-based rendering
 - Lazy-loaded via `React.lazy()` — zero impact on initial bundle
 - `devicePixelRatio` scaling for crisp rendering on high-DPI displays
@@ -2714,29 +2824,32 @@ pnpm turbo typecheck  # 0 errors
 - Page navigation with scroll-based tracking, page jump, and keyboard shortcuts
 
 **Annotation & Sketch Integration:**
+
 - Annotation layer positioned over each PDF page canvas (reuses Word-style annotation infrastructure)
 - Sketch canvas overlay via `useSketchCanvas` hook for freehand drawing on PDF pages
 - Z-index stack: canvas (base) -> text layer -> annotation layer -> sketch layer
 - Page-level annotation anchoring (annotations linked to specific PDF pages)
 
 **RAG Deep-Linking:**
+
 - RAG search results deep-link to specific PDF pages via `#page=N` URL fragment
 - Content Viewer embeds PdfViewer for PDF-type knowledge sources
 - Source Manager displays PDF sources with page count and thumbnail preview
 
 **Security:**
+
 - `maxPages: 1000` guard against PDF bombs
 - 30-second render timeout per page
 - Memory management: off-screen page canvases destroyed to prevent memory pressure
 
 ### Files Affected
 
-| Category | Key Files |
-|----------|-----------|
-| Components | `apps/web/src/components/pdf-viewer/PdfViewer.tsx`, `PdfPage.tsx`, `PdfAnnotationLayer.tsx` |
-| Hooks | `apps/web/src/components/pdf-viewer/usePdfDocument.ts`, `usePdfNavigation.ts` |
-| Integration | `apps/web/src/pages/content-viewer/ContentViewer.tsx` (PDF branch) |
-| Config | `vite.config.ts` (PDF.js worker bundling) |
+| Category    | Key Files                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| Components  | `apps/web/src/components/pdf-viewer/PdfViewer.tsx`, `PdfPage.tsx`, `PdfAnnotationLayer.tsx` |
+| Hooks       | `apps/web/src/components/pdf-viewer/usePdfDocument.ts`, `usePdfNavigation.ts`               |
+| Integration | `apps/web/src/pages/content-viewer/ContentViewer.tsx` (PDF branch)                          |
+| Config      | `vite.config.ts` (PDF.js worker bundling)                                                   |
 
 ### Acceptance Criteria
 
@@ -2772,6 +2885,7 @@ pnpm turbo typecheck  # 0 errors
 ### What Was Built
 
 **Admin Embedding Dashboard (`/admin/embeddings`):**
+
 - Embedding statistics overview: total embeddings, coverage percentage, average dimensions, index health
 - Per-course embedding coverage chart showing indexed vs total content ratio
 - Embedding activity log with real-time updates (embedding generation, reindexing events)
@@ -2779,17 +2893,20 @@ pnpm turbo typecheck  # 0 errors
 - HNSW index health monitor: index size, build status, estimated recall
 
 **Embedding Status Indicator:**
+
 - Source Manager shows per-source embedding status (PENDING/PROCESSING/READY/FAILED)
 - Badge component showing chunk count and embedding completeness percentage
 - Animated progress indicator during active embedding generation
 
 **Search Experience Improvements:**
+
 - Empty state messaging when no embeddings exist for searched content
 - "Content is being indexed" status when embeddings are in progress
 - RAG quality indicator showing semantic score confidence on search results
 - Source attribution in AI chat responses (links to source documents)
 
 **GraphQL API Additions:**
+
 - `embeddingStatistics` query — aggregate stats for admin dashboard
 - `courseEmbeddingCoverage` query — per-course embedding metrics
 - `embeddingActivityLog` query — paginated activity log with filters
@@ -2798,13 +2915,13 @@ pnpm turbo typecheck  # 0 errors
 
 ### Files Affected
 
-| Category | Key Files |
-|----------|-----------|
-| Pages | `apps/web/src/pages/admin-embeddings/AdminEmbeddingsPage.tsx` |
+| Category   | Key Files                                                                                                   |
+| ---------- | ----------------------------------------------------------------------------------------------------------- |
+| Pages      | `apps/web/src/pages/admin-embeddings/AdminEmbeddingsPage.tsx`                                               |
 | Components | `EmbeddingCoverageChart.tsx`, `EmbeddingActivityLog.tsx`, `EmbeddingStatusBadge.tsx`, `ReindexControls.tsx` |
-| GraphQL | `apps/subgraph-knowledge/src/embedding/embedding.resolver.ts` (new queries/mutations) |
-| Services | `apps/subgraph-knowledge/src/embedding/embedding-statistics.service.ts` |
-| Routes | `apps/web/src/lib/routes/admin-routes.tsx` (new `/admin/embeddings` route) |
+| GraphQL    | `apps/subgraph-knowledge/src/embedding/embedding.resolver.ts` (new queries/mutations)                       |
+| Services   | `apps/subgraph-knowledge/src/embedding/embedding-statistics.service.ts`                                     |
+| Routes     | `apps/web/src/lib/routes/admin-routes.tsx` (new `/admin/embeddings` route)                                  |
 
 ### Acceptance Criteria
 
@@ -2838,16 +2955,16 @@ pnpm turbo typecheck  # 0 errors
 
 ### Deliverables
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Backend test files | ~existing | +~99 new test files |
-| Backend test cases | ~3,572 | ~4,932 (+~1,360) |
-| subgraph-content coverage | <90% | ~90% |
-| subgraph-core coverage | <90% | ~92% |
-| subgraph-agent coverage | <90% | ~90% |
-| subgraph-knowledge coverage | ~90% | ~97% |
-| Files over 300 lines | multiple | 0 |
-| Lint warnings | >0 | 0 |
+| Metric                      | Before    | After               |
+| --------------------------- | --------- | ------------------- |
+| Backend test files          | ~existing | +~99 new test files |
+| Backend test cases          | ~3,572    | ~4,932 (+~1,360)    |
+| subgraph-content coverage   | <90%      | ~90%                |
+| subgraph-core coverage      | <90%      | ~92%                |
+| subgraph-agent coverage     | <90%      | ~90%                |
+| subgraph-knowledge coverage | ~90%      | ~97%                |
+| Files over 300 lines        | multiple  | 0                   |
+| Lint warnings               | >0        | 0                   |
 
 ### Acceptance Criteria
 

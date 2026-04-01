@@ -29,7 +29,7 @@ export class MarketplaceResolver {
   constructor(
     private readonly marketplaceService: MarketplaceService,
     private readonly payoutService: InstructorPayoutService,
-    private readonly checkoutService: MarketplaceCheckoutService,
+    private readonly checkoutService: MarketplaceCheckoutService
   ) {}
 
   @Query('courseListings')
@@ -50,7 +50,10 @@ export class MarketplaceResolver {
       filters
     );
     return buildRelayConnection(
-      listings as (typeof listings[number] & { id: string; createdAt?: string })[],
+      listings as ((typeof listings)[number] & {
+        id: string;
+        createdAt?: string;
+      })[],
       limit ?? listings.length,
       listings.length,
       null
@@ -161,7 +164,10 @@ export class MarketplaceResolver {
   @Query('myPayouts')
   async getMyPayouts(@Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
-    const rows = await this.payoutService.getPayoutHistory(tenantCtx.userId, tenantCtx);
+    const rows = await this.payoutService.getPayoutHistory(
+      tenantCtx.userId,
+      tenantCtx
+    );
     return rows.map((r) => ({
       id: r.id,
       periodMonth: r.periodMonth,
@@ -229,13 +235,17 @@ export class MarketplaceResolver {
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    const result = await this.checkoutService.requestRefund(purchaseId, tenantCtx);
+    const result = await this.checkoutService.requestRefund(
+      purchaseId,
+      tenantCtx
+    );
     return {
       ...result,
       status: 'REFUNDED',
-      createdAt: result.createdAt instanceof Date
-        ? result.createdAt.toISOString()
-        : result.createdAt,
+      createdAt:
+        result.createdAt instanceof Date
+          ? result.createdAt.toISOString()
+          : result.createdAt,
     };
   }
 

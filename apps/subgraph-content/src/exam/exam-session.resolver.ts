@@ -1,13 +1,7 @@
 /**
  * ExamSessionResolver — Thin resolver for exam delivery mutations/queries.
  */
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Context,
-} from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException, Logger } from '@nestjs/common';
 import type { GraphQLContext } from '../auth/auth.middleware';
 import type { TenantContext } from '@edusphere/db';
@@ -23,11 +17,13 @@ export class ExamSessionResolver {
   @Query('myExamSessions')
   async myExamSessions(
     @Args('blueprintId') blueprintId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.deliveryService.listUserSessions(
-      blueprintId, tc.userId, tc.tenantId,
+      blueprintId,
+      tc.userId,
+      tc.tenantId
     );
   }
 
@@ -40,11 +36,13 @@ export class ExamSessionResolver {
   @Mutation('startExamSession')
   async startExamSession(
     @Args('blueprintId') blueprintId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.deliveryService.startSession(
-      blueprintId, tc.userId, tc.tenantId,
+      blueprintId,
+      tc.userId,
+      tc.tenantId
     );
   }
 
@@ -53,12 +51,16 @@ export class ExamSessionResolver {
     @Args('sessionId') sessionId: string,
     @Args('itemId') itemId: string,
     @Args('answer') answer: unknown,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     submitExamAnswerSchema.parse({ sessionId, itemId, answer });
     return this.deliveryService.submitAnswer(
-      sessionId, itemId, answer, tc.userId, tc.tenantId,
+      sessionId,
+      itemId,
+      answer,
+      tc.userId,
+      tc.tenantId
     );
   }
 
@@ -66,29 +68,30 @@ export class ExamSessionResolver {
   async flagExamQuestion(
     @Args('sessionId') sessionId: string,
     @Args('itemId') itemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.deliveryService.flagQuestion(
-      sessionId, itemId, tc.userId, tc.tenantId,
+      sessionId,
+      itemId,
+      tc.userId,
+      tc.tenantId
     );
   }
 
   @Mutation('submitExam')
   async submitExam(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
-    return this.deliveryService.submitExam(
-      sessionId, tc.userId, tc.tenantId,
-    );
+    return this.deliveryService.submitExam(sessionId, tc.userId, tc.tenantId);
   }
 
   @Mutation('voidExamSession')
   async voidExamSession(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.deliveryService.voidSession(sessionId, tc.tenantId);

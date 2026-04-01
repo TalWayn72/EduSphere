@@ -40,8 +40,18 @@ const MOCK_COURSE_DRAFT = {
       title: 'Module 1: Basics',
       order: 0,
       contentItems: [
-        { __typename: 'ContentItem', id: 'ci-1', title: 'Lesson 1', type: 'VIDEO' },
-        { __typename: 'ContentItem', id: 'ci-2', title: 'Quiz 1', type: 'QUIZ' },
+        {
+          __typename: 'ContentItem',
+          id: 'ci-1',
+          title: 'Lesson 1',
+          type: 'VIDEO',
+        },
+        {
+          __typename: 'ContentItem',
+          id: 'ci-2',
+          title: 'Quiz 1',
+          type: 'QUIZ',
+        },
       ],
     },
   ],
@@ -59,7 +69,11 @@ const READINESS_CHECKS = {
   courseId: COURSE_ID,
   checks: [
     { name: 'has_title', label: 'Course has a title', passed: true },
-    { name: 'has_description', label: 'Course has a description', passed: true },
+    {
+      name: 'has_description',
+      label: 'Course has a description',
+      passed: true,
+    },
     { name: 'has_modules', label: 'At least one module exists', passed: true },
     { name: 'has_content', label: 'Modules have content items', passed: true },
     { name: 'has_quiz', label: 'At least one quiz exists', passed: true },
@@ -71,7 +85,11 @@ const READINESS_CHECKS_FAILING = {
   ...READINESS_CHECKS,
   checks: [
     { name: 'has_title', label: 'Course has a title', passed: true },
-    { name: 'has_description', label: 'Course has a description', passed: false },
+    {
+      name: 'has_description',
+      label: 'Course has a description',
+      passed: false,
+    },
     { name: 'has_modules', label: 'At least one module exists', passed: true },
     { name: 'has_content', label: 'Modules have content items', passed: false },
     { name: 'has_quiz', label: 'At least one quiz exists', passed: false },
@@ -83,7 +101,7 @@ const READINESS_CHECKS_FAILING = {
 
 async function setupPublishMocks(
   page: Page,
-  opts: { readiness?: typeof READINESS_CHECKS; publishSuccess?: boolean } = {},
+  opts: { readiness?: typeof READINESS_CHECKS; publishSuccess?: boolean } = {}
 ) {
   const readiness = opts.readiness ?? READINESS_CHECKS;
   const publishSuccess = opts.publishSuccess ?? true;
@@ -126,7 +144,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await login(page);
   });
 
-  test('publish button is visible on draft course detail page', async ({ page }) => {
+  test('publish button is visible on draft course detail page', async ({
+    page,
+  }) => {
     await setupPublishMocks(page);
     await page.goto(`${BASE_URL}/courses/${COURSE_ID}`, {
       waitUntil: 'domcontentloaded',
@@ -155,7 +175,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await expect(readinessSheet).toBeVisible({ timeout: 5_000 });
   });
 
-  test('readiness checklist shows all checks when they pass', async ({ page }) => {
+  test('readiness checklist shows all checks when they pass', async ({
+    page,
+  }) => {
     await setupPublishMocks(page, { readiness: READINESS_CHECKS });
     await page.goto(`${BASE_URL}/courses/${COURSE_ID}`, {
       waitUntil: 'domcontentloaded',
@@ -169,8 +191,12 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
 
     // All 5 check items should be visible
     await expect(readinessSheet.getByText('Course has a title')).toBeVisible();
-    await expect(readinessSheet.getByText('Course has a description')).toBeVisible();
-    await expect(readinessSheet.getByText('At least one module exists')).toBeVisible();
+    await expect(
+      readinessSheet.getByText('Course has a description')
+    ).toBeVisible();
+    await expect(
+      readinessSheet.getByText('At least one module exists')
+    ).toBeVisible();
 
     // Confirm publish button should be enabled when all checks pass
     const confirmBtn = page.getByTestId('confirm-publish-btn');
@@ -178,7 +204,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await expect(confirmBtn).toBeEnabled();
   });
 
-  test('confirm publish button is disabled when checks fail', async ({ page }) => {
+  test('confirm publish button is disabled when checks fail', async ({
+    page,
+  }) => {
     await setupPublishMocks(page, { readiness: READINESS_CHECKS_FAILING });
     await page.goto(`${BASE_URL}/courses/${COURSE_ID}`, {
       waitUntil: 'domcontentloaded',
@@ -196,7 +224,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await expect(confirmBtn).toBeDisabled();
   });
 
-  test('confirming publish transitions course to PUBLISHED status', async ({ page }) => {
+  test('confirming publish transitions course to PUBLISHED status', async ({
+    page,
+  }) => {
     await setupPublishMocks(page, { publishSuccess: true });
     await page.goto(`${BASE_URL}/courses/${COURSE_ID}`, {
       waitUntil: 'domcontentloaded',
@@ -204,7 +234,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByTestId('publish-course-btn').click();
-    await expect(page.getByTestId('readiness-sheet')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('readiness-sheet')).toBeVisible({
+      timeout: 5_000,
+    });
 
     await page.getByTestId('confirm-publish-btn').click();
     await page.waitForLoadState('domcontentloaded');
@@ -214,7 +246,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await expect(successMsg).toBeVisible({ timeout: 8_000 });
   });
 
-  test('publish error shows friendly message, not raw GraphQL error', async ({ page }) => {
+  test('publish error shows friendly message, not raw GraphQL error', async ({
+    page,
+  }) => {
     await setupPublishMocks(page, { publishSuccess: false });
     await page.goto(`${BASE_URL}/courses/${COURSE_ID}`, {
       waitUntil: 'domcontentloaded',
@@ -222,17 +256,23 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByTestId('publish-course-btn').click();
-    await expect(page.getByTestId('readiness-sheet')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('readiness-sheet')).toBeVisible({
+      timeout: 5_000,
+    });
 
     await page.getByTestId('confirm-publish-btn').click();
     await page.waitForLoadState('domcontentloaded');
 
     // Raw GraphQL error must NOT appear
     await expect(
-      page.getByText('Course validation failed: missing required fields'),
+      page.getByText('Course validation failed: missing required fields')
     ).not.toBeVisible({ timeout: 3_000 });
-    await expect(page.getByText('[GraphQL]')).not.toBeVisible({ timeout: 2_000 });
-    await expect(page.getByText('VALIDATION_ERROR')).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('[GraphQL]')).not.toBeVisible({
+      timeout: 2_000,
+    });
+    await expect(page.getByText('VALIDATION_ERROR')).not.toBeVisible({
+      timeout: 2_000,
+    });
   });
 
   test('no raw technical strings on course detail page', async ({ page }) => {
@@ -257,7 +297,9 @@ test.describe('Course Publish Flow — DEV_MODE', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByTestId('publish-course-btn').click();
-    await expect(page.getByTestId('readiness-sheet')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('readiness-sheet')).toBeVisible({
+      timeout: 5_000,
+    });
 
     await expect(page).toHaveScreenshot('course-publish-readiness-sheet.png', {
       maxDiffPixels: 300,

@@ -1,4 +1,12 @@
-import { pgTable, uuid, text, integer, boolean, jsonb, timestamp } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  integer,
+  boolean,
+  jsonb,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 
 export const onboardingState = pgTable('onboarding_state', {
   userId: uuid('user_id').primaryKey(),
@@ -9,6 +17,10 @@ export const onboardingState = pgTable('onboarding_state', {
   completed: boolean('completed').notNull().default(false),
   skipped: boolean('skipped').notNull().default(false),
   data: jsonb('data').default({}),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });

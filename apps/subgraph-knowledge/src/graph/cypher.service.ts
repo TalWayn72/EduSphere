@@ -17,7 +17,11 @@
  * enforces security via AGE parameterized queries.
  */
 import { Injectable } from '@nestjs/common';
-import type { ConceptProperties, RelationshipProperties, ConceptRelationshipType } from '@edusphere/db';
+import type {
+  ConceptProperties,
+  RelationshipProperties,
+  ConceptRelationshipType,
+} from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
 import { CypherConceptRelationService } from './cypher-concept-relation.service';
 import { CypherPersonService } from './cypher-person.service';

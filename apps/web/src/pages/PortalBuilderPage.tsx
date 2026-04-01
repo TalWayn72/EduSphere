@@ -42,7 +42,9 @@ function parseServerBlocks(
 
 export function PortalBuilderPage() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [{ data }] = useQuery({ query: MY_PORTAL_QUERY, pause: !mounted });
   const [, saveMutation] = useMutation(SAVE_PORTAL_LAYOUT_MUTATION);
   const [, publishMutation] = useMutation(PUBLISH_PORTAL_MUTATION);
@@ -125,51 +127,51 @@ export function PortalBuilderPage() {
 
   return (
     <AdminLayout>
-    <PageHeader
-      title="Portal Builder"
-      breadcrumbs={[
-        { label: 'Admin', href: '/admin' },
-        { label: 'Portal Builder' },
-      ]}
-    />
-    <div className="flex flex-col h-screen mt-4">
-      {/* Toolbar */}
-      <header className="flex items-center gap-3 px-6 py-3 border-b bg-background shrink-0">
-        <input
-          className="flex-1 text-lg font-semibold bg-transparent border-none outline-none"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          aria-label="Portal title"
-          placeholder="Portal title..."
-        />
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-4 py-1.5 text-sm border rounded-lg hover:bg-muted transition-colors disabled:opacity-50"
-        >
-          {saving ? 'Saving...' : 'Save Draft'}
-        </button>
-        <button
-          onClick={isPublished ? handleUnpublish : handlePublish}
-          className="px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          {isPublished ? 'Unpublish' : 'Publish'}
-        </button>
-      </header>
-
-      {/* Two-panel body */}
-      <div className="flex flex-1 overflow-hidden">
-        <BlockPalette onAdd={handleDrop} />
-        <main className="flex-1 p-6 overflow-y-auto bg-muted/10">
-          <CanvasDropZone
-            blocks={blocks}
-            onDrop={handleDrop}
-            onRemove={handleRemove}
-            onReorder={handleReorder}
+      <PageHeader
+        title="Portal Builder"
+        breadcrumbs={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Portal Builder' },
+        ]}
+      />
+      <div className="flex flex-col h-screen mt-4">
+        {/* Toolbar */}
+        <header className="flex items-center gap-3 px-6 py-3 border-b bg-background shrink-0">
+          <input
+            className="flex-1 text-lg font-semibold bg-transparent border-none outline-none"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            aria-label="Portal title"
+            placeholder="Portal title..."
           />
-        </main>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-4 py-1.5 text-sm border rounded-lg hover:bg-muted transition-colors disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save Draft'}
+          </button>
+          <button
+            onClick={isPublished ? handleUnpublish : handlePublish}
+            className="px-4 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            {isPublished ? 'Unpublish' : 'Publish'}
+          </button>
+        </header>
+
+        {/* Two-panel body */}
+        <div className="flex flex-1 overflow-hidden">
+          <BlockPalette onAdd={handleDrop} />
+          <main className="flex-1 p-6 overflow-y-auto bg-muted/10">
+            <CanvasDropZone
+              blocks={blocks}
+              onDrop={handleDrop}
+              onRemove={handleRemove}
+              onReorder={handleReorder}
+            />
+          </main>
+        </div>
       </div>
-    </div>
     </AdminLayout>
   );
 }

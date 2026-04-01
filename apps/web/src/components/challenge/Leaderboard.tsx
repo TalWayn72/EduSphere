@@ -14,7 +14,10 @@ const RANK_MEDALS = ['🥇', '🥈', '🥉'];
 
 function formatCompletedAt(iso: string | null | undefined): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 export function Leaderboard({ entries }: LeaderboardProps) {
@@ -31,23 +34,37 @@ export function Leaderboard({ entries }: LeaderboardProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/40">
-            <th className="px-4 py-2 text-left font-medium text-muted-foreground w-16">Rank</th>
-            <th className="px-4 py-2 text-left font-medium text-muted-foreground">Learner</th>
-            <th className="px-4 py-2 text-right font-medium text-muted-foreground">Score</th>
-            <th className="px-4 py-2 text-right font-medium text-muted-foreground hidden sm:table-cell">Completed</th>
+            <th className="px-4 py-2 text-left font-medium text-muted-foreground w-16">
+              Rank
+            </th>
+            <th className="px-4 py-2 text-left font-medium text-muted-foreground">
+              Learner
+            </th>
+            <th className="px-4 py-2 text-right font-medium text-muted-foreground">
+              Score
+            </th>
+            <th className="px-4 py-2 text-right font-medium text-muted-foreground hidden sm:table-cell">
+              Completed
+            </th>
           </tr>
         </thead>
         <tbody>
           {entries.map((entry, idx) => {
             const displayRank = entry.rank ?? idx + 1;
-            const medal = displayRank <= 3 ? RANK_MEDALS[displayRank - 1] : null;
+            const medal =
+              displayRank <= 3 ? RANK_MEDALS[displayRank - 1] : null;
             return (
-              <tr key={entry.id} className="border-b border-border/50 last:border-0 hover:bg-muted/20 transition-colors">
+              <tr
+                key={entry.id}
+                className="border-b border-border/50 last:border-0 hover:bg-muted/20 transition-colors"
+              >
                 <td className="px-4 py-2 text-center font-semibold text-foreground">
                   {medal ? (
                     <span aria-label={`Rank ${displayRank}`}>{medal}</span>
                   ) : (
-                    <span className="text-muted-foreground">#{displayRank}</span>
+                    <span className="text-muted-foreground">
+                      #{displayRank}
+                    </span>
                   )}
                 </td>
                 <td className="px-4 py-2 text-foreground">

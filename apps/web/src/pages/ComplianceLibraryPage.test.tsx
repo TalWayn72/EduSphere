@@ -64,7 +64,11 @@ describe('ComplianceLibraryPage', () => {
 
   it('renders h1 "Compliance Course Library"', () => {
     mockUseQuery.mockReturnValue([
-      { fetching: false, error: undefined, data: { complianceCourses: MOCK_COURSES } },
+      {
+        fetching: false,
+        error: undefined,
+        data: { complianceCourses: MOCK_COURSES },
+      },
     ]);
     renderPage();
     expect(
@@ -78,7 +82,9 @@ describe('ComplianceLibraryPage', () => {
     ]);
     renderPage();
     // aria-busy grid is rendered instead of cards
-    expect(screen.getByLabelText(/loading compliance courses/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/loading compliance courses/i)
+    ).toBeInTheDocument();
   });
 
   it('renders course cards when data loads (8 courses)', () => {
@@ -108,8 +114,8 @@ describe('ComplianceLibraryPage', () => {
       },
     ]);
     renderPage();
-    expect(
-      screen.getByRole('alert')
-    ).toHaveTextContent(/unable to load compliance library/i);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      /unable to load compliance library/i
+    );
   });
 });

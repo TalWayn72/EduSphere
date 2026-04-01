@@ -36,6 +36,7 @@ flowchart LR
 ## Problem
 
 Previously, Security and QA divisions only engaged at Wave 2 (implementation). This caused:
+
 - Missing `data-testid` attributes discovered post-implementation
 - Threat models written after code was committed
 - Security gaps found too late to fix cheaply
@@ -50,11 +51,11 @@ Each Wave 1 planning phase MUST produce:
 
 For every new feature or mutation:
 
-| Threat | STRIDE Category | Mitigation | Owner |
-|--------|----------------|-----------|-------|
-| Unauthorized access to [resource] | Spoofing | {AUTH_TOKEN} + {ROLE_DIRECTIVE} | Backend |
-| Data leak across tenants | Information Disclosure | {ROW_SECURITY} + withTenantContext | Database |
-| Injection via user input | Tampering | {VALIDATION_LIB} validation | Backend |
+| Threat                            | STRIDE Category        | Mitigation                         | Owner    |
+| --------------------------------- | ---------------------- | ---------------------------------- | -------- |
+| Unauthorized access to [resource] | Spoofing               | {AUTH_TOKEN} + {ROLE_DIRECTIVE}    | Backend  |
+| Data leak across tenants          | Information Disclosure | {ROW_SECURITY} + withTenantContext | Database |
+| Injection via user input          | Tampering              | {VALIDATION_LIB} validation        | Backend  |
 
 #### 2. Testability Contract (QA Division)
 
@@ -62,15 +63,18 @@ For every new UI component or API endpoint:
 
 ```markdown
 ## Required data-testid Attributes
+
 - data-testid="feature-main-container"
 - data-testid="feature-submit-button"
 - data-testid="feature-error-message"
 
 ## Required Error Codes
+
 - FEATURE_NOT_FOUND
 - FEATURE_PERMISSION_DENIED
 
 ## Mock Seams
+
 - API query: mockable via page.route()
 - External service: mockable via dependency injection
 ```
@@ -98,4 +102,4 @@ For every new UI component or API endpoint:
 
 ---
 
-*Template version: 1.0*
+_Template version: 1.0_

@@ -31,7 +31,9 @@ describe('PendingInvitesTable', () => {
   });
 
   it('renders table headers', () => {
-    const invites = [{ id: '1', email: 'x@y.com', role: 'STUDENT', status: 'pending' }];
+    const invites = [
+      { id: '1', email: 'x@y.com', role: 'STUDENT', status: 'pending' },
+    ];
     render(<PendingInvitesTable invites={invites} fetching={false} t={t} />);
     expect(screen.getByText('team.colEmail')).toBeInTheDocument();
     expect(screen.getByText('team.colRole')).toBeInTheDocument();

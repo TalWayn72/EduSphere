@@ -23,7 +23,11 @@ function makeEmptyQuestion(): QuizQuestionItem {
   };
 }
 
-export function QuizBuilderForm({ questions, passingScore, onChange }: QuizBuilderFormProps) {
+export function QuizBuilderForm({
+  questions,
+  passingScore,
+  onChange,
+}: QuizBuilderFormProps) {
   const handleAdd = () => {
     onChange([...questions, makeEmptyQuestion()], passingScore);
   };
@@ -76,7 +80,10 @@ export function QuizBuilderForm({ questions, passingScore, onChange }: QuizBuild
           <Label htmlFor="passing-score" className="text-sm font-medium">
             Passing Score
           </Label>
-          <span className="text-sm font-semibold text-primary" aria-live="polite">
+          <span
+            className="text-sm font-semibold text-primary"
+            aria-live="polite"
+          >
             {passingScore}%
           </span>
         </div>

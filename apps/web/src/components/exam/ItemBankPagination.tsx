@@ -11,7 +11,10 @@ interface ItemBankPaginationProps {
 }
 
 export function ItemBankPagination({
-  page, pageSize, totalCount, onPageChange,
+  page,
+  pageSize,
+  totalCount,
+  onPageChange,
 }: ItemBankPaginationProps) {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const start = Math.min(page * pageSize + 1, totalCount);

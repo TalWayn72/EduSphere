@@ -6,7 +6,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 
-const compositionCalls: Array<{ id: string; durationInFrames: number; fps: number; width: number; height: number }> = [];
+const compositionCalls: Array<{
+  id: string;
+  durationInFrames: number;
+  fps: number;
+  width: number;
+  height: number;
+}> = [];
 
 vi.mock('remotion', () => ({
   Composition: (props: Record<string, unknown>) => {
@@ -20,8 +26,14 @@ vi.mock('remotion', () => ({
     return null;
   },
   useCurrentFrame: vi.fn(() => 0),
-  useVideoConfig: vi.fn(() => ({ width: 1920, height: 1080, fps: 30, durationInFrames: 300 })),
-  AbsoluteFill: ({ children }: { children: React.ReactNode }) => React.createElement('div', null, children),
+  useVideoConfig: vi.fn(() => ({
+    width: 1920,
+    height: 1080,
+    fps: 30,
+    durationInFrames: 300,
+  })),
+  AbsoluteFill: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('div', null, children),
   spring: vi.fn(() => 0.5),
   interpolate: vi.fn(() => 0),
 }));

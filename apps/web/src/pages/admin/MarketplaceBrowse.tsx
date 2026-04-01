@@ -11,7 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -49,7 +53,13 @@ interface MarketplaceListing {
 }
 
 const CATEGORIES = [
-  'all', 'technology', 'business', 'design', 'science', 'humanities', 'compliance',
+  'all',
+  'technology',
+  'business',
+  'design',
+  'science',
+  'humanities',
+  'compliance',
 ] as const;
 
 function CourseCard({
@@ -64,10 +74,17 @@ function CourseCard({
   isCheckingOut: boolean;
 }) {
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow" data-testid={`course-card-${course.id}`}>
+    <Card
+      className="overflow-hidden hover:shadow-md transition-shadow"
+      data-testid={`course-card-${course.id}`}
+    >
       <div className="aspect-video bg-muted relative">
         {course.thumbnailUrl ? (
-          <img src={course.thumbnailUrl} alt="" className="object-cover w-full h-full" />
+          <img
+            src={course.thumbnailUrl}
+            alt=""
+            className="object-cover w-full h-full"
+          />
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
             {t('marketplace.noImage')}
@@ -76,14 +93,18 @@ function CourseCard({
       </div>
       <CardContent className="p-4 space-y-2">
         <h3 className="font-semibold text-sm line-clamp-2">{course.title}</h3>
-        <p className="text-xs text-muted-foreground line-clamp-2">{course.description}</p>
+        <p className="text-xs text-muted-foreground line-clamp-2">
+          {course.description}
+        </p>
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold">
             {course.priceUsdCents === 0
               ? t('marketplace.free')
               : `$${(course.priceUsdCents / 100).toFixed(2)}`}
           </span>
-          <Badge variant="secondary" className="text-xs">{course.category}</Badge>
+          <Badge variant="secondary" className="text-xs">
+            {course.category}
+          </Badge>
         </div>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{course.instructorName}</span>
@@ -98,7 +119,9 @@ function CourseCard({
           onClick={() => onCheckout(course.id)}
           data-testid={`checkout-btn-${course.id}`}
         >
-          {isCheckingOut ? t('marketplace.processing') : t('marketplace.addToOrg')}
+          {isCheckingOut
+            ? t('marketplace.processing')
+            : t('marketplace.addToOrg')}
         </Button>
       </CardContent>
     </Card>
@@ -111,7 +134,9 @@ export function MarketplaceBrowse() {
   const [category, setCategory] = useState('all');
   const [mounted, setMounted] = useState(false);
   const [checkingOutId, setCheckingOutId] = useState<string | null>(null);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }] = useQuery<{
     marketplaceListings: { items: MarketplaceListing[]; totalCount: number };
@@ -130,22 +155,28 @@ export function MarketplaceBrowse() {
     createCheckoutSession: { sessionUrl: string; sessionId: string };
   }>(CREATE_CHECKOUT_SESSION_MUTATION);
 
-  const handleCheckout = useCallback(async (listingId: string) => {
-    setCheckingOutId(listingId);
-    try {
-      const result = await executeCheckout({ listingId });
-      if (result.data?.createCheckoutSession?.sessionUrl) {
-        window.location.href = result.data.createCheckoutSession.sessionUrl;
+  const handleCheckout = useCallback(
+    async (listingId: string) => {
+      setCheckingOutId(listingId);
+      try {
+        const result = await executeCheckout({ listingId });
+        if (result.data?.createCheckoutSession?.sessionUrl) {
+          window.location.href = result.data.createCheckoutSession.sessionUrl;
+        }
+      } finally {
+        setCheckingOutId(null);
       }
-    } finally {
-      setCheckingOutId(null);
-    }
-  }, [executeCheckout]);
+    },
+    [executeCheckout]
+  );
 
   const listings = data?.marketplaceListings?.items ?? [];
 
   return (
-    <AdminLayout title={t('marketplace.title')} description={t('marketplace.description')}>
+    <AdminLayout
+      title={t('marketplace.title')}
+      description={t('marketplace.description')}
+    >
       <div data-testid="marketplace-browse-page" className="space-y-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
@@ -156,7 +187,10 @@ export function MarketplaceBrowse() {
             aria-label={t('marketplace.searchLabel')}
           />
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-48" aria-label={t('marketplace.categoryLabel')}>
+            <SelectTrigger
+              className="w-48"
+              aria-label={t('marketplace.categoryLabel')}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -172,7 +206,11 @@ export function MarketplaceBrowse() {
         {fetching ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Card key={i}><CardContent className="p-4"><Skeleton className="h-48 w-full" /></CardContent></Card>
+              <Card key={i}>
+                <CardContent className="p-4">
+                  <Skeleton className="h-48 w-full" />
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : listings.length === 0 ? (

@@ -67,7 +67,9 @@ describe('ScimSyncLog — header', () => {
 
   it('renders the description text', () => {
     render(<ScimSyncLog entries={[]} />);
-    expect(screen.getByText('Recent SCIM provisioning operations')).toBeTruthy();
+    expect(
+      screen.getByText('Recent SCIM provisioning operations')
+    ).toBeTruthy();
   });
 });
 

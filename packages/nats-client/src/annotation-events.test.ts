@@ -41,7 +41,12 @@ describe('annotation-events type guards', () => {
     });
 
     it('returns true for all annotation layers', () => {
-      for (const layer of ['PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED']) {
+      for (const layer of [
+        'PERSONAL',
+        'SHARED',
+        'INSTRUCTOR',
+        'AI_GENERATED',
+      ]) {
         expect(isAnnotationEvent({ ...validAnnotation, layer })).toBe(true);
       }
     });
@@ -71,15 +76,15 @@ describe('annotation-events type guards', () => {
     });
 
     it('returns false when annotationId is not a string', () => {
-      expect(
-        isAnnotationEvent({ ...validAnnotation, annotationId: 123 })
-      ).toBe(false);
+      expect(isAnnotationEvent({ ...validAnnotation, annotationId: 123 })).toBe(
+        false
+      );
     });
 
     it('returns false when assetId is not a string', () => {
-      expect(
-        isAnnotationEvent({ ...validAnnotation, assetId: null })
-      ).toBe(false);
+      expect(isAnnotationEvent({ ...validAnnotation, assetId: null })).toBe(
+        false
+      );
     });
 
     it('returns false for empty object', () => {

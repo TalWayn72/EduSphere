@@ -163,7 +163,9 @@ for (const { label, path: pagePath } of PAGES) {
 
     // restore session via silent SSO
     await loginKeycloak(page);
-    await page.goto(`${BASE_URL}${pagePath}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}${pagePath}`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('networkidle').catch(() => {});
 
     entry.url = page.url();
@@ -264,11 +266,14 @@ test.describe('UI Audit — DEV_MODE pages', () => {
       timeout: 5_000,
     });
 
-    await expect(page).toHaveScreenshot('ui-audit-knowledge-graph-devmode.png', {
-      fullPage: false,
-      maxDiffPixels: 200,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'ui-audit-knowledge-graph-devmode.png',
+      {
+        fullPage: false,
+        maxDiffPixels: 200,
+        animations: 'disabled',
+      }
+    );
   });
 
   test('collaboration page renders without crash', async ({ page }) => {

@@ -37,7 +37,9 @@ export function OnboardingChecklist() {
   const [open, setOpen] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data }] = useQuery<{ onboardingStatus: OnboardingData }>({
     query: ONBOARDING_STATUS_QUERY,
@@ -45,9 +47,12 @@ export function OnboardingChecklist() {
   });
 
   const status = data?.onboardingStatus;
-  if (!status || dismissed || status.completedCount === status.totalCount) return null;
+  if (!status || dismissed || status.completedCount === status.totalCount)
+    return null;
 
-  const progress = Math.round((status.completedCount / status.totalCount) * 100);
+  const progress = Math.round(
+    (status.completedCount / status.totalCount) * 100
+  );
 
   return (
     <div
@@ -60,7 +65,12 @@ export function OnboardingChecklist() {
         <Card className="shadow-lg">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm">{t('checklist.title')}</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)} aria-label={t('checklist.collapse')}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setOpen(false)}
+              aria-label={t('checklist.collapse')}
+            >
               &#x2212;
             </Button>
           </CardHeader>
@@ -68,7 +78,10 @@ export function OnboardingChecklist() {
             <div className="space-y-1">
               <Progress value={progress} className="h-1.5" />
               <p className="text-xs text-muted-foreground">
-                {t('checklist.progress', { done: status.completedCount, total: status.totalCount })}
+                {t('checklist.progress', {
+                  done: status.completedCount,
+                  total: status.totalCount,
+                })}
               </p>
             </div>
             <ul className="space-y-2" role="list">

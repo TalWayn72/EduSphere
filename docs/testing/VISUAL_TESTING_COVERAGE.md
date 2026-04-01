@@ -4,41 +4,41 @@
 
 ## Current Status
 
-| Metric | Count | Target |
-|--------|-------|--------|
-| **E2E Visual Assertions** | 2,054 | 500+ |
-| **Visual Spec Files** | 215 | 40+ |
-| **Total E2E Spec Files** | 290 | — |
-| **Snapshot Baseline Dirs** | 163 | — |
-| **Baseline PNG Files** | 4,613 | — |
-| **Storybook Stories** | 69+ files | Full component coverage |
-| **CI Shards** | 4 parallel | Optimal for ~500 tests |
+| Metric                     | Count      | Target                  |
+| -------------------------- | ---------- | ----------------------- |
+| **E2E Visual Assertions**  | 2,054      | 500+                    |
+| **Visual Spec Files**      | 215        | 40+                     |
+| **Total E2E Spec Files**   | 290        | —                       |
+| **Snapshot Baseline Dirs** | 163        | —                       |
+| **Baseline PNG Files**     | 4,613      | —                       |
+| **Storybook Stories**      | 69+ files  | Full component coverage |
+| **CI Shards**              | 4 parallel | Optimal for ~500 tests  |
 
 ## Coverage by Category
 
-| Category | Assertions | Spec Files |
-|----------|-----------|------------|
-| Admin pages | ~20 | `visual-regression-admin.spec.ts` |
-| Dark mode | ~30 | `visual-dark-mode-{public,dashboard,admin,learning}.spec.ts` |
-| RTL (Hebrew) | ~25 | `visual-rtl-{public,authenticated,forms}.spec.ts` |
-| Accessibility | ~30 | `visual-a11y-{focus-states,high-contrast,reduced-motion}.spec.ts` |
-| Charts & Data Viz | ~20 | `visual-charts-{assessment,gamification,analytics}.spec.ts` |
-| User Flows | ~25 | `visual-flow-{student-onboarding,instructor-course,exam-lifecycle,collaboration}.spec.ts` |
-| Error States | ~15 | `visual-error-states.spec.ts` |
-| Loading States | ~15 | `visual-loading-states.spec.ts` |
-| Cross-browser | ~70 | `visual-cross-browser-{critical,forms}.spec.ts` |
-| Viewport | ~30 | `visual-viewport-{4k,laptop,small-mobile}.spec.ts` |
-| Forms | ~30 | `visual-cross-browser-forms.spec.ts`, `visual-rtl-forms.spec.ts` |
-| Baseline & Other | ~60+ | `visual-regression-{baseline,public,auth,social,content,...}.spec.ts` |
+| Category          | Assertions | Spec Files                                                                                |
+| ----------------- | ---------- | ----------------------------------------------------------------------------------------- |
+| Admin pages       | ~20        | `visual-regression-admin.spec.ts`                                                         |
+| Dark mode         | ~30        | `visual-dark-mode-{public,dashboard,admin,learning}.spec.ts`                              |
+| RTL (Hebrew)      | ~25        | `visual-rtl-{public,authenticated,forms}.spec.ts`                                         |
+| Accessibility     | ~30        | `visual-a11y-{focus-states,high-contrast,reduced-motion}.spec.ts`                         |
+| Charts & Data Viz | ~20        | `visual-charts-{assessment,gamification,analytics}.spec.ts`                               |
+| User Flows        | ~25        | `visual-flow-{student-onboarding,instructor-course,exam-lifecycle,collaboration}.spec.ts` |
+| Error States      | ~15        | `visual-error-states.spec.ts`                                                             |
+| Loading States    | ~15        | `visual-loading-states.spec.ts`                                                           |
+| Cross-browser     | ~70        | `visual-cross-browser-{critical,forms}.spec.ts`                                           |
+| Viewport          | ~30        | `visual-viewport-{4k,laptop,small-mobile}.spec.ts`                                        |
+| Forms             | ~30        | `visual-cross-browser-forms.spec.ts`, `visual-rtl-forms.spec.ts`                          |
+| Baseline & Other  | ~60+       | `visual-regression-{baseline,public,auth,social,content,...}.spec.ts`                     |
 
 ## Tools
 
-| Tool | Purpose | Integration |
-|------|---------|-------------|
-| **Playwright** | Primary E2E visual testing | `toHaveScreenshot()` with pixel-diff |
-| **Lost Pixel** | Storybook component regression | `.lostpixel/` baselines |
-| **Argos CI** | Cloud screenshot review | `ARGOS_TOKEN` in CI secrets |
-| **Storybook test-runner** | Component story validation | `build-storybook` in CI |
+| Tool                      | Purpose                        | Integration                          |
+| ------------------------- | ------------------------------ | ------------------------------------ |
+| **Playwright**            | Primary E2E visual testing     | `toHaveScreenshot()` with pixel-diff |
+| **Lost Pixel**            | Storybook component regression | `.lostpixel/` baselines              |
+| **Argos CI**              | Cloud screenshot review        | `ARGOS_TOKEN` in CI secrets          |
+| **Storybook test-runner** | Component story validation     | `build-storybook` in CI              |
 
 ## How to Run Visual Tests
 
@@ -125,13 +125,13 @@ graph TD
 
 ### Artifact Outputs
 
-| Artifact | Description | Retention |
-|----------|-------------|-----------|
-| `visual-shard-{0..3}` | Per-shard screenshots & results | 30 days |
-| `blob-report-{0..3}` | Per-shard Playwright blob reports | 7 days |
-| `visual-regression-report` | Merged HTML report (all shards) | 30 days |
-| `visual-regression-screenshots` | All merged screenshots | 30 days |
-| `lost-pixel-baselines` | Storybook component baselines | 30 days |
+| Artifact                        | Description                       | Retention |
+| ------------------------------- | --------------------------------- | --------- |
+| `visual-shard-{0..3}`           | Per-shard screenshots & results   | 30 days   |
+| `blob-report-{0..3}`            | Per-shard Playwright blob reports | 7 days    |
+| `visual-regression-report`      | Merged HTML report (all shards)   | 30 days   |
+| `visual-regression-screenshots` | All merged screenshots            | 30 days   |
+| `lost-pixel-baselines`          | Storybook component baselines     | 30 days   |
 
 ### Browser Caching
 
@@ -139,16 +139,16 @@ Playwright browser binaries are cached using `actions/cache@v4` with key based o
 
 ## Screenshot Naming Convention
 
-| Pattern | Example | Used In |
-|---------|---------|---------|
-| `xbrowser-{page}-full.png` | `xbrowser-dashboard-full.png` | Cross-browser critical pages |
-| `xbrowser-{page}-header.png` | `xbrowser-login-header.png` | Cross-browser headers |
-| `xbrowser-form-{page}-{section}.png` | `xbrowser-form-login-inputs.png` | Cross-browser forms |
-| `rtl-{category}-{page}-{detail}.png` | `rtl-forms-course-create-full.png` | RTL layout tests |
-| `dark-{page}-{detail}.png` | `dark-dashboard-sidebar.png` | Dark mode tests |
-| `a11y-{feature}-{page}.png` | `a11y-focus-login-inputs.png` | Accessibility tests |
-| `viewport-{size}-{page}.png` | `viewport-4k-dashboard.png` | Viewport tests |
-| `flow-{name}-step-{n}.png` | `flow-onboarding-step-3.png` | User flow tests |
+| Pattern                              | Example                            | Used In                      |
+| ------------------------------------ | ---------------------------------- | ---------------------------- |
+| `xbrowser-{page}-full.png`           | `xbrowser-dashboard-full.png`      | Cross-browser critical pages |
+| `xbrowser-{page}-header.png`         | `xbrowser-login-header.png`        | Cross-browser headers        |
+| `xbrowser-form-{page}-{section}.png` | `xbrowser-form-login-inputs.png`   | Cross-browser forms          |
+| `rtl-{category}-{page}-{detail}.png` | `rtl-forms-course-create-full.png` | RTL layout tests             |
+| `dark-{page}-{detail}.png`           | `dark-dashboard-sidebar.png`       | Dark mode tests              |
+| `a11y-{feature}-{page}.png`          | `a11y-focus-login-inputs.png`      | Accessibility tests          |
+| `viewport-{size}-{page}.png`         | `viewport-4k-dashboard.png`        | Viewport tests               |
+| `flow-{name}-step-{n}.png`           | `flow-onboarding-step-3.png`       | User flow tests              |
 
 ## Adding New Visual Tests
 
@@ -162,12 +162,12 @@ Playwright browser binaries are cached using `actions/cache@v4` with key based o
 
 ## Comparison Options
 
-| Option | Value | Use Case |
-|--------|-------|----------|
-| `STABLE_OPTS` | 1% maxDiffPixelRatio, fullPage, animations disabled | Static pages |
-| `LOOSE_OPTS` | 5% maxDiffPixelRatio, fullPage, animations disabled | Dynamic content |
-| Custom | Per-element screenshot without fullPage | Component-level tests |
+| Option        | Value                                               | Use Case              |
+| ------------- | --------------------------------------------------- | --------------------- |
+| `STABLE_OPTS` | 1% maxDiffPixelRatio, fullPage, animations disabled | Static pages          |
+| `LOOSE_OPTS`  | 5% maxDiffPixelRatio, fullPage, animations disabled | Dynamic content       |
+| Custom        | Per-element screenshot without fullPage             | Component-level tests |
 
 ---
 
-*Last updated: 2026-03-29 | Generated with visual-test-coverage.cjs*
+_Last updated: 2026-03-29 | Generated with visual-test-coverage.cjs_

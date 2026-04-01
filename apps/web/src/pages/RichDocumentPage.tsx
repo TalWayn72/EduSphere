@@ -50,12 +50,15 @@ export function RichDocumentPage() {
   const { contentId = '' } = useParams<{ contentId: string }>();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const role = useAuthRole();
-  const isInstructor = role === 'INSTRUCTOR' || role === 'ORG_ADMIN' || role === 'SUPER_ADMIN';
+  const isInstructor =
+    role === 'INSTRUCTOR' || role === 'ORG_ADMIN' || role === 'SUPER_ADMIN';
 
   // Mounted guard: prevent urql cache dispatch during sibling route render
   // (content viewer pages share CONTENT_ITEM_QUERY across sibling routes).
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery<ContentItemResult>({
     query: CONTENT_ITEM_QUERY,

@@ -54,12 +54,17 @@ describe('TemplateResolver', () => {
 
   describe('resolveTemplateType()', () => {
     it('returns templateType when present on parent', () => {
-      const result = resolver.resolveTemplateType({ templateType: 'TUTOR', template: 'OTHER' });
+      const result = resolver.resolveTemplateType({
+        templateType: 'TUTOR',
+        template: 'OTHER',
+      });
       expect(result).toBe('TUTOR');
     });
 
     it('falls back to template column when templateType is missing', () => {
-      const result = resolver.resolveTemplateType({ template: 'CHAVRUTA_DEBATE' });
+      const result = resolver.resolveTemplateType({
+        template: 'CHAVRUTA_DEBATE',
+      });
       expect(result).toBe('CHAVRUTA_DEBATE');
     });
 

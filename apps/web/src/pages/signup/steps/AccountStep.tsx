@@ -84,7 +84,9 @@ export function AccountStep() {
           <Checkbox
             id="tosAccepted"
             checked={tosAccepted === true}
-            onCheckedChange={(v) => setValue('tosAccepted', (v === true) as true)}
+            onCheckedChange={(v) =>
+              setValue('tosAccepted', (v === true) as true)
+            }
             aria-required="true"
           />
           <Label htmlFor="tosAccepted" className="text-sm leading-snug">

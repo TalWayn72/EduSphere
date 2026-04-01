@@ -6,16 +6,16 @@
 
 ## Overall Status: Phase 47 Complete — Active Development
 
-| Metric | Value |
-|--------|-------|
-| Active Branch | master |
-| Latest Commit | 8afc4bc (Phase 47 — AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) |
-| Phases Complete | 47 / 47 planned |
-| Total Tests | 7,635+ |
-| Test Pass Rate | 100% |
-| TypeScript Errors | 0 |
-| Open Critical Bugs | 0 |
-| Open Medium Bugs | ~5 (see OPEN_ISSUES.md) |
+| Metric             | Value                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| Active Branch      | master                                                                               |
+| Latest Commit      | 8afc4bc (Phase 47 — AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) |
+| Phases Complete    | 47 / 47 planned                                                                      |
+| Total Tests        | 7,635+                                                                               |
+| Test Pass Rate     | 100%                                                                                 |
+| TypeScript Errors  | 0                                                                                    |
+| Open Critical Bugs | 0                                                                                    |
+| Open Medium Bugs   | ~5 (see OPEN_ISSUES.md)                                                              |
 
 ---
 
@@ -62,73 +62,73 @@ graph TD
 
 ## Phase Completion Summary
 
-| Phase | Name | Status | Session |
-|-------|------|--------|---------|
-| 1 | Infrastructure Setup | Complete | Session 1 |
-| 2 | Database Schema + RLS | Complete | Session 2 |
-| 3 | Core Subgraph | Complete | Session 3 |
-| 4 | Content Subgraph | Complete | Session 4 |
-| 5 | Annotation Subgraph | Complete | Session 5 |
-| 6 | Collaboration Subgraph | Complete | Session 6 |
-| 7 | Agent Subgraph | Complete | Session 7 |
-| 8 | Knowledge Subgraph | Complete | Session 8 |
-| 9 | Gateway Federation | Complete | Session 9 |
-| 10 | Frontend Core | Complete | Session 10 |
-| 11 | Mobile (Expo SDK 54) | Complete | Session 11 |
-| 12 | AI Pipeline (LangGraph + LlamaIndex) | Complete | Session 12 |
-| 13 | Security Hardening (RLS, JWT, mTLS) | Complete | Session 13 |
-| 14 | Monitoring (Prometheus + Grafana + Jaeger) | Complete | Session 14 |
-| 15 | CI/CD Pipeline (GitHub Actions) | Complete | Session 15 |
-| 16 | Multi-Tenancy + Admin | Complete | Session 16 |
-| 17 | Real-Time Collaboration | Complete | Session 17 |
-| 18 | Admin Dashboard Upgrade | Complete | Session 18-19 |
-| 19 | Competitive Gap Closure Tier 1 | Complete | Session 19-20 |
-| 20 | GDPR/Security Compliance | Complete | Session 20 |
-| 21 | Memory Safety + OOM Prevention | Complete | Session 21 |
-| 22 | i18n (Hebrew + English) | Complete | Session 22 |
-| 23 | Mobile Polish + Code Quality | Complete | Session 23 |
-| 24 | PRD Gap Closure (G1-G8) | Complete | Session 24 |
-| 25 | UI/UX Revolution + Design System | Complete | Session 25 |
-| 26 | SkillTree + UserSkillMastery | Complete | Session 25 (Phase 5) |
-| 27 | Live Sessions + Offline Web + KG context | Complete | Session 26-27 |
-| 28 | Live Sessions Mutations + Offline Sync + PWA + SI-3 | ✅ | Session 28 |
-| 29 | Stripe Checkout Flow | ✅ | Session 28 |
-| 30 | Personal KG Wiki + Annotation Merge Request | ✅ | Session 28 |
-| 31 | Video Sketch Overlay Enhancement (6 tools) | ✅ | Session 28 |
-| 32 | Real-time AI Subtitle Translation | ✅ | Session 28 |
-| 33 | Remote Proctoring | ✅ | Session 28 |
-| 34 | 3D Models & Simulations | ✅ | Session 28 |
-| 35 | Performance + Analytics + Mobile Parity | ✅ | Session 29 |
-| 36 | Tech Debt + Recommendations Pipeline | ✅ | Session 30 |
-| 37 | Gamification + Manager Onboarding | ✅ | Session 30 |
-| 38 | Certificates + Marketplace + Quiz SRS | ✅ | Session 31 |
-| 39 | Motion Design + WCAG QA + Security Import | ✅ | Session 31 |
-| 40 | xAPI + Drive Import | ✅ | Session 32 |
-| 41 | White-Label Runtime | ✅ | Session 32 |
-| 42 | Expo 55 + SCORM 2004 + Analytics | ✅ | Session 33 |
-| 43 | Dark Mode Contrast Fixes | ✅ | Session 33 |
-| 44 | Dark Mode Contrast Fixes (BUG-059) | ✅ | Session 33 |
-| 45 | Social Learning Experience | ✅ | Session 34 |
-| **46** | **Group Challenges + KG Peer Matching** | **✅** | **Session 35** |
-| **47** | **AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials** | **✅** | **Session 35** |
+| Phase  | Name                                                                | Status   | Session              |
+| ------ | ------------------------------------------------------------------- | -------- | -------------------- |
+| 1      | Infrastructure Setup                                                | Complete | Session 1            |
+| 2      | Database Schema + RLS                                               | Complete | Session 2            |
+| 3      | Core Subgraph                                                       | Complete | Session 3            |
+| 4      | Content Subgraph                                                    | Complete | Session 4            |
+| 5      | Annotation Subgraph                                                 | Complete | Session 5            |
+| 6      | Collaboration Subgraph                                              | Complete | Session 6            |
+| 7      | Agent Subgraph                                                      | Complete | Session 7            |
+| 8      | Knowledge Subgraph                                                  | Complete | Session 8            |
+| 9      | Gateway Federation                                                  | Complete | Session 9            |
+| 10     | Frontend Core                                                       | Complete | Session 10           |
+| 11     | Mobile (Expo SDK 54)                                                | Complete | Session 11           |
+| 12     | AI Pipeline (LangGraph + LlamaIndex)                                | Complete | Session 12           |
+| 13     | Security Hardening (RLS, JWT, mTLS)                                 | Complete | Session 13           |
+| 14     | Monitoring (Prometheus + Grafana + Jaeger)                          | Complete | Session 14           |
+| 15     | CI/CD Pipeline (GitHub Actions)                                     | Complete | Session 15           |
+| 16     | Multi-Tenancy + Admin                                               | Complete | Session 16           |
+| 17     | Real-Time Collaboration                                             | Complete | Session 17           |
+| 18     | Admin Dashboard Upgrade                                             | Complete | Session 18-19        |
+| 19     | Competitive Gap Closure Tier 1                                      | Complete | Session 19-20        |
+| 20     | GDPR/Security Compliance                                            | Complete | Session 20           |
+| 21     | Memory Safety + OOM Prevention                                      | Complete | Session 21           |
+| 22     | i18n (Hebrew + English)                                             | Complete | Session 22           |
+| 23     | Mobile Polish + Code Quality                                        | Complete | Session 23           |
+| 24     | PRD Gap Closure (G1-G8)                                             | Complete | Session 24           |
+| 25     | UI/UX Revolution + Design System                                    | Complete | Session 25           |
+| 26     | SkillTree + UserSkillMastery                                        | Complete | Session 25 (Phase 5) |
+| 27     | Live Sessions + Offline Web + KG context                            | Complete | Session 26-27        |
+| 28     | Live Sessions Mutations + Offline Sync + PWA + SI-3                 | ✅       | Session 28           |
+| 29     | Stripe Checkout Flow                                                | ✅       | Session 28           |
+| 30     | Personal KG Wiki + Annotation Merge Request                         | ✅       | Session 28           |
+| 31     | Video Sketch Overlay Enhancement (6 tools)                          | ✅       | Session 28           |
+| 32     | Real-time AI Subtitle Translation                                   | ✅       | Session 28           |
+| 33     | Remote Proctoring                                                   | ✅       | Session 28           |
+| 34     | 3D Models & Simulations                                             | ✅       | Session 28           |
+| 35     | Performance + Analytics + Mobile Parity                             | ✅       | Session 29           |
+| 36     | Tech Debt + Recommendations Pipeline                                | ✅       | Session 30           |
+| 37     | Gamification + Manager Onboarding                                   | ✅       | Session 30           |
+| 38     | Certificates + Marketplace + Quiz SRS                               | ✅       | Session 31           |
+| 39     | Motion Design + WCAG QA + Security Import                           | ✅       | Session 31           |
+| 40     | xAPI + Drive Import                                                 | ✅       | Session 32           |
+| 41     | White-Label Runtime                                                 | ✅       | Session 32           |
+| 42     | Expo 55 + SCORM 2004 + Analytics                                    | ✅       | Session 33           |
+| 43     | Dark Mode Contrast Fixes                                            | ✅       | Session 33           |
+| 44     | Dark Mode Contrast Fixes (BUG-059)                                  | ✅       | Session 33           |
+| 45     | Social Learning Experience                                          | ✅       | Session 34           |
+| **46** | **Group Challenges + KG Peer Matching**                             | **✅**   | **Session 35**       |
+| **47** | **AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials** | **✅**   | **Session 35**       |
 
 ---
 
 ## Test Coverage
 
-| Package | Tests | Status |
-|---------|-------|--------|
-| subgraph-core | 640 | Pass |
-| subgraph-content | 1,160+ | Pass |
-| subgraph-annotation | 144 | Pass |
-| subgraph-collaboration | 180+ | Pass |
-| subgraph-agent | 702 | Pass |
-| subgraph-knowledge | 582 | Pass |
-| web (frontend) | 4,098 | Pass |
-| security tests | 1,060 | Pass |
-| mobile | 256 | Pass |
-| subgraph-content | 1,193 | Pass |
-| **TOTAL** | **7,635+** | **100% pass** |
+| Package                | Tests      | Status        |
+| ---------------------- | ---------- | ------------- |
+| subgraph-core          | 640        | Pass          |
+| subgraph-content       | 1,160+     | Pass          |
+| subgraph-annotation    | 144        | Pass          |
+| subgraph-collaboration | 180+       | Pass          |
+| subgraph-agent         | 702        | Pass          |
+| subgraph-knowledge     | 582        | Pass          |
+| web (frontend)         | 4,098      | Pass          |
+| security tests         | 1,060      | Pass          |
+| mobile                 | 256        | Pass          |
+| subgraph-content       | 1,193      | Pass          |
+| **TOTAL**              | **7,635+** | **100% pass** |
 
 ---
 
@@ -151,6 +151,7 @@ graph TD
 ## Recent Activity
 
 ### Session 35 cont. — Phase 47 (2026-03-10)
+
 - GAP-3 Chavruta: ChavrutaPartnerMatchService (AGE + SQL), 7 tests
 - GAP-6 Mentor Path: findMentorsByPathTopology() (Apache AGE Cypher STUDIED path + SQL fallback), 5 tests
 - GAP-7 Cohort Insights: getCohortInsights() social_feed_items with cohort_id, 3 tests
@@ -160,6 +161,7 @@ graph TD
 - Tests: agent 702 | knowledge 582 | content 1,193 | web 4,098
 
 ### Session 35 — Phase 46 (2026-03-10)
+
 - Phase 46: Group Challenges + KG Peer Matching — 30 files changed, 2,536 insertions
 - DB migration 0028: group_challenges, challenge_participants, peer_match_requests (RLS + SI-1)
 - GroupChallengeService: createChallenge, joinChallenge, getActiveChallenges, publishScoreEvent (NATS)
@@ -170,6 +172,7 @@ graph TD
 - Tests: 4,074 web (333 files) | 1,060 security | group-challenges.spec.ts (Phase 46 security gate)
 
 ### Session 34 — Phase 45 (2026-03-09 to 2026-03-10)
+
 - Phase 45: Social Learning Experience — 84 files changed, 7,725 insertions
 - Social feed (activity stream), peer reviews, group study rooms
 - Follow/unfollow user graph (Apache AGE), social feed items NATS fan-out
@@ -180,6 +183,7 @@ graph TD
 - Test fixes: Layout mock + useMutation re-render guard + mounted findByText (commit 1534304)
 
 ### Session 28 — Phases 28-34 (2026-03-06)
+
 - Phase 28: Live Session mutations (end/join/cancel/start), SI-3 encryption fix, PWA, CoursesDiscovery filters
 - Phase 29: Stripe checkout flow (`CheckoutPage`, `PurchaseCourseButton`, @stripe packages)
 - Phase 30: Personal Knowledge Graph wiki + Annotation Merge Request + Instructor merge queue
@@ -187,7 +191,7 @@ graph TD
 - Phase 32: AI subtitle translation (LibreTranslate, SubtitleTrack, VideoSubtitleSelector)
 - Phase 33: Remote Proctoring (WebRTC overlay, ProctoringSession, tab-switch detection)
 - Phase 34: 3D Models viewer (Three.js, Model3DInfo, uploadModel3D, full memory safety)
-ALL PRD GAPS CLOSED (G-1 through G-4, P-1 through P-3)
+  ALL PRD GAPS CLOSED (G-1 through G-4, P-1 through P-3)
 
 ### Session 27 — Phase 27 (2026-03-06)
 
@@ -211,22 +215,22 @@ ALL PRD GAPS CLOSED (G-1 through G-4, P-1 through P-3)
 
 ## Service Ports
 
-| Service | Port | Status |
-|---------|------|--------|
-| PostgreSQL 16 + AGE + pgvector | 5432 | Running |
-| Keycloak | 8080 | Running |
-| NATS JetStream | 4222 | Running |
-| MinIO | 9000 | Running |
-| Jaeger (OTLP) | 16686 | Running |
-| Hive Gateway v2 | 4000 | Running |
-| subgraph-core | 4001 | Running |
-| subgraph-content | 4002 | Running |
-| subgraph-annotation | 4003 | Running |
-| subgraph-collaboration | 4004 | Running |
-| subgraph-agent | 4005 | Running |
-| subgraph-knowledge | 4006 | Running |
-| Frontend web | 5173 | Running |
-| Mobile (Expo) | — | Running |
+| Service                        | Port  | Status  |
+| ------------------------------ | ----- | ------- |
+| PostgreSQL 16 + AGE + pgvector | 5432  | Running |
+| Keycloak                       | 8080  | Running |
+| NATS JetStream                 | 4222  | Running |
+| MinIO                          | 9000  | Running |
+| Jaeger (OTLP)                  | 16686 | Running |
+| Hive Gateway v2                | 4000  | Running |
+| subgraph-core                  | 4001  | Running |
+| subgraph-content               | 4002  | Running |
+| subgraph-annotation            | 4003  | Running |
+| subgraph-collaboration         | 4004  | Running |
+| subgraph-agent                 | 4005  | Running |
+| subgraph-knowledge             | 4006  | Running |
+| Frontend web                   | 5173  | Running |
+| Mobile (Expo)                  | —     | Running |
 
 ---
 
@@ -236,4 +240,4 @@ All 47 planned phases complete. Phase 48: Protocol closure + P2 admin wire-up
 
 ---
 
-*Source of truth: [OPEN_ISSUES.md](../../OPEN_ISSUES.md) | [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)*
+_Source of truth: [OPEN_ISSUES.md](../../OPEN_ISSUES.md) | [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)_

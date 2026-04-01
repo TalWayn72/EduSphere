@@ -11,7 +11,10 @@ import {
   findRelatedConcepts,
   createRelationship,
 } from '@edusphere/db';
-import type { RelationshipProperties, ConceptRelationshipType } from '@edusphere/db';
+import type {
+  RelationshipProperties,
+  ConceptRelationshipType,
+} from '@edusphere/db';
 import { graphConfig } from '@edusphere/config';
 
 const GRAPH_NAME = graphConfig.graphName;

@@ -16,7 +16,12 @@ import {
   ADD_FILE_SOURCE,
 } from '@/lib/graphql/sources.queries';
 import type { SourceType } from './types';
-import { IS_DEV_MODE, authHeaders, getSourceErrorKey, hasValidAuth } from './utils';
+import {
+  IS_DEV_MODE,
+  authHeaders,
+  getSourceErrorKey,
+  hasValidAuth,
+} from './utils';
 import { devAddSource } from './dev-mock';
 
 interface MutationCallbacks {
@@ -36,49 +41,90 @@ function requireAuth(): void {
   }
 }
 
-export function useAddUrlMutation({ onAdded, setSuccess, setError, t }: MutationCallbacks) {
+export function useAddUrlMutation({
+  onAdded,
+  setSuccess,
+  setError,
+  t,
+}: MutationCallbacks) {
   return useMutation({
     mutationFn: IS_DEV_MODE
       ? (input: { courseId: string; title: string; url: string }) =>
           Promise.resolve(devAddSource('URL', input.title, input.url))
       : (input: { courseId: string; title: string; url: string }) => {
           requireAuth();
-          return graphqlClient.request(ADD_URL_SOURCE, { input }, authHeaders());
+          return graphqlClient.request(
+            ADD_URL_SOURCE,
+            { input },
+            authHeaders()
+          );
         },
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 }
 
-export function useAddTextMutation({ onAdded, setSuccess, setError, t }: MutationCallbacks) {
+export function useAddTextMutation({
+  onAdded,
+  setSuccess,
+  setError,
+  t,
+}: MutationCallbacks) {
   return useMutation({
     mutationFn: IS_DEV_MODE
       ? (input: { courseId: string; title: string; text: string }) =>
           Promise.resolve(devAddSource('TEXT', input.title))
       : (input: { courseId: string; title: string; text: string }) => {
           requireAuth();
-          return graphqlClient.request(ADD_TEXT_SOURCE, { input }, authHeaders());
+          return graphqlClient.request(
+            ADD_TEXT_SOURCE,
+            { input },
+            authHeaders()
+          );
         },
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 }
 
-export function useAddYoutubeMutation({ onAdded, setSuccess, setError, t }: MutationCallbacks) {
+export function useAddYoutubeMutation({
+  onAdded,
+  setSuccess,
+  setError,
+  t,
+}: MutationCallbacks) {
   return useMutation({
     mutationFn: IS_DEV_MODE
       ? (input: { courseId: string; title: string; url: string }) =>
           Promise.resolve(devAddSource('YOUTUBE', input.title, input.url))
       : (input: { courseId: string; title: string; url: string }) => {
           requireAuth();
-          return graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }, authHeaders());
+          return graphqlClient.request(
+            ADD_YOUTUBE_SOURCE,
+            { input },
+            authHeaders()
+          );
         },
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 }
 
-export function useAddFileMutation({ onAdded, setSuccess, setError, t }: MutationCallbacks) {
+export function useAddFileMutation({
+  onAdded,
+  setSuccess,
+  setError,
+  t,
+}: MutationCallbacks) {
   return useMutation({
     mutationFn: IS_DEV_MODE
       ? (input: {
@@ -94,7 +140,9 @@ export function useAddFileMutation({ onAdded, setSuccess, setError, t }: Mutatio
             : lower.endsWith('.txt')
               ? 'FILE_TXT'
               : 'FILE_PDF';
-          return Promise.resolve(devAddSource(devType, input.title, input.fileName));
+          return Promise.resolve(
+            devAddSource(devType, input.title, input.fileName)
+          );
         }
       : (input: {
           courseId: string;
@@ -104,9 +152,16 @@ export function useAddFileMutation({ onAdded, setSuccess, setError, t }: Mutatio
           mimeType: string;
         }) => {
           requireAuth();
-          return graphqlClient.request(ADD_FILE_SOURCE, { input }, authHeaders());
+          return graphqlClient.request(
+            ADD_FILE_SOURCE,
+            { input },
+            authHeaders()
+          );
         },
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 }

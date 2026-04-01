@@ -95,7 +95,9 @@ describe('SourceDetailDrawer', () => {
     });
 
     render(<SourceDetailDrawer sourceId="s1" onClose={vi.fn()} />);
-    expect(screen.getByText('This is the raw content of the source.')).toBeInTheDocument();
+    expect(
+      screen.getByText('This is the raw content of the source.')
+    ).toBeInTheDocument();
     expect(screen.getByText('Test Source')).toBeInTheDocument();
   });
 
@@ -127,7 +129,9 @@ describe('SourceDetailDrawer', () => {
     });
 
     render(<SourceDetailDrawer sourceId="s2" onClose={vi.fn()} />);
-    expect(screen.getByText('Extracted text from PDF document.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Extracted text from PDF document.')
+    ).toBeInTheDocument();
     expect(screen.getByText('PDF Source')).toBeInTheDocument();
   });
 

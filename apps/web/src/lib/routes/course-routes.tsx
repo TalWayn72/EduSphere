@@ -93,21 +93,48 @@ export const courseRoutes: RouteObject[] = [
   // Course list & CRUD
   { path: '/courses', element: guarded(<CourseList />) },
   { path: '/courses/new', element: guarded(<CourseCreatePage />) },
-  { path: '/courses/:courseId/analytics', element: guarded(<CourseAnalyticsPage />) },
+  {
+    path: '/courses/:courseId/analytics',
+    element: guarded(<CourseAnalyticsPage />),
+  },
   { path: '/courses/:courseId/edit', element: guarded(<CourseEditPage />) },
   // Lesson Pipeline Builder — WYSIWYG authoring
-  { path: '/courses/:courseId/pipeline/builder', element: guarded(<LessonPipelineBuilderPage />) },
+  {
+    path: '/courses/:courseId/pipeline/builder',
+    element: guarded(<LessonPipelineBuilderPage />),
+  },
   // Quiz Builder — instructor creates a quiz for a module
-  { path: '/courses/:courseId/modules/:moduleId/quiz/new', element: guarded(<QuizBuilderPage />) },
+  {
+    path: '/courses/:courseId/modules/:moduleId/quiz/new',
+    element: guarded(<QuizBuilderPage />),
+  },
   // Create lesson — must come before :courseId to avoid route shadowing
-  { path: '/courses/:courseId/lessons/new', element: guarded(<CreateLessonPage />) },
-  { path: '/courses/:courseId/lessons/:lessonId/pipeline', element: guarded(<LessonPipelinePage />) },
-  { path: '/courses/:courseId/lessons/:lessonId/results', element: guarded(<LessonResultsPage />) },
-  { path: '/courses/:courseId/lessons/:lessonId/preview', element: guarded(<LessonPreviewPage />) },
-  { path: '/courses/:courseId/lessons/:lessonId', element: guarded(<LessonDetailPage />) },
+  {
+    path: '/courses/:courseId/lessons/new',
+    element: guarded(<CreateLessonPage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId/pipeline',
+    element: guarded(<LessonPipelinePage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId/results',
+    element: guarded(<LessonResultsPage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId/preview',
+    element: guarded(<LessonPreviewPage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId',
+    element: guarded(<LessonDetailPage />),
+  },
   { path: '/courses/:courseId', element: guarded(<CourseDetailPage />) },
   // Content import — bulk import lessons
-  { path: '/courses/:courseId/import', element: guarded(<ContentImportPage />) },
+  {
+    path: '/courses/:courseId/import',
+    element: guarded(<ContentImportPage />),
+  },
   // Library
   { path: '/library', element: guarded(<CourseLibraryPage />) },
   // Phase 64 — pre-built compliance course library

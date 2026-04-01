@@ -46,7 +46,9 @@ export function TenantAnalyticsCharts({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Active Learners Trend</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Learners Trend
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
@@ -55,7 +57,12 @@ export function TenantAnalyticsCharts({
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Area type="monotone" dataKey="value" stroke="#6366F1" fill="#6366F133" />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#6366F1"
+                  fill="#6366F133"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -63,7 +70,9 @@ export function TenantAnalyticsCharts({
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Completion Rate Trend (%)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Completion Rate Trend (%)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
@@ -72,7 +81,12 @@ export function TenantAnalyticsCharts({
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#10B981" dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#10B981"
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -89,16 +103,24 @@ export function TenantAnalyticsCharts({
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
                   <th className="pb-2 pr-4 font-medium">Course</th>
-                  <th className="pb-2 pr-4 font-medium text-right">Enrollments</th>
-                  <th className="pb-2 pr-4 font-medium text-right">Completion %</th>
+                  <th className="pb-2 pr-4 font-medium text-right">
+                    Enrollments
+                  </th>
+                  <th className="pb-2 pr-4 font-medium text-right">
+                    Completion %
+                  </th>
                   <th className="pb-2 font-medium text-right">Avg Hours</th>
                 </tr>
               </thead>
               <tbody>
                 {topCourses.map((course) => (
                   <tr key={course.courseId} className="border-b last:border-0">
-                    <td className="py-2 pr-4 font-medium">{course.courseTitle}</td>
-                    <td className="py-2 pr-4 text-right">{course.enrollmentCount}</td>
+                    <td className="py-2 pr-4 font-medium">
+                      {course.courseTitle}
+                    </td>
+                    <td className="py-2 pr-4 text-right">
+                      {course.enrollmentCount}
+                    </td>
                     <td className="py-2 pr-4 text-right">
                       {(course.completionRate * 100).toFixed(1)}%
                     </td>
@@ -109,7 +131,10 @@ export function TenantAnalyticsCharts({
                 ))}
                 {topCourses.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-4 text-center text-muted-foreground">
+                    <td
+                      colSpan={4}
+                      className="py-4 text-center text-muted-foreground"
+                    >
                       No course data available.
                     </td>
                   </tr>

@@ -38,7 +38,9 @@ describe('BUG-091: Workspace package hoisting in Docker container', () => {
     it('should NOT have individual hardcoded package symlinks only', () => {
       // The old pattern was: individual if-blocks for each package
       // The new pattern uses a for loop over all packages
-      const forLoopMatch = startup.match(/for\s+\w+\s+in\s+\/app\/packages\/\*\//);
+      const forLoopMatch = startup.match(
+        /for\s+\w+\s+in\s+\/app\/packages\/\*\//
+      );
       expect(forLoopMatch).not.toBeNull();
     });
 
@@ -70,9 +72,7 @@ describe('BUG-091: Workspace package hoisting in Docker container', () => {
     });
 
     it('should not have the old nats-only symlink block', () => {
-      expect(startup).not.toMatch(
-        /if \[ ! -d "\/app\/node_modules\/nats" \]/
-      );
+      expect(startup).not.toMatch(/if \[ ! -d "\/app\/node_modules\/nats" \]/);
     });
   });
 
@@ -96,13 +96,13 @@ describe('BUG-091: Workspace package hoisting in Docker container', () => {
         expect(section, `section for ${name} not found`).toBeDefined();
 
         const retriesMatch = section!.match(/startretries\s*=\s*(\d+)/);
-        expect(
-          retriesMatch,
-          `startretries missing for ${name}`
-        ).not.toBeNull();
+        expect(retriesMatch, `startretries missing for ${name}`).not.toBeNull();
 
         const retries = parseInt(retriesMatch![1], 10);
-        expect(retries, `${name} startretries=${retries} < 5`).toBeGreaterThanOrEqual(5);
+        expect(
+          retries,
+          `${name} startretries=${retries} < 5`
+        ).toBeGreaterThanOrEqual(5);
       }
     });
 

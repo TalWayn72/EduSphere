@@ -17,7 +17,12 @@ export interface VideoSectionProps {
   hlsManifestUrl?: string | null;
   videoTitle: string | null;
   contentFetching: boolean;
-  transcript: Array<{ id: string; startTime: number; endTime: number; text: string }>;
+  transcript: Array<{
+    id: string;
+    startTime: number;
+    endTime: number;
+    text: string;
+  }>;
   currentTime: number;
   duration: number;
   seekTarget: number | undefined;
@@ -102,9 +107,7 @@ export const VideoSection = React.memo(function VideoSection({
           {contentFetching ? (
             <SkeletonLine className="h-3 w-32" />
           ) : (
-            <span className="text-xs text-muted-foreground">
-              {videoTitle}
-            </span>
+            <span className="text-xs text-muted-foreground">{videoTitle}</span>
           )}
         </div>
         {contentFetching ? (

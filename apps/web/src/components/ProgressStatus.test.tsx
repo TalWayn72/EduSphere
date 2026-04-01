@@ -24,7 +24,7 @@ const MESSAGES = ['progress.step.one', 'progress.step.two'];
 describe('ProgressStatus', () => {
   it('renders with inline variant: spinner and text in a row', () => {
     const { container } = render(
-      <ProgressStatus messages={MESSAGES} active={true} variant="inline" />,
+      <ProgressStatus messages={MESSAGES} active={true} variant="inline" />
     );
 
     // Outer wrapper is a flex span (inline — uses span to work inside <button>)
@@ -33,24 +33,28 @@ describe('ProgressStatus', () => {
     expect(wrapper.className).toContain('inline-flex');
 
     // Spinner svg present (aria-hidden="true")
-    expect(container.querySelector('svg[aria-hidden="true"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('svg[aria-hidden="true"]')
+    ).toBeInTheDocument();
   });
 
   it('renders with block variant: vertical column layout', () => {
     const { container } = render(
-      <ProgressStatus messages={MESSAGES} active={true} variant="block" />,
+      <ProgressStatus messages={MESSAGES} active={true} variant="block" />
     );
 
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.className).toContain('flex-col');
 
     // Spinner present in block variant by default
-    expect(container.querySelector('svg[aria-hidden="true"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('svg[aria-hidden="true"]')
+    ).toBeInTheDocument();
   });
 
   it('renders with minimal variant: text only, no spinner', () => {
     const { container } = render(
-      <ProgressStatus messages={MESSAGES} active={true} variant="minimal" />,
+      <ProgressStatus messages={MESSAGES} active={true} variant="minimal" />
     );
 
     // No spinner svg in minimal variant
@@ -70,7 +74,7 @@ describe('ProgressStatus', () => {
 
   it('does not render anything when active is false', () => {
     const { container } = render(
-      <ProgressStatus messages={MESSAGES} active={false} />,
+      <ProgressStatus messages={MESSAGES} active={false} />
     );
 
     expect(container.firstChild).toBeNull();
@@ -78,15 +82,27 @@ describe('ProgressStatus', () => {
 
   it('shows spinner when showSpinner is true for inline variant', () => {
     const { container } = render(
-      <ProgressStatus messages={MESSAGES} active={true} variant="inline" showSpinner={true} />,
+      <ProgressStatus
+        messages={MESSAGES}
+        active={true}
+        variant="inline"
+        showSpinner={true}
+      />
     );
 
-    expect(container.querySelector('svg[aria-hidden="true"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('svg[aria-hidden="true"]')
+    ).toBeInTheDocument();
   });
 
   it('hides spinner when showSpinner is false', () => {
     const { container } = render(
-      <ProgressStatus messages={MESSAGES} active={true} variant="inline" showSpinner={false} />,
+      <ProgressStatus
+        messages={MESSAGES}
+        active={true}
+        variant="inline"
+        showSpinner={false}
+      />
     );
 
     expect(container.querySelector('svg')).not.toBeInTheDocument();
@@ -96,9 +112,8 @@ describe('ProgressStatus', () => {
 
   // BUG-093: regression — AI_COURSE_GENERATION_MESSAGES has 4+ messages
   it('BUG-093: AI_COURSE_GENERATION_MESSAGES has at least 4 cycling messages', async () => {
-    const { AI_COURSE_GENERATION_MESSAGES } = await import(
-      '../lib/progress-messages'
-    );
+    const { AI_COURSE_GENERATION_MESSAGES } =
+      await import('../lib/progress-messages');
     expect(AI_COURSE_GENERATION_MESSAGES.length).toBeGreaterThanOrEqual(4);
     // Each message should be a non-empty i18n key
     for (const msg of AI_COURSE_GENERATION_MESSAGES) {
@@ -110,7 +125,7 @@ describe('ProgressStatus', () => {
 
   it('does not render when messages array is empty', () => {
     const { container } = render(
-      <ProgressStatus messages={[]} active={true} />,
+      <ProgressStatus messages={[]} active={true} />
     );
 
     expect(container.firstChild).toBeNull();

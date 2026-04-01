@@ -28,9 +28,7 @@ describe('BlockPalette', () => {
 
   it('each item has an aria-label following "Add X block" pattern', () => {
     render(<BlockPalette />);
-    expect(
-      screen.getByLabelText('Add Hero Banner block')
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Add Hero Banner block')).toBeInTheDocument();
     expect(
       screen.getByLabelText('Add Featured Courses block')
     ).toBeInTheDocument();

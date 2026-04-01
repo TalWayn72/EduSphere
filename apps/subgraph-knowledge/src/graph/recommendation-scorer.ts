@@ -10,10 +10,17 @@
  */
 
 export interface ScoringSignals {
-  skillGaps: Array<{ conceptName: string; level: 'NONE' | 'ATTEMPTED' | 'FAMILIAR' }>;
+  skillGaps: Array<{
+    conceptName: string;
+    level: 'NONE' | 'ATTEMPTED' | 'FAMILIAR';
+  }>;
   learningVelocity: { lessonsPerWeek: number };
   enrolledCourseIds: Set<string>;
-  tenantTopCourses: Array<{ courseId: string; enrollmentCount: number; addedAt: Date }>;
+  tenantTopCourses: Array<{
+    courseId: string;
+    enrollmentCount: number;
+    addedAt: Date;
+  }>;
 }
 
 export interface CourseCandidate {
@@ -46,21 +53,24 @@ const VELOCITY_DIVISOR = 10;
  */
 export function scoreCoursesForUser(
   candidates: CourseCandidate[],
-  signals: ScoringSignals,
+  signals: ScoringSignals
 ): ScoredCourse[] {
   if (candidates.length === 0) return [];
 
-  const maxEnrollment = Math.max(...candidates.map((c) => c.enrollmentCount), 1);
+  const maxEnrollment = Math.max(
+    ...candidates.map((c) => c.enrollmentCount),
+    1
+  );
   const now = new Date();
   const freshnessCutoff = new Date(now.getTime() - THIRTY_DAYS_MS);
 
   const gapConceptNames = new Set(
-    signals.skillGaps.map((g) => g.conceptName.toLowerCase()),
+    signals.skillGaps.map((g) => g.conceptName.toLowerCase())
   );
 
   const velocityBoost = Math.min(
     signals.learningVelocity.lessonsPerWeek / VELOCITY_DIVISOR,
-    MAX_VELOCITY_BOOST,
+    MAX_VELOCITY_BOOST
   );
 
   return candidates
@@ -68,10 +78,11 @@ export function scoreCoursesForUser(
     .map((c) => {
       // Signal 1: skill gap match
       const tagOverlap = c.tags.filter((t) =>
-        gapConceptNames.has(t.toLowerCase()),
+        gapConceptNames.has(t.toLowerCase())
       ).length;
       const gapScore =
-        Math.min(tagOverlap / Math.max(gapConceptNames.size, 1), 1.0) * GAP_WEIGHT;
+        Math.min(tagOverlap / Math.max(gapConceptNames.size, 1), 1.0) *
+        GAP_WEIGHT;
 
       // Signal 2: freshness
       const freshnessScore = c.addedAt > freshnessCutoff ? FRESHNESS_BOOST : 0;
@@ -88,7 +99,7 @@ export function scoreCoursesForUser(
       let reason: string;
       if (hasGapMatch) {
         const topGap = signals.skillGaps.find((g) =>
-          c.tags.some((t) => t.toLowerCase() === g.conceptName.toLowerCase()),
+          c.tags.some((t) => t.toLowerCase() === g.conceptName.toLowerCase())
         );
         reason = topGap
           ? `Based on your gap in ${topGap.conceptName}`

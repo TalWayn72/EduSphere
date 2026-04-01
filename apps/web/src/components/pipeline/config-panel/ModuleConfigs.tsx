@@ -17,7 +17,11 @@ interface ModuleConfigProps {
   onChange: (key: string, value: unknown) => void;
 }
 
-export function ModuleConfigs({ moduleType, config, onChange }: ModuleConfigProps) {
+export function ModuleConfigs({
+  moduleType,
+  config,
+  onChange,
+}: ModuleConfigProps) {
   const { t } = useTranslation('content');
 
   if (moduleType === 'ASR') {
@@ -26,7 +30,10 @@ export function ModuleConfigs({ moduleType, config, onChange }: ModuleConfigProp
         <ConfigSelect
           value={(config['language'] as string) ?? DEFAULT_LOCALE}
           onChange={(v) => onChange('language', v)}
-          options={ASR_LANGUAGES.map((l) => ({ value: l.value, label: l.label }))}
+          options={ASR_LANGUAGES.map((l) => ({
+            value: l.value,
+            label: l.label,
+          }))}
         />
       </ConfigField>
     );
@@ -81,7 +88,9 @@ export function ModuleConfigs({ moduleType, config, onChange }: ModuleConfigProp
   if (moduleType === 'QA_GATE') {
     return (
       <ConfigField
-        label={t('pipeline.qualityThreshold', { value: (config['threshold'] as number) ?? 70 })}
+        label={t('pipeline.qualityThreshold', {
+          value: (config['threshold'] as number) ?? 70,
+        })}
         tooltip={t('pipeline.qualityThresholdTooltip')}
       >
         <input
@@ -98,8 +107,19 @@ export function ModuleConfigs({ moduleType, config, onChange }: ModuleConfigProp
     );
   }
 
-  if (['NER_SOURCE_LINKING', 'CONTENT_CLEANING', 'STRUCTURED_NOTES', 'PUBLISH_SHARE'].includes(moduleType)) {
-    return <p className="text-xs text-muted-foreground">{t('pipeline.autoModule')}</p>;
+  if (
+    [
+      'NER_SOURCE_LINKING',
+      'CONTENT_CLEANING',
+      'STRUCTURED_NOTES',
+      'PUBLISH_SHARE',
+    ].includes(moduleType)
+  ) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        {t('pipeline.autoModule')}
+      </p>
+    );
   }
 
   return null;

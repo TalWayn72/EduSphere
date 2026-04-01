@@ -32,7 +32,11 @@ describe('Skeleton', () => {
   });
 
   it('renders children', () => {
-    render(<Skeleton><span>child</span></Skeleton>);
+    render(
+      <Skeleton>
+        <span>child</span>
+      </Skeleton>
+    );
     expect(screen.getByText('child')).toBeInTheDocument();
   });
 });

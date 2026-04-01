@@ -9,7 +9,11 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useParams: () => ({ courseId: 'c-1', itemId: 'item-1' }), useNavigate: () => vi.fn() };
+  return {
+    ...actual,
+    useParams: () => ({ courseId: 'c-1', itemId: 'item-1' }),
+    useNavigate: () => vi.fn(),
+  };
 });
 
 vi.mock('react-hook-form', async () => {
@@ -18,7 +22,10 @@ vi.mock('react-hook-form', async () => {
     ...actual,
     useForm: () => ({
       register: vi.fn(() => ({})),
-      handleSubmit: vi.fn((cb: () => void) => (e: Event) => { e?.preventDefault?.(); cb(); }),
+      handleSubmit: vi.fn((cb: () => void) => (e: Event) => {
+        e?.preventDefault?.();
+        cb();
+      }),
       watch: vi.fn(),
       formState: { errors: {}, isValid: true },
       control: {},
@@ -39,7 +46,9 @@ vi.mock('@/hooks/useAuthRole', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 vi.mock('./ExamItemFormFields', () => ({
@@ -50,7 +59,11 @@ import { ExamItemEditorPage } from './ExamItemEditorPage';
 
 describe('ExamItemEditorPage', () => {
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><ExamItemEditorPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <ExamItemEditorPage />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

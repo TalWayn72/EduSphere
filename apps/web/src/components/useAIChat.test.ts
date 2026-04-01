@@ -47,9 +47,13 @@ import * as urql from 'urql';
 function setupUrqlMocks() {
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'START_SESSION') {
-      return [{ fetching: false }, mockStartSession] as ReturnType<typeof urql.useMutation>;
+      return [{ fetching: false }, mockStartSession] as ReturnType<
+        typeof urql.useMutation
+      >;
     }
-    return [{ fetching: false }, mockSendMessage] as ReturnType<typeof urql.useMutation>;
+    return [{ fetching: false }, mockSendMessage] as ReturnType<
+      typeof urql.useMutation
+    >;
   });
   vi.mocked(urql.useSubscription).mockReturnValue([
     { data: null, fetching: false },

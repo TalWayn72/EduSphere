@@ -108,7 +108,12 @@ test.describe('SkillTree Security — Authentication enforcement', () => {
           status: 401,
           contentType: 'application/json',
           body: JSON.stringify({
-            errors: [{ message: 'Unauthorized', extensions: { code: 'UNAUTHENTICATED' } }],
+            errors: [
+              {
+                message: 'Unauthorized',
+                extensions: { code: 'UNAUTHENTICATED' },
+              },
+            ],
           }),
         });
       } else {
@@ -116,7 +121,9 @@ test.describe('SkillTree Security — Authentication enforcement', () => {
       }
     });
 
-    await page.goto(`${BASE_URL}/skill-tree`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // ProtectedRoute kicks in before skillTree query fires — page redirects to /login
     await page.waitForURL(/\/login/, { timeout: 10_000 });
@@ -151,13 +158,17 @@ test.describe('SkillTree Security — Authenticated access', () => {
       }
     });
 
-    await page.goto(`${BASE_URL}/skill-tree`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // Should NOT redirect to /login
     expect(page.url()).not.toContain('/login');
 
     // Raw error strings must NOT appear
-    await expect(page.getByText('Unauthorized', { exact: true })).not.toBeVisible({
+    await expect(
+      page.getByText('Unauthorized', { exact: true })
+    ).not.toBeVisible({
       timeout: 2_000,
     });
     await expect(
@@ -190,7 +201,9 @@ test.describe('SkillTree Security — Authenticated access', () => {
       }
     });
 
-    await page.goto(`${BASE_URL}/skill-tree`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
 
     // Internal error message must NOT leak to UI
     await expect(
@@ -338,9 +351,7 @@ test.describe('SkillTree Security — UI security guards', () => {
     await login(page);
   });
 
-  test('skill-tree page visual regression with mock data', async ({
-    page,
-  }) => {
+  test('skill-tree page visual regression with mock data', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
       if (body.includes('skillTree')) {

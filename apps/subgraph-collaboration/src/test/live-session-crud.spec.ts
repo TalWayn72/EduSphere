@@ -50,9 +50,19 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((col, val) => ({ col, val, op: 'eq' })),
   and: vi.fn((...conditions: unknown[]) => ({ conditions, op: 'and' })),
   desc: vi.fn((col: string) => ({ col, order: 'desc' })),
-  inArray: vi.fn((col: string, vals: string[]) => ({ col, vals, op: 'inArray' })),
+  inArray: vi.fn((col: string, vals: string[]) => ({
+    col,
+    vals,
+    op: 'inArray',
+  })),
   sql: vi.fn(() => ({ raw: true })),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, callback: (tx: typeof mockTx) => unknown) => callback(mockTx)),
+  withTenantContext: vi.fn(
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      callback: (tx: typeof mockTx) => unknown
+    ) => callback(mockTx)
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -94,7 +104,9 @@ const MOCK_DISCUSSION_2 = {
 
 function setupSelectChain(result: unknown[]) {
   const limitFn = vi.fn(() => {
-    const p = Promise.resolve(result) as Promise<unknown[]> & { offset: ReturnType<typeof vi.fn> };
+    const p = Promise.resolve(result) as Promise<unknown[]> & {
+      offset: ReturnType<typeof vi.fn>;
+    };
     p.offset = vi.fn(() => Promise.resolve(result));
     return p;
   });
@@ -167,7 +179,10 @@ describe('Live Session CRUD — discussion-based sessions', () => {
   it('lists sessions for a course', async () => {
     setupSelectChain([MOCK_DISCUSSION, MOCK_DISCUSSION_2]);
     const result = await service.findDiscussionsByCourse(
-      'course-1', 20, 0, MOCK_AUTH
+      'course-1',
+      20,
+      0,
+      MOCK_AUTH
     );
     expect(Array.isArray(result)).toBe(true);
   });
@@ -177,11 +192,14 @@ describe('Live Session CRUD — discussion-based sessions', () => {
     let callCount = 0;
     mockFrom.mockImplementation(() => {
       callCount++;
-      const result = callCount === 1
-        ? [{ discussion_id: 'disc-1' }, { discussion_id: 'disc-2' }]
-        : [MOCK_DISCUSSION, MOCK_DISCUSSION_2];
+      const result =
+        callCount === 1
+          ? [{ discussion_id: 'disc-1' }, { discussion_id: 'disc-2' }]
+          : [MOCK_DISCUSSION, MOCK_DISCUSSION_2];
       const limitFn = vi.fn(() => {
-        const p = Promise.resolve(result) as Promise<unknown[]> & { offset: ReturnType<typeof vi.fn> };
+        const p = Promise.resolve(result) as Promise<unknown[]> & {
+          offset: ReturnType<typeof vi.fn>;
+        };
         p.offset = vi.fn(() => Promise.resolve(result));
         return p;
       });

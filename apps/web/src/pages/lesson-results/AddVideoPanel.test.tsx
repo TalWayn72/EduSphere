@@ -13,8 +13,12 @@ vi.mock('urql', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) =>
-    <button {...props}>{children}</button>,
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/lib/graphql/lesson.queries', () => ({
@@ -29,7 +33,11 @@ describe('AddVideoPanel', () => {
   it('renders without crash', () => {
     const { container } = render(
       <MemoryRouter>
-        <AddVideoPanel lessonId="l-1" courseId="c-1" lessonTitle="Test Lesson" />
+        <AddVideoPanel
+          lessonId="l-1"
+          courseId="c-1"
+          lessonTitle="Test Lesson"
+        />
       </MemoryRouter>
     );
     expect(container).toBeTruthy();

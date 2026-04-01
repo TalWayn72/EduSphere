@@ -52,12 +52,19 @@ export class EmailSmtpProvider implements EmailProvider {
 
       return this.transporter;
     } catch {
-      throw new Error('nodemailer package not installed — run: pnpm add nodemailer');
+      throw new Error(
+        'nodemailer package not installed — run: pnpm add nodemailer'
+      );
     }
   }
 
-  async send(to: string, subject: string, html: string): Promise<string | null> {
-    const from = process.env['EMAIL_FROM'] ?? 'EduSphere <noreply@edusphere.dev>';
+  async send(
+    to: string,
+    subject: string,
+    html: string
+  ): Promise<string | null> {
+    const from =
+      process.env['EMAIL_FROM'] ?? 'EduSphere <noreply@edusphere.dev>';
     const transporter = this.getTransporter();
 
     try {

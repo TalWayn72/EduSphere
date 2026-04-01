@@ -50,7 +50,7 @@ describe('WhisperClient', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: vi.fn().mockResolvedValue(mockResponse),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial Response mock
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial Response mock
       } as any);
 
       // Mock createReadStream so file access is not required
@@ -72,7 +72,7 @@ describe('WhisperClient', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial Response mock
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial Response mock
       } as any);
 
       vi.mock('fs', async () => ({
@@ -100,7 +100,7 @@ describe('WhisperClient', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: vi.fn().mockResolvedValue(mockResponse),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial Response mock
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial Response mock
       } as any);
 
       vi.mock('fs', async () => ({

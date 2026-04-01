@@ -143,6 +143,7 @@ export type PeerReviewAssignment = typeof peerReviewAssignments.$inferSelect;
 export type NewPeerReviewAssignment = typeof peerReviewAssignments.$inferInsert;
 
 export type DiscussionMessageLike = typeof discussionMessageLikes.$inferSelect;
-export type NewDiscussionMessageLike = typeof discussionMessageLikes.$inferInsert;
+export type NewDiscussionMessageLike =
+  typeof discussionMessageLikes.$inferInsert;
 
 // SocialFeedItem types are exported from social.ts

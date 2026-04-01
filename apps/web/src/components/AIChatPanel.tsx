@@ -81,7 +81,8 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           aria-label="AI disclosure"
           className="mx-4 mt-3 text-xs text-muted-foreground bg-muted/50 rounded p-2 mb-2"
         >
-          You are interacting with an AI assistant. Responses are AI-generated and may contain errors.
+          You are interacting with an AI assistant. Responses are AI-generated
+          and may contain errors.
         </div>
 
         <AgentSelector
@@ -94,7 +95,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <Sparkles className="h-12 w-12 mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">{t('chatPanel.startConversation')}</p>
+              <p className="text-lg font-medium mb-2">
+                {t('chatPanel.startConversation')}
+              </p>
               <p className="text-sm max-w-xs">
                 Ask me anything about {currentAgent.name.toLowerCase()} topics!
               </p>
@@ -102,7 +105,11 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           ) : (
             <>
               {messages.map((message) => (
-                <ChatMessage key={message.id} message={message} agentName={currentAgent.name} />
+                <ChatMessage
+                  key={message.id}
+                  message={message}
+                  agentName={currentAgent.name}
+                />
               ))}
               <div ref={messagesEndRef} />
             </>
@@ -145,11 +152,18 @@ function AgentSelector({
 }) {
   return (
     <div className="p-4 border-b bg-background">
-      <label htmlFor="ai-agent-select" className="text-sm font-medium mb-2 block">
+      <label
+        htmlFor="ai-agent-select"
+        className="text-sm font-medium mb-2 block"
+      >
         {t('selectAgent')}
       </label>
       <Select value={selectedAgent} onValueChange={onSelect}>
-        <SelectTrigger id="ai-agent-select" className="w-full" aria-label={t('selectAgent')}>
+        <SelectTrigger
+          id="ai-agent-select"
+          className="w-full"
+          aria-label={t('selectAgent')}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -159,7 +173,9 @@ function AgentSelector({
                 <span>{agent.icon}</span>
                 <div className="flex flex-col">
                   <span className="font-medium">{agent.name}</span>
-                  <span className="text-xs text-muted-foreground line-clamp-1">{agent.description}</span>
+                  <span className="text-xs text-muted-foreground line-clamp-1">
+                    {agent.description}
+                  </span>
                 </div>
               </div>
             </SelectItem>
@@ -204,7 +220,13 @@ function ChatInputBar({
           className="flex-1"
         />
         {isStreaming ? (
-          <Button variant="outline" size="sm" onClick={stopGeneration} className="shrink-0" aria-label="Stop generation">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={stopGeneration}
+            className="shrink-0"
+            aria-label="Stop generation"
+          >
             &#9632; Stop
           </Button>
         ) : (
@@ -219,7 +241,9 @@ function ChatInputBar({
           </Button>
         )}
       </div>
-      <p className="text-xs text-muted-foreground mt-2">{t('chatPanel.inputHint')}</p>
+      <p className="text-xs text-muted-foreground mt-2">
+        {t('chatPanel.inputHint')}
+      </p>
     </div>
   );
 }

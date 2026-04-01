@@ -73,10 +73,7 @@ export function LtiPlatformForm({ onSubmit, onCancel }: LtiPlatformFormProps) {
         >
           {FORM_FIELDS.map((field) => (
             <div key={field}>
-              <label
-                htmlFor={field}
-                className="text-sm font-medium capitalize"
-              >
+              <label htmlFor={field} className="text-sm font-medium capitalize">
                 {field.replace(/([A-Z])/g, ' $1')}
               </label>
               <input

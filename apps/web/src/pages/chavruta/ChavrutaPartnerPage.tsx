@@ -27,7 +27,9 @@ export function ChavrutaPartnerPage() {
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState('');
   const [mounted, setMounted] = useState(false);
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -40,7 +42,7 @@ export function ChavrutaPartnerPage() {
   });
 
   const [{ fetching: creating }, createSession] = useMutation(
-    CREATE_CHAVRUTA_SESSION_MUTATION,
+    CREATE_CHAVRUTA_SESSION_MUTATION
   );
 
   const handleRequestPartner = async (partnerId: string, topic: string) => {
@@ -49,13 +51,18 @@ export function ChavrutaPartnerPage() {
       toast.error('AI features require your consent.', {
         action: {
           label: 'Enable in Settings',
-          onClick: () => navigate('/settings?highlight=ai-consent&returnTo=/chavruta/partner'),
+          onClick: () =>
+            navigate(
+              '/settings?highlight=ai-consent&returnTo=/chavruta/partner'
+            ),
         },
       });
       return;
     }
     setSelectedPartnerId(partnerId);
-    const result = await createSession({ input: { partnerId, courseId, topic } });
+    const result = await createSession({
+      input: { partnerId, courseId, topic },
+    });
     if (result.error) {
       const consentErr = result.error.graphQLErrors?.find(
         (e) => e.extensions?.code === 'CONSENT_REQUIRED'
@@ -63,18 +70,21 @@ export function ChavrutaPartnerPage() {
       if (consentErr) {
         console.error(
           '[ChavrutaPartnerPage] AI features require consent:',
-          consentErr.message,
+          consentErr.message
         );
         toast.error('AI features require your consent.', {
           action: {
             label: 'Enable in Settings',
-            onClick: () => navigate('/settings?highlight=ai-consent&returnTo=/chavruta/partner'),
+            onClick: () =>
+              navigate(
+                '/settings?highlight=ai-consent&returnTo=/chavruta/partner'
+              ),
           },
         });
       } else {
         console.error(
           '[ChavrutaPartnerPage] Failed to create session:',
-          result.error.message,
+          result.error.message
         );
       }
     }
@@ -86,7 +96,9 @@ export function ChavrutaPartnerPage() {
     <Layout>
       <div className="mx-auto max-w-2xl space-y-6 p-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('chavruta.pageTitle')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {t('chavruta.pageTitle')}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {t('chavruta.pageDescription')}
           </p>
@@ -103,20 +115,29 @@ export function ChavrutaPartnerPage() {
         </div>
 
         {fetching && (
-          <p className="text-sm text-muted-foreground">{t('chavruta.searching')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('chavruta.searching')}
+          </p>
         )}
         {error && (
           <p className="text-sm text-destructive" role="alert">
             {t('chavruta.loadError')}
           </p>
         )}
-        {!fetching && !error && courseId.length >= 3 && matches.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            {t('chavruta.noPartners')}
-          </p>
-        )}
+        {!fetching &&
+          !error &&
+          courseId.length >= 3 &&
+          matches.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              {t('chavruta.noPartners')}
+            </p>
+          )}
 
-        <div className="space-y-4" role="list" aria-label={t('chavruta.partnersAriaLabel')}>
+        <div
+          className="space-y-4"
+          role="list"
+          aria-label={t('chavruta.partnersAriaLabel')}
+        >
           {matches.map((match) => (
             <Card key={match.partnerId} role="listitem">
               <CardHeader className="pb-2">
@@ -128,15 +149,24 @@ export function ChavrutaPartnerPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="mb-1 text-sm text-muted-foreground">{match.matchReason}</p>
+                <p className="mb-1 text-sm text-muted-foreground">
+                  {match.matchReason}
+                </p>
                 <p className="mb-3 text-sm">
-                  <span className="font-medium">{t('chavruta.suggestedTopic')}</span> {match.topic}
+                  <span className="font-medium">
+                    {t('chavruta.suggestedTopic')}
+                  </span>{' '}
+                  {match.topic}
                 </p>
                 <Button
                   size="sm"
-                  onClick={() => handleRequestPartner(match.partnerId, match.topic)}
+                  onClick={() =>
+                    handleRequestPartner(match.partnerId, match.topic)
+                  }
                   disabled={creating && selectedPartnerId === match.partnerId}
-                  aria-label={t('chavruta.requestAriaLabel', { name: match.partnerName })}
+                  aria-label={t('chavruta.requestAriaLabel', {
+                    name: match.partnerName,
+                  })}
                 >
                   {creating && selectedPartnerId === match.partnerId
                     ? t('chavruta.sending')

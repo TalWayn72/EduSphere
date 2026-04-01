@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateText, stepCountIs } from 'ai';
 import type { Tool } from 'ai';
 import { openai } from '@ai-sdk/openai';
@@ -117,7 +123,9 @@ export class AdaptiveTutorWorkflow {
   private async assessNode(state: TutorState): Promise<Partial<TutorState>> {
     // Assess the complexity of the question
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       prompt: `Analyze this student question and determine their likely understanding level:
 Question: "${state.question}"
 
@@ -154,7 +162,9 @@ Provide a clear, educational explanation.`;
     const systemPrompt = injectLocale(basePrompt, this.locale);
 
     const generateOpts: Parameters<typeof generateText>[0] = {
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Question: ${state.question}
 
@@ -181,7 +191,9 @@ Provide a comprehensive yet accessible explanation.`,
   private async verifyNode(state: TutorState): Promise<Partial<TutorState>> {
     // Generate comprehension check question
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       prompt: `Based on this explanation:
 "${state.explanation}"
 
@@ -197,7 +209,9 @@ Generate ONE thoughtful comprehension check question that tests understanding wi
   private async followupNode(state: TutorState): Promise<Partial<TutorState>> {
     // Generate follow-up suggestions
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       prompt: `Given this question and explanation:
 Question: "${state.question}"
 Explanation: "${state.explanation}"

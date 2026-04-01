@@ -71,9 +71,9 @@ test.describe('Course Discovery — page structure', () => {
 
   test('category filter buttons are rendered', async ({ page }) => {
     // CATEGORY_FILTERS: All, Programming, Design, Business, Science, Languages, Arts
-    await expect(
-      page.getByRole('button', { name: 'All' }).first()
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: 'All' }).first()).toBeVisible(
+      { timeout: 10_000 }
+    );
     await expect(
       page.getByRole('button', { name: 'Programming' }).first()
     ).toBeVisible({ timeout: 10_000 });
@@ -107,9 +107,9 @@ test.describe('Course Discovery — course cards', () => {
 
   test('course cards contain category label', async ({ page }) => {
     // Mock data includes 'Programming' category for several courses
-    await expect(
-      page.getByText('Programming').first()
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Programming').first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
@@ -136,14 +136,14 @@ test.describe('Course Discovery — interactivity', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // The TypeScript Bootcamp course must remain visible
-    await expect(
-      page.getByText(/TypeScript Bootcamp/i)
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/TypeScript Bootcamp/i)).toBeVisible({
+      timeout: 5_000,
+    });
 
     // A course from a completely different category should be hidden
-    await expect(
-      page.getByText(/Digital Photography/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Digital Photography/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('search with no matching results shows empty state', async ({
@@ -167,7 +167,11 @@ test.describe('Course Discovery — interactivity', () => {
     // to the LayoutGrid / List icon buttons
     const gridBtn = page
       .locator('[data-testid="course-grid-toggle"]')
-      .or(page.locator('button').filter({ has: page.locator('.lucide-layout-grid') }));
+      .or(
+        page
+          .locator('button')
+          .filter({ has: page.locator('.lucide-layout-grid') })
+      );
     const listBtn = page
       .locator('[data-testid="course-list-toggle"]')
       .or(page.locator('button').filter({ has: page.locator('.lucide-list') }));
@@ -186,9 +190,9 @@ test.describe('Course Discovery — interactivity', () => {
 
     // In list mode the grid container should switch to a single-column layout.
     // Phase 2 must toggle a [data-view="list"] attribute or "list-mode" class.
-    const container = page.locator('[data-view="list"]').or(
-      page.locator('.list-mode')
-    );
+    const container = page
+      .locator('[data-view="list"]')
+      .or(page.locator('.list-mode'));
     await expect(container.first()).toBeVisible({ timeout: 3_000 });
   });
 

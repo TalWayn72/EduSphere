@@ -1,17 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockCloseAllPools, mockSelect, mockFrom: _mockFrom, mockWhere } = vi.hoisted(
-  () => {
-    const mockWhere = vi.fn().mockResolvedValue([]);
-    const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
-    return {
-      mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
-      mockSelect: vi.fn().mockReturnValue({ from: mockFrom }),
-      mockFrom,
-      mockWhere,
-    };
-  }
-);
+const {
+  mockCloseAllPools,
+  mockSelect,
+  mockFrom: _mockFrom,
+  mockWhere,
+} = vi.hoisted(() => {
+  const mockWhere = vi.fn().mockResolvedValue([]);
+  const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+  return {
+    mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
+    mockSelect: vi.fn().mockReturnValue({ from: mockFrom }),
+    mockFrom,
+    mockWhere,
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
@@ -88,8 +91,8 @@ describe('OrgDomainService', () => {
   it('findByOrgId propagates database errors', async () => {
     mockWhere.mockRejectedValueOnce(new Error('DB error'));
 
-    await expect(
-      service.findByOrgId('org-1', TENANT_CTX)
-    ).rejects.toThrow('DB error');
+    await expect(service.findByOrgId('org-1', TENANT_CTX)).rejects.toThrow(
+      'DB error'
+    );
   });
 });

@@ -50,7 +50,10 @@ vi.mock('@edusphere/db', () => ({
   desc: vi.fn((a: unknown) => ({ desc: a })),
   inArray: vi.fn((a: unknown, b: unknown) => ({ inArray: [a, b] })),
   ilike: vi.fn((a: unknown, b: unknown) => ({ ilike: [a, b] })),
-  sql: Object.assign(vi.fn((a: unknown) => ({ sql: a })), { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }),
+  sql: Object.assign(
+    vi.fn((a: unknown) => ({ sql: a })),
+    { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }
+  ),
 }));
 
 vi.mock('nats', () => ({ connect: vi.fn().mockResolvedValue(mockNatsConn) }));
@@ -222,7 +225,11 @@ describe('SocialService', () => {
         }),
       });
       await service.getSocialFeed('user-1', 'tenant-1', 20);
-      expect(service.getFollowing).toHaveBeenCalledWith('user-1', 'tenant-1', 100);
+      expect(service.getFollowing).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        100
+      );
     });
 
     it('respects the limit parameter', async () => {
@@ -237,7 +244,11 @@ describe('SocialService', () => {
         }),
       });
       await service.getSocialFeed('user-1', 'tenant-1', 5);
-      expect(service.getFollowing).toHaveBeenCalledWith('user-1', 'tenant-1', 100);
+      expect(service.getFollowing).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        100
+      );
     });
   });
 

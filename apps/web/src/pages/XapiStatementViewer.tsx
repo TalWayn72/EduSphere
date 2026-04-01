@@ -32,9 +32,7 @@ export function XapiStatementViewer({ statements }: XapiStatementViewerProps) {
       </CardHeader>
       <CardContent>
         {statements.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            No statements yet.
-          </p>
+          <p className="text-muted-foreground text-sm">No statements yet.</p>
         ) : (
           <div className="divide-y text-sm">
             {statements.map((s) => (

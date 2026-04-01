@@ -35,14 +35,18 @@ Object.defineProperty(globalThis, 'self', {
     __WB_MANIFEST: [],
     addEventListener: (type: string, handler: EventHandler) => {
       if (type === 'push') (g.__swPushHandlers as EventHandler[]).push(handler);
-      if (type === 'notificationclick') (g.__swNotifClickHandlers as EventHandler[]).push(handler);
+      if (type === 'notificationclick')
+        (g.__swNotifClickHandlers as EventHandler[]).push(handler);
     },
     registration: {
-      showNotification: (...args: unknown[]) => (g.__swShowNotification as ReturnType<typeof vi.fn>)(...args),
+      showNotification: (...args: unknown[]) =>
+        (g.__swShowNotification as ReturnType<typeof vi.fn>)(...args),
     },
     clients: {
-      matchAll: (...args: unknown[]) => (g.__swMatchAll as ReturnType<typeof vi.fn>)(...args),
-      openWindow: (...args: unknown[]) => (g.__swOpenWindow as ReturnType<typeof vi.fn>)(...args),
+      matchAll: (...args: unknown[]) =>
+        (g.__swMatchAll as ReturnType<typeof vi.fn>)(...args),
+      openWindow: (...args: unknown[]) =>
+        (g.__swOpenWindow as ReturnType<typeof vi.fn>)(...args),
     },
   },
   writable: true,
@@ -70,7 +74,9 @@ describe('Service Worker', () => {
 
   it('registers a notificationclick event listener', async () => {
     await import('./sw');
-    expect((g.__swNotifClickHandlers as EventHandler[]).length).toBeGreaterThan(0);
+    expect((g.__swNotifClickHandlers as EventHandler[]).length).toBeGreaterThan(
+      0
+    );
   });
 
   it('push handler shows notification with defaults when no data', async () => {

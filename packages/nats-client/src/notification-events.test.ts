@@ -60,9 +60,9 @@ describe('notification-events type guards', () => {
     });
 
     it('returns false for missing deliveryId', () => {
-      expect(
-        isDeliveryStatusEvent({ channel: 'email', status: 'sent' })
-      ).toBe(false);
+      expect(isDeliveryStatusEvent({ channel: 'email', status: 'sent' })).toBe(
+        false
+      );
     });
   });
 

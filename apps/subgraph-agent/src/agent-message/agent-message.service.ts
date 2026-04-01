@@ -1,5 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { db, withTenantContext, type Database, type TenantContext } from '@edusphere/db';
+import {
+  db,
+  withTenantContext,
+  type Database,
+  type TenantContext,
+} from '@edusphere/db';
 import { agentMessages, NewAgentMessage } from '@edusphere/db';
 import { eq, asc } from 'drizzle-orm';
 import type { AuthContext } from '@edusphere/auth';
@@ -18,7 +23,8 @@ export class AgentMessageService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
+        userRole: (authContext.roles[0] ??
+          'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         const [message] = await txDb
@@ -46,7 +52,8 @@ export class AgentMessageService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
+        userRole: (authContext.roles[0] ??
+          'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         return txDb
@@ -68,7 +75,8 @@ export class AgentMessageService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
+        userRole: (authContext.roles[0] ??
+          'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         const [message] = await txDb
@@ -98,7 +106,8 @@ export class AgentMessageService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
+        userRole: (authContext.roles[0] ??
+          'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         const result = await txDb

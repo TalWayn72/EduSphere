@@ -92,7 +92,9 @@ describe('BUG-093: Course generation timeout configuration', () => {
     expect(src).toBeTruthy();
     // Extract the timeout value — pattern: WORKFLOW_TIMEOUT_MS = 10 * 60 * 1000 or a numeric literal
     const literalMatch = src.match(/WORKFLOW_TIMEOUT_MS\s*=\s*(\d[\d_]*)/);
-    const exprMatch = src.match(/WORKFLOW_TIMEOUT_MS\s*=\s*(\d+)\s*\*\s*(\d+)\s*\*\s*(\d+)/);
+    const exprMatch = src.match(
+      /WORKFLOW_TIMEOUT_MS\s*=\s*(\d+)\s*\*\s*(\d+)\s*\*\s*(\d+)/
+    );
     let timeoutMs = 0;
     if (exprMatch) {
       timeoutMs =

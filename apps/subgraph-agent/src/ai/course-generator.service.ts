@@ -5,7 +5,13 @@
  * Memory safety: implements OnModuleDestroy and closes the DB pool.
  */
 
-import { Injectable, Inject, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -51,7 +57,7 @@ export class CourseGeneratorService implements OnModuleDestroy {
 
   constructor(
     private readonly consentGuard: LlmConsentGuard,
-    @Inject(EXECUTION_PUBSUB) private readonly pubSub: typeof executionPubSub,
+    @Inject(EXECUTION_PUBSUB) private readonly pubSub: typeof executionPubSub
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -64,7 +70,7 @@ export class CourseGeneratorService implements OnModuleDestroy {
    */
   private async ensureAgentDefinition(
     userId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<string> {
     if (this.courseGeneratorAgentId) return this.courseGeneratorAgentId;
 
@@ -74,8 +80,8 @@ export class CourseGeneratorService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.agent_definitions.name, COURSE_GENERATOR_AGENT_NAME),
-          eq(schema.agent_definitions.tenant_id, tenantId),
-        ),
+          eq(schema.agent_definitions.tenant_id, tenantId)
+        )
       )
       .limit(1);
 
@@ -98,13 +104,13 @@ export class CourseGeneratorService implements OnModuleDestroy {
     const agentDefId = rows[0]?.id;
     if (!agentDefId) {
       throw new InternalServerErrorException(
-        'Failed to create course-generator agent definition',
+        'Failed to create course-generator agent definition'
       );
     }
     this.courseGeneratorAgentId = agentDefId;
     this.logger.log(
       { agentId: agentDefId, tenantId },
-      'Created course-generator agent definition',
+      'Created course-generator agent definition'
     );
     return agentDefId;
   }
@@ -145,7 +151,9 @@ export class CourseGeneratorService implements OnModuleDestroy {
       .returning();
 
     if (!execution) {
-      throw new InternalServerErrorException('Failed to create execution record');
+      throw new InternalServerErrorException(
+        'Failed to create execution record'
+      );
     }
 
     const executionId = execution.id;
@@ -156,20 +164,27 @@ export class CourseGeneratorService implements OnModuleDestroy {
     // with generateObject + Zod schema.
     const WORKFLOW_TIMEOUT_MS = 15 * 60 * 1000;
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Course generation timed out after 15 minutes')), WORKFLOW_TIMEOUT_MS)
+      setTimeout(
+        () => reject(new Error('Course generation timed out after 15 minutes')),
+        WORKFLOW_TIMEOUT_MS
+      )
     );
-    Promise.race([this.runWorkflowAsync(executionId, options), timeoutPromise]).catch(
-      async (err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
+    Promise.race([
+      this.runWorkflowAsync(executionId, options),
+      timeoutPromise,
+    ]).catch(async (err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error(
+        { executionId, err: msg },
+        'Course generation workflow failed'
+      );
+      await this.markFailed(executionId, msg).catch((dbErr) =>
         this.logger.error(
-          { executionId, err: msg },
-          'Course generation workflow failed'
-        );
-        await this.markFailed(executionId, msg).catch((dbErr) =>
-          this.logger.error({ executionId, dbErr }, 'Failed to mark execution as failed')
-        );
-      }
-    );
+          { executionId, dbErr },
+          'Failed to mark execution as failed'
+        )
+      );
+    });
 
     return { executionId, status: 'RUNNING', modules: [] };
   }

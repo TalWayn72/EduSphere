@@ -15,10 +15,7 @@ test.describe('MarketplacePage — DEV_MODE guard', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
-      if (
-        body.includes('CourseListings') ||
-        body.includes('courseListings')
-      ) {
+      if (body.includes('CourseListings') || body.includes('courseListings')) {
         await route.fulfill({
           contentType: 'application/json',
           body: JSON.stringify({
@@ -61,7 +58,9 @@ test.describe('MarketplacePage — DEV_MODE guard', () => {
       }
     });
     await login(page);
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
   });
 
@@ -119,11 +118,15 @@ test.describe('MarketplacePage — Live backend', () => {
   test('marketplace loads and shows course listings or empty state', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Either courses are listed or an empty/loading state is visible
-    const hasItems = await page.locator('[data-testid="course-listing-card"]').count();
+    const hasItems = await page
+      .locator('[data-testid="course-listing-card"]')
+      .count();
     const hasHeading = await page.getByRole('heading').first().isVisible();
     expect(hasItems + (hasHeading ? 1 : 0)).toBeGreaterThan(0);
 
@@ -134,7 +137,9 @@ test.describe('MarketplacePage — Live backend', () => {
   });
 
   test('filter controls are accessible', async ({ page }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // At least a search input or a filter select should be visible

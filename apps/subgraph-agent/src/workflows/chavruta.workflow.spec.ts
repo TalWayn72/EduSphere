@@ -82,9 +82,7 @@ describe('createChavrutaWorkflow', () => {
 
   it('CHALLENGE -> RESPOND transition', async () => {
     const wf = createChavrutaWorkflow(makeFakeModel());
-    const result = await wf.step(
-      makeContext({ currentState: 'CHALLENGE' })
-    );
+    const result = await wf.step(makeContext({ currentState: 'CHALLENGE' }));
 
     expect(result.nextState).toBe('RESPOND');
   });
@@ -136,9 +134,7 @@ describe('createChavrutaWorkflow', () => {
     });
     const wf = createChavrutaWorkflow(makeFakeModel());
 
-    const result = await wf.step(
-      makeContext({ currentState: 'EVALUATE' })
-    );
+    const result = await wf.step(makeContext({ currentState: 'EVALUATE' }));
 
     expect(result.understandingScore).toBe(4);
     expect(result.nextState).toBe('CONCLUDE');
@@ -150,9 +146,7 @@ describe('createChavrutaWorkflow', () => {
     });
     const wf = createChavrutaWorkflow(makeFakeModel());
 
-    const result = await wf.step(
-      makeContext({ currentState: 'EVALUATE' })
-    );
+    const result = await wf.step(makeContext({ currentState: 'EVALUATE' }));
 
     expect(result.understandingScore).toBe(3);
   });
@@ -161,9 +155,7 @@ describe('createChavrutaWorkflow', () => {
     mockGenerateText.mockResolvedValueOnce({ text: '[SCORE:9] Excellent!' });
     const wf = createChavrutaWorkflow(makeFakeModel());
 
-    const result = await wf.step(
-      makeContext({ currentState: 'EVALUATE' })
-    );
+    const result = await wf.step(makeContext({ currentState: 'EVALUATE' }));
 
     expect(result.understandingScore).toBe(5);
   });
@@ -172,9 +164,7 @@ describe('createChavrutaWorkflow', () => {
 
   it('CONCLUDE returns isComplete=true', async () => {
     const wf = createChavrutaWorkflow(makeFakeModel());
-    const result = await wf.step(
-      makeContext({ currentState: 'CONCLUDE' })
-    );
+    const result = await wf.step(makeContext({ currentState: 'CONCLUDE' }));
 
     expect(result.isComplete).toBe(true);
     expect(result.nextState).toBe('CONCLUDE');

@@ -54,7 +54,7 @@ const SERVICE_PATH = path.join(
   'subgraph-agent',
   'src',
   'ai',
-  'local-inference.service.ts',
+  'local-inference.service.ts'
 );
 
 /** Read the service source once for the whole suite. */
@@ -212,7 +212,9 @@ test.describe('Air-Gap: No unguarded external-provider imports', () => {
     expect(ollamaMatches).toBeGreaterThanOrEqual(1);
 
     // And no openai/anthropic provider factories
-    expect(content).not.toMatch(/createOpenAI|createAnthropic|openai-ai-provider|@anthropic-ai\/sdk/);
+    expect(content).not.toMatch(
+      /createOpenAI|createAnthropic|openai-ai-provider|@anthropic-ai\/sdk/
+    );
   });
 
   test('blocked providers array contains exactly openai and anthropic', () => {
@@ -236,7 +238,10 @@ test.describe('Air-Gap: OnModuleInit lifecycle integration', () => {
 
     // Slice from onModuleInit through to the next method (onModuleDestroy)
     const destroyStart = content.indexOf('onModuleDestroy()', initStart);
-    const initBody = content.slice(initStart, destroyStart > -1 ? destroyStart : undefined);
+    const initBody = content.slice(
+      initStart,
+      destroyStart > -1 ? destroyStart : undefined
+    );
 
     expect(initBody).toContain('isAirgapped()');
     expect(initBody).toContain('verifyModelHash()');

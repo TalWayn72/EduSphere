@@ -25,32 +25,55 @@ describe('Cmi5LauncherService', () => {
     it('calls xapiStatementService.storeStatement with tenantId', async () => {
       await service.emitStatement('launched', params);
       expect(mockStoreStatement).toHaveBeenCalledTimes(1);
-      expect(mockStoreStatement).toHaveBeenCalledWith('tenant-abc', expect.any(Object));
+      expect(mockStoreStatement).toHaveBeenCalledWith(
+        'tenant-abc',
+        expect.any(Object)
+      );
     });
 
     it('builds statement with correct verb id for launched', async () => {
       await service.emitStatement('launched', params);
-      const stmt = mockStoreStatement.mock.calls[0][1] as Record<string, unknown>;
-      expect((stmt.verb as Record<string, string>).id).toBe(CMI5_VERBS.launched);
+      const stmt = mockStoreStatement.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
+      expect((stmt.verb as Record<string, string>).id).toBe(
+        CMI5_VERBS.launched
+      );
     });
 
     it('builds statement with correct verb id for terminated', async () => {
       await service.emitStatement('terminated', params);
-      const stmt = mockStoreStatement.mock.calls[0][1] as Record<string, unknown>;
-      expect((stmt.verb as Record<string, string>).id).toBe(CMI5_VERBS.terminated);
+      const stmt = mockStoreStatement.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
+      expect((stmt.verb as Record<string, string>).id).toBe(
+        CMI5_VERBS.terminated
+      );
     });
 
     it('includes sessionId in context extensions', async () => {
       await service.emitStatement('initialized', params);
-      const stmt = mockStoreStatement.mock.calls[0][1] as Record<string, unknown>;
+      const stmt = mockStoreStatement.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
       const ctx = stmt.context as Record<string, unknown>;
       const extensions = ctx.extensions as Record<string, string>;
-      expect(extensions['https://adlnet.gov/expapi/cmi5/context/sessionId']).toBe(params.sessionId);
+      expect(
+        extensions['https://adlnet.gov/expapi/cmi5/context/sessionId']
+      ).toBe(params.sessionId);
     });
 
     it('merges extra extensions into context', async () => {
-      await service.emitStatement('passed', params, { 'https://example.com/score': 0.9 });
-      const stmt = mockStoreStatement.mock.calls[0][1] as Record<string, unknown>;
+      await service.emitStatement('passed', params, {
+        'https://example.com/score': 0.9,
+      });
+      const stmt = mockStoreStatement.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
       const ctx = stmt.context as Record<string, unknown>;
       const extensions = ctx.extensions as Record<string, unknown>;
       expect(extensions['https://example.com/score']).toBe(0.9);
@@ -58,12 +81,17 @@ describe('Cmi5LauncherService', () => {
 
     it('does not throw when storeStatement rejects', async () => {
       mockStoreStatement.mockRejectedValueOnce(new Error('DB error'));
-      await expect(service.emitStatement('launched', params)).resolves.not.toThrow();
+      await expect(
+        service.emitStatement('launched', params)
+      ).resolves.not.toThrow();
     });
 
     it('sets actor mbox with mailto: prefix', async () => {
       await service.emitStatement('launched', params);
-      const stmt = mockStoreStatement.mock.calls[0][1] as Record<string, unknown>;
+      const stmt = mockStoreStatement.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
       const actor = stmt.actor as Record<string, string>;
       expect(actor.mbox).toBe('mailto:alice@example.com');
     });
@@ -77,24 +105,42 @@ describe('Cmi5LauncherService', () => {
     });
 
     it('Completed mode requires completed=true', () => {
-      expect(service.isSatisfied({ mode: 'Completed' }, true, false)).toBe(true);
-      expect(service.isSatisfied({ mode: 'Completed' }, false, true)).toBe(false);
+      expect(service.isSatisfied({ mode: 'Completed' }, true, false)).toBe(
+        true
+      );
+      expect(service.isSatisfied({ mode: 'Completed' }, false, true)).toBe(
+        false
+      );
     });
 
     it('CompletedAndPassed requires both true', () => {
-      expect(service.isSatisfied({ mode: 'CompletedAndPassed' }, true, true)).toBe(true);
-      expect(service.isSatisfied({ mode: 'CompletedAndPassed' }, true, false)).toBe(false);
-      expect(service.isSatisfied({ mode: 'CompletedAndPassed' }, false, true)).toBe(false);
+      expect(
+        service.isSatisfied({ mode: 'CompletedAndPassed' }, true, true)
+      ).toBe(true);
+      expect(
+        service.isSatisfied({ mode: 'CompletedAndPassed' }, true, false)
+      ).toBe(false);
+      expect(
+        service.isSatisfied({ mode: 'CompletedAndPassed' }, false, true)
+      ).toBe(false);
     });
 
     it('CompletedOrPassed satisfies when either is true', () => {
-      expect(service.isSatisfied({ mode: 'CompletedOrPassed' }, true, false)).toBe(true);
-      expect(service.isSatisfied({ mode: 'CompletedOrPassed' }, false, true)).toBe(true);
-      expect(service.isSatisfied({ mode: 'CompletedOrPassed' }, false, false)).toBe(false);
+      expect(
+        service.isSatisfied({ mode: 'CompletedOrPassed' }, true, false)
+      ).toBe(true);
+      expect(
+        service.isSatisfied({ mode: 'CompletedOrPassed' }, false, true)
+      ).toBe(true);
+      expect(
+        service.isSatisfied({ mode: 'CompletedOrPassed' }, false, false)
+      ).toBe(false);
     });
 
     it('NotApplicable always returns true', () => {
-      expect(service.isSatisfied({ mode: 'NotApplicable' }, false, false)).toBe(true);
+      expect(service.isSatisfied({ mode: 'NotApplicable' }, false, false)).toBe(
+        true
+      );
     });
   });
 
@@ -103,20 +149,29 @@ describe('Cmi5LauncherService', () => {
       const url = service.buildLaunchUrl(
         'https://au.example.com/course',
         params,
-        'https://lrs.example.com/xapi',
+        'https://lrs.example.com/xapi'
       );
       const parsed = new URL(url);
       expect(parsed.searchParams.get('registration')).toBe(params.registration);
       expect(parsed.searchParams.get('activityId')).toBe(params.activityId);
-      expect(parsed.searchParams.get('endpoint')).toBe('https://lrs.example.com/xapi');
+      expect(parsed.searchParams.get('endpoint')).toBe(
+        'https://lrs.example.com/xapi'
+      );
     });
   });
 
   describe('CMI5_VERBS', () => {
     it('defines all 9 required verbs', () => {
       const required = [
-        'launched', 'initialized', 'terminated', 'passed',
-        'failed', 'completed', 'satisfied', 'waived', 'abandoned',
+        'launched',
+        'initialized',
+        'terminated',
+        'passed',
+        'failed',
+        'completed',
+        'satisfied',
+        'waived',
+        'abandoned',
       ] as const;
       for (const verb of required) {
         // eslint-disable-next-line security/detect-object-injection -- verb is from const literal array

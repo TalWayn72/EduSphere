@@ -15,8 +15,8 @@ interface Discussion {
   id: string;
   title: string;
   courseId: string;
-  participantsCount: number;
-  messagesCount: number;
+  participantCount: number;
+  messageCount: number;
   createdAt: string;
 }
 
@@ -71,17 +71,21 @@ export function DiscussionsPage() {
               <Link key={discussion.id} to={`/discussions/${discussion.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base line-clamp-2">{discussion.title}</CardTitle>
+                    <CardTitle className="text-base line-clamp-2">
+                      {discussion.title}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MessageSquare className="h-4 w-4" aria-hidden />
-                        {discussion.messagesCount} {t('messagesCount')}
+                        {discussion.messageCount} {t('messageCount')}
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="h-4 w-4" aria-hidden />
-                        {t('participants', { count: discussion.participantsCount })}
+                        {t('participants', {
+                          count: discussion.participantCount,
+                        })}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">

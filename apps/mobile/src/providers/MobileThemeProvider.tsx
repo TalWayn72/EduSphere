@@ -99,9 +99,7 @@ async function loadCachedBranding(): Promise<{
     ]);
     const slug = pairs[0]?.[1] ?? null;
     const raw = pairs[1]?.[1];
-    const branding = raw
-      ? (JSON.parse(raw) as MobileBrandingData)
-      : null;
+    const branding = raw ? (JSON.parse(raw) as MobileBrandingData) : null;
     return { slug, branding };
   } catch {
     return { slug: null, branding: null };
@@ -115,11 +113,16 @@ async function loadCachedBranding(): Promise<{
 export function MobileThemeProvider({
   children,
   tenantSlug,
-  graphqlUrl = process.env.EXPO_PUBLIC_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
+  graphqlUrl = process.env.EXPO_PUBLIC_GRAPHQL_URL ??
+    'http://localhost:4000/graphql',
 }: MobileThemeProviderProps) {
-  const [branding, setBranding] = useState<MobileBrandingData>(DEFAULT_MOBILE_BRANDING);
+  const [branding, setBranding] = useState<MobileBrandingData>(
+    DEFAULT_MOBILE_BRANDING
+  );
   const [isLoading, setIsLoading] = useState(true);
-  const [resolvedSlug, setResolvedSlug] = useState<string | null>(tenantSlug ?? null);
+  const [resolvedSlug, setResolvedSlug] = useState<string | null>(
+    tenantSlug ?? null
+  );
 
   // On mount: load cached branding for instant cold start
   useEffect(() => {
@@ -127,15 +130,17 @@ export function MobileThemeProvider({
       setResolvedSlug(tenantSlug);
       return;
     }
-    loadCachedBranding().then(({ slug, branding: cached }) => {
-      if (slug && cached) {
-        setResolvedSlug(slug);
-        setBranding(cached);
-        applyPlatformBranding(cached);
-      }
-    }).catch(() => {
-      // Non-fatal
-    });
+    loadCachedBranding()
+      .then(({ slug, branding: cached }) => {
+        if (slug && cached) {
+          setResolvedSlug(slug);
+          setBranding(cached);
+          applyPlatformBranding(cached);
+        }
+      })
+      .catch(() => {
+        // Non-fatal
+      });
   }, [tenantSlug]);
 
   // Fetch branding from server when slug is known
@@ -175,7 +180,9 @@ export function MobileThemeProvider({
   }, [resolvedSlug, graphqlUrl]);
 
   return (
-    <MobileThemeContext.Provider value={{ branding, isLoading, tenantSlug: resolvedSlug }}>
+    <MobileThemeContext.Provider
+      value={{ branding, isLoading, tenantSlug: resolvedSlug }}
+    >
       {children}
     </MobileThemeContext.Provider>
   );
@@ -187,4 +194,9 @@ export function useMobileTheme(): MobileThemeContextValue {
 }
 
 // Export helpers for testing
-export { isColorDark, DEFAULT_MOBILE_BRANDING, TENANT_SLUG_KEY, BRANDING_CACHE_KEY };
+export {
+  isColorDark,
+  DEFAULT_MOBILE_BRANDING,
+  TENANT_SLUG_KEY,
+  BRANDING_CACHE_KEY,
+};

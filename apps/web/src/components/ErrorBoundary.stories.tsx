@@ -45,7 +45,9 @@ export const CustomFallback: Story = {
       fallback={
         <div className="p-8 text-center border rounded-lg bg-amber-50 dark:bg-amber-950">
           <p className="text-lg font-semibold">Custom Error UI</p>
-          <p className="text-sm text-muted-foreground mt-1">A custom fallback was provided.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            A custom fallback was provided.
+          </p>
         </div>
       }
     >

@@ -24,7 +24,11 @@ vi.mock('@edusphere/db', () => ({
     values,
   })),
   withTenantContext: (...args: unknown[]) => mockWithTenantContext(...args),
-  userFollows: { followingId: 'followingId', followerId: 'followerId', tenantId: 'tenantId' },
+  userFollows: {
+    followingId: 'followingId',
+    followerId: 'followerId',
+    tenantId: 'tenantId',
+  },
   userProgress: {
     userId: 'userId',
     contentItemId: 'contentItemId',
@@ -38,7 +42,11 @@ vi.mock('@edusphere/db', () => ({
 
 import { SocialRecommendationsDataService } from './social-recommendations-data.service.js';
 
-const CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+const CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'STUDENT' as const,
+};
 
 describe('SocialRecommendationsDataService', () => {
   let service: SocialRecommendationsDataService;
@@ -53,10 +61,12 @@ describe('SocialRecommendationsDataService', () => {
   it('returns list of followed user IDs', async () => {
     mockTx.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([
-          { followingId: 'user-2' },
-          { followingId: 'user-3' },
-        ]),
+        where: vi
+          .fn()
+          .mockResolvedValue([
+            { followingId: 'user-2' },
+            { followingId: 'user-3' },
+          ]),
       }),
     });
     const ids = await service.getFollowedUserIds('user-1', 'tenant-1', CTX);
@@ -78,10 +88,12 @@ describe('SocialRecommendationsDataService', () => {
   it('returns intersection of followers and followed', async () => {
     mockTx.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([
-          { followerId: 'user-2' },
-          { followerId: 'user-5' },
-        ]),
+        where: vi
+          .fn()
+          .mockResolvedValue([
+            { followerId: 'user-2' },
+            { followerId: 'user-5' },
+          ]),
       }),
     });
     const mutual = await service.getMutualFollowerIds(
@@ -98,10 +110,12 @@ describe('SocialRecommendationsDataService', () => {
   it('returns Set of completed content item IDs', async () => {
     mockTx.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([
-          { contentItemId: 'ci-1' },
-          { contentItemId: 'ci-2' },
-        ]),
+        where: vi
+          .fn()
+          .mockResolvedValue([
+            { contentItemId: 'ci-1' },
+            { contentItemId: 'ci-2' },
+          ]),
       }),
     });
     const set = await service.getCompletedContentIds('user-1', CTX);

@@ -2,13 +2,7 @@
  * DiscussionFieldResolvers — Field resolvers for DiscussionMessage and DiscussionParticipant.
  * Extracted from discussion.resolver.ts for file-size compliance (<300 lines).
  */
-import {
-  Resolver,
-  Args,
-  Context,
-  ResolveField,
-  Parent,
-} from '@nestjs/graphql';
+import { Resolver, Args, Context, ResolveField, Parent } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
 import { DiscussionService } from './discussion.service';
 import type { AuthContext } from '@edusphere/auth';

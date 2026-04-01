@@ -14,11 +14,7 @@ export const CREATE_SESSION = gql`
 export const SEND_MESSAGE = gql`
   mutation SendMessage($sessionId: ID!, $content: String!) {
     createAgentMessage(
-      input: {
-        sessionId: $sessionId
-        role: "USER"
-        content: $content
-      }
+      input: { sessionId: $sessionId, role: "USER", content: $content }
     ) {
       id
     }

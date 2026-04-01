@@ -8,8 +8,12 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn(),
   inArray: vi.fn(),
   createDatabaseConnection: vi.fn(() => ({
-    select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })) })),
-    delete: vi.fn(() => ({ where: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]) })) })),
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })),
+    })),
+    delete: vi.fn(() => ({
+      where: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]) })),
+    })),
     insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue(undefined) })),
   })),
   schema: {
@@ -21,7 +25,9 @@ vi.mock('@edusphere/db', () => ({
     users: {},
     auditLog: {},
   },
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) => fn({})),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) => fn({})
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 

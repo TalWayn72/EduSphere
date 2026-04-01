@@ -54,12 +54,20 @@ describe('CrossFadeImage', () => {
     vi.useFakeTimers();
 
     const { rerender } = render(
-      <CrossFadeImage src="https://example.com/img1.png" alt="First" fadeDuration={400} />
+      <CrossFadeImage
+        src="https://example.com/img1.png"
+        alt="First"
+        fadeDuration={400}
+      />
     );
 
     act(() => {
       rerender(
-        <CrossFadeImage src="https://example.com/img2.png" alt="Second" fadeDuration={400} />
+        <CrossFadeImage
+          src="https://example.com/img2.png"
+          alt="Second"
+          fadeDuration={400}
+        />
       );
     });
 
@@ -68,7 +76,9 @@ describe('CrossFadeImage', () => {
 
     expect((current as HTMLImageElement).style.opacity).toBe('0');
     expect((next as HTMLImageElement).style.opacity).toBe('1');
-    expect((next as HTMLImageElement).getAttribute('src')).toBe('https://example.com/img2.png');
+    expect((next as HTMLImageElement).getAttribute('src')).toBe(
+      'https://example.com/img2.png'
+    );
 
     vi.useRealTimers();
   });
@@ -77,12 +87,20 @@ describe('CrossFadeImage', () => {
     vi.useFakeTimers();
 
     const { rerender } = render(
-      <CrossFadeImage src="https://example.com/img1.png" alt="First" fadeDuration={400} />
+      <CrossFadeImage
+        src="https://example.com/img1.png"
+        alt="First"
+        fadeDuration={400}
+      />
     );
 
     act(() => {
       rerender(
-        <CrossFadeImage src="https://example.com/img2.png" alt="Second" fadeDuration={400} />
+        <CrossFadeImage
+          src="https://example.com/img2.png"
+          alt="Second"
+          fadeDuration={400}
+        />
       );
     });
 
@@ -91,7 +109,9 @@ describe('CrossFadeImage', () => {
     });
 
     const current = screen.getByTestId('cross-fade-current');
-    expect((current as HTMLImageElement).getAttribute('src')).toBe('https://example.com/img2.png');
+    expect((current as HTMLImageElement).getAttribute('src')).toBe(
+      'https://example.com/img2.png'
+    );
     expect(screen.queryByTestId('cross-fade-next')).toBeNull();
 
     vi.useRealTimers();
@@ -106,7 +126,9 @@ describe('CrossFadeImage', () => {
     );
 
     act(() => {
-      rerender(<CrossFadeImage src="https://example.com/img2.png" fadeDuration={400} />);
+      rerender(
+        <CrossFadeImage src="https://example.com/img2.png" fadeDuration={400} />
+      );
     });
 
     unmount();
@@ -116,7 +138,9 @@ describe('CrossFadeImage', () => {
   });
 
   it('renders nothing when src transitions from value to null', () => {
-    const { rerender } = render(<CrossFadeImage src="https://example.com/img1.png" />);
+    const { rerender } = render(
+      <CrossFadeImage src="https://example.com/img1.png" />
+    );
     act(() => {
       rerender(<CrossFadeImage src={null} />);
     });
@@ -181,7 +205,9 @@ describe('CrossFadeImage', () => {
     vi.useFakeTimers();
     const { useCrossFadeGif } = await import('./useCrossFadeGif');
     const mockSchedule = vi.fn();
-    vi.mocked(useCrossFadeGif).mockReturnValue({ scheduleGifPause: mockSchedule });
+    vi.mocked(useCrossFadeGif).mockReturnValue({
+      scheduleGifPause: mockSchedule,
+    });
 
     const { rerender } = render(
       <CrossFadeImage

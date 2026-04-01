@@ -29,7 +29,7 @@ export function ExamLockdownStatus({
         hasViolations
           ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
           : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
-        className,
+        className
       )}
       role="status"
       aria-label={

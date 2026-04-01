@@ -19,7 +19,9 @@ vi.mock('@/components/ui/button', () => ({
 
 vi.mock('@/components/ui/badge', () => ({
   Badge: ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-    <span data-testid="badge" {...props}>{children}</span>
+    <span data-testid="badge" {...props}>
+      {children}
+    </span>
   ),
 }));
 
@@ -39,8 +41,16 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select-content">{children}</div>
   ),
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-testid={`select-item-${value}`} role="option">{children}</div>
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => (
+    <div data-testid={`select-item-${value}`} role="option">
+      {children}
+    </div>
   ),
   SelectTrigger: ({ children }: { children: React.ReactNode }) => (
     <button data-testid="select-trigger">{children}</button>
@@ -48,10 +58,16 @@ vi.mock('@/components/ui/select', () => ({
 }));
 
 vi.mock('@/components/ui/table', () => ({
-  TableRow: ({ children, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => (
+  TableRow: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLTableRowElement>) => (
     <tr {...props}>{children}</tr>
   ),
-  TableCell: ({ children, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+  TableCell: ({
+    children,
+    ...props
+  }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
     <td {...props}>{children}</td>
   ),
 }));

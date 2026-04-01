@@ -20,7 +20,11 @@ import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions, NatsSubjects } from '@edusphere/nats-client';
 import type { LessonPayload } from '@edusphere/nats-client';
 
-export type { CreateLessonInput, UpdateLessonInput, MappedLesson } from './lesson.helpers.js';
+export type {
+  CreateLessonInput,
+  UpdateLessonInput,
+  MappedLesson,
+} from './lesson.helpers.js';
 export { mapLesson, UUID_REGEX } from './lesson.helpers.js';
 
 import { mapLesson, UUID_REGEX } from './lesson.helpers.js';
@@ -234,26 +238,44 @@ export class LessonService implements OnModuleDestroy {
 
   // ─── Private validation helpers ───────────────────────────────────────────
 
-  private validateCreateInput(input: CreateLessonInput, tenantCtx: TenantContext): void {
+  private validateCreateInput(
+    input: CreateLessonInput,
+    tenantCtx: TenantContext
+  ): void {
     if (!UUID_REGEX.test(input.courseId)) {
-      this.logger.warn(`[LessonService] createLesson rejected: invalid courseId "${input.courseId}"`);
-      throw new BadRequestException('מזהה הקורס אינו תקין. ודא שהקורס קיים במערכת.');
+      this.logger.warn(
+        `[LessonService] createLesson rejected: invalid courseId "${input.courseId}"`
+      );
+      throw new BadRequestException(
+        'מזהה הקורס אינו תקין. ודא שהקורס קיים במערכת.'
+      );
     }
     if (!tenantCtx.tenantId) {
-      this.logger.error('[LessonService] createLesson rejected: tenantId missing');
-      throw new BadRequestException('שגיאת אימות: חסר מזהה ארגון. נסה להתחבר מחדש.');
+      this.logger.error(
+        '[LessonService] createLesson rejected: tenantId missing'
+      );
+      throw new BadRequestException(
+        'שגיאת אימות: חסר מזהה ארגון. נסה להתחבר מחדש.'
+      );
     }
   }
 
-  private async validateCourseExists(courseId: string, tenantCtx: TenantContext): Promise<void> {
+  private async validateCourseExists(
+    courseId: string,
+    tenantCtx: TenantContext
+  ): Promise<void> {
     const [course] = await this.db
       .select({ id: schema.courses.id, tenant_id: schema.courses.tenant_id })
       .from(schema.courses)
-      .where(and(eq(schema.courses.id, courseId), isNull(schema.courses.deleted_at)))
+      .where(
+        and(eq(schema.courses.id, courseId), isNull(schema.courses.deleted_at))
+      )
       .limit(1);
 
     if (!course) {
-      this.logger.warn(`[LessonService] createLesson rejected: course "${courseId}" not found in DB`);
+      this.logger.warn(
+        `[LessonService] createLesson rejected: course "${courseId}" not found in DB`
+      );
       throw new NotFoundException('הקורס לא נמצא. ייתכן שנמחק או שהמזהה שגוי.');
     }
     if (course.tenant_id !== tenantCtx.tenantId) {
@@ -276,11 +298,17 @@ export class LessonService implements OnModuleDestroy {
       this.logger.warn(
         `[LessonService] createLesson rejected: instructorId "${instructorId}" not found in users table.`
       );
-      throw new BadRequestException('המשתמש לא נמצא במערכת. ייתכן שיש בעיית סנכרון עם מערכת ההזדהות.');
+      throw new BadRequestException(
+        'המשתמש לא נמצא במערכת. ייתכן שיש בעיית סנכרון עם מערכת ההזדהות.'
+      );
     }
   }
 
-  private handleCreateError(err: unknown, input: CreateLessonInput, tenantCtx: TenantContext): never {
+  private handleCreateError(
+    err: unknown,
+    input: CreateLessonInput,
+    tenantCtx: TenantContext
+  ): never {
     const errMsg = String(err);
     this.logger.error(
       `[LessonService] Failed to create lesson for course "${input.courseId}" ` +
@@ -290,7 +318,9 @@ export class LessonService implements OnModuleDestroy {
       throw new BadRequestException('הקורס לא נמצא במסד הנתונים.');
     }
     if (errMsg.includes('foreign key') && errMsg.includes('instructor_id')) {
-      throw new BadRequestException('המרצה לא נמצא במערכת. בדוק את סנכרון המשתמשים.');
+      throw new BadRequestException(
+        'המרצה לא נמצא במערכת. בדוק את סנכרון המשתמשים.'
+      );
     }
     if (errMsg.includes('foreign key') && errMsg.includes('tenant_id')) {
       throw new BadRequestException('הארגון לא נמצא. נסה להתחבר מחדש.');

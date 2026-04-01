@@ -32,7 +32,9 @@ test.describe('IS-5568 — html lang attribute', () => {
     }
   });
 
-  test('lang and dir update when locale changes to Hebrew', async ({ page }) => {
+  test('lang and dir update when locale changes to Hebrew', async ({
+    page,
+  }) => {
     // Set the locale in localStorage before navigating
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
@@ -48,7 +50,9 @@ test.describe('IS-5568 — html lang attribute', () => {
     expect(dir).toBe('rtl');
   });
 
-  test('lang and dir update when locale changes to English', async ({ page }) => {
+  test('lang and dir update when locale changes to English', async ({
+    page,
+  }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
     await page.evaluate(() => {
@@ -86,7 +90,9 @@ test.describe('IS-5568 — Keyboard alternatives for drag-and-drop', () => {
     expect(true).toBe(true);
   });
 
-  test('AgentStudioPage palette items are clickable (keyboard accessible)', async ({ page }) => {
+  test('AgentStudioPage palette items are clickable (keyboard accessible)', async ({
+    page,
+  }) => {
     await page.goto('/agents/studio');
     await page.waitForLoadState('domcontentloaded');
 
@@ -95,9 +101,9 @@ test.describe('IS-5568 — Keyboard alternatives for drag-and-drop', () => {
     const count = await paletteButtons.count();
     if (count > 0) {
       // Verify palette items are buttons (not just divs)
-      const firstTag = await paletteButtons.first().evaluate(
-        (el) => el.tagName.toLowerCase()
-      );
+      const firstTag = await paletteButtons
+        .first()
+        .evaluate((el) => el.tagName.toLowerCase());
       expect(firstTag).toBe('button');
 
       // Verify keyboard accessibility — item has aria-label
@@ -140,8 +146,8 @@ test.describe('IS-5568 — Tab order on main pages', () => {
       }
 
       // At least some interactive elements should receive focus
-      const interactiveElements = focusedElements.filter(
-        (tag) => ['a', 'button', 'input', 'select', 'textarea'].includes(tag)
+      const interactiveElements = focusedElements.filter((tag) =>
+        ['a', 'button', 'input', 'select', 'textarea'].includes(tag)
       );
       expect(interactiveElements.length).toBeGreaterThan(0);
     });

@@ -21,7 +21,9 @@ export const files = pgTable('files', {
   size: bigint('size', { mode: 'number' }).notNull(),
   storageKey: varchar('storage_key', { length: 500 }).notNull(),
   url: text('url'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const filesRLS = sql`

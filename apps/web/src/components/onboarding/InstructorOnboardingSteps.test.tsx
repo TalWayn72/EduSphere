@@ -21,7 +21,10 @@ const mockCompleteOnboarding = vi.fn().mockResolvedValue({ data: {} });
 
 vi.mock('urql', () => ({
   useMutation: vi.fn((query: string) => {
-    if (query.includes('UpdateOnboardingStep') || query === 'UPDATE_ONBOARDING_STEP_MUTATION') {
+    if (
+      query.includes('UpdateOnboardingStep') ||
+      query === 'UPDATE_ONBOARDING_STEP_MUTATION'
+    ) {
       return [{ fetching: false }, mockUpdateStep];
     }
     return [{ fetching: false }, mockCompleteOnboarding];

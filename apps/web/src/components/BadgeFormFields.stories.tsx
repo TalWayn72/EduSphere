@@ -22,7 +22,13 @@ const filledForm: BadgeFormData = {
   conditionValue: 10,
 };
 
-function Wrapper({ initial = emptyForm, saving }: { initial?: BadgeFormData; saving?: boolean }) {
+function Wrapper({
+  initial = emptyForm,
+  saving,
+}: {
+  initial?: BadgeFormData;
+  saving?: boolean;
+}) {
   const [value, setValue] = useState(initial);
   return (
     <BadgeFormFields

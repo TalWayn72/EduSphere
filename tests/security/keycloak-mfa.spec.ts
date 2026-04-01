@@ -13,7 +13,7 @@ import { resolve, join } from 'node:path';
 import { describe, it, expect, beforeAll } from 'vitest';
 
 const REALM_PATH = resolve(
-  join(import.meta.dirname, '../../infrastructure/docker/keycloak-realm.json'),
+  join(import.meta.dirname, '../../infrastructure/docker/keycloak-realm.json')
 );
 
 interface AuthExecution {
@@ -133,12 +133,16 @@ describe('Keycloak MFA enforcement (ISO 27001 A.9.4.2, SOC 2 CC6.1)', () => {
 
   describe('CONFIGURE_TOTP required action', () => {
     it('CONFIGURE_TOTP required action is present', () => {
-      const action = realm.requiredActions.find((a) => a.alias === 'CONFIGURE_TOTP');
+      const action = realm.requiredActions.find(
+        (a) => a.alias === 'CONFIGURE_TOTP'
+      );
       expect(action).toBeDefined();
     });
 
     it('CONFIGURE_TOTP required action is enabled', () => {
-      const action = realm.requiredActions.find((a) => a.alias === 'CONFIGURE_TOTP');
+      const action = realm.requiredActions.find(
+        (a) => a.alias === 'CONFIGURE_TOTP'
+      );
       expect(action?.enabled).toBe(true);
     });
   });
@@ -148,17 +152,17 @@ describe('Keycloak MFA enforcement (ISO 27001 A.9.4.2, SOC 2 CC6.1)', () => {
   describe('Authentication flows — MFA for privileged roles', () => {
     it('has a "MFA - Privileged Role OTP" flow defined', () => {
       const flow = realm.authenticationFlows.find(
-        (f) => f.alias === 'MFA - Privileged Role OTP',
+        (f) => f.alias === 'MFA - Privileged Role OTP'
       );
       expect(flow).toBeDefined();
     });
 
     it('"MFA - Privileged Role OTP" flow contains a REQUIRED auth-otp-form execution', () => {
       const flow = realm.authenticationFlows.find(
-        (f) => f.alias === 'MFA - Privileged Role OTP',
+        (f) => f.alias === 'MFA - Privileged Role OTP'
       );
       const otpExecution = flow?.authenticationExecutions.find(
-        (e) => e.authenticator === 'auth-otp-form',
+        (e) => e.authenticator === 'auth-otp-form'
       );
       expect(otpExecution).toBeDefined();
       expect(otpExecution?.requirement).toBe('REQUIRED');
@@ -166,29 +170,33 @@ describe('Keycloak MFA enforcement (ISO 27001 A.9.4.2, SOC 2 CC6.1)', () => {
 
     it('"MFA - Privileged Role OTP" flow has a conditional-user-role step', () => {
       const flow = realm.authenticationFlows.find(
-        (f) => f.alias === 'MFA - Privileged Role OTP',
+        (f) => f.alias === 'MFA - Privileged Role OTP'
       );
       const roleCondition = flow?.authenticationExecutions.find(
-        (e) => e.authenticator === 'conditional-user-role',
+        (e) => e.authenticator === 'conditional-user-role'
       );
       expect(roleCondition).toBeDefined();
       expect(roleCondition?.requirement).toBe('REQUIRED');
     });
 
     it('"forms" flow includes the "MFA - Privileged Role OTP" sub-flow', () => {
-      const formsFlow = realm.authenticationFlows.find((f) => f.alias === 'forms');
+      const formsFlow = realm.authenticationFlows.find(
+        (f) => f.alias === 'forms'
+      );
       expect(formsFlow).toBeDefined();
       const privilegedStep = formsFlow?.authenticationExecutions.find(
-        (e) => e.flowAlias === 'MFA - Privileged Role OTP',
+        (e) => e.flowAlias === 'MFA - Privileged Role OTP'
       );
       expect(privilegedStep).toBeDefined();
       expect(privilegedStep?.requirement).toBe('CONDITIONAL');
     });
 
     it('"forms" flow delegates to "Browser - Conditional 2FA" for standard 2FA', () => {
-      const formsFlow = realm.authenticationFlows.find((f) => f.alias === 'forms');
+      const formsFlow = realm.authenticationFlows.find(
+        (f) => f.alias === 'forms'
+      );
       const conditionalStep = formsFlow?.authenticationExecutions.find(
-        (e) => e.flowAlias === 'Browser - Conditional 2FA',
+        (e) => e.flowAlias === 'Browser - Conditional 2FA'
       );
       expect(conditionalStep).toBeDefined();
       expect(conditionalStep?.requirement).toBe('CONDITIONAL');
@@ -196,10 +204,10 @@ describe('Keycloak MFA enforcement (ISO 27001 A.9.4.2, SOC 2 CC6.1)', () => {
 
     it('"Browser - Conditional 2FA" flow has OTP as REQUIRED (not OPTIONAL)', () => {
       const flow = realm.authenticationFlows.find(
-        (f) => f.alias === 'Browser - Conditional 2FA',
+        (f) => f.alias === 'Browser - Conditional 2FA'
       );
       const otpExecution = flow?.authenticationExecutions.find(
-        (e) => e.authenticator === 'auth-otp-form',
+        (e) => e.authenticator === 'auth-otp-form'
       );
       expect(otpExecution).toBeDefined();
       expect(otpExecution?.requirement).toBe('REQUIRED');
@@ -211,21 +219,21 @@ describe('Keycloak MFA enforcement (ISO 27001 A.9.4.2, SOC 2 CC6.1)', () => {
   describe('Authenticator configuration — privileged roles', () => {
     it('has a "privileged-role-condition" authenticator config', () => {
       const config = realm.authenticatorConfig?.find(
-        (c) => c.alias === 'privileged-role-condition',
+        (c) => c.alias === 'privileged-role-condition'
       );
       expect(config).toBeDefined();
     });
 
     it('"privileged-role-condition" config targets ORG_ADMIN role', () => {
       const config = realm.authenticatorConfig?.find(
-        (c) => c.alias === 'privileged-role-condition',
+        (c) => c.alias === 'privileged-role-condition'
       );
       expect(config?.config.roles).toContain('ORG_ADMIN');
     });
 
     it('"privileged-role-condition" config targets SUPER_ADMIN role', () => {
       const config = realm.authenticatorConfig?.find(
-        (c) => c.alias === 'privileged-role-condition',
+        (c) => c.alias === 'privileged-role-condition'
       );
       expect(config?.config.roles).toContain('SUPER_ADMIN');
     });
@@ -240,11 +248,11 @@ describe('Keycloak MFA enforcement (ISO 27001 A.9.4.2, SOC 2 CC6.1)', () => {
 
     it('"browser" top-level flow delegates to "forms" sub-flow', () => {
       const browserFlow = realm.authenticationFlows.find(
-        (f) => f.alias === 'browser' && f.topLevel,
+        (f) => f.alias === 'browser' && f.topLevel
       );
       expect(browserFlow).toBeDefined();
       const formsStep = browserFlow?.authenticationExecutions.find(
-        (e) => e.flowAlias === 'forms',
+        (e) => e.flowAlias === 'forms'
       );
       expect(formsStep).toBeDefined();
     });

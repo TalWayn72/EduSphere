@@ -21,8 +21,18 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('./ApiKeysPage.table', () => ({
-  ApiKeysTable: ({ keys, fetching }: { keys: unknown[]; fetching: boolean }) => (
-    <div data-testid="api-keys-table" data-fetching={fetching} data-count={keys.length} />
+  ApiKeysTable: ({
+    keys,
+    fetching,
+  }: {
+    keys: unknown[];
+    fetching: boolean;
+  }) => (
+    <div
+      data-testid="api-keys-table"
+      data-fetching={fetching}
+      data-count={keys.length}
+    />
   ),
 }));
 
@@ -39,7 +49,10 @@ function setupMocks(queryData?: { apiKeys: unknown[] }, fetching = false) {
     { data: queryData, fetching, error: undefined },
     vi.fn(),
   ] as never);
-  vi.mocked(urql.useMutation).mockReturnValue([{}, mockExecuteMutation] as never);
+  vi.mocked(urql.useMutation).mockReturnValue([
+    {},
+    mockExecuteMutation,
+  ] as never);
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -59,7 +72,9 @@ describe('ApiKeysPage', () => {
   it('renders create key form with description input', () => {
     setupMocks();
     render(<ApiKeysPage />);
-    expect(screen.getByLabelText('apiKeys.descriptionLabel')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('apiKeys.descriptionLabel')
+    ).toBeInTheDocument();
   });
 
   it('renders generate button', () => {

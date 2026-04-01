@@ -17,7 +17,11 @@ import { z } from 'zod';
  * Prevents stored XSS when user-supplied pilot form data is displayed in admin UI.
  */
 const stripHtml = (val: string): string =>
-  val.replace(/<[^>]*>/g, '').replace(/</g, '').replace(/>/g, '').trim();
+  val
+    .replace(/<[^>]*>/g, '')
+    .replace(/</g, '')
+    .replace(/>/g, '')
+    .trim();
 
 export const OrgTypeEnum = z.enum([
   'UNIVERSITY',
@@ -39,7 +43,11 @@ export const PilotSignupSchema = z.object({
   // SC-02: strip HTML tags from contactName to prevent stored XSS
   contactName: z.string().min(2).max(255).transform(stripHtml),
   contactEmail: z.string().email().max(255),
-  contactPhone: z.string().max(50).optional().transform((v) => (v ? stripHtml(v) : v)),
+  contactPhone: z
+    .string()
+    .max(50)
+    .optional()
+    .transform((v) => (v ? stripHtml(v) : v)),
   estimatedUsers: z.number().int().min(1).max(100_000),
   // SC-02 + T-15: max 2000 chars + strip HTML on useCase (use_case) field
   useCase: z.string().min(10).max(2000).transform(stripHtml),

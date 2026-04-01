@@ -11,7 +11,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -33,8 +35,20 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 const MOCK_RESULTS = [
-  { questionId: 'q1', score: 8, maxScore: 10, explanation: 'Good coverage', suggestions: ['Add more examples'] },
-  { questionId: 'q2', score: 5, maxScore: 10, explanation: 'Missing key terms', suggestions: ['Review chapter 3'] },
+  {
+    questionId: 'q1',
+    score: 8,
+    maxScore: 10,
+    explanation: 'Good coverage',
+    suggestions: ['Add more examples'],
+  },
+  {
+    questionId: 'q2',
+    score: 5,
+    maxScore: 10,
+    explanation: 'Missing key terms',
+    suggestions: ['Review chapter 3'],
+  },
 ];
 
 vi.mock('urql', async (importOriginal) => {
@@ -42,7 +56,10 @@ vi.mock('urql', async (importOriginal) => {
   return {
     ...actual,
     useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
-    useQuery: vi.fn(() => [{ fetching: false, data: { autoGradingResults: MOCK_RESULTS } }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { fetching: false, data: { autoGradingResults: MOCK_RESULTS } },
+      vi.fn(),
+    ]),
   };
 });
 

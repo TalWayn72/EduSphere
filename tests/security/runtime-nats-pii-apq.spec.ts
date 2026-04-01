@@ -35,7 +35,10 @@ function collectTsFiles(dir: string): string[] {
     const stat = statSync(full);
     if (stat.isDirectory() && entry !== 'node_modules' && entry !== 'dist') {
       results.push(...collectTsFiles(full));
-    } else if (stat.isFile() && (entry.endsWith('.ts') || entry.endsWith('.tsx'))) {
+    } else if (
+      stat.isFile() &&
+      (entry.endsWith('.ts') || entry.endsWith('.tsx'))
+    ) {
       results.push(full);
     }
   }
@@ -48,28 +51,24 @@ function collectTsFiles(dir: string): string[] {
 
 describe('SI-7: NATS TLS enforcement — services use buildNatsOptions()', () => {
   it('subgraph-agent NatsService imports buildNatsOptions from @edusphere/nats-client', () => {
-    const content = readFile(
-      'apps/subgraph-agent/src/nats/nats.service.ts',
-    );
+    const content = readFile('apps/subgraph-agent/src/nats/nats.service.ts');
     expect(content).toBeTruthy();
-    expect(content).toContain("buildNatsOptions");
-    expect(content).toContain("@edusphere/nats-client");
+    expect(content).toContain('buildNatsOptions');
+    expect(content).toContain('@edusphere/nats-client');
   });
 
   it('subgraph-content AtRiskFlagService imports buildNatsOptions from @edusphere/nats-client', () => {
     // NATS usage moved from LiveSessionService to AtRiskFlagService
     const content = readFile(
-      'apps/subgraph-content/src/at-risk/at-risk-flag.service.ts',
+      'apps/subgraph-content/src/at-risk/at-risk-flag.service.ts'
     );
     expect(content).toBeTruthy();
-    expect(content).toContain("buildNatsOptions");
-    expect(content).toContain("@edusphere/nats-client");
+    expect(content).toContain('buildNatsOptions');
+    expect(content).toContain('@edusphere/nats-client');
   });
 
   it('subgraph-agent NatsService calls buildNatsOptions() before connect()', () => {
-    const content = readFile(
-      'apps/subgraph-agent/src/nats/nats.service.ts',
-    );
+    const content = readFile('apps/subgraph-agent/src/nats/nats.service.ts');
     // Must use buildNatsOptions() result when calling connect
     expect(content).toMatch(/buildNatsOptions\(\)/);
     expect(content).toMatch(/connect\(opts\)/);
@@ -79,14 +78,14 @@ describe('SI-7: NATS TLS enforcement — services use buildNatsOptions()', () =>
       (line) =>
         line.includes('connect({') &&
         line.includes('servers') &&
-        !line.trim().startsWith('//'),
+        !line.trim().startsWith('//')
     );
     expect(bareConnectLines).toHaveLength(0);
   });
 
   it('subgraph-content AtRiskFlagService uses buildNatsOptions() in connect', () => {
     const content = readFile(
-      'apps/subgraph-content/src/at-risk/at-risk-flag.service.ts',
+      'apps/subgraph-content/src/at-risk/at-risk-flag.service.ts'
     );
     // The service must call buildNatsOptions() before connect
     expect(content).toMatch(/connect\(buildNatsOptions\(\)\)/);
@@ -133,14 +132,14 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
 
       for (const filePath of tsFiles) {
         // Skip test files and spec files
-        if (filePath.includes('.spec.') || filePath.includes('.test.')) continue;
+        if (filePath.includes('.spec.') || filePath.includes('.test.'))
+          continue;
 
         const content = readFileSync(filePath, 'utf-8');
 
         // Check if file imports connect from nats
         const importsNatsConnect =
-          content.includes("from 'nats'") &&
-          content.includes('connect');
+          content.includes("from 'nats'") && content.includes('connect');
 
         if (!importsNatsConnect) continue;
 
@@ -148,7 +147,9 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
         const usesBuildNatsOptions = content.includes('buildNatsOptions');
 
         if (!usesBuildNatsOptions) {
-          const relative = filePath.replace(resolve(ROOT) + '\\', '').replace(/\\/g, '/');
+          const relative = filePath
+            .replace(resolve(ROOT) + '\\', '')
+            .replace(/\\/g, '/');
           violations.push(relative);
         }
       }
@@ -156,7 +157,7 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
 
     expect(
       violations,
-      `Files importing nats connect() without buildNatsOptions: ${violations.join(', ')}`,
+      `Files importing nats connect() without buildNatsOptions: ${violations.join(', ')}`
     ).toHaveLength(0);
   });
 
@@ -168,7 +169,8 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
       const tsFiles = collectTsFiles(absDir);
 
       for (const filePath of tsFiles) {
-        if (filePath.includes('.spec.') || filePath.includes('.test.')) continue;
+        if (filePath.includes('.spec.') || filePath.includes('.test.'))
+          continue;
 
         const content = readFileSync(filePath, 'utf-8');
 
@@ -177,7 +179,9 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
         const hasBuildNatsOptions = content.includes('buildNatsOptions');
 
         if (hasBareConnect && !hasBuildNatsOptions) {
-          const relative = filePath.replace(resolve(ROOT) + '\\', '').replace(/\\/g, '/');
+          const relative = filePath
+            .replace(resolve(ROOT) + '\\', '')
+            .replace(/\\/g, '/');
           bareConnectFiles.push(relative);
         }
       }
@@ -185,7 +189,7 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
 
     expect(
       bareConnectFiles,
-      `Files with bare connect({ servers: }) without buildNatsOptions: ${bareConnectFiles.join(', ')}`,
+      `Files with bare connect({ servers: }) without buildNatsOptions: ${bareConnectFiles.join(', ')}`
     ).toHaveLength(0);
   });
 });
@@ -308,7 +312,8 @@ describe('SEC-8: APQ registry supports Redis backend', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('OPS-4: Alertmanager routes to real receivers', () => {
-  const ALERTMANAGER_FILE = 'infrastructure/monitoring/alertmanager/alertmanager.yml';
+  const ALERTMANAGER_FILE =
+    'infrastructure/monitoring/alertmanager/alertmanager.yml';
 
   it('alertmanager.yml exists', () => {
     const fullPath = resolve(ROOT, ALERTMANAGER_FILE);
@@ -355,7 +360,9 @@ describe('OPS-4: Alertmanager routes to real receivers', () => {
     // The webhook URL must use environment variable substitution
     expect(content).toMatch(/\$\{SLACK_WEBHOOK_URL\}/);
     // Must NOT contain a hardcoded https://hooks.slack.com URL
-    expect(content).not.toMatch(/https:\/\/hooks\.slack\.com\/services\/T[A-Z0-9]+/);
+    expect(content).not.toMatch(
+      /https:\/\/hooks\.slack\.com\/services\/T[A-Z0-9]+/
+    );
   });
 
   it('PagerDuty service key is sourced from env var (not hardcoded)', () => {

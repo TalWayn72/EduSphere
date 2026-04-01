@@ -18,7 +18,10 @@ interface BlueprintDistributionsProps {
 }
 
 export function BlueprintDistributions({
-  domainDist, onDomainChange, bloomDist, onBloomChange,
+  domainDist,
+  onDomainChange,
+  bloomDist,
+  onBloomChange,
 }: BlueprintDistributionsProps) {
   const [newDomain, setNewDomain] = useState('');
 
@@ -48,10 +51,20 @@ export function BlueprintDistributions({
               value={newDomain}
               onChange={(e) => setNewDomain(e.target.value)}
               placeholder="Add domain (e.g. Algorithms)"
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addDomain(); } }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addDomain();
+                }
+              }}
               className="max-w-[240px]"
             />
-            <Button type="button" variant="outline" size="sm" onClick={addDomain}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addDomain}
+            >
               Add
             </Button>
           </div>

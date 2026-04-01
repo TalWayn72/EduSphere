@@ -185,7 +185,11 @@ describe('AIChatPanel', () => {
   // 5. Changing agent selector resets messages (empty state) ───────────────────
 
   it('a freshly mounted panel has no messages (empty state)', () => {
-    const { container } = render(<MemoryRouter><AIChatPanel /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <AIChatPanel />
+      </MemoryRouter>
+    );
     openPanel(container);
     // Agent selector area is visible
     expect(
@@ -254,7 +258,11 @@ describe('AIChatPanel', () => {
 
   it('renders a message that arrives via the subscription', async () => {
     // Render first with no subscription data (realistic initial state)
-    const { container, rerender } = render(<MemoryRouter><AIChatPanel /></MemoryRouter>);
+    const { container, rerender } = render(
+      <MemoryRouter>
+        <AIChatPanel />
+      </MemoryRouter>
+    );
     openPanel(container);
 
     // Simulate subscription data arriving after mount (push from server)
@@ -278,7 +286,11 @@ describe('AIChatPanel', () => {
       },
       vi.fn(),
     ] as unknown as ReturnType<typeof useSubscription>);
-    rerender(<MemoryRouter><AIChatPanel /></MemoryRouter>);
+    rerender(
+      <MemoryRouter>
+        <AIChatPanel />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       expect(
@@ -290,7 +302,11 @@ describe('AIChatPanel', () => {
   // 9. Custom className propagation ─────────────────────────────────────────────
 
   it('applies custom className to the panel wrapper', () => {
-    const { container } = render(<MemoryRouter><AIChatPanel className="my-custom-class" /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <AIChatPanel className="my-custom-class" />
+      </MemoryRouter>
+    );
     expect(container.querySelector('.my-custom-class')).toBeInTheDocument();
   });
 

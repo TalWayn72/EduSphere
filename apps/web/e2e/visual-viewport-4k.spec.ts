@@ -36,13 +36,15 @@ test.describe('Visual Regression — 4K QHD 2560×1440 @visual', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
   });
 
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — 4K QHD screenshot`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
 
@@ -53,7 +55,9 @@ test.describe('Visual Regression — 4K QHD 2560×1440 @visual', () => {
     });
   }
 
-  test('landing — content is centered with max-width constraint', async ({ page }) => {
+  test('landing — content is centered with max-width constraint', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
@@ -73,7 +77,9 @@ test.describe('Visual Regression — 4K QHD 2560×1440 @visual', () => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
     const hasOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
     );
     expect(hasOverflow).toBe(false);
   });

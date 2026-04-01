@@ -25,8 +25,9 @@ const mockTx = vi.hoisted(() => ({
   execute: vi.fn(),
 }));
 const mockWithTenantContext = vi.hoisted(() =>
-  vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
-    fn(mockTx)
+  vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
+      fn(mockTx)
   )
 );
 const mockExecuteCypher = vi.hoisted(() => vi.fn().mockResolvedValue([]));
@@ -93,7 +94,11 @@ describe('PeerMatchingService — findMentorsByPathTopology', () => {
       })),
     });
 
-    const result = await service.findMentorsByPathTopology(USER, TENANT, COURSE);
+    const result = await service.findMentorsByPathTopology(
+      USER,
+      TENANT,
+      COURSE
+    );
 
     expect(result).toHaveLength(1);
     expect(result[0].mentorId).toBe(MENTOR);
@@ -111,7 +116,11 @@ describe('PeerMatchingService — findMentorsByPathTopology', () => {
       })),
     });
 
-    const result = await service.findMentorsByPathTopology(USER, TENANT, COURSE);
+    const result = await service.findMentorsByPathTopology(
+      USER,
+      TENANT,
+      COURSE
+    );
 
     expect(Array.isArray(result)).toBe(true);
   });
@@ -131,7 +140,11 @@ describe('PeerMatchingService — findMentorsByPathTopology', () => {
     ];
     mockExecuteCypher.mockResolvedValueOnce(ageRows);
 
-    const result = await service.findMentorsByPathTopology(USER, TENANT, COURSE);
+    const result = await service.findMentorsByPathTopology(
+      USER,
+      TENANT,
+      COURSE
+    );
 
     expect(result).toHaveLength(2);
     expect(result[0].mentorId).toBe('mentor-a-uuid');
@@ -149,7 +162,11 @@ describe('PeerMatchingService — findMentorsByPathTopology', () => {
     ];
     mockExecuteCypher.mockResolvedValueOnce(ageRows);
 
-    const result = await service.findMentorsByPathTopology(USER, TENANT, COURSE);
+    const result = await service.findMentorsByPathTopology(
+      USER,
+      TENANT,
+      COURSE
+    );
 
     expect(result[0].pathOverlapScore).toBe(1);
   });
@@ -164,7 +181,11 @@ describe('PeerMatchingService — findMentorsByPathTopology', () => {
       })),
     });
 
-    const result = await service.findMentorsByPathTopology(USER, TENANT, COURSE);
+    const result = await service.findMentorsByPathTopology(
+      USER,
+      TENANT,
+      COURSE
+    );
 
     expect(result).toEqual([]);
   });

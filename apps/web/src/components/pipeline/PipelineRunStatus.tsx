@@ -50,18 +50,38 @@ const STATUS_COLOR: Record<string, string> = {
   CANCELLED: 'bg-muted border-border text-muted-foreground',
 };
 
-export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, isLoading }: Props) {
+export function PipelineRunStatus({
+  run,
+  onCancel,
+  onRetryModule,
+  onSkipModule,
+  isLoading,
+}: Props) {
   const colorClass =
     STATUS_COLOR[run.status] ?? 'bg-muted border-border text-muted-foreground';
   const statusLabel = STATUS_LABEL[run.status] ?? run.status;
   const moduleStatuses = useLessonPipelineStore((s) => s.moduleStatuses);
   const nodes = useLessonPipelineStore((s) => s.nodes);
-  const [selectedResult, setSelectedResult] = useState<PipelineResult | null>(null);
+  const [selectedResult, setSelectedResult] = useState<PipelineResult | null>(
+    null
+  );
 
-  const summary = extractOutput(run.results, 'SUMMARIZATION', 'shortSummary') as string | null;
-  const notes = extractOutput(run.results, 'STRUCTURED_NOTES', 'outputMarkdown') as string | null;
-  const qaScore = extractOutput(run.results, 'QA_GATE', 'qaScore') as number | null;
-  const transcript = extractOutput(run.results, 'ASR', 'transcript') as string | null;
+  const summary = extractOutput(
+    run.results,
+    'SUMMARIZATION',
+    'shortSummary'
+  ) as string | null;
+  const notes = extractOutput(
+    run.results,
+    'STRUCTURED_NOTES',
+    'outputMarkdown'
+  ) as string | null;
+  const qaScore = extractOutput(run.results, 'QA_GATE', 'qaScore') as
+    | number
+    | null;
+  const transcript = extractOutput(run.results, 'ASR', 'transcript') as
+    | string
+    | null;
 
   // Build stepper steps from store nodes + moduleStatuses
   const stepperSteps = nodes
@@ -69,8 +89,12 @@ export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, 
     .map((n) => ({
       moduleType: n.moduleType,
       status: (moduleStatuses[n.moduleType] ?? 'pending') as ModuleStatusValue,
-      errorMessage: extractOutput(run.results, n.moduleType, 'errorMessage') as string | null,
-      output: extractOutput(run.results, n.moduleType, 'outputSummary') as string | null,
+      errorMessage: extractOutput(run.results, n.moduleType, 'errorMessage') as
+        | string
+        | null,
+      output: extractOutput(run.results, n.moduleType, 'outputSummary') as
+        | string
+        | null,
     }));
 
   const isRunning = run.status === 'RUNNING' || run.status === 'FAILED';
@@ -111,7 +135,11 @@ export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, 
       {/* Vertical stepper for in-progress/failed runs */}
       {showStepper && !isLoading && (
         <div className="mb-3">
-          <PipelineStepper steps={stepperSteps} onRetry={onRetryModule} onSkip={onSkipModule} />
+          <PipelineStepper
+            steps={stepperSteps}
+            onRetry={onRetryModule}
+            onSkip={onSkipModule}
+          />
         </div>
       )}
       {showStepper && isLoading && (
@@ -146,7 +174,11 @@ export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, 
       {run.status === 'COMPLETED' && (
         <div className="space-y-2 text-xs">
           {summary && (
-            <ResultBlock title="סיכום" content={String(summary)} testId="result-summary" />
+            <ResultBlock
+              title="סיכום"
+              content={String(summary)}
+              testId="result-summary"
+            />
           )}
           {qaScore != null && (
             <ResultBlock
@@ -158,19 +190,27 @@ export function PipelineRunStatus({ run, onCancel, onRetryModule, onSkipModule, 
           {transcript && (
             <ResultBlock
               title="תמלול (קטע)"
-              content={String(transcript).slice(0, 300) + (String(transcript).length > 300 ? '...' : '')}
+              content={
+                String(transcript).slice(0, 300) +
+                (String(transcript).length > 300 ? '...' : '')
+              }
               testId="result-transcript"
             />
           )}
           {notes && (
             <ResultBlock
               title="הערות מובנות"
-              content={String(notes).slice(0, 400) + (String(notes).length > 400 ? '...' : '')}
+              content={
+                String(notes).slice(0, 400) +
+                (String(notes).length > 400 ? '...' : '')
+              }
               testId="result-notes"
             />
           )}
           {!summary && !transcript && !notes && (
-            <p className="text-muted-foreground">Pipeline הסתיים. חזור לשיעור לצפייה בתוצאות.</p>
+            <p className="text-muted-foreground">
+              Pipeline הסתיים. חזור לשיעור לצפייה בתוצאות.
+            </p>
           )}
         </div>
       )}
@@ -191,7 +231,9 @@ function ResultBlock({
     <div data-testid={testId}>
       <span className="font-semibold">{title}</span>
       {content && (
-        <p className="mt-0.5 text-foreground whitespace-pre-line leading-relaxed">{content}</p>
+        <p className="mt-0.5 text-foreground whitespace-pre-line leading-relaxed">
+          {content}
+        </p>
       )}
     </div>
   );
@@ -203,7 +245,8 @@ function extractOutput(
   key: string
 ): unknown {
   const result = results.find(
-    (r) => r.moduleName === moduleName || r.moduleName === moduleName.toLowerCase()
+    (r) =>
+      r.moduleName === moduleName || r.moduleName === moduleName.toLowerCase()
   );
   if (!result?.outputData) return null;
   return (result.outputData as Record<string, unknown>)[key] ?? null;

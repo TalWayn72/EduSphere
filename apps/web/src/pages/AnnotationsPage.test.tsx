@@ -1,11 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AnnotationsPage } from './AnnotationsPage';
 import { mockAnnotations } from '@/lib/mock-annotations';
 
 // Mock urql to avoid Provider requirement
-const mockDeleteFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+const mockDeleteFn = vi
+  .fn()
+  .mockResolvedValue({ data: undefined, error: undefined });
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
@@ -18,7 +26,10 @@ vi.mock('urql', () => ({
     { data: undefined, fetching: false, error: undefined },
     vi.fn(),
   ]),
-  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, mockDeleteFn]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    mockDeleteFn,
+  ]),
 }));
 
 // Mock Layout to avoid router/auth complexity
@@ -182,7 +193,9 @@ describe('AnnotationsPage', () => {
       renderPage();
       // Hover-state is CSS-only; the button is in the DOM even without hover.
       // Get all trash buttons and click the first one.
-      const trashBtns = screen.getAllByRole('button', { name: /delete annotation/i });
+      const trashBtns = screen.getAllByRole('button', {
+        name: /delete annotation/i,
+      });
       expect(trashBtns.length).toBeGreaterThan(0);
       fireEvent.click(trashBtns[0]);
       await waitFor(() => {
@@ -193,7 +206,9 @@ describe('AnnotationsPage', () => {
 
     it('closes dialog and calls delete mutation when confirmed', async () => {
       renderPage();
-      const trashBtns = screen.getAllByRole('button', { name: /delete annotation/i });
+      const trashBtns = screen.getAllByRole('button', {
+        name: /delete annotation/i,
+      });
       fireEvent.click(trashBtns[0]);
 
       await waitFor(() => {
@@ -213,7 +228,9 @@ describe('AnnotationsPage', () => {
 
     it('does NOT call delete mutation when dialog is cancelled', async () => {
       renderPage();
-      const trashBtns = screen.getAllByRole('button', { name: /delete annotation/i });
+      const trashBtns = screen.getAllByRole('button', {
+        name: /delete annotation/i,
+      });
       fireEvent.click(trashBtns[0]);
 
       await waitFor(() => {
@@ -241,7 +258,9 @@ describe('AnnotationsPage', () => {
       ] as unknown as ReturnType<typeof useQuery>);
 
       renderPage();
-      const trashBtn = screen.getByRole('button', { name: /delete annotation/i });
+      const trashBtn = screen.getByRole('button', {
+        name: /delete annotation/i,
+      });
       fireEvent.click(trashBtn);
 
       await waitFor(() => {
@@ -277,7 +296,9 @@ describe('AnnotationsPage', () => {
 
       const { rerender } = renderPage();
 
-      const trashBtn = screen.getByRole('button', { name: /delete annotation/i });
+      const trashBtn = screen.getByRole('button', {
+        name: /delete annotation/i,
+      });
       expect(trashBtn).toBeInTheDocument();
 
       fireEvent.click(trashBtn);
@@ -309,12 +330,16 @@ describe('AnnotationsPage', () => {
 
       // Regression guard: the annotation should be gone from the list
       await waitFor(() => {
-        expect(screen.queryAllByRole('button', { name: /delete annotation/i })).toHaveLength(0);
+        expect(
+          screen.queryAllByRole('button', { name: /delete annotation/i })
+        ).toHaveLength(0);
       });
 
       // BAD state: annotation still visible — assert it is absent
       expect(document.body.textContent).not.toContain(
-        typeof singleAnnotation.content === 'string' ? singleAnnotation.content : ''
+        typeof singleAnnotation.content === 'string'
+          ? singleAnnotation.content
+          : ''
       );
     });
   });

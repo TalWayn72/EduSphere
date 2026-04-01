@@ -178,7 +178,10 @@ describe('NatsNotificationBridge — memory leak / subscription tracking', () =>
     });
 
     it('does NOT call drain when NATS never connected (no onModuleInit)', async () => {
-      const fresh = new NatsNotificationBridge(makeMockPubSub(), makeMockPushDispatch());
+      const fresh = new NatsNotificationBridge(
+        makeMockPubSub(),
+        makeMockPushDispatch()
+      );
       await fresh.onModuleDestroy();
       // mockDrain is only defined after connect() runs; it should not have been called.
       if (mockDrain) {

@@ -120,7 +120,12 @@ export class PollService implements OnModuleDestroy {
   }
 
   // Delegation methods — forwarded to PollVoteService
-  async vote(pollId: string, userId: string, optionIndex: number, tenantId: string) {
+  async vote(
+    pollId: string,
+    userId: string,
+    optionIndex: number,
+    tenantId: string
+  ) {
     return this.voteService.vote(pollId, userId, optionIndex, tenantId);
   }
 

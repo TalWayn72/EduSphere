@@ -73,7 +73,9 @@ describe('ChatMessage', () => {
     // Build backtick string at runtime to avoid file-write escaping issues
     const bt = String.fromCharCode(96);
     const codeContent = 'Use ' + bt + 'mycode' + bt + ' here';
-    renderWithRouter(<ChatMessage message={makeMessage({ content: codeContent })} />);
+    renderWithRouter(
+      <ChatMessage message={makeMessage({ content: codeContent })} />
+    );
     const code = screen.getByText('mycode');
     expect(code.tagName).toBe('CODE');
   });
@@ -81,7 +83,9 @@ describe('ChatMessage', () => {
   it('renders multi-paragraph content', () => {
     const sep = String.fromCharCode(10) + String.fromCharCode(10);
     const twoParas = ['Paragraph one', 'Paragraph two'].join(sep);
-    renderWithRouter(<ChatMessage message={makeMessage({ content: twoParas })} />);
+    renderWithRouter(
+      <ChatMessage message={makeMessage({ content: twoParas })} />
+    );
     expect(screen.getByText('Paragraph one')).toBeInTheDocument();
     expect(screen.getByText('Paragraph two')).toBeInTheDocument();
   });

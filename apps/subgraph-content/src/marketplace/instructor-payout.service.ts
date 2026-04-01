@@ -10,7 +10,12 @@
  * Memory safety: monthly cron uses setTimeout/setInterval + OnModuleDestroy.
  * RLS: instructors see only their own payouts (enforced by DB policy).
  */
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -47,9 +52,11 @@ export interface PayoutRow {
   paidAt: Date | null;
 }
 
-function toPayoutRow(r: typeof schema.instructorPayouts.$inferSelect): PayoutRow {
+function toPayoutRow(
+  r: typeof schema.instructorPayouts.$inferSelect
+): PayoutRow {
   const gross = r.amountCents;
-  const platform = Math.round(gross * 0.30);
+  const platform = Math.round(gross * 0.3);
   const instructor = gross - platform;
   const periodStart = r.periodStart as Date | null;
   const periodMonth = periodStart
@@ -82,17 +89,27 @@ export class InstructorPayoutService implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     if (process.env['PAYOUT_CRON_ENABLED'] !== 'true') return;
     const delayMs = msUntilFirstOfNextMonth();
-    this.logger.log(`Monthly payout cron scheduled in ${Math.round(delayMs / 3600000)}h`);
+    this.logger.log(
+      `Monthly payout cron scheduled in ${Math.round(delayMs / 3600000)}h`
+    );
     this.initTimeout = setTimeout(() => {
       this.initTimeout = null;
       void this.runMonthlyPayouts();
-      this.intervalHandle = setInterval(() => { void this.runMonthlyPayouts(); }, MS_PER_MONTH);
+      this.intervalHandle = setInterval(() => {
+        void this.runMonthlyPayouts();
+      }, MS_PER_MONTH);
     }, delayMs);
   }
 
   onModuleDestroy(): void {
-    if (this.initTimeout) { clearTimeout(this.initTimeout); this.initTimeout = null; }
-    if (this.intervalHandle) { clearInterval(this.intervalHandle); this.intervalHandle = null; }
+    if (this.initTimeout) {
+      clearTimeout(this.initTimeout);
+      this.initTimeout = null;
+    }
+    if (this.intervalHandle) {
+      clearInterval(this.intervalHandle);
+      this.intervalHandle = null;
+    }
     void closeAllPools();
   }
 

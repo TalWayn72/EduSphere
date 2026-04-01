@@ -33,9 +33,7 @@ export function deriveTenantKey(tenantId: string, keyVersion?: string): Buffer {
       : `ENCRYPTION_MASTER_KEY_${version.toUpperCase()}`;
   const masterKey = process.env[envVar] ?? process.env['ENCRYPTION_MASTER_KEY'];
   if (!masterKey || masterKey.length < 32) {
-    throw new Error(
-      `${envVar} must be set and at least 32 characters`
-    );
+    throw new Error(`${envVar} must be set and at least 32 characters`);
   }
   return createHmac('sha256', Buffer.from(masterKey, 'utf8'))
     .update(tenantId)
@@ -76,7 +74,12 @@ export function decryptField(ciphertext: string, tenantKey: Buffer): string {
   if (parts.length === 4 && parts[0]!.startsWith('v')) {
     // Versioned format: v1:<iv>:<tag>:<data>
     // If key version differs from current, caller should provide the correct tenantKey
-    [, ivHex, authTagHex, encryptedHex] = parts as [string, string, string, string];
+    [, ivHex, authTagHex, encryptedHex] = parts as [
+      string,
+      string,
+      string,
+      string,
+    ];
   } else if (parts.length === 3) {
     // Legacy format (pre-SEC-4): <iv>:<tag>:<data>
     [ivHex, authTagHex, encryptedHex] = parts as [string, string, string];
@@ -122,7 +125,10 @@ export function migrateEncryptedField(
   tenantId: string
 ): string {
   const version = getKeyVersion(ciphertext);
-  const oldKey = deriveTenantKey(tenantId, version === 'legacy' ? CURRENT_KEY_VERSION : version);
+  const oldKey = deriveTenantKey(
+    tenantId,
+    version === 'legacy' ? CURRENT_KEY_VERSION : version
+  );
   const plaintext = decryptField(ciphertext, oldKey);
   const newKey = deriveTenantKey(tenantId);
   return encryptField(plaintext, newKey);

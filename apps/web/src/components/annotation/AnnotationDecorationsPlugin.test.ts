@@ -31,10 +31,12 @@ vi.mock('@tiptap/pm/view', () => {
   const mockDecorationSet = { empty: true };
   return {
     Decoration: {
-      inline: vi.fn((_from: number, _to: number, attrs: Record<string, unknown>) => ({
-        type: 'inline',
-        attrs,
-      })),
+      inline: vi.fn(
+        (_from: number, _to: number, attrs: Record<string, unknown>) => ({
+          type: 'inline',
+          attrs,
+        })
+      ),
     },
     DecorationSet: {
       create: vi.fn(() => mockDecorationSet),
@@ -74,7 +76,10 @@ describe('AnnotationDecorationsPlugin', () => {
     it('returns a Plugin instance', () => {
       const getAnnotations = () => [] as TextRangeAnnotation[];
       const getFocusedId = () => null;
-      const plugin = createAnnotationDecorationsPlugin(getAnnotations, getFocusedId);
+      const plugin = createAnnotationDecorationsPlugin(
+        getAnnotations,
+        getFocusedId
+      );
       expect(plugin).toBeDefined();
       expect(plugin).toHaveProperty('key');
       expect(plugin).toHaveProperty('spec');
@@ -89,7 +94,9 @@ describe('AnnotationDecorationsPlugin', () => {
     it('creates an extension named annotationDecorations', () => {
       const getAnnotations = () => [] as TextRangeAnnotation[];
       const getFocusedId = () => null;
-      const ext = createAnnotationExtension(getAnnotations, getFocusedId) as { name: string };
+      const ext = createAnnotationExtension(getAnnotations, getFocusedId) as {
+        name: string;
+      };
       expect(ext.name).toBe('annotationDecorations');
     });
   });

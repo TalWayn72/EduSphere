@@ -25,9 +25,16 @@ async function loginAndNavigate(page: Page, path: string) {
 }
 
 async function assertNoRawErrors(page: Page) {
-  const rawErrors = ['CombinedError', 'graphQLErrors', 'Cannot return null', 'INTERNAL_SERVER_ERROR'];
+  const rawErrors = [
+    'CombinedError',
+    'graphQLErrors',
+    'Cannot return null',
+    'INTERNAL_SERVER_ERROR',
+  ];
   for (const err of rawErrors) {
-    await expect(page.getByText(err, { exact: false })).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(err, { exact: false })).not.toBeVisible({
+      timeout: 2_000,
+    });
   }
 }
 
@@ -90,12 +97,20 @@ test.describe('shallow-coverage — T-16: Dashboard', () => {
     });
   });
 
-  test('dashboard error shows friendly message (no raw GraphQL)', async ({ page }) => {
+  test('dashboard error shows friendly message (no raw GraphQL)', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'MyEnrollments' || opName === 'GetMyEnrollments') {
         return JSON.stringify({
           data: { myEnrollments: null },
-          errors: [{ message: 'SET LOCAL app.current_tenant failed: invalid UUID format', extensions: { code: 'RLS_CONTEXT_ERROR' } }],
+          errors: [
+            {
+              message:
+                'SET LOCAL app.current_tenant failed: invalid UUID format',
+              extensions: { code: 'RLS_CONTEXT_ERROR' },
+            },
+          ],
         });
       }
       return null;
@@ -104,7 +119,9 @@ test.describe('shallow-coverage — T-16: Dashboard', () => {
     await loginAndNavigate(page, '/dashboard');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByText('SET LOCAL app.current_tenant failed')).not.toBeVisible({ timeout: 3_000 });
+    await expect(
+      page.getByText('SET LOCAL app.current_tenant failed')
+    ).not.toBeVisible({ timeout: 3_000 });
 
     await expect(page).toHaveScreenshot('dashboard-error.png', {
       maxDiffPixelRatio: 0.05,
@@ -119,7 +136,11 @@ test.describe('shallow-coverage — T-17: Profile Page', () => {
 
   test('profile page loads user info', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
-      if (opName === 'MyProfile' || opName === 'GetProfile' || opName === 'Me') {
+      if (
+        opName === 'MyProfile' ||
+        opName === 'GetProfile' ||
+        opName === 'Me'
+      ) {
         return JSON.stringify({
           data: {
             me: {
@@ -147,17 +168,39 @@ test.describe('shallow-coverage — T-17: Profile Page', () => {
     });
   });
 
-  test('profile update mutation error shows friendly message', async ({ page }) => {
+  test('profile update mutation error shows friendly message', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
-      if (opName === 'MyProfile' || opName === 'GetProfile' || opName === 'Me') {
+      if (
+        opName === 'MyProfile' ||
+        opName === 'GetProfile' ||
+        opName === 'Me'
+      ) {
         return JSON.stringify({
-          data: { me: { id: 'user-001', email: 'super.admin@edusphere.dev', name: 'Super Admin', role: 'SUPER_ADMIN', locale: 'en', avatar: null, bio: null } },
+          data: {
+            me: {
+              id: 'user-001',
+              email: 'super.admin@edusphere.dev',
+              name: 'Super Admin',
+              role: 'SUPER_ADMIN',
+              locale: 'en',
+              avatar: null,
+              bio: null,
+            },
+          },
         });
       }
       if (opName === 'UpdateProfile' || opName === 'UpdateUserProfile') {
         return JSON.stringify({
           data: { updateProfile: null },
-          errors: [{ message: 'Email already in use by another account in tenant tenant-001', extensions: { code: 'DUPLICATE_EMAIL' } }],
+          errors: [
+            {
+              message:
+                'Email already in use by another account in tenant tenant-001',
+              extensions: { code: 'DUPLICATE_EMAIL' },
+            },
+          ],
         });
       }
       return null;
@@ -167,7 +210,9 @@ test.describe('shallow-coverage — T-17: Profile Page', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Look for edit or save buttons
-    const editBtn = page.getByRole('button', { name: /edit|update|save profile/i }).first();
+    const editBtn = page
+      .getByRole('button', { name: /edit|update|save profile/i })
+      .first();
     if (await editBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await editBtn.click();
       await page.waitForLoadState('domcontentloaded');
@@ -197,15 +242,43 @@ test.describe('shallow-coverage — T-18: Course Discover', () => {
   test.describe.configure({ mode: 'serial' });
 
   const MOCK_COURSES = [
-    { id: 'course-001', title: 'Introduction to Machine Learning', slug: 'intro-ml', isPublished: true, difficulty: 'BEGINNER', estimatedHours: 10, thumbnail: null, description: 'Learn ML basics.' },
-    { id: 'course-002', title: 'Advanced Python', slug: 'advanced-python', isPublished: true, difficulty: 'ADVANCED', estimatedHours: 20, thumbnail: null, description: 'Deep Python concepts.' },
+    {
+      id: 'course-001',
+      title: 'Introduction to Machine Learning',
+      slug: 'intro-ml',
+      isPublished: true,
+      difficulty: 'BEGINNER',
+      estimatedHours: 10,
+      thumbnail: null,
+      description: 'Learn ML basics.',
+    },
+    {
+      id: 'course-002',
+      title: 'Advanced Python',
+      slug: 'advanced-python',
+      isPublished: true,
+      difficulty: 'ADVANCED',
+      estimatedHours: 20,
+      thumbnail: null,
+      description: 'Deep Python concepts.',
+    },
   ];
 
   test('course discover page loads course catalog', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
-      if (opName === 'AllCourses' || opName === 'DiscoverCourses' || opName === 'Courses') {
+      if (
+        opName === 'AllCourses' ||
+        opName === 'DiscoverCourses' ||
+        opName === 'Courses'
+      ) {
         return JSON.stringify({
-          data: { courses: { nodes: MOCK_COURSES, pageInfo: { hasNextPage: false, endCursor: null }, totalCount: 2 } },
+          data: {
+            courses: {
+              nodes: MOCK_COURSES,
+              pageInfo: { hasNextPage: false, endCursor: null },
+              totalCount: 2,
+            },
+          },
         });
       }
       return null;
@@ -222,8 +295,20 @@ test.describe('shallow-coverage — T-18: Course Discover', () => {
 
   test('course discover filter shows no raw errors', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
-      if (opName === 'AllCourses' || opName === 'DiscoverCourses' || opName === 'Courses') {
-        return JSON.stringify({ data: { courses: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null }, totalCount: 0 } } });
+      if (
+        opName === 'AllCourses' ||
+        opName === 'DiscoverCourses' ||
+        opName === 'Courses'
+      ) {
+        return JSON.stringify({
+          data: {
+            courses: {
+              nodes: [],
+              pageInfo: { hasNextPage: false, endCursor: null },
+              totalCount: 0,
+            },
+          },
+        });
       }
       return null;
     });
@@ -232,7 +317,10 @@ test.describe('shallow-coverage — T-18: Course Discover', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Try to type in search if available
-    const searchInput = page.getByRole('searchbox').or(page.getByRole('textbox')).first();
+    const searchInput = page
+      .getByRole('searchbox')
+      .or(page.getByRole('textbox'))
+      .first();
     if (await searchInput.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await searchInput.fill('machine learning');
       await page.keyboard.press('Enter');
@@ -260,11 +348,19 @@ test.describe('shallow-coverage — T-19: Settings Theme', () => {
     });
   });
 
-  test('settings page updateUserPreferences success shows success toast', async ({ page }) => {
+  test('settings page updateUserPreferences success shows success toast', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'UpdateUserPreferences') {
         return JSON.stringify({
-          data: { updateUserPreferences: { userId: 'user-001', locale: 'fr', theme: 'dark' } },
+          data: {
+            updateUserPreferences: {
+              userId: 'user-001',
+              locale: 'fr',
+              theme: 'dark',
+            },
+          },
         });
       }
       return null;
@@ -291,12 +387,20 @@ test.describe('shallow-coverage — T-19: Settings Theme', () => {
     });
   });
 
-  test('settings updateUserPreferences mutation error — no raw GraphQL shown', async ({ page }) => {
+  test('settings updateUserPreferences mutation error — no raw GraphQL shown', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'UpdateUserPreferences') {
         return JSON.stringify({
           data: { updateUserPreferences: null },
-          errors: [{ message: 'Cannot set locale: "zz" is not in SUPPORTED_LOCALES enum', extensions: { code: 'INVALID_ENUM_VALUE' } }],
+          errors: [
+            {
+              message:
+                'Cannot set locale: "zz" is not in SUPPORTED_LOCALES enum',
+              extensions: { code: 'INVALID_ENUM_VALUE' },
+            },
+          ],
         });
       }
       return null;
@@ -306,7 +410,9 @@ test.describe('shallow-coverage — T-19: Settings Theme', () => {
     await page.waitForLoadState('domcontentloaded');
 
     await page.getByRole('combobox').first().click();
-    const englishOption = page.getByRole('option', { name: /English/i }).first();
+    const englishOption = page
+      .getByRole('option', { name: /English/i })
+      .first();
     if (await englishOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await englishOption.click();
       await page.waitForLoadState('domcontentloaded');
@@ -334,7 +440,8 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
     courseId: COURSE_ID,
     title: 'Introduction to Gradient Descent',
     description: 'Understanding gradient descent optimization algorithm.',
-    content: '# Gradient Descent\n\nGradient descent is an optimization algorithm...',
+    content:
+      '# Gradient Descent\n\nGradient descent is an optimization algorithm...',
     status: 'PUBLISHED',
     estimatedMinutes: 15,
     order: 1,
@@ -361,7 +468,9 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
     });
   });
 
-  test('complete lesson mutation shows no raw errors on failure', async ({ page }) => {
+  test('complete lesson mutation shows no raw errors on failure', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'LessonDetail' || opName === 'GetLesson') {
         return JSON.stringify({ data: { lesson: MOCK_LESSON } });
@@ -372,7 +481,13 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
       if (opName === 'CompleteLesson' || opName === 'MarkLessonComplete') {
         return JSON.stringify({
           data: { completeLesson: null },
-          errors: [{ message: 'Lesson completion requires quiz score ≥70% for LESSON_ID=00000000-0000-0000-0000-000000000020', extensions: { code: 'COMPLETION_BLOCKED' } }],
+          errors: [
+            {
+              message:
+                'Lesson completion requires quiz score ≥70% for LESSON_ID=00000000-0000-0000-0000-000000000020',
+              extensions: { code: 'COMPLETION_BLOCKED' },
+            },
+          ],
         });
       }
       return null;
@@ -382,7 +497,9 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Try to find and click a "Mark Complete" button
-    const completeBtn = page.getByRole('button', { name: /complete|mark.*complete|finish/i }).first();
+    const completeBtn = page
+      .getByRole('button', { name: /complete|mark.*complete|finish/i })
+      .first();
     if (await completeBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await completeBtn.click();
       await page.waitForLoadState('domcontentloaded');
@@ -401,12 +518,17 @@ test.describe('shallow-coverage — T-20: Lesson Detail', () => {
   test('lesson pipeline page loads without errors', async ({ page }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'LessonPipeline' || opName === 'GetLessonPipeline') {
-        return JSON.stringify({ data: { lessonPipeline: { steps: [], status: 'DRAFT' } } });
+        return JSON.stringify({
+          data: { lessonPipeline: { steps: [], status: 'DRAFT' } },
+        });
       }
       return null;
     });
 
-    await loginAndNavigate(page, `/courses/${COURSE_ID}/lessons/${LESSON_ID}/pipeline`);
+    await loginAndNavigate(
+      page,
+      `/courses/${COURSE_ID}/lessons/${LESSON_ID}/pipeline`
+    );
     await page.waitForLoadState('domcontentloaded');
     await assertNoRawErrors(page);
 

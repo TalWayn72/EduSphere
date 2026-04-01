@@ -50,7 +50,11 @@ function createMockCtx(): CanvasRenderingContext2D {
     lineJoin: 'miter' as CanvasRenderingContext2D['lineJoin'],
     globalCompositeOperation: 'source-over',
     font: '',
-    canvas: { width: 800, height: 600, toDataURL: vi.fn().mockReturnValue('data:image/png;base64,stub') },
+    canvas: {
+      width: 800,
+      height: 600,
+      toDataURL: vi.fn().mockReturnValue('data:image/png;base64,stub'),
+    },
     drawImage: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),
@@ -61,7 +65,9 @@ const mockCtx = createMockCtx();
 const origGetContext = HTMLCanvasElement.prototype.getContext;
 
 beforeEach(() => {
-  HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockCtx) as unknown as typeof origGetContext;
+  HTMLCanvasElement.prototype.getContext = vi
+    .fn()
+    .mockReturnValue(mockCtx) as unknown as typeof origGetContext;
 });
 afterEach(() => {
   HTMLCanvasElement.prototype.getContext = origGetContext;
@@ -70,7 +76,9 @@ afterEach(() => {
 // Mock HTMLCanvasElement.prototype.toDataURL
 const origToDataURL = HTMLCanvasElement.prototype.toDataURL;
 beforeEach(() => {
-  HTMLCanvasElement.prototype.toDataURL = vi.fn().mockReturnValue('data:image/png;base64,canvas-stub');
+  HTMLCanvasElement.prototype.toDataURL = vi
+    .fn()
+    .mockReturnValue('data:image/png;base64,canvas-stub');
 });
 afterEach(() => {
   HTMLCanvasElement.prototype.toDataURL = origToDataURL;
@@ -95,7 +103,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#ff0000"
         strokeWidth={2}
-      />,
+      />
     );
 
     const canvas = screen.getByTestId('sketch-canvas');
@@ -113,7 +121,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     const tools = ['freehand', 'eraser', 'rect', 'arrow', 'ellipse', 'text'];
@@ -131,16 +139,16 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
       'aria-pressed',
-      'true',
+      'true'
     );
     expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute(
       'aria-pressed',
-      'false',
+      'false'
     );
   });
 
@@ -153,17 +161,17 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByTestId('sketch-tool-rect'));
     expect(screen.getByTestId('sketch-tool-rect')).toHaveAttribute(
       'aria-pressed',
-      'true',
+      'true'
     );
     expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
       'aria-pressed',
-      'false',
+      'false'
     );
   });
 
@@ -176,15 +184,24 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByTestId('sketch-tool-eraser'));
-    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
 
     fireEvent.click(screen.getByTestId('sketch-tool-ellipse'));
-    expect(screen.getByTestId('sketch-tool-ellipse')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('sketch-tool-ellipse')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('fires onSave with sketch data when Save is clicked', () => {
@@ -198,7 +215,7 @@ describe('PdfSketchOverlay', () => {
         color="#000"
         strokeWidth={2}
         onSave={onSave}
-      />,
+      />
     );
 
     fireEvent.click(screen.getByTestId('sketch-save-btn'));
@@ -219,7 +236,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByText('Page 1')).toBeInTheDocument();
@@ -232,7 +249,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByText('Page 2')).toBeInTheDocument();
@@ -247,7 +264,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     // Unmount should not throw and should clean up internal state
@@ -263,11 +280,13 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByLabelText('Sketch overlay')).toBeInTheDocument();
-    expect(screen.getByLabelText(/Sketch drawing canvas for page/)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Sketch drawing canvas for page/)
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Sketch tools')).toBeInTheDocument();
   });
 
@@ -280,10 +299,13 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
-    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
 
     rerender(
       <PdfSketchOverlay
@@ -293,11 +315,17 @@ describe('PdfSketchOverlay', () => {
         activeTool="arrow"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
-    expect(screen.getByTestId('sketch-tool-arrow')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('sketch-tool-arrow')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('has a Clear button', () => {
@@ -309,7 +337,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByTestId('sketch-clear-btn')).toBeInTheDocument();
@@ -325,10 +353,12 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#ff0000"
         strokeWidth={2}
-      />,
+      />
     );
 
-    expect(screen.getAllByLabelText('Stroke color').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByLabelText('Stroke color').length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('each tool button has an aria-label', () => {
@@ -340,7 +370,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     const tools = ['freehand', 'eraser', 'rect', 'arrow', 'ellipse', 'text'];
@@ -358,7 +388,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByLabelText('Save sketch')).toBeInTheDocument();
@@ -373,7 +403,7 @@ describe('PdfSketchOverlay', () => {
         activeTool="freehand"
         color="#000"
         strokeWidth={2}
-      />,
+      />
     );
 
     expect(screen.getByLabelText('Sketching on page 5')).toBeInTheDocument();

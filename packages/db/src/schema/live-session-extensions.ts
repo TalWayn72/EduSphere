@@ -21,7 +21,9 @@ export const breakoutRooms = pgTable(
     bbbBreakoutId: text('bbb_breakout_id'),
     capacity: integer('capacity').notNull().default(10),
     assignedUserIds: uuid('assigned_user_ids').array().notNull().default([]),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => ({
     sessionIdx: index('breakout_rooms_session_idx').on(t.sessionId),
@@ -39,7 +41,9 @@ export const sessionPolls = pgTable(
     question: text('question').notNull(),
     options: jsonb('options').notNull(), // string[] array
     isActive: boolean('is_active').notNull().default(false),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     closedAt: timestamp('closed_at', { withTimezone: true }),
   },
   (t) => ({
@@ -57,7 +61,9 @@ export const pollVotes = pgTable(
     userId: uuid('user_id').notNull(),
     tenantId: uuid('tenant_id').notNull(),
     optionIndex: integer('option_index').notNull(),
-    votedAt: timestamp('voted_at', { withTimezone: true }).notNull().defaultNow(),
+    votedAt: timestamp('voted_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => ({
     pollUserIdx: index('poll_votes_poll_user_idx').on(t.pollId, t.userId),

@@ -49,7 +49,9 @@ export function parseFrontmatter(content: string): ParsedMarkdown {
     // Handle array syntax: [a, b, c]
     if (value.startsWith('[') && value.endsWith(']')) {
       const inner = value.slice(1, -1);
-      frontmatter[key] = inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, ''));
+      frontmatter[key] = inner
+        .split(',')
+        .map((s) => s.trim().replace(/^["']|["']$/g, ''));
     } else {
       // Strip surrounding quotes
       value = value.replace(/^["']|["']$/g, '');
@@ -63,7 +65,9 @@ export function parseFrontmatter(content: string): ParsedMarkdown {
 /**
  * Read and parse a markdown file with frontmatter.
  */
-export async function readMarkdownFile(filePath: string): Promise<ParsedMarkdown> {
+export async function readMarkdownFile(
+  filePath: string
+): Promise<ParsedMarkdown> {
   const content = await readFile(filePath, 'utf-8');
   return parseFrontmatter(content);
 }

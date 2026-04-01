@@ -21,11 +21,15 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/ui/skeleton', () => ({
-  Skeleton: ({ className }: { className: string }) => <div data-testid="skeleton" className={className} />,
+  Skeleton: ({ className }: { className: string }) => (
+    <div data-testid="skeleton" className={className} />
+  ),
 }));
 
 vi.mock('@/components/ui/progress', () => ({
-  Progress: ({ value }: { value: number }) => <div data-testid="progress" data-value={value} />,
+  Progress: ({ value }: { value: number }) => (
+    <div data-testid="progress" data-value={value} />
+  ),
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
@@ -103,7 +107,9 @@ describe('BillingPage', () => {
     render(<BillingPage />);
     // Each plan name appears in both header and grid
     expect(screen.getAllByText('STARTER').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('PROFESSIONAL').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('PROFESSIONAL').length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getAllByText('ENTERPRISE').length).toBeGreaterThanOrEqual(1);
   });
 

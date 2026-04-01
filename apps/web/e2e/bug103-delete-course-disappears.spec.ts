@@ -86,11 +86,17 @@ test.describe('bug103 — Deleted course disappears from list', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Both courses should be visible
-    await expect(page.getByText(COURSE_TO_DELETE.title)).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText(OTHER_COURSE.title)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(COURSE_TO_DELETE.title)).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByText(OTHER_COURSE.title)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('T-2: after delete mutation, course disappears from list', async ({ page }) => {
+  test('T-2: after delete mutation, course disappears from list', async ({
+    page,
+  }) => {
     let deleteWasCalled = false;
 
     // 1. Authenticate
@@ -101,7 +107,11 @@ test.describe('bug103 — Deleted course disappears from list', () => {
       const queryStr = String(body?.query ?? '');
 
       // Course detail queries
-      if (opName === 'CourseDetail' || opName === 'GetCourse' || opName === 'Course') {
+      if (
+        opName === 'CourseDetail' ||
+        opName === 'GetCourse' ||
+        opName === 'Course'
+      ) {
         return JSON.stringify({
           data: {
             course: {
@@ -140,7 +150,10 @@ test.describe('bug103 — Deleted course disappears from list', () => {
       if (opName === 'MyCourseProgress') {
         return JSON.stringify({ data: { myCourseProgress: null } });
       }
-      if (opName === 'LessonsByCourse' || queryStr.includes('lessonsByCourse')) {
+      if (
+        opName === 'LessonsByCourse' ||
+        queryStr.includes('lessonsByCourse')
+      ) {
         return JSON.stringify({ data: { lessonsByCourse: [] } });
       }
       return null;
@@ -178,19 +191,19 @@ test.describe('bug103 — Deleted course disappears from list', () => {
         const path = new URL(url).pathname;
         return path === '/courses' || path === '/courses/';
       },
-      { timeout: 10_000 },
+      { timeout: 10_000 }
     );
 
     // BUG-103 regression guard: deleted course must NOT appear in the course
     // grid. We scope to h3 headings (course card titles) to avoid matching the
     // "Course … has been deleted" success toast that may still be visible.
     await expect(
-      page.locator('main h3', { hasText: COURSE_TO_DELETE.title }),
+      page.locator('main h3', { hasText: COURSE_TO_DELETE.title })
     ).toHaveCount(0, { timeout: 10_000 });
 
     // The remaining course should still be visible
     await expect(
-      page.locator('main h3', { hasText: OTHER_COURSE.title }),
+      page.locator('main h3', { hasText: OTHER_COURSE.title })
     ).toBeVisible({ timeout: 10_000 });
 
     // Verify delete mutation was called
@@ -218,10 +231,14 @@ test.describe('bug103 — Deleted course disappears from list', () => {
     // 3. Navigate to courses list
     await page.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText(OTHER_COURSE.title)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(OTHER_COURSE.title)).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Deleted course must NOT appear
-    await expect(page.getByText(COURSE_TO_DELETE.title)).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(COURSE_TO_DELETE.title)).not.toBeVisible({
+      timeout: 5_000,
+    });
 
     await page.screenshot({
       path: `${SCREENSHOTS_DIR}/bug103-courses-after-deletion.png`,

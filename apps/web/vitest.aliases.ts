@@ -10,15 +10,27 @@ const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
 // GSAP stubs — GSAP uses browser APIs (requestAnimationFrame, etc.) not available in jsdom.
 // The stubs replace all GSAP calls with no-ops so component tests can run without crashing.
 const gsapStub = path.resolve(__dirname, './src/test/stubs/gsap-stub.ts');
-const gsapReactStub = path.resolve(__dirname, './src/test/stubs/gsap-react-stub.ts');
+const gsapReactStub = path.resolve(
+  __dirname,
+  './src/test/stubs/gsap-react-stub.ts'
+);
 // virtual:pwa-register — Vite virtual module not available outside Vite dev/build;
 // stub lets Vitest resolve the import in pwa.ts without crashing.
-const pwaRegisterStub = path.resolve(__dirname, './src/test/stubs/pwa-register-stub.ts');
+const pwaRegisterStub = path.resolve(
+  __dirname,
+  './src/test/stubs/pwa-register-stub.ts'
+);
 // Three.js stubs — package is not installed; stubs allow Vite import-analysis
 // to resolve the paths; vi.mock() replaces the exports at test runtime.
 const threeStub = path.resolve(__dirname, './src/test/stubs/three-stub.ts');
-const threeGltfStub = path.resolve(__dirname, './src/test/stubs/three-gltf-stub.ts');
-const threeOrbitStub = path.resolve(__dirname, './src/test/stubs/three-orbit-stub.ts');
+const threeGltfStub = path.resolve(
+  __dirname,
+  './src/test/stubs/three-gltf-stub.ts'
+);
+const threeOrbitStub = path.resolve(
+  __dirname,
+  './src/test/stubs/three-orbit-stub.ts'
+);
 // Each @tiptap/pm/* package and @tiptap/core needs its own distinct stub file.
 // Vitest uses the resolved file path as the module-cache key, so if multiple
 // packages alias to the same file, vi.mock() calls overwrite each other
@@ -76,8 +88,14 @@ export const vitestAliases: Alias[] = [
   // Three.js — not installed; stubs allow Vite import-analysis to pass.
   // Subpath entries use regex `find` and MUST be listed before the root 'three'
   // entry, otherwise 'three' prefix-matches subpaths first.
-  { find: /^three\/examples\/jsm\/loaders\/GLTFLoader\.js$/, replacement: threeGltfStub },
-  { find: /^three\/examples\/jsm\/controls\/OrbitControls\.js$/, replacement: threeOrbitStub },
+  {
+    find: /^three\/examples\/jsm\/loaders\/GLTFLoader\.js$/,
+    replacement: threeGltfStub,
+  },
+  {
+    find: /^three\/examples\/jsm\/controls\/OrbitControls\.js$/,
+    replacement: threeOrbitStub,
+  },
   { find: /^three$/, replacement: threeStub },
   // GSAP — uses browser APIs not available in jsdom; stub all GSAP imports.
   { find: /^gsap\/ScrollTrigger$/, replacement: gsapStub },

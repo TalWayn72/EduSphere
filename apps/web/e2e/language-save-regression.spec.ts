@@ -19,12 +19,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
-import {
-  BASE_URL,
-  TEST_USERS,
-  KEYCLOAK_REALM_URL,
-  IS_DEV_MODE,
-} from './env';
+import { BASE_URL, TEST_USERS, KEYCLOAK_REALM_URL, IS_DEV_MODE } from './env';
 import { routeGraphQL } from './graphql-mock.helpers';
 import { login, loginInDevMode } from './auth.helpers';
 
@@ -46,7 +41,9 @@ async function loginViaKeycloak(
     )
     .catch(() => {});
 
-  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  const signInBtn = page.getByRole('button', {
+    name: /sign in with keycloak/i,
+  });
   await signInBtn.waitFor({ timeout: 10_000 });
   await signInBtn.click();
 
@@ -64,12 +61,13 @@ async function loginViaKeycloak(
     '\\$&'
   );
   await page.waitForURL(new RegExp(appHostPattern), { timeout: 60_000 });
-  await page.waitForLoadState('domcontentloaded', { timeout: 30_000 }).catch(() => {});
   await page
-    .waitForFunction(
-      () => !document.body.textContent?.includes('Loading'),
-      { timeout: 30_000 }
-    )
+    .waitForLoadState('domcontentloaded', { timeout: 30_000 })
+    .catch(() => {});
+  await page
+    .waitForFunction(() => !document.body.textContent?.includes('Loading'), {
+      timeout: 30_000,
+    })
     .catch(() => {});
 }
 
@@ -121,9 +119,9 @@ test.describe('language-save-regression — ci-compatible mock guard', () => {
     await page.waitForTimeout(500);
 
     // THE REGRESSION GUARD: this exact Hebrew error string must NEVER appear
-    await expect(
-      page.getByText('שמירת העדפות שפה נכשלה')
-    ).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('שמירת העדפות שפה נכשלה')).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('BUG-065 guard: generic failed-to-save text also absent', async ({

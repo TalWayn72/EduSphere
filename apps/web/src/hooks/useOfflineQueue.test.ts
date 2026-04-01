@@ -64,7 +64,9 @@ describe('useOfflineQueue', () => {
       });
     });
 
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]') as unknown[];
+    const stored = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) ?? '[]'
+    ) as unknown[];
     expect(stored).toHaveLength(1);
   });
 
@@ -119,7 +121,8 @@ describe('useOfflineQueue', () => {
       result.current.enqueue({ id: 'b', operationName: 'OpB', variables: {} });
     });
 
-    const handler = vi.fn()
+    const handler = vi
+      .fn()
       .mockRejectedValueOnce(new Error('network'))
       .mockResolvedValueOnce(undefined);
 
@@ -176,8 +179,12 @@ describe('useOfflineQueue', () => {
 
     // Only the fresh item should have been processed (expired item is evicted)
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler).toHaveBeenCalledWith(expect.objectContaining({ id: 'fresh-item' }));
-    expect(handler).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'old-item' }));
+    expect(handler).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'fresh-item' })
+    );
+    expect(handler).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'old-item' })
+    );
   });
 
   // ─── online event auto-flush ───────────────────────────────────────────────
@@ -194,7 +201,9 @@ describe('useOfflineQueue', () => {
     unmount();
 
     // Should have removed 'online' listener on unmount
-    const onlineRemoved = removeSpy.mock.calls.some(([event]) => event === 'online');
+    const onlineRemoved = removeSpy.mock.calls.some(
+      ([event]) => event === 'online'
+    );
     expect(onlineRemoved).toBe(true);
 
     addSpy.mockRestore();
@@ -205,7 +214,11 @@ describe('useOfflineQueue', () => {
     const { result } = renderHook(() => useOfflineQueue());
 
     act(() => {
-      result.current.enqueue({ id: 'sync-item', operationName: 'SyncOp', variables: {} });
+      result.current.enqueue({
+        id: 'sync-item',
+        operationName: 'SyncOp',
+        variables: {},
+      });
     });
     expect(result.current.pendingCount).toBe(1);
 
@@ -235,7 +248,11 @@ describe('useOfflineQueue', () => {
 
     // Enqueue a new fresh item
     act(() => {
-      result.current.enqueue({ id: 'new-id', operationName: 'NewOp', variables: {} });
+      result.current.enqueue({
+        id: 'new-id',
+        operationName: 'NewOp',
+        variables: {},
+      });
     });
 
     // Now flush with a handler — TTL eviction happens inside flush
@@ -246,8 +263,12 @@ describe('useOfflineQueue', () => {
 
     // Handler is called ONLY for the fresh item; stale item is evicted by TTL
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler).toHaveBeenCalledWith(expect.objectContaining({ id: 'new-id' }));
-    expect(handler).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'stale-id' }));
+    expect(handler).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'new-id' })
+    );
+    expect(handler).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'stale-id' })
+    );
     // Queue is cleared
     expect(result.current.pendingCount).toBe(0);
   });
@@ -257,7 +278,11 @@ describe('useOfflineQueue', () => {
     const { result } = renderHook(() => useOfflineQueue());
 
     act(() => {
-      result.current.enqueue({ id: 'item-online', operationName: 'OnlineOp', variables: {} });
+      result.current.enqueue({
+        id: 'item-online',
+        operationName: 'OnlineOp',
+        variables: {},
+      });
     });
     expect(result.current.pendingCount).toBe(1);
 
@@ -279,12 +304,16 @@ describe('useOfflineQueue', () => {
 
     const { unmount } = renderHook(() => useOfflineQueue());
 
-    const onlineRegistered = addSpy.mock.calls.some(([event]) => event === 'online');
+    const onlineRegistered = addSpy.mock.calls.some(
+      ([event]) => event === 'online'
+    );
     expect(onlineRegistered).toBe(true);
 
     unmount();
 
-    const onlineRemoved = removeSpy.mock.calls.some(([event]) => event === 'online');
+    const onlineRemoved = removeSpy.mock.calls.some(
+      ([event]) => event === 'online'
+    );
     expect(onlineRemoved).toBe(true);
 
     addSpy.mockRestore();
@@ -297,8 +326,16 @@ describe('useOfflineQueue', () => {
     const { result } = renderHook(() => useOfflineQueue({ onFlush }));
 
     act(() => {
-      result.current.enqueue({ id: 'item-a', operationName: 'OpA', variables: { x: 1 } });
-      result.current.enqueue({ id: 'item-b', operationName: 'OpB', variables: { x: 2 } });
+      result.current.enqueue({
+        id: 'item-a',
+        operationName: 'OpA',
+        variables: { x: 1 },
+      });
+      result.current.enqueue({
+        id: 'item-b',
+        operationName: 'OpB',
+        variables: { x: 2 },
+      });
     });
     expect(result.current.pendingCount).toBe(2);
 
@@ -309,8 +346,12 @@ describe('useOfflineQueue', () => {
     });
 
     expect(onFlush).toHaveBeenCalledTimes(2);
-    expect(onFlush).toHaveBeenCalledWith(expect.objectContaining({ id: 'item-a' }));
-    expect(onFlush).toHaveBeenCalledWith(expect.objectContaining({ id: 'item-b' }));
+    expect(onFlush).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'item-a' })
+    );
+    expect(onFlush).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'item-b' })
+    );
     // Queue is cleared after flush
     expect(result.current.pendingCount).toBe(0);
   });
@@ -342,8 +383,12 @@ describe('useOfflineQueue', () => {
 
     // Only fresh item should be processed
     expect(onFlush).toHaveBeenCalledTimes(1);
-    expect(onFlush).toHaveBeenCalledWith(expect.objectContaining({ id: 'fresh-item' }));
-    expect(onFlush).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'expired-item' }));
+    expect(onFlush).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'fresh-item' })
+    );
+    expect(onFlush).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'expired-item' })
+    );
     expect(result.current.pendingCount).toBe(0);
   });
 
@@ -352,7 +397,11 @@ describe('useOfflineQueue', () => {
     const { result } = renderHook(() => useOfflineQueue());
 
     act(() => {
-      result.current.enqueue({ id: 'item-x', operationName: 'OpX', variables: {} });
+      result.current.enqueue({
+        id: 'item-x',
+        operationName: 'OpX',
+        variables: {},
+      });
     });
     expect(result.current.pendingCount).toBe(1);
 
@@ -379,13 +428,17 @@ describe('useOfflineQueue', () => {
     );
 
     // Count online listeners registered so far
-    const onlineCallsBefore = addSpy.mock.calls.filter(([event]) => event === 'online').length;
+    const onlineCallsBefore = addSpy.mock.calls.filter(
+      ([event]) => event === 'online'
+    ).length;
 
     // Rerender with a new callback reference
     rerender({ onFlush: onFlushV2 });
 
     // No new online listener should have been registered
-    const onlineCallsAfter = addSpy.mock.calls.filter(([event]) => event === 'online').length;
+    const onlineCallsAfter = addSpy.mock.calls.filter(
+      ([event]) => event === 'online'
+    ).length;
     expect(onlineCallsAfter).toBe(onlineCallsBefore);
 
     addSpy.mockRestore();

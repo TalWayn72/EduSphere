@@ -103,7 +103,10 @@ describe('GraphragAuditService', () => {
       confidenceScore: 0.88,
     });
 
-    const insertedValues = mockInsertValues.mock.calls[0][0] as Record<string, unknown>;
+    const insertedValues = mockInsertValues.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     const meta = insertedValues['metadata'] as Record<string, unknown>;
     expect(meta['queryId']).toBe('q-002');
     expect(meta['modelHash']).toBe('deadbeef');
@@ -115,11 +118,10 @@ describe('GraphragAuditService', () => {
 
   it('service has no update or delete methods (immutability invariant)', () => {
     // Casting to unknown to inspect all keys without TypeScript complaints
-    const keys = Object.getOwnPropertyNames(
-      Object.getPrototypeOf(service)
-    );
+    const keys = Object.getOwnPropertyNames(Object.getPrototypeOf(service));
     const mutatingMethods = keys.filter(
-      (k) => k.toLowerCase().includes('update') || k.toLowerCase().includes('delete')
+      (k) =>
+        k.toLowerCase().includes('update') || k.toLowerCase().includes('delete')
     );
     expect(mutatingMethods).toHaveLength(0);
   });

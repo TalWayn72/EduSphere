@@ -12,7 +12,10 @@ interface SearchResultCardProps {
   query: string;
 }
 
-export const SearchResultCard = React.memo(function SearchResultCard({ result, query }: SearchResultCardProps) {
+export const SearchResultCard = React.memo(function SearchResultCard({
+  result,
+  query,
+}: SearchResultCardProps) {
   const navigate = useNavigate();
   const config = TYPE_CONFIG[result.type];
 
@@ -24,9 +27,7 @@ export const SearchResultCard = React.memo(function SearchResultCard({ result, q
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <p
-              className={`text-sm font-semibold ${config.color} truncate`}
-            >
+            <p className={`text-sm font-semibold ${config.color} truncate`}>
               <Highlight text={result.title} query={query} />
             </p>
             <p className="text-sm text-foreground/80 mt-0.5 line-clamp-2">
@@ -43,11 +44,7 @@ export const SearchResultCard = React.memo(function SearchResultCard({ result, q
               </div>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 flex-shrink-0"
-          >
+          <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

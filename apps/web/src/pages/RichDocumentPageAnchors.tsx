@@ -55,7 +55,7 @@ export function RichDocumentPageAnchors({
   // Stable server anchors reference — prevents useCallback dep churn
   const serverAnchors = useMemo<VisualAnchor[]>(
     () => anchorsResult.data?.getVisualAnchors ?? [],
-    [anchorsResult.data?.getVisualAnchors],
+    [anchorsResult.data?.getVisualAnchors]
   );
 
   // Merge server anchors with local optimistic removals
@@ -68,7 +68,7 @@ export function RichDocumentPageAnchors({
 
   const { activeAnchorId } = useAnchorDetection(
     anchorPositions,
-    scrollContainerRef,
+    scrollContainerRef
   );
 
   const handleAnchorDeleted = useCallback(
@@ -78,7 +78,7 @@ export function RichDocumentPageAnchors({
         return base.filter((a) => a.id !== anchorId);
       });
     },
-    [serverAnchors],
+    [serverAnchors]
   );
 
   const handlePreviewAsStudent = useCallback(() => {

@@ -56,9 +56,11 @@ async function seed() {
     // with a random UUID, causing onConflictDoNothing to silently skip the
     // insert — leaving the expected ID missing. We delete any conflicting row
     // first (it has no FK dependents on a fresh seed).
-    await db.delete(users).where(
-      sql`email = 'super.admin@edusphere.dev' AND tenant_id = '00000000-0000-0000-0000-000000000000'::uuid AND id != '00000000-0000-0000-0000-000000000001'::uuid` as SQL
-    );
+    await db
+      .delete(users)
+      .where(
+        sql`email = 'super.admin@edusphere.dev' AND tenant_id = '00000000-0000-0000-0000-000000000000'::uuid AND id != '00000000-0000-0000-0000-000000000001'::uuid` as SQL
+      );
 
     // Create users
     await db
@@ -194,7 +196,9 @@ async function seed() {
       console.log('✅ Apache AGE graph ontology initialized');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.log(`⚠️  Apache AGE not available — skipping graph ontology: ${msg}`);
+      console.log(
+        `⚠️  Apache AGE not available — skipping graph ontology: ${msg}`
+      );
     }
 
     // Seed example course: נהר שלום — הרש"ש

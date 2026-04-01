@@ -27,10 +27,11 @@ export const createExamItemSchema = z.object({
   moduleId: z.string().uuid().optional(),
   domainTag: z.string().min(1).max(100),
   bloomLevel: BloomLevelSchema,
-  questionData: z.record(z.string(), z.unknown()).refine(
-    (data) => data && typeof data === 'object',
-    { message: 'questionData must be a valid object' },
-  ),
+  questionData: z
+    .record(z.string(), z.unknown())
+    .refine((data) => data && typeof data === 'object', {
+      message: 'questionData must be a valid object',
+    }),
   source: ExamItemSourceSchema.optional().default('MANUAL'),
 });
 
@@ -60,10 +61,11 @@ export const generateExamItemsSchema = z.object({
 export const submitExamAnswerSchema = z.object({
   sessionId: z.string().uuid(),
   itemId: z.string().uuid(),
-  answer: z.record(z.string(), z.unknown()).refine(
-    (data) => data && typeof data === 'object',
-    { message: 'answer must be a valid object' },
-  ),
+  answer: z
+    .record(z.string(), z.unknown())
+    .refine((data) => data && typeof data === 'object', {
+      message: 'answer must be a valid object',
+    }),
 });
 
 export type CreateExamItemInput = z.infer<typeof createExamItemSchema>;

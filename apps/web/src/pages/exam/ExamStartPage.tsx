@@ -38,7 +38,7 @@ export function ExamStartPage() {
     setSession(
       session.id,
       session.questionOrder ?? [],
-      session.timeRemainingSeconds ?? 0,
+      session.timeRemainingSeconds ?? 0
     );
     navigate(`/exam/session/${session.id}`, { replace: true });
   };
@@ -92,7 +92,10 @@ export function ExamStartPage() {
           {/* Instructions */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" aria-hidden />
+              <AlertTriangle
+                className="h-4 w-4 text-yellow-500 dark:text-yellow-400"
+                aria-hidden
+              />
               Exam Instructions
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -117,7 +120,9 @@ export function ExamStartPage() {
           </label>
 
           {error && (
-            <p className="text-sm text-red-500 dark:text-red-400" role="alert">{error}</p>
+            <p className="text-sm text-red-500 dark:text-red-400" role="alert">
+              {error}
+            </p>
           )}
 
           <Button

@@ -44,7 +44,9 @@ vi.mock('urql', () => ({
         acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: { myGamificationStats: MOCK_STATS }, fetching: false }]),
+  useQuery: vi.fn(() => [
+    { data: { myGamificationStats: MOCK_STATS }, fetching: false },
+  ]),
 }));
 
 vi.mock('@/lib/graphql/gamification.queries', () => ({
@@ -52,17 +54,22 @@ vi.mock('@/lib/graphql/gamification.queries', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => React.createElement('div', {}, children),
+  Layout: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('div', {}, children),
 }));
 
 vi.mock('lucide-react', () => ({
-  Trophy: () => React.createElement('span', { 'data-testid': 'trophy-icon' }, 'Trophy'),
-  Flame: () => React.createElement('span', { 'data-testid': 'flame-icon' }, 'Flame'),
-  Target: () => React.createElement('span', { 'data-testid': 'target-icon' }, 'Target'),
+  Trophy: () =>
+    React.createElement('span', { 'data-testid': 'trophy-icon' }, 'Trophy'),
+  Flame: () =>
+    React.createElement('span', { 'data-testid': 'flame-icon' }, 'Flame'),
+  Target: () =>
+    React.createElement('span', { 'data-testid': 'target-icon' }, 'Target'),
 }));
 
 vi.mock('@/components/ui/tabs', () => ({
-  Tabs: ({ children }: { children: React.ReactNode }) => React.createElement('div', {}, children),
+  Tabs: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('div', {}, children),
   TabsList: ({ children }: { children: React.ReactNode }) =>
     React.createElement('div', { role: 'tablist' }, children),
   TabsTrigger: ({
@@ -73,7 +80,12 @@ vi.mock('@/components/ui/tabs', () => ({
     children: React.ReactNode;
     value: string;
     onClick?: () => void;
-  }) => React.createElement('button', { role: 'tab', 'data-value': value, onClick }, children),
+  }) =>
+    React.createElement(
+      'button',
+      { role: 'tab', 'data-value': value, onClick },
+      children
+    ),
   TabsContent: ({
     children,
     value,
@@ -84,24 +96,63 @@ vi.mock('@/components/ui/tabs', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) =>
     React.createElement('div', { 'data-testid': 'card', className }, children),
-  CardHeader: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    React.createElement('div', { className }, children),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    React.createElement('div', { className }, children),
-  CardTitle: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    React.createElement('h3', { className }, children),
+  CardHeader: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => React.createElement('div', { className }, children),
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => React.createElement('div', { className }, children),
+  CardTitle: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => React.createElement('h3', { className }, children),
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant }: { children: React.ReactNode; variant?: string }) =>
-    React.createElement('span', { 'data-variant': variant }, children),
+  Badge: ({
+    children,
+    variant,
+  }: {
+    children: React.ReactNode;
+    variant?: string;
+  }) => React.createElement('span', { 'data-variant': variant }, children),
 }));
 
 vi.mock('@/components/ui/progress', () => ({
-  Progress: ({ value, className, 'aria-label': ariaLabel }: { value: number; className?: string; 'aria-label'?: string }) =>
-    React.createElement('div', { role: 'progressbar', 'aria-valuenow': value, 'aria-label': ariaLabel, className }),
+  Progress: ({
+    value,
+    className,
+    'aria-label': ariaLabel,
+  }: {
+    value: number;
+    className?: string;
+    'aria-label'?: string;
+  }) =>
+    React.createElement('div', {
+      role: 'progressbar',
+      'aria-valuenow': value,
+      'aria-label': ariaLabel,
+      className,
+    }),
 }));
 
 vi.mock('@/components/ui/skeleton', () => ({
@@ -149,7 +200,9 @@ describe('GamificationPage', () => {
   it('renders Challenges tab button', () => {
     renderPage();
     const tabs = screen.getAllByRole('tab');
-    const challengesTab = tabs.find((t) => t.textContent?.includes('Challenges'));
+    const challengesTab = tabs.find((t) =>
+      t.textContent?.includes('Challenges')
+    );
     expect(challengesTab).toBeDefined();
   });
 

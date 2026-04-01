@@ -70,7 +70,9 @@ describe('AnchorFrame', () => {
       />
     );
 
-    const frame = container.querySelector('[data-testid="anchor-frame"]') as HTMLElement;
+    const frame = container.querySelector(
+      '[data-testid="anchor-frame"]'
+    ) as HTMLElement;
     expect(frame).not.toBeNull();
     // top = elRect.top(100) - containerRect.top(0) + scrollTop(0) - 2 = 98
     expect(frame.style.top).toBe('98px');
@@ -99,7 +101,9 @@ describe('AnchorFrame', () => {
       />
     );
 
-    const frame = container.querySelector('[data-testid="anchor-frame"]') as HTMLElement;
+    const frame = container.querySelector(
+      '[data-testid="anchor-frame"]'
+    ) as HTMLElement;
     expect(frame).not.toBeNull();
     fireEvent.click(frame);
     expect(onFrameClick).toHaveBeenCalledWith('click-anchor');
@@ -122,7 +126,9 @@ describe('AnchorFrame', () => {
       />
     );
 
-    const frame = container.querySelector('[data-testid="anchor-frame"]') as HTMLElement;
+    const frame = container.querySelector(
+      '[data-testid="anchor-frame"]'
+    ) as HTMLElement;
     fireEvent.keyDown(frame, { key: 'Enter' });
     expect(onFrameClick).toHaveBeenCalledWith('key-anchor');
 
@@ -130,7 +136,8 @@ describe('AnchorFrame', () => {
   });
 
   it('removes scroll and resize listeners on unmount', () => {
-    const { container: domContainer } = makeContainerWithAnchor('remove-anchor');
+    const { container: domContainer } =
+      makeContainerWithAnchor('remove-anchor');
     document.body.appendChild(domContainer);
 
     const containerRef = { current: domContainer };
@@ -147,7 +154,10 @@ describe('AnchorFrame', () => {
     unmount();
 
     expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
-    expect(windowRemoveSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+    expect(windowRemoveSpy).toHaveBeenCalledWith(
+      'resize',
+      expect.any(Function)
+    );
 
     document.body.removeChild(domContainer);
   });

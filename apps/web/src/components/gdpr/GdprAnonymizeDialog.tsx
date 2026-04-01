@@ -55,13 +55,9 @@ export function GdprAnonymizeDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent
-        data-testid="gdpr-anonymize-dialog"
-      >
+      <DialogContent data-testid="gdpr-anonymize-dialog">
         <DialogHeader>
-          <DialogTitle>
-            Permanently Anonymize User Data
-          </DialogTitle>
+          <DialogTitle>Permanently Anonymize User Data</DialogTitle>
           <DialogDescription>
             This action is <strong>irreversible</strong>. All personal data
             {userName ? ` for ${userName}` : ''} will be permanently anonymized
@@ -80,9 +76,12 @@ export function GdprAnonymizeDialog({
 
           <div className="space-y-2">
             <Label htmlFor="gdpr-confirm-input">
-              Type <span className="font-mono font-bold">{CONFIRMATION_WORD}</span> to confirm
+              Type{' '}
+              <span className="font-mono font-bold">{CONFIRMATION_WORD}</span>{' '}
+              to confirm
               <span className="sr-only">
-                (type the word {CONFIRMATION_WORD} in uppercase to enable the anonymize button)
+                (type the word {CONFIRMATION_WORD} in uppercase to enable the
+                anonymize button)
               </span>
             </Label>
             <Input

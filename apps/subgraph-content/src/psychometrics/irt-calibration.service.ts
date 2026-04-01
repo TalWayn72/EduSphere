@@ -45,7 +45,7 @@ export class IRTCalibrationService implements OnModuleDestroy {
   /** Calibrate a single item via EM algorithm. Requires N >= 200. */
   async calibrateItem(
     itemId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<IRTParameters | null> {
     const ctx = sysCtx(tenantId);
     const responses = await withTenantContext(this.db, ctx, (tx) =>
@@ -55,26 +55,23 @@ export class IRTCalibrationService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.itemResponseLog.itemId, itemId),
-            eq(schema.itemResponseLog.tenantId, tenantId),
-          ),
-        ),
+            eq(schema.itemResponseLog.tenantId, tenantId)
+          )
+        )
     );
 
     if (responses.length < MIN_RESPONSES) {
       this.logger.warn(
         { itemId, count: responses.length, required: MIN_RESPONSES },
-        '[IRTCalibrationService] Insufficient responses for calibration',
+        '[IRTCalibrationService] Insufficient responses for calibration'
       );
       return null;
     }
 
-    const userThetas = await this.estimateInitialAbilities(
-      responses,
-      tenantId,
-    );
+    const userThetas = await this.estimateInitialAbilities(responses, tenantId);
     const result = runEM(
       responses.map((r) => ({ userId: r.userId, isCorrect: r.isCorrect })),
-      userThetas,
+      userThetas
     );
 
     await withTenantContext(this.db, ctx, (tx) =>
@@ -86,12 +83,12 @@ export class IRTCalibrationService implements OnModuleDestroy {
           irtC: result.c,
           calibrationStatus: 'CALIBRATED',
         })
-        .where(eq(schema.examItems.id, itemId)),
+        .where(eq(schema.examItems.id, itemId))
     );
 
     this.logger.log(
       { itemId, ...result },
-      '[IRTCalibrationService] Item calibrated',
+      '[IRTCalibrationService] Item calibrated'
     );
     return { itemId, ...result };
   }
@@ -104,7 +101,7 @@ export class IRTCalibrationService implements OnModuleDestroy {
   /** Fisher information at a given theta for a set of items. */
   computeItemInformation(
     items: Array<{ a: number; b: number; c: number }>,
-    theta: number,
+    theta: number
   ): number {
     return computeTestInformation(items, theta);
   }
@@ -113,7 +110,7 @@ export class IRTCalibrationService implements OnModuleDestroy {
 
   private async estimateInitialAbilities(
     responses: { userId: string; isCorrect: boolean }[],
-    tenantId: string,
+    tenantId: string
   ): Promise<Map<string, number>> {
     const ctx = sysCtx(tenantId);
     const userIds = [...new Set(responses.map((r) => r.userId))];
@@ -127,9 +124,9 @@ export class IRTCalibrationService implements OnModuleDestroy {
           .where(
             and(
               eq(schema.itemResponseLog.userId, uid),
-              eq(schema.itemResponseLog.tenantId, tenantId),
-            ),
-          ),
+              eq(schema.itemResponseLog.tenantId, tenantId)
+            )
+          )
       );
       const p = all.filter((r) => r.isCorrect).length / (all.length || 1);
       const bounded = clamp(p, 0.01, 0.99);

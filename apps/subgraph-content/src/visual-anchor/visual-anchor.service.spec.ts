@@ -11,8 +11,13 @@ const { mockReturning, mockWtc } = vi.hoisted(() => {
   return { mockReturning, mockWtc };
 });
 
-const mockSet = vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) }));
-const mockWhere = vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([]), returning: mockReturning }));
+const mockSet = vi.fn(() => ({
+  where: vi.fn(() => ({ returning: mockReturning })),
+}));
+const mockWhere = vi.fn(() => ({
+  orderBy: vi.fn().mockResolvedValue([]),
+  returning: mockReturning,
+}));
 const mockValues = vi.fn(() => ({ returning: mockReturning }));
 const mockFrom = vi.fn(() => ({ where: mockWhere }));
 const mockInsert = vi.fn(() => ({ values: mockValues }));
@@ -24,8 +29,17 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   withTenantContext: mockWtc,
   schema: {
-    visualAnchors: { id: 'id', media_asset_id: 'media_asset_id', deleted_at: 'deleted_at', document_order: 'document_order' },
-    visualAssets: { id: 'id', course_id: 'course_id', deleted_at: 'deleted_at' },
+    visualAnchors: {
+      id: 'id',
+      media_asset_id: 'media_asset_id',
+      deleted_at: 'deleted_at',
+      document_order: 'document_order',
+    },
+    visualAssets: {
+      id: 'id',
+      course_id: 'course_id',
+      deleted_at: 'deleted_at',
+    },
     media_assets: { id: 'id', course_id: 'course_id' },
   },
   eq: vi.fn((a, b) => ({ eq: [a, b] })),
@@ -46,7 +60,9 @@ vi.mock('nats', () => ({
 vi.mock('@aws-sdk/client-s3', () => {
   const mockSend = vi.fn().mockResolvedValue({});
   // Use function constructor (not arrow) — Vitest 4 requires this for 'new' calls
-  function MockS3Client(this: { send: typeof mockSend }) { this.send = mockSend; }
+  function MockS3Client(this: { send: typeof mockSend }) {
+    this.send = mockSend;
+  }
   return {
     S3Client: MockS3Client,
     GetObjectCommand: vi.fn(),
@@ -60,7 +76,14 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
 }));
 
 vi.mock('@edusphere/config', () => ({
-  minioConfig: { bucket: 'edusphere', endpoint: 'localhost', port: 9000, region: 'us-east-1', accessKey: 'minio', secretKey: 'minio123' },
+  minioConfig: {
+    bucket: 'edusphere',
+    endpoint: 'localhost',
+    port: 9000,
+    region: 'us-east-1',
+    accessKey: 'minio',
+    secretKey: 'minio123',
+  },
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
@@ -68,7 +91,11 @@ import { VisualAnchorService } from './visual-anchor.service';
 
 // ── Test helpers ──────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'INSTRUCTOR' as const };
+const TENANT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 const ANCHOR_ROW = {
   id: 'anchor-uuid-1',
@@ -107,9 +134,13 @@ describe('VisualAnchorService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockReturning.mockReset(); // clear leftover mockResolvedValueOnce queue
-    mockWtc.mockReset();       // clear wtc queue, then restore default passthrough
+    mockWtc.mockReset(); // clear wtc queue, then restore default passthrough
     mockWtc.mockImplementation((_db: unknown, _ctx: unknown, fn: unknown) =>
-      (fn as (tx: unknown) => Promise<unknown>)({ insert: mockInsert, update: mockUpdate, select: mockSelect })
+      (fn as (tx: unknown) => Promise<unknown>)({
+        insert: mockInsert,
+        update: mockUpdate,
+        select: mockSelect,
+      })
     );
     service = new VisualAnchorService(
       mockClamav as never,
@@ -144,7 +175,12 @@ describe('VisualAnchorService', () => {
   it('throws when anchorText is empty', async () => {
     await expect(
       service.createAnchor(
-        { mediaAssetId: '550e8400-e29b-41d4-a716-446655440001', courseId: '550e8400-e29b-41d4-a716-446655440002', anchorText: '', documentOrder: 0 },
+        {
+          mediaAssetId: '550e8400-e29b-41d4-a716-446655440001',
+          courseId: '550e8400-e29b-41d4-a716-446655440002',
+          anchorText: '',
+          documentOrder: 0,
+        },
         TENANT_CTX
       )
     ).rejects.toThrow();
@@ -153,7 +189,12 @@ describe('VisualAnchorService', () => {
   it('throws when mediaAssetId is not a UUID', async () => {
     await expect(
       service.createAnchor(
-        { mediaAssetId: 'not-a-uuid', courseId: 'course-1', anchorText: 'text', documentOrder: 0 },
+        {
+          mediaAssetId: 'not-a-uuid',
+          courseId: 'course-1',
+          anchorText: 'text',
+          documentOrder: 0,
+        },
         TENANT_CTX
       )
     ).rejects.toThrow();
@@ -162,7 +203,9 @@ describe('VisualAnchorService', () => {
   // ── deleteAnchor — soft-delete + NATS ─────────────────────────────────────────
 
   it('soft-deletes anchor and returns true', async () => {
-    mockReturning.mockResolvedValueOnce([{ id: 'anchor-uuid-1', media_asset_id: 'media-1' }]);
+    mockReturning.mockResolvedValueOnce([
+      { id: 'anchor-uuid-1', media_asset_id: 'media-1' },
+    ]);
 
     const result = await service.deleteAnchor('anchor-uuid-1', TENANT_CTX);
     expect(result).toBe(true);
@@ -170,7 +213,9 @@ describe('VisualAnchorService', () => {
 
   it('throws NotFoundException when anchor not found on delete', async () => {
     mockReturning.mockResolvedValueOnce([]);
-    await expect(service.deleteAnchor('missing-id', TENANT_CTX)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.deleteAnchor('missing-id', TENANT_CTX)
+    ).rejects.toThrow(NotFoundException);
   });
 
   // ── assignAsset ───────────────────────────────────────────────────────────────
@@ -184,33 +229,45 @@ describe('VisualAnchorService', () => {
     const VISUAL_ASSET_ROW = { course_id: 'course-1' };
     const withAsset = { ...ANCHOR_ROW, visual_asset_id: 'asset-uuid-1' };
     mockWtc
-      .mockResolvedValueOnce([ANCHOR_ROW])       // 1. select anchor
-      .mockResolvedValueOnce([MEDIA_ASSET_ROW])  // 2. select media_asset
+      .mockResolvedValueOnce([ANCHOR_ROW]) // 1. select anchor
+      .mockResolvedValueOnce([MEDIA_ASSET_ROW]) // 2. select media_asset
       .mockResolvedValueOnce([VISUAL_ASSET_ROW]); // 3. select visual_asset
     // 4. update+returning uses the passthrough implementation → mockReturning
     mockWtc.mockImplementationOnce((_db: unknown, _ctx: unknown, fn: unknown) =>
-      (fn as (tx: unknown) => Promise<unknown>)({ insert: mockInsert, update: mockUpdate, select: mockSelect })
+      (fn as (tx: unknown) => Promise<unknown>)({
+        insert: mockInsert,
+        update: mockUpdate,
+        select: mockSelect,
+      })
     );
     mockReturning.mockResolvedValueOnce([withAsset]);
 
-    const result = await service.assignAsset('anchor-uuid-1', 'asset-uuid-1', TENANT_CTX);
+    const result = await service.assignAsset(
+      'anchor-uuid-1',
+      'asset-uuid-1',
+      TENANT_CTX
+    );
     expect(result.visualAssetId).toBe('asset-uuid-1');
   });
 
   it('throws NotFoundException when anchor not found on assign', async () => {
     mockWtc.mockResolvedValueOnce([]); // 1. select anchor returns empty
-    await expect(service.assignAsset('missing', 'asset-1', TENANT_CTX)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.assignAsset('missing', 'asset-1', TENANT_CTX)
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('throws BadRequestException on cross-course assignment', async () => {
     const MEDIA_ASSET_ROW = { course_id: 'course-A' };
     const VISUAL_ASSET_ROW = { course_id: 'course-B' }; // different course → cross-course block
     mockWtc
-      .mockResolvedValueOnce([ANCHOR_ROW])       // 1. select anchor
-      .mockResolvedValueOnce([MEDIA_ASSET_ROW])  // 2. select media_asset
+      .mockResolvedValueOnce([ANCHOR_ROW]) // 1. select anchor
+      .mockResolvedValueOnce([MEDIA_ASSET_ROW]) // 2. select media_asset
       .mockResolvedValueOnce([VISUAL_ASSET_ROW]); // 3. select visual_asset (different course)
 
-    await expect(service.assignAsset('anchor-uuid-1', 'asset-uuid-1', TENANT_CTX)).rejects.toThrow(BadRequestException);
+    await expect(
+      service.assignAsset('anchor-uuid-1', 'asset-uuid-1', TENANT_CTX)
+    ).rejects.toThrow(BadRequestException);
   });
 
   // ── confirmVisualAssetUpload — INFECTED path ──────────────────────────────────
@@ -224,7 +281,9 @@ describe('VisualAnchorService', () => {
 
     // Override S3 send to return a stream for GetObject
     const readable = Readable.from(Buffer.from('eicar'));
-    const s3 = (service as unknown as { s3: { send: ReturnType<typeof vi.fn> } }).s3;
+    const s3 = (
+      service as unknown as { s3: { send: ReturnType<typeof vi.fn> } }
+    ).s3;
     s3.send = vi.fn().mockResolvedValue({ Body: readable });
 
     await expect(

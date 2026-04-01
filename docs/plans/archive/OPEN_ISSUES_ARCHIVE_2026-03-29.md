@@ -6,98 +6,98 @@
 
 ## Status Summary (Quick Reference)
 
-| ID | Issue | Status | Fixed In |
-|----|-------|--------|----------|
-| SEC-1 | Dev-token grants SUPER_ADMIN | ✅ Fixed | `a13c080` |
-| SEC-3 | Subgraphs skip JWT audience | ✅ Fixed | `a13c080` |
-| SEC-4 | PII encryption no key versioning | ✅ Fixed | `06ad847` |
-| SEC-5 | No Cypher injection tests | ✅ Fixed | `ca885a2` |
-| SEC-8 | APQ registry in-memory only | ✅ Fixed | `06ad847` |
-| BE-7 | Auth header fallback no stripping | ✅ Fixed | `a13c080` |
-| SI-7 | 15 services raw NATS without TLS | ✅ Fixed | `e2a714d` |
-| OPS-4 | Alertmanager routes to null | ✅ Fixed | `06ad847` |
-| DB-2 | HNSW indexes missing on 3 tables | ✅ Fixed | `dfa5dda` |
-| DB-3 | agentSessions lacks tenant_id | ✅ Fixed | `dfa5dda` |
-| DB-4 | 29 schemas missing withTimezone | ✅ Fixed | `dfa5dda` |
-| BE-2 | AgentService no Promise.race | ✅ Fixed | `202d8f0` |
-| BE-3 | adminUsers O(N) full fetch | ✅ Fixed | `202d8f0` |
-| BE-5 | MediaService NATS per upload | ✅ Fixed | `202d8f0` |
-| BE-9 | resetUserPassword stub | ✅ Fixed | `bcec7c4` |
-| BE-4 | Mutations accept unknown no Zod | ✅ Fixed | `d4e1eea` |
-| FE-1 | No route-level error boundaries | ✅ Fixed | `ad488c2` |
-| QA-4 | Visual snapshots disabled in CI | ✅ Fixed | `4aa2626` |
-| BUG-070 | Landing tab navigation | ✅ Fixed | `b2338e3` |
-| BUG-071 | AI Course consent error | ✅ Fixed | `fed522a` |
-| BUG-072 | APQ gateway error cascade | ✅ Fixed | `390a623` |
-| BUG-073 | Media upload failure | ✅ Fixed | `256655c` |
-| BUG-074 | CreateLesson generic error + SI-9 violation | ✅ Fixed | (pending commit) |
-| ARCH-6 | CRDT compaction no automated trigger | ✅ Fixed | `cf60f20` |
-| ARCH-5 | Connection budget undocumented | ✅ Fixed | `c5edcb4` |
-| ARCH-4 | Content subgraph 38 domains (ADR) | ✅ Documented | `26d01d0` |
-| ARCH-1 | PostgreSQL extraction plan | ✅ Documented | `c5edcb4` |
-| DB-7 | withReadReplica creates new Drizzle per call | ✅ Fixed | `a8672f9` |
-| BE-10 | No circuit breaker for external deps | ✅ Fixed | `3e88fae` |
-| QA-6 | No E2E for cross-role mutation auth | ✅ Fixed | `c649df4` |
-| DOC-9 | No operational runbooks | ✅ Fixed | `3e2b019` |
-| OPS-5 | Base images use floating tags | ✅ Fixed | `d64ea70` |
-| QA-1 | 504 waitForTimeout calls in E2E | ✅ Fixed | `0f26985` |
-| FE-2 | No token expiry reaction | ✅ Fixed | (Wave 3 commit) |
-| FE-4/UX-3 | Sidebar 19 items no role grouping | ✅ Fixed | (Wave 3 commit) |
-| FE-6 | guarded() no client-side role check | ✅ Fixed | (Wave 4 commit) |
-| FE-5 | No shared useFileUpload hook | ✅ Fixed | `d44f376` |
-| ARCH-8 | HybridRAG fusion weights hardcoded | ✅ Fixed | `7ef3bc0` |
-| DB-6 | Concept embeddings orphaned on delete | ✅ Fixed | `49a7d13` |
-| BE-6 | Relay cursor uses offset encoding | ✅ Fixed | (keyset pagination) |
-| ORCH-4 | Discovery wave checklist incomplete | ✅ Fixed | `b360fcc` |
-| DOC-2 | CHANGELOG missing 20+ versions | ✅ Fixed | (Wave 6 commit) |
-| DOC-4 | docs/INDEX.md frozen at Session 27 | ✅ Fixed | (Wave 6 commit) |
-| BUG-074 | Polling anti-pattern on Pipeline page | ✅ Fixed | Phase 65 R1 |
-| BUG-075 | PUBLISH_SHARE module is a stub | ✅ Fixed | Phase 65 R2 |
-| BUG-076 | NER entities never reach Knowledge Graph | ✅ Fixed | Phase 65 R3 |
-| BUG-077 | Course publish lacks validation | ✅ Fixed | Phase 65 R4 |
-| BUG-078 | Missing aria-live on pipeline status | ✅ Fixed | Phase 65 R5 |
-| BUG-079 | Breadcrumb missing lesson link | ✅ Fixed | Phase 65 R5 |
-| BUG-080 | Mobile layout broken on pipeline page | ✅ Fixed | Phase 65 R5 |
-| BUG-081 | PDF source upload fails — pdfParse is not a function | ✅ Fixed | c4bb7ca |
-| BUG-082 | Footer/landing links use `<a href>` instead of `<Link>` | ✅ Fixed | a3995e5, ffd4438 |
-| FEAT-065 | Social & Notification Integration (Email + WhatsApp + Social Sharing) | ✅ Implemented | 8115644 |
-| PROC-001 | Services left down after agent operations — ERR_CONNECTION_REFUSED | ✅ Fixed | (process fix) |
-| BUG-083 | Iron Rule enforcement gaps — Docker daemon check missing, no git hooks | ✅ Fixed | (pending commit) |
-| TS-001 | TypeScript errors in subgraph-core Phase 65 services | ✅ Fixed | (pending commit) |
-| FEAT-066 | Smart Requirement Links — consent navigation with highlight | ✅ Implemented | (pending commit — frontend consent gate addendum) |
-| BUG-084 | Dashboard mastery overview flash/disappear — empty array fallback | ✅ Fixed | (pending commit) |
-| BUG-085 | Consent link missing in AI Course Creator modal — stale container build | ✅ Fixed | (pending commit) |
-| BUG-086 | "Download VPAT / HECVAT" button navigates instead of downloading | ✅ Fixed | (pending commit) |
-| BUG-087 | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent | ✅ Fixed | `66a0b79` |
-| BUG-088 | Consent toggle saves to localStorage only — backend DB never synced; no return navigation | ✅ Fixed | (pending commit) |
-| BUG-089 | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback | ✅ Fixed | (pending commit) |
-| FEAT-090 | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s | ✅ Implemented | (pending commit) |
-| BUG-091 | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules | ✅ Fixed | (pending commit) |
-| BUG-092 | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch) | ✅ Fixed (2 rounds) | (pending commit) |
-| BUG-093 | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama | ✅ Fixed (3 rounds) | (pending commit) |
-| BUG-094 | Consent save fails — consent resolver missing from Docker container dist | ✅ Fixed | (pending commit) |
-| BUG-095 | AI course creation fails end-to-end — no course created, redirects to /courses | ✅ Fixed | (pending commit) |
-| BUG-096 | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring) | ✅ Fixed | c04ded08..59cd59cc |
-| BUG-097 | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken | ✅ Fixed (8 rounds) | c04ded08..77d9931d |
-| BUG-098 | Adding course source fails — 400 Bad Request when auth token missing | ✅ Fixed | (pending commit) |
-| BUG-099 | i18n English content on Hebrew locale — 7 social/collab pages hardcoded English | ✅ Fixed | (pending commit) |
-| BUG-100 | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection | ✅ Fixed | (pending commit) |
-| BUG-101 | Delete Course — 400 Bad Request + accessibility console errors | ✅ Fixed | `c7beef92` |
-| BUG-102 | Delete course button missing from CourseDetailPage | ✅ Fixed | (pending commit) |
-| BUG-103 | Delete Course fails silently — course not removed from list after deletion | ✅ Fixed | `3dce63f4`, `0ad9030b`, `ae4a4200`, `10f9e269` |
-| F-065 | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown | ✅ Complete | Phase 68 |
-| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform | ✅ Complete (All Waves — F-01 through F-15) | `df587183`, `0af3996d`, `ff162ce6`, `8f4d975f`, `058c0b4c` |
-| INFRA-1 | HiveMind shared intelligence layer (3 MCP servers) | ✅ Fixed | (pending commit) |
-| BUG-104 | Knowledge Graph Page — "Invalid time value" GraphQL Error | ✅ Fixed | (pending commit) |
-| BUG-105 | Cannot return null for AgentTemplate.templateType | ✅ Fixed | (pending commit) |
-| BUG-106 | GraphQL 400 Bad Request errors on Lesson Pipeline page | ✅ Fixed | (pending commit) |
-| BUG-107 | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing) | ✅ Fixed | (pending commit) |
-| FEAT-TEST-COVERAGE | Web Unit Test Coverage Improvement (57% → 95%+) | ✅ Fixed | (24 Mar 2026) |
-| FEAT-COVERAGE-001 | Web Unit Test Coverage Boost to 95%+ (177 new test files) | ✅ Fixed | (25 Mar 2026) |
-| FEAT-RAG-ACTIVATION | RAG Pipeline Activation — wire HNSW indexes, content indexing, concept publisher, seed embeddings, graph traversal | ✅ Fixed (Sprint 1) | (pending commit) |
-| FEAT-PDF-VIEWER | PDF Experience — in-browser PDF viewer, text annotation, sketch overlay, presigned URLs | ✅ Fixed (Sprint 2) | (pending commit) |
-| FEAT-OBSERVABILITY | Observability — EmbeddingCoverageChart, EmbeddingActivityLog, enhanced admin dashboard | ✅ Fixed (Sprint 3) | (pending commit) |
-| FEAT-VISUAL-TESTING | Visual Testing Expansion — 499→2,054 toHaveScreenshot assertions across 215 spec files, 4,613 baseline PNGs. QA gate: 46 failures fixed (graphcache __typename, stale baselines, timing, DEV_MODE skips) | ✅ Complete | 2026-03-29 |
+| ID                  | Issue                                                                                                                                                                                                      | Status                                      | Fixed In                                                   |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------- |
+| SEC-1               | Dev-token grants SUPER_ADMIN                                                                                                                                                                               | ✅ Fixed                                    | `a13c080`                                                  |
+| SEC-3               | Subgraphs skip JWT audience                                                                                                                                                                                | ✅ Fixed                                    | `a13c080`                                                  |
+| SEC-4               | PII encryption no key versioning                                                                                                                                                                           | ✅ Fixed                                    | `06ad847`                                                  |
+| SEC-5               | No Cypher injection tests                                                                                                                                                                                  | ✅ Fixed                                    | `ca885a2`                                                  |
+| SEC-8               | APQ registry in-memory only                                                                                                                                                                                | ✅ Fixed                                    | `06ad847`                                                  |
+| BE-7                | Auth header fallback no stripping                                                                                                                                                                          | ✅ Fixed                                    | `a13c080`                                                  |
+| SI-7                | 15 services raw NATS without TLS                                                                                                                                                                           | ✅ Fixed                                    | `e2a714d`                                                  |
+| OPS-4               | Alertmanager routes to null                                                                                                                                                                                | ✅ Fixed                                    | `06ad847`                                                  |
+| DB-2                | HNSW indexes missing on 3 tables                                                                                                                                                                           | ✅ Fixed                                    | `dfa5dda`                                                  |
+| DB-3                | agentSessions lacks tenant_id                                                                                                                                                                              | ✅ Fixed                                    | `dfa5dda`                                                  |
+| DB-4                | 29 schemas missing withTimezone                                                                                                                                                                            | ✅ Fixed                                    | `dfa5dda`                                                  |
+| BE-2                | AgentService no Promise.race                                                                                                                                                                               | ✅ Fixed                                    | `202d8f0`                                                  |
+| BE-3                | adminUsers O(N) full fetch                                                                                                                                                                                 | ✅ Fixed                                    | `202d8f0`                                                  |
+| BE-5                | MediaService NATS per upload                                                                                                                                                                               | ✅ Fixed                                    | `202d8f0`                                                  |
+| BE-9                | resetUserPassword stub                                                                                                                                                                                     | ✅ Fixed                                    | `bcec7c4`                                                  |
+| BE-4                | Mutations accept unknown no Zod                                                                                                                                                                            | ✅ Fixed                                    | `d4e1eea`                                                  |
+| FE-1                | No route-level error boundaries                                                                                                                                                                            | ✅ Fixed                                    | `ad488c2`                                                  |
+| QA-4                | Visual snapshots disabled in CI                                                                                                                                                                            | ✅ Fixed                                    | `4aa2626`                                                  |
+| BUG-070             | Landing tab navigation                                                                                                                                                                                     | ✅ Fixed                                    | `b2338e3`                                                  |
+| BUG-071             | AI Course consent error                                                                                                                                                                                    | ✅ Fixed                                    | `fed522a`                                                  |
+| BUG-072             | APQ gateway error cascade                                                                                                                                                                                  | ✅ Fixed                                    | `390a623`                                                  |
+| BUG-073             | Media upload failure                                                                                                                                                                                       | ✅ Fixed                                    | `256655c`                                                  |
+| BUG-074             | CreateLesson generic error + SI-9 violation                                                                                                                                                                | ✅ Fixed                                    | (pending commit)                                           |
+| ARCH-6              | CRDT compaction no automated trigger                                                                                                                                                                       | ✅ Fixed                                    | `cf60f20`                                                  |
+| ARCH-5              | Connection budget undocumented                                                                                                                                                                             | ✅ Fixed                                    | `c5edcb4`                                                  |
+| ARCH-4              | Content subgraph 38 domains (ADR)                                                                                                                                                                          | ✅ Documented                               | `26d01d0`                                                  |
+| ARCH-1              | PostgreSQL extraction plan                                                                                                                                                                                 | ✅ Documented                               | `c5edcb4`                                                  |
+| DB-7                | withReadReplica creates new Drizzle per call                                                                                                                                                               | ✅ Fixed                                    | `a8672f9`                                                  |
+| BE-10               | No circuit breaker for external deps                                                                                                                                                                       | ✅ Fixed                                    | `3e88fae`                                                  |
+| QA-6                | No E2E for cross-role mutation auth                                                                                                                                                                        | ✅ Fixed                                    | `c649df4`                                                  |
+| DOC-9               | No operational runbooks                                                                                                                                                                                    | ✅ Fixed                                    | `3e2b019`                                                  |
+| OPS-5               | Base images use floating tags                                                                                                                                                                              | ✅ Fixed                                    | `d64ea70`                                                  |
+| QA-1                | 504 waitForTimeout calls in E2E                                                                                                                                                                            | ✅ Fixed                                    | `0f26985`                                                  |
+| FE-2                | No token expiry reaction                                                                                                                                                                                   | ✅ Fixed                                    | (Wave 3 commit)                                            |
+| FE-4/UX-3           | Sidebar 19 items no role grouping                                                                                                                                                                          | ✅ Fixed                                    | (Wave 3 commit)                                            |
+| FE-6                | guarded() no client-side role check                                                                                                                                                                        | ✅ Fixed                                    | (Wave 4 commit)                                            |
+| FE-5                | No shared useFileUpload hook                                                                                                                                                                               | ✅ Fixed                                    | `d44f376`                                                  |
+| ARCH-8              | HybridRAG fusion weights hardcoded                                                                                                                                                                         | ✅ Fixed                                    | `7ef3bc0`                                                  |
+| DB-6                | Concept embeddings orphaned on delete                                                                                                                                                                      | ✅ Fixed                                    | `49a7d13`                                                  |
+| BE-6                | Relay cursor uses offset encoding                                                                                                                                                                          | ✅ Fixed                                    | (keyset pagination)                                        |
+| ORCH-4              | Discovery wave checklist incomplete                                                                                                                                                                        | ✅ Fixed                                    | `b360fcc`                                                  |
+| DOC-2               | CHANGELOG missing 20+ versions                                                                                                                                                                             | ✅ Fixed                                    | (Wave 6 commit)                                            |
+| DOC-4               | docs/INDEX.md frozen at Session 27                                                                                                                                                                         | ✅ Fixed                                    | (Wave 6 commit)                                            |
+| BUG-074             | Polling anti-pattern on Pipeline page                                                                                                                                                                      | ✅ Fixed                                    | Phase 65 R1                                                |
+| BUG-075             | PUBLISH_SHARE module is a stub                                                                                                                                                                             | ✅ Fixed                                    | Phase 65 R2                                                |
+| BUG-076             | NER entities never reach Knowledge Graph                                                                                                                                                                   | ✅ Fixed                                    | Phase 65 R3                                                |
+| BUG-077             | Course publish lacks validation                                                                                                                                                                            | ✅ Fixed                                    | Phase 65 R4                                                |
+| BUG-078             | Missing aria-live on pipeline status                                                                                                                                                                       | ✅ Fixed                                    | Phase 65 R5                                                |
+| BUG-079             | Breadcrumb missing lesson link                                                                                                                                                                             | ✅ Fixed                                    | Phase 65 R5                                                |
+| BUG-080             | Mobile layout broken on pipeline page                                                                                                                                                                      | ✅ Fixed                                    | Phase 65 R5                                                |
+| BUG-081             | PDF source upload fails — pdfParse is not a function                                                                                                                                                       | ✅ Fixed                                    | c4bb7ca                                                    |
+| BUG-082             | Footer/landing links use `<a href>` instead of `<Link>`                                                                                                                                                    | ✅ Fixed                                    | a3995e5, ffd4438                                           |
+| FEAT-065            | Social & Notification Integration (Email + WhatsApp + Social Sharing)                                                                                                                                      | ✅ Implemented                              | 8115644                                                    |
+| PROC-001            | Services left down after agent operations — ERR_CONNECTION_REFUSED                                                                                                                                         | ✅ Fixed                                    | (process fix)                                              |
+| BUG-083             | Iron Rule enforcement gaps — Docker daemon check missing, no git hooks                                                                                                                                     | ✅ Fixed                                    | (pending commit)                                           |
+| TS-001              | TypeScript errors in subgraph-core Phase 65 services                                                                                                                                                       | ✅ Fixed                                    | (pending commit)                                           |
+| FEAT-066            | Smart Requirement Links — consent navigation with highlight                                                                                                                                                | ✅ Implemented                              | (pending commit — frontend consent gate addendum)          |
+| BUG-084             | Dashboard mastery overview flash/disappear — empty array fallback                                                                                                                                          | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-085             | Consent link missing in AI Course Creator modal — stale container build                                                                                                                                    | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-086             | "Download VPAT / HECVAT" button navigates instead of downloading                                                                                                                                           | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-087             | Settings page crashes with "Something went wrong" at /settings?highlight=ai-consent                                                                                                                        | ✅ Fixed                                    | `66a0b79`                                                  |
+| BUG-088             | Consent toggle saves to localStorage only — backend DB never synced; no return navigation                                                                                                                  | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-089             | AI course generation fails — agent_id mismatch + Ollama spec v1/v2 + no PubSub + no poll fallback                                                                                                          | ✅ Fixed                                    | (pending commit)                                           |
+| FEAT-090            | Dynamic Progress Status Indicator — cycling descriptive text for all async operations >2s                                                                                                                  | ✅ Implemented                              | (pending commit)                                           |
+| BUG-091             | Container subgraphs FATAL — pnpm workspace packages not hoisted to root node_modules                                                                                                                       | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-092             | AI consent save fails (R1: stale turbo cache in Docker; R2: @ai-sdk/openai v3 spec mismatch)                                                                                                               | ✅ Fixed (2 rounds)                         | (pending commit)                                           |
+| BUG-093             | AI Course Creator — no progress text (stale Docker dist) + 5-min timeout too short for CPU Ollama                                                                                                          | ✅ Fixed (3 rounds)                         | (pending commit)                                           |
+| BUG-094             | Consent save fails — consent resolver missing from Docker container dist                                                                                                                                   | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-095             | AI course creation fails end-to-end — no course created, redirects to /courses                                                                                                                             | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-096             | Knowledge Graph "שרת לא נגיש" error banner shows on all errors (recurring)                                                                                                                                 | ✅ Fixed                                    | c04ded08..59cd59cc                                         |
+| BUG-097             | Mixed Hebrew/English UI — i18n not applied to all pages + RTL layout broken                                                                                                                                | ✅ Fixed (8 rounds)                         | c04ded08..77d9931d                                         |
+| BUG-098             | Adding course source fails — 400 Bad Request when auth token missing                                                                                                                                       | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-099             | i18n English content on Hebrew locale — 7 social/collab pages hardcoded English                                                                                                                            | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-100             | GraphQL 400 Bad Request on Challenges page — flat array instead of Relay Connection                                                                                                                        | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-101             | Delete Course — 400 Bad Request + accessibility console errors                                                                                                                                             | ✅ Fixed                                    | `c7beef92`                                                 |
+| BUG-102             | Delete course button missing from CourseDetailPage                                                                                                                                                         | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-103             | Delete Course fails silently — course not removed from list after deletion                                                                                                                                 | ✅ Fixed                                    | `3dce63f4`, `0ad9030b`, `ae4a4200`, `10f9e269`             |
+| F-065               | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Generation, Browser Lockdown                                                                                                        | ✅ Complete                                 | Phase 68                                                   |
+| FEAT-ORG-ONBOARDING | Organization Self-Service Onboarding & White-Label Platform                                                                                                                                                | ✅ Complete (All Waves — F-01 through F-15) | `df587183`, `0af3996d`, `ff162ce6`, `8f4d975f`, `058c0b4c` |
+| INFRA-1             | HiveMind shared intelligence layer (3 MCP servers)                                                                                                                                                         | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-104             | Knowledge Graph Page — "Invalid time value" GraphQL Error                                                                                                                                                  | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-105             | Cannot return null for AgentTemplate.templateType                                                                                                                                                          | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-106             | GraphQL 400 Bad Request errors on Lesson Pipeline page                                                                                                                                                     | ✅ Fixed                                    | (pending commit)                                           |
+| BUG-107             | Knowledge Graph — Cannot return null for Concept.id (systemic agtype parsing)                                                                                                                              | ✅ Fixed                                    | (pending commit)                                           |
+| FEAT-TEST-COVERAGE  | Web Unit Test Coverage Improvement (57% → 95%+)                                                                                                                                                            | ✅ Fixed                                    | (24 Mar 2026)                                              |
+| FEAT-COVERAGE-001   | Web Unit Test Coverage Boost to 95%+ (177 new test files)                                                                                                                                                  | ✅ Fixed                                    | (25 Mar 2026)                                              |
+| FEAT-RAG-ACTIVATION | RAG Pipeline Activation — wire HNSW indexes, content indexing, concept publisher, seed embeddings, graph traversal                                                                                         | ✅ Fixed (Sprint 1)                         | (pending commit)                                           |
+| FEAT-PDF-VIEWER     | PDF Experience — in-browser PDF viewer, text annotation, sketch overlay, presigned URLs                                                                                                                    | ✅ Fixed (Sprint 2)                         | (pending commit)                                           |
+| FEAT-OBSERVABILITY  | Observability — EmbeddingCoverageChart, EmbeddingActivityLog, enhanced admin dashboard                                                                                                                     | ✅ Fixed (Sprint 3)                         | (pending commit)                                           |
+| FEAT-VISUAL-TESTING | Visual Testing Expansion — 499→2,054 toHaveScreenshot assertions across 215 spec files, 4,613 baseline PNGs. QA gate: 46 failures fixed (graphcache \_\_typename, stale baselines, timing, DEV_MODE skips) | ✅ Complete                                 | 2026-03-29                                                 |
 
 ---
 
@@ -115,45 +115,45 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 
 46 E2E failures identified and fixed across 5 categories:
 
-| Category | Count | Root Cause | Fix |
-|----------|-------|-----------|-----|
-| Visual snapshot mismatches | 21 | Stale baselines (UI changed since baseline creation) | Regenerated baselines, increased `maxDiffPixelRatio` |
-| Loading state timing | 10 | Invalid CSS selector (`text=Loading` in compound selector), low timeout | Split into `.or()` pattern, `timeout: 15_000` |
-| Navigation/redirect | 7 | SmartRoot changed to `/dashboard`, DEV_MODE auto-auth | Updated assertions, added `test.skip(IS_DEV_MODE)` |
-| Content/DOM assertions | 5 | Lucide icon class rename, `getByText` strict mode | `svg[class*="bar-chart"]`, `{ exact: true }` |
-| DEV_MODE auth | 3 | Tests expected unauthenticated behavior | Skip guards with `IS_DEV_MODE` check |
+| Category                   | Count | Root Cause                                                              | Fix                                                  |
+| -------------------------- | ----- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| Visual snapshot mismatches | 21    | Stale baselines (UI changed since baseline creation)                    | Regenerated baselines, increased `maxDiffPixelRatio` |
+| Loading state timing       | 10    | Invalid CSS selector (`text=Loading` in compound selector), low timeout | Split into `.or()` pattern, `timeout: 15_000`        |
+| Navigation/redirect        | 7     | SmartRoot changed to `/dashboard`, DEV_MODE auto-auth                   | Updated assertions, added `test.skip(IS_DEV_MODE)`   |
+| Content/DOM assertions     | 5     | Lucide icon class rename, `getByText` strict mode                       | `svg[class*="bar-chart"]`, `{ exact: true }`         |
+| DEV_MODE auth              | 3     | Tests expected unauthenticated behavior                                 | Skip guards with `IS_DEV_MODE` check                 |
 
 **Key spec files fixed:**
 
-| File | Tests | Key Fix |
-|------|-------|---------|
-| `e2e/my-badges.spec.ts` | 15 | urql graphcache requires `__typename` on mock objects; operation-name filtering in route handler |
-| `e2e/loading-states.spec.ts` | 20 | `text=Loading` invalid in CSS compound selector; use `.or(page.getByText())` |
-| `e2e/dashboard-widgets.spec.ts` | 18 | `Promise.any(isVisible())` instant-check; use `.or()` locator pattern |
-| `e2e/auth-flow-security.spec.ts` | 20 | DEV_MODE auto-authenticates; `test.skip(IS_DEV_MODE)` |
-| `e2e/auth.spec.ts` | 12 | Outdated redirect/heading assertions |
-| `e2e/pricing-page.spec.ts` | 14 | Strict mode `getByText('Custom')`; non-existent "White-label INCLUDED" text |
-| `e2e/blog.spec.ts` | 5 | Font loading timeout; stale baselines |
-| `e2e/consent-link-regression.spec.ts` | 3 | Font loading timeout |
+| File                                  | Tests | Key Fix                                                                                          |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------ |
+| `e2e/my-badges.spec.ts`               | 15    | urql graphcache requires `__typename` on mock objects; operation-name filtering in route handler |
+| `e2e/loading-states.spec.ts`          | 20    | `text=Loading` invalid in CSS compound selector; use `.or(page.getByText())`                     |
+| `e2e/dashboard-widgets.spec.ts`       | 18    | `Promise.any(isVisible())` instant-check; use `.or()` locator pattern                            |
+| `e2e/auth-flow-security.spec.ts`      | 20    | DEV_MODE auto-authenticates; `test.skip(IS_DEV_MODE)`                                            |
+| `e2e/auth.spec.ts`                    | 12    | Outdated redirect/heading assertions                                                             |
+| `e2e/pricing-page.spec.ts`            | 14    | Strict mode `getByText('Custom')`; non-existent "White-label INCLUDED" text                      |
+| `e2e/blog.spec.ts`                    | 5     | Font loading timeout; stale baselines                                                            |
+| `e2e/consent-link-regression.spec.ts` | 3     | Font loading timeout                                                                             |
 
 ### Coverage Areas
 
-| Area | Spec file patterns |
-|------|-------------------|
-| Public pages (exhaustive) | `visual-exhaustive-public-*.spec.ts` (100 assertions) |
-| Dashboard (exhaustive) | `visual-exhaustive-dashboard-*.spec.ts` (100 assertions) |
-| Admin (exhaustive) | `visual-exhaustive-admin-*.spec.ts` (100 assertions) |
-| Learning (exhaustive) | `visual-exhaustive-learning-*.spec.ts` (100 assertions) |
-| Route coverage | `visual-routes-*.spec.ts` |
-| Dark mode | `visual-dark-mode-*.spec.ts` |
-| RTL layout | `visual-rtl-*.spec.ts` |
-| Accessibility | `visual-a11y-*.spec.ts` |
-| User interactions | `visual-interactions-*.spec.ts` |
-| User flows | `visual-flow-*.spec.ts` |
-| Charts & data-viz | `visual-charts-*.spec.ts` |
-| Regression guards | `visual-regression-*.spec.ts` |
-| Viewport matrix | `visual-viewport-matrix-*.spec.ts` |
-| Cross-browser | `visual-cross-browser-*.spec.ts` |
+| Area                      | Spec file patterns                                       |
+| ------------------------- | -------------------------------------------------------- |
+| Public pages (exhaustive) | `visual-exhaustive-public-*.spec.ts` (100 assertions)    |
+| Dashboard (exhaustive)    | `visual-exhaustive-dashboard-*.spec.ts` (100 assertions) |
+| Admin (exhaustive)        | `visual-exhaustive-admin-*.spec.ts` (100 assertions)     |
+| Learning (exhaustive)     | `visual-exhaustive-learning-*.spec.ts` (100 assertions)  |
+| Route coverage            | `visual-routes-*.spec.ts`                                |
+| Dark mode                 | `visual-dark-mode-*.spec.ts`                             |
+| RTL layout                | `visual-rtl-*.spec.ts`                                   |
+| Accessibility             | `visual-a11y-*.spec.ts`                                  |
+| User interactions         | `visual-interactions-*.spec.ts`                          |
+| User flows                | `visual-flow-*.spec.ts`                                  |
+| Charts & data-viz         | `visual-charts-*.spec.ts`                                |
+| Regression guards         | `visual-regression-*.spec.ts`                            |
+| Viewport matrix           | `visual-viewport-matrix-*.spec.ts`                       |
+| Cross-browser             | `visual-cross-browser-*.spec.ts`                         |
 
 ### Documentation
 
@@ -171,6 +171,7 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 **Problem:** All RAG components exist individually (pgvector schema, HNSW index SQL, Apache AGE graph, HybridRAG engine, NATS consumers, LLM integration) but they are NOT wired together. Content is not indexed, HNSW indexes are not applied, knowledge graph stays empty, seed data has no embeddings, and `findRelatedConcepts()` returns `[]`.
 
 **5 Work Items:**
+
 1. **WI-1: HNSW Index Migration** — Create Drizzle migration for 4 HNSW indexes (currently standalone SQL, not in migration runner) ✅
 2. **WI-2: Content Indexing Pipeline** — Wire PDF/Image/Video upload → chunking → embedding as automated pipeline ✅
 3. **WI-3: NATS Concept Publisher** — Bridge content uploads → NER extraction → `EDUSPHERE.content.*.ner.extracted` → Apache AGE graph ✅
@@ -178,6 +179,7 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 5. **WI-5: Transcript→KnowledgeSource Bridge + Graph Traversal** — Auto-create knowledge_sources for transcripts; implement `findRelatedConcepts()` with Apache AGE Cypher ✅
 
 **Solution (Sprint 1):**
+
 - HNSW indexes applied via Drizzle migration `0042_transcript_knowledge_bridge.sql`
 - Content ingestion pipeline wired for PDF, URL, YouTube, and Text source types
 - NATS concept extraction publisher bridges content uploads to Apache AGE graph
@@ -188,27 +190,27 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 
 **Files created/modified:**
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `packages/db/src/migrations/0042_transcript_knowledge_bridge.sql` | NEW | HNSW index migration + transcript-knowledge bridge tables |
-| `packages/db/src/seed/seed-embeddings.ts` | NEW | Pre-computed seed embeddings for demo content |
-| `packages/db/src/schema/knowledge-sources.ts` | MODIFIED | Knowledge source schema updates for bridge |
-| `packages/db/src/seed.ts` | MODIFIED | Wire seed-embeddings into seed runner |
-| `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` | MODIFIED | Content indexing pipeline (PDF, URL, YouTube, Text) |
-| `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts` | NEW | NATS publisher for NER extraction events |
-| `apps/subgraph-knowledge/src/nats/transcript-bridge.consumer.ts` | NEW | Transcript-to-KnowledgeSource bridge consumer |
-| `apps/subgraph-knowledge/src/sources/knowledge-source.graphql` | MODIFIED | SDL updates for reindex mutation + ReindexResult type |
-| `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.ts` | MODIFIED | Resolver for reindexCourseEmbeddings |
-| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts` | MODIFIED | Service logic for embedding reindex + graph traversal |
-| `apps/web/src/components/source-manager/SourceManager.tsx` | MODIFIED | Source manager UI updates for new source types |
-| `apps/web/src/pages/search/SearchPage.tsx` | MODIFIED | Search page wired to vector search backend |
-| `apps/web/src/pages/content-viewer/AiChatPanel.tsx` | MODIFIED | AI chat panel uses RAG context |
-| `apps/web/src/pages/admin/EmbeddingDashboardPage.tsx` | NEW | Admin embedding dashboard page |
-| `apps/web/src/pages/admin/EmbeddingDashboardPage.stats.tsx` | NEW | Embedding stats component |
-| `apps/web/src/lib/graphql/embedding.queries.ts` | NEW | GraphQL queries for embedding operations |
-| `apps/web/src/lib/graphql/agent.queries.ts` | MODIFIED | Agent queries updated for RAG integration |
-| `apps/web/src/lib/routes/admin-routes.tsx` | MODIFIED | Admin routes — added /admin/embeddings |
-| `apps/web/src/components/admin/AdminSidebar.tsx` | MODIFIED | Sidebar — added Embeddings nav item |
+| File                                                                         | Status   | Purpose                                                   |
+| ---------------------------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| `packages/db/src/migrations/0042_transcript_knowledge_bridge.sql`            | NEW      | HNSW index migration + transcript-knowledge bridge tables |
+| `packages/db/src/seed/seed-embeddings.ts`                                    | NEW      | Pre-computed seed embeddings for demo content             |
+| `packages/db/src/schema/knowledge-sources.ts`                                | MODIFIED | Knowledge source schema updates for bridge                |
+| `packages/db/src/seed.ts`                                                    | MODIFIED | Wire seed-embeddings into seed runner                     |
+| `apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts` | MODIFIED | Content indexing pipeline (PDF, URL, YouTube, Text)       |
+| `apps/subgraph-knowledge/src/nats/concept-extraction-publisher.service.ts`   | NEW      | NATS publisher for NER extraction events                  |
+| `apps/subgraph-knowledge/src/nats/transcript-bridge.consumer.ts`             | NEW      | Transcript-to-KnowledgeSource bridge consumer             |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.graphql`               | MODIFIED | SDL updates for reindex mutation + ReindexResult type     |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.ts`           | MODIFIED | Resolver for reindexCourseEmbeddings                      |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts`            | MODIFIED | Service logic for embedding reindex + graph traversal     |
+| `apps/web/src/components/source-manager/SourceManager.tsx`                   | MODIFIED | Source manager UI updates for new source types            |
+| `apps/web/src/pages/search/SearchPage.tsx`                                   | MODIFIED | Search page wired to vector search backend                |
+| `apps/web/src/pages/content-viewer/AiChatPanel.tsx`                          | MODIFIED | AI chat panel uses RAG context                            |
+| `apps/web/src/pages/admin/EmbeddingDashboardPage.tsx`                        | NEW      | Admin embedding dashboard page                            |
+| `apps/web/src/pages/admin/EmbeddingDashboardPage.stats.tsx`                  | NEW      | Embedding stats component                                 |
+| `apps/web/src/lib/graphql/embedding.queries.ts`                              | NEW      | GraphQL queries for embedding operations                  |
+| `apps/web/src/lib/graphql/agent.queries.ts`                                  | MODIFIED | Agent queries updated for RAG integration                 |
+| `apps/web/src/lib/routes/admin-routes.tsx`                                   | MODIFIED | Admin routes — added /admin/embeddings                    |
+| `apps/web/src/components/admin/AdminSidebar.tsx`                             | MODIFIED | Sidebar — added Embeddings nav item                       |
 
 **Tests added:** 125 unit tests + 96 security tests + E2E spec
 **E2E spec:** `apps/web/e2e/rag-activation.spec.ts`
@@ -226,18 +228,21 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 **Problem:** Web app had 57% test file coverage (474/831 files), 50 failing tests, and many critical components untested (exam engine, onboarding, merge-queue, pipeline, SEO, etc.)
 
 **Solution — 4-wave parallel execution:**
+
 - **Wave 1:** Fixed 50 failing tests + wrote 346 new tests for exam/ (13 files), onboarding/ (4), merge-queue/ (3), 22 untested pages
 - **Wave 2:** 393 new tests for components (quiz-builder, peer-matching, seo, landing, source-manager, gdpr, skills, investor, pipeline, analytics, content-import, partners, social, standalone components)
 - **Wave 3:** 96 new tests for hooks (6), contexts (1), providers (2), utils (1), lib utilities (3)
 - **Wave 4:** Cleaned 10 duplicate test files, verified full suite passes
 
 **Results:**
+
 - Tests: 474 → 5,236 (all passing, 0 failures)
 - Test files: 474 → 569+
 - TypeScript: 0 errors (strict mode)
 - Coverage: 57% → estimated 95%+ (file-level)
 
 **Test files created (key additions):**
+
 - `components/exam/*.test.tsx` (13 files)
 - `components/onboarding/*.test.tsx` (4 files)
 - `components/merge-queue/*.test.tsx` (3 files)
@@ -261,6 +266,7 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 **Problem:** Web app unit test file coverage was at 74% (approximately 632/849 source files had corresponding test files). Major gaps in lib/graphql (0%), lib/routes (0%), components/ui (13%).
 
 **Solution — 3-wave parallel execution:**
+
 - **Wave 1 (3 Leads):** lib/graphql 68 files 337 tests, components/ui 28 files 251 tests, lib/routes 10 files 123 tests
 - **Wave 2 (3 Leads):** Pages <80% 23 files 99 tests, Components <80% 16 files 145 tests, lib/ remaining 5 files 51 tests
 - **Wave 3 (2 Agents):** Hooks 11 files 117 tests, Remotion+misc 16 files 106 tests
@@ -268,6 +274,7 @@ Expanded visual regression testing from 499 to 2,054 `toHaveScreenshot` assertio
 **Result:** 177 new test files, 1,229 new tests, coverage 74% → 98.4%
 
 **Test files:** See `apps/web/src/**/*.test.{ts,tsx}` (177 new files across all directories including):
+
 - `src/lib/graphql/*.test.ts` (68 files — all GraphQL operation modules)
 - `src/lib/routes/*.test.tsx` (10 files — all route modules)
 - `src/components/ui/*.test.tsx` (28 files — all shadcn/ui components)
@@ -290,154 +297,168 @@ Self-service organization onboarding with provisioning pipeline, user invitation
 
 ### Scope
 
-| Category | Count | Details |
-|----------|-------|---------|
-| DB tables | 11 | `onboarding_checklist`, `org_invitations`, `course_licenses`, `api_keys`, `webhook_endpoints`, `gamification_config`, `marketplace_listings`, `tenant_audit_log`, `org_badges`, `custom_domains`, `welcome_message` |
-| Migrations | 4 | `0036_org_onboarding.sql`, `0037_audit_log_and_badges.sql`, `0038_custom_domains.sql`, `0039_welcome_message.sql` |
-| GraphQL SDL | 2 | `org-onboarding.graphql` (Core), `marketplace-org.graphql` (Content) |
-| Mutations | 18 | createOrganization, inviteUser, acceptInvitation, revokeInvitation, updateMemberRole, removeMember, createApiKey, revokeApiKey, createWebhook, updateWebhook, deleteWebhook, testWebhook, licenseCourse, revokeCourseLicense, updateGamificationConfig, exportAnalytics, publishToMarketplace, unpublishFromMarketplace |
-| Queries | 12 | myOrganization, orgMembers, orgInvitations, trialStatus, apiKeys, webhooks, webhookDeliveries, courseLicenses, gamificationConfig, orgAnalytics, marketplaceListings, marketplaceListing |
-| NestJS services | 28 | OrgProvisioningService, OrgInvitationService, OrgLicensingService, OrgOnboardingResolver, MarketplaceOrgService, MarketplaceOrgResolver, OrgBadgeService, BadgeAutoAwardService, AtRiskLearnerService, AnalyticsSnapshotCron, AnalyticsExportController, DomainProvisioningService, MarketplaceCheckoutService, MarketplacePayoutService, CourseCopyService, AuditLogInterceptor, + Zod schemas, module wiring |
-| React pages | 32 | OrgSignupWizard (3 steps), TeamManagement, ApiKeysPage, WebhooksPage, GamificationConfig, AnalyticsDashboard, MarketplaceBrowse, OrgCatalog, BillingPage, SsoConfigPage, ThemeProvider, StepIndicator, SlugField, BadgeAutoAwardEditor, LearnerDetailPanel, DomainConfigPage, MarketplacePurchases, MarketplaceSuccess, BrandedLoginPage |
-| New packages | 1 | `packages/dns-provider/` (DNS provisioning abstraction) |
-| Mobile services | 2 | push-notifications, offline-db + eas.json org-build profile |
-| i18n namespaces | 7 x 10 locales = 70 files | orgOnboarding, orgAdmin, orgBranding, orgMarketplace, orgAnalytics, orgGamification, orgApi |
-| Security tests | 201+ | RLS isolation, rate limiting, CSRF, GDPR erasure, cross-tenant isolation, RLS completeness audit |
-| QA tests | ~300+ | Unit tests + E2E (org-signup-wizard.spec.ts, org-i18n-pages.spec.ts, branded-login.spec.ts) |
-| Features complete | 15/15 | F-01 through F-15 — all waves delivered |
+| Category          | Count                     | Details                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DB tables         | 11                        | `onboarding_checklist`, `org_invitations`, `course_licenses`, `api_keys`, `webhook_endpoints`, `gamification_config`, `marketplace_listings`, `tenant_audit_log`, `org_badges`, `custom_domains`, `welcome_message`                                                                                                                                                                                            |
+| Migrations        | 4                         | `0036_org_onboarding.sql`, `0037_audit_log_and_badges.sql`, `0038_custom_domains.sql`, `0039_welcome_message.sql`                                                                                                                                                                                                                                                                                              |
+| GraphQL SDL       | 2                         | `org-onboarding.graphql` (Core), `marketplace-org.graphql` (Content)                                                                                                                                                                                                                                                                                                                                           |
+| Mutations         | 18                        | createOrganization, inviteUser, acceptInvitation, revokeInvitation, updateMemberRole, removeMember, createApiKey, revokeApiKey, createWebhook, updateWebhook, deleteWebhook, testWebhook, licenseCourse, revokeCourseLicense, updateGamificationConfig, exportAnalytics, publishToMarketplace, unpublishFromMarketplace                                                                                        |
+| Queries           | 12                        | myOrganization, orgMembers, orgInvitations, trialStatus, apiKeys, webhooks, webhookDeliveries, courseLicenses, gamificationConfig, orgAnalytics, marketplaceListings, marketplaceListing                                                                                                                                                                                                                       |
+| NestJS services   | 28                        | OrgProvisioningService, OrgInvitationService, OrgLicensingService, OrgOnboardingResolver, MarketplaceOrgService, MarketplaceOrgResolver, OrgBadgeService, BadgeAutoAwardService, AtRiskLearnerService, AnalyticsSnapshotCron, AnalyticsExportController, DomainProvisioningService, MarketplaceCheckoutService, MarketplacePayoutService, CourseCopyService, AuditLogInterceptor, + Zod schemas, module wiring |
+| React pages       | 32                        | OrgSignupWizard (3 steps), TeamManagement, ApiKeysPage, WebhooksPage, GamificationConfig, AnalyticsDashboard, MarketplaceBrowse, OrgCatalog, BillingPage, SsoConfigPage, ThemeProvider, StepIndicator, SlugField, BadgeAutoAwardEditor, LearnerDetailPanel, DomainConfigPage, MarketplacePurchases, MarketplaceSuccess, BrandedLoginPage                                                                       |
+| New packages      | 1                         | `packages/dns-provider/` (DNS provisioning abstraction)                                                                                                                                                                                                                                                                                                                                                        |
+| Mobile services   | 2                         | push-notifications, offline-db + eas.json org-build profile                                                                                                                                                                                                                                                                                                                                                    |
+| i18n namespaces   | 7 x 10 locales = 70 files | orgOnboarding, orgAdmin, orgBranding, orgMarketplace, orgAnalytics, orgGamification, orgApi                                                                                                                                                                                                                                                                                                                    |
+| Security tests    | 201+                      | RLS isolation, rate limiting, CSRF, GDPR erasure, cross-tenant isolation, RLS completeness audit                                                                                                                                                                                                                                                                                                               |
+| QA tests          | ~300+                     | Unit tests + E2E (org-signup-wizard.spec.ts, org-i18n-pages.spec.ts, branded-login.spec.ts)                                                                                                                                                                                                                                                                                                                    |
+| Features complete | 15/15                     | F-01 through F-15 — all waves delivered                                                                                                                                                                                                                                                                                                                                                                        |
 
 ### Key Files Created
 
 #### Database
-| File | Purpose |
-|------|---------|
-| `packages/db/src/migrations/0036_org_onboarding.sql` | 7 new tables with RLS policies |
-| `packages/db/src/migrations/0036_org_onboarding_down.rollback` | Rollback migration |
-| `packages/db/src/schema/onboarding-checklist.ts` | Drizzle schema for onboarding checklist |
-| `packages/db/src/schema/org-invitations.ts` | Drizzle schema for invitations |
-| `packages/db/src/schema/api-keys.ts` | Drizzle schema for API keys |
-| `packages/db/src/schema/webhook-endpoints.ts` | Drizzle schema for webhooks |
-| `packages/db/src/schema/course-licenses.ts` | Drizzle schema for course licenses |
-| `packages/db/src/schema/gamification-config.ts` | Drizzle schema for gamification config |
-| `packages/db/src/schema/marketplace.ts` | Drizzle schema for marketplace listings |
+
+| File                                                           | Purpose                                 |
+| -------------------------------------------------------------- | --------------------------------------- |
+| `packages/db/src/migrations/0036_org_onboarding.sql`           | 7 new tables with RLS policies          |
+| `packages/db/src/migrations/0036_org_onboarding_down.rollback` | Rollback migration                      |
+| `packages/db/src/schema/onboarding-checklist.ts`               | Drizzle schema for onboarding checklist |
+| `packages/db/src/schema/org-invitations.ts`                    | Drizzle schema for invitations          |
+| `packages/db/src/schema/api-keys.ts`                           | Drizzle schema for API keys             |
+| `packages/db/src/schema/webhook-endpoints.ts`                  | Drizzle schema for webhooks             |
+| `packages/db/src/schema/course-licenses.ts`                    | Drizzle schema for course licenses      |
+| `packages/db/src/schema/gamification-config.ts`                | Drizzle schema for gamification config  |
+| `packages/db/src/schema/marketplace.ts`                        | Drizzle schema for marketplace listings |
 
 #### Backend (Core Subgraph)
-| File | Purpose |
-|------|---------|
-| `apps/subgraph-core/src/tenant/org-onboarding.graphql` | SDL — 18 mutations, 10 queries, 20+ types |
-| `apps/subgraph-core/src/tenant/org-onboarding.resolver.ts` | Resolver wiring |
-| `apps/subgraph-core/src/tenant/org-onboarding.schemas.ts` | Zod validation schemas |
-| `apps/subgraph-core/src/tenant/org-provisioning.service.ts` | 8-step provisioning pipeline |
-| `apps/subgraph-core/src/tenant/org-invitation.service.ts` | Invitation CRUD + token validation |
-| `apps/subgraph-core/src/tenant/org-licensing.service.ts` | Course licensing + seat management |
+
+| File                                                        | Purpose                                   |
+| ----------------------------------------------------------- | ----------------------------------------- |
+| `apps/subgraph-core/src/tenant/org-onboarding.graphql`      | SDL — 18 mutations, 10 queries, 20+ types |
+| `apps/subgraph-core/src/tenant/org-onboarding.resolver.ts`  | Resolver wiring                           |
+| `apps/subgraph-core/src/tenant/org-onboarding.schemas.ts`   | Zod validation schemas                    |
+| `apps/subgraph-core/src/tenant/org-provisioning.service.ts` | 8-step provisioning pipeline              |
+| `apps/subgraph-core/src/tenant/org-invitation.service.ts`   | Invitation CRUD + token validation        |
+| `apps/subgraph-core/src/tenant/org-licensing.service.ts`    | Course licensing + seat management        |
 
 #### Backend (Content Subgraph)
-| File | Purpose |
-|------|---------|
-| `apps/subgraph-content/src/marketplace/marketplace-org.graphql` | SDL — 2 mutations, 2 queries |
-| `apps/subgraph-content/src/marketplace/marketplace-org.resolver.ts` | Marketplace resolver |
-| `apps/subgraph-content/src/marketplace/marketplace-org.service.ts` | Marketplace listing service |
+
+| File                                                                | Purpose                      |
+| ------------------------------------------------------------------- | ---------------------------- |
+| `apps/subgraph-content/src/marketplace/marketplace-org.graphql`     | SDL — 2 mutations, 2 queries |
+| `apps/subgraph-content/src/marketplace/marketplace-org.resolver.ts` | Marketplace resolver         |
+| `apps/subgraph-content/src/marketplace/marketplace-org.service.ts`  | Marketplace listing service  |
 
 #### Frontend
-| File | Purpose |
-|------|---------|
-| `apps/web/src/pages/signup/OrgSignupWizard.tsx` | 3-step signup wizard |
-| `apps/web/src/pages/signup/OrgSignupWizard.schema.ts` | Zod form validation |
-| `apps/web/src/pages/signup/StepIndicator.tsx` | Step progress indicator |
-| `apps/web/src/pages/signup/steps/AccountStep.tsx` | Admin account step |
-| `apps/web/src/pages/signup/steps/OrgDetailsStep.tsx` | Org name + slug step |
-| `apps/web/src/pages/signup/steps/BrandingStep.tsx` | Logo + color config step |
-| `apps/web/src/pages/signup/steps/SlugField.tsx` | Slug field with availability check |
-| `apps/web/src/pages/admin/TeamManagement.tsx` | Member list + role management |
-| `apps/web/src/pages/admin/TeamManagement.invites.tsx` | Invitation management |
-| `apps/web/src/pages/admin/ApiKeysPage.tsx` | API key management |
-| `apps/web/src/pages/admin/ApiKeysPage.table.tsx` | API key table component |
-| `apps/web/src/pages/admin/WebhooksPage.tsx` | Webhook endpoint management |
-| `apps/web/src/pages/admin/WebhooksPage.form.tsx` | Webhook form component |
-| `apps/web/src/pages/admin/GamificationConfig.tsx` | Gamification settings |
-| `apps/web/src/pages/admin/GamificationConfig.badges.tsx` | Badge configuration |
-| `apps/web/src/pages/admin/AnalyticsDashboard.tsx` | Org analytics dashboard |
-| `apps/web/src/pages/admin/MarketplaceBrowse.tsx` | Marketplace browser |
-| `apps/web/src/pages/admin/OrgCatalog.tsx` | Organization course catalog |
-| `apps/web/src/pages/admin/BillingPage.tsx` | Billing + plan management |
-| `apps/web/src/pages/admin/SsoConfigPage.tsx` | SSO/SAML configuration |
+
+| File                                                     | Purpose                            |
+| -------------------------------------------------------- | ---------------------------------- |
+| `apps/web/src/pages/signup/OrgSignupWizard.tsx`          | 3-step signup wizard               |
+| `apps/web/src/pages/signup/OrgSignupWizard.schema.ts`    | Zod form validation                |
+| `apps/web/src/pages/signup/StepIndicator.tsx`            | Step progress indicator            |
+| `apps/web/src/pages/signup/steps/AccountStep.tsx`        | Admin account step                 |
+| `apps/web/src/pages/signup/steps/OrgDetailsStep.tsx`     | Org name + slug step               |
+| `apps/web/src/pages/signup/steps/BrandingStep.tsx`       | Logo + color config step           |
+| `apps/web/src/pages/signup/steps/SlugField.tsx`          | Slug field with availability check |
+| `apps/web/src/pages/admin/TeamManagement.tsx`            | Member list + role management      |
+| `apps/web/src/pages/admin/TeamManagement.invites.tsx`    | Invitation management              |
+| `apps/web/src/pages/admin/ApiKeysPage.tsx`               | API key management                 |
+| `apps/web/src/pages/admin/ApiKeysPage.table.tsx`         | API key table component            |
+| `apps/web/src/pages/admin/WebhooksPage.tsx`              | Webhook endpoint management        |
+| `apps/web/src/pages/admin/WebhooksPage.form.tsx`         | Webhook form component             |
+| `apps/web/src/pages/admin/GamificationConfig.tsx`        | Gamification settings              |
+| `apps/web/src/pages/admin/GamificationConfig.badges.tsx` | Badge configuration                |
+| `apps/web/src/pages/admin/AnalyticsDashboard.tsx`        | Org analytics dashboard            |
+| `apps/web/src/pages/admin/MarketplaceBrowse.tsx`         | Marketplace browser                |
+| `apps/web/src/pages/admin/OrgCatalog.tsx`                | Organization course catalog        |
+| `apps/web/src/pages/admin/BillingPage.tsx`               | Billing + plan management          |
+| `apps/web/src/pages/admin/SsoConfigPage.tsx`             | SSO/SAML configuration             |
 
 #### Tests
-| File | Purpose |
-|------|---------|
-| `apps/web/e2e/org-signup-wizard.spec.ts` | E2E signup flow |
-| `apps/web/e2e/org-i18n-pages.spec.ts` | i18n regression for org pages |
-| `apps/web/src/components/org/OrgSignupWizard.test.tsx` | Unit tests |
-| `tests/security/org-onboarding-rls.spec.ts` | RLS isolation tests |
+
+| File                                                   | Purpose                        |
+| ------------------------------------------------------ | ------------------------------ |
+| `apps/web/e2e/org-signup-wizard.spec.ts`               | E2E signup flow                |
+| `apps/web/e2e/org-i18n-pages.spec.ts`                  | i18n regression for org pages  |
+| `apps/web/src/components/org/OrgSignupWizard.test.tsx` | Unit tests                     |
+| `tests/security/org-onboarding-rls.spec.ts`            | RLS isolation tests            |
 | `tests/security/org-onboarding-rate-csrf-gdpr.spec.ts` | Rate limit + CSRF + GDPR tests |
 
 #### Architecture
-| File | Purpose |
-|------|---------|
+
+| File                                                      | Purpose                  |
+| --------------------------------------------------------- | ------------------------ |
 | `docs/plans/features/FEAT-ORG-ONBOARDING-ARCHITECTURE.md` | Full architecture design |
-| `docs/plans/features/FEAT-ORG-ONBOARDING-ADMIN-GUIDE.md` | Admin guide |
+| `docs/plans/features/FEAT-ORG-ONBOARDING-ADMIN-GUIDE.md`  | Admin guide              |
 
 ### Wave 3-5 (22 Mar 2026) — Remaining Features
 
 #### F-10 Content Isolation Audit (`8f4d975f`)
-| File | Purpose |
-|------|---------|
-| `packages/db/src/migrations/0037_audit_log_and_badges.sql` | Audit log + badges tables |
-| `packages/db/src/schema/tenant-audit-log.ts` | Drizzle schema for tenant audit log |
-| `apps/subgraph-core/src/interceptors/audit-log.interceptor.ts` | Auto-capture mutation audit trail |
-| `tests/security/cross-tenant-isolation.spec.ts` | Cross-tenant isolation tests |
-| `tests/security/rls-completeness-audit.spec.ts` | RLS completeness audit across all tables |
+
+| File                                                           | Purpose                                  |
+| -------------------------------------------------------------- | ---------------------------------------- |
+| `packages/db/src/migrations/0037_audit_log_and_badges.sql`     | Audit log + badges tables                |
+| `packages/db/src/schema/tenant-audit-log.ts`                   | Drizzle schema for tenant audit log      |
+| `apps/subgraph-core/src/interceptors/audit-log.interceptor.ts` | Auto-capture mutation audit trail        |
+| `tests/security/cross-tenant-isolation.spec.ts`                | Cross-tenant isolation tests             |
+| `tests/security/rls-completeness-audit.spec.ts`                | RLS completeness audit across all tables |
 
 #### F-12 Per-Org Gamification (`8f4d975f`)
-| File | Purpose |
-|------|---------|
-| `apps/subgraph-core/src/gamification/org-badge.service.ts` | Org-scoped badge management |
+
+| File                                                              | Purpose                         |
+| ----------------------------------------------------------------- | ------------------------------- |
+| `apps/subgraph-core/src/gamification/org-badge.service.ts`        | Org-scoped badge management     |
 | `apps/subgraph-core/src/gamification/badge-auto-award.service.ts` | Automatic badge awarding engine |
-| `apps/web/src/pages/admin/BadgeAutoAwardEditor.tsx` | Admin UI for auto-award rules |
+| `apps/web/src/pages/admin/BadgeAutoAwardEditor.tsx`               | Admin UI for auto-award rules   |
 
 #### F-15 Org Analytics (`8f4d975f`)
-| File | Purpose |
-|------|---------|
-| `apps/subgraph-core/src/analytics/at-risk-learner.service.ts` | At-risk learner detection |
-| `apps/subgraph-core/src/analytics/analytics-snapshot.cron.ts` | Periodic analytics snapshot cron |
-| `apps/subgraph-core/src/analytics/analytics-export.controller.ts` | CSV/JSON analytics export |
-| `apps/web/src/pages/admin/LearnerDetailPanel.tsx` | Learner detail drill-down panel |
+
+| File                                                              | Purpose                          |
+| ----------------------------------------------------------------- | -------------------------------- |
+| `apps/subgraph-core/src/analytics/at-risk-learner.service.ts`     | At-risk learner detection        |
+| `apps/subgraph-core/src/analytics/analytics-snapshot.cron.ts`     | Periodic analytics snapshot cron |
+| `apps/subgraph-core/src/analytics/analytics-export.controller.ts` | CSV/JSON analytics export        |
+| `apps/web/src/pages/admin/LearnerDetailPanel.tsx`                 | Learner detail drill-down panel  |
 
 #### F-03 Subdomain Provisioning (`058c0b4c`)
-| File | Purpose |
-|------|---------|
-| `packages/dns-provider/` | New package — DNS provisioning abstraction (mock + real providers) |
-| `packages/db/src/migrations/0038_custom_domains.sql` | Custom domains table |
-| `apps/subgraph-core/src/tenant/domain-provisioning.service.ts` | Domain verification + SSL provisioning |
-| `apps/web/src/pages/admin/DomainConfigPage.tsx` | Admin domain configuration UI |
+
+| File                                                           | Purpose                                                            |
+| -------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `packages/dns-provider/`                                       | New package — DNS provisioning abstraction (mock + real providers) |
+| `packages/db/src/migrations/0038_custom_domains.sql`           | Custom domains table                                               |
+| `apps/subgraph-core/src/tenant/domain-provisioning.service.ts` | Domain verification + SSL provisioning                             |
+| `apps/web/src/pages/admin/DomainConfigPage.tsx`                | Admin domain configuration UI                                      |
 
 #### F-14 Content Marketplace (`058c0b4c`)
-| File | Purpose |
-|------|---------|
-| `apps/subgraph-core/src/marketplace/marketplace-checkout.service.ts` | Checkout flow + Stripe integration |
-| `apps/subgraph-core/src/marketplace/marketplace-payout.service.ts` | Seller payout management |
-| `apps/subgraph-content/src/marketplace/course-copy.service.ts` | Deep-copy course on license purchase |
-| `apps/web/src/pages/admin/MarketplacePurchases.tsx` | Purchase history admin page |
-| `apps/web/src/pages/admin/MarketplaceSuccess.tsx` | Post-purchase success page |
+
+| File                                                                 | Purpose                              |
+| -------------------------------------------------------------------- | ------------------------------------ |
+| `apps/subgraph-core/src/marketplace/marketplace-checkout.service.ts` | Checkout flow + Stripe integration   |
+| `apps/subgraph-core/src/marketplace/marketplace-payout.service.ts`   | Seller payout management             |
+| `apps/subgraph-content/src/marketplace/course-copy.service.ts`       | Deep-copy course on license purchase |
+| `apps/web/src/pages/admin/MarketplacePurchases.tsx`                  | Purchase history admin page          |
+| `apps/web/src/pages/admin/MarketplaceSuccess.tsx`                    | Post-purchase success page           |
 
 #### F-09 Branded Login Page (`058c0b4c`)
-| File | Purpose |
-|------|---------|
-| `packages/db/src/migrations/0039_welcome_message.sql` | Welcome message table |
-| `apps/web/src/pages/auth/BrandedLoginPage.tsx` | Org-branded login page with custom logo/colors |
-| `apps/web/e2e/branded-login.spec.ts` | E2E test for branded login |
+
+| File                                                  | Purpose                                        |
+| ----------------------------------------------------- | ---------------------------------------------- |
+| `packages/db/src/migrations/0039_welcome_message.sql` | Welcome message table                          |
+| `apps/web/src/pages/auth/BrandedLoginPage.tsx`        | Org-branded login page with custom logo/colors |
+| `apps/web/e2e/branded-login.spec.ts`                  | E2E test for branded login                     |
 
 #### F-11 White-Label Mobile (`058c0b4c`)
-| File | Purpose |
-|------|---------|
-| `apps/mobile/src/services/push-notifications.ts` | Push notification service |
-| `apps/mobile/src/services/offline-db.ts` | Offline SQLite database service |
-| `apps/mobile/eas.json` | EAS Build org-build profile |
-| `scripts/build-org-app.sh` | Org-branded mobile app build script |
+
+| File                                             | Purpose                             |
+| ------------------------------------------------ | ----------------------------------- |
+| `apps/mobile/src/services/push-notifications.ts` | Push notification service           |
+| `apps/mobile/src/services/offline-db.ts`         | Offline SQLite database service     |
+| `apps/mobile/eas.json`                           | EAS Build org-build profile         |
+| `scripts/build-org-app.sh`                       | Org-branded mobile app build script |
 
 #### Wave 0 — Trial Period Update
-| File | Purpose |
-|------|---------|
+
+| File                                                        | Purpose            |
+| ----------------------------------------------------------- | ------------------ |
 | `apps/subgraph-core/src/tenant/org-provisioning.service.ts` | TRIAL_DAYS 14 → 90 |
 
 ### Anti-Recurrence
@@ -485,22 +506,22 @@ After clicking "Delete Course" and confirming the dialog, the course is not remo
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/lib/urql-client.ts` | Added graphcache invalidation rules for `deleteCourse` and `createCourse` mutations |
-| `apps/web/src/pages/course-list/useCourseListData.ts` | Added navigation state detection (`deleted: true`) to trigger network-only refetch |
-| `apps/web/src/pages/course-detail/CourseHeaderCard.tsx` | Pass `{ deleted: true }` in navigate state after delete; show success toast |
-| `apps/web/src/pages/CourseEditPage.tsx` | Aligned with updated deletion flow |
-| `apps/web/src/pages/CourseList.test.tsx` | Added regression tests for cache invalidation and post-delete list update |
-| 10 i18n locale files (`packages/i18n/src/locales/*/courses.json`) | Added `courseDeletedSuccess` key |
+| File                                                              | Change                                                                              |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `apps/web/src/lib/urql-client.ts`                                 | Added graphcache invalidation rules for `deleteCourse` and `createCourse` mutations |
+| `apps/web/src/pages/course-list/useCourseListData.ts`             | Added navigation state detection (`deleted: true`) to trigger network-only refetch  |
+| `apps/web/src/pages/course-detail/CourseHeaderCard.tsx`           | Pass `{ deleted: true }` in navigate state after delete; show success toast         |
+| `apps/web/src/pages/CourseEditPage.tsx`                           | Aligned with updated deletion flow                                                  |
+| `apps/web/src/pages/CourseList.test.tsx`                          | Added regression tests for cache invalidation and post-delete list update           |
+| 10 i18n locale files (`packages/i18n/src/locales/*/courses.json`) | Added `courseDeletedSuccess` key                                                    |
 
 ### Tests
 
-| Test Type | Count | Status |
-|-----------|-------|--------|
-| Frontend unit (CourseList.test.tsx) | Regression tests added | ✅ Passing |
-| E2E (Playwright) | — | ⏳ Pending |
-| **Total** | **Regression tests passing** | **✅ Fixed** |
+| Test Type                           | Count                        | Status       |
+| ----------------------------------- | ---------------------------- | ------------ |
+| Frontend unit (CourseList.test.tsx) | Regression tests added       | ✅ Passing   |
+| E2E (Playwright)                    | —                            | ⏳ Pending   |
+| **Total**                           | **Regression tests passing** | **✅ Fixed** |
 
 ### Anti-Recurrence
 
@@ -531,18 +552,18 @@ Added `DeleteCourseButton` import and conditional render to `CourseHeaderCard.ts
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/course-detail/CourseHeaderCard.tsx` | Added `DeleteCourseButton` import + conditional render with role guard |
-| `apps/web/src/pages/CourseDetailPage.test.tsx` | Added 3 regression tests: button visible for INSTRUCTOR, hidden for STUDENT, navigation after delete |
+| File                                                    | Change                                                                                               |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `apps/web/src/pages/course-detail/CourseHeaderCard.tsx` | Added `DeleteCourseButton` import + conditional render with role guard                               |
+| `apps/web/src/pages/CourseDetailPage.test.tsx`          | Added 3 regression tests: button visible for INSTRUCTOR, hidden for STUDENT, navigation after delete |
 
 ### Tests
 
-| Test Type | Count | Status |
-|-----------|-------|--------|
-| Frontend unit (CourseDetailPage.test.tsx) | 3 | ✅ All passing |
-| E2E (Playwright) | — | ⏳ Pending |
-| **Total** | **3** | **✅ 3/3 pass (E2E pending)** |
+| Test Type                                 | Count | Status                        |
+| ----------------------------------------- | ----- | ----------------------------- |
+| Frontend unit (CourseDetailPage.test.tsx) | 3     | ✅ All passing                |
+| E2E (Playwright)                          | —     | ⏳ Pending                    |
+| **Total**                                 | **3** | **✅ 3/3 pass (E2E pending)** |
 
 ### Anti-Recurrence
 
@@ -581,21 +602,21 @@ Clicking "מחק קורס" (delete course) sends a GraphQL mutation that returns
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/course/DeleteCourseDialog.tsx` | Removed conflicting manual aria attributes (`role`, `aria-modal`, `aria-labelledby`) |
-| `apps/subgraph-content/src/course/course.resolver.spec.ts` | Fixed assertion signatures, added 2 missing constructor mocks, added 3 new tests |
-| `apps/gateway/supergraph.graphql` | Added `courseEnrollmentCount` query, `courseReadiness` query, `CourseReadiness` and `CourseReadinessCheck` types |
+| File                                                       | Change                                                                                                           |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/course/DeleteCourseDialog.tsx`    | Removed conflicting manual aria attributes (`role`, `aria-modal`, `aria-labelledby`)                             |
+| `apps/subgraph-content/src/course/course.resolver.spec.ts` | Fixed assertion signatures, added 2 missing constructor mocks, added 3 new tests                                 |
+| `apps/gateway/supergraph.graphql`                          | Added `courseEnrollmentCount` query, `courseReadiness` query, `CourseReadiness` and `CourseReadinessCheck` types |
 
 ### Tests
 
-| Test Type | Count | Status |
-|-----------|-------|--------|
-| Backend unit (course.resolver.spec.ts) | 27 | ✅ All passing |
-| Frontend unit (DeleteCourseDialog.test.tsx) | 11 | ✅ All passing |
-| Frontend unit (DeleteCourseButton.test.tsx) | 4 | ✅ All passing |
-| E2E (Playwright) | — | ⏳ Pending |
-| **Total** | **42** | **✅ 42/42 pass (E2E pending)** |
+| Test Type                                   | Count  | Status                          |
+| ------------------------------------------- | ------ | ------------------------------- |
+| Backend unit (course.resolver.spec.ts)      | 27     | ✅ All passing                  |
+| Frontend unit (DeleteCourseDialog.test.tsx) | 11     | ✅ All passing                  |
+| Frontend unit (DeleteCourseButton.test.tsx) | 4      | ✅ All passing                  |
+| E2E (Playwright)                            | —      | ⏳ Pending                      |
+| **Total**                                   | **42** | **✅ 42/42 pass (E2E pending)** |
 
 ### Anti-Recurrence
 
@@ -627,17 +648,17 @@ The Challenges page fails to load with a GraphQL 400 Bad Request error. The fron
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
+| File                                                       | Change                                                        |
+| ---------------------------------------------------------- | ------------------------------------------------------------- |
 | `apps/subgraph-core/src/challenges/challenges.resolver.ts` | Wrapped return in Connection format, added date serialization |
 
 ### Tests
 
-| Test Type | Count | Status |
-|-----------|-------|--------|
-| Backend unit/integration | 10 | ✅ All passing |
-| Frontend unit | 5 | ✅ All passing |
-| **Total** | **15** | **✅ 15/15 pass** |
+| Test Type                | Count  | Status            |
+| ------------------------ | ------ | ----------------- |
+| Backend unit/integration | 10     | ✅ All passing    |
+| Frontend unit            | 5      | ✅ All passing    |
+| **Total**                | **15** | **✅ 15/15 pass** |
 
 ### Anti-Recurrence
 
@@ -684,22 +705,22 @@ Pages were created with hardcoded English strings instead of using `useTranslati
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/GroupChallengesPage.tsx` | Added `useTranslation('gamification')`, replaced hardcoded strings |
-| `apps/web/src/pages/ChallengeDetailPage.tsx` | Added `useTranslation('gamification')`, replaced hardcoded strings |
-| `apps/web/src/pages/PeerMatchingPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
-| `apps/web/src/pages/PeerReviewPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
-| `apps/web/src/pages/DiscussionsPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
-| `apps/web/src/pages/MentorDiscoveryPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings |
-| `apps/web/src/pages/ChavrutaPage.tsx` | Added `useTranslation('collaboration')`, replaced hardcoded strings |
-| 30 locale JSON files | Updated across 10 locales (`gamification.json`, `social.json`, `collaboration.json`) |
+| File                                         | Change                                                                               |
+| -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `apps/web/src/pages/GroupChallengesPage.tsx` | Added `useTranslation('gamification')`, replaced hardcoded strings                   |
+| `apps/web/src/pages/ChallengeDetailPage.tsx` | Added `useTranslation('gamification')`, replaced hardcoded strings                   |
+| `apps/web/src/pages/PeerMatchingPage.tsx`    | Added `useTranslation('social')`, replaced hardcoded strings                         |
+| `apps/web/src/pages/PeerReviewPage.tsx`      | Added `useTranslation('social')`, replaced hardcoded strings                         |
+| `apps/web/src/pages/DiscussionsPage.tsx`     | Added `useTranslation('social')`, replaced hardcoded strings                         |
+| `apps/web/src/pages/MentorDiscoveryPage.tsx` | Added `useTranslation('social')`, replaced hardcoded strings                         |
+| `apps/web/src/pages/ChavrutaPage.tsx`        | Added `useTranslation('collaboration')`, replaced hardcoded strings                  |
+| 30 locale JSON files                         | Updated across 10 locales (`gamification.json`, `social.json`, `collaboration.json`) |
 
 ### Tests
 
-| Test File | Count | Status |
-|-----------|-------|--------|
-| `GroupChallengesPage.test.tsx` | 5 | ✅ All passing |
+| Test File                      | Count | Status         |
+| ------------------------------ | ----- | -------------- |
+| `GroupChallengesPage.test.tsx` | 5     | ✅ All passing |
 
 ### Anti-Recurrence
 
@@ -722,6 +743,7 @@ On the course edit page, when a user opens the "מקורות מידע" (Sources)
 ### Root Cause
 
 **Chain of failure:**
+
 1. Keycloak `init()` times out after 10s → `keycloak.token` is `undefined`
 2. `authHeaders()` in `urql-client.ts` returns empty headers (no `Authorization` header)
 3. GraphQL request reaches gateway without auth → subgraph resolver's `this.auth(ctx)` throws `UnauthorizedException`
@@ -735,51 +757,54 @@ On the course edit page, when a user opens the "מקורות מידע" (Sources)
 ### Discovery (3 Waves — 21 files affected)
 
 **Wave 1 (exact match — 4 files):**
+
 - `apps/web/src/components/source-manager/SourceManager.tsx` — query + delete mutation without `requireAuth()` guard
 - `apps/web/src/components/source-manager/SourceDetailDrawer.tsx` — query without `requireAuth()` guard
 - `apps/web/src/lib/urql-client.ts` — sends empty auth header when token is undefined
 - `apps/subgraph-knowledge/src/sources/knowledge-source.graphql` — 7 operations missing `@authenticated` directive
 
 **Wave 2 (similarity — 14 Dialog components):**
+
 - 14 Dialog components across the app missing `DialogDescription` for accessibility (a11y), found while fixing `AddSourceModal` conversion to Radix Dialog:
   - `ConsentDialog.tsx`, `CourseDeleteConfirmDialog.tsx`, `AiConsentDialog.tsx`, `PipelineConfigDialog.tsx`, `PortalBlockEditorDialog.tsx`, `ConfirmPublishDialog.tsx`, `CertificatePreviewDialog.tsx`, `ExamPreviewDialog.tsx`, `BadgePreviewDialog.tsx`, `CredentialVerifyDialog.tsx`, `ExamConfigDialog.tsx`, `TranscriptImportDialog.tsx`, `ScormPackageDialog.tsx`, `ComplianceReviewDialog.tsx`
 
 **Wave 3 (class of bug — missing error handling + auth middleware):**
+
 - `SourceManager.tsx` delete mutation — no `onError` handler (silent failure)
 - `SourceDetailDrawer.tsx` — no error state UI (loading forever on failure)
 - `urql-client.ts` gqlClient singleton — no auth middleware / no token refresh logic
 
 ### Fix Rounds (3 rounds)
 
-| Round | Scope | Details |
-|-------|-------|---------|
-| **Round 1** | Core fix — AddSourceModal + auth guards | Added `hasValidAuth()` and `requireAuth()` utility functions in `utils.ts`. Converted `AddSourceModal` from raw HTML to Radix Dialog. Expanded `getSourceErrorKey()` to handle auth-specific (`UNAUTHENTICATED`, `FORBIDDEN`) and network errors. Added auth guard to `useAddSourceMutations`. |
-| **Round 2** | Discovery fixes — SourceManager, SourceDetailDrawer, Dialogs | Added `requireAuth()` guard to SourceManager query + delete. Added `onError` handler to delete mutation. Added error state UI to SourceDetailDrawer. Fixed 14 Dialog components with missing `DialogDescription` (a11y). |
-| **Round 3** | Backend — GraphQL schema auth directives | Added `@authenticated` and `@requiresScopes(scopes: ["content:read"])` / `@requiresScopes(scopes: ["content:write"])` to all 7 operations in `knowledge-source.graphql`: `knowledgeSources` (query), `knowledgeSource` (query), `createKnowledgeSource`, `updateKnowledgeSource`, `deleteKnowledgeSource`, `ingestKnowledgeSource`, `knowledgeSourceIngestionStatus` |
+| Round       | Scope                                                        | Details                                                                                                                                                                                                                                                                                                                                                              |
+| ----------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Round 1** | Core fix — AddSourceModal + auth guards                      | Added `hasValidAuth()` and `requireAuth()` utility functions in `utils.ts`. Converted `AddSourceModal` from raw HTML to Radix Dialog. Expanded `getSourceErrorKey()` to handle auth-specific (`UNAUTHENTICATED`, `FORBIDDEN`) and network errors. Added auth guard to `useAddSourceMutations`.                                                                       |
+| **Round 2** | Discovery fixes — SourceManager, SourceDetailDrawer, Dialogs | Added `requireAuth()` guard to SourceManager query + delete. Added `onError` handler to delete mutation. Added error state UI to SourceDetailDrawer. Fixed 14 Dialog components with missing `DialogDescription` (a11y).                                                                                                                                             |
+| **Round 3** | Backend — GraphQL schema auth directives                     | Added `@authenticated` and `@requiresScopes(scopes: ["content:read"])` / `@requiresScopes(scopes: ["content:write"])` to all 7 operations in `knowledge-source.graphql`: `knowledgeSources` (query), `knowledgeSource` (query), `createKnowledgeSource`, `updateKnowledgeSource`, `deleteKnowledgeSource`, `ingestKnowledgeSource`, `knowledgeSourceIngestionStatus` |
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/source-manager/utils.ts` | NEW — `hasValidAuth()`, `requireAuth()`, `getSourceErrorKey()` |
-| `apps/web/src/components/source-manager/useAddSourceMutations.ts` | Auth guard before mutations, expanded error handling |
-| `apps/web/src/components/source-manager/AddSourceModal.tsx` | Converted to Radix Dialog, auth-aware error messages |
-| `apps/web/src/components/source-manager/SourceManager.tsx` | Auth guard on query + delete, `onError` handler on delete |
-| `apps/web/src/components/source-manager/SourceDetailDrawer.tsx` | Auth guard on query, error state UI |
-| `apps/web/src/components/source-manager/index.ts` | Barrel export updated |
-| `apps/web/src/components/ui/dialog.tsx` | Added `DialogDescription` export/helper |
-| `apps/subgraph-knowledge/src/sources/knowledge-source.graphql` | `@authenticated` + `@requiresScopes` on 7 operations |
-| 14 Dialog components (various) | Added `DialogDescription` for a11y compliance |
-| `packages/i18n/src/locales/en/content.json` | Auth error message keys |
-| `packages/i18n/src/locales/he/content.json` | Hebrew auth error message translations |
+| File                                                              | Change                                                         |
+| ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| `apps/web/src/components/source-manager/utils.ts`                 | NEW — `hasValidAuth()`, `requireAuth()`, `getSourceErrorKey()` |
+| `apps/web/src/components/source-manager/useAddSourceMutations.ts` | Auth guard before mutations, expanded error handling           |
+| `apps/web/src/components/source-manager/AddSourceModal.tsx`       | Converted to Radix Dialog, auth-aware error messages           |
+| `apps/web/src/components/source-manager/SourceManager.tsx`        | Auth guard on query + delete, `onError` handler on delete      |
+| `apps/web/src/components/source-manager/SourceDetailDrawer.tsx`   | Auth guard on query, error state UI                            |
+| `apps/web/src/components/source-manager/index.ts`                 | Barrel export updated                                          |
+| `apps/web/src/components/ui/dialog.tsx`                           | Added `DialogDescription` export/helper                        |
+| `apps/subgraph-knowledge/src/sources/knowledge-source.graphql`    | `@authenticated` + `@requiresScopes` on 7 operations           |
+| 14 Dialog components (various)                                    | Added `DialogDescription` for a11y compliance                  |
+| `packages/i18n/src/locales/en/content.json`                       | Auth error message keys                                        |
+| `packages/i18n/src/locales/he/content.json`                       | Hebrew auth error message translations                         |
 
 ### Tests
 
-| Test File | Type | Coverage |
-|-----------|------|----------|
-| Unit tests for `utils.ts` | Unit | `hasValidAuth()`, `requireAuth()`, `getSourceErrorKey()` — all error code paths |
-| Unit tests for `useAddSourceMutations.ts` | Unit | Auth guard blocks mutation when token missing |
-| E2E Playwright test | E2E | Source add flow — verifies auth error toast (not generic), no 400 in console |
+| Test File                                 | Type | Coverage                                                                        |
+| ----------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| Unit tests for `utils.ts`                 | Unit | `hasValidAuth()`, `requireAuth()`, `getSourceErrorKey()` — all error code paths |
+| Unit tests for `useAddSourceMutations.ts` | Unit | Auth guard blocks mutation when token missing                                   |
+| E2E Playwright test                       | E2E  | Source add flow — verifies auth error toast (not generic), no 400 in console    |
 
 ### Anti-Recurrence
 
@@ -821,21 +846,22 @@ Hardcoded English strings in JSX instead of using react-i18next `t()` calls. Fou
 
 ### Fix Rounds (8 rounds)
 
-| Round | Scope | Files Changed | Details |
-|-------|-------|---------------|---------|
-| R1 | Core i18n infrastructure | DirectionContext, 3 namespace JSONs, P0 pages | Created `DirectionContext` provider, added `social.json`, `gamification.json`, `profile.json` namespaces, wired P0 critical pages to `t()` |
-| R2 | P1/P2 pages + security hardening | 14 files + 13 components | Replaced hardcoded strings in 14 admin/feature pages; replaced raw `error.message` with i18n keys in 13 components |
-| R3 | Hebrew translations + test setup | Hebrew JSON files, test config | Added all Hebrew translations for 3 new namespaces; fixed test setup for i18n mocking; addressed remaining hardcoded strings |
-| R4 | Test fixes | AppSidebar, AIChatPanel, PublicNav, Settings | Fixed test failures in sidebar RTL logic, chat panel layout, public navigation, and settings page |
-| R5 | Auth, settings, PublicNav | Auth pages, settings, navigation | Hebrew translations for authentication flows, settings page, and public navigation bar |
-| R5.5 | Login page | Login page button | Fixed Sign In button text on login page |
-| R6 | Courses page | 14 files | Full i18n coverage for courses page and related components |
-| R7 | Public pages + common keys | About, FAQ, Terms, etc. + 60 common keys | Hebrew translations for all public-facing pages plus 60 shared common translation keys |
-| R8 | Landing page + authenticated forms | 13 landing components + 16 auth form pages + 227 i18n keys | Complete i18n coverage for landing page (all 13 components) and all authenticated form pages (16 pages), adding 227 new i18n keys |
+| Round | Scope                              | Files Changed                                              | Details                                                                                                                                    |
+| ----- | ---------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | Core i18n infrastructure           | DirectionContext, 3 namespace JSONs, P0 pages              | Created `DirectionContext` provider, added `social.json`, `gamification.json`, `profile.json` namespaces, wired P0 critical pages to `t()` |
+| R2    | P1/P2 pages + security hardening   | 14 files + 13 components                                   | Replaced hardcoded strings in 14 admin/feature pages; replaced raw `error.message` with i18n keys in 13 components                         |
+| R3    | Hebrew translations + test setup   | Hebrew JSON files, test config                             | Added all Hebrew translations for 3 new namespaces; fixed test setup for i18n mocking; addressed remaining hardcoded strings               |
+| R4    | Test fixes                         | AppSidebar, AIChatPanel, PublicNav, Settings               | Fixed test failures in sidebar RTL logic, chat panel layout, public navigation, and settings page                                          |
+| R5    | Auth, settings, PublicNav          | Auth pages, settings, navigation                           | Hebrew translations for authentication flows, settings page, and public navigation bar                                                     |
+| R5.5  | Login page                         | Login page button                                          | Fixed Sign In button text on login page                                                                                                    |
+| R6    | Courses page                       | 14 files                                                   | Full i18n coverage for courses page and related components                                                                                 |
+| R7    | Public pages + common keys         | About, FAQ, Terms, etc. + 60 common keys                   | Hebrew translations for all public-facing pages plus 60 shared common translation keys                                                     |
+| R8    | Landing page + authenticated forms | 13 landing components + 16 auth form pages + 227 i18n keys | Complete i18n coverage for landing page (all 13 components) and all authenticated form pages (16 pages), adding 227 new i18n keys          |
 
 ### Files Affected (~65 TSX files + 30 JSON locale files)
 
 Key files across `apps/web/` and `packages/i18n/`:
+
 - `apps/web/src/contexts/DirectionContext.tsx` (new)
 - `apps/web/src/pages/` — SocialFeedPage, GamificationPage, PublicProfilePage, MyProgressPage, 14 admin/feature pages, courses pages, auth pages, settings, 16 authenticated form pages
 - `apps/web/src/components/` — AppSidebar, AIChatPanel, PublicNav, Settings, 13 error-handling components, 13 landing page components
@@ -849,22 +875,22 @@ Key files across `apps/web/` and `packages/i18n/`:
 
 ### Tests
 
-| Metric | Result |
-|--------|--------|
-| Unit tests | 729 pass, 0 new failures |
-| TypeScript | 0 new errors |
+| Metric                                               | Result                                                    |
+| ---------------------------------------------------- | --------------------------------------------------------- |
+| Unit tests                                           | 729 pass, 0 new failures                                  |
+| TypeScript                                           | 0 new errors                                              |
 | i18n coverage tests (`bug097-i18n-coverage.test.ts`) | 213 pass — static scan: all pages import `useTranslation` |
-| Coverage + regression tests | 153 pass — verify no hardcoded English strings remain |
-| `apps/web/e2e/bug096-rtl-layout.spec.ts` | E2E — sidebar flips to right in RTL, logical CSS verified |
-| `apps/web/e2e/bug096-hebrew-strings.spec.ts` | E2E — no English strings visible on Hebrew pages |
-| `apps/web/e2e/bug096-all-locales.spec.ts` | E2E — parameterized smoke test for all 10 locales |
+| Coverage + regression tests                          | 153 pass — verify no hardcoded English strings remain     |
+| `apps/web/e2e/bug096-rtl-layout.spec.ts`             | E2E — sidebar flips to right in RTL, logical CSS verified |
+| `apps/web/e2e/bug096-hebrew-strings.spec.ts`         | E2E — no English strings visible on Hebrew pages          |
+| `apps/web/e2e/bug096-all-locales.spec.ts`            | E2E — parameterized smoke test for all 10 locales         |
 
 ### CI Gate Scripts (Anti-Recurrence)
 
-| Script | Purpose |
-|--------|---------|
-| `apps/web/scripts/lint-i18n-hardcoded.cjs` | Scans TSX files for hardcoded English strings not wrapped in `t()` — fails CI if found |
-| `apps/web/scripts/lint-physical-css.cjs` | Scans for physical CSS properties (`left-0`, `ml-*`, `mr-*`, `border-r`, etc.) — enforces logical properties for RTL |
+| Script                                     | Purpose                                                                                                              |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/scripts/lint-i18n-hardcoded.cjs` | Scans TSX files for hardcoded English strings not wrapped in `t()` — fails CI if found                               |
+| `apps/web/scripts/lint-physical-css.cjs`   | Scans for physical CSS properties (`left-0`, `ml-*`, `mr-*`, `border-r`, etc.) — enforces logical properties for RTL |
 
 ### Anti-Recurrence
 
@@ -898,34 +924,38 @@ Key files across `apps/web/` and `packages/i18n/`:
 ### Fix Rounds (Session 2)
 
 **Round 1 (Backend — Zod schema):**
+
 - Increased `CourseSchema.modules.max(8)` → `.max(20)` and `.min(2)` → `.min(1)`
 - Increased `contentItemTitles.max(6)` → `.max(10)`
 - File: `apps/subgraph-agent/src/ai/course-generator.workflow.ts`
 
 **Round 2 (Frontend — Polling mechanism):**
+
 - Replaced `useQuery` + `executePoll()` with direct `urqlClient.query()` inside `setInterval`
 - Direct client query bypasses urql hook cache entirely
 - Added 5-minute hard timeout with user-friendly error message
 - File: `apps/web/src/components/AiCourseCreatorModal.tsx`
 
 **Round 3 (Frontend — Error visibility):**
+
 - Added `formatError()` that detects raw Zod JSON and returns i18n error message
 - Added retry button (RotateCw icon) on error display
 - Added `console.error` logging at every failure path with `[AiCourseCreatorModal]` prefix
 - File: `apps/web/src/components/AiCourseCreatorModal.tsx`
 
 **Round 4 (Frontend — returnTo fix):**
+
 - Replaced hardcoded `returnTo="/courses/new"` with `useLocation().pathname`
 - Works correctly from both `/courses` and `/courses/new`
 - File: `apps/web/src/components/AiCourseCreatorModal.tsx`
 
 ### Tests
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `apps/web/src/components/AiCourseCreatorModal.test.tsx` | 16 | All pass — removed useQuery mock, added urqlClient mock, added retry test |
-| `apps/subgraph-agent/src/ai/course-generator.service.spec.ts` | 5 | Service tests pass |
-| `scripts/debug/bug095-deep-e2e.cjs` | E2E | Full flow: Keycloak login → /courses → AI modal → generate → outline → create draft → redirect |
+| File                                                          | Tests | Purpose                                                                                        |
+| ------------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/AiCourseCreatorModal.test.tsx`       | 16    | All pass — removed useQuery mock, added urqlClient mock, added retry test                      |
+| `apps/subgraph-agent/src/ai/course-generator.service.spec.ts` | 5     | Service tests pass                                                                             |
+| `scripts/debug/bug095-deep-e2e.cjs`                           | E2E   | Full flow: Keycloak login → /courses → AI modal → generate → outline → create draft → redirect |
 
 ### E2E Result (Session 2 — final verification)
 
@@ -963,19 +993,19 @@ Pink error banner "שרת לא נגיש — מציג נתוני ריצוי" (Ser
 
 ### Fix Rounds
 
-| Round | File | Change |
-|-------|------|--------|
-| R1 | `apps/web/src/pages/knowledge-graph/use-graph-data.ts` | Added `classifyGraphError()` → categorizes errors as `network`/`auth`/`graphql`. Returns `EMPTY_GRAPH` on error (not mock data). Exports `errorKind` |
-| R1 | `apps/web/src/pages/knowledge-graph/KnowledgeGraph.tsx` | Banner shows context-specific message per error type (auth → "Authentication required", graphql → "Failed to load graph", network → "Server unavailable") |
-| R2 | `packages/i18n/src/locales/{en,he,es,fr,pt,ru,zh-CN,hi,bn,id}/knowledge.json` | Added `authRequired` key in 10 languages. Fixed `networkUnavailable` to say "check your connection" (not "showing backup data") |
+| Round | File                                                                          | Change                                                                                                                                                    |
+| ----- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | `apps/web/src/pages/knowledge-graph/use-graph-data.ts`                        | Added `classifyGraphError()` → categorizes errors as `network`/`auth`/`graphql`. Returns `EMPTY_GRAPH` on error (not mock data). Exports `errorKind`      |
+| R1    | `apps/web/src/pages/knowledge-graph/KnowledgeGraph.tsx`                       | Banner shows context-specific message per error type (auth → "Authentication required", graphql → "Failed to load graph", network → "Server unavailable") |
+| R2    | `packages/i18n/src/locales/{en,he,es,fr,pt,ru,zh-CN,hi,bn,id}/knowledge.json` | Added `authRequired` key in 10 languages. Fixed `networkUnavailable` to say "check your connection" (not "showing backup data")                           |
 
 ### Tests
 
-| File | Count | Coverage |
-|------|-------|----------|
-| `apps/web/src/pages/knowledge-graph/classify-graph-error.test.ts` | 11 | Unit tests for classifyGraphError covering all error types |
-| `apps/web/src/pages/KnowledgeGraph.test.tsx` | 5 new | Auth/graphql/network error messages, no mock nodes on error, no "backup data" text |
-| **Total** | **78/78 pass** | All knowledge-graph test files |
+| File                                                              | Count          | Coverage                                                                           |
+| ----------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `apps/web/src/pages/knowledge-graph/classify-graph-error.test.ts` | 11             | Unit tests for classifyGraphError covering all error types                         |
+| `apps/web/src/pages/KnowledgeGraph.test.tsx`                      | 5 new          | Auth/graphql/network error messages, no mock nodes on error, no "backup data" text |
+| **Total**                                                         | **78/78 pass** | All knowledge-graph test files                                                     |
 
 ### Anti-recurrence
 
@@ -997,16 +1027,18 @@ Pink error banner "שרת לא נגיש — מציג נתוני ריצוי" (Ser
 
 ### Fix Rounds
 
-| Round | Scope | Commit | Details |
-|-------|-------|--------|---------|
-| R1 | Original fix | `ee9119ef` | Mount `apps/subgraph-core/dist` (writable — startup.sh copies SDL) |
-| R2 | Wave 2 subgraphs | `8762d870` | Mount `subgraph-annotation/dist`, `subgraph-collaboration/dist` (:ro) |
-| R3 | Wave 3 packages | `8762d870` | Mount `packages/metrics`, `config`, `graphql-shared`, `health`, `rag` dist (:ro) |
+| Round | Scope            | Commit     | Details                                                                          |
+| ----- | ---------------- | ---------- | -------------------------------------------------------------------------------- |
+| R1    | Original fix     | `ee9119ef` | Mount `apps/subgraph-core/dist` (writable — startup.sh copies SDL)               |
+| R2    | Wave 2 subgraphs | `8762d870` | Mount `subgraph-annotation/dist`, `subgraph-collaboration/dist` (:ro)            |
+| R3    | Wave 3 packages  | `8762d870` | Mount `packages/metrics`, `config`, `graphql-shared`, `health`, `rag` dist (:ro) |
 
 ### Files Changed
+
 - `docker-compose.yml` — 8 new volume mounts (1 subgraph-core writable + 2 subgraph :ro + 5 package :ro)
 
 ### Verification
+
 - **E2E:** `scripts/debug/bug094-full-e2e.cjs` — Settings UI consent toggle → AI course "Colors" generated (282s)
 - **Container:** All 6 subgraphs RUNNING (`supervisorctl status`)
 - **Auth:** All 5 users authenticated via Keycloak
@@ -1064,8 +1096,8 @@ Toggling AI Processing consent in Settings page shows error toast "שמירת ה
 
 ### Fix (Round 1)
 
-| File | Change |
-|------|--------|
+| File                 | Change                                                                                                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Dockerfile:179-184` | Added `rm -rf` for ALL subgraph `dist/` directories before `pnpm turbo build` — forces fresh NestJS compilation, prevents stale turbo cache from skipping new modules |
 
 ### Hotfix (immediate container fix without rebuild)
@@ -1077,10 +1109,10 @@ Toggling AI Processing consent in Settings page shows error toast "שמירת ה
 
 ### Tests Added
 
-| File | Count | Description |
-|------|-------|-------------|
-| `apps/web/e2e/consent-requirement-link.spec.ts` | 1 | BUG-092 regression: consent save shows success toast, no error toast |
-| `tests/security/consent-management.spec.ts` | 4 | BUG-092: ConsentModule imported, consent.module.ts exists, Dockerfile clears dist/, nest-cli assets include .graphql |
+| File                                            | Count | Description                                                                                                          |
+| ----------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/e2e/consent-requirement-link.spec.ts` | 1     | BUG-092 regression: consent save shows success toast, no error toast                                                 |
+| `tests/security/consent-management.spec.ts`     | 4     | BUG-092: ConsentModule imported, consent.module.ts exists, Dockerfile clears dist/, nest-cli assets include .graphql |
 
 ### Discovery List — Round 1 (Waves 1-3)
 
@@ -1094,8 +1126,8 @@ Toggling AI Processing consent in Settings page shows error toast "שמירת ה
 
 **Solution:** Pinned `@ai-sdk/openai` to `~2.0.0` in `apps/subgraph-agent/package.json`, which uses provider spec v2 matching `ai@5.x`. Ran `pnpm install` to downgrade from 3.0.30 to 2.0.x.
 
-| File | Change |
-|------|--------|
+| File                               | Change                                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------------- |
 | `apps/subgraph-agent/package.json` | Changed `@ai-sdk/openai` from `^3.0.30` to `~2.0.0` (spec v2, compatible with ai@5.x) |
 
 **Verification:** Course "Introduction to Basic Mathematics for Beginners" generated successfully — 4+ modules with lessons, polled to COMPLETED status.
@@ -1104,27 +1136,29 @@ Toggling AI Processing consent in Settings page shows error toast "שמירת ה
 
 **Wave 1 — Exact match (`@ai-sdk/openai@^3.0.30` paired with `ai@^5.0.0`):**
 
-| # | File | `@ai-sdk/openai` | `ai` | Status |
-|---|------|-------------------|------|--------|
-| 1 | `apps/subgraph-agent/package.json` | `~2.0.0` | `^5.0.0` | ✅ Fixed in Round 2 |
-| 2 | `packages/langgraph-workflows/package.json` | `^3.0.30` | `^5.0.0` | **AFFECTED** — same spec v3 mismatch, will crash at runtime |
-| 3 | `apps/subgraph-content/package.json` | `^3.0.30` | `^5.0.0` | **AFFECTED** — same spec v3 mismatch (alt-text-generator) |
-| 4 | `apps/transcription-worker/package.json` | `^3.0.30` | `^5.0.0` | **AFFECTED** — same spec v3 mismatch (concept-extractor) |
+| #   | File                                        | `@ai-sdk/openai` | `ai`     | Status                                                      |
+| --- | ------------------------------------------- | ---------------- | -------- | ----------------------------------------------------------- |
+| 1   | `apps/subgraph-agent/package.json`          | `~2.0.0`         | `^5.0.0` | ✅ Fixed in Round 2                                         |
+| 2   | `packages/langgraph-workflows/package.json` | `^3.0.30`        | `^5.0.0` | **AFFECTED** — same spec v3 mismatch, will crash at runtime |
+| 3   | `apps/subgraph-content/package.json`        | `^3.0.30`        | `^5.0.0` | **AFFECTED** — same spec v3 mismatch (alt-text-generator)   |
+| 4   | `apps/transcription-worker/package.json`    | `^3.0.30`        | `^5.0.0` | **AFFECTED** — same spec v3 mismatch (concept-extractor)    |
 
 **Wave 2 — Similarity (other AI SDK version patterns):**
 
-| # | File | `@ai-sdk/openai` | `ai` | Status |
-|---|------|-------------------|------|--------|
-| 5 | `packages/rag/package.json` | `^1.0.0` | `^4.0.38` | OK — v1.x is spec v2, ai v4 is compatible |
-| 6 | `apps/subgraph-collaboration/package.json` | `^1.3.22` | `^5.0.0` | OK — v1.x is spec v2, compatible with ai v5 |
+| #   | File                                       | `@ai-sdk/openai` | `ai`      | Status                                      |
+| --- | ------------------------------------------ | ---------------- | --------- | ------------------------------------------- |
+| 5   | `packages/rag/package.json`                | `^1.0.0`         | `^4.0.38` | OK — v1.x is spec v2, ai v4 is compatible   |
+| 6   | `apps/subgraph-collaboration/package.json` | `^1.3.22`        | `^5.0.0`  | OK — v1.x is spec v2, compatible with ai v5 |
 
 `ollama-ai-provider@^1.2.0` (spec v1, incompatible with `ai@5` `generateObject`) still present in 4 packages:
+
 - `apps/subgraph-agent/package.json`
 - `apps/subgraph-collaboration/package.json`
 - `apps/subgraph-content/package.json`
 - `apps/transcription-worker/package.json`
 
 8 source files still import `createOllama` from `ollama-ai-provider`:
+
 - `apps/subgraph-agent/src/ai/ai-legacy-runner.service.ts`
 - `apps/subgraph-agent/src/ai/roleplay.workflow.ts`
 - `apps/subgraph-agent/src/ai/local-inference.service.ts`
@@ -1145,6 +1179,7 @@ The root cause is a **provider spec version mismatch** — `@ai-sdk/openai` v3.x
 Additionally, `ollama-ai-provider@1.2.0` (spec v1) is deprecated and documented in `docs/reference/STACK_CAPABILITIES_UPGRADE_PLAN.md` as requiring replacement.
 
 **Remaining items (documented for future fix — not in scope for BUG-092 Round 2):**
+
 - [ ] Pin `@ai-sdk/openai` to `~2.0.0` in `packages/langgraph-workflows/package.json` (currently `^3.0.30`)
 - [ ] Pin `@ai-sdk/openai` to `~2.0.0` in `apps/subgraph-content/package.json` (currently `^3.0.30`)
 - [ ] Pin `@ai-sdk/openai` to `~2.0.0` in `apps/transcription-worker/package.json` (currently `^3.0.30`)
@@ -1172,6 +1207,7 @@ Additionally, `ollama-ai-provider@1.2.0` (spec v1) is deprecated and documented 
 ### Symptom
 
 Two issues in the AI Course Creator flow:
+
 1. **No progress text:** The `ProgressStatus` component (added in FEAT-090 / BUG-089R2) was not rendering in the AI Course Creator modal — users saw a spinner with no descriptive text during generation.
 2. **5-minute timeout:** Backend `WORKFLOW_TIMEOUT_MS` (course-generator.service.ts) and `EXECUTION_TIMEOUT_MS` (agent.service.ts) were both set to 5 minutes (300,000ms), but CPU-based Ollama typically takes 4–6 minutes for structured JSON course generation, causing frequent timeouts.
 
@@ -1189,31 +1225,31 @@ Two issues in the AI Course Creator flow:
 
 ### Fix (Round 1) — Increase course-generator timeout
 
-| File | Change |
-|------|--------|
+| File                                                     | Change                                                                       |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `apps/subgraph-agent/src/ai/course-generator.service.ts` | Increased `WORKFLOW_TIMEOUT_MS` from 300,000ms (5 min) to 600,000ms (10 min) |
 
 ### Fix (Round 2) — Increase agent service timeout
 
-| File | Change |
-|------|--------|
+| File                                             | Change                                                       |
+| ------------------------------------------------ | ------------------------------------------------------------ |
 | `apps/subgraph-agent/src/agent/agent.service.ts` | Increased `EXECUTION_TIMEOUT_MS` from 300,000ms to 600,000ms |
 
 ### Fix (Round 3) — Rebuild frontend for Docker
 
-| File | Change |
-|------|--------|
+| File                       | Change                                                                                                                                   |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/web/dist/` (rebuilt) | Ran `pnpm --filter @edusphere/web build` to generate new dist with ProgressStatus component, served by Docker container via volume mount |
 
 ### Tests Added
 
-| Test File | Coverage |
-|-----------|----------|
+| Test File                                               | Coverage                                            |
+| ------------------------------------------------------- | --------------------------------------------------- |
 | `apps/web/src/components/AiCourseCreatorModal.test.tsx` | BUG-093 regression: ProgressStatus renders in modal |
-| `tests/security/ai-compliance.spec.ts` | BUG-093: timeout >= 10 min assertions |
-| `apps/web/src/components/ProgressStatus.test.tsx` | BUG-093: message count verification |
-| `scripts/debug/bug093-visual-test.cjs` | Full visual E2E course creation flow |
-| `scripts/debug/bug093-dom-inspect.cjs` | DOM inspection during generation |
+| `tests/security/ai-compliance.spec.ts`                  | BUG-093: timeout >= 10 min assertions               |
+| `apps/web/src/components/ProgressStatus.test.tsx`       | BUG-093: message count verification                 |
+| `scripts/debug/bug093-visual-test.cjs`                  | Full visual E2E course creation flow                |
+| `scripts/debug/bug093-dom-inspect.cjs`                  | DOM inspection during generation                    |
 
 ### Anti-Recurrence
 
@@ -1233,24 +1269,20 @@ Two issues in the AI Course Creator flow:
 ### Root Cause (4 issues across 2 rounds)
 
 **Round 1:**
+
 1. **`agent_id` type mismatch:** `CourseGeneratorService.generateCourse()` inserted `agent_id: 'course-generator'` (a string name) into `agent_executions`, but the column is `uuid NOT NULL` with FK to `agent_definitions.id`. PostgreSQL rejected the INSERT.
 2. **Missing `rag_config` column:** The Drizzle schema for `agent_definitions` defines a `rag_config` jsonb column, but the actual database table never had this column (migration was never applied).
 
-**Round 2:**
-3. **`ollama-ai-provider` v1 spec incompatible with AI SDK v5:** The `ollama-ai-provider` package (v1.2.0) returns models implementing spec v1, but AI SDK v5's `generateObject()` requires spec v2. Error: `"Unsupported model version v1 for provider 'ollama.chat'"`. This caused the LangGraph workflow to fail immediately.
-4. **No PubSub publication on status change:** `CourseGeneratorService.markFailed()` and the COMPLETED update only wrote to the DB — they never published a PubSub event to `executionStatus_${executionId}`. The frontend subscription never fired, so the spinner hung forever.
-5. **No polling fallback:** If the WebSocket subscription failed, there was no fallback mechanism to detect status changes.
+**Round 2:** 3. **`ollama-ai-provider` v1 spec incompatible with AI SDK v5:** The `ollama-ai-provider` package (v1.2.0) returns models implementing spec v1, but AI SDK v5's `generateObject()` requires spec v2. Error: `"Unsupported model version v1 for provider 'ollama.chat'"`. This caused the LangGraph workflow to fail immediately. 4. **No PubSub publication on status change:** `CourseGeneratorService.markFailed()` and the COMPLETED update only wrote to the DB — they never published a PubSub event to `executionStatus_${executionId}`. The frontend subscription never fired, so the spinner hung forever. 5. **No polling fallback:** If the WebSocket subscription failed, there was no fallback mechanism to detect status changes.
 
 ### Solution
 
 **Round 1:**
+
 1. Changed `CourseGeneratorService` to use find-or-create pattern via `ensureAgentDefinition()`.
 2. Added the missing `rag_config` column via `ALTER TABLE`.
 
-**Round 2:**
-3. **Replaced `ollama-ai-provider` with `@ai-sdk/openai`:** Ollama exposes an OpenAI-compatible API at `/v1`. Using `createOpenAI({ baseURL: '${ollamaUrl}/v1', apiKey: 'ollama' })` produces spec v2 models compatible with AI SDK v5.
-4. **Added PubSub to CourseGeneratorService:** Extracted `executionPubSub` into a shared NestJS provider (`execution-pubsub.provider.ts`), injected into both `AgentResolver` and `CourseGeneratorService`. Both `markFailed()` and COMPLETED updates now publish events.
-5. **Added polling fallback on frontend:** `AiCourseCreatorModal` now polls `agentExecution(id)` every 3s as a fallback when subscription/WebSocket is unavailable. 5-minute timeout with user-friendly error.
+**Round 2:** 3. **Replaced `ollama-ai-provider` with `@ai-sdk/openai`:** Ollama exposes an OpenAI-compatible API at `/v1`. Using `createOpenAI({ baseURL: '${ollamaUrl}/v1', apiKey: 'ollama' })` produces spec v2 models compatible with AI SDK v5. 4. **Added PubSub to CourseGeneratorService:** Extracted `executionPubSub` into a shared NestJS provider (`execution-pubsub.provider.ts`), injected into both `AgentResolver` and `CourseGeneratorService`. Both `markFailed()` and COMPLETED updates now publish events. 5. **Added polling fallback on frontend:** `AiCourseCreatorModal` now polls `agentExecution(id)` every 3s as a fallback when subscription/WebSocket is unavailable. 5-minute timeout with user-friendly error.
 
 ### Files Changed
 
@@ -1286,20 +1318,22 @@ Two issues in the AI Course Creator flow:
 
 ### FEAT-090: Dynamic Progress Status Indicator ✅
 
-| Field | Value |
-|-------|-------|
-| **Status** | ✅ Implemented |
+| Field        | Value                      |
+| ------------ | -------------------------- |
+| **Status**   | ✅ Implemented             |
 | **Priority** | 🟡 Medium (UX Enhancement) |
-| **Created** | 2026-03-18 |
+| **Created**  | 2026-03-18                 |
 
 **Description:** Claude-like dynamic text status indicator for all operations taking >2 seconds. Instead of a static spinner, shows cycling descriptive text messages (e.g., "מנתח את הנושא..." → "בונה מתווה..." → "יוצר מודולים...").
 
 **Files Created:**
+
 - `apps/web/src/hooks/useProgressStatus.ts` — Cycling logic hook (78 lines)
 - `apps/web/src/components/ProgressStatus.tsx` — UI component, 3 variants: inline/block/minimal (126 lines)
 - `apps/web/src/lib/progress-messages.ts` — Message registry for 7 operation types (57 lines)
 
 **Files Modified:**
+
 - `apps/web/src/components/AiCourseCreatorModal.tsx` — Replaced static spinner with ProgressStatus
 - `apps/web/src/components/LoadingSpinner.tsx` — Added optional messages prop
 - `apps/web/src/components/quiz/QuizPlayer.tsx` — Quiz grading progress
@@ -1310,6 +1344,7 @@ Two issues in the AI Course Creator flow:
 - `packages/i18n/src/locales/*/common.json` — 10 languages × 27 keys = 270 translations
 
 **Tests:**
+
 - `apps/web/src/hooks/useProgressStatus.test.ts` — 8 unit tests
 - `apps/web/src/hooks/useProgressStatus.memory.test.ts` — 5 memory safety tests
 - `apps/web/src/components/ProgressStatus.test.tsx` — 8 component tests
@@ -1317,6 +1352,7 @@ Two issues in the AI Course Creator flow:
 - Total: 26 new tests, all passing
 
 **Documentation:**
+
 - `docs/plans/features/FEAT-progress-status-indicator.md` — PRD
 - `docs/architecture/ADR-progress-status-indicator.md` — Architecture Decision Record
 - `docs/plans/features/FEAT-progress-status-ux-spec.md` — UX/UI Design Specification
@@ -1331,35 +1367,43 @@ Two issues in the AI Course Creator flow:
 - **Reporter:** User (screenshots of settings page + AI Course Creator modal)
 
 ### Problem
+
 1. **Consent not persisted to DB:** PrivacyConsentCard saves consent to localStorage only. Backend LlmConsentGuard checks `user_consents` DB table → always empty → CONSENT_REQUIRED error persists after toggling.
 2. **No return navigation:** RequirementLink sends user to `/settings?highlight=ai-consent` but there's no way back to the feature that needed consent.
 3. **Generate button not disabled:** Users can click "Generate Course" even when the consent warning is visible.
 
 ### Root Cause (Round 1 — incomplete fix, 18 Mar 2026)
+
 - `ConsentService.updateConsent()` existed in backend but had **no GraphQL mutation** exposing it — no resolver, no module registration, no SDL.
 - Frontend saved consent to `localStorage` only (optimistic), never called backend.
 - `RequirementLink` used a simple `<Link to="/settings?highlight=...">` with no `returnTo` parameter.
 
 ### Root Cause (Round 2 — actual fix, 18 Mar 2026)
+
 Round 1 created the SDL, resolver, module, and frontend mutation — but **the mutation still failed at runtime** because:
+
 1. **`supergraph.graphql` was never recomposed** after adding `consent.graphql` — the gateway didn't know about `updateConsent`, so it returned an error to the frontend.
 2. **Docker container's `dist/` was stale** — `consent.module.js` and `consent.resolver.js` were never compiled into `dist/consent/`, so even after adding to supergraph the subgraph wouldn't find the resolver.
 3. Round 1 visual test saw the error toast "שמירת ההסכמה לשרת נכשלה" but **incorrectly classified it as "expected in dev env"** instead of investigating the failure.
 
 ### Discovery Waves
+
 - **Wave 1:** PrivacyConsentCard.tsx → localStorage only, no mutation call. LlmConsentGuard → queries DB.
 - **Wave 2:** 5 AI entry points checked: AiCourseCreatorModal, AIChatPanel, useAgentChat, useChavrutaDebate, AgentStudioPage, ChavrutaPartnerPage. All use localStorage for frontend gate + backend CONSENT_REQUIRED fallback.
 - **Wave 3 (Round 1):** ConsentService exists with `updateConsent()` but not registered in any NestJS module. No GraphQL SDL for consent mutations anywhere in the codebase.
 - **Wave 3 (Round 2):** `updateConsent` missing from `apps/gateway/supergraph.graphql` — gateway can't route the mutation. 53 SDL files across 4 subgraphs lack federation preamble (non-blocking; subgraph-level merge handles it).
 
 ### Solution
+
 **Round 1 — Backend (core subgraph):**
+
 - Created `consent.graphql` SDL with `updateConsent(input: UpdateConsentInput!): Boolean! @authenticated`
 - Created `consent.resolver.ts` — delegates to existing `ConsentService.updateConsent()`
 - Created `consent.module.ts` — registers resolver + service
 - Registered `ConsentModule` in `app.module.ts`
 
 **Round 1 — Frontend:**
+
 - Created `consent.queries.ts` with `UPDATE_CONSENT_MUTATION`
 - Updated `PrivacyConsentCard.tsx` — now calls mutation on toggle (optimistic update + revert on error)
 - Updated `RequirementLink.tsx` — added `returnTo` prop for return navigation
@@ -1370,6 +1414,7 @@ Round 1 created the SDL, resolver, module, and frontend mutation — but **the m
 - Added `syncError` + `backToPage` i18n keys to all 10 locales
 
 **Round 2 — Gateway + Docker (the actual fix):**
+
 - Added `extend schema @link(...)` federation preamble to `consent.graphql`
 - Added `updateConsent` mutation, `UpdateConsentInput` input, `ConsentType` enum to `apps/gateway/supergraph.graphql`
 - Rebuilt subgraph-core inside Docker: `npx nest build` → `dist/consent/` now has resolver + module + graphql
@@ -1377,6 +1422,7 @@ Round 1 created the SDL, resolver, module, and frontend mutation — but **the m
 - Verified mutation succeeds: `curl -X POST /graphql -d '{"query":"mutation { updateConsent(...) }"}' → {"data":{"updateConsent":true}}`
 
 ### Files Changed (Round 1 + Round 2)
+
 - `apps/subgraph-core/src/consent/consent.graphql` (new; Round 2: added federation preamble)
 - `apps/subgraph-core/src/consent/consent.resolver.ts` (new)
 - `apps/subgraph-core/src/consent/consent.module.ts` (new)
@@ -1393,16 +1439,19 @@ Round 1 created the SDL, resolver, module, and frontend mutation — but **the m
 - `packages/i18n/src/locales/*/settings.json` (10 locales — syncError + backToPage keys)
 
 ### Tests Added
+
 - `apps/web/src/pages/SettingsPage.test.tsx`: 4 BUG-088 regression tests (mutation call, localStorage save, back button present/absent)
 - `apps/subgraph-core/src/consent/consent.resolver.spec.ts`: 3 tests (correct params, unauthenticated, withdrawal)
 - `apps/web/e2e/consent-requirement-link.spec.ts`: 4 BUG-088 E2E tests (toggle interactive, back button with/without returnTo, **Round 2: mutation succeeds through gateway**)
 
 ### Visual Verification
+
 - Round 1: `docs/screenshots/bug088-settings-returnto.png` — Settings page with back arrow (but toggle mutation failed — was incorrectly classified as "expected")
 - **Round 2 (actual proof):** `docs/screenshots/bug088-r2-after-toggle.png` — Toggle clicked → **"Privacy preference saved" success toast** → mutation returned `{"data":{"updateConsent":true}}`
 - **Round 2 API proof:** `curl -X POST /graphql -H "Authorization: Bearer $TOKEN" -d '{"query":"mutation { updateConsent(...) }"}' → {"data":{"updateConsent":true}}`
 
 ### Anti-Recurrence
+
 - Backend `updateConsent` mutation ensures consent is always persisted to DB (GDPR Art.7 proof)
 - Frontend optimistic update + revert pattern ensures UI stays consistent with backend
 - `returnTo` parameter on all consent navigation paths ensures users can return to their workflow
@@ -1419,12 +1468,15 @@ Round 1 created the SDL, resolver, module, and frontend mutation — but **the m
 - **Reporter:** User (screenshot)
 
 ### Problem
+
 Navigating to `/settings?highlight=ai-consent` (the consent flow link from FEAT-066 Smart Requirement Links) shows "Something went wrong" error instead of the Settings page. The page crashes when the highlight animation triggers a Radix UI `Tooltip` render.
 
 ### Root Cause
+
 `PrivacyConsentCard.tsx` renders a Radix UI `<Tooltip defaultOpen>` when `?highlight=ai-consent` is in the URL and the highlight animation is active. Radix UI's `Tooltip` component **requires** a `TooltipProvider` ancestor in the React component tree. No `TooltipProvider` existed anywhere in `App.tsx` or the component hierarchy. When the tooltip tried to access its missing provider context, it threw an error caught by `ErrorBoundary`.
 
 **Root cause chain:**
+
 1. User clicks RequirementLink → navigates to `/settings?highlight=ai-consent`
 2. `useSettingsHighlight` reads URL param → `highlightId = 'ai-consent'`
 3. After 300ms scroll delay, `setIsHighlighted(true)` fires
@@ -1433,27 +1485,33 @@ Navigating to `/settings?highlight=ai-consent` (the consent flow link from FEAT-
 6. `ErrorBoundary` catches → shows "Something went wrong"
 
 ### Discovery Waves
+
 - **Wave 1 (exact match):** 3 files use Radix Tooltip. 2 have local `TooltipProvider` (`AITransparencyBadge`, `PricingSection`). 1 missing (`PrivacyConsentCard`).
 - **Wave 2 (similarity):** `VideoAnnotationLayer.tsx` also uses Tooltip without provider (silent bug — never crashes because tooltip is hover-triggered, not `defaultOpen`). All pages, hooks, components, mobile screens checked.
 - **Wave 3 (class of bug):** Tooltip is the ONLY Radix UI component in this codebase that requires a provider. No other missing providers found.
 
 ### Solution
+
 Added global `<TooltipProvider>` to `App.tsx` wrapping the entire app tree (inside `BrandingProvider`, around `RouterProvider`). This fixes:
+
 1. The crashing `PrivacyConsentCard` tooltip (BUG-087 root cause)
 2. The silently broken `VideoAnnotationLayer` tooltip (Wave 2 discovery)
 3. All future tooltip usages globally
 
 ### Files Changed
+
 - `apps/web/src/App.tsx` — Added `TooltipProvider` import + wrapper around app tree
 - `apps/web/src/pages/SettingsPage.test.tsx` — 2 BUG-087 regression tests
 - `apps/web/e2e/consent-requirement-link.spec.ts` — 1 BUG-087 E2E regression test
 
 ### Tests Added
+
 - `apps/web/src/pages/SettingsPage.test.tsx`: "REGRESSION BUG-087: renders without crash when ?highlight=ai-consent is in URL"
 - `apps/web/src/pages/SettingsPage.test.tsx`: "REGRESSION BUG-087: Something went wrong is never shown on settings page"
 - `apps/web/e2e/consent-requirement-link.spec.ts`: "REGRESSION BUG-087: /settings?highlight=ai-consent does not crash"
 
 ### Container Deployment & Visual Verification
+
 - **Local frontend rebuild:** `npx vite build` → new hashed chunks in `apps/web/dist/`
 - **Docker volume mount:** `./apps/web/dist:/app/apps/web/dist:ro` in `docker-compose.yml` picks up the rebuild
 - **Container restart:** `docker restart edusphere-all-in-one` loads updated assets
@@ -1462,6 +1520,7 @@ Added global `<TooltipProvider>` to `App.tsx` wrapping the entire app tree (insi
 - **Verification scripts:** `apps/web/scripts/bug087-verify2.cjs` (local dev), `apps/web/scripts/bug087-docker-verify2.cjs` (Docker + Keycloak auth)
 
 ### Anti-Recurrence
+
 - Global `TooltipProvider` in `App.tsx` prevents any future tooltip from crashing due to missing provider
 - Regression tests guard against both the crash UI appearing AND the specific highlight URL scenario
 - Visual verification iron rule established: UI bugs must ALWAYS have browser-level proof before declaring fixed
@@ -1475,17 +1534,21 @@ Added global `<TooltipProvider>` to `App.tsx` wrapping the entire app tree (insi
 - **Reporter:** User (visual inspection)
 
 ### Problem
+
 The "Download VPAT / HECVAT" button on the landing page Compliance section uses `<Link to="/compliance">` which navigates to the compliance info page. No downloadable VPAT or HECVAT documents exist. Procurement teams expect to download actual files.
 
 ### Root Cause
+
 The button was implemented as a navigation link to `/compliance` (a general info page) rather than providing actual downloadable compliance documents. No VPAT or HECVAT files were created.
 
 ### Discovery Waves
+
 - **Wave 1 (exact match):** Only 1 instance — `ComplianceBadgesSection.tsx:64`
 - **Wave 2 (similarity):** Checked all 33 files with "download" patterns. 10+ other download buttons use correct patterns (`<a download>`, `window.open()`). No other anti-pattern found.
 - **Wave 3 (class of bug):** No other "fake download" buttons found across pages, components, or mobile app.
 
 ### Solution (Round 1)
+
 1. Created `public/compliance/EduSphere-VPAT-2.5.html` — full VPAT 2.5 document (WCAG 2.2 AA + Section 508)
 2. Created `public/compliance/EduSphere-HECVAT-Lite-2026.html` — HECVAT Lite assessment
 3. Added "Download Compliance Documents" section to `CompliancePage.tsx` with `<a href="..." download>` links
@@ -1493,6 +1556,7 @@ The button was implemented as a navigation link to `/compliance` (a general info
 5. Added "Downloads" pill to CompliancePage navigation
 
 ### Files Changed
+
 - `apps/web/public/compliance/EduSphere-VPAT-2.5.html` (new)
 - `apps/web/public/compliance/EduSphere-HECVAT-Lite-2026.html` (new)
 - `apps/web/src/pages/CompliancePage.tsx` (downloads section + nav pill)
@@ -1501,11 +1565,13 @@ The button was implemented as a navigation link to `/compliance` (a general info
 - `apps/web/src/components/landing/ComplianceBadgesSection.test.tsx` (updated href assertion)
 
 ### Tests Added
+
 - `CompliancePage.test.tsx` — "has downloads section with VPAT and HECVAT download links" (verifies `download` attribute + correct href)
 - `CompliancePage.test.tsx` — "has Downloads pill in navigation"
 - `ComplianceBadgesSection.test.tsx` — updated href assertion to `/compliance#downloads`
 
 ### Anti-recurrence
+
 - Tests verify `download` attribute is present on VPAT/HECVAT links — any removal would fail CI
 
 ## BUG-084 — Dashboard Mastery Overview Flash/Disappear (18 Mar 2026)
@@ -1641,13 +1707,13 @@ The button was implemented as a navigation link to `/compliance` (a general info
   - `apps/subgraph-core/src/notifications/notification-preferences.service.ts`
   - `apps/subgraph-core/src/notifications/notification-preferences.resolver.ts`
 
-
 ## FEAT-065 — Social & Notification Integration (18 Mar 2026)
 
 **Status:** ✅ Implemented
 **Scope:** Multi-channel notification dispatch (Email + WhatsApp), social sharing, social links, notification preferences
 
 ### Architecture
+
 - **NotificationDispatcher** — Central orchestrator routing to 5 channels (in-app, push_web, push_mobile, email, whatsapp)
 - **Email Channel** — Provider-agnostic (Resend + SMTP fallback) with retry worker
 - **WhatsApp Channel** — Meta Cloud API with OTP verification and admin alerts
@@ -1655,6 +1721,7 @@ The button was implemented as a navigation link to `/compliance` (a general info
 - **Delivery Tracking** — Persistent notification_deliveries table with status tracking
 
 ### Files Created (45+)
+
 **DB Schemas (4):** notification-deliveries.ts, notification-preferences.ts, whatsapp-contacts.ts, tenant-social-links.ts
 **Backend Services (12):** dispatcher, preferences, deliveries, email channel, resend provider, smtp provider, whatsapp channel, meta provider, retry worker, admin alerts, whatsapp registration (service + resolver)
 **Frontend Components (8):** SocialShareButton, SocialShareMenu, ShareBadgeDialog, SocialLinksBar + tests
@@ -1664,12 +1731,14 @@ The button was implemented as a navigation link to `/compliance` (a general info
 **Tests (5):** notification-rls.spec.ts, notification-events.test.ts, memory safety specs, component tests
 
 ### Security
+
 - All 5 new tables have RLS with correct SI-1 variable names (24 security tests pass)
 - Phone numbers encrypted per SI-3
 - WhatsApp consent tracked per GDPR
 - Rate limiting on email (100/hr/tenant) and WhatsApp (1000/day/WABA)
 
 ### Anti-recurrence
+
 - `tests/security/notification-rls.spec.ts` guards RLS on all 4 new schema files
 - Memory safety test validates OnModuleDestroy on dispatcher and retry worker
 
@@ -1682,11 +1751,13 @@ The button was implemented as a navigation link to `/compliance` (a general info
 **Root Cause:** `pdf-parse` v2.4.5 changed its API from a callable default export to a class-based named export (`PDFParse`). The code in `document-parser.service.ts:52-72` used the v1 pattern `pdfParse(buffer)` which fails at runtime with `pdfParse is not a function`.
 
 **Discovery Waves:**
+
 - **Wave 1 (exact match):** `pdf-parse` import found only in `document-parser.service.ts` — single location
 - **Wave 2 (similarity):** No other files use pdf-parse; DOCX (mammoth) and YouTube parsers use different libraries
 - **Wave 3 (class of bug):** All dynamic imports in document-parser.service.ts checked — mammoth uses same defensive pattern but works because its export shape didn't change
 
 **Solution:**
+
 - Changed `parsePdf()` to use `new PDFParse({ data: buffer })` → `parser.getText()` → `parser.destroy()` (v2 class API)
 - `result.total` replaces `data.numpages` for page count
 
@@ -1700,6 +1771,7 @@ The button was implemented as a navigation link to `/compliance` (a general info
 **Secondary issue found:** `subgraph-knowledge` crashed 5× on startup with `Query.socialRecommendations defined in resolvers, but not in schema` — resolved on final restart (stale build artifact).
 
 **Tests Added:**
+
 - `document-parser.service.pdf-youtube.spec.ts` — 9 tests (2 for parsePdf with v2 mock)
 - `apps/web/e2e/knowledge-sources.spec.ts` Suite 7 — 2 BUG-081 regression tests
 
@@ -1715,11 +1787,13 @@ The button was implemented as a navigation link to `/compliance` (a general info
 **Root Cause:** `LandingFooter.tsx` and 11 other components used plain HTML `<a href>` tags for internal routes, causing full page reloads instead of SPA navigation. Hash links like `#pricing` didn't work from non-landing pages because they relied on same-page anchor behavior.
 
 **Discovery Waves:**
+
 - **Wave 1 (exact match):** `<a href="/...">` pattern found in 12 source files across `components/landing/`, `components/`, `pages/`
 - **Wave 2 (similarity):** All 155+ routes scanned — `InstructorOnboardingCTA`, `OnboardingReentryCard`, `ApiKeySection`, `CrmSettingsPage` (`window.location.href`), `PublicNav` (10 anchor links), `CompliancePage` (section pills) all had the same anti-pattern
 - **Wave 3 (class of bug):** All `<a href` usages verified — remaining instances are external URLs, API endpoints, or auth redirects (correctly using `<a>`)
 
 **Solution:**
+
 - Replaced all internal `<a href>` with React Router `<Link to>` across 12 files
 - Changed hash-only links (`#pricing`) to `/#pricing` format for cross-page navigation
 - Added smooth scroll handlers (`scrollIntoView({ behavior: 'smooth' })`) for same-page anchors
@@ -1847,12 +1921,12 @@ On the landing page (`/landing`), the 4 nav tabs (Features, Pricing, Compliance,
 
 **File:** `apps/web/src/components/PublicNav.tsx` (lines 30, 62)
 
-| Tab | Before (broken) | After (fixed) |
-|-----|-----------------|---------------|
-| Features | `<a href={anchor('#features')}>` | No change |
-| Pricing | `<a href={anchor('#pricing')}>` | No change |
-| **Compliance** | **`<Link to="/compliance">`** | **`<a href={anchor('#compliance')}>`** |
-| Pilot | `<a href={anchor('#pilot-cta')}>` | No change |
+| Tab            | Before (broken)                   | After (fixed)                          |
+| -------------- | --------------------------------- | -------------------------------------- |
+| Features       | `<a href={anchor('#features')}>`  | No change                              |
+| Pricing        | `<a href={anchor('#pricing')}>`   | No change                              |
+| **Compliance** | **`<Link to="/compliance">`**     | **`<a href={anchor('#compliance')}>`** |
+| Pilot          | `<a href={anchor('#pilot-cta')}>` | No change                              |
 
 The same issue existed in the mobile menu (line 62). Additionally, Pilot tab was missing from the mobile menu.
 
@@ -1866,17 +1940,17 @@ The same issue existed in the mobile menu (line 62). Additionally, Pilot tab was
 
 ### Fix Applied
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/PublicNav.tsx:30` | `<Link to="/compliance">` → `<a href={anchor('#compliance')}>` |
-| `apps/web/src/components/PublicNav.tsx:62` | Same fix in mobile menu + added missing Pilot tab |
-| `apps/web/src/test-utils/route-registry.ts:149` | `href: '/compliance'` → `href: '#compliance'` |
+| File                                            | Change                                                         |
+| ----------------------------------------------- | -------------------------------------------------------------- |
+| `apps/web/src/components/PublicNav.tsx:30`      | `<Link to="/compliance">` → `<a href={anchor('#compliance')}>` |
+| `apps/web/src/components/PublicNav.tsx:62`      | Same fix in mobile menu + added missing Pilot tab              |
+| `apps/web/src/test-utils/route-registry.ts:149` | `href: '/compliance'` → `href: '#compliance'`                  |
 
 ### Tests Added
 
-| Test File | Coverage |
-|-----------|----------|
-| `apps/web/src/components/PublicNav.test.tsx` | BUG-070 regression: all 4 tabs use `<a>`, Compliance not `<Link>`, mobile has Pilot |
+| Test File                                     | Coverage                                                                                                                                                       |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/PublicNav.test.tsx`  | BUG-070 regression: all 4 tabs use `<a>`, Compliance not `<Link>`, mobile has Pilot                                                                            |
 | `apps/web/e2e/landing-tab-navigation.spec.ts` | **33 E2E tests:** all 24 permutations of 4 tabs, Compliance regression guard (5 tests), visual regression screenshots, URL integrity + rapid-click stress test |
 
 ### Anti-recurrence
@@ -1901,6 +1975,7 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 **Backend: VERIFIED WORKING** — Direct test with valid JWT returns presigned URL correctly (tested via `scripts/test-presign.mjs`). MinIO healthy, all subgraphs running, gateway routing works.
 
 **1. Content Subgraph JWT Audience Mismatch (Architecture Risk)**
+
 - `packages/config/src/keycloak.ts:4` defaults `clientId` to `'edusphere-app'`
 - Frontend authenticates with `client_id=edusphere-web` → JWT `aud: "edusphere-web"`
 - `KEYCLOAK_CLIENT_ID` env var is empty in container → subgraph uses default `'edusphere-app'`
@@ -1909,12 +1984,14 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 - **Risk:** If gateway header forwarding breaks for any reason, ALL authenticated queries to ALL subgraphs fail
 
 **2. No Retry Mechanism (UX Bug)**
+
 - `apps/web/src/pages/CourseWizardMediaStep.tsx:148-154` — on presign failure, state → `'error'`
 - No "retry" button exists — user must remove file (X) and re-add
 - Error message is generic `t('wizard.failedUploadUrl')` — actual `presignResult.error` is discarded
 - No `console.error` logging — impossible to diagnose from browser DevTools
 
 **3. Transient Error Vulnerability**
+
 - Steps 1-2 of wizard are purely client-side (no server calls)
 - If user spends extended time on steps 1-2, JWT may expire
 - Token refresh (60s interval, 70s buffer) should prevent this, but edge cases exist
@@ -1923,31 +2000,33 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 ### Discovery Waves
 
 **Wave 1 — Exact match:**
+
 - `apps/web/src/pages/CourseWizardMediaStep.tsx:124-154` — `uploadFile()` presign error handling
 
 **Wave 2 — Similar patterns (all presigned URL consumers):**
 
-| # | File | Same Issue |
-|---|------|------------|
-| 1 | `apps/web/src/pages/CourseWizardMediaStep.tsx` | No retry, generic error, no logging |
-| 2 | `apps/web/src/components/visual-anchoring/AssetUploader.tsx` | Same presigned URL pattern |
-| 3 | `apps/web/src/components/scorm/ScormImportDialog.tsx` | Same pattern (XHR-based) |
-| 4 | `apps/web/src/components/editor/RichDocumentEditor.tsx` | Same `PRESIGNED_UPLOAD_QUERY` |
+| #   | File                                                         | Same Issue                          |
+| --- | ------------------------------------------------------------ | ----------------------------------- |
+| 1   | `apps/web/src/pages/CourseWizardMediaStep.tsx`               | No retry, generic error, no logging |
+| 2   | `apps/web/src/components/visual-anchoring/AssetUploader.tsx` | Same presigned URL pattern          |
+| 3   | `apps/web/src/components/scorm/ScormImportDialog.tsx`        | Same pattern (XHR-based)            |
+| 4   | `apps/web/src/components/editor/RichDocumentEditor.tsx`      | Same `PRESIGNED_UPLOAD_QUERY`       |
 
 **Wave 3 — Class of bug:**
+
 - **Audience mismatch:** ALL 6 subgraphs use `keycloakConfig.clientId` default `'edusphere-app'` → JWT validation always fails, always relies on gateway fallback
 - **Generic upload errors:** All upload components swallow actual error details
 - **No retry pattern:** None of the upload components have retry functionality
 
 ### Fix Recommendations
 
-| Priority | Fix | File(s) |
-|----------|-----|---------|
-| P0 | Set `KEYCLOAK_CLIENT_ID=edusphere-web` in container env OR remove audience validation for gateway-proxied subgraphs | `packages/config/src/keycloak.ts`, Docker env |
-| P1 | Add retry button: when `entry.state === 'error'`, render button that resets state to `'idle'` | `apps/web/src/pages/CourseWizardMediaStep.tsx` |
-| P1 | Log actual error: `console.error('[MediaUpload] presign failed:', presignResult.error)` | Same file |
-| P2 | Add token freshness check before upload: `if (!isAuthenticated()) { /* show re-login prompt */ }` | Same file |
-| P2 | Apply retry + logging pattern to all Wave 2 files | 4 files listed above |
+| Priority | Fix                                                                                                                 | File(s)                                        |
+| -------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| P0       | Set `KEYCLOAK_CLIENT_ID=edusphere-web` in container env OR remove audience validation for gateway-proxied subgraphs | `packages/config/src/keycloak.ts`, Docker env  |
+| P1       | Add retry button: when `entry.state === 'error'`, render button that resets state to `'idle'`                       | `apps/web/src/pages/CourseWizardMediaStep.tsx` |
+| P1       | Log actual error: `console.error('[MediaUpload] presign failed:', presignResult.error)`                             | Same file                                      |
+| P2       | Add token freshness check before upload: `if (!isAuthenticated()) { /* show re-login prompt */ }`                   | Same file                                      |
+| P2       | Apply retry + logging pattern to all Wave 2 files                                                                   | 4 files listed above                           |
 
 ### קבצים מושפעים
 
@@ -1961,15 +2040,18 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 ### Fix Applied (2026-03-17)
 
 **Round 1 — Root cause fix (audience mismatch):**
+
 - `packages/auth/src/middleware.ts` — removed `clientId` from `JWTValidator` constructor; subgraphs skip audience validation since gateway already validates JWT
 - `apps/subgraph-collaboration/src/crdt/hocuspocus.service.ts` — same fix (removed `clientId`)
 - Note: `apps/subgraph-knowledge/src/sources/knowledge-source.controller.ts` already correct (no clientId)
 
 **Round 2 — Frontend UX fix:**
+
 - `apps/web/src/pages/CourseWizardMediaStep.tsx` — added retry button on error state, added `console.error` logging for presign failures
 - `packages/i18n/src/locales/*/courses.json` — added `retryUpload` key in all 10 locales
 
 **Tests added:**
+
 - `apps/web/src/pages/CourseWizardMediaStep.test.tsx` — 3 BUG-073 regression tests (retry button shown, retry resets to idle, error logged)
 - `packages/auth/src/middleware.test.ts` — 1 BUG-073 regression test (no audience validation)
 
@@ -2000,6 +2082,7 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 **Wave 1 — Exact match:** Found the generic catch block in `lesson.service.ts:create()` with `"Failed to create lesson..."` string.
 
 **Wave 2 — Similarity search:** Found 44 files across 6 subgraphs using `createDatabaseConnection` without `withTenantContext()`. Most are in:
+
 - `apps/subgraph-content/src/lesson/lesson-asset.service.ts`
 - `apps/subgraph-content/src/lesson/lesson-pipeline.service.ts`
 - `apps/subgraph-content/src/lesson/lesson-pipeline-orchestrator.service.ts`
@@ -2010,22 +2093,26 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 ### Fix Rounds
 
 **Round 1 — LessonService rewrite:**
+
 - Added `withTenantContext()` to ALL methods: `findById`, `findByCourse`, `create`, `update`, `delete`, `publish`
 - Added pre-validation in `create()`: UUID format check on courseId, tenantId non-empty, course exists + tenant match, instructor exists in users table
 - All error messages in Hebrew with structured `[LessonService]` prefix logging
 - FK violation errors now return user-friendly Hebrew messages (no raw SQL leak)
 
 **Round 2 — Frontend error handling:**
+
 - `CreateLessonPage`: network errors mapped to Hebrew message `"שגיאת רשת: לא ניתן להתחבר לשרת. נסה שוב."`
 - Error display upgraded to styled alert with dismiss button, `role="alert"`, `data-testid="create-lesson-error"`
 - Console.error logging added with `[CreateLessonPage]` prefix
 
 **Files modified:**
+
 - `apps/subgraph-content/src/lesson/lesson.service.ts` — complete rewrite with withTenantContext + pre-validation
 - `apps/web/src/pages/CreateLessonPage.tsx` — error handling + Hebrew messages + styled alert
 - `apps/subgraph-content/src/lesson/lesson-asset.service.ts` — structured logging improvement
 
 **Tests added:**
+
 - `apps/subgraph-content/src/lesson/lesson.service.spec.ts` — 21 tests (complete rewrite): withTenantContext compliance, pre-validation (course UUID, tenant empty, course not found, tenant mismatch, instructor not found), Hebrew error messages, no raw SQL in error regression guard
 - `apps/web/src/pages/CreateLessonPage.test.tsx` — 3 new tests: error dismiss button, network error Hebrew message, updated error display test (20 total passing)
 
@@ -2050,30 +2137,33 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 ### Discovery Waves
 
 **Wave 1 — Exact match:**
+
 - `apps/web/src/lib/urql-client.ts:101-108` — `persistedExchange` gated on `import.meta.env.PROD`
 
 **Wave 2 — Similar patterns:**
+
 - No other urql client configs found (mobile uses Apollo)
 - No other `import.meta.env.PROD` guards with similar APQ issues
 - Gateway `apps/gateway/gateway.config.ts:292-300` — correctly loads manifest only if file exists
 
 **Wave 3 — Class of bug (env-gated features without env validation):**
+
 - `.env`, `.env.example`, Dockerfile — all missing `VITE_APQ_ENABLED` declaration
 
 ### Fix
 
-| File | Change |
-|------|--------|
+| File                              | Change                                                                                                                                 |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/web/src/lib/urql-client.ts` | Replace `import.meta.env.PROD` guard with explicit `VITE_APQ_ENABLED === 'true'`; add network error logging in `errorExchange.onError` |
-| `apps/web/.env` | Add `VITE_APQ_ENABLED=false` |
-| `apps/web/.env.example` | Add `VITE_APQ_ENABLED=false` with documentation |
-| `apps/web/Dockerfile` | Add `ARG VITE_APQ_ENABLED=false` |
+| `apps/web/.env`                   | Add `VITE_APQ_ENABLED=false`                                                                                                           |
+| `apps/web/.env.example`           | Add `VITE_APQ_ENABLED=false` with documentation                                                                                        |
+| `apps/web/Dockerfile`             | Add `ARG VITE_APQ_ENABLED=false`                                                                                                       |
 
 ### Tests Added
 
-| File | Test |
-|------|------|
-| `apps/web/src/lib/urql-client.test.ts` | `APQ guard — VITE_APQ_ENABLED` (2 tests): verifies exchange disabled by default |
+| File                                   | Test                                                                                    |
+| -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `apps/web/src/lib/urql-client.test.ts` | `APQ guard — VITE_APQ_ENABLED` (2 tests): verifies exchange disabled by default         |
 | `apps/web/src/lib/urql-client.test.ts` | `network error logging` (2 tests): verifies `[GraphQL][Network]` prefix in console.warn |
 
 ### Anti-Recurrence
@@ -2106,16 +2196,19 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 ### Fix Rounds
 
 **Round 1 — Frontend consent differentiation**:
+
 - `AiCourseCreatorModal.tsx` — check `error.graphQLErrors` for `CONSENT_REQUIRED` code, show specific i18n message
 - 10 i18n locale files — added `aiCreator.consentRequired` key (en, he, es, fr, pt, ru, hi, id, bn, zh-CN)
 - `agent-course-gen.queries.ts` — removed misleading "not yet in supergraph" comment
 
 **Round 2 — Critical AI mutations (7 files)**:
+
 - `ChavrutaPartnerPage.tsx`, `AIChatPanel.tsx`, `useChavrutaDebate.ts`, `useAgentChat.ts` — web consent checks
 - `AIChatScreen.tsx`, `AITutorScreen.tsx` — mobile Alert.alert for consent errors
 - `AgentStudioPage.tsx` — agent studio consent check
 
 **Round 3 — Backend fixes**:
+
 - `course-generator.service.ts` — `Promise.race` with 5-min timeout + `markFailed` on timeout/error
 - `course-generator.workflow.ts` — detect ECONNREFUSED/fetch-failed → actionable LLM error message
 
@@ -2173,12 +2266,15 @@ When uploading a PDF file ("הנחיות לפורים פו.pdf") in the course c
 **קבצים:** 127 E2E spec files in `apps/web/e2e/`
 
 ### שורש הבעיה
+
 Vite HMR WebSocket (`ws://localhost:5176/__vite_hmr__`) stays permanently open during E2E tests. Playwright's `waitForLoadState('networkidle')` requires ALL network connections idle for 500ms — HMR WebSocket never idles → every call times out at 30s.
 
 ### תיקון
+
 Global replacement: `networkidle` → `domcontentloaded` across all 127 E2E files (967 instances).
 
 ### מניעת הישנות
+
 - Grep for `networkidle` in CI — should return 0 matches in `apps/web/e2e/`
 - New E2E specs should use `domcontentloaded` or element-specific waits
 
@@ -2191,15 +2287,18 @@ Global replacement: `networkidle` → `domcontentloaded` across all 127 E2E file
 **קבצים:** `apps/web/src/App.tsx`, `apps/web/src/lib/auth.ts`
 
 ### שורש הבעיה
+
 After Keycloak login, browser redirects back with `?code=...&state=...` params. `keycloak.init()` processes the code but `history.replaceState()` to clean the URL doesn't trigger React Router re-render. The lazy-loaded route components get stuck in Suspense fallback ("Initializing authentication...").
 
 Additionally, if `keycloak.init()` hangs (server unreachable during token exchange), the app stays on the spinner forever with no timeout.
 
 ### תיקון
+
 1. **`App.tsx`:** Detect Keycloak redirect params → after bootstrap, clean URL + force `router.navigate('/dashboard')` to re-sync React Router
 2. **`auth.ts`:** 10-second timeout on `keycloak.init()` via `Promise.race()` — falls back to unauthenticated state instead of infinite spinner
 
 ### מניעת הישנות
+
 - Auth unit tests verify timeout behavior
 - SmartRoot + ProtectedRoute tests verify redirect flow
 
@@ -2212,16 +2311,20 @@ Additionally, if `keycloak.init()` hangs (server unreachable during token exchan
 **SC:** WCAG 2.2 SC 1.4.3 (Contrast Minimum), SC 1.4.11 (Non-text Contrast)
 
 ### תסמין (Symptom)
+
 1. "Start 90-Day Pilot" button in HeroSection was invisible — white text on white/indigo background
 2. 56+ low-contrast text instances across 20+ files (light + dark modes)
 
 ### שרשרת גורמים — Root Cause
+
 1. **HeroSection button:** `<Button>` default variant applied `bg-primary` via shadcn/ui. `tailwind-merge` cannot resolve conflicts between CSS-variable classes (`bg-primary`) and standard classes (`bg-transparent`). Both classes stayed in DOM; `bg-primary` (indigo) won, rendering white text on indigo as a solid block.
 2. **Tailwind v4 dark mode:** `darkMode: ['class']` in `tailwind.config.js` is **ignored** by Tailwind CSS v4.2.0. Class-based dark mode requires `@custom-variant dark (&:where(.dark, .dark *));` in CSS. Without it, all `dark:` utility classes had zero effect.
 3. **Low-contrast text:** `text-slate-400`/`text-gray-400`/`text-indigo-200`/`text-white/30` used on dark backgrounds — all below 4.5:1 AA ratio.
 
 ### תיקון (Fix)
+
 **Round 1 — Critical:**
+
 - `HeroSection.tsx:75` — Replaced `<Button>` with plain `<Link>` to bypass tailwind-merge conflict entirely
 - `globals.css` — Added `@custom-variant dark (&:where(.dark, .dark *));` after `@import "tailwindcss"`
 - `globals.css` — Light mode `--primary`: 67% → 58% lightness (WCAG AA 6.4:1 with white)
@@ -2250,12 +2353,14 @@ Additionally, if `keycloak.init()` hangs (server unreachable during token exchan
 | Multiple pages | `text-indigo-200`→`text-indigo-100` where on dark backgrounds |
 
 ### אימות (Verification)
+
 - axe-core audit: **0 fixable violations** across 15 pages × 2 modes (light + dark) = 30 audits
 - Only remaining: 2-3 Remotion player internal elements (third-party, `aria-hidden`, unfixable)
 - HeroSection button: `color: rgb(255, 255, 255)`, `bg: rgba(0, 0, 0, 0)` — confirmed visible
 - Screenshots: `docs/screenshots/contrast-hero-light.png`, `docs/screenshots/contrast-hero-dark.png`
 
 ### בדיקות שנוספו (Tests Added)
+
 - `apps/web/e2e/contrast-visual-audit.spec.ts` — ~36 test cases:
   - Landing page hero + full-scroll (light + dark) with Remotion exclusion
   - Form pages: PilotSignupPage, PartnerSignupPage (light + dark)
@@ -2264,6 +2369,7 @@ Additionally, if `keycloak.init()` hangs (server unreachable during token exchan
   - Visual regression screenshots: 6 baseline tests (light + dark × 3 pages)
 
 ### מניעת הישנות (Anti-Recurrence)
+
 1. `contrast-visual-audit.spec.ts` — CI gate: axe-core color-contrast on all pages
 2. Visual regression baselines prevent accidental contrast regressions
 3. `@custom-variant dark` in `globals.css` — class-based dark mode now works correctly in Tailwind v4
@@ -2277,14 +2383,17 @@ Additionally, if `keycloak.init()` hangs (server unreachable during token exchan
 **קומפוננטות:** `apps/gateway/supergraph.graphql`, `apps/subgraph-core/`, Docker/supervisord
 
 ### תסמין (Symptom)
+
 Switching language to Hebrew in Settings shows: "שמירת העדפות שפה נכשלה" (language preference save failed). First fix (2026-03-12) addressed `challenges.graphql` bad import, but the bug recurred because the **supergraph itself was missing CORE and KNOWLEDGE subgraphs entirely**.
 
 ### שרשרת גורמים — Original (Fixed 2026-03-12)
+
 1. `challenges.graphql` imported `"@requiresRole"` from Federation spec URL (custom directive, not spec element)
 2. subgraph-core crashed on startup → gateway couldn't reach port 4001
 3. Fix: removed bad import from `challenges.graphql`
 
 ### שרשרת גורמים — Recurrence (Fixed 2026-03-15)
+
 1. `apps/gateway/supergraph.graphql` `join__Graph` enum only listed 4 subgraphs: AGENT, ANNOTATION, COLLABORATION, CONTENT
 2. **CORE (port 4001) and KNOWLEDGE (port 4006) were completely missing** from the supergraph
 3. ALL CORE queries and mutations were unreachable through the gateway
@@ -2293,7 +2402,9 @@ Switching language to Hebrew in Settings shows: "שמירת העדפות שפה 
 6. The existing E2E tests used `routeGraphQL()` mocks, so they always passed — they never tested the real gateway
 
 ### תיקון — Recurrence (2026-03-15)
+
 Added CORE and KNOWLEDGE subgraphs to `apps/gateway/supergraph.graphql`:
+
 - Added `CORE` and `KNOWLEDGE` to `join__Graph` enum with correct URLs
 - Added `@join__type(graph: CORE)` and `@join__type(graph: KNOWLEDGE)` to Query/Mutation types
 - Added `@join__type(graph: CORE, key: "id")` to User type with all CORE fields (email, firstName, lastName, role, preferences, etc.)
@@ -2304,33 +2415,41 @@ Added CORE and KNOWLEDGE subgraphs to `apps/gateway/supergraph.graphql`:
 - Restarted gateway: `docker exec edusphere-all-in-one supervisorctl restart gateway`
 
 ### Verification
+
 - Gateway introspection confirms `updateUserPreferences` is accessible (125 total mutations)
 - Direct GraphQL mutation test returns `DOWNSTREAM_SERVICE_ERROR` (auth error, NOT schema validation) — confirms correct routing to CORE subgraph
 
 ### בדיקות E2E שנוספו (Tests Added)
+
 - `apps/web/e2e/language-save-regression.spec.ts` (7 tests — success toast, no error toast, logout/login persistence, visual snapshot)
 - `tests/security/federation-link-imports.spec.ts` (8+ tests — CI gate: no SDL file may import custom directives; **NEW: all 6 subgraphs must be present in supergraph**)
 
 ### Screenshots
+
 - `docs/screenshots/settings-language-save-success.png` — success toast
 - `docs/screenshots/login-page-hebrew-after-logout.png` — Hebrew login page after logout
 - `docs/screenshots/dashboard-hebrew-after-login.png` — Hebrew dashboard after re-login
 - `docs/screenshots/settings-hebrew-persisted-after-relogin.png` — Hebrew selected after re-login
 
 ### מניעת הישנות (Anti-Recurrence)
+
 1. `tests/security/federation-link-imports.spec.ts` — CI gate blocks SDL files from importing custom directives from Federation spec URL
 2. **NEW:** Same test file now verifies all 6 subgraphs (AGENT, ANNOTATION, COLLABORATION, CONTENT, CORE, KNOWLEDGE) are present in `supergraph.graphql`
 3. **NEW:** Same test verifies `updateUserPreferences` mutation has `@join__field(graph: CORE)` annotation
 
 ### Wave 3 — Structural Root Cause (Class of Bug)
+
 **Bug class:** supergraph.graphql manually maintained, no automation to keep in sync with subgraph SDL files.
+
 - `pnpm compose` must be run manually — no pre-commit/pre-push hook triggers it
 - CI `federation.yml` falls back silently when compose fails (subgraphs down in CI)
 - No drift detection: no test compares committed supergraph vs. what SDL files would produce
 - **Fix (2026-03-16):** Added pre-commit guard in `.husky/pre-commit` + CI failure when SDL changed but supergraph wasn't updated
 
 ### Discovery List (Wave 2 — Missing CORE subgraph impact)
+
 All of these operations were unreachable through the gateway before the fix:
+
 - User management (createUser, updateUser, me, users)
 - Language/locale preferences (updateUserPreferences)
 - Billing (mySubscription, myUsage, submitPilotRequest)
@@ -2358,58 +2477,65 @@ All of these operations were unreachable through the gateway before the fix:
 **Components:** `apps/web/src/lib/i18n.ts`, `apps/web/src/pages/ProfilePage.tsx`, `apps/web/src/pages/XapiSettingsPage.test.tsx`
 
 ### Symptom
+
 Switching language to Hebrew (or any non-English locale) showed raw i18n key names instead of translations on every page. All locale JSON files returned HTTP 404 in the browser network tab.
 
 ### Root Cause
+
 1. **`apps/web/src/lib/i18n.ts`** used `/* @vite-ignore */ import('../../node_modules/@edusphere/i18n/...')` as the dynamic import path for locale files. This path resolved at dev time but Vite could not bundle or serve files from `node_modules` via dynamic import — all locale fetches returned **404 Not Found**.
 2. **`apps/web/src/pages/ProfilePage.tsx`** had namespace ordering `['common', 'dashboard']` — the primary namespace should be `dashboard` (listed first) to match `useTranslation('dashboard')` usage. This caused fallback key resolution failures for dashboard-specific keys.
 3. **`apps/web/src/pages/XapiSettingsPage.test.tsx`** had a `navigate()` call inside render that triggered an infinite re-render loop in React Router tests.
 
 ### Fix
+
 1. **i18n.ts**: Replaced `@vite-ignore` + `../../node_modules/` import path with `import.meta.glob('../../../../packages/i18n/src/locales/**/*.json')` — Vite's glob import correctly bundles all locale JSON files at build time, no runtime HTTP fetches needed.
 2. **ProfilePage.tsx**: Changed namespace ordering to `['dashboard', 'common']` (primary namespace first).
 3. **XapiSettingsPage.test.tsx**: Fixed navigate() loop by correcting React Router mock setup.
 
 ### Files Changed
-| File | Change |
-|------|--------|
-| `apps/web/src/lib/i18n.ts` | `import.meta.glob` replaces `@vite-ignore` dynamic import |
-| `apps/web/src/pages/ProfilePage.tsx` | Namespace ordering `['dashboard', 'common']` |
-| `apps/web/src/pages/XapiSettingsPage.test.tsx` | Fixed navigate() infinite loop |
+
+| File                                           | Change                                                    |
+| ---------------------------------------------- | --------------------------------------------------------- |
+| `apps/web/src/lib/i18n.ts`                     | `import.meta.glob` replaces `@vite-ignore` dynamic import |
+| `apps/web/src/pages/ProfilePage.tsx`           | Namespace ordering `['dashboard', 'common']`              |
+| `apps/web/src/pages/XapiSettingsPage.test.tsx` | Fixed navigate() infinite loop                            |
 
 ### Tests Added (~575 new tests)
-| File | Tests | Purpose |
-|------|-------|---------|
-| `apps/web/src/lib/i18n.test.ts` | 180 | Core i18n loading, namespace resolution, fallback chains, locale switching |
-| `apps/web/e2e/i18n-smoke-guard.spec.ts` | 17 | E2E guard: every page checked for raw i18n keys after locale switch |
-| `apps/web/e2e/multi-role-visual-audit.spec.ts` | 37 | All 5 roles × multiple pages — visual audit for translation gaps |
-| `apps/web/e2e/error-boundary.spec.ts` | 15 | Error boundary behavior across pages |
-| `apps/web/e2e/loading-states.spec.ts` | 20 | Loading skeleton/spinner states on all major pages |
-| `apps/web/e2e/tablet-viewport.spec.ts` | 20 | Tablet viewport (768×1024) layout verification |
-| `apps/web/e2e/performance-smoke.spec.ts` | 15 | Performance smoke tests (bundle size, FCP, route load time) |
-| `apps/web/e2e/pwa-service-worker.spec.ts` | 15 | PWA service worker registration and caching |
-| `apps/web/e2e/role-access-control.spec.ts` | 25 | Role-based route access control for all 5 roles |
-| `apps/web/e2e/i18n-completeness.spec.ts` | 40 | Scan all locale files for missing keys across 9 languages |
-| `apps/web/src/hooks/useContentImport.test.ts` | 10 | Content import hook unit tests |
-| 6 page unit test files | 129 | Page-level unit tests (various pages) |
-| 20+ component test expansions | ~30 | Expanded existing component test coverage |
-| Annotation subgraph tests | 20 | `apps/subgraph-annotation/` test expansion |
-| Collaboration subgraph tests | 24 | `apps/subgraph-collaboration/` test expansion |
-| 13 E2E files expanded | ~100 | Additional scenarios in existing E2E spec files |
+
+| File                                           | Tests | Purpose                                                                    |
+| ---------------------------------------------- | ----- | -------------------------------------------------------------------------- |
+| `apps/web/src/lib/i18n.test.ts`                | 180   | Core i18n loading, namespace resolution, fallback chains, locale switching |
+| `apps/web/e2e/i18n-smoke-guard.spec.ts`        | 17    | E2E guard: every page checked for raw i18n keys after locale switch        |
+| `apps/web/e2e/multi-role-visual-audit.spec.ts` | 37    | All 5 roles × multiple pages — visual audit for translation gaps           |
+| `apps/web/e2e/error-boundary.spec.ts`          | 15    | Error boundary behavior across pages                                       |
+| `apps/web/e2e/loading-states.spec.ts`          | 20    | Loading skeleton/spinner states on all major pages                         |
+| `apps/web/e2e/tablet-viewport.spec.ts`         | 20    | Tablet viewport (768×1024) layout verification                             |
+| `apps/web/e2e/performance-smoke.spec.ts`       | 15    | Performance smoke tests (bundle size, FCP, route load time)                |
+| `apps/web/e2e/pwa-service-worker.spec.ts`      | 15    | PWA service worker registration and caching                                |
+| `apps/web/e2e/role-access-control.spec.ts`     | 25    | Role-based route access control for all 5 roles                            |
+| `apps/web/e2e/i18n-completeness.spec.ts`       | 40    | Scan all locale files for missing keys across 9 languages                  |
+| `apps/web/src/hooks/useContentImport.test.ts`  | 10    | Content import hook unit tests                                             |
+| 6 page unit test files                         | 129   | Page-level unit tests (various pages)                                      |
+| 20+ component test expansions                  | ~30   | Expanded existing component test coverage                                  |
+| Annotation subgraph tests                      | 20    | `apps/subgraph-annotation/` test expansion                                 |
+| Collaboration subgraph tests                   | 24    | `apps/subgraph-collaboration/` test expansion                              |
+| 13 E2E files expanded                          | ~100  | Additional scenarios in existing E2E spec files                            |
 
 ### Anti-Recurrence
+
 1. **`apps/web/e2e/i18n-smoke-guard.spec.ts`** — visits every major page after switching to Hebrew, asserts zero raw i18n keys visible (keys matching `[a-z]+\.[a-z]+` pattern without translation)
 2. **`apps/web/e2e/multi-role-visual-audit.spec.ts`** — logs in as each of the 5 roles, visits role-specific pages, checks for untranslated strings
 3. **`apps/web/e2e/i18n-completeness.spec.ts`** — scans all 9 locale directories, verifies every namespace file has matching keys across all languages
 4. **`apps/web/src/lib/i18n.test.ts`** — 180 unit tests verify glob import resolves all locales, namespace loading, fallback behavior
 
 ### Discovery List
-| Wave | File | Issue |
-|------|------|-------|
-| 1 | `apps/web/src/lib/i18n.ts` | `@vite-ignore` + `node_modules` path → 404 for all locales |
-| 2 | `apps/web/src/pages/ProfilePage.tsx` | Namespace ordering wrong → dashboard keys fell back to common |
-| 2 | `apps/web/src/pages/XapiSettingsPage.test.tsx` | navigate() infinite loop in test |
-| 3 | All pages using `useTranslation()` | Verified namespace ordering correct after fix |
+
+| Wave | File                                           | Issue                                                         |
+| ---- | ---------------------------------------------- | ------------------------------------------------------------- |
+| 1    | `apps/web/src/lib/i18n.ts`                     | `@vite-ignore` + `node_modules` path → 404 for all locales    |
+| 2    | `apps/web/src/pages/ProfilePage.tsx`           | Namespace ordering wrong → dashboard keys fell back to common |
+| 2    | `apps/web/src/pages/XapiSettingsPage.test.tsx` | navigate() infinite loop in test                              |
+| 3    | All pages using `useTranslation()`             | Verified namespace ordering correct after fix                 |
 
 ---
 
@@ -2420,32 +2546,36 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 **Purpose:** Bring total test count from ~8,445 to ~9,020+ with focus on E2E coverage gaps, i18n validation, role-based access, performance, and cross-viewport testing.
 
 ### New E2E Test Files
-| File | Tests | Category |
-|------|-------|----------|
-| `apps/web/e2e/i18n-smoke-guard.spec.ts` | 17 | i18n regression guard |
-| `apps/web/e2e/multi-role-visual-audit.spec.ts` | 37 | Multi-role visual audit |
-| `apps/web/e2e/error-boundary.spec.ts` | 15 | Error boundary coverage |
-| `apps/web/e2e/loading-states.spec.ts` | 20 | Loading state verification |
-| `apps/web/e2e/tablet-viewport.spec.ts` | 20 | Tablet viewport layout |
-| `apps/web/e2e/performance-smoke.spec.ts` | 15 | Performance smoke tests |
-| `apps/web/e2e/pwa-service-worker.spec.ts` | 15 | PWA/service worker tests |
-| `apps/web/e2e/role-access-control.spec.ts` | 25 | RBAC route protection |
-| `apps/web/e2e/i18n-completeness.spec.ts` | 40 | Cross-locale key completeness |
+
+| File                                           | Tests | Category                      |
+| ---------------------------------------------- | ----- | ----------------------------- |
+| `apps/web/e2e/i18n-smoke-guard.spec.ts`        | 17    | i18n regression guard         |
+| `apps/web/e2e/multi-role-visual-audit.spec.ts` | 37    | Multi-role visual audit       |
+| `apps/web/e2e/error-boundary.spec.ts`          | 15    | Error boundary coverage       |
+| `apps/web/e2e/loading-states.spec.ts`          | 20    | Loading state verification    |
+| `apps/web/e2e/tablet-viewport.spec.ts`         | 20    | Tablet viewport layout        |
+| `apps/web/e2e/performance-smoke.spec.ts`       | 15    | Performance smoke tests       |
+| `apps/web/e2e/pwa-service-worker.spec.ts`      | 15    | PWA/service worker tests      |
+| `apps/web/e2e/role-access-control.spec.ts`     | 25    | RBAC route protection         |
+| `apps/web/e2e/i18n-completeness.spec.ts`       | 40    | Cross-locale key completeness |
 
 ### New Unit Test Files
-| File | Tests | Category |
-|------|-------|----------|
-| `apps/web/src/lib/i18n.test.ts` | 180 | i18n core loading + namespaces |
-| `apps/web/src/hooks/useContentImport.test.ts` | 10 | Content import hook |
-| 6 page unit test files | 129 | Page-level component tests |
+
+| File                                          | Tests | Category                       |
+| --------------------------------------------- | ----- | ------------------------------ |
+| `apps/web/src/lib/i18n.test.ts`               | 180   | i18n core loading + namespaces |
+| `apps/web/src/hooks/useContentImport.test.ts` | 10    | Content import hook            |
+| 6 page unit test files                        | 129   | Page-level component tests     |
 
 ### Backend Test Expansion
-| Area | Tests | Category |
-|------|-------|----------|
-| Annotation subgraph | 20 | Resolver + service tests |
-| Collaboration subgraph | 24 | Resolver + service tests |
+
+| Area                   | Tests | Category                 |
+| ---------------------- | ----- | ------------------------ |
+| Annotation subgraph    | 20    | Resolver + service tests |
+| Collaboration subgraph | 24    | Resolver + service tests |
 
 ### Existing File Expansions
+
 - 20+ component test files expanded with additional scenarios (~30 new tests)
 - 13 existing E2E spec files expanded with ~100 new test cases
 
@@ -2459,71 +2589,77 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 **Severity:** 🟡 Medium → ✅ Resolved
 
 ### Phase 51 — B2B GTM Core
-| Deliverable | Status |
-|------------|--------|
-| LandingPage B2B rewrite (12 sections) | ✅ |
-| PilotSignupPage + PilotRequestsAdminPage + PilotBanner | ✅ |
-| PricingPage (4 tiers: $12K/$35K/$65K/Custom) | ✅ |
-| OrgUsagePage + PlatformUsageDashboard + UsageMeter | ✅ |
-| ROIAnalyticsDashboardPage (YAU formula + PDF export) | ✅ |
-| CourseCreatePage AI CTA + QuizBuilderPage AI button | ✅ |
-| SEO: robots.txt, llms.txt, sitemap.xml, JsonLd, usePageTitle | ✅ |
-| Billing schema migration 0030 (YAU + subscriptions + pilots) | ✅ |
-| AEO @Throttle + robots.txt trailing slash + llms.txt sanitized | ✅ |
+
+| Deliverable                                                    | Status |
+| -------------------------------------------------------------- | ------ |
+| LandingPage B2B rewrite (12 sections)                          | ✅     |
+| PilotSignupPage + PilotRequestsAdminPage + PilotBanner         | ✅     |
+| PricingPage (4 tiers: $12K/$35K/$65K/Custom)                   | ✅     |
+| OrgUsagePage + PlatformUsageDashboard + UsageMeter             | ✅     |
+| ROIAnalyticsDashboardPage (YAU formula + PDF export)           | ✅     |
+| CourseCreatePage AI CTA + QuizBuilderPage AI button            | ✅     |
+| SEO: robots.txt, llms.txt, sitemap.xml, JsonLd, usePageTitle   | ✅     |
+| Billing schema migration 0030 (YAU + subscriptions + pilots)   | ✅     |
+| AEO @Throttle + robots.txt trailing slash + llms.txt sanitized | ✅     |
 
 ### Phase 52 — Air-Gapped + Partner Portal + HRIS + Investor Deck
-| Deliverable | Status |
-|------------|--------|
-| LocalInferenceService (AIRGAP_MODE + model hash verification) | ✅ |
-| GraphragAuditService (append-only audit trail, immutable) | ✅ |
-| Helm chart (infrastructure/helm/edusphere-airgapped/) | ✅ |
-| Zarf K3s package (infrastructure/zarf/zarf.yaml) | ✅ |
-| airgap-enforcement.spec.ts (23 security tests) | ✅ |
-| partners + partner_revenue schema (migration 0031) | ✅ |
-| PartnerService (SHA-256 API key, never plaintext) | ✅ |
-| PartnerSignupPage + PartnerDashboardPage (30%/70% split) | ✅ |
-| IHrisAdapter + ScimAdapter (RFC 7643/7644) + Workday/SAP/Banner | ✅ |
-| HrisIntegrationService + HrisConfigPage | ✅ |
-| InvestorDeckPage (10 Guy Kawasaki slides, SUPER_ADMIN) | ✅ |
+
+| Deliverable                                                     | Status |
+| --------------------------------------------------------------- | ------ |
+| LocalInferenceService (AIRGAP_MODE + model hash verification)   | ✅     |
+| GraphragAuditService (append-only audit trail, immutable)       | ✅     |
+| Helm chart (infrastructure/helm/edusphere-airgapped/)           | ✅     |
+| Zarf K3s package (infrastructure/zarf/zarf.yaml)                | ✅     |
+| airgap-enforcement.spec.ts (23 security tests)                  | ✅     |
+| partners + partner_revenue schema (migration 0031)              | ✅     |
+| PartnerService (SHA-256 API key, never plaintext)               | ✅     |
+| PartnerSignupPage + PartnerDashboardPage (30%/70% split)        | ✅     |
+| IHrisAdapter + ScimAdapter (RFC 7643/7644) + Workday/SAP/Banner | ✅     |
+| HrisIntegrationService + HrisConfigPage                         | ✅     |
+| InvestorDeckPage (10 Guy Kawasaki slides, SUPER_ADMIN)          | ✅     |
 
 ### Test Totals (Phase 53 — commit 171ebfe)
-| Suite | Files | Tests |
-|-------|-------|-------|
-| Web | 365 | 4419 ✅ |
-| Security | 45 | 1353 ✅ |
-| subgraph-agent | 45 | 719 ✅ |
-| subgraph-core | 99 | 879 ✅ |
-| subgraph-knowledge | — | 610 ✅ |
-| **Total** | | **~8,000+** ✅ |
+
+| Suite              | Files | Tests          |
+| ------------------ | ----- | -------------- |
+| Web                | 365   | 4419 ✅        |
+| Security           | 45    | 1353 ✅        |
+| subgraph-agent     | 45    | 719 ✅         |
+| subgraph-core      | 99    | 879 ✅         |
+| subgraph-knowledge | —     | 610 ✅         |
+| **Total**          |       | **~8,000+** ✅ |
 
 ### Phase 53 — AI Auto-Grading + Gap Analysis + Stripe Stub + Partner Tiers
-| Deliverable | Status |
-|------------|--------|
-| AutoGradingService (GraphRAG rubric scoring + LLM grader) | ✅ |
-| AutoGradingResultsPage (/admin/auto-grading) | ✅ |
-| GapAnalysisService (org-level knowledge gap detection) | ✅ |
-| GapAnalysisDashboardPage (/admin/gap-analysis) | ✅ |
-| StripeInvoiceService (B2B invoice stub) + StripeInvoicePage | ✅ |
-| PartnerTierService (Bronze→Silver→Gold→Platinum) | ✅ |
-| PartnerTierBadge component | ✅ |
+
+| Deliverable                                                 | Status |
+| ----------------------------------------------------------- | ------ |
+| AutoGradingService (GraphRAG rubric scoring + LLM grader)   | ✅     |
+| AutoGradingResultsPage (/admin/auto-grading)                | ✅     |
+| GapAnalysisService (org-level knowledge gap detection)      | ✅     |
+| GapAnalysisDashboardPage (/admin/gap-analysis)              | ✅     |
+| StripeInvoiceService (B2B invoice stub) + StripeInvoicePage | ✅     |
+| PartnerTierService (Bronze→Silver→Gold→Platinum)            | ✅     |
+| PartnerTierBadge component                                  | ✅     |
 
 ### Phase 54 — E2E Playwright Specs (Protocol Closure)
-| E2E Spec | Status |
-|----------|--------|
-| `apps/web/e2e/pilot-signup.spec.ts` (6 suites, 28 tests) | ✅ |
-| `apps/web/e2e/pilot-admin-approval.spec.ts` (5 suites, 27 tests) | ✅ |
-| `apps/web/e2e/pricing-page.spec.ts` (8 suites, 36 tests) | ✅ |
-| `apps/web/e2e/ai-course-builder.spec.ts` (6 suites, 37 tests) | ✅ |
-| `apps/web/e2e/org-usage.spec.ts` (4 suites, 15 tests) | ✅ |
-| `apps/web/e2e/airgap-mode.spec.ts` (5 suites, 20 tests — static analysis) | ✅ |
-| `apps/web/e2e/partner-signup.spec.ts` (7 suites, 33 tests) | ✅ |
-| `apps/web/e2e/auto-grading-gap-analysis.spec.ts` (2 blocks, 31 tests) | ✅ |
-| All 8 specs pass chromium + mobile-chrome — commit `68a2f26` (2026-03-12) | ✅ |
-| Mobile-chrome stability fixes (sidebar collapse, auth wait, schema) — commit `5b11628` | ✅ |
-| webkit/firefox made opt-in via `PLAYWRIGHT_ALL_BROWSERS=true` (browsers blocked by corp proxy) | ✅ |
-| **207/207 tests pass on mobile-chrome · 207/207 on chromium · 414/414 total** | ✅ |
+
+| E2E Spec                                                                                       | Status |
+| ---------------------------------------------------------------------------------------------- | ------ |
+| `apps/web/e2e/pilot-signup.spec.ts` (6 suites, 28 tests)                                       | ✅     |
+| `apps/web/e2e/pilot-admin-approval.spec.ts` (5 suites, 27 tests)                               | ✅     |
+| `apps/web/e2e/pricing-page.spec.ts` (8 suites, 36 tests)                                       | ✅     |
+| `apps/web/e2e/ai-course-builder.spec.ts` (6 suites, 37 tests)                                  | ✅     |
+| `apps/web/e2e/org-usage.spec.ts` (4 suites, 15 tests)                                          | ✅     |
+| `apps/web/e2e/airgap-mode.spec.ts` (5 suites, 20 tests — static analysis)                      | ✅     |
+| `apps/web/e2e/partner-signup.spec.ts` (7 suites, 33 tests)                                     | ✅     |
+| `apps/web/e2e/auto-grading-gap-analysis.spec.ts` (2 blocks, 31 tests)                          | ✅     |
+| All 8 specs pass chromium + mobile-chrome — commit `68a2f26` (2026-03-12)                      | ✅     |
+| Mobile-chrome stability fixes (sidebar collapse, auth wait, schema) — commit `5b11628`         | ✅     |
+| webkit/firefox made opt-in via `PLAYWRIGHT_ALL_BROWSERS=true` (browsers blocked by corp proxy) | ✅     |
+| **207/207 tests pass on mobile-chrome · 207/207 on chromium · 414/414 total**                  | ✅     |
 
 ---
+
 **מצב פרויקט:** ✅ **Phase 50 ✅** (WCAG 2.2 AA + EU AI Act + Security Compliance) + **Phase 47 ✅** (AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials) + **Phase 46 ✅** (Group Challenges + KG Peer Matching) + Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅** + **AEO Phase 2 ✅** + **Phase 55 ✅** (admin wiring) + **Phase 56 ✅** (HRIS+Partner+AEO pre-render) + **Phase 57 ✅** (i18n) + **Phase 58 ✅** (Lesson Pipeline Builder) + **Phase 59 ✅** (Instructor Marketplace) + **Phase 60 ✅** (360° Assessments) + **Phase 61 ✅** (OpenBadges 3.0) + **Phase 62 ✅** (SCORM 2004 Export) + **Phase 63 ✅** (Portal Builder) + **Phase 64 ✅** (Compliance Library) + **BUG-059 ✅** (dark mode contrast) + **BUG-066 ✅** (i18n translation 404 — @vite-ignore fix) + **TEST-EXPANSION-001 ✅** (~575 new tests)
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅** | **Phase 50 WCAG 2.2 AA + EU AI Act + Security Compliance ✅**
 **בדיקות:** Security: **1,185 tests** | Web: **4,765+** (370+ files) | Knowledge: **598** | Transcription: **95** | Backend subgraphs: **2,621+** (agent 702 + content 1193 + knowledge 598 + annotation 164 + collab 204 + core 719+) | סה"כ: **~9,020+ tests** | TypeScript: **0 errors**
@@ -2536,83 +2672,94 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 **Severity:** 🟡 Medium → ✅ Resolved
 
 ### Phase 59 — Instructor Marketplace + Revenue Sharing (F-031)
-| Deliverable | Status | Commit |
-|------------|--------|--------|
-| `InstructorPayoutService` — monthly cron (PAYOUT_CRON_ENABLED env guard) | ✅ | 4840b7d |
-| `getPayoutHistory()` + `getAllPayouts()` — 70%/30% revenue split | ✅ | 4840b7d |
-| `InstructorPayout` GraphQL type + `myPayouts` + `allPayouts` queries | ✅ | 4840b7d |
-| `MarketplaceResolver` — `getMyPayouts` / `getAllPayouts` handlers | ✅ | 4840b7d |
-| `instructor-payout.service.spec.ts` — 5 tests (cron lifecycle + memory safety) | ✅ | 4840b7d |
-| `InstructorEarningsPage.tsx` — monthly BarChart + payout status badge | ✅ | 4840b7d |
+
+| Deliverable                                                                    | Status | Commit  |
+| ------------------------------------------------------------------------------ | ------ | ------- |
+| `InstructorPayoutService` — monthly cron (PAYOUT_CRON_ENABLED env guard)       | ✅     | 4840b7d |
+| `getPayoutHistory()` + `getAllPayouts()` — 70%/30% revenue split               | ✅     | 4840b7d |
+| `InstructorPayout` GraphQL type + `myPayouts` + `allPayouts` queries           | ✅     | 4840b7d |
+| `MarketplaceResolver` — `getMyPayouts` / `getAllPayouts` handlers              | ✅     | 4840b7d |
+| `instructor-payout.service.spec.ts` — 5 tests (cron lifecycle + memory safety) | ✅     | 4840b7d |
+| `InstructorEarningsPage.tsx` — monthly BarChart + payout status badge          | ✅     | 4840b7d |
 
 ### Phase 60 — 360° Multi-Rater Assessments (F-030)
-| Deliverable | Status | Commit |
-|------------|--------|--------|
-| `PeerReviewRubricService` — `scoreResponse()`, `getAggregatedResults()` | ✅ | df3403c |
-| `peer-review-rubric.service.spec.ts` — 5 tests | ✅ | df3403c |
-| `AssessmentResultsDetailPage.tsx` — RadarChart + rater breakdown table | ✅ | df3403c |
-| `AssessmentResultsDetailPage.test.tsx` — 4 tests | ✅ | df3403c |
-| Route `/assessments/:id/results-detail` wired in router | ✅ | df3403c |
+
+| Deliverable                                                             | Status | Commit  |
+| ----------------------------------------------------------------------- | ------ | ------- |
+| `PeerReviewRubricService` — `scoreResponse()`, `getAggregatedResults()` | ✅     | df3403c |
+| `peer-review-rubric.service.spec.ts` — 5 tests                          | ✅     | df3403c |
+| `AssessmentResultsDetailPage.tsx` — RadarChart + rater breakdown table  | ✅     | df3403c |
+| `AssessmentResultsDetailPage.test.tsx` — 4 tests                        | ✅     | df3403c |
+| Route `/assessments/:id/results-detail` wired in router                 | ✅     | df3403c |
 
 ### Phase 61 — OpenBadges 3.0 Blockchain Credentials (F-025)
-| Deliverable | Status | Commit |
-|------------|--------|--------|
-| `BadgeIssuerService` — W3C VC JSON + SHA-256 proof + `issueBadge()` / `verifyBadge()` | ✅ | 97f4152 |
-| `badge-issuer.service.spec.ts` — 6 tests (issue, verify, tamper detection) | ✅ | 97f4152 |
-| `BadgeVerifierPage.tsx` — "Download VC JSON" button + verification status | ✅ | 97f4152 |
-| `MyOpenBadgesPage.tsx` — "Download VC" + "Share to LinkedIn" per badge | ✅ | 97f4152 |
+
+| Deliverable                                                                           | Status | Commit  |
+| ------------------------------------------------------------------------------------- | ------ | ------- |
+| `BadgeIssuerService` — W3C VC JSON + SHA-256 proof + `issueBadge()` / `verifyBadge()` | ✅     | 97f4152 |
+| `badge-issuer.service.spec.ts` — 6 tests (issue, verify, tamper detection)            | ✅     | 97f4152 |
+| `BadgeVerifierPage.tsx` — "Download VC JSON" button + verification status             | ✅     | 97f4152 |
+| `MyOpenBadgesPage.tsx` — "Download VC" + "Share to LinkedIn" per badge                | ✅     | 97f4152 |
 
 ### Phase 62 — SCORM 2004 Export (F-032)
-| Deliverable | Status | Commit |
-|------------|--------|--------|
-| `ScormExportService` — `exportCourseAsScorm2004()` — imsmanifest.xml + entry HTML | ✅ | 97f4152 |
-| `scorm-export.service.spec.ts` — 6 tests (manifest format, XML safety, ZIP structure) | ✅ | 97f4152 |
-| `scorm.graphql` — `ScormExportResult` type + `exportCourseAsScorm2004` mutation | ✅ | 97f4152 |
-| `scorm.resolver.ts` — mutation handler | ✅ | 97f4152 |
-| `CourseCreatePage.tsx` — "Export as SCORM 2004" button + mutation wiring | ✅ | 97f4152 |
+
+| Deliverable                                                                           | Status | Commit  |
+| ------------------------------------------------------------------------------------- | ------ | ------- |
+| `ScormExportService` — `exportCourseAsScorm2004()` — imsmanifest.xml + entry HTML     | ✅     | 97f4152 |
+| `scorm-export.service.spec.ts` — 6 tests (manifest format, XML safety, ZIP structure) | ✅     | 97f4152 |
+| `scorm.graphql` — `ScormExportResult` type + `exportCourseAsScorm2004` mutation       | ✅     | 97f4152 |
+| `scorm.resolver.ts` — mutation handler                                                | ✅     | 97f4152 |
+| `CourseCreatePage.tsx` — "Export as SCORM 2004" button + mutation wiring              | ✅     | 97f4152 |
 
 ### Phase 63 — No-Code Portal Builder (F-037)
-| Deliverable | Status | Commit |
-|------------|--------|--------|
-| Migration `0033_portal_config.sql` — `portal_config JSONB` column on `tenants` | ✅ | a2f737c |
-| `tenants.ts` — `portalConfig` Drizzle column + `PortalConfig`/`PortalBlock` interfaces | ✅ | a2f737c |
-| `PortalBlockEditor.tsx` — `@dnd-kit/sortable` drag-drop, 5 block types (Hero/Courses/Features/CTA/Testimonials) | ✅ | a2f737c |
-| `PortalBlockEditor.test.tsx` — 4 tests | ✅ | a2f737c |
+
+| Deliverable                                                                                                     | Status | Commit  |
+| --------------------------------------------------------------------------------------------------------------- | ------ | ------- |
+| Migration `0033_portal_config.sql` — `portal_config JSONB` column on `tenants`                                  | ✅     | a2f737c |
+| `tenants.ts` — `portalConfig` Drizzle column + `PortalConfig`/`PortalBlock` interfaces                          | ✅     | a2f737c |
+| `PortalBlockEditor.tsx` — `@dnd-kit/sortable` drag-drop, 5 block types (Hero/Courses/Features/CTA/Testimonials) | ✅     | a2f737c |
+| `PortalBlockEditor.test.tsx` — 4 tests                                                                          | ✅     | a2f737c |
 
 ### Phase 64 — Pre-Built Compliance Course Library (F-038)
-| Deliverable | Status | Commit |
-|------------|--------|--------|
-| `compliance-library.ts` seed — 8 courses (FERPA/GDPR/HIPAA/Cybersecurity/Harassment/Privacy/AI Ethics/Integrity) | ✅ | a2f737c |
-| `ComplianceLibraryService` — `getComplianceCourses()` + `cloneComplianceCourse()` | ✅ | a2f737c |
-| `compliance-library.service.spec.ts` — 5 tests | ✅ | a2f737c |
-| `ComplianceCourse` type + `complianceCourses` / `cloneComplianceCourse` SDL | ✅ | a2f737c |
-| `ComplianceLibraryPage.tsx` — 8-card grid, mounted guard, clone mutation | ✅ | a2f737c |
-| Route `/library/compliance` wired in router | ✅ | a2f737c |
+
+| Deliverable                                                                                                      | Status | Commit  |
+| ---------------------------------------------------------------------------------------------------------------- | ------ | ------- |
+| `compliance-library.ts` seed — 8 courses (FERPA/GDPR/HIPAA/Cybersecurity/Harassment/Privacy/AI Ethics/Integrity) | ✅     | a2f737c |
+| `ComplianceLibraryService` — `getComplianceCourses()` + `cloneComplianceCourse()`                                | ✅     | a2f737c |
+| `compliance-library.service.spec.ts` — 5 tests                                                                   | ✅     | a2f737c |
+| `ComplianceCourse` type + `complianceCourses` / `cloneComplianceCourse` SDL                                      | ✅     | a2f737c |
+| `ComplianceLibraryPage.tsx` — 8-card grid, mounted guard, clone mutation                                         | ✅     | a2f737c |
+| Route `/library/compliance` wired in router                                                                      | ✅     | a2f737c |
 
 ### E2E Specs — Phase 59–64
-| Spec | Status |
-|------|--------|
+
+| Spec                                                                             | Status                         |
+| -------------------------------------------------------------------------------- | ------------------------------ |
 | E2E specs for Phase 59–64 features (embedded in existing specs via mock GraphQL) | ✅ Included in existing suites |
 
 ### Test Totals (Phase 59–64 — commit c5488d3)
-| Suite | Tests |
-|-------|-------|
-| subgraph-content | 1,233 ✅ |
-| security | 1,370 ✅ |
-| web | 4,424+ ✅ |
-| TypeScript | 0 errors ✅ |
+
+| Suite            | Tests       |
+| ---------------- | ----------- |
+| subgraph-content | 1,233 ✅    |
+| security         | 1,370 ✅    |
+| web              | 4,424+ ✅   |
+| TypeScript       | 0 errors ✅ |
 
 ### Test Fixes (commit c5488d3)
+
 - `XapiSettingsPage.test.tsx` — replaced `callCount++` anti-pattern with query-string based mock discrimination (`opts?.query === 'XAPI_TOKENS_QUERY'`); React 19 mounted-guard causes double render
 - `UserManagementPage.test.tsx` — replaced `mockReturnValueOnce` chain with `mockImplementation(() => results[mutCallCount++ % 3])` for stable mutation order
 
 ---
 
 ## AEO-001 — Answer Engine Optimization Implementation
+
 **Status:** ✅ Phase 1 + Phase 2 Complete (2026-03-12) — E2E 30/30 chromium ✅
 **Severity:** 🟡 Medium (growth opportunity)
 
 ### Implemented (Phase 1)
+
 - robots.txt with AI bot rules (GPTbot, ClaudeBot, PerplexityBot)
 - llms.txt + llms-full.txt for AI system guidance
 - react-helmet-async per-page meta tags
@@ -2624,6 +2771,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - E2E: 4 Playwright spec files for AEO pages + aeo-global-meta.spec.ts (17/17 chromium tests)
 
 ### Session 3 Final Fix (2026-03-12 — commit ce9d874)
+
 - Fixed "each AEO page has a unique canonical URL" E2E test: replaced generic `waitForFunction(() => !!document.querySelector('link[rel="canonical"]'))` with path-specific guard: waits until canonical href INCLUDES the page segment (e.g. "faq"). Prevents reading stale/mismatched canonical before react-helmet-async finishes updating the DOM.
 - Timeout raised 10s → 15s for slower CI environments
 - E2E: 17/17 chromium tests now pass ✅
@@ -2631,8 +2779,9 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - Visual snapshot baseline: apps/web/e2e/aeo-global-meta.spec.ts-snapshots/landing-with-aeo-chromium-win32.png
 
 ### Session 2 Fixes (2026-03-11 — commits c6e5317, e6fda7a, 4df1e86)
+
 - Fixed canonical URL deduplication: removed static canonical from index.html (was causing double canonical with react-helmet-async); Helmet now manages all canonicals
-- Fixed Twitter meta: changed `property=` → `name=` for all twitter:* tags in index.html
+- Fixed Twitter meta: changed `property=` → `name=` for all twitter:\* tags in index.html
 - Added static EducationalOrganization + WebSite JSON-LD to index.html (AI bots see them without JS)
 - Added `<meta name="twitter:card">` to PageMeta.tsx (was missing)
 - Fixed E2E canonical test to use `waitForFunction` instead of `networkidle` (Keycloak blocks networkidle)
@@ -2641,6 +2790,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - Updated aeo-security.spec.ts to accept gateway-level rate limiting as compliant
 
 ### Phase 2 — Complete (2026-03-12 — commit 67f3c69)
+
 - `/catalog` public page — 6 featured courses with CourseSchema JSON-LD × 6 + BreadcrumbList
 - `/instructors` public page — 4 instructor profiles with PersonSchema × 4 + BreadcrumbList
 - CourseSchema.tsx, PersonSchema.tsx, HowToSchema.tsx — new reusable schema components
@@ -2652,12 +2802,14 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - E2E: aeo-phase2.spec.ts — 30/30 pass, 6 skipped (backend sitemap tests — expected)
 
 ### Remaining (Phase 3 — Future)
+
 - Blog with original research content (requires CMS infrastructure)
 - Dynamic OG image generation per course (requires Vercel OG or similar)
 - Course schema on REAL dynamic course pages (requires public course catalog API)
 - Instructor profiles for REAL users (requires public profile opt-in)
 
 ### Files Added
+
 - apps/web/public/robots.txt
 - apps/web/public/llms.txt
 - apps/web/public/llms-full.txt
@@ -2684,6 +2836,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - E2E: apps/web/e2e/aeo-faq-page.spec.ts, apps/web/e2e/aeo-glossary-page.spec.ts
 
 ### Anti-Recurrence
+
 - safeJsonLd() test at apps/web/src/lib/safe-json-ld.test.ts verifies </script> escaping
 - tests/security/aeo-security.spec.ts verifies no credentials in llms.txt
 - apps/web/e2e/aeo-global-meta.spec.ts:164 — path-specific canonical guard (catches regression if react-helmet-async stops updating canonical per page)
@@ -2691,18 +2844,21 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 ---
 
 ## B2B GTM Platform — Full Implementation ✅ Complete | HIGH
+
 **Status:** ✅ Complete | **Date:** 2026-03-11
 **Branch:** feat/compliance-accessibility-security
 
 **Scope:** B2B White-Label LMS: Landing Page + Billing + YAU + Pilot Flow + SEO + Security
 
 ### Database (packages/db)
+
 - `packages/db/src/schema/billing.ts` — 5 tables: subscription_plans, tenant_subscriptions, yau_events, pilot_requests, usage_snapshots
 - `packages/db/src/migrations/0030_b2b_billing.sql` — migration with RLS policies + plan seeds
 - RLS: tenant-scoped policies on tenant_subscriptions, yau_events, usage_snapshots
 - SI-1 compliance: `app.current_user_id` (not `app.current_user`) in all YAU policies
 
 ### Backend (apps/subgraph-core)
+
 - `apps/subgraph-core/src/billing/yau-counter.service.ts` — YAU counting (upsert + NATS at 90% limit)
 - `apps/subgraph-core/src/billing/subscription.service.ts` — subscription lifecycle + pilot creation
 - `apps/subgraph-core/src/billing/pilot.service.ts` — public pilot submission + SUPER_ADMIN approval
@@ -2712,6 +2868,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - 40 unit tests + memory safety spec (OnModuleDestroy verified on all 3 services)
 
 ### Frontend (apps/web)
+
 - 12 landing page sections: Hero, TrustBar, ComplianceBadges, VsCompetitors, UniqueFeatures, HowPilot, AICourse, ROICalculator, Pricing, PilotCTA, Testimonials, Footer
 - `apps/web/index.html` — full SEO: title, description, OG, Twitter, JSON-LD SoftwareApplication schema
 - `apps/web/public/sitemap.xml` — 10 URLs with priorities
@@ -2721,6 +2878,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - WCAG 2.2 AA: all interactive elements have aria-labels, sufficient contrast
 
 ### Security
+
 - `docs/security/B2B_BILLING_THREAT_MODEL.md` — full STRIDE analysis (22 threats)
 - `tests/security/b2b-billing-security.spec.ts` — 60 security tests (60/60 ✅)
 - Rate limiting: pilot endpoint max 5/IP/hour (SC-01)
@@ -2730,11 +2888,13 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - YAU RLS policy split into 3 PERMISSIVE policies — no OR-bypass (SC-07)
 
 ### E2E Tests
+
 - `apps/web/e2e/landing-b2b.spec.ts` — 52 tests (hero, trust, compliance, pricing, pilot form)
 - `apps/web/e2e/landing-visual-regression.spec.ts` — 15 tests (toHaveScreenshot all sections)
 - `apps/web/e2e/landing-accessibility.spec.ts` — 35 tests (axe-core WCAG audit)
 
 ### Research
+
 - `docs/product/LMS_PRICING_INTELLIGENCE_2026.md` — full competitive pricing report (11 vendors)
 - **Pricing validation:** $12,000/yr (500 YAU) = 2.5–5x cheaper than D2L/Docebo → HOLD pricing ✅
 - **90-day pilot = top-end differentiator** (industry norm: 30 days) ✅
@@ -2745,6 +2905,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 ---
 
 ## Phase 50 — WCAG 2.2 AA + Security Compliance ✅ Complete | HIGH
+
 **Status:** ✅ Complete | **Commit:** 72a961b | **Date:** 2026-03-11
 **Branch:** feat/compliance-accessibility-security
 **Tests:** web 4,190/4,190 ✅ | security 1,185/1,185 ✅ | knowledge 598/598 ✅ | transcription 95/95 ✅
@@ -2753,6 +2914,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 **Deliverables:**
 
 ### WCAG 2.2 AA Accessibility
+
 - **SC 2.5.7** `DragOrderQuestion` — keyboard drag alternative (arrow keys + Enter to move items)
 - **SC 2.1.1** `KnowledgeSkillTree` — full ARIA APG tree widget (role=tree, role=treeitem, keyboard navigation)
 - **SC 3.1.1** `lang` attribute — auto-set on `<html>` from i18n locale on every language change
@@ -2762,11 +2924,13 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - **SC 3.3.7** Onboarding forms — `autoComplete` attributes on all identity fields
 
 ### EU AI Act Compliance (Art. 14 + Art. 50)
+
 - `AIOverrideRequestButton` — human oversight control (Art. 14), visible on all AI-generated content
 - `AITransparencyBadge` — AI disclosure badge (Art. 50), consistent placement across AI features
 - `AIChatPanel` — disclosure banner shown at session start before first AI interaction
 
 ### Security
+
 - HTTP Security Headers middleware (gateway): `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`
 - pgvector RLS cross-tenant fix — `content_embeddings` and `annotation_embeddings` now enforce tenant isolation (OWASP LLM06)
 - Keycloak MFA enforcement — OTP required for INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN roles
@@ -2774,6 +2938,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - K8s NetworkPolicy — deny-all default + explicit allow rules per subgraph
 
 ### Compliance Documentation (10 docs in `docs/compliance/`)
+
 - ROPA (Records of Processing Activities)
 - DPIA (Data Protection Impact Assessment)
 - Breach Notification Procedure
@@ -2785,11 +2950,13 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - Vendor Risk Register
 
 ### Security Tests Added
+
 - `tests/security/http-security-headers.spec.ts` (+30 tests)
 - `tests/security/keycloak-mfa.spec.ts` (+30 tests)
 - `tests/security/linkerd-mtls.spec.ts` (+30 tests)
 
 **Anti-recurrence:**
+
 - WCAG: `apps/web/e2e/accessibility.spec.ts` — axe-core scans on every major page
 - EU AI Act: `tests/security/ai-compliance.spec.ts` — asserts disclosure banner + override button presence
 - Security headers: `tests/security/http-security-headers.spec.ts` — asserts all 6 headers present
@@ -2797,36 +2964,43 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 ---
 
 ## BUG-058..062-UI-REGRESSION | ✅ Fixed | HIGH
+
 **UI/UX Bug Batch — nav keys, layout, logo, SRS error, language persistence**
 **Date:** 2026-03-11
 **Severity:** 🔴 Critical (visible to all users)
 
 ### BUG-058: Missing nav translation keys → raw key names shown in sidebar
+
 **Problem:** `skillPaths`, `socialFeed`, `findPeople`, `peerReview`, `assessments`, `groupChallenges`, `peerMatching`, `cohortInsights` were missing from `en/nav.json` and `he/nav.json`. Sidebar displayed raw key strings (e.g., "skillPaths") instead of human-readable labels.
 **Fix:** Added all 8 missing keys to both `packages/i18n/src/locales/en/nav.json` and `packages/i18n/src/locales/he/nav.json`.
 **Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-001 suite — asserts raw keys never appear in sidebar.
 
 ### BUG-059: Layout main content overlaps expanded sidebar
+
 **Problem:** `Layout.tsx` always applied `ml-16` (64px) to main content, even when sidebar was expanded to `w-60` (240px). Content appeared behind the sidebar at 100% zoom.
 **Fix:** `AppSidebar.tsx` now sets `--sidebar-w` CSS variable (64px/240px) on `document.documentElement` via useEffect. `Layout.tsx` uses `style={{ marginLeft: 'var(--sidebar-w, 64px)' }}` instead of hardcoded `ml-16`.
 **Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-003 suite — asserts main content x >= sidebar right edge.
 
 ### BUG-060: Logo not visible (default SVG missing)
+
 **Problem:** `DEFAULT_BRANDING.logoUrl` pointed to `/defaults/logo.svg` but the directory `apps/web/public/defaults/` didn't exist. Logo was a broken image.
 **Fix:** Created `apps/web/public/defaults/logo.svg` (simple "E" on blue square). Added `onError` handler to `AppSidebar` logo img that hides broken image and shows letter-based `data-testid="sidebar-logo-fallback"` div.
 **Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-002 suite — asserts logo img OR fallback is visible.
 
 ### BUG-061: SRS Review page shows raw `[GraphQL] Unexpected error.` to users
+
 **Problem:** `SrsReviewPage.tsx` rendered `{error.message}` directly, exposing urql internal error strings.
 **Fix:** Removed the `<p>{error.message}</p>` line. Error state now shows only the i18n-translated friendly message.
 **Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-004 suite — asserts `[GraphQL] Unexpected error.` never in DOM. `SrsReviewPage.test.tsx` updated: `queryByText('Network error')` asserts NOT in document.
 
 ### BUG-062: Language preference reverts after DB failure (backend down in dev)
+
 **Problem:** `useUserPreferences.setLocale()` was reverting localStorage AND i18next to previous locale when the GraphQL mutation failed. In dev mode (backend down), any language change was immediately lost.
 **Fix:** Removed the revert block. localStorage and i18n keep the new locale even when DB mutation fails. Error is logged and rethrown for UI toast. The locale will be synced to DB via `GlobalLocaleSync` on next session when backend is available.
 **Anti-recurrence:** `apps/web/e2e/ui-bugs-regression.spec.ts` BUG-006 suite — asserts localStorage survives reload. `useUserPreferences.test.ts` BUG-045 updated to verify localStorage IS kept as new value after DB failure.
 
 ### Additional fixes in this batch:
+
 - `CertificatesPage.tsx`: Replaced 4 hardcoded English strings with `useTranslation('common')` + `t()` calls
 - `packages/i18n/src/locales/{en,he}/common.json`: Added `certificates` i18n section
 - **New E2E files:** `apps/web/e2e/course-lifecycle.spec.ts`, `apps/web/e2e/ui-bugs-regression.spec.ts`
@@ -2836,12 +3010,14 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 ---
 
 ## FEAT-PHASE47-KG-CHAVRUTA | ✅ Complete | HIGH
+
 **Phase 47 — AI Chavruta Partner + Mentor Path + Cohort Insights + Graph Credentials**
 **Date:** 2026-03-10
 **Commit:** ed551b5
 **Status:** ✅ Complete — 41 files, 2,815 insertions
 
 **Deliverables:**
+
 - **GAP-3** `ChavrutaPartnerMatchService` (subgraph-agent): `findPartnerForDebate()` matches users enrolled in same course; `createPartnerSession()` stores into `chavruta_partner_sessions`; SDL + resolver + 7 tests
 - **GAP-6** `PeerMatchingService.findMentorsByPathTopology()` (subgraph-knowledge): Apache AGE Cypher `STUDIED` path overlap (≥2 shared concepts) + SQL fallback; `MentorPathMatch` SDL type; 5 tests
 - **GAP-7** `CohortInsightsService` (subgraph-knowledge): `getCohortInsights()` queries past-cohort `social_feed_items` with `cohort_id`; `cohortInsights` GraphQL query; 3 tests
@@ -2851,6 +3027,7 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 - **Test counts**: agent 702/702 | knowledge 582/582 | content 1193/1193 | web 4098/4098
 
 **Anti-recurrence:**
+
 - `chavruta-partner.service.spec.ts` guards against self-matching (partnerId === userId)
 - `mentor-path.service.spec.ts` guards Apache AGE Cypher fallback to SQL on error
 - `graph-credential.service.spec.ts` guards 70% coverage gate enforcement
@@ -2858,31 +3035,35 @@ Switching language to Hebrew (or any non-English locale) showed raw i18n key nam
 ---
 
 ## FEAT-PHASE45-SOCIAL-LEARNING | ✅ Fixed | HIGH
+
 **Phase 45 — Social Learning Experience**
 **Date:** 2026-03-09
 **Status:** ✅ Complete — committed 60b292c (2026-03-09)
 **Deliverables:**
+
 - Sprint A: Supergraph wire-up (myFollowers, myFollowing, socialFeed, socialRecommendations, publicProfile, discussions, assessments, peer-review), social feed backend (`getSocialFeed`/`getSocialRecommendations`/`searchUsers`/NATS fan-out), DB migration 0027 (peer_review_rubrics, peer_review_assignments, social_feed_items, discussion_message_likes), notification extension (PEER_REVIEW_ASSIGNED/RECEIVED/DISCUSSION_REPLY/PEER_FOLLOWED_ACTIVITY)
 - Sprint B: DiscussionsPage + DiscussionDetailPage + MessageComposer + MessageItem, SocialFeedPage + FeedItem (P0: SocialFeedWidget mounted guard added), PublicProfilePage + FollowersList `pause:true` removed, UserSearchPage (/people), AssessmentCampaignsPage + AssessmentResponsePage + AssessmentResultPage + RadarChart, PeerReviewPage + ReviewAssignmentPage + RubricScorer, AppSidebar nav items, 9 new routes in router.tsx
 - Sprint C: PeerReviewService (IDOR guard — `reviewerId === assignment.reviewerId`, auto-assign peers via enrollment shuffle, NATS events), DiscussionInsightsService (SEC-6 compliant Ollama summarization via `JSON.stringify({task,data})`), 4 E2E specs (social-feed/discussions/peer-review/assessment-360), security gate `social-learning.spec.ts` (32 assertions)
 - Security fixes: SEC-1 self-follow `BadRequestException('Cannot follow yourself')`, SEC-3 XSS `content.replace(/<[^>]*>/g, '')` + maxLength 2000
-**Anti-recurrence:**
+  **Anti-recurrence:**
 - IDOR: `peer-review.service.ts` enforces `reviewerId === assignment.reviewerId` before any update — also backed by RLS `reviewer_id::text = current_setting('app.current_user_id')`
 - SEC-6: `social-learning.spec.ts` asserts `JSON.stringify` pattern in `discussion-insights.service.ts`
 - SEC-1: `social-learning.spec.ts` asserts `BadRequestException.*Cannot follow yourself` in `social.service.ts`
-**E2E files:** `apps/web/e2e/social-feed.spec.ts`, `apps/web/e2e/discussions.spec.ts`, `apps/web/e2e/peer-review.spec.ts`, `apps/web/e2e/assessment-360.spec.ts`
-**Security test file:** `tests/security/social-learning.spec.ts` (32 assertions)
+  **E2E files:** `apps/web/e2e/social-feed.spec.ts`, `apps/web/e2e/discussions.spec.ts`, `apps/web/e2e/peer-review.spec.ts`, `apps/web/e2e/assessment-360.spec.ts`
+  **Security test file:** `tests/security/social-learning.spec.ts` (32 assertions)
 
 ---
 
 ## FEAT-PHASE44-SKILLS | ✅ Fixed | HIGH
+
 **Phase 44 — Skills-Based Learning Paths**
 **Date:** 2026-03-09
 **Status:** ✅ Complete — committed 17c18bf (2026-03-09)
-**Deliverables:** skills/skill_prerequisites/skill_paths/learner_skill_progress tables + RLS + migration 0026, SkillService + SkillGapService + SkillResolver in subgraph-agent, SkillPathPage + SkillGapDashboard + SkillPathCard in web frontend, 21 RLS tests + 9 unit tests + 7 security tests
-**Anti-recurrence:** skills-rls.test.ts uses getTableName() from drizzle-orm (not table._.name)
+**Deliverables:** skills/skill*prerequisites/skill_paths/learner_skill_progress tables + RLS + migration 0026, SkillService + SkillGapService + SkillResolver in subgraph-agent, SkillPathPage + SkillGapDashboard + SkillPathCard in web frontend, 21 RLS tests + 9 unit tests + 7 security tests
+**Anti-recurrence:** skills-rls.test.ts uses getTableName() from drizzle-orm (not table.*.name)
 
 ## FEAT-PHASE43-SCORM-ANALYTICS | ✅ Fixed | HIGH
+
 **Phase 43 — SCORM 2004 + cmi5 + Analytics + Expo SDK 55**
 **Date:** 2026-03-09
 **Status:** ✅ Complete — committed 17c18bf (2026-03-09)
@@ -2895,6 +3076,7 @@ Phase 42 — White-Label Runtime per Tenant
 Session: 33 (2026-03-09) — All items resolved.
 
 Files:
+
 - `apps/web/src/hooks/useTenantBranding.ts`
 - `apps/web/src/contexts/BrandingContext.tsx`
 - `apps/web/src/hooks/usePublicBranding.ts`
@@ -2917,48 +3099,52 @@ Anti-recurrence: `customCss` uses `el.textContent` (not `el.innerHTML`) — guar
 Phase 38 — Assessment Engine / Certificate Download / Marketplace Data / Quiz Builder / SRS UI
 Session: 32 (2026-03-08) — All 10 items resolved across Sprint A (backend), Sprint B (frontend/mobile), Sprint C (QA gate).
 
-| ID | Item | Status |
-|----|------|--------|
-| P38-1 | Certificate presigned URL: getCertificateDownloadUrl backend + SDL + CertificatesPage web | ✅ Fixed |
-| P38-2 | CourseListing JOIN: courses + users table JOIN in marketplace.service.ts | ✅ Fixed |
-| P38-3 | MarketplacePage: show real title/instructorName + filter UI | ✅ Fixed |
-| P38-4 | Marketplace filters: WHERE clauses in marketplace.service.ts | ✅ Fixed |
-| P38-5 | QuizBuilderPage: instructor quiz creation UI | ✅ Fixed |
-| P38-6 | InstructorEarningsPage: enabled: false → mounted guard | ✅ Fixed |
-| P38-7 | Mobile SrsReviewScreen + CertificatesScreen | ✅ Fixed |
-| P38-8 | Supergraph: add certificateDownloadUrl query | ✅ Fixed |
-| P38-9 | AppSidebar: Certificates + SRS Review + QuizBuilder nav items | ✅ Fixed |
-| P38-10 | API_CONTRACTS Section 25 + OPEN_ISSUES sync | ✅ Fixed |
+| ID     | Item                                                                                      | Status   |
+| ------ | ----------------------------------------------------------------------------------------- | -------- |
+| P38-1  | Certificate presigned URL: getCertificateDownloadUrl backend + SDL + CertificatesPage web | ✅ Fixed |
+| P38-2  | CourseListing JOIN: courses + users table JOIN in marketplace.service.ts                  | ✅ Fixed |
+| P38-3  | MarketplacePage: show real title/instructorName + filter UI                               | ✅ Fixed |
+| P38-4  | Marketplace filters: WHERE clauses in marketplace.service.ts                              | ✅ Fixed |
+| P38-5  | QuizBuilderPage: instructor quiz creation UI                                              | ✅ Fixed |
+| P38-6  | InstructorEarningsPage: enabled: false → mounted guard                                    | ✅ Fixed |
+| P38-7  | Mobile SrsReviewScreen + CertificatesScreen                                               | ✅ Fixed |
+| P38-8  | Supergraph: add certificateDownloadUrl query                                              | ✅ Fixed |
+| P38-9  | AppSidebar: Certificates + SRS Review + QuizBuilder nav items                             | ✅ Fixed |
+| P38-10 | API_CONTRACTS Section 25 + OPEN_ISSUES sync                                               | ✅ Fixed |
 
 ### E2E Specs Added (Sprint C):
+
 - `apps/web/e2e/certificates.spec.ts` — 8 DEV_MODE tests + 2 live-backend tests; MinIO key path leak guard, raw error string guards, visual snapshot
 - `apps/web/e2e/marketplace-data.spec.ts` — 7 DEV_MODE tests + 2 live-backend tests; UUID truncation guard, real title/instructor assertions, filter controls
 - `apps/web/e2e/quiz-builder.spec.ts` — 4 DEV_MODE tests + 2 live-backend tests; instructor access, student redirect guard, crash overlay guard
 - `apps/web/e2e/srs-review.spec.ts` — 5 DEV_MODE tests + 1 live-backend test; empty state handling, raw error string guards, GraphQL error guard
 
 ### Security Tests Extended (graphql-authorization.spec.ts):
+
 - G-15: certificate.graphql — myCertificates/@authenticated, certificateDownloadUrl/@authenticated + certId argument required, verifyCertificate public (8 assertions)
 - G-15: marketplace.graphql — courseListings/@authenticated, instructorEarnings/@requiresRole INSTRUCTOR, createCourseListing/@requiresRole INSTRUCTOR, STUDENT blocked on create/publish, purchaseCourse self-service (11 assertions)
 - Total security tests: 967 (was 948, +19 new assertions)
 
 ### Tests:
+
 - `@edusphere/web`: 3881/3881 unit tests (302 files, was 3860/300)
 - Security: 967/967 (36 spec files, was 948)
 - TypeScript: 0 errors
 
 ### Anti-recurrence:
+
 - Raw MinIO key paths: `certificates.spec.ts:57` — `expect(body).not.toMatch(/internal\/tenants\//)` guards against presigned URL bypass
 - UUID truncation in marketplace: `marketplace-data.spec.ts:68` — `expect(body).not.toMatch(/Course [0-9a-f]{8}/)` guards against regression to UUID display
 - certificateDownloadUrl always requires @authenticated: `graphql-authorization.spec.ts` G-15 phase 38 block
 
 ### Known Open Gaps (deferred to Phase 39+):
 
-| ID | Gap | Status |
-|----|-----|--------|
-| P38-OG1 | `CourseListing.tags` always returns `[]` — no `course_tags` table yet | ⏳ Phase 39+ |
+| ID      | Gap                                                                        | Status       |
+| ------- | -------------------------------------------------------------------------- | ------------ |
+| P38-OG1 | `CourseListing.tags` always returns `[]` — no `course_tags` table yet      | ⏳ Phase 39+ |
 | P38-OG2 | `CourseListing.rating` always returns `null` — rating system not yet built | ⏳ Phase 39+ |
-| P38-OG3 | `CourseListing.totalLessons` always returns `0` — aggregation pending | ⏳ Phase 39+ |
-| P38-OG4 | `instructorName` filter uses COALESCE — may miss users with no firstName | ⏳ Phase 39+ |
+| P38-OG3 | `CourseListing.totalLessons` always returns `0` — aggregation pending      | ⏳ Phase 39+ |
+| P38-OG4 | `instructorName` filter uses COALESCE — may miss users with no firstName   | ⏳ Phase 39+ |
 
 ---
 
@@ -2968,6 +3154,7 @@ Phase 37 — Gamification Completion + Manager Dashboard + Onboarding + Producti
 Session 31 (2026-03-08) — All 10 items resolved across 8 parallel agents.
 
 ### Delivered:
+
 1. ✅ Gamification: user_streaks + challenges + user_challenge_progress DB (migration 0022, RLS), StreakService, ChallengesService, LeaderboardService (1-hour LRU cache, clearInterval on destroy), GamificationPage (3 tabs: Progress/Challenges/Leaderboard)
 2. ✅ Manager Dashboard: team_members DB (migration 0023, RLS tenant isolation), ManagerDashboardService, ManagerDashboardPage, supergraph TeamOverview/TeamMemberProgress types
 3. ✅ Onboarding: onboarding_state DB (migration 0024, RLS user isolation), OnboardingService, OnboardingPage (student 5-step + instructor 4-step), StudentOnboardingSteps, InstructorOnboardingSteps, DashboardPage banner (dismissible, ARIA role="status")
@@ -2980,6 +3167,7 @@ Session 31 (2026-03-08) — All 10 items resolved across 8 parallel agents.
 10. ✅ Mobile: GamificationScreen + OnboardingScreen + 256 tests; KnowledgeGraphScreen MOCK removed
 
 ### E2E Specs Added:
+
 - `apps/web/e2e/gamification.spec.ts`
 - `apps/web/e2e/manager-dashboard.spec.ts`
 - `apps/web/e2e/onboarding-student.spec.ts`
@@ -2987,11 +3175,13 @@ Session 31 (2026-03-08) — All 10 items resolved across 8 parallel agents.
 - `apps/web/e2e/marketplace.spec.ts`
 
 ### Security Tests Extended (graphql-authorization.spec.ts):
+
 - G-15: manager.graphql — myTeamOverview/addTeamMember require MANAGER/ORG_ADMIN/SUPER_ADMIN, STUDENT blocked (11 new assertions)
 - G-15: onboarding.graphql — skipOnboarding/updateOnboardingStep/completeOnboarding require @authenticated, self-service (no @requiresRole) (7 new assertions)
 - Total security tests: 948 (was 928, +20 new assertions)
 
 ### Tests:
+
 - `@edusphere/subgraph-core`: 719/719 unit tests (85 files)
 - `@edusphere/web`: 3860/3860 unit tests (300 files)
 - `@edusphere/mobile`: 256/256 unit tests (21 files)
@@ -3009,6 +3199,7 @@ Session 31 (2026-03-08) — All 10 items resolved across 8 parallel agents.
 **Files touched:**
 
 DB:
+
 - `packages/db/src/schema/user-xp.ts`
 - `packages/db/src/schema/course-lesson-builder.ts`
 - `packages/db/src/migrations/0020_user_xp.sql`
@@ -3016,6 +3207,7 @@ DB:
 - `packages/db/src/schema/index.ts`
 
 Backend:
+
 - `apps/subgraph-core/src/gamification/xp.service.ts` — XP awards + level computation
 - `apps/subgraph-core/src/gamification/xp.service.spec.ts`
 - `apps/subgraph-core/src/user/recommended-courses.service.ts` — real gap-based + fallback
@@ -3029,6 +3221,7 @@ Backend:
 - `apps/subgraph-knowledge/src/graph/recommendation-scorer.ts` — 4-signal pure function
 
 Frontend:
+
 - `apps/web/src/pages/CoursesDiscoveryPage.tsx` — MOCK_COURSES removed, real urql query
 - `apps/web/src/pages/AtRiskDashboardPage.tsx` — MOCK_LEARNERS removed, real query
 - `apps/web/src/pages/DashboardPage.tsx` — MOCK_XP removed, totalXp/level wired
@@ -3039,6 +3232,7 @@ Frontend:
 - `.github/workflows/ci.yml` — Lighthouse a11y `|| true` removed (hard gate)
 
 E2E:
+
 - `apps/web/e2e/courses-discovery-realdata.spec.ts`
 - `apps/web/e2e/recommendations-realdata.spec.ts`
 - `apps/web/e2e/at-risk-dashboard.spec.ts`
@@ -3046,16 +3240,18 @@ E2E:
 - `apps/web/e2e/xp-dashboard.spec.ts`
 
 Security:
+
 - `tests/security/graphql-authorization.spec.ts` — 11 new Phase 36 assertions
 
-**Problem:** 11 technical debt items from Phase 35 audit — 2 production-blocking (MOCK_COURSES, empty recommendations), 5 medium (web-vitals, mobile TS, VAPID docs, AtRisk mock, Chavruta TD-7 verified consistent), 3 new features (XP, scorer, pipeline)
+**Problem:** 11 technical debt items from Phase 35 audit — 2 production-blocking (MOCK*COURSES, empty recommendations), 5 medium (web-vitals, mobile TS, VAPID docs, AtRisk mock, Chavruta TD-7 verified consistent), 3 new features (XP, scorer, pipeline)
 **Root cause:** Deferred items from Phase 35 sprint timeline
 **Solution:** Sprint A (TD-1..9) + Sprint B (XP, scorer, pipeline) + Sprint C (E2E gate)
 **Tests:** 42 new E2E tests + 11 security assertions; all 689 core + 556 knowledge + 3822+ web tests passing
-**Anti-recurrence:** E2E guards assert MOCK_ constants absent from DOM; security tests assert RBAC on all new mutations
+**Anti-recurrence:** E2E guards assert MOCK* constants absent from DOM; security tests assert RBAC on all new mutations
 **Commits:** 599f3e9 (Sprint A) + 2e6ef00 (Sprint B) + bc1c618 (Sprint C)
 
 **Post-session fixes (08 Mar 2026 — Session 30):**
+
 - `11fe7f4` fix(i18n): sync 72 locale files — 8 non-English locales missing keys from Phases 27-36; 304/304 i18n tests now pass
 - `e35349a` fix(gateway,knowledge): supergraph SDL sync — 15 pre-existing contract-test failures fixed; Course/ContentItem/Module CONTENT ownership, UserCourse/CourseProgress/AtRiskLearner/CourseLessonPlan types, totalXp+level on UserStats; 88/88 contract tests
 - `0f65ab8` fix(content): lesson-plan.service.spec.ts unused vars renamed to `_mock*`
@@ -3071,6 +3267,7 @@ Security:
 **Files touched:**
 
 DB:
+
 - `packages/db/src/schema/tenant-analytics-snapshots.ts`
 - `packages/db/src/schema/push-notification-tokens.ts`
 - `packages/db/src/schema/user-learning-velocity.ts`
@@ -3080,24 +3277,28 @@ DB:
 - `packages/db/src/schema/schema-phase35.test.ts` (42 tests)
 
 N+1 Fix:
+
 - `apps/subgraph-knowledge/src/embedding/embedding.dataloader.ts`
 - `apps/subgraph-knowledge/src/graph/skill-gap.recommendations.ts`
 - `apps/subgraph-knowledge/src/graph/adaptive-path.service.ts`
 - `apps/subgraph-knowledge/src/graph/adaptive-path.resolver.ts`
 
 SDL:
+
 - `apps/subgraph-core/src/user/user.graphql`
 - `apps/subgraph-content/src/analytics/analytics.graphql`
 - `apps/subgraph-core/src/notifications/notifications.graphql`
 - `apps/subgraph-knowledge/src/graph/graph.graphql`
 
 Backend:
+
 - `apps/subgraph-core/src/user/activity-feed.service.ts`
 - `apps/subgraph-core/src/user/in-progress-courses.service.ts`
 - `apps/subgraph-core/src/notifications/push-token.service.ts`
 - `apps/subgraph-content/src/analytics/tenant-analytics.service.ts`
 
 Frontend:
+
 - `apps/web/src/lib/graphql/dashboard.queries.ts`
 - `apps/web/src/pages/DashboardPage.tsx` (5 MOCK constants replaced)
 - `apps/web/src/pages/TenantAnalyticsPage.tsx`
@@ -3106,25 +3307,28 @@ Frontend:
 - `apps/web/src/components/ui/OptimizedImage.tsx`
 
 Mobile:
+
 - `apps/mobile/src/screens/LiveSessionsScreen.tsx`
 - `apps/mobile/src/screens/SkillTreeScreen.tsx`
 - `apps/mobile/src/screens/ModelViewerScreen.tsx`
 - `apps/mobile/src/components/WeeklyActivityBar.tsx`
 
 E2E:
+
 - `apps/web/e2e/dashboard-realdata.spec.ts`
 - `apps/web/e2e/tenant-analytics.spec.ts`
 - `apps/web/e2e/push-notifications.spec.ts`
 - `apps/web/e2e/adaptive-recommendations.spec.ts`
 
 Security:
+
 - `tests/security/push-notifications-security.spec.ts`
 
 **Problem:** 6 production gaps — mock data in DashboardPage, no tenant analytics, no Lighthouse CI, no push notifications, mobile parity gaps, N+1 in skill-gap.recommendations.ts (documented TODO in code)
 **Root cause:** Phase 35 scope — intentional deferred items from Phase 34
 **Solution:** Complete Phase 35 implementation across 9 sub-phases
 **Tests:** 650+ passing (unit) + 4 new E2E specs + security tests
-**Anti-recurrence:** E2E spec `dashboard-realdata.spec.ts` asserts no "Dr. Cohen" / "MOCK_" strings in DOM
+**Anti-recurrence:** E2E spec `dashboard-realdata.spec.ts` asserts no "Dr. Cohen" / "MOCK\_" strings in DOM
 
 ---
 
@@ -3143,15 +3347,18 @@ Security:
 ### Deliverables
 
 **Phase 0 — Infrastructure:**
+
 - ClamAV service added to `docker-compose.yml` (1g mem_limit, healthcheck)
 - Env vars: `CLAMAV_HOST`, `CLAMAV_PORT`
 
 **Phase 1 — Database:**
+
 - Migration `0016_visual_anchoring.sql` — 3 new tables: `visual_assets`, `visual_anchors`, `document_versions`
 - RLS policies + 7 performance indexes
 - Drizzle schema: `packages/db/src/schema/visual-anchoring.ts`
 
 **Phase 2 — Backend (subgraph-content, port 4002):**
+
 - `ClamavService` — inline ClamAV scanning, ZIP-bomb guard (>100MB), graceful fallback
 - `ImageOptimizerService` — WebP conversion (sharp), magic-byte verification (file-type), ZIP-bomb size guard
 - `VisualAnchorService` — CRUD + simhash + RLS + NATS events (`EDUSPHERE.visual.anchor.created/deleted`)
@@ -3161,6 +3368,7 @@ Security:
 - All modules registered in `AppModule`
 
 **Phase 3 — Frontend Web:**
+
 - `VisualSidebar.tsx` — 280px fixed panel, CrossFade image display, RTL-aware
 - `CrossFadeImage.tsx` — GPU-accelerated 300ms opacity transitions
 - `AnchorFrame.tsx` — border frame over active text passage
@@ -3172,14 +3380,17 @@ Security:
 - `useVisualAssetSearch.ts` — debounced 300ms search hook
 
 **Phase 4 — Mobile:**
+
 - `VisualBottomSheet.tsx` — @gorhom/bottom-sheet, snap points 25/50/90%
 
 **Packages added:**
+
 - Backend: `clamscan`, `sharp`, `file-type`, `@types/clamscan`
 - Web: `idb`, `dompurify`, `@types/dompurify`
 - Mobile: `@gorhom/bottom-sheet`
 
 ### Tests
+
 - `clamav.service.spec.ts` — 7 tests (injected scanner pattern)
 - `image-optimizer.service.spec.ts` — 12 tests (real 1×1 sharp images)
 - `visual-anchor.service.spec.ts` — 10 tests
@@ -3188,6 +3399,7 @@ Security:
 - All components: unit tests with RTL-aware assertions
 
 ### Key Technical Decisions
+
 - ClamAV: inline scan (immediate rejection per PRD), graceful fallback when daemon unavailable
 - WebP: skip GIF (animation) and SVG (vector), convert all others with quality=85
 - rAF throttle: every 3rd frame (~20fps detection, 60fps render)
@@ -3196,26 +3408,28 @@ Security:
 - `withTenantContext.mockResolvedValueOnce()` per-test override (not complex mock chains)
 
 ### Plan
+
 `docs/plans/features/VISUAL-ANCHORING-ASSET-LINKING.md`
 
 ### Gap Resolution Log (G-1 through G-12) — all resolved in commit `ca16f57` (2026-03-08)
 
-| # | Gap | Description | Resolution | Status |
-|---|-----|-------------|------------|--------|
-| G-1 | ClamavModule registration | `ClamavModule` not registered in `AppModule` | Registered in earlier commit — `ClamavModule` added to `AppModule` imports | ✅ Resolved |
-| G-2 | Interactive SVG | SVG assets not interactive; no XSS-safe rendering | `useInteractiveSvg.ts` + DOMPurify sanitization added to `VisualSidebar.tsx` | ✅ Resolved |
-| G-3 | GIF last-frame pause | Animated GIFs kept looping; no pause-at-last-frame support | `useCrossFadeGif.ts` — canvas-based last-frame extraction, pauses on crossfade end | ✅ Resolved |
-| G-4 | Hebrew FTS dictionary | Full-text search used `english` dictionary; Hebrew text not indexed | SQL migration adds `hebrew` FTS configuration + `pg_catalog.simple` fallback for `visual_assets` | ✅ Resolved |
-| G-5 | `searchVisualAssets` query | GraphQL query missing from SDL and resolver | `searchVisualAssets` added to `visual-anchor.graphql` SDL + `VisualAnchorResolver` | ✅ Resolved |
-| G-6 | E2E instructor spec | No E2E coverage for instructor anchor-creation flow | `apps/web/e2e/visual-anchoring-instructor.spec.ts` — 5 E2E tests (create/edit/delete anchors, asset upload) | ✅ Resolved |
-| G-7 | Visual regression spec | No visual regression snapshots for anchoring UI | `apps/web/e2e/visual-anchoring-visual.spec.ts` — 7 `toHaveScreenshot()` visual regression tests | ✅ Resolved |
-| G-8 | `AssetPicker` unit tests | `AssetPicker.tsx` had no unit test coverage | `apps/web/src/components/__tests__/AssetPicker.test.tsx` — 13 unit tests | ✅ Resolved |
-| G-9 | `VisualBottomSheet` unit tests | Mobile `VisualBottomSheet.tsx` had no unit test coverage | `apps/mobile/src/components/__tests__/VisualBottomSheet.test.tsx` — 26 unit tests | ✅ Resolved |
-| G-10 | `ResumeBanner` integration | `ResumeBanner.tsx` existed but was not wired into `UnifiedLearningPage` | `ResumeBanner` imported and rendered in `UnifiedLearningPage.tsx` above content area | ✅ Resolved |
-| G-11 | `anchorDomMap` scroll perf | `anchorDomMap` rebuilt on every scroll event (O(n) per frame) | Refactored to rebuild only on anchor-list changes (`useEffect` dep array), not per-scroll | ✅ Resolved |
-| G-12 | `RichDocumentPage` integration | Visual anchoring not wired into `RichDocumentPage` | `RichDocumentPageAnchors.tsx` wrapper integrates `VisualSidebar` + `AnchorEditor` into `RichDocumentPage` | ✅ Resolved |
+| #    | Gap                            | Description                                                             | Resolution                                                                                                  | Status      |
+| ---- | ------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ----------- |
+| G-1  | ClamavModule registration      | `ClamavModule` not registered in `AppModule`                            | Registered in earlier commit — `ClamavModule` added to `AppModule` imports                                  | ✅ Resolved |
+| G-2  | Interactive SVG                | SVG assets not interactive; no XSS-safe rendering                       | `useInteractiveSvg.ts` + DOMPurify sanitization added to `VisualSidebar.tsx`                                | ✅ Resolved |
+| G-3  | GIF last-frame pause           | Animated GIFs kept looping; no pause-at-last-frame support              | `useCrossFadeGif.ts` — canvas-based last-frame extraction, pauses on crossfade end                          | ✅ Resolved |
+| G-4  | Hebrew FTS dictionary          | Full-text search used `english` dictionary; Hebrew text not indexed     | SQL migration adds `hebrew` FTS configuration + `pg_catalog.simple` fallback for `visual_assets`            | ✅ Resolved |
+| G-5  | `searchVisualAssets` query     | GraphQL query missing from SDL and resolver                             | `searchVisualAssets` added to `visual-anchor.graphql` SDL + `VisualAnchorResolver`                          | ✅ Resolved |
+| G-6  | E2E instructor spec            | No E2E coverage for instructor anchor-creation flow                     | `apps/web/e2e/visual-anchoring-instructor.spec.ts` — 5 E2E tests (create/edit/delete anchors, asset upload) | ✅ Resolved |
+| G-7  | Visual regression spec         | No visual regression snapshots for anchoring UI                         | `apps/web/e2e/visual-anchoring-visual.spec.ts` — 7 `toHaveScreenshot()` visual regression tests             | ✅ Resolved |
+| G-8  | `AssetPicker` unit tests       | `AssetPicker.tsx` had no unit test coverage                             | `apps/web/src/components/__tests__/AssetPicker.test.tsx` — 13 unit tests                                    | ✅ Resolved |
+| G-9  | `VisualBottomSheet` unit tests | Mobile `VisualBottomSheet.tsx` had no unit test coverage                | `apps/mobile/src/components/__tests__/VisualBottomSheet.test.tsx` — 26 unit tests                           | ✅ Resolved |
+| G-10 | `ResumeBanner` integration     | `ResumeBanner.tsx` existed but was not wired into `UnifiedLearningPage` | `ResumeBanner` imported and rendered in `UnifiedLearningPage.tsx` above content area                        | ✅ Resolved |
+| G-11 | `anchorDomMap` scroll perf     | `anchorDomMap` rebuilt on every scroll event (O(n) per frame)           | Refactored to rebuild only on anchor-list changes (`useEffect` dep array), not per-scroll                   | ✅ Resolved |
+| G-12 | `RichDocumentPage` integration | Visual anchoring not wired into `RichDocumentPage`                      | `RichDocumentPageAnchors.tsx` wrapper integrates `VisualSidebar` + `AnchorEditor` into `RichDocumentPage`   | ✅ Resolved |
 
 **Final test counts (post G-1..G-12 fixes):**
+
 - Web: **3750** tests (was 3731 before G-6/G-7/G-8 additions)
 - subgraph-content: **1096** tests (was 1095)
 - Security: **865** tests
@@ -3243,21 +3457,22 @@ Pages rendered through the React Router use a `guarded()` wrapper that provides 
 ### Discovery List (3 Waves)
 
 **Wave 1 — Exact match:**
+
 - `CoursesDiscoveryPage.tsx` — original reported route `/explore`
 
 **Wave 2 — All pages scan (MANDATORY):**
 All 70 page files in `apps/web/src/pages/` scanned via grep for `import.*Layout`:
 
-| # | File | Route | Status |
-|---|------|-------|--------|
-| 1 | `CoursesDiscoveryPage.tsx` | `/explore`, `/discover`, `/courses/discover` | 🔴 FIXED |
-| 2 | `CourseLibraryPage.tsx` | `/library` | 🔴 FIXED |
-| 3 | `InstructorEarningsPage.tsx` | `/instructor/earnings` | 🔴 FIXED |
-| 4 | `MarketplacePage.tsx` | `/marketplace` | 🔴 FIXED |
-| 5 | `ProgramsPage.tsx` | `/programs` | 🔴 FIXED |
-| 6 | `ProgramDetailPage.tsx` | `/programs/:id` | 🔴 FIXED |
-| 7 | `ThemeSettingsPage.tsx` | `/settings/theme` | 🔴 FIXED |
-| 8 | `PortalBuilderPage.tsx` | `/admin/portal` | 🔴 FIXED (AdminLayout) |
+| #   | File                         | Route                                        | Status                 |
+| --- | ---------------------------- | -------------------------------------------- | ---------------------- |
+| 1   | `CoursesDiscoveryPage.tsx`   | `/explore`, `/discover`, `/courses/discover` | 🔴 FIXED               |
+| 2   | `CourseLibraryPage.tsx`      | `/library`                                   | 🔴 FIXED               |
+| 3   | `InstructorEarningsPage.tsx` | `/instructor/earnings`                       | 🔴 FIXED               |
+| 4   | `MarketplacePage.tsx`        | `/marketplace`                               | 🔴 FIXED               |
+| 5   | `ProgramsPage.tsx`           | `/programs`                                  | 🔴 FIXED               |
+| 6   | `ProgramDetailPage.tsx`      | `/programs/:id`                              | 🔴 FIXED               |
+| 7   | `ThemeSettingsPage.tsx`      | `/settings/theme`                            | 🔴 FIXED               |
+| 8   | `PortalBuilderPage.tsx`      | `/admin/portal`                              | 🔴 FIXED (AdminLayout) |
 
 **Wave 3 — Class of bug (all pages without Layout wrapper):**
 Intentionally no-Layout pages (correct): `LandingPage`, `Login`, `AccessibilityStatementPage`, `BadgeVerifierPage`, `LtiLaunchPage`, `PublicProfilePage`, `PortalPage` — these are public/marketing pages with no auth requirement.
@@ -3265,6 +3480,7 @@ Intentionally no-Layout pages (correct): `LandingPage`, `Login`, `AccessibilityS
 ### Fix
 
 For each affected page:
+
 1. Added `import { Layout } from '@/components/Layout';`
 2. Wrapped the main JSX return with `<Layout>...</Layout>`
 3. For pages with `<div className="min-h-screen bg-background">` as outer wrapper — replaced that div with `<Layout>` (Layout already provides min-h-screen)
@@ -3276,6 +3492,7 @@ For each affected page:
 New file: `apps/web/e2e/sidebar-nav.spec.ts`
 
 4 test suites:
+
 1. **Sidebar visible on all protected routes** — 7 routes × (toBeAttached + toBeVisible)
 2. **Visual regression screenshots** — `sidebar-on-{slug}.png` per route
 3. **Not hidden by attribute** — aria-hidden and hidden attribute checks
@@ -3286,6 +3503,7 @@ New file: `apps/web/e2e/sidebar-nav.spec.ts`
 ### Test Infrastructure Fix
 
 After adding Layout to the 8 pages, their unit tests required mock updates:
+
 - All 8 page test files: added `vi.mock('@/components/AppSidebar', ...)` + `vi.mock('@/components/Layout', ...)`
 - `KnowledgeGraphPage.test.tsx`: pre-existing `getByText` ambiguity (multiple elements) fixed → `getByRole('heading', ...)`
 - Pattern going forward: every page test that wraps content in Layout MUST mock both Layout and AppSidebar
@@ -3317,6 +3535,7 @@ After `enrollMutation` succeeded, `MY_ENROLLMENTS_QUERY` urql cache was NOT inva
 ### Fix
 
 **Round 1 — `CourseDetailPage.tsx`** ([apps/web/src/pages/CourseDetailPage.tsx](apps/web/src/pages/CourseDetailPage.tsx)):
+
 - Destructured `reexecuteEnrollments` from `useQuery(MY_ENROLLMENTS_QUERY)`
 - Added `enrolledLocal: boolean | null` state that pins new enrolled state immediately after mutation
 - Added `useEffect([enrollData])` to reset `enrolledLocal` once server data refetches
@@ -3324,11 +3543,13 @@ After `enrollMutation` succeeded, `MY_ENROLLMENTS_QUERY` urql cache was NOT inva
 - Pattern mirrors the correct implementation in `CourseList.tsx`
 
 **Round 2 — `CoursesDiscoveryPage.tsx`** ([apps/web/src/pages/CoursesDiscoveryPage.tsx](apps/web/src/pages/CoursesDiscoveryPage.tsx)):
+
 - Added `MY_ENROLLMENTS_QUERY` import and `useQuery` with `pause: !mounted`
 - Built `enrolledIds = useMemo(() => new Set(...), [enrollmentData])`
 - Passed `enrolled={enrolledIds.has(course.id)}` to each `CourseCard` (overrides the hardcoded `false`)
 
 ### Tests Added
+
 - `CourseDetailPage.test.tsx`: 3 new regression tests
   - `calls reexecuteEnrollments with network-only after successful enroll`
   - `regression guard: Enroll button does NOT revert to "הירשם" after successful enrollment`
@@ -3338,6 +3559,7 @@ After `enrollMutation` succeeded, `MY_ENROLLMENTS_QUERY` urql cache was NOT inva
   - `no course shows "Continue" when myEnrollments is empty (non-enrolled user)`
 
 ### Anti-Recurrence
+
 - `CourseDetailPage.test.tsx` ← guards against `useOptimistic` revert
 - `CoursesDiscoveryPage.test.tsx` ← guards against `enrolled: false` hardcode regression
 
@@ -3351,43 +3573,45 @@ After `enrollMutation` succeeded, `MY_ENROLLMENTS_QUERY` urql cache was NOT inva
 **PRD Link:** i18n Phase A+B — BUG-047 follow-up gap
 
 ### Problem
+
 Despite Hebrew locale being set and `dir="rtl"` applied to the document, the sidebar navigation and dashboard content displayed hardcoded English strings. English text in RTL context caused reversed punctuation ("!Welcome back" instead of "Welcome back!").
 
 ### Root Causes (5 identified)
 
-| # | Root Cause | File | Impact |
-|---|-----------|------|--------|
-| RC-1 | `AppSidebar` NAV_ITEMS used hardcoded English strings, no `useTranslation` | `AppSidebar.tsx:28-35` | All nav labels in English |
-| RC-2 | `DashboardPage` all UI labels hardcoded English, no `useTranslation` | `DashboardPage.tsx:205,259,288` | Welcome msg, section titles hardcoded |
-| RC-3 | Mock data (course titles, activity) hardcoded English, no `dir="ltr"` | `DashboardPage.tsx:40-95` | BiDi reversal of punctuation |
-| RC-4 | Unicode BiDi — English text in `dir="rtl"` without isolation | `DashboardPage.tsx:126` | "!Welcome back" punctuation flip |
-| RC-5 | FOUC: `index.html` FOUC script didn't set `dir`/`lang` before React | `index.html:9-20` | Flash of LTR before RTL applied |
+| #    | Root Cause                                                                 | File                            | Impact                                |
+| ---- | -------------------------------------------------------------------------- | ------------------------------- | ------------------------------------- |
+| RC-1 | `AppSidebar` NAV_ITEMS used hardcoded English strings, no `useTranslation` | `AppSidebar.tsx:28-35`          | All nav labels in English             |
+| RC-2 | `DashboardPage` all UI labels hardcoded English, no `useTranslation`       | `DashboardPage.tsx:205,259,288` | Welcome msg, section titles hardcoded |
+| RC-3 | Mock data (course titles, activity) hardcoded English, no `dir="ltr"`      | `DashboardPage.tsx:40-95`       | BiDi reversal of punctuation          |
+| RC-4 | Unicode BiDi — English text in `dir="rtl"` without isolation               | `DashboardPage.tsx:126`         | "!Welcome back" punctuation flip      |
+| RC-5 | FOUC: `index.html` FOUC script didn't set `dir`/`lang` before React        | `index.html:9-20`               | Flash of LTR before RTL applied       |
 
 ### Why this was a regression from BUG-047
+
 BUG-047 fixed locale **persistence and sync** (localStorage, DB, GlobalLocaleSync). It applied `dir="rtl"` correctly. However, it did NOT connect AppSidebar and DashboardPage to the i18n system. Hebrew translation files existed but were never consumed.
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/AppSidebar.tsx` | Added `useTranslation('nav')`, NAV_ITEMS now use `labelKey` + `t(labelKey)` |
-| `apps/web/src/pages/DashboardPage.tsx` | Added `useTranslation('dashboard')` + `useTranslation('common')`, all UI strings use `t()`, mock data elements get `dir="ltr"` to prevent BiDi reversal |
-| `apps/web/index.html` | FOUC script now reads `edusphere_locale` and sets `dir` + `lang` before React hydrates |
-| `packages/i18n/src/locales/en/nav.json` | Added: `myCourses`, `discover`, `knowledgeGraph`, `liveSessions`, `settings`, `lightMode`, `darkMode`, `collapse`, `expandSidebar`, `collapseSidebar`, `switchToLight`, `switchToDark` |
-| `packages/i18n/src/locales/he/nav.json` | Same keys in Hebrew |
-| `packages/i18n/src/locales/en/dashboard.json` | Added: `subtitle`, `dayStreak`, `inProgress`, `completed`, `xpPoints`, `masteryOverview`, `progress`, `recommendedForYou` |
-| `packages/i18n/src/locales/he/dashboard.json` | Same keys in Hebrew |
-| `apps/web/src/components/AppSidebar.test.tsx` | Updated `data-testid` assertions to new `nav-item-${labelKey}` pattern, added i18n label tests |
-| `apps/web/src/pages/DashboardPage.test.tsx` | Updated "see all" → "view all" (matches `tCommon('viewAll')`) |
-| `apps/web/src/components/AppSidebar.bug056.test.tsx` | **NEW** — 5 regression tests: labelKey testids, i18n label content, OLD testid absence guard |
+| File                                                 | Change                                                                                                                                                                                 |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/AppSidebar.tsx`             | Added `useTranslation('nav')`, NAV_ITEMS now use `labelKey` + `t(labelKey)`                                                                                                            |
+| `apps/web/src/pages/DashboardPage.tsx`               | Added `useTranslation('dashboard')` + `useTranslation('common')`, all UI strings use `t()`, mock data elements get `dir="ltr"` to prevent BiDi reversal                                |
+| `apps/web/index.html`                                | FOUC script now reads `edusphere_locale` and sets `dir` + `lang` before React hydrates                                                                                                 |
+| `packages/i18n/src/locales/en/nav.json`              | Added: `myCourses`, `discover`, `knowledgeGraph`, `liveSessions`, `settings`, `lightMode`, `darkMode`, `collapse`, `expandSidebar`, `collapseSidebar`, `switchToLight`, `switchToDark` |
+| `packages/i18n/src/locales/he/nav.json`              | Same keys in Hebrew                                                                                                                                                                    |
+| `packages/i18n/src/locales/en/dashboard.json`        | Added: `subtitle`, `dayStreak`, `inProgress`, `completed`, `xpPoints`, `masteryOverview`, `progress`, `recommendedForYou`                                                              |
+| `packages/i18n/src/locales/he/dashboard.json`        | Same keys in Hebrew                                                                                                                                                                    |
+| `apps/web/src/components/AppSidebar.test.tsx`        | Updated `data-testid` assertions to new `nav-item-${labelKey}` pattern, added i18n label tests                                                                                         |
+| `apps/web/src/pages/DashboardPage.test.tsx`          | Updated "see all" → "view all" (matches `tCommon('viewAll')`)                                                                                                                          |
+| `apps/web/src/components/AppSidebar.bug056.test.tsx` | **NEW** — 5 regression tests: labelKey testids, i18n label content, OLD testid absence guard                                                                                           |
 
 ### Tests Added
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `AppSidebar.bug056.test.tsx` | 5 | Guard against regression: i18n labels present, old hardcoded testids absent |
-| `AppSidebar.test.tsx` | +2 new tests | i18n nav labels, Settings label via i18n |
-| `DashboardPage.test.tsx` | 1 updated | "see all" → "view all" |
+| File                         | Tests        | Purpose                                                                     |
+| ---------------------------- | ------------ | --------------------------------------------------------------------------- |
+| `AppSidebar.bug056.test.tsx` | 5            | Guard against regression: i18n labels present, old hardcoded testids absent |
+| `AppSidebar.test.tsx`        | +2 new tests | i18n nav labels, Settings label via i18n                                    |
+| `DashboardPage.test.tsx`     | 1 updated    | "see all" → "view all"                                                      |
 
 **Anti-recurrence:** `AppSidebar.bug056.test.tsx:42-51` asserts OLD hardcoded testids (`nav-item-my-courses`, `nav-item-knowledge-graph`) do NOT exist — any regression would fail immediately.
 
@@ -3401,24 +3625,24 @@ BUG-047 fixed locale **persistence and sync** (localStorage, DB, GlobalLocaleSyn
 
 ### Deliverables
 
-| Deliverable | Status | Files |
-|---|---|---|
-| DB migration 0015: `model_format`, `model_animations`, `poly_count` on `media_assets` | ✅ | `packages/db/src/migrations/0015_model_assets.sql` |
-| Drizzle schema update — 3D model fields + `MODEL_3D` enum value | ✅ | `packages/db/src/schema/content.ts` |
-| GraphQL SDL — `Model3DInfo`, `ModelAnimation`, `AssetType` enum, `uploadModel3D` mutation, `model3d` field on `MediaAsset` | ✅ | `apps/subgraph-content/src/media/media.graphql` |
-| `MediaService.createModel3DUpload()` — format validation, MinIO presigned PUT, DB insert | ✅ | `apps/subgraph-content/src/media/media.service.ts` |
-| `MediaResolver` — `uploadModel3D` mutation + `model3d` `@ResolveField` | ✅ | `apps/subgraph-content/src/media/media.resolver.ts` |
-| `Model3DViewer.tsx` — Three.js WebGL viewer (dynamic import), OrbitControls, full memory safety | ✅ | `apps/web/src/components/Model3DViewer.tsx` |
-| Three.js test stubs — `three-stub.ts`, `three-gltf-stub.ts`, `three-orbit-stub.ts` | ✅ | `apps/web/src/test/stubs/` |
-| `model3d.queries.ts` — `UPLOAD_MODEL_3D_MUTATION` + `GET_MEDIA_ASSET_MODEL_QUERY` | ✅ | `apps/web/src/lib/graphql/model3d.queries.ts` |
+| Deliverable                                                                                                                | Status | Files                                               |
+| -------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------- |
+| DB migration 0015: `model_format`, `model_animations`, `poly_count` on `media_assets`                                      | ✅     | `packages/db/src/migrations/0015_model_assets.sql`  |
+| Drizzle schema update — 3D model fields + `MODEL_3D` enum value                                                            | ✅     | `packages/db/src/schema/content.ts`                 |
+| GraphQL SDL — `Model3DInfo`, `ModelAnimation`, `AssetType` enum, `uploadModel3D` mutation, `model3d` field on `MediaAsset` | ✅     | `apps/subgraph-content/src/media/media.graphql`     |
+| `MediaService.createModel3DUpload()` — format validation, MinIO presigned PUT, DB insert                                   | ✅     | `apps/subgraph-content/src/media/media.service.ts`  |
+| `MediaResolver` — `uploadModel3D` mutation + `model3d` `@ResolveField`                                                     | ✅     | `apps/subgraph-content/src/media/media.resolver.ts` |
+| `Model3DViewer.tsx` — Three.js WebGL viewer (dynamic import), OrbitControls, full memory safety                            | ✅     | `apps/web/src/components/Model3DViewer.tsx`         |
+| Three.js test stubs — `three-stub.ts`, `three-gltf-stub.ts`, `three-orbit-stub.ts`                                         | ✅     | `apps/web/src/test/stubs/`                          |
+| `model3d.queries.ts` — `UPLOAD_MODEL_3D_MUTATION` + `GET_MEDIA_ASSET_MODEL_QUERY`                                          | ✅     | `apps/web/src/lib/graphql/model3d.queries.ts`       |
 
 ### Tests Added (Phase 34)
 
-| File | Tests | Coverage |
-|---|---|---|
-| `model3d.service.spec.ts` (NEW) | 14 | Format validation (4), unknown format rejection, result shape, key path, S3 failure, onModuleDestroy, resolveModel3d (5) |
-| `Model3DViewer.test.tsx` (NEW) | 18 | Canvas render, loading state, error state, onLoad/onError callbacks, memory safety ×4 (renderer/rAF/OrbitControls/ResizeObserver), unavailable fallback, GLTFLoader call |
-| `model3d-viewer.spec.ts` (E2E — NEW) | 5 + 2 visual | Canvas visible, loading state, no raw error strings, upload mutation, visual ×2 |
+| File                                 | Tests        | Coverage                                                                                                                                                                 |
+| ------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `model3d.service.spec.ts` (NEW)      | 14           | Format validation (4), unknown format rejection, result shape, key path, S3 failure, onModuleDestroy, resolveModel3d (5)                                                 |
+| `Model3DViewer.test.tsx` (NEW)       | 18           | Canvas render, loading state, error state, onLoad/onError callbacks, memory safety ×4 (renderer/rAF/OrbitControls/ResizeObserver), unavailable fallback, GLTFLoader call |
+| `model3d-viewer.spec.ts` (E2E — NEW) | 5 + 2 visual | Canvas visible, loading state, no raw error strings, upload mutation, visual ×2                                                                                          |
 
 **New files:** `model3d.service.spec.ts`, `Model3DViewer.tsx`, `Model3DViewer.test.tsx`, `model3d.queries.ts`, `three-stub.ts`, `three-gltf-stub.ts`, `three-orbit-stub.ts`, `e2e/model3d-viewer.spec.ts`, `0015_model_assets.sql`
 **Memory safety:** renderer.dispose() + geometry/material dispose + OrbitControls.dispose() + cancelAnimationFrame + ResizeObserver.disconnect() — all in useEffect cleanup.
@@ -3434,27 +3658,27 @@ BUG-047 fixed locale **persistence and sync** (localStorage, DB, GlobalLocaleSyn
 
 ### Deliverables
 
-| Deliverable | Status | Files |
-|---|---|---|
-| DB migration 0014: `proctoring_sessions` table + RLS | ✅ | `packages/db/src/migrations/0014_proctoring_sessions.sql` |
-| Drizzle schema — `proctoring_sessions` table with JSONB flags | ✅ | `packages/db/src/schema/content.ts` |
-| `proctoring.graphql` SDL — `ProctoringSession`, `ProctoringFlag`, `ProctoringFlagType` enum, 3 mutations, 2 queries | ✅ | `apps/subgraph-agent/src/proctoring/proctoring.graphql` |
-| `ProctoringService` — startSession, flagEvent, endSession, getSession, getReport + `OnModuleDestroy` | ✅ | `apps/subgraph-agent/src/proctoring/proctoring.service.ts` |
-| `ProctoringResolver` — delegates to service, extracts authContext | ✅ | `apps/subgraph-agent/src/proctoring/proctoring.resolver.ts` |
-| `ProctoringModule` wired into `AppModule` | ✅ | `apps/subgraph-agent/src/proctoring/proctoring.module.ts` |
-| `proctoring.queries.ts` — 3 mutations + 1 query (urql/gql) | ✅ | `apps/web/src/lib/graphql/proctoring.queries.ts` |
-| `useProctoringSession.ts` — lifecycle hook (start/flag/end/isActive) | ✅ | `apps/web/src/hooks/useProctoringSession.ts` |
-| `ProctoringOverlay.tsx` — webcam preview, tab-switch detection, active badge, flag count | ✅ | `apps/web/src/components/ProctoringOverlay.tsx` |
-| `ProctoringReportCard.tsx` — status badge, flag timeline list | ✅ | `apps/web/src/components/ProctoringReportCard.tsx` |
-| `AssessmentForm.tsx` updated — `proctoringEnabled` prop renders overlay | ✅ | `apps/web/src/components/AssessmentForm.tsx` |
+| Deliverable                                                                                                         | Status | Files                                                       |
+| ------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------- |
+| DB migration 0014: `proctoring_sessions` table + RLS                                                                | ✅     | `packages/db/src/migrations/0014_proctoring_sessions.sql`   |
+| Drizzle schema — `proctoring_sessions` table with JSONB flags                                                       | ✅     | `packages/db/src/schema/content.ts`                         |
+| `proctoring.graphql` SDL — `ProctoringSession`, `ProctoringFlag`, `ProctoringFlagType` enum, 3 mutations, 2 queries | ✅     | `apps/subgraph-agent/src/proctoring/proctoring.graphql`     |
+| `ProctoringService` — startSession, flagEvent, endSession, getSession, getReport + `OnModuleDestroy`                | ✅     | `apps/subgraph-agent/src/proctoring/proctoring.service.ts`  |
+| `ProctoringResolver` — delegates to service, extracts authContext                                                   | ✅     | `apps/subgraph-agent/src/proctoring/proctoring.resolver.ts` |
+| `ProctoringModule` wired into `AppModule`                                                                           | ✅     | `apps/subgraph-agent/src/proctoring/proctoring.module.ts`   |
+| `proctoring.queries.ts` — 3 mutations + 1 query (urql/gql)                                                          | ✅     | `apps/web/src/lib/graphql/proctoring.queries.ts`            |
+| `useProctoringSession.ts` — lifecycle hook (start/flag/end/isActive)                                                | ✅     | `apps/web/src/hooks/useProctoringSession.ts`                |
+| `ProctoringOverlay.tsx` — webcam preview, tab-switch detection, active badge, flag count                            | ✅     | `apps/web/src/components/ProctoringOverlay.tsx`             |
+| `ProctoringReportCard.tsx` — status badge, flag timeline list                                                       | ✅     | `apps/web/src/components/ProctoringReportCard.tsx`          |
+| `AssessmentForm.tsx` updated — `proctoringEnabled` prop renders overlay                                             | ✅     | `apps/web/src/components/AssessmentForm.tsx`                |
 
 ### Tests Added (Phase 33)
 
-| File | Tests | Coverage |
-|---|---|---|
-| `proctoring.service.spec.ts` (NEW) | 16 | onModuleDestroy, startSession (3), flagEvent (5), endSession (3), getSession (2), getReport (1), mapSession (2) |
-| `ProctoringOverlay.test.tsx` (NEW) | 23 | Render, start btn, webcam visibility, active badge, flag count, tab-switch detection, stop btn, memory safety × 2, onFlagCountChange + 6 ProctoringReportCard tests |
-| `proctoring.spec.ts` (E2E — NEW) | 6 + 3 visual | Start btn visible, active badge after start, stop ends session, tab-switch flag count, raw string guard, visual regression × 3 |
+| File                               | Tests        | Coverage                                                                                                                                                            |
+| ---------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `proctoring.service.spec.ts` (NEW) | 16           | onModuleDestroy, startSession (3), flagEvent (5), endSession (3), getSession (2), getReport (1), mapSession (2)                                                     |
+| `ProctoringOverlay.test.tsx` (NEW) | 23           | Render, start btn, webcam visibility, active badge, flag count, tab-switch detection, stop btn, memory safety × 2, onFlagCountChange + 6 ProctoringReportCard tests |
+| `proctoring.spec.ts` (E2E — NEW)   | 6 + 3 visual | Start btn visible, active badge after start, stop ends session, tab-switch flag count, raw string guard, visual regression × 3                                      |
 
 **New files:** `proctoring.service.ts`, `proctoring.resolver.ts`, `proctoring.module.ts`, `proctoring.service.spec.ts`, `proctoring.graphql`, `proctoring.queries.ts`, `useProctoringSession.ts`, `ProctoringOverlay.tsx`, `ProctoringReportCard.tsx`, `ProctoringOverlay.test.tsx`, `e2e/proctoring.spec.ts`, `0014_proctoring_sessions.sql`
 **Visual regression screenshots:** `proctoring-inactive.png`, `proctoring-active.png`, `proctoring-flagged.png`
@@ -3702,12 +3926,15 @@ Visual evidence: screenshot showed `"Processing was interrupted (service restart
 ### Root Cause Chain
 
 `SourceManager.tsx:782-786` (before fix):
+
 ```tsx
-{source.status === 'FAILED' && source.errorMessage && (
-  <span className="text-xs text-red-400 truncate">
-    — {source.errorMessage}  {/* ← raw backend string, no sanitization */}
-  </span>
-)}
+{
+  source.status === 'FAILED' && source.errorMessage && (
+    <span className="text-xs text-red-400 truncate">
+      — {source.errorMessage} {/* ← raw backend string, no sanitization */}
+    </span>
+  );
+}
 ```
 
 The backend (`knowledge-source.service.ts:63`) sets `error_message = 'Processing was interrupted (service restarted)'` for stale PENDING/PROCESSING sources on service restart. This internal technical message was forwarded verbatim to the React UI.
@@ -3715,18 +3942,19 @@ The backend (`knowledge-source.service.ts:63`) sets `error_message = 'Processing
 ### Discovery List (3 waves)
 
 **Wave 1 — Exact match:**
+
 1. `apps/web/src/components/SourceManager.tsx:784` — raw `{source.errorMessage}` in UI ← PRIMARY
 
-**Wave 2 — Similarity search (same `errorMessage` pattern in other pages):**
-2. `apps/web/src/pages/CrmSettingsPage.tsx:241` — `{entry.errorMessage}` (admin-only sync log — acceptable)
-3. `apps/web/src/pages/ScimSettingsPage.tsx:257` — `{entry.errorMessage}` (admin-only sync log — acceptable)
+**Wave 2 — Similarity search (same `errorMessage` pattern in other pages):** 2. `apps/web/src/pages/CrmSettingsPage.tsx:241` — `{entry.errorMessage}` (admin-only sync log — acceptable) 3. `apps/web/src/pages/ScimSettingsPage.tsx:257` — `{entry.errorMessage}` (admin-only sync log — acceptable)
 
 **Wave 3 — Class-of-bug (raw backend error strings in UI):**
+
 - CrmSettingsPage and ScimSettingsPage are admin-only pages where raw error details are expected by admins. No fix needed.
 
 ### Fix
 
 **Round 1 — SourceManager.tsx:**
+
 - Added `getFriendlySourceErrorKey(errorMessage?: string): string` helper that maps known backend error patterns to i18n keys:
   - `"interrupted"` / `"service restarted"` → `sources.errorServiceRestarted`
   - `"timeout"` / `"timed out"` → `sources.errorTimeout`
@@ -3736,18 +3964,19 @@ The backend (`knowledge-source.service.ts:63`) sets `error_message = 'Processing
 - Now shows error description for ALL FAILED sources (not only when `errorMessage` is set)
 
 **i18n additions:**
+
 - `packages/i18n/src/locales/en/content.json` — added `errorServiceRestarted`, `errorTimeout`, `errorFileTooLarge`
 - `packages/i18n/src/locales/he/content.json` — Hebrew translations for same keys
 
 ### Tests Added
 
-| Type | File | Assertion |
-|------|------|-----------|
-| Unit | `SourceManager.test.tsx` | `getFriendlySourceErrorKey('Processing was interrupted...')` → `sources.errorServiceRestarted` |
-| Unit | `SourceManager.test.tsx` | Raw string NOT in DOM when FAILED source rendered |
-| E2E | `knowledge-sources.spec.ts` (Suite 3) | `page.route()` injects FAILED source; asserts `Processing was interrupted` NOT visible |
-| E2E | `knowledge-sources.spec.ts` (Suite 3) | `document.body.textContent` does not contain `service restarted` |
-| Visual | `knowledge-sources.spec.ts` (Suite 3) | `toHaveScreenshot('sources-panel-failed-source.png')` |
+| Type   | File                                  | Assertion                                                                                      |
+| ------ | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Unit   | `SourceManager.test.tsx`              | `getFriendlySourceErrorKey('Processing was interrupted...')` → `sources.errorServiceRestarted` |
+| Unit   | `SourceManager.test.tsx`              | Raw string NOT in DOM when FAILED source rendered                                              |
+| E2E    | `knowledge-sources.spec.ts` (Suite 3) | `page.route()` injects FAILED source; asserts `Processing was interrupted` NOT visible         |
+| E2E    | `knowledge-sources.spec.ts` (Suite 3) | `document.body.textContent` does not contain `service restarted`                               |
+| Visual | `knowledge-sources.spec.ts` (Suite 3) | `toHaveScreenshot('sources-panel-failed-source.png')`                                          |
 
 ### Anti-recurrence
 
@@ -3779,15 +4008,16 @@ No rate limiting existed → 5 identical warnings per load.
 ### Fix
 
 `apps/web/src/lib/urql-client.ts`:
+
 - Added module-level `const _warnedSubscriptionOps = new Set<string>()` — tracks operation names already warned
 - In `onError`: extract `opName` from `operation.query.definitions` — skip the `console.warn` if `opName` already in the set
 - Only the first occurrence per subscription operation name per page session is logged
 
 ### Tests Added
 
-| Type | File | Assertion |
-|------|------|-----------|
-| E2E | `knowledge-sources.spec.ts` (Suite 4) | Monitors `console.warn` for subscription auth messages — count per unique warning ≤ 1 |
+| Type | File                                  | Assertion                                                                             |
+| ---- | ------------------------------------- | ------------------------------------------------------------------------------------- |
+| E2E  | `knowledge-sources.spec.ts` (Suite 4) | Monitors `console.warn` for subscription auth messages — count per unique warning ≤ 1 |
 
 ### Anti-recurrence
 
@@ -3809,52 +4039,50 @@ Additionally, two `[Auth] Subscription auth error` warnings appeared in the cons
 ### Root Cause Chain
 
 **Primary (400 Bad Request):**
+
 1. `apps/web/src/pages/LiveSessionsPage.tsx` queries `liveSessions(status, limit, offset)` via urql
 2. `apps/web/src/lib/graphql/live-session.queries.ts` defines `LIST_LIVE_SESSIONS_QUERY` with `liveSessions(...)` + fields `participantCount/maxParticipants/instructorId/courseId`
 3. `apps/gateway/supergraph.graphql` had **zero entries** for `LiveSession` type — the gateway never knew about this query
 4. **Root cause:** The `liveSessions` (plural, list) query was never added to the content subgraph SDL. The `liveSession` (singular, by contentItemId) existed but not the list variant. Even the singular query was missing from the supergraph because the supergraph was never recomposed after live sessions were added.
 
-**Secondary (E2E test never caught it):**
-5. `apps/web/e2e/live-sessions.spec.ts:472` — test only checked `bodyText.length > 10` — "Failed to load sessions" passes that check easily
-6. No visual regression test explicitly asserted `[data-testid="sessions-error"]` NOT visible
-7. The visual screenshot test (`toHaveScreenshot`) was also not protecting us — no baseline existed for the `/sessions` list page
+**Secondary (E2E test never caught it):** 5. `apps/web/e2e/live-sessions.spec.ts:472` — test only checked `bodyText.length > 10` — "Failed to load sessions" passes that check easily 6. No visual regression test explicitly asserted `[data-testid="sessions-error"]` NOT visible 7. The visual screenshot test (`toHaveScreenshot`) was also not protecting us — no baseline existed for the `/sessions` list page
 
 ### Discovery List (3 Waves)
 
 **Wave 1 — Exact match:**
+
 1. `apps/subgraph-content/src/live-session/live-session.graphql` — missing `liveSessions` query + missing fields (`participantCount`, `maxParticipants`, `instructorId`, `courseId`) + missing `@key(fields: "id")`
 2. `apps/subgraph-content/src/live-session/live-session.resolver.ts` — missing `@Query('liveSessions')` + `@Query('liveSessionById')` resolvers
 3. `apps/subgraph-content/src/live-session/live-session.service.ts` — missing `listSessions()` + `getById()` methods + missing fields in `LiveSessionResult` interface + `map()` method
 4. `apps/gateway/supergraph.graphql` — `LiveSession` type, all live session queries/mutations, `JoinSessionResult`, `StartLiveSessionResult`, `SessionAttendee*` types all absent
 
-**Wave 2 — Similar pattern (E2E gaps):**
-5. `apps/web/e2e/live-sessions.spec.ts` — visual test has no `@authenticated` mock + no negative assertion on `sessions-error`
-6. `apps/web/src/pages/LiveSessionsPage.test.tsx` — no tests for `sessions-error` state, no BUG-055 regression guard
+**Wave 2 — Similar pattern (E2E gaps):** 5. `apps/web/e2e/live-sessions.spec.ts` — visual test has no `@authenticated` mock + no negative assertion on `sessions-error` 6. `apps/web/src/pages/LiveSessionsPage.test.tsx` — no tests for `sessions-error` state, no BUG-055 regression guard
 
-**Wave 3 — Class of bug (supergraph never updated):**
-7. Pattern: SDL added to subgraph → supergraph not recomposed → gateway serves 400 forever
-8. Same pattern was the root cause of BUG-007 (Admin Panel) and BUG-026 (myOpenBadges)
+**Wave 3 — Class of bug (supergraph never updated):** 7. Pattern: SDL added to subgraph → supergraph not recomposed → gateway serves 400 forever 8. Same pattern was the root cause of BUG-007 (Admin Panel) and BUG-026 (myOpenBadges)
 
 ### Fix Rounds
 
 **Round 1 — Backend SDL + service + resolver:**
+
 - `apps/subgraph-content/src/live-session/live-session.graphql` — added `@key(fields: "id")`, `liveSessions` query, `liveSessionById` query, new optional fields
 - `apps/subgraph-content/src/live-session/live-session.service.ts` — added `listSessions()`, `getById()`, updated `LiveSessionResult` + `map()`
 - `apps/subgraph-content/src/live-session/live-session.resolver.ts` — added `listSessions` and `getLiveSessionById` handlers with Pino logging
 
 **Round 2 — Supergraph manual update:**
+
 - `apps/gateway/supergraph.graphql` — added `LiveSession` type, `JoinSessionResult`, `StartLiveSessionResult`, `SessionAttendee*` types; added `liveSession/liveSessions/liveSessionById/sessionAttendees` to Query; added `createLiveSession/joinLiveSession/startLiveSession/endLiveSession/cancelLiveSession` to Mutation
 
 **Round 3 — Test coverage:**
+
 - `apps/web/e2e/live-sessions.spec.ts` — added `mockLiveSessionsSuccess()` helper; added `sessions page does NOT show error state (BUG-057)` regression guard; added `sessions page shows clean error UI` test; updated visual test to use mock + assert no error visible
 - `apps/web/src/pages/LiveSessionsPage.test.tsx` — added 2 regression tests: `REGRESSION BUG-057: shows sessions-error when GraphQL returns error` and `REGRESSION BUG-057: does NOT show sessions-error when GraphQL succeeds`
 
 ### Tests Added
 
-| File | Tests | Type |
-|------|-------|------|
-| `apps/web/src/pages/LiveSessionsPage.test.tsx` | 2 regression guards (BUG-057) | Unit |
-| `apps/web/e2e/live-sessions.spec.ts` | `mockLiveSessionsSuccess` helper + 2 new tests + updated visual | E2E |
+| File                                           | Tests                                                           | Type |
+| ---------------------------------------------- | --------------------------------------------------------------- | ---- |
+| `apps/web/src/pages/LiveSessionsPage.test.tsx` | 2 regression guards (BUG-057)                                   | Unit |
+| `apps/web/e2e/live-sessions.spec.ts`           | `mockLiveSessionsSuccess` helper + 2 new tests + updated visual | E2E  |
 
 ### Anti-recurrence
 
@@ -10695,6 +10923,7 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 ---
 
 ## BUG-059 | ✅ Fixed | HIGH
+
 **Dark mode color contrast — invisible/low-contrast text (WCAG 2.1 AA violation)**
 
 **Date:** 2026-03-08
@@ -10709,13 +10938,15 @@ Components bypassed the design token system (`text-foreground`, `text-muted-fore
 
 **Partial fix in Phase 29 (2026-03-08):**
 23 critical issues fixed across 5 files:
-- `apps/web/src/components/AnnotationItem.tsx` — 5 fixes (bg-white→dark:bg-card, text-gray-* → dark:text-foreground/muted-foreground, bg-gray-100→dark:bg-muted, border-gray-200→dark:border-border)
+
+- `apps/web/src/components/AnnotationItem.tsx` — 5 fixes (bg-white→dark:bg-card, text-gray-\* → dark:text-foreground/muted-foreground, bg-gray-100→dark:bg-muted, border-gray-200→dark:border-border)
 - `apps/web/src/components/AnnotationPanel.tsx` — 3 fixes
 - `apps/web/src/components/DocumentAnnotationPanel.tsx` — 5 fixes
 - `apps/web/src/components/SourceManager.tsx` — 3 fixes (close button, tabs, footer)
 - `apps/web/src/pages/LandingPage.tsx` — 16 fixes (nav, stats bar, features, how-it-works, testimonials, pricing sections)
 
 **Remaining issues (next sprint backlog — ~40 instances in 14 files):**
+
 - `apps/web/src/pages/LessonPipelinePage.tsx` — 8 instances
 - `apps/web/src/pages/LessonResultsPage.tsx` — 10 instances
 - `apps/web/src/pages/CreateLessonPage.tsx` + `.step2.tsx` — 6 instances
@@ -10737,14 +10968,15 @@ Components bypassed the design token system (`text-foreground`, `text-muted-fore
 
 ---
 
-
 ---
 
 ## FEAT-PHASE39-MOTION-WCAG-QA-SECURITY | ✅ Fixed | HIGH
+
 **Phase 39 — Motion Design, WCAG 2.2, QA Tooling, Security Hardening v2**
 Commit: `683fe22` (Wave 3 final), preceded by `9fbd1c0` (Wave 2) and `909da67` (Wave 1)
 
 **Delivered:**
+
 - Framer Motion v11 + GSAP + Lenis: hero GSAP stagger, whileInView cards, smooth scroll
 - Remotion compositions: HeroBackground (300f@30fps) + StatsCounter (spring physics)
 - ReducedMotionProvider: `useReducedMotion()` guards all animations (WCAG 2.3.3)
@@ -10762,10 +10994,12 @@ Commit: `683fe22` (Wave 3 final), preceded by `9fbd1c0` (Wave 2) and `909da67` (
 ---
 
 ## FEAT-PHASE40-SMART-CONTENT-IMPORT | ✅ Fixed | HIGH
+
 **Phase 40 — Smart Content Import + AI Ingestion Pipeline**
 Commit: `ae622ce`
 
 **Sprint A — Backend:**
+
 - `content-import.service.ts`: importFromYoutube + importFromWebsite + cancelImport
 - `youtube.client.ts`: YouTube Data API v3, paginated, quota-aware (BadRequestException on 403)
 - `firecrawl.client.ts`: Firecrawl API site crawl + LLM lesson extraction
@@ -10774,6 +11008,7 @@ Commit: `ae622ce`
 - Security: ctx.tenantId/ctx.userId always from JWT (SI-9 compliant)
 
 **Sprint B — Frontend:**
+
 - `ContentImportPage.tsx`: role-gated wizard (INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN)
 - `ImportSourceSelector.tsx`: YouTube / Website / Folder source picker (aria-pressed)
 - `FolderUploadZone.tsx`: webkitdirectory, numeric sort, iOS Safari fallback, size warning
@@ -10782,6 +11017,7 @@ Commit: `ae622ce`
 - Route: `/courses/:courseId/import`
 
 **Sprint D — AI Pipeline:**
+
 - `content-ingestion-pipeline.service.ts`: magic-byte file router + ZIP bomb guard (5GB) + path traversal rejection
 - `tesseract-ocr.service.ts`: Tesseract.js v5, 2-worker scheduler, `onModuleDestroy` cleanup
 - `image-understanding.service.ts`: Moondream 2 via Ollama (caption + handwriting detection)
@@ -10797,11 +11033,13 @@ Commit: `ae622ce`
 ---
 
 ## FEAT-PHASE41-XAPI-DRIVE-MOBILE | ✅ Fixed | HIGH
+
 **Phase 41 — xAPI NATS Bridge + Google Drive Import + Mobile Offline Queue**
 
 **Status:** ✅ Complete — committed ae129f0 (2026-03-09)
 
 **Deliverables (Phase 41 Sprint A — xAPI Pipeline):**
+
 - `apps/subgraph-content/src/xapi/xapi-verb-mappings.ts` — xAPI 1.0.3 verb table + NATS→xAPI mapper
 - `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.ts` — subscribes to 6 NATS subjects → stores xAPI statements
 - `apps/subgraph-content/src/xapi/xapi-export.service.ts` — `getStatementCount()` with `since` filter
@@ -10810,6 +11048,7 @@ Commit: `ae622ce`
 - `apps/gateway/supergraph.graphql` — added `xapiStatementCount` + `clearXapiStatements`
 
 **Deliverables (Phase 41 Sprint B — Google Drive):**
+
 - `apps/subgraph-content/src/content-import/google-drive.client.ts` — native-fetch Drive API client (no googleapis)
 - `apps/subgraph-content/src/content-import/content-import.graphql` — `DriveImportInput` + `importFromDrive` mutation
 - `apps/subgraph-content/src/content-import/content-import.service.ts` — `importFromDrive()` with 5-min timeout guard
@@ -10818,6 +11057,7 @@ Commit: `ae622ce`
 - `apps/web/src/pages/OAuthCallbackPage.tsx` — postMessage OAuth relay page
 
 **Deliverables (Phase 41 Sprint C — Mobile):**
+
 - `apps/mobile/src/services/XapiOfflineQueue.ts` — expo-sqlite queue with 500-row eviction cap
 - `apps/mobile/src/hooks/useXapiTracking.ts` — `track()` + `flush()` hook (no NetInfo coupling)
 
@@ -10832,6 +11072,7 @@ Commit: `ae622ce`
 | `EDUSPHERE.poll.voted` | responded | `http://adlnet.gov/expapi/verbs/responded` |
 
 **Security:**
+
 - xAPI tokens: SHA-256 hash only (SI-3) — raw tokens never stored or logged
 - Drive `accessToken`: in-memory only, never inserted into DB or logged
 - NATS bridge: skips events with missing `tenantId` or `userId`
@@ -10839,6 +11080,7 @@ Commit: `ae622ce`
 - Mobile queue: capped at 500 rows (Memory Safety Rule)
 
 **Tests added:**
+
 - `xapi-nats-bridge.service.spec.ts` — 5 tests (verb mappings, lifecycle, missing tenantId guard)
 - `xapi-export.service.spec.ts` — 3 tests (count, since param, empty)
 - `google-drive.client.spec.ts` — 4 tests (list files, 403 error, empty folder, download buffer)
@@ -10855,61 +11097,69 @@ Commit: `ae622ce`
 **Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 2026-03-14
 
 ### Problem
+
 21 features across the platform had UI that displayed mock data or called stub services that returned fake data. Users saw convincing UIs that did nothing real.
 
 ### Features Wired (21 total)
 
 #### Group A — subgraph-core (7 features):
-| ID | Feature | Before | After |
-|----|---------|--------|-------|
-| F-05 | myTenantUsage | Query didn't exist | Real resolver aggregating tenant data |
-| F-06 | platformLiveStats | Query didn't exist | Cross-tenant aggregation (SUPER_ADMIN only) |
-| F-07 | partnerDashboard + API key regen | Mock revenue + no-op button | Real query + SHA-256 hashed key |
-| F-09 | Stripe billing | All stubs returning fake IDs | Graceful degradation (real when STRIPE_SECRET_KEY set) |
-| F-11 | Web Push | sendWebPush() was no-op | Real web-push with VAPID (when installed) |
-| F-18 | At-Risk thresholds | Local state only | Saved to tenant_settings JSONB |
-| F-20 | GDPR ANONYMIZE | Skipped entirely | SHA-256 irreversible anonymization + audit log |
+
+| ID   | Feature                          | Before                       | After                                                  |
+| ---- | -------------------------------- | ---------------------------- | ------------------------------------------------------ |
+| F-05 | myTenantUsage                    | Query didn't exist           | Real resolver aggregating tenant data                  |
+| F-06 | platformLiveStats                | Query didn't exist           | Cross-tenant aggregation (SUPER_ADMIN only)            |
+| F-07 | partnerDashboard + API key regen | Mock revenue + no-op button  | Real query + SHA-256 hashed key                        |
+| F-09 | Stripe billing                   | All stubs returning fake IDs | Graceful degradation (real when STRIPE_SECRET_KEY set) |
+| F-11 | Web Push                         | sendWebPush() was no-op      | Real web-push with VAPID (when installed)              |
+| F-18 | At-Risk thresholds               | Local state only             | Saved to tenant_settings JSONB                         |
+| F-20 | GDPR ANONYMIZE                   | Skipped entirely             | SHA-256 irreversible anonymization + audit log         |
 
 #### Group B — subgraph-content (3 features):
-| ID | Feature | Before | After |
-|----|---------|--------|-------|
-| F-13 | Google Drive import | Files listed, never processed | Download → MinIO → DB record → NATS event |
-| F-14 | xAPI clearStatements | Returned 0 always | Real Drizzle DELETE + audit log |
-| F-15 | LTI platforms | env-backed single platform | DB-backed multi-tenant CRUD |
+
+| ID   | Feature              | Before                        | After                                     |
+| ---- | -------------------- | ----------------------------- | ----------------------------------------- |
+| F-13 | Google Drive import  | Files listed, never processed | Download → MinIO → DB record → NATS event |
+| F-14 | xAPI clearStatements | Returned 0 always             | Real Drizzle DELETE + audit log           |
+| F-15 | LTI platforms        | env-backed single platform    | DB-backed multi-tenant CRUD               |
 
 #### Group C — subgraph-knowledge + agent (4 features):
-| ID | Feature | Before | After |
-|----|---------|--------|-------|
+
+| ID   | Feature            | Before                   | After                                 |
+| ---- | ------------------ | ------------------------ | ------------------------------------- |
 | F-08 | myTopMasteryTopics | SDL existed, no resolver | Real resolver querying mastery tables |
-| F-12 | OCR ingestion | Empty string stub | Calls TesseractOcrService |
-| F-16 | Lesson citations | 3 fake citations | pgvector semantic search |
-| F-21 | Chavruta type | 'CHAVRUTA' (wrong) | 'CHAVRUTA_DEBATE' (matches schema) |
+| F-12 | OCR ingestion      | Empty string stub        | Calls TesseractOcrService             |
+| F-16 | Lesson citations   | 3 fake citations         | pgvector semantic search              |
+| F-21 | Chavruta type      | 'CHAVRUTA' (wrong)       | 'CHAVRUTA_DEBATE' (matches schema)    |
 
 #### Group D — Frontend wiring (7 features):
-| ID | Feature | Before | After |
-|----|---------|--------|-------|
-| F-01 | AutoGradingResults | MOCK_RESULTS | Real useQuery + loading/empty/error states |
-| F-02 | GapAnalysis | MOCK_GAPS | Wired to existing skillGapAnalysis resolver |
-| F-04 | MergeQueue | Local state approve/reject | Real mutations + reject dialog |
-| F-05b | OrgUsage | No year selector | Year dropdown + useQuery |
-| F-06b | InvestorDeck | Missing BUG-052 guard | Mounted guard + skeleton |
-| F-07b | PartnerDashboard | MOCK_REVENUE | Real query + key regen mutation |
-| F-17b | StripeInvoice | MOCK_INVOICES | Real query + generate dialog |
-| F-19 | Mobile language | AsyncStorage only | GraphQL mutation sync |
+
+| ID    | Feature            | Before                     | After                                       |
+| ----- | ------------------ | -------------------------- | ------------------------------------------- |
+| F-01  | AutoGradingResults | MOCK_RESULTS               | Real useQuery + loading/empty/error states  |
+| F-02  | GapAnalysis        | MOCK_GAPS                  | Wired to existing skillGapAnalysis resolver |
+| F-04  | MergeQueue         | Local state approve/reject | Real mutations + reject dialog              |
+| F-05b | OrgUsage           | No year selector           | Year dropdown + useQuery                    |
+| F-06b | InvestorDeck       | Missing BUG-052 guard      | Mounted guard + skeleton                    |
+| F-07b | PartnerDashboard   | MOCK_REVENUE               | Real query + key regen mutation             |
+| F-17b | StripeInvoice      | MOCK_INVOICES              | Real query + generate dialog                |
+| F-19  | Mobile language    | AsyncStorage only          | GraphQL mutation sync                       |
 
 ### Security
+
 - 94 new security tests (tests/security/feature-wiring-security.spec.ts)
 - All SI-1..SI-10 invariants verified
 - 3 known gaps documented: HRIS encryptField, Drive ClamAV scan, platformLiveStats resolver gate
 
 ### Tests Added
+
 - 52 frontend unit tests (5 test files updated)
 - 94 security static analysis tests (1 new file)
 - 11 new backend service files with Pino logging
 
 ### Anti-Recurrence
+
 - tests/security/feature-wiring-security.spec.ts guards all 10 security areas
-- Frontend tests verify real query wiring (no more MOCK_ constants)
+- Frontend tests verify real query wiring (no more MOCK\_ constants)
 
 ---
 
@@ -10918,14 +11168,17 @@ Commit: `ae622ce`
 **Status:** ✅ Implemented | **Severity:** 🟡 Medium (UX) | **Date:** 18 March 2026
 
 ### Problem
+
 8 locations across the codebase showed CONSENT_REQUIRED errors as plain text ("AI features require your consent. Please enable AI processing in Settings → Privacy.") with **no clickable link, no Privacy section in Settings, and no navigation guidance**. Users were stuck with no way to resolve the issue.
 
 ### Root Cause
+
 - No Privacy & AI consent section existed in SettingsPage
 - Error messages were hardcoded English strings (not i18n)
 - No reusable pattern for requirement-link navigation
 
 ### Solution
+
 **3 new reusable components + 8 location fixes:**
 
 1. **`RequirementLink`** — Reusable warning component with clickable `<Link>` to `/settings?highlight=<id>`
@@ -10934,33 +11187,35 @@ Commit: `ae622ce`
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/RequirementLink.tsx` | **NEW** — reusable requirement link component |
-| `apps/web/src/hooks/useSettingsHighlight.ts` | **NEW** — scroll-to + highlight hook |
-| `apps/web/src/components/settings/PrivacyConsentCard.tsx` | **NEW** — Privacy consent toggles card |
-| `apps/web/src/pages/SettingsPage.tsx` | Added PrivacyConsentCard |
-| `apps/web/src/components/AiCourseCreatorModal.tsx` | RequirementLink replaces plain errorMsg |
-| `apps/web/src/components/AIChatPanel.tsx` | consent-required message type |
-| `apps/web/src/components/ChatMessage.tsx` | Renders RequirementLink for consent messages |
-| `apps/web/src/types/chat.ts` | Added `type` field to Message interface |
-| `apps/web/src/hooks/useAgentChat.ts` | consent-required marker |
-| `apps/web/src/hooks/useChavrutaDebate.ts` | consent-required marker |
-| `apps/web/src/pages/chavruta/ChavrutaPartnerPage.tsx` | toast.error with navigate action |
-| `apps/web/src/pages/AgentStudioPage.tsx` | toast.error with navigate action |
-| `apps/web/src/styles/globals.css` | settings-highlight keyframe animation |
-| `packages/i18n/src/locales/en/settings.json` | privacy.* keys |
-| `packages/i18n/src/locales/he/settings.json` | privacy.* keys (Hebrew) |
-| `packages/i18n/src/locales/en/common.json` | consentRequired.* keys |
-| `packages/i18n/src/locales/he/common.json` | consentRequired.* keys (Hebrew) |
+| File                                                      | Change                                        |
+| --------------------------------------------------------- | --------------------------------------------- |
+| `apps/web/src/components/RequirementLink.tsx`             | **NEW** — reusable requirement link component |
+| `apps/web/src/hooks/useSettingsHighlight.ts`              | **NEW** — scroll-to + highlight hook          |
+| `apps/web/src/components/settings/PrivacyConsentCard.tsx` | **NEW** — Privacy consent toggles card        |
+| `apps/web/src/pages/SettingsPage.tsx`                     | Added PrivacyConsentCard                      |
+| `apps/web/src/components/AiCourseCreatorModal.tsx`        | RequirementLink replaces plain errorMsg       |
+| `apps/web/src/components/AIChatPanel.tsx`                 | consent-required message type                 |
+| `apps/web/src/components/ChatMessage.tsx`                 | Renders RequirementLink for consent messages  |
+| `apps/web/src/types/chat.ts`                              | Added `type` field to Message interface       |
+| `apps/web/src/hooks/useAgentChat.ts`                      | consent-required marker                       |
+| `apps/web/src/hooks/useChavrutaDebate.ts`                 | consent-required marker                       |
+| `apps/web/src/pages/chavruta/ChavrutaPartnerPage.tsx`     | toast.error with navigate action              |
+| `apps/web/src/pages/AgentStudioPage.tsx`                  | toast.error with navigate action              |
+| `apps/web/src/styles/globals.css`                         | settings-highlight keyframe animation         |
+| `packages/i18n/src/locales/en/settings.json`              | privacy.\* keys                               |
+| `packages/i18n/src/locales/he/settings.json`              | privacy.\* keys (Hebrew)                      |
+| `packages/i18n/src/locales/en/common.json`                | consentRequired.\* keys                       |
+| `packages/i18n/src/locales/he/common.json`                | consentRequired.\* keys (Hebrew)              |
 
 ### Tests Added
+
 - `apps/web/src/components/RequirementLink.test.tsx` — 5 unit tests
 - `apps/web/src/hooks/useSettingsHighlight.test.ts` — 5 unit tests
 - `apps/web/src/components/settings/PrivacyConsentCard.test.tsx` — 7 unit tests
 - `apps/web/e2e/consent-requirement-link.spec.ts` — 5 E2E tests
 
 ### Anti-Recurrence
+
 1. `RequirementLink.test.tsx` guards against rendering plain text warnings
 2. `consent-requirement-link.spec.ts` E2E verifies the full flow: error → link → navigate → highlight → toggle
 3. `PrivacyConsentCard.test.tsx` ensures localStorage sync works
@@ -10974,13 +11229,13 @@ Commit: `ae622ce`
 
 **Fix:** Added frontend `localStorage.getItem('edusphere_consent_AI_PROCESSING') !== 'true'` checks to all 5 AI feature entry points, so RequirementLink shows immediately without needing a backend round-trip:
 
-| File | Change |
-|------|--------|
-| `AiCourseCreatorModal.tsx` | `useMemo` consent gate + conditional RequirementLink rendering |
-| `AIChatPanel.tsx` | Early return with `consent-required` message type |
-| `useAgentChat.ts` | Early return with consent-required marker |
-| `AgentStudioPage.tsx` | Early return + toast.error with navigate action |
-| `ChavrutaPartnerPage.tsx` | Early return + toast.error with navigate action |
+| File                            | Change                                                              |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `AiCourseCreatorModal.tsx`      | `useMemo` consent gate + conditional RequirementLink rendering      |
+| `AIChatPanel.tsx`               | Early return with `consent-required` message type                   |
+| `useAgentChat.ts`               | Early return with consent-required marker                           |
+| `AgentStudioPage.tsx`           | Early return + toast.error with navigate action                     |
+| `ChavrutaPartnerPage.tsx`       | Early return + toast.error with navigate action                     |
 | `AiCourseCreatorModal.test.tsx` | Updated: localStorage consent in beforeEach + consent-specific test |
 
 **Visual Verification:** Screenshot at `docs/screenshots/feat066-modal-consent-link.png` confirms RequirementLink is visible with clickable link to `/settings?highlight=ai-consent`.
@@ -11009,26 +11264,26 @@ Two issues combined:
 
 ### Fix (3 parts)
 
-| File | Change |
-|------|--------|
-| `infrastructure/docker/startup.sh` | Replaced 3 individual if-blocks with comprehensive loop: (1) symlinks ALL `/app/packages/*/` to `/app/node_modules/@edusphere/`, (2) hoists ALL npm packages from `/app/apps/subgraph-*/node_modules/` to root |
-| `infrastructure/docker/supervisord.conf` | Added `startretries=10` to all 6 subgraph programs |
-| `tests/infrastructure/workspace-hoist.spec.ts` | 10 regression tests validating the fix |
+| File                                           | Change                                                                                                                                                                                                         |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `infrastructure/docker/startup.sh`             | Replaced 3 individual if-blocks with comprehensive loop: (1) symlinks ALL `/app/packages/*/` to `/app/node_modules/@edusphere/`, (2) hoists ALL npm packages from `/app/apps/subgraph-*/node_modules/` to root |
+| `infrastructure/docker/supervisord.conf`       | Added `startretries=10` to all 6 subgraph programs                                                                                                                                                             |
+| `tests/infrastructure/workspace-hoist.spec.ts` | 10 regression tests validating the fix                                                                                                                                                                         |
 
 ### Discovery List
 
-| Wave | Location | Issue |
-|------|----------|-------|
-| 1 | `startup.sh` lines 134-173 | Only 3 packages symlinked (prom-client, nats, langgraph-workflows) |
-| 2 | `supervisord.conf` all subgraph sections | No `startretries` set (default=3, too low) |
-| 3 | All workspace packages | 19 of 20 packages missing from root node_modules |
-| 3 | All subgraph npm deps | @nestjs/graphql, @nestjs/common, @ai-sdk/*, etc. not hoisted |
+| Wave | Location                                 | Issue                                                              |
+| ---- | ---------------------------------------- | ------------------------------------------------------------------ |
+| 1    | `startup.sh` lines 134-173               | Only 3 packages symlinked (prom-client, nats, langgraph-workflows) |
+| 2    | `supervisord.conf` all subgraph sections | No `startretries` set (default=3, too low)                         |
+| 3    | All workspace packages                   | 19 of 20 packages missing from root node_modules                   |
+| 3    | All subgraph npm deps                    | @nestjs/graphql, @nestjs/common, @ai-sdk/\*, etc. not hoisted      |
 
 ### Tests Added
 
-| Test File | Tests | Coverage |
-|-----------|-------|----------|
-| `tests/infrastructure/workspace-hoist.spec.ts` | 10 | startup.sh loop pattern, no old individual blocks, supervisord retries ≥5, autorestart=true, critical packages exist |
+| Test File                                      | Tests | Coverage                                                                                                             |
+| ---------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------- |
+| `tests/infrastructure/workspace-hoist.spec.ts` | 10    | startup.sh loop pattern, no old individual blocks, supervisord retries ≥5, autorestart=true, critical packages exist |
 
 ### Anti-Recurrence
 
@@ -11058,32 +11313,32 @@ Added a `sessionStorage` flag (`LOCALE_SYNCED_KEY = 'edusphere_locale_synced'`) 
 
 ### Files Modified
 
-| File | Change |
-|------|--------|
+| File                                           | Change                                                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `apps/web/src/components/GlobalLocaleSync.tsx` | Added fresh-login detection via `LOCALE_SYNCED_KEY`; forces DB re-sync when flag is absent |
-| `apps/web/src/lib/auth.ts` | Exported `LOCALE_SYNCED_KEY`; clears the flag in `login()` and `logout()` |
-| `apps/web/src/hooks/useUserPreferences.ts` | Same fresh-login detection pattern added for consistency |
+| `apps/web/src/lib/auth.ts`                     | Exported `LOCALE_SYNCED_KEY`; clears the flag in `login()` and `logout()`                  |
+| `apps/web/src/hooks/useUserPreferences.ts`     | Same fresh-login detection pattern added for consistency                                   |
 
 ### Tests Added
 
-| Test File | Tests | Coverage |
-|-----------|-------|----------|
-| `apps/web/src/components/GlobalLocaleSync.test.tsx` | 3 | BUG-091 regression guards — forces re-sync on fresh login, skips re-sync when flag present, clears flag after sync |
-| `apps/web/src/lib/auth.test.ts` | 2 | BUG-091 regression guards — `login()` clears flag, `logout()` clears flag |
-| `apps/web/e2e/bug091-locale-login-sync.spec.ts` | 4 | Full E2E: login → locale synced from DB → correct language displayed; logout → flag cleared; repeat login → re-sync fires |
+| Test File                                           | Tests | Coverage                                                                                                                  |
+| --------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/GlobalLocaleSync.test.tsx` | 3     | BUG-091 regression guards — forces re-sync on fresh login, skips re-sync when flag present, clears flag after sync        |
+| `apps/web/src/lib/auth.test.ts`                     | 2     | BUG-091 regression guards — `login()` clears flag, `logout()` clears flag                                                 |
+| `apps/web/e2e/bug091-locale-login-sync.spec.ts`     | 4     | Full E2E: login → locale synced from DB → correct language displayed; logout → flag cleared; repeat login → re-sync fires |
 
 ### Discovery List
 
-| Wave | Location | Issue |
-|------|----------|-------|
-| Wave 1 — Exact match | `apps/web/src/components/GlobalLocaleSync.tsx` | Primary file — sync guard missing fresh-login detection |
-| Wave 1 — Exact match | `apps/web/src/hooks/useUserPreferences.ts` | Same sync logic — same anti-pattern present |
-| Wave 1 — Exact match | `apps/web/src/lib/auth.ts` | `login()`/`logout()` needed to clear the new flag |
-| Wave 2 — Similarity search | `apps/web/src/pages/` (all) | No similar sync gaps found |
-| Wave 2 — Similarity search | `apps/web/src/hooks/` (all) | `useUserPreferences.ts` — same anti-pattern (fixed in Round 2) |
-| Wave 2 — Similarity search | `apps/web/src/components/` (all) | No other locale sync components found |
-| Wave 2 — Similarity search | `apps/mobile/src/` (all) | No mobile equivalent affected (mobile uses AsyncStorage with separate path) |
-| Wave 3 — Class of bug | `sessionStorage`/`localStorage` sync patterns (all) | `StorageManager.clearLocalStorage()` already preserves `edusphere_locale` — no other sync gaps found |
+| Wave                       | Location                                            | Issue                                                                                                |
+| -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Wave 1 — Exact match       | `apps/web/src/components/GlobalLocaleSync.tsx`      | Primary file — sync guard missing fresh-login detection                                              |
+| Wave 1 — Exact match       | `apps/web/src/hooks/useUserPreferences.ts`          | Same sync logic — same anti-pattern present                                                          |
+| Wave 1 — Exact match       | `apps/web/src/lib/auth.ts`                          | `login()`/`logout()` needed to clear the new flag                                                    |
+| Wave 2 — Similarity search | `apps/web/src/pages/` (all)                         | No similar sync gaps found                                                                           |
+| Wave 2 — Similarity search | `apps/web/src/hooks/` (all)                         | `useUserPreferences.ts` — same anti-pattern (fixed in Round 2)                                       |
+| Wave 2 — Similarity search | `apps/web/src/components/` (all)                    | No other locale sync components found                                                                |
+| Wave 2 — Similarity search | `apps/mobile/src/` (all)                            | No mobile equivalent affected (mobile uses AsyncStorage with separate path)                          |
+| Wave 3 — Class of bug      | `sessionStorage`/`localStorage` sync patterns (all) | `StorageManager.clearLocalStorage()` already preserves `edusphere_locale` — no other sync gaps found |
 
 ### Anti-Recurrence
 
@@ -11118,32 +11373,35 @@ Full certification-grade examination system with AI-powered question generation,
 ### Discovery Waves (Completion Protocol)
 
 **Wave 1 — Exact Match (TypeScript + lint errors):**
+
 - 5 TypeScript errors in exam backend services
   - `apps/subgraph-content/src/exam/exam-item-generator.service.ts` — missing type annotations on AI SDK response
   - `apps/subgraph-content/src/exam/exam-item-grader.ts` — incorrect return type on grading pipeline
   - `apps/subgraph-content/src/exam/exam-item.schemas.ts` — Zod schema type mismatch with IRT parameters
 
 **Wave 2 — Similarity Search (same anti-patterns in sibling code):**
+
 - CAT engine `administeredItems` array lacked max-size eviction guard (memory safety violation)
 - NATS connection race condition in exam event publisher — `connect()` called before `onModuleInit` complete
 - `exam_item_embeddings` table missing RLS policy (SI-9 violation — cross-tenant vector search possible)
 - Auth pattern inconsistency across 4 exam resolvers — mixed `@authenticated` + manual JWT check instead of standardized `@requiresScopes`
 
 **Wave 3 — Class of Bug (broader pattern search):**
+
 - `ExamResultPage` retake button used stale session ID after exam void — fixed with fresh query
 - `useExamMutations` hook swallowed GraphQL errors silently — added structured error exposure to UI toast
 
 ### Fixes Applied (All Rounds)
 
-| Round | Fix | Files |
-|-------|-----|-------|
-| R1 | 5 TypeScript errors fixed (type annotations, return types, Zod schemas) | `exam-item-generator.service.ts`, `exam-item-grader.ts`, `exam-item.schemas.ts` |
-| R2 | CAT array size guard — `administeredItems.slice(-maxItems)` eviction at configured limit | `cat-engine.service.ts` |
-| R2 | NATS connection race condition — deferred publish until `onModuleInit` resolves | `exam-event.publisher.ts` |
-| R2 | RLS added to `exam_item_embeddings` — tenant isolation on vector similarity search | `packages/db` migration |
-| R2 | Auth pattern standardized — `@requiresScopes` on all 4 exam resolvers | `exam-item.resolver.ts`, `exam-blueprint.resolver.ts`, `exam-session.resolver.ts`, `exam-result.resolver.ts` |
-| R3 | ExamResultPage retake button — fresh session query after void | `ExamResultPage.tsx` |
-| R3 | useExamMutations error exposure — GraphQL errors surfaced to toast notifications | `useExamMutations.ts` |
+| Round | Fix                                                                                      | Files                                                                                                        |
+| ----- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| R1    | 5 TypeScript errors fixed (type annotations, return types, Zod schemas)                  | `exam-item-generator.service.ts`, `exam-item-grader.ts`, `exam-item.schemas.ts`                              |
+| R2    | CAT array size guard — `administeredItems.slice(-maxItems)` eviction at configured limit | `cat-engine.service.ts`                                                                                      |
+| R2    | NATS connection race condition — deferred publish until `onModuleInit` resolves          | `exam-event.publisher.ts`                                                                                    |
+| R2    | RLS added to `exam_item_embeddings` — tenant isolation on vector similarity search       | `packages/db` migration                                                                                      |
+| R2    | Auth pattern standardized — `@requiresScopes` on all 4 exam resolvers                    | `exam-item.resolver.ts`, `exam-blueprint.resolver.ts`, `exam-session.resolver.ts`, `exam-result.resolver.ts` |
+| R3    | ExamResultPage retake button — fresh session query after void                            | `ExamResultPage.tsx`                                                                                         |
+| R3    | useExamMutations error exposure — GraphQL errors surfaced to toast notifications         | `useExamMutations.ts`                                                                                        |
 
 ### Files Created
 
@@ -11164,6 +11422,7 @@ Full certification-grade examination system with AI-powered question generation,
 ### Tests
 
 **211+ tests across 27 files:**
+
 - 131 backend tests (resolvers, services, CAT engine, psychometrics, assembly, AI generation)
 - 80 frontend/E2E tests (exam UI components, delivery flow, timer, results display, browser lockdown)
 - **4 Playwright E2E specs:** exam delivery flow, item bank CRUD, blueprint management, results page
@@ -11185,12 +11444,14 @@ Full certification-grade examination system with AI-powered question generation,
 **Description:** Development infrastructure for agent coordination — NOT product code. Three MCP servers providing shared memory across agent sessions.
 
 **Components:**
+
 - `tools/mcp-vector-memory/` — ChromaDB-backed vector search (12 tools, 18 tests)
 - `tools/mcp-coordination-bridge/` — SQLite-based pub/sub, locking, status tracking (15 tools, 30 tests)
 - `tools/docker-compose.hivemind.yml` — Isolated ChromaDB container (port 8100, separate from product)
 - `tools/tests/` — Integration tests (2) + performance benchmarks (4)
 
 **Key Design Decisions:**
+
 - ChromaDB runs in separate docker-compose (NOT in product docker-compose.yml)
 - SQLite WAL mode for coordination bridge (zero external dependencies)
 - All MCP tools prefixed: `vm_*` (vector-memory) and `cb_*` (coordination-bridge)
@@ -11218,11 +11479,11 @@ Full certification-grade examination system with AI-powered question generation,
   - `apps/gateway/supergraph.graphql`
 - **Tests:**
 
-| Test File | Coverage |
-|-----------|----------|
-| `apps/gateway/tests/compose-normalizers.test.ts` | 13 unit tests for compose.js normalizers (docstring cleanup, directive-tolerant matching, idempotency, agent SDL normalization) |
-| `apps/gateway/tests/supergraph-pipeline-types.test.ts` | Supergraph validation — verifies pipeline types present after composition |
-| `apps/web/e2e/bug104-pipeline-graphql.spec.ts` | E2E Playwright test — Lesson Pipeline page loads without 400 errors |
+| Test File                                              | Coverage                                                                                                                        |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/gateway/tests/compose-normalizers.test.ts`       | 13 unit tests for compose.js normalizers (docstring cleanup, directive-tolerant matching, idempotency, agent SDL normalization) |
+| `apps/gateway/tests/supergraph-pipeline-types.test.ts` | Supergraph validation — verifies pipeline types present after composition                                                       |
+| `apps/web/e2e/bug104-pipeline-graphql.spec.ts`         | E2E Playwright test — Lesson Pipeline page loads without 400 errors                                                             |
 
 - **Visual Verification:** Screenshot at `docs/screenshots/bug106-pipeline-fixed.png`
 - **Note:** 400 errors in console were actually `customCss` on `TenantBranding` — global branding issue, not pipeline-specific. Tracked separately.
@@ -11248,26 +11509,26 @@ Full certification-grade examination system with AI-powered question generation,
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `packages/db/src/graph/ontology.ts` | Replaced `'timestamp()'` string literal with `Date.now()` |
-| `apps/subgraph-knowledge/src/graph/graph-types.ts` | Added `safeIsoDate()` defensive helper |
-| `apps/subgraph-knowledge/src/graph/graph-concept.service.ts` | Applied `safeIsoDate()` to timestamp mapping |
-| `apps/subgraph-knowledge/src/graph/graph-concept-link.service.ts` | Applied `safeIsoDate()` to timestamp mapping |
-| `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` | Applied safe date handling |
-| `apps/subgraph-knowledge/src/embedding/embedding.service.ts` | Applied safe date handling |
+| File                                                               | Change                                                    |
+| ------------------------------------------------------------------ | --------------------------------------------------------- |
+| `packages/db/src/graph/ontology.ts`                                | Replaced `'timestamp()'` string literal with `Date.now()` |
+| `apps/subgraph-knowledge/src/graph/graph-types.ts`                 | Added `safeIsoDate()` defensive helper                    |
+| `apps/subgraph-knowledge/src/graph/graph-concept.service.ts`       | Applied `safeIsoDate()` to timestamp mapping              |
+| `apps/subgraph-knowledge/src/graph/graph-concept-link.service.ts`  | Applied `safeIsoDate()` to timestamp mapping              |
+| `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts` | Applied safe date handling                                |
+| `apps/subgraph-knowledge/src/embedding/embedding.service.ts`       | Applied safe date handling                                |
 
 ### Tests
 
 - 62+ assertions across 6 test files (111 total passing)
 
-| Test File | Coverage |
-|-----------|----------|
-| `apps/subgraph-knowledge/src/graph/graph-types.spec.ts` | safeIsoDate null/undefined/epoch/"timestamp()" string tests |
-| `apps/subgraph-knowledge/src/graph/graph-concept.service.spec.ts` | mapConcept regression |
-| `apps/subgraph-knowledge/src/graph/graph-concept-link.service.spec.ts` | mapConceptLink regression |
-| `apps/subgraph-knowledge/src/embedding/embedding-store.service.spec.ts` | safeDate regression |
-| `apps/subgraph-knowledge/src/embedding/embedding.service.spec.ts` | safeDate regression |
+| Test File                                                               | Coverage                                                    |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `apps/subgraph-knowledge/src/graph/graph-types.spec.ts`                 | safeIsoDate null/undefined/epoch/"timestamp()" string tests |
+| `apps/subgraph-knowledge/src/graph/graph-concept.service.spec.ts`       | mapConcept regression                                       |
+| `apps/subgraph-knowledge/src/graph/graph-concept-link.service.spec.ts`  | mapConceptLink regression                                   |
+| `apps/subgraph-knowledge/src/embedding/embedding-store.service.spec.ts` | safeDate regression                                         |
+| `apps/subgraph-knowledge/src/embedding/embedding.service.spec.ts`       | safeDate regression                                         |
 
 ### Anti-Recurrence
 
@@ -11302,20 +11563,20 @@ Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
+| File                                                              | Change                                     |
+| ----------------------------------------------------------------- | ------------------------------------------ |
 | `apps/subgraph-agent/src/agent-session/agent-session.resolver.ts` | Added `resolveTemplateType` field resolver |
 
 ### Tests
 
-| Test File | Coverage |
-|-----------|----------|
+| Test File                                                              | Coverage                                                    |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `apps/subgraph-agent/src/agent-session/agent-session.resolver.spec.ts` | 7 regression tests covering templateType/agentType/fallback |
 
 ### Anti-Recurrence
 
 - Field resolver ensures non-null contract is always satisfied regardless of DB field naming
-**Files:** `tools/` directory (new), `.mcp.json` (updated), 10 agent prompt templates (updated)
+  **Files:** `tools/` directory (new), `.mcp.json` (updated), 10 agent prompt templates (updated)
 
 ---
 
@@ -11329,6 +11590,7 @@ Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `
   2. `[KnowledgeGraph] Concepts query error: [GraphQL] Cannot return null for non-nullable field Concept.id` (use-graph-data.ts:171)
 
 ### Root Cause
+
 **Primary:** `packages/db/src/graph/client.ts` — `executeCypher()` returned raw PostgreSQL rows with `{ result: "<agtype string>" }` without parsing the Apache AGE agtype column. All 10+ consumer services accessed `.id`, `.name` directly on the row, which were always `undefined` because actual data was inside the unparsed `result` string.
 
 **Secondary:** `packages/db/src/graph/ontology.ts` — `createConcept()` used `JSON.stringify({id: 'gen_random_uuid()::text'})` which stored the literal string as the concept ID instead of generating a UUID.
@@ -11336,6 +11598,7 @@ Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `
 **Why recurring:** The type mismatch between what `executeCypher` returned (raw pg rows) and what consumers expected (flat property objects) was systemic. Previous fixes (BUG-104 timestamp, BUG-096 error handling) addressed symptoms without fixing the underlying agtype parsing gap.
 
 ### Fix (systemic — at executeCypher level)
+
 - Added `parseAgtypeValue()` — parses vertex/edge/scalar agtype strings into plain JS objects
 - Added `unwrapAgeRow()` — unwraps the `result` column from pg rows
 - Modified all `executeCypher` return paths to auto-parse agtype results
@@ -11343,16 +11606,19 @@ Added `@ResolveField('templateType')` in `agent-session.resolver.ts` that maps `
 - **All 10+ consumer services benefit automatically** — no more symptom-level fixes
 
 ### Files Changed
+
 1. `packages/db/src/graph/client.ts` — `parseAgtypeValue()`, `unwrapAgeRow()`, modified `executeCypher` + `addVertex`
 2. `packages/db/src/graph/ontology.ts` — Fixed `createConcept` UUID generation
 3. `packages/db/src/graph/client.test.ts` — Updated assertions + 15 regression tests
 4. `packages/db/src/graph/ontology.test.ts` — 3 BUG-107 regression tests
 
 ### Tests Added
+
 - 18 new tests total (533 passing in @edusphere/db, 690 in subgraph-knowledge)
 - Anti-recurrence: `parseAgtypeValue` unit tests ensure agtype parsing never regresses
 
 ### Discovery List
+
 Wave 1: 10 cypher service files consume `executeCypher` — all now auto-fixed at source
 Wave 2: All subgraph-knowledge graph services checked — same pattern, all fixed by `unwrapAgeRow`
 Wave 3: `JSON.stringify` with Cypher function literals — same class as BUG-104, fixed in `ontology.ts`
@@ -11368,6 +11634,7 @@ Wave 3: `JSON.stringify` with Cypher function literals — same class as BUG-104
 **Problem:** PDF files uploaded as knowledge sources had no in-browser viewing experience. Users could not view, annotate text, or sketch on PDF documents. Additionally, PDF files were not actually stored in MinIO (missing `file_key`), so even downloading was broken.
 
 **Solution (Sprint 2):**
+
 - Built full PDF viewing experience with `pdfjs-dist` (PdfDocumentViewer component)
 - Added text annotation support on PDF pages (PdfAnnotationLayer via PdfViewer)
 - Added sketch drawing overlay on documents (PdfSketchOverlay with Konva.js)
@@ -11377,24 +11644,24 @@ Wave 3: `JSON.stringify` with Cypher function literals — same class as BUG-104
 
 **Files created:**
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `apps/web/src/components/pdf/PdfSketchOverlay.tsx` | NEW | Sketch drawing overlay on PDF pages (Konva.js) |
-| `apps/web/src/components/pdf/PdfDocumentViewer.tsx` | NEW | Core PDF viewer component using pdfjs-dist |
-| `apps/web/src/components/pdf/index.ts` | NEW | Barrel file for PDF component exports |
-| `apps/web/src/components/pdf/PdfViewer.test.tsx` | NEW | Unit tests for PdfViewer |
-| `apps/web/src/components/pdf/PdfAnnotationLayer.test.tsx` | NEW | Unit tests for PdfAnnotationLayer |
-| `apps/web/src/components/pdf/PdfSketchOverlay.test.tsx` | NEW | Unit tests for PdfSketchOverlay |
-| `apps/web/src/components/pdf/PdfDocumentViewer.test.tsx` | NEW | Unit tests for PdfDocumentViewer |
-| `apps/web/e2e/pdf-viewer.spec.ts` | NEW | E2E Playwright spec for PDF viewer |
+| File                                                      | Status | Purpose                                        |
+| --------------------------------------------------------- | ------ | ---------------------------------------------- |
+| `apps/web/src/components/pdf/PdfSketchOverlay.tsx`        | NEW    | Sketch drawing overlay on PDF pages (Konva.js) |
+| `apps/web/src/components/pdf/PdfDocumentViewer.tsx`       | NEW    | Core PDF viewer component using pdfjs-dist     |
+| `apps/web/src/components/pdf/index.ts`                    | NEW    | Barrel file for PDF component exports          |
+| `apps/web/src/components/pdf/PdfViewer.test.tsx`          | NEW    | Unit tests for PdfViewer                       |
+| `apps/web/src/components/pdf/PdfAnnotationLayer.test.tsx` | NEW    | Unit tests for PdfAnnotationLayer              |
+| `apps/web/src/components/pdf/PdfSketchOverlay.test.tsx`   | NEW    | Unit tests for PdfSketchOverlay                |
+| `apps/web/src/components/pdf/PdfDocumentViewer.test.tsx`  | NEW    | Unit tests for PdfDocumentViewer               |
+| `apps/web/e2e/pdf-viewer.spec.ts`                         | NEW    | E2E Playwright spec for PDF viewer             |
 
 **Files modified:**
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `apps/web/src/components/source-manager/SourceDetailDrawer.tsx` | MODIFIED | Integrated PDF viewer into source detail drawer |
-| `apps/web/src/lib/graphql/sources.queries.ts` | MODIFIED | Added `fileUrl` field to source queries |
-| `apps/web/src/components/source-manager/types.ts` | MODIFIED | Added `fileUrl` to source types |
+| File                                                              | Status   | Purpose                                                 |
+| ----------------------------------------------------------------- | -------- | ------------------------------------------------------- |
+| `apps/web/src/components/source-manager/SourceDetailDrawer.tsx`   | MODIFIED | Integrated PDF viewer into source detail drawer         |
+| `apps/web/src/lib/graphql/sources.queries.ts`                     | MODIFIED | Added `fileUrl` field to source queries                 |
+| `apps/web/src/components/source-manager/types.ts`                 | MODIFIED | Added `fileUrl` to source types                         |
 | `apps/subgraph-knowledge/src/sources/knowledge-source.service.ts` | MODIFIED | Fixed MinIO upload — PDF files now stored with file_key |
 
 **Tests added:** 88 unit tests + 10 backend tests + E2E spec
@@ -11411,6 +11678,7 @@ Wave 3: `JSON.stringify` with Cypher function literals — same class as BUG-104
 **Problem:** The admin embedding dashboard lacked detailed visibility into embedding coverage and activity. Administrators needed charts and logs to monitor embedding pipeline health.
 
 **Solution (Sprint 3):**
+
 - Added `EmbeddingCoverageChart` component — visual chart showing embedding coverage across courses
 - Added `EmbeddingActivityLog` component — real-time activity log for embedding operations
 - Enhanced admin embedding dashboard page with new visualization components

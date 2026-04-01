@@ -44,10 +44,9 @@ describe('i18n translation files', () => {
       for (const ns of NAMESPACES) {
         it(`${locale}/${ns}.json exists and has at least 1 key`, () => {
           const filePath = path.join(LOCALES_DIR, locale, `${ns}.json`);
-          expect(
-            fs.existsSync(filePath),
-            `Missing: ${locale}/${ns}.json`
-          ).toBe(true);
+          expect(fs.existsSync(filePath), `Missing: ${locale}/${ns}.json`).toBe(
+            true
+          );
 
           const content = loadJson(locale, ns);
           expect(Object.keys(content).length).toBeGreaterThan(0);

@@ -2,7 +2,12 @@
  * UserAdminService — Admin operations: bulk import, list, suspend, password reset.
  * Extracted from UserService for file-size compliance (<300 lines).
  */
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import {
   schema,
   eq,
@@ -161,7 +166,13 @@ export class UserAdminService implements OnModuleInit {
   }
 
   async listUsers(
-    opts: { page?: number; limit?: number; search?: string; role?: string; after?: string | null },
+    opts: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      role?: string;
+      after?: string | null;
+    },
     authContext: AuthContext
   ): Promise<RelayConnection<NonNullable<MappedUser>>> {
     const limit = opts.limit ?? 20;
@@ -173,7 +184,10 @@ export class UserAdminService implements OnModuleInit {
     );
     const cursorSignal = opts.after ?? (offset > 0 ? '__page__' : null);
     return buildRelayConnection(
-      result.users as (NonNullable<MappedUser> & { id: string; createdAt?: string })[],
+      result.users as (NonNullable<MappedUser> & {
+        id: string;
+        createdAt?: string;
+      })[],
       limit,
       result.total,
       cursorSignal
@@ -186,19 +200,26 @@ export class UserAdminService implements OnModuleInit {
     authContext: AuthContext
   ): Promise<NonNullable<MappedUser>> {
     const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.userService.getDb(), tenantCtx, async (tx) => {
-      const [user] = await tx
-        .update(schema.users)
-        .set({ deleted_at: suspended ? new Date() : null, updated_at: new Date() })
-        .where(eq(schema.users.id, userId))
-        .returning();
-      if (!user) throw new NotFoundException('User not found');
-      this.logger.log(
-        { userId, suspended, tenantId: tenantCtx.tenantId },
-        '[UserAdminService] suspendUser applied'
-      );
-      return this.userService.mapUser(user) as NonNullable<MappedUser>;
-    });
+    return withTenantContext(
+      this.userService.getDb(),
+      tenantCtx,
+      async (tx) => {
+        const [user] = await tx
+          .update(schema.users)
+          .set({
+            deleted_at: suspended ? new Date() : null,
+            updated_at: new Date(),
+          })
+          .where(eq(schema.users.id, userId))
+          .returning();
+        if (!user) throw new NotFoundException('User not found');
+        this.logger.log(
+          { userId, suspended, tenantId: tenantCtx.tenantId },
+          '[UserAdminService] suspendUser applied'
+        );
+        return this.userService.mapUser(user) as NonNullable<MappedUser>;
+      }
+    );
   }
 
   async adminUsers(
@@ -206,27 +227,35 @@ export class UserAdminService implements OnModuleInit {
     authContext: AuthContext
   ): Promise<{ users: NonNullable<MappedUser>[]; total: number }> {
     const tenantCtx = this.toTenantContext(authContext);
-    return withTenantContext(this.userService.getDb(), tenantCtx, async (tx) => {
-      const rows = await (opts.role
-        ? tx
-            .select()
-            .from(schema.users)
-            .where(eq(schema.users.role, opts.role as UserRole))
-            .limit(opts.limit)
-            .offset(opts.offset)
-        : tx.select().from(schema.users).limit(opts.limit).offset(opts.offset));
-      const countQuery = tx
-        .select({ total: sql<number>`cast(count(*) as integer)` })
-        .from(schema.users);
-      const [countResult] = opts.role
-        ? await countQuery.where(eq(schema.users.role, opts.role as UserRole))
-        : await countQuery;
-      return {
-        users: rows
-          .map((u) => this.userService.mapUser(u))
-          .filter((u): u is NonNullable<MappedUser> => u !== null),
-        total: countResult?.total ?? 0,
-      };
-    });
+    return withTenantContext(
+      this.userService.getDb(),
+      tenantCtx,
+      async (tx) => {
+        const rows = await (opts.role
+          ? tx
+              .select()
+              .from(schema.users)
+              .where(eq(schema.users.role, opts.role as UserRole))
+              .limit(opts.limit)
+              .offset(opts.offset)
+          : tx
+              .select()
+              .from(schema.users)
+              .limit(opts.limit)
+              .offset(opts.offset));
+        const countQuery = tx
+          .select({ total: sql<number>`cast(count(*) as integer)` })
+          .from(schema.users);
+        const [countResult] = opts.role
+          ? await countQuery.where(eq(schema.users.role, opts.role as UserRole))
+          : await countQuery;
+        return {
+          users: rows
+            .map((u) => this.userService.mapUser(u))
+            .filter((u): u is NonNullable<MappedUser> => u !== null),
+          total: countResult?.total ?? 0,
+        };
+      }
+    );
   }
 }

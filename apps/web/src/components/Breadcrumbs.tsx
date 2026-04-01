@@ -16,11 +16,18 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   return (
     <nav
       aria-label="Breadcrumb"
-      className={cn('flex items-center gap-1 text-sm text-muted-foreground', className)}
+      className={cn(
+        'flex items-center gap-1 text-sm text-muted-foreground',
+        className
+      )}
     >
       <ol className="flex items-center gap-1">
         <li>
-          <Link to="/" className="hover:text-foreground transition-colors" aria-label="Home">
+          <Link
+            to="/"
+            className="hover:text-foreground transition-colors"
+            aria-label="Home"
+          >
             <Home className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
         </li>
@@ -28,7 +35,10 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
           <li key={item.label} className="flex items-center gap-1">
             <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
             {item.href && i < items.length - 1 ? (
-              <Link to={item.href} className="hover:text-foreground transition-colors">
+              <Link
+                to={item.href}
+                className="hover:text-foreground transition-colors"
+              >
                 {item.label}
               </Link>
             ) : (

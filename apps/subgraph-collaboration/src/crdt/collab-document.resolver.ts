@@ -15,9 +15,7 @@ interface GraphQLContext {
 export class CollabDocumentResolver {
   private readonly logger = new Logger(CollabDocumentResolver.name);
 
-  constructor(
-    private readonly collabDocumentService: CollabDocumentService
-  ) {}
+  constructor(private readonly collabDocumentService: CollabDocumentService) {}
 
   @Mutation('compactCollabDocument')
   async compactCollabDocument(

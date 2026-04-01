@@ -60,9 +60,33 @@ const MOCK_LESSON = {
     lessonId: LESSON_ID,
     templateName: 'THEMATIC',
     nodes: [
-      { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף', enabled: true, order: 0, config: {} },
-      { id: 'n2', moduleType: 'ASR', label: 'Transcription', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
-      { id: 'n3', moduleType: 'SUMMARIZATION', label: 'Summary', labelHe: 'סיכום', enabled: true, order: 2, config: {} },
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+      {
+        id: 'n2',
+        moduleType: 'ASR',
+        label: 'Transcription',
+        labelHe: 'תמלול',
+        enabled: true,
+        order: 1,
+        config: {},
+      },
+      {
+        id: 'n3',
+        moduleType: 'SUMMARIZATION',
+        label: 'Summary',
+        labelHe: 'סיכום',
+        enabled: true,
+        order: 2,
+        config: {},
+      },
     ],
     config: {},
     status: 'DRAFT',
@@ -96,7 +120,7 @@ const MOCK_TEMPLATES = [
 
 function pipelineMockHandler(
   operationName: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ): string | null {
   const query = (body.query as string) ?? '';
 
@@ -150,9 +174,9 @@ const FORBIDDEN_STRINGS = [
 
 async function assertNoForbiddenStrings(page: Page): Promise<void> {
   for (const str of FORBIDDEN_STRINGS) {
-    await expect(
-      page.getByText(str, { exact: false }),
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(str, { exact: false })).not.toBeVisible({
+      timeout: 2_000,
+    });
   }
 }
 
@@ -163,19 +187,19 @@ test.describe('BUG-104: Pipeline page — no GraphQL 400 errors', () => {
     await login(page);
   });
 
-  test('pipeline page loads without 400 Bad Request responses', async ({ page }) => {
+  test('pipeline page loads without 400 Bad Request responses', async ({
+    page,
+  }) => {
     // Track all GraphQL responses to detect 400 errors
-    const graphqlErrors: Array<{ status: number; url: string; body: string }> = [];
+    const graphqlErrors: Array<{ status: number; url: string; body: string }> =
+      [];
 
     // Set up mocks BEFORE navigation
     await routeGraphQL(page, pipelineMockHandler);
 
     // Also monitor for any 400 responses that slip through
     page.on('response', (response) => {
-      if (
-        response.url().includes('graphql') &&
-        response.status() === 400
-      ) {
+      if (response.url().includes('graphql') && response.status() === 400) {
         graphqlErrors.push({
           status: response.status(),
           url: response.url(),
@@ -193,14 +217,16 @@ test.describe('BUG-104: Pipeline page — no GraphQL 400 errors', () => {
     // BUG-104 REGRESSION GUARD: no 400 responses from GraphQL
     expect(
       graphqlErrors,
-      `GraphQL 400 errors detected: ${JSON.stringify(graphqlErrors)}`,
+      `GraphQL 400 errors detected: ${JSON.stringify(graphqlErrors)}`
     ).toHaveLength(0);
 
     // No raw error strings in the UI
     await assertNoForbiddenStrings(page);
   });
 
-  test('pipeline page renders pipeline nodes from mock data', async ({ page }) => {
+  test('pipeline page renders pipeline nodes from mock data', async ({
+    page,
+  }) => {
     await routeGraphQL(page, pipelineMockHandler);
 
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
@@ -216,7 +242,7 @@ test.describe('BUG-104: Pipeline page — no GraphQL 400 errors', () => {
       await expect(ingestionNode).toBeVisible();
       await expect(page.getByTestId('pipeline-node-ASR')).toBeVisible();
       await expect(
-        page.getByTestId('pipeline-node-SUMMARIZATION'),
+        page.getByTestId('pipeline-node-SUMMARIZATION')
       ).toBeVisible();
     }
 
@@ -250,7 +276,9 @@ test.describe('BUG-104: Pipeline page — no GraphQL 400 errors', () => {
     await assertNoForbiddenStrings(page);
   });
 
-  test('BUG-104 visual regression — pipeline page screenshot', async ({ page }) => {
+  test('BUG-104 visual regression — pipeline page screenshot', async ({
+    page,
+  }) => {
     await routeGraphQL(page, pipelineMockHandler);
 
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
@@ -270,7 +298,9 @@ test.describe('BUG-104: Pipeline page — 400 error handling', () => {
     await login(page);
   });
 
-  test('simulated 400 response shows friendly error, not raw technical string', async ({ page }) => {
+  test('simulated 400 response shows friendly error, not raw technical string', async ({
+    page,
+  }) => {
     // Simulate the pre-fix behavior: gateway returns 400 for unknown pipeline types
     await page.route('**/graphql', async (route) => {
       const request = route.request();
@@ -290,8 +320,13 @@ test.describe('BUG-104: Pipeline page — 400 error handling', () => {
 
       let parsed: Record<string, unknown> = {};
       try {
-        parsed = JSON.parse(request.postData() ?? '{}') as Record<string, unknown>;
-      } catch { /* ignore */ }
+        parsed = JSON.parse(request.postData() ?? '{}') as Record<
+          string,
+          unknown
+        >;
+      } catch {
+        /* ignore */
+      }
 
       const query = (parsed.query as string) ?? '';
 

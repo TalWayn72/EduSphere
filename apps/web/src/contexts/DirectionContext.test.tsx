@@ -118,6 +118,9 @@ describe('DirectionContext', () => {
     const i18n = await import('i18next');
     const { unmount } = renderHook(() => useDirection(), { wrapper });
     unmount();
-    expect(i18n.default.off).toHaveBeenCalledWith('languageChanged', expect.any(Function));
+    expect(i18n.default.off).toHaveBeenCalledWith(
+      'languageChanged',
+      expect.any(Function)
+    );
   });
 });

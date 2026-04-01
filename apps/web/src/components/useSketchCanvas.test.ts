@@ -46,7 +46,10 @@ describe('renderPath', () => {
   it('draws freehand path', () => {
     const ctx = createMockCtx();
     const path: SketchPath = {
-      points: [{ x: 0.1, y: 0.2 }, { x: 0.3, y: 0.4 }],
+      points: [
+        { x: 0.1, y: 0.2 },
+        { x: 0.3, y: 0.4 },
+      ],
       color: '#ff0000',
       width: 2,
       tool: 'freehand',
@@ -73,7 +76,10 @@ describe('renderPath', () => {
   it('draws eraser path with destination-out and restores source-over', () => {
     const ctx = createMockCtx();
     const path: SketchPath = {
-      points: [{ x: 0.1, y: 0.1 }, { x: 0.5, y: 0.5 }],
+      points: [
+        { x: 0.1, y: 0.1 },
+        { x: 0.5, y: 0.5 },
+      ],
       color: '#000',
       width: 10,
       tool: 'eraser',
@@ -99,7 +105,10 @@ describe('renderPath', () => {
   it('draws rect', () => {
     const ctx = createMockCtx();
     const path: SketchPath = {
-      points: [{ x: 0.1, y: 0.1 }, { x: 0.5, y: 0.5 }],
+      points: [
+        { x: 0.1, y: 0.1 },
+        { x: 0.5, y: 0.5 },
+      ],
       color: '#00f',
       width: 3,
       tool: 'rect',
@@ -111,7 +120,10 @@ describe('renderPath', () => {
   it('draws ellipse', () => {
     const ctx = createMockCtx();
     const path: SketchPath = {
-      points: [{ x: 0.2, y: 0.2 }, { x: 0.8, y: 0.8 }],
+      points: [
+        { x: 0.2, y: 0.2 },
+        { x: 0.8, y: 0.8 },
+      ],
       color: '#0f0',
       width: 2,
       tool: 'ellipse',
@@ -124,7 +136,10 @@ describe('renderPath', () => {
   it('draws arrow', () => {
     const ctx = createMockCtx();
     const path: SketchPath = {
-      points: [{ x: 0.1, y: 0.1 }, { x: 0.9, y: 0.9 }],
+      points: [
+        { x: 0.1, y: 0.1 },
+        { x: 0.9, y: 0.9 },
+      ],
       color: '#f0f',
       width: 2,
       tool: 'arrow',
@@ -168,7 +183,9 @@ describe('useSketchCanvas', () => {
     const mockCtx = createMockCtx();
     const canvas = {
       getContext: vi.fn().mockReturnValue(mockCtx),
-      getBoundingClientRect: vi.fn().mockReturnValue({ left: 0, top: 0, width: 100, height: 100 }),
+      getBoundingClientRect: vi
+        .fn()
+        .mockReturnValue({ left: 0, top: 0, width: 100, height: 100 }),
       width: 100,
       height: 100,
     } as unknown as HTMLCanvasElement;

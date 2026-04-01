@@ -36,8 +36,12 @@ async function getRedisClient(): Promise<typeof redisClient> {
   try {
     // Dynamic import — redis is optional dependency (may not be installed)
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const redisMod = await (Function('return import("redis")')() as Promise<Record<string, unknown>>);
-    const createClient = redisMod['createClient'] as (opts: { url: string }) => Record<string, unknown>;
+    const redisMod = await (Function('return import("redis")')() as Promise<
+      Record<string, unknown>
+    >);
+    const createClient = redisMod['createClient'] as (opts: {
+      url: string;
+    }) => Record<string, unknown>;
     const client = createClient({ url: REDIS_URL });
     await (client['connect'] as () => Promise<void>)();
     redisClient = client as unknown as typeof redisClient;
@@ -62,7 +66,10 @@ void getRedisClient();
  * Register a query string under its SHA-256 hash.
  * Uses Redis if available, otherwise in-memory with LRU eviction.
  */
-export async function registerQuery(hash: string, query: string): Promise<void> {
+export async function registerQuery(
+  hash: string,
+  query: string
+): Promise<void> {
   const redis = await getRedisClient();
   if (redis) {
     await redis.set(`${REDIS_APQ_PREFIX}${hash}`, query, { EX: REDIS_APQ_TTL });

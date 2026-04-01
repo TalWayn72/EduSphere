@@ -39,7 +39,9 @@ const baseProps = {
 describe('ExamItemReviewCard', () => {
   it('renders question text', () => {
     render(<ExamItemReviewCard {...baseProps} />);
-    expect(screen.getByText('What is the capital of France?')).toBeInTheDocument();
+    expect(
+      screen.getByText('What is the capital of France?')
+    ).toBeInTheDocument();
   });
 
   it('shows domain badge', () => {
@@ -75,7 +77,9 @@ describe('ExamItemReviewCard', () => {
       },
     };
     render(<ExamItemReviewCard {...dragItem} />);
-    expect(screen.getByText(/DRAG_ORDER — preview not available/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/DRAG_ORDER — preview not available/)
+    ).toBeInTheDocument();
   });
 
   it('calls onApprove with index when Approve clicked', () => {

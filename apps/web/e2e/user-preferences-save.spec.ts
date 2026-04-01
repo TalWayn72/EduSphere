@@ -154,12 +154,14 @@ test.describe('user-preferences-save — happy path', () => {
     await expect(successToast).toBeVisible({ timeout: 10_000 });
 
     // Error toast must NOT appear
-    await expect(
-      page.getByText(/נכשלה|failed to save/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/נכשלה|failed to save/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
-  test('locale selector reflects the new value immediately after save', async ({ page }) => {
+  test('locale selector reflects the new value immediately after save', async ({
+    page,
+  }) => {
     await routeGraphQL(page, makeHappyPathHandler('es'));
 
     await page.goto(`${BASE_URL}/settings`, { waitUntil: 'domcontentloaded' });
@@ -169,7 +171,10 @@ test.describe('user-preferences-save — happy path', () => {
     await combo.click();
 
     // ME_QUERY mock returns 'en' → combobox starts at English → select Spanish
-    await page.getByRole('option', { name: /Español/i }).first().click();
+    await page
+      .getByRole('option', { name: /Español/i })
+      .first()
+      .click();
     await page.waitForTimeout(500);
 
     await expect(combo).toContainText(/Español|es/i);
@@ -246,9 +251,9 @@ test.describe('user-preferences-save — error path (GraphQL mock)', () => {
       await expect(errorToast).toBeVisible({ timeout: 10_000 });
 
       // Success toast must NOT appear
-      await expect(
-        page.getByText(/העדפת השפה נשמרה/i)
-      ).not.toBeVisible({ timeout: 3_000 });
+      await expect(page.getByText(/העדפת השפה נשמרה/i)).not.toBeVisible({
+        timeout: 3_000,
+      });
     }
   });
 
@@ -269,8 +274,8 @@ test.describe('user-preferences-save — error path (GraphQL mock)', () => {
     await page.getByRole('option', { name: /עברית/i }).first().click();
 
     // Success toast (or at minimum no error toast)
-    await expect(
-      page.getByText(/נכשלה|failed/i)
-    ).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/נכשלה|failed/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 });

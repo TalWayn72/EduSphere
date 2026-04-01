@@ -21,8 +21,18 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('./TeamManagement.invites', () => ({
-  PendingInvitesTable: ({ invites, fetching }: { invites: unknown[]; fetching: boolean }) => (
-    <div data-testid="invites-table" data-count={invites.length} data-fetching={fetching} />
+  PendingInvitesTable: ({
+    invites,
+    fetching,
+  }: {
+    invites: unknown[];
+    fetching: boolean;
+  }) => (
+    <div
+      data-testid="invites-table"
+      data-count={invites.length}
+      data-fetching={fetching}
+    />
   ),
 }));
 
@@ -72,7 +82,9 @@ describe('TeamManagement', () => {
   });
 
   it('renders PendingInvitesTable', () => {
-    setupMocks([{ id: '1', email: 'a@b.com', role: 'STUDENT', status: 'pending' }]);
+    setupMocks([
+      { id: '1', email: 'a@b.com', role: 'STUDENT', status: 'pending' },
+    ]);
     render(<TeamManagement />);
     const table = screen.getByTestId('invites-table');
     expect(table).toBeInTheDocument();

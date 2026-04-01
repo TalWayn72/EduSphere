@@ -51,7 +51,7 @@ describe('CoursePublishService', () => {
     it('throws NotFoundException when course not found', async () => {
       findById.mockResolvedValue(null);
       await expect(
-        service.checkCourseReadiness('no-course', findById),
+        service.checkCourseReadiness('no-course', findById)
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -120,7 +120,7 @@ describe('CoursePublishService', () => {
 
       const result = await service.checkCourseReadiness('c1', findById);
       const pipeCheck = result.checks.find(
-        (c) => c.name === 'has_pipeline_results',
+        (c) => c.name === 'has_pipeline_results'
       );
       expect(pipeCheck?.passed).toBe(false);
     });
@@ -136,12 +136,19 @@ describe('CoursePublishService', () => {
       const countChain = makeSelectChain([{ cnt: 1 }]);
       mockSelect.mockReturnValueOnce({ from: countChain.from });
 
-      const returning = vi.fn().mockResolvedValue([{ id: 'c1', is_published: true }]);
+      const returning = vi
+        .fn()
+        .mockResolvedValue([{ id: 'c1', is_published: true }]);
       const where = vi.fn().mockReturnValue({ returning });
       const set = vi.fn().mockReturnValue({ where });
       mockUpdate.mockReturnValue({ set });
 
-      const result = await service.setPublished('c1', true, findById, mapCourse);
+      const result = await service.setPublished(
+        'c1',
+        true,
+        findById,
+        mapCourse
+      );
       expect(mapCourse).toHaveBeenCalled();
       expect(result).toMatchObject({ id: 'c1', mapped: true });
     });
@@ -152,24 +159,33 @@ describe('CoursePublishService', () => {
       mockSelect.mockReturnValue({ from: chain.from });
 
       await expect(
-        service.setPublished('c1', true, findById, mapCourse),
+        service.setPublished('c1', true, findById, mapCourse)
       ).rejects.toThrow(BadRequestException);
     });
 
     it('unpublishes without readiness check', async () => {
-      const returning = vi.fn().mockResolvedValue([{ id: 'c1', is_published: false }]);
+      const returning = vi
+        .fn()
+        .mockResolvedValue([{ id: 'c1', is_published: false }]);
       const where = vi.fn().mockReturnValue({ returning });
       const set = vi.fn().mockReturnValue({ where });
       mockUpdate.mockReturnValue({ set });
 
-      const result = await service.setPublished('c1', false, findById, mapCourse);
+      const result = await service.setPublished(
+        'c1',
+        false,
+        findById,
+        mapCourse
+      );
       expect(findById).not.toHaveBeenCalled();
       expect(result).toMatchObject({ id: 'c1', mapped: true });
     });
 
     it('throws BadRequestException when DB update fails', async () => {
       findById.mockResolvedValue({ title: 'T', description: 'D' });
-      const lessonChain = makeSelectChainNoLimit([{ id: 'l1', status: 'READY' }]);
+      const lessonChain = makeSelectChainNoLimit([
+        { id: 'l1', status: 'READY' },
+      ]);
       mockSelect.mockReturnValueOnce({ from: lessonChain.from });
       const countChain = makeSelectChain([{ cnt: 1 }]);
       mockSelect.mockReturnValueOnce({ from: countChain.from });
@@ -179,7 +195,7 @@ describe('CoursePublishService', () => {
       });
 
       await expect(
-        service.setPublished('c1', true, findById, mapCourse),
+        service.setPublished('c1', true, findById, mapCourse)
       ).rejects.toThrow(BadRequestException);
     });
   });

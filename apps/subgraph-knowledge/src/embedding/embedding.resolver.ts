@@ -19,7 +19,9 @@ type GqlContext = {
 /** Extract a typed TenantContext from the GraphQL request context or throw. */
 function requireTenantCtx(ctx: GqlContext): TenantContext {
   if (!ctx.tenantId || !ctx.userId || !ctx.role) {
-    throw new UnauthorizedException('Missing tenant context for embedding query');
+    throw new UnauthorizedException(
+      'Missing tenant context for embedding query'
+    );
   }
   return {
     tenantId: ctx.tenantId,
@@ -70,7 +72,12 @@ export class EmbeddingResolver {
   ) {
     const tenantCtx = requireTenantCtx(ctx);
     // Legacy — delegates to vector search ignoring contentItemId filter
-    return this.embeddingService.semanticSearchByVector(query, tenantCtx, limit, 0.7);
+    return this.embeddingService.semanticSearchByVector(
+      query,
+      tenantCtx,
+      limit,
+      0.7
+    );
   }
 
   @Mutation('createEmbedding')

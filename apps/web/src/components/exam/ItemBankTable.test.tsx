@@ -100,7 +100,11 @@ describe('ItemBankTable', () => {
   it('calls onSelect with empty set when deselect-all clicked', () => {
     const onSelect = vi.fn();
     render(
-      <ItemBankTable {...defaultProps} selectedIds={new Set(['1', '2'])} onSelect={onSelect} />,
+      <ItemBankTable
+        {...defaultProps}
+        selectedIds={new Set(['1', '2'])}
+        onSelect={onSelect}
+      />
     );
     const selectAll = screen.getByLabelText('Select all');
     fireEvent.click(selectAll);

@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -84,7 +90,9 @@ export class ChavrutaDebateWorkflow {
 
   private async argueNode(state: DebateState): Promise<Partial<DebateState>> {
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       system: injectLocale(
         'You are a skilled debate participant.',
         this.locale
@@ -113,7 +121,9 @@ Provide a strong, logical argument for your position. Use evidence and reasoning
     if (!lastArgument) return {};
 
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       system: injectLocale(
         'You are a skilled debate participant.',
         this.locale
@@ -148,7 +158,9 @@ Provide a strong counter-argument that addresses their points while advancing yo
       .join('\n\n');
 
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       system: injectLocale('You are a philosophical teacher.', this.locale),
       prompt: `Synthesize the following debate:
 

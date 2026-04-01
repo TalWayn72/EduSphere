@@ -20,15 +20,11 @@ interface GraphQLContext {
   authContext?: AuthContext;
 }
 
-function buildTenantCtx(
-  auth: AuthContext,
-  tenantId?: string
-): TenantContext {
+function buildTenantCtx(auth: AuthContext, tenantId?: string): TenantContext {
   return {
     tenantId: tenantId ?? auth.tenantId ?? '',
     userId: auth.userId ?? '',
-    userRole:
-      (auth.roles?.[0] as TenantContext['userRole']) ?? 'STUDENT',
+    userRole: (auth.roles?.[0] as TenantContext['userRole']) ?? 'STUDENT',
   };
 }
 
@@ -112,7 +108,9 @@ export class BillingQueryResolver {
     // SUPER_ADMIN may query any tenant. Never trust caller-supplied tenantId alone.
     const callerRole = auth.roles?.[0] as string | undefined;
     if (callerRole !== 'SUPER_ADMIN' && auth.tenantId !== tenantId) {
-      throw new UnauthorizedException('Cannot access another tenant\'s usage data');
+      throw new UnauthorizedException(
+        "Cannot access another tenant's usage data"
+      );
     }
     return this.yauCounter.getMonthlyUsageSnapshot(tenantId);
   }
@@ -120,9 +118,7 @@ export class BillingQueryResolver {
 
 @Resolver('Mutation')
 export class BillingMutationResolver {
-  constructor(
-    private readonly pilots: PilotService
-  ) {}
+  constructor(private readonly pilots: PilotService) {}
 
   @Mutation('submitPilotRequest')
   async submitPilotRequest(@Args('input') input: unknown) {

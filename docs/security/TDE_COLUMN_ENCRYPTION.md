@@ -12,22 +12,23 @@ per-tenant encryption key.
 
 ## Encrypted Fields
 
-| Table         | Column         | Sensitivity                          |
-| ------------- | -------------- | ------------------------------------ |
-| `users`       | `email`        | PII — GDPR Art.4 personal data       |
-| `users`       | `first_name`   | PII                                  |
-| `users`       | `last_name`    | PII                                  |
-| `annotations` | `content`      | Sensitive — user notes and highlights|
+| Table         | Column       | Sensitivity                           |
+| ------------- | ------------ | ------------------------------------- |
+| `users`       | `email`      | PII — GDPR Art.4 personal data        |
+| `users`       | `first_name` | PII                                   |
+| `users`       | `last_name`  | PII                                   |
+| `annotations` | `content`    | Sensitive — user notes and highlights |
 
 ## Key Management
 
-| Environment | Source                                                         |
-| ----------- | -------------------------------------------------------------- |
-| Development | `TENANT_ENCRYPTION_KEY` env var, fallback `dev-key-{tenantId}` |
+| Environment | Source                                                            |
+| ----------- | ----------------------------------------------------------------- |
+| Development | `TENANT_ENCRYPTION_KEY` env var, fallback `dev-key-{tenantId}`    |
 | Staging     | HashiCorp Vault path `secret/edusphere/tenant/{tenantId}/enc-key` |
 | Production  | HashiCorp Vault path `secret/edusphere/tenant/{tenantId}/enc-key` |
 
 **Iron rules for key management:**
+
 - Never store encryption keys in the database or application logs
 - Never hard-code keys in source code
 - Rotate keys quarterly via Vault's secret versioning (keep previous version active for 30 days during re-encryption)
@@ -96,12 +97,12 @@ Minimum verification period before dropping the old column: **30 days**.
 
 ## Compliance Mapping
 
-| Standard               | Clause                    | How This Satisfies It                          |
-| ---------------------- | ------------------------- | ---------------------------------------------- |
-| GDPR Art.32            | Technical security measures | Encryption at rest for personal data          |
-| ISO 27001 A.10.1.1     | Cryptographic controls    | pgcrypto AES-256 symmetric encryption         |
-| EU AI Act Art.9        | Risk management           | Data protection for AI-processed personal data|
-| SOC 2 CC6.1            | Logical access controls   | Per-tenant key isolation prevents cross-read   |
+| Standard           | Clause                      | How This Satisfies It                          |
+| ------------------ | --------------------------- | ---------------------------------------------- |
+| GDPR Art.32        | Technical security measures | Encryption at rest for personal data           |
+| ISO 27001 A.10.1.1 | Cryptographic controls      | pgcrypto AES-256 symmetric encryption          |
+| EU AI Act Art.9    | Risk management             | Data protection for AI-processed personal data |
+| SOC 2 CC6.1        | Logical access controls     | Per-tenant key isolation prevents cross-read   |
 
 ## Testing
 

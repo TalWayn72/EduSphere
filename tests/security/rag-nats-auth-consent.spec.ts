@@ -295,7 +295,7 @@ describe('CypherConceptService — parameterized queries (no injection)', () => 
 
   it('updateConcept uses allowedKeys whitelist for property names', () => {
     expect(src).toContain('allowedKeys');
-    expect(src).toContain("new Set");
+    expect(src).toContain('new Set');
   });
 
   it('findAllConcepts uses MAX_CONCEPT_LIMIT to prevent unbounded queries', () => {
@@ -319,7 +319,9 @@ describe('SI-10: EmbeddingProviderService LLM consent analysis', () => {
   let guardSrc: string;
 
   beforeAll(() => {
-    providerSrc = read(`${KNOWLEDGE_SRC}/embedding/embedding-provider.service.ts`);
+    providerSrc = read(
+      `${KNOWLEDGE_SRC}/embedding/embedding-provider.service.ts`
+    );
     guardSrc = read('apps/subgraph-agent/src/ai/llm-consent.guard.ts');
   });
 
@@ -347,7 +349,7 @@ describe('SI-10: EmbeddingProviderService LLM consent analysis', () => {
   });
 
   it('OpenAI API key is used only when OPENAI_API_KEY env var is set (not hardcoded)', () => {
-    expect(providerSrc).toContain("process.env.OPENAI_API_KEY");
+    expect(providerSrc).toContain('process.env.OPENAI_API_KEY');
     // No hardcoded API keys
     expect(providerSrc).not.toMatch(/sk-[a-zA-Z0-9]{20,}/);
   });
@@ -379,17 +381,23 @@ describe('Embedding GraphQL mutation authorization', () => {
   });
 
   it('createEmbedding mutation has @authenticated directive', () => {
-    const createLine = schema.split('\n').find(l => l.includes('createEmbedding'));
+    const createLine = schema
+      .split('\n')
+      .find((l) => l.includes('createEmbedding'));
     expect(createLine).toContain('@authenticated');
   });
 
   it('deleteEmbedding mutation has @authenticated directive', () => {
-    const deleteLine = schema.split('\n').find(l => l.includes('deleteEmbedding(id'));
+    const deleteLine = schema
+      .split('\n')
+      .find((l) => l.includes('deleteEmbedding(id'));
     expect(deleteLine).toContain('@authenticated');
   });
 
   it('deleteEmbeddingsByContentItem mutation has @authenticated directive', () => {
-    const deleteLine = schema.split('\n').find(l => l.includes('deleteEmbeddingsByContentItem'));
+    const deleteLine = schema
+      .split('\n')
+      .find((l) => l.includes('deleteEmbeddingsByContentItem'));
     expect(deleteLine).toContain('@authenticated');
   });
 

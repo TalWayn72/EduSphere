@@ -10,7 +10,12 @@ interface ChatSidebarProps {
   participantCount: number;
 }
 
-export function ChatSidebar({ isLive, messages, onSend, participantCount }: ChatSidebarProps) {
+export function ChatSidebar({
+  isLive,
+  messages,
+  onSend,
+  participantCount,
+}: ChatSidebarProps) {
   const [input, setInput] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +44,10 @@ export function ChatSidebar({ isLive, messages, onSend, participantCount }: Chat
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3" data-testid="chat-messages">
+      <div
+        className="flex-1 overflow-y-auto px-3 py-3 space-y-3"
+        data-testid="chat-messages"
+      >
         {messages.length === 0 && (
           <p className="text-xs text-muted-foreground text-center mt-4">
             No messages yet. Be the first to say hello!

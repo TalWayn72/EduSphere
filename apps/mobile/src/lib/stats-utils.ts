@@ -29,7 +29,8 @@ export function resolveStats(
     return {
       activeCourses: apiStats.coursesEnrolled ?? mockStats.activeCourses,
       learningStreak: mockStats.learningStreak, // not in UserStats schema
-      studyTimeMinutes: apiStats.totalLearningMinutes ?? mockStats.studyTimeMinutes,
+      studyTimeMinutes:
+        apiStats.totalLearningMinutes ?? mockStats.studyTimeMinutes,
       conceptsMastered: apiStats.conceptsMastered ?? mockStats.conceptsMastered,
     };
   }

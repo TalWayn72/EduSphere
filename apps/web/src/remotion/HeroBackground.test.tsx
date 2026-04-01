@@ -18,14 +18,26 @@ const useVideoConfigMock = vi.fn(() => ({
 vi.mock('remotion', () => ({
   useCurrentFrame: (...args: unknown[]) => useCurrentFrameMock(...args),
   useVideoConfig: (...args: unknown[]) => useVideoConfigMock(...args),
-  AbsoluteFill: ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) =>
-    React.createElement('div', { 'data-testid': 'absolute-fill', style }, children),
-  interpolate: vi.fn((input: number, inputRange: number[], outputRange: number[]) => {
-    const [inMin, inMax] = inputRange;
-    const [outMin, outMax] = outputRange;
-    const t = Math.max(0, Math.min(1, (input - inMin) / (inMax - inMin)));
-    return outMin + t * (outMax - outMin);
-  }),
+  AbsoluteFill: ({
+    children,
+    style,
+  }: {
+    children: React.ReactNode;
+    style?: React.CSSProperties;
+  }) =>
+    React.createElement(
+      'div',
+      { 'data-testid': 'absolute-fill', style },
+      children
+    ),
+  interpolate: vi.fn(
+    (input: number, inputRange: number[], outputRange: number[]) => {
+      const [inMin, inMax] = inputRange;
+      const [outMin, outMax] = outputRange;
+      const t = Math.max(0, Math.min(1, (input - inMin) / (inMax - inMin)));
+      return outMin + t * (outMax - outMin);
+    }
+  ),
 }));
 
 import { HeroBackground } from './HeroBackground';

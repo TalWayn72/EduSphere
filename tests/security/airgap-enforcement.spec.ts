@@ -17,8 +17,7 @@ const read = (p: string): string =>
 // ── LocalInferenceService static analysis ─────────────────────────────────────
 
 describe('Air-Gap: LocalInferenceService enforcement', () => {
-  const servicePath =
-    'apps/subgraph-agent/src/ai/local-inference.service.ts';
+  const servicePath = 'apps/subgraph-agent/src/ai/local-inference.service.ts';
 
   it('local-inference.service.ts exists', () => {
     expect(existsSync(resolve(ROOT, servicePath))).toBe(true);
@@ -62,7 +61,10 @@ describe('Air-Gap: LocalInferenceService enforcement', () => {
   it('service has spec file with tests', () => {
     expect(
       existsSync(
-        resolve(ROOT, 'apps/subgraph-agent/src/ai/local-inference.service.spec.ts')
+        resolve(
+          ROOT,
+          'apps/subgraph-agent/src/ai/local-inference.service.spec.ts'
+        )
       )
     ).toBe(true);
   });
@@ -71,8 +73,7 @@ describe('Air-Gap: LocalInferenceService enforcement', () => {
 // ── Helm values.yaml static analysis ─────────────────────────────────────────
 
 describe('Air-Gap: Helm chart values disable external providers', () => {
-  const valuesPath =
-    'infrastructure/helm/edusphere-airgapped/values.yaml';
+  const valuesPath = 'infrastructure/helm/edusphere-airgapped/values.yaml';
 
   it('values.yaml exists', () => {
     expect(existsSync(resolve(ROOT, valuesPath))).toBe(true);

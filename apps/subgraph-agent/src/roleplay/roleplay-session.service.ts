@@ -60,7 +60,10 @@ export class RoleplaySessionService implements OnModuleDestroy {
       .values({ user_id: userId, scenario_id: scenarioId, tenant_id: tenantId })
       .returning();
 
-    if (!session) throw new InternalServerErrorException('Failed to create scenario session');
+    if (!session)
+      throw new InternalServerErrorException(
+        'Failed to create scenario session'
+      );
 
     this.runWorkflowAsync(session.id, template).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);

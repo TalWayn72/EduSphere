@@ -5,7 +5,9 @@ import * as urql from 'urql';
 import { AssessmentResponsePage } from './AssessmentResponsePage';
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('urql', async () => ({
@@ -23,7 +25,10 @@ function renderWithRoute() {
   return render(
     <MemoryRouter initialEntries={['/assessments/c1/respond']}>
       <Routes>
-        <Route path="/assessments/:id/respond" element={<AssessmentResponsePage />} />
+        <Route
+          path="/assessments/:id/respond"
+          element={<AssessmentResponsePage />}
+        />
       </Routes>
     </MemoryRouter>
   );

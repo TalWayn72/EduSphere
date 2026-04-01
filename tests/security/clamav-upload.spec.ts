@@ -19,9 +19,10 @@ describe('ClamAV Upload Security (SI-Upload)', () => {
 
   it('file size > 100MB is rejected before ClamAV scan', async () => {
     // Dynamically import to avoid module resolution in CI without ClamAV
-    const { ClamavService } = await import(
-      '../../apps/subgraph-content/src/clamav/clamav.service'
-    ).catch(() => ({ ClamavService: null }));
+    const { ClamavService } =
+      await import('../../apps/subgraph-content/src/clamav/clamav.service').catch(
+        () => ({ ClamavService: null })
+      );
 
     if (!ClamavService) {
       // Skip if module not available in test environment
@@ -32,15 +33,16 @@ describe('ClamAV Upload Security (SI-Upload)', () => {
     const service = new ClamavService();
     const oversizedBuffer = Buffer.alloc(101 * 1024 * 1024); // 101 MB
 
-    await expect(service.scanBuffer(oversizedBuffer, 'large.bin')).rejects.toThrow(
-      'File too large for scanning'
-    );
+    await expect(
+      service.scanBuffer(oversizedBuffer, 'large.bin')
+    ).rejects.toThrow('File too large for scanning');
   });
 
   it('ClamAV service returns hasError=true when scanner unavailable (graceful degradation)', async () => {
-    const { ClamavService } = await import(
-      '../../apps/subgraph-content/src/clamav/clamav.service'
-    ).catch(() => ({ ClamavService: null }));
+    const { ClamavService } =
+      await import('../../apps/subgraph-content/src/clamav/clamav.service').catch(
+        () => ({ ClamavService: null })
+      );
 
     if (!ClamavService) {
       expect(true).toBe(true);

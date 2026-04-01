@@ -58,7 +58,7 @@ export function normaliseAnnotation(
   const text = extractContentText(gql.content);
   const timestampStart = extractTimestamp(gql.spatialData);
 
-  const localLayer = (gql.layer as string) as AnnotationLayer;
+  const localLayer = gql.layer as string as AnnotationLayer;
 
   return {
     id: gql.id,

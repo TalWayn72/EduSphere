@@ -1,7 +1,17 @@
 /**
  * VideoSketchToolbar — tool selector, color picker, and action buttons for VideoSketchOverlay.
  */
-import { Pencil, Eraser, Square, ArrowUpRight, Circle, Type, Trash2, Check, X } from 'lucide-react';
+import {
+  Pencil,
+  Eraser,
+  Square,
+  ArrowUpRight,
+  Circle,
+  Type,
+  Trash2,
+  Check,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { DrawingTool } from './useSketchCanvas';
@@ -19,19 +29,28 @@ interface Props {
 
 const TOOLS: { id: DrawingTool; Icon: React.ElementType; label: string }[] = [
   { id: 'freehand', Icon: Pencil, label: 'Freehand' },
-  { id: 'eraser',   Icon: Eraser,         label: 'Eraser' },
-  { id: 'rect',     Icon: Square,         label: 'Rectangle' },
-  { id: 'arrow',    Icon: ArrowUpRight,   label: 'Arrow' },
-  { id: 'ellipse',  Icon: Circle,         label: 'Ellipse' },
-  { id: 'text',     Icon: Type,           label: 'Text' },
+  { id: 'eraser', Icon: Eraser, label: 'Eraser' },
+  { id: 'rect', Icon: Square, label: 'Rectangle' },
+  { id: 'arrow', Icon: ArrowUpRight, label: 'Arrow' },
+  { id: 'ellipse', Icon: Circle, label: 'Ellipse' },
+  { id: 'text', Icon: Type, label: 'Text' },
 ];
 
 export function VideoSketchToolbar({
-  tool, color, saving,
-  onToolChange, onColorChange, onClear, onSave, onCancel,
+  tool,
+  color,
+  saving,
+  onToolChange,
+  onColorChange,
+  onClear,
+  onSave,
+  onCancel,
 }: Props) {
   return (
-    <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5" data-testid="sketch-toolbar">
+    <div
+      className="absolute top-2 right-2 flex flex-col items-end gap-1.5"
+      data-testid="sketch-toolbar"
+    >
       {/* Tool + color row */}
       <div className="flex items-center gap-0.5 bg-black/70 rounded p-1">
         {TOOLS.map(({ id, Icon, label }) => (
@@ -51,7 +70,10 @@ export function VideoSketchToolbar({
         ))}
 
         {/* Color picker */}
-        <label className="relative cursor-pointer ml-1" aria-label="Stroke color">
+        <label
+          className="relative cursor-pointer ml-1"
+          aria-label="Stroke color"
+        >
           <input
             type="color"
             value={color}
@@ -72,7 +94,10 @@ export function VideoSketchToolbar({
         <Button
           size="sm"
           variant="ghost"
-          className={cn('h-7 px-2 text-[11px] bg-black/60 text-white hover:bg-black/80', saving && 'opacity-50')}
+          className={cn(
+            'h-7 px-2 text-[11px] bg-black/60 text-white hover:bg-black/80',
+            saving && 'opacity-50'
+          )}
           onClick={onClear}
           disabled={saving}
           aria-label="Clear sketch"

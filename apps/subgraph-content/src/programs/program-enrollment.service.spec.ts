@@ -120,9 +120,9 @@ describe('ProgramEnrollmentService', () => {
       .mockResolvedValueOnce([]) // no existing enrollment
       .mockResolvedValueOnce([]); // no program
 
-    await expect(
-      svc.enrollInProgram(PROGRAM, USER, TENANT)
-    ).rejects.toThrow(NotFoundException);
+    await expect(svc.enrollInProgram(PROGRAM, USER, TENANT)).rejects.toThrow(
+      NotFoundException
+    );
   });
 
   it('enrollInProgram throws ConflictException when program not published', async () => {
@@ -131,9 +131,9 @@ describe('ProgramEnrollmentService', () => {
       .mockResolvedValueOnce([]) // no existing enrollment
       .mockResolvedValueOnce([unpublished]); // program not published
 
-    await expect(
-      svc.enrollInProgram(PROGRAM, USER, TENANT)
-    ).rejects.toThrow(ConflictException);
+    await expect(svc.enrollInProgram(PROGRAM, USER, TENANT)).rejects.toThrow(
+      ConflictException
+    );
   });
 
   // ── getUserEnrollments ────────────────────────────────────────────────────
@@ -172,7 +172,9 @@ describe('ProgramEnrollmentService', () => {
   });
 
   it('getProgramProgress calculates correct percentage', async () => {
-    const program = makeProgram({ requiredCourseIds: ['c-1', 'c-2', 'c-3', 'c-4'] });
+    const program = makeProgram({
+      requiredCourseIds: ['c-1', 'c-2', 'c-3', 'c-4'],
+    });
     const completions = [{ courseId: 'c-1' }, { courseId: 'c-3' }];
     mockWithTenantContext
       .mockResolvedValueOnce([program])
@@ -189,9 +191,9 @@ describe('ProgramEnrollmentService', () => {
   it('getProgramProgress throws NotFoundException when program not found', async () => {
     mockWithTenantContext.mockResolvedValueOnce([]);
 
-    await expect(
-      svc.getProgramProgress(PROGRAM, USER, TENANT)
-    ).rejects.toThrow(NotFoundException);
+    await expect(svc.getProgramProgress(PROGRAM, USER, TENANT)).rejects.toThrow(
+      NotFoundException
+    );
   });
 
   // ── getEnrollmentCounts ───────────────────────────────────────────────────

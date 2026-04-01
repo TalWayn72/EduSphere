@@ -29,9 +29,15 @@ export const STATUS_STYLES: Record<SystemStatus, string> = {
 };
 
 export const STATUS_ICONS: Record<SystemStatus, React.ReactNode> = {
-  CONNECTED: React.createElement(CheckCircle, { className: 'h-4 w-4 text-green-600 dark:text-green-400' }),
-  NOT_CONFIGURED: React.createElement(XCircle, { className: 'h-4 w-4 text-gray-400 dark:text-gray-500' }),
-  ERROR: React.createElement(XCircle, { className: 'h-4 w-4 text-red-600 dark:text-red-400' }),
+  CONNECTED: React.createElement(CheckCircle, {
+    className: 'h-4 w-4 text-green-600 dark:text-green-400',
+  }),
+  NOT_CONFIGURED: React.createElement(XCircle, {
+    className: 'h-4 w-4 text-gray-400 dark:text-gray-500',
+  }),
+  ERROR: React.createElement(XCircle, {
+    className: 'h-4 w-4 text-red-600 dark:text-red-400',
+  }),
 };
 
 export interface SyncEntry {

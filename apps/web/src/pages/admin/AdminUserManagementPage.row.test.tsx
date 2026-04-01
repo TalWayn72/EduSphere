@@ -23,7 +23,11 @@ const baseUser = {
   lastLogin: '2026-03-01T12:00:00Z',
 };
 
-function renderRow(overrides?: Partial<typeof baseUser>, selected = false, onToggle = vi.fn()) {
+function renderRow(
+  overrides?: Partial<typeof baseUser>,
+  selected = false,
+  onToggle = vi.fn()
+) {
   return render(
     <table>
       <tbody>
@@ -33,7 +37,7 @@ function renderRow(overrides?: Partial<typeof baseUser>, selected = false, onTog
           onToggle={onToggle}
         />
       </tbody>
-    </table>,
+    </table>
   );
 }
 

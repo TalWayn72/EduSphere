@@ -17,7 +17,11 @@ describe('StripeInvoiceService (stub)', () => {
   });
 
   it('generateAnnualInvoice returns a draft invoice with required fields', async () => {
-    const result = await service.generateAnnualInvoice('tenant-1', 'plan-1', 2026);
+    const result = await service.generateAnnualInvoice(
+      'tenant-1',
+      'plan-1',
+      2026
+    );
 
     expect(result.invoiceId).toMatch(/^inv_stub_/);
     expect(result.currency).toBe('USD');
@@ -34,7 +38,11 @@ describe('StripeInvoiceService (stub)', () => {
   });
 
   it('generateAnnualInvoice sets dueDate within the requested year', async () => {
-    const result = await service.generateAnnualInvoice('tenant-2', 'plan-2', 2027);
+    const result = await service.generateAnnualInvoice(
+      'tenant-2',
+      'plan-2',
+      2027
+    );
     expect(result.dueDate.getUTCFullYear()).toBe(2027);
   });
 

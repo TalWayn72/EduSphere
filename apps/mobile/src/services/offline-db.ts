@@ -56,9 +56,7 @@ export async function getDatabase(
  * Close the database for a specific tenant.
  * Call this on tenant switch before opening a new one.
  */
-export async function closeTenantDatabase(
-  tenantSlug: string
-): Promise<void> {
+export async function closeTenantDatabase(tenantSlug: string): Promise<void> {
   const db = activeDatabases.get(tenantSlug);
   if (!db) return;
   activeDatabases.delete(tenantSlug);
@@ -72,14 +70,19 @@ export async function closeTenantDatabase(
  * Delete a tenant's local database file.
  * Closes the connection first if open.
  */
-export async function clearTenantCache(
-  tenantSlug: string
-): Promise<void> {
+export async function clearTenantCache(tenantSlug: string): Promise<void> {
   await closeTenantDatabase(tenantSlug);
   const dbName = buildDatabaseName(tenantSlug);
   // expo-sqlite v16: deleteDatabaseAsync
-  if ('deleteDatabaseAsync' in SQLite && typeof SQLite.deleteDatabaseAsync === 'function') {
-    await (SQLite as unknown as { deleteDatabaseAsync: (name: string) => Promise<void> }).deleteDatabaseAsync(dbName);
+  if (
+    'deleteDatabaseAsync' in SQLite &&
+    typeof SQLite.deleteDatabaseAsync === 'function'
+  ) {
+    await (
+      SQLite as unknown as {
+        deleteDatabaseAsync: (name: string) => Promise<void>;
+      }
+    ).deleteDatabaseAsync(dbName);
   }
 }
 

@@ -30,8 +30,13 @@ export interface CatExamResult {
 }
 
 export function CatExamPlayer({
-  sessionId, initialItem, minItems, maxItems,
-  timeLimitSeconds, lockdownEnabled = true, onComplete,
+  sessionId,
+  initialItem,
+  minItems,
+  maxItems,
+  timeLimitSeconds,
+  lockdownEnabled = true,
+  onComplete,
 }: CatExamPlayerProps) {
   const [currentItem, setCurrentItem] = useState<ExamItem>(initialItem);
   const [itemNumber, setItemNumber] = useState(1);
@@ -42,7 +47,9 @@ export function CatExamPlayer({
 
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   const submitAndGetNext = useCallback(async () => {
@@ -52,9 +59,13 @@ export function CatExamPlayer({
       const res = await fetch('/api/exam/cat-answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, itemId: currentItem.id, answer: selectedAnswer }),
+        body: JSON.stringify({
+          sessionId,
+          itemId: currentItem.id,
+          answer: selectedAnswer,
+        }),
       });
-      const data = await res.json() as {
+      const data = (await res.json()) as {
         terminated: boolean;
         item?: ExamItem;
         result?: CatExamResult;
@@ -73,14 +84,20 @@ export function CatExamPlayer({
     }
   }, [sessionId, currentItem.id, selectedAnswer, isSubmitting, onComplete]);
 
-  const handleTerminate = useCallback((reason: string) => {
-    setIsTerminated(true);
-    onComplete({ sessionId, theta: 0, se: 9.99, reason });
-  }, [sessionId, onComplete]);
+  const handleTerminate = useCallback(
+    (reason: string) => {
+      setIsTerminated(true);
+      onComplete({ sessionId, theta: 0, se: 9.99, reason });
+    },
+    [sessionId, onComplete]
+  );
 
   if (isTerminated) return null;
 
-  const qd = currentItem.questionData as { stem: string; options?: Array<{ id: string; text: string }> };
+  const qd = currentItem.questionData as {
+    stem: string;
+    options?: Array<{ id: string; text: string }>;
+  };
 
   return (
     <SecureExamWrapper
@@ -111,7 +128,10 @@ export function CatExamPlayer({
         />
 
         <div className="flex justify-end">
-          <Button onClick={submitAndGetNext} disabled={!selectedAnswer || isSubmitting}>
+          <Button
+            onClick={submitAndGetNext}
+            disabled={!selectedAnswer || isSubmitting}
+          >
             {isSubmitting ? 'Submitting...' : 'Next'}
           </Button>
         </div>

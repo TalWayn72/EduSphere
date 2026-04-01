@@ -18,10 +18,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import {
-  useTreeKeyboard,
-  getVisibleOrder,
-} from './useTreeKeyboard';
+import { useTreeKeyboard, getVisibleOrder } from './useTreeKeyboard';
 import type { TreeKeyboardNode } from './useTreeKeyboard';
 
 // ── Test data ──────────────────────────────────────────────────────────────────
@@ -49,10 +46,7 @@ describe('getVisibleOrder', () => {
   });
 
   it('includes nested children when parent chain expanded', () => {
-    const visible = getVisibleOrder(
-      nodes,
-      new Set(['root-1', 'child-1b'])
-    );
+    const visible = getVisibleOrder(nodes, new Set(['root-1', 'child-1b']));
     expect(visible).toEqual([
       'root-1',
       'child-1a',

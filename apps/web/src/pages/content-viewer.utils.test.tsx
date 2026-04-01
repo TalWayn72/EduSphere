@@ -91,9 +91,7 @@ describe('content-viewer.utils', () => {
     });
 
     it('renders non-matching parts in <span> elements', () => {
-      const { container } = render(
-        <>{highlightText('abc def ghi', 'def')}</>
-      );
+      const { container } = render(<>{highlightText('abc def ghi', 'def')}</>);
       const spans = container.querySelectorAll('span');
       expect(spans.length).toBeGreaterThanOrEqual(2);
       expect(container.textContent).toBe('abc def ghi');

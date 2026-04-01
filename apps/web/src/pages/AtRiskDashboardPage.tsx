@@ -142,91 +142,97 @@ export function AtRiskDashboardPage() {
           title="At-Risk Learners"
           description="Identify and support learners who may need intervention"
         />
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {statCards.map(({ icon: Icon, label, value, color }) => (
-            <Card key={label}>
-              <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center gap-2">
-                <Icon className={'h-4 w-4 ' + color} />
-                <CardTitle className="text-xs font-medium text-muted-foreground">
-                  {label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <p className="text-2xl font-bold">{value}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {error && (
-          <div
-            role="alert"
-            className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-950 dark:text-red-300"
-          >
-            {t('atRisk.loadError')}
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {statCards.map(({ icon: Icon, label, value, color }) => (
+              <Card key={label}>
+                <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center gap-2">
+                  <Icon className={'h-4 w-4 ' + color} />
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                    {label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4">
+                  <p className="text-2xl font-bold">{value}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        )}
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Select
-            value={filter}
-            onValueChange={(v) => setFilter(v as RiskFilter)}
-          >
-            <SelectTrigger className="w-44">
-              <SelectValue placeholder={t('atRisk.riskLevelPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('atRisk.allRiskLevels')}</SelectItem>
-              <SelectItem value="high">{t('atRisk.highRiskLabel')}</SelectItem>
-              <SelectItem value="medium">{t('atRisk.mediumRiskLabel')}</SelectItem>
-              <SelectItem value="low">{t('atRisk.lowRiskLabel')}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-            <SelectTrigger className="w-52">
-              <SelectValue placeholder={t('atRisk.sortByPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="risk">{t('atRisk.sortRisk')}</SelectItem>
-              <SelectItem value="inactive">
-                {t('atRisk.sortInactive')}
-              </SelectItem>
-              <SelectItem value="progress">{t('atRisk.sortProgress')}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-auto"
-            onClick={() => exportCsv(visible)}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {t('atRisk.exportCsv')}
-          </Button>
+          {error && (
+            <div
+              role="alert"
+              className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-950 dark:text-red-300"
+            >
+              {t('atRisk.loadError')}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              value={filter}
+              onValueChange={(v) => setFilter(v as RiskFilter)}
+            >
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder={t('atRisk.riskLevelPlaceholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('atRisk.allRiskLevels')}</SelectItem>
+                <SelectItem value="high">
+                  {t('atRisk.highRiskLabel')}
+                </SelectItem>
+                <SelectItem value="medium">
+                  {t('atRisk.mediumRiskLabel')}
+                </SelectItem>
+                <SelectItem value="low">{t('atRisk.lowRiskLabel')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+              <SelectTrigger className="w-52">
+                <SelectValue placeholder={t('atRisk.sortByPlaceholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="risk">{t('atRisk.sortRisk')}</SelectItem>
+                <SelectItem value="inactive">
+                  {t('atRisk.sortInactive')}
+                </SelectItem>
+                <SelectItem value="progress">
+                  {t('atRisk.sortProgress')}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-auto"
+              onClick={() => exportCsv(visible)}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {t('atRisk.exportCsv')}
+            </Button>
+          </div>
+
+          <Card>
+            <CardContent className="pt-4">
+              {!fetching && !error && learners.length === 0 ? (
+                <p
+                  data-testid="empty-state"
+                  className="text-sm text-muted-foreground py-4 text-center"
+                >
+                  {t('atRisk.emptyState')}
+                </p>
+              ) : (
+                <AtRiskLearnersTable
+                  learners={visible}
+                  onResolve={handleResolve}
+                  resolving={resolving}
+                />
+              )}
+            </CardContent>
+          </Card>
+
+          <RiskThresholdConfig />
         </div>
-
-        <Card>
-          <CardContent className="pt-4">
-            {!fetching && !error && learners.length === 0 ? (
-              <p
-                data-testid="empty-state"
-                className="text-sm text-muted-foreground py-4 text-center"
-              >
-                {t('atRisk.emptyState')}
-              </p>
-            ) : (
-              <AtRiskLearnersTable
-                learners={visible}
-                onResolve={handleResolve}
-                resolving={resolving}
-              />
-            )}
-          </CardContent>
-        </Card>
-
-        <RiskThresholdConfig />
-      </div>
       </PageShell>
     </AdminLayout>
   );

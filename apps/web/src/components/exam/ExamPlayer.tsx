@@ -36,12 +36,12 @@ export function ExamPlayer({ examTitle, onSubmit }: Props) {
 
   const answeredIds = useMemo(
     () => new Set(Object.keys(store.answers)),
-    [store.answers],
+    [store.answers]
   );
 
   const questionItemIds = useMemo(
     () => store.questions.map((q) => q.itemId),
-    [store.questions],
+    [store.questions]
   );
 
   const handleAnswer = useCallback(
@@ -50,7 +50,7 @@ export function ExamPlayer({ examTitle, onSubmit }: Props) {
       store.setAnswer(currentQuestion.itemId, value);
       submitAnswer(store.sessionId, currentQuestion.itemId, value);
     },
-    [currentQuestion, store, submitAnswer],
+    [currentQuestion, store, submitAnswer]
   );
 
   const handleToggleFlag = useCallback(() => {
@@ -127,11 +127,12 @@ export function ExamPlayer({ examTitle, onSubmit }: Props) {
           <DialogHeader>
             <DialogTitle>Submit Exam?</DialogTitle>
             <DialogDescription>
-              You have answered {answeredIds.size} of {store.questions.length} questions.
+              You have answered {answeredIds.size} of {store.questions.length}{' '}
+              questions.
               {store.flagged.size > 0 && (
                 <> {store.flagged.size} question(s) are flagged for review.</>
-              )}
-              {' '}This action cannot be undone.
+              )}{' '}
+              This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

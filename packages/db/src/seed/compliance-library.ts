@@ -29,21 +29,24 @@ export const COMPLIANCE_COURSES: ComplianceCourseSeed[] = [
   {
     id: '00000000-0000-0000-0000-000000000c02',
     title: 'GDPR for Employees',
-    description: 'Essential GDPR knowledge for employees handling EU personal data.',
+    description:
+      'Essential GDPR knowledge for employees handling EU personal data.',
     category: 'compliance',
     tags: ['GDPR', 'privacy', 'EU'],
   },
   {
     id: '00000000-0000-0000-0000-000000000c03',
     title: 'HIPAA Overview',
-    description: 'Core HIPAA requirements for protecting healthcare information.',
+    description:
+      'Core HIPAA requirements for protecting healthcare information.',
     category: 'compliance',
     tags: ['HIPAA', 'healthcare', 'privacy'],
   },
   {
     id: '00000000-0000-0000-0000-000000000c04',
     title: 'Cybersecurity Fundamentals',
-    description: 'Essential cybersecurity practices to protect organizational assets.',
+    description:
+      'Essential cybersecurity practices to protect organizational assets.',
     category: 'compliance',
     tags: ['cybersecurity', 'security'],
   },

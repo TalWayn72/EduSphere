@@ -7,13 +7,20 @@ import { MemoryRouter } from 'react-router-dom';
 import { AgentStudioPage } from './AgentStudioPage';
 
 function renderPage() {
-  return render(<MemoryRouter><AgentStudioPage /></MemoryRouter>);
+  return render(
+    <MemoryRouter>
+      <AgentStudioPage />
+    </MemoryRouter>
+  );
 }
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{}, vi.fn().mockResolvedValue({ data: {}, error: null })]),
+  useMutation: vi.fn(() => [
+    {},
+    vi.fn().mockResolvedValue({ data: {}, error: null }),
+  ]),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -69,7 +76,14 @@ describe('AgentStudioPage', () => {
 
   it('renders all 6 node types in the palette', () => {
     renderPage();
-    for (const type of ['start', 'assess', 'explain', 'quiz', 'debate', 'end']) {
+    for (const type of [
+      'start',
+      'assess',
+      'explain',
+      'quiz',
+      'debate',
+      'end',
+    ]) {
       expect(screen.getByTestId(`palette-${type}`)).toBeInTheDocument();
     }
   });
@@ -86,9 +100,7 @@ describe('AgentStudioPage', () => {
 
   it('shows empty-state prompt on canvas when no nodes', () => {
     renderPage();
-    expect(
-      screen.getByText(/drag nodes here/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/drag nodes here/i)).toBeInTheDocument();
   });
 
   // ── Workflow name ─────────────────────────────────────────────────────────
@@ -177,7 +189,9 @@ describe('AgentStudioPage', () => {
     });
     const node = document.querySelector('[data-testid^="workflow-node-"]')!;
     fireEvent.click(node);
-    const labelInput = screen.getByTestId('node-label-input') as HTMLInputElement;
+    const labelInput = screen.getByTestId(
+      'node-label-input'
+    ) as HTMLInputElement;
     expect(labelInput.value).toBe('Quiz');
   });
 
@@ -194,7 +208,9 @@ describe('AgentStudioPage', () => {
     const node = document.querySelector('[data-testid^="workflow-node-"]')!;
     fireEvent.click(node);
     fireEvent.click(screen.getByTestId('delete-node-btn'));
-    expect(document.querySelectorAll('[data-testid^="workflow-node-"]').length).toBe(0);
+    expect(
+      document.querySelectorAll('[data-testid^="workflow-node-"]').length
+    ).toBe(0);
   });
 
   // ── Connect nodes ─────────────────────────────────────────────────────────
@@ -228,14 +244,18 @@ describe('AgentStudioPage', () => {
       dataTransfer: { getData: () => 'ASSESS' },
     });
 
-    const [node1, node2] = document.querySelectorAll('[data-testid^="workflow-node-"]');
+    const [node1, node2] = document.querySelectorAll(
+      '[data-testid^="workflow-node-"]'
+    );
     // Click first to start connecting
     fireEvent.click(node1!);
     // Click second to complete connection
     fireEvent.click(node2!);
 
     // SVG path should now exist for the edge
-    const paths = document.querySelectorAll('svg path:not([d="M0,0 L0,6 L8,3 z"])');
+    const paths = document.querySelectorAll(
+      'svg path:not([d="M0,0 L0,6 L8,3 z"])'
+    );
     expect(paths.length).toBeGreaterThan(0);
   });
 

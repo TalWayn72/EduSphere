@@ -66,7 +66,9 @@ export default function FeedItem({ item }: FeedItemProps) {
       <div className="flex-1 min-w-0">
         <p className="text-sm leading-snug">
           <span className="font-semibold">{item.actorDisplayName}</span>{' '}
-          <span className="text-muted-foreground">{getVerbLabel(item.verb)}</span>{' '}
+          <span className="text-muted-foreground">
+            {getVerbLabel(item.verb)}
+          </span>{' '}
           <span className="font-medium">{item.objectTitle}</span>
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">

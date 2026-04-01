@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -134,7 +140,9 @@ export class LessonIngestionWorkflow {
     );
 
     const { text } = await generateText({
-      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateText
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Extract metadata from YouTube URL: ${state.videoUrl}
 Return JSON with: { "title": "...", "estimatedDurationMinutes": 0 }`,

@@ -10,7 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { WebhookForm, type WebhookFormData } from './WebhooksPage.form';
 
@@ -38,10 +43,13 @@ interface Webhook {
 export function WebhooksPage() {
   const { t } = useTranslation('orgApi');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }, reexecute] = useQuery<{ webhooks: Webhook[] }>({
-    query: WEBHOOKS_QUERY, pause: !mounted,
+    query: WEBHOOKS_QUERY,
+    pause: !mounted,
   });
   const [, createWebhook] = useMutation(CREATE_WEBHOOK_MUTATION);
   const [, deleteWebhook] = useMutation(DELETE_WEBHOOK_MUTATION);
@@ -59,20 +67,29 @@ export function WebhooksPage() {
   const webhooks = data?.webhooks ?? [];
 
   return (
-    <AdminLayout title={t('webhooks.title')} description={t('webhooks.description')}>
+    <AdminLayout
+      title={t('webhooks.title')}
+      description={t('webhooks.description')}
+    >
       <h1 className="sr-only">Webhooks</h1>
       <div data-testid="webhooks-page" className="space-y-6">
         <WebhookForm t={t} onSubmit={onCreate} />
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('webhooks.existingTitle')}</CardTitle>
+            <CardTitle className="text-base">
+              {t('webhooks.existingTitle')}
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {fetching ? (
-              <p className="p-4 text-sm text-muted-foreground">{t('webhooks.loading')}</p>
+              <p className="p-4 text-sm text-muted-foreground">
+                {t('webhooks.loading')}
+              </p>
             ) : webhooks.length === 0 ? (
-              <p className="p-4 text-sm text-muted-foreground">{t('webhooks.noWebhooks')}</p>
+              <p className="p-4 text-sm text-muted-foreground">
+                {t('webhooks.noWebhooks')}
+              </p>
             ) : (
               <Table>
                 <TableHeader>
@@ -86,21 +103,35 @@ export function WebhooksPage() {
                 <TableBody>
                   {webhooks.map((wh) => (
                     <TableRow key={wh.id}>
-                      <TableCell className="text-xs font-mono">{wh.url}</TableCell>
+                      <TableCell className="text-xs font-mono">
+                        {wh.url}
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {wh.events.map((e) => (
-                            <Badge key={e} variant="secondary" className="text-xs">{e}</Badge>
+                            <Badge
+                              key={e}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {e}
+                            </Badge>
                           ))}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant={wh.active ? 'default' : 'secondary'}>
-                          {wh.active ? t('webhooks.active') : t('webhooks.inactive')}
+                          {wh.active
+                            ? t('webhooks.active')
+                            : t('webhooks.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" onClick={() => onDelete(wh.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDelete(wh.id)}
+                        >
                           {t('webhooks.delete')}
                         </Button>
                       </TableCell>

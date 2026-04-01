@@ -6,7 +6,13 @@ import { PersonSchema } from './PersonSchema';
 
 describe('PersonSchema', () => {
   it('renders without throwing', () => {
-    expect(() => render(<HelmetProvider><PersonSchema name='Dr. Test' /></HelmetProvider>)).not.toThrow();
+    expect(() =>
+      render(
+        <HelmetProvider>
+          <PersonSchema name="Dr. Test" />
+        </HelmetProvider>
+      )
+    ).not.toThrow();
   });
 
   it('builds Person schema', () => {

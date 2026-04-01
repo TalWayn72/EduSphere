@@ -17,7 +17,9 @@ test.describe('360° Assessments — DEV_MODE guard', () => {
   });
 
   test('assessments page renders heading', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -26,21 +28,27 @@ test.describe('360° Assessments — DEV_MODE guard', () => {
   });
 
   test('assessments page has no crash overlay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
     });
   });
 
   test('no [object Object] in assessments DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
   test('assessments page shows list or empty state', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const hasAssessments = await page
@@ -63,7 +71,9 @@ test.describe('360° Assessments — Live backend', () => {
   });
 
   test('assessments page renders with screenshot', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -76,7 +86,9 @@ test.describe('360° Assessments — Live backend', () => {
 
   test('assessments page renders correctly as instructor', async ({ page }) => {
     await loginViaKeycloak(page, TEST_USERS.instructor);
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -160,7 +172,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   test('campaign creation form — create button or new assessment link exists', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page.locator(
@@ -178,14 +192,19 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   test('campaign creation form — clicking create does not crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const createBtn = page.locator(
       '[data-testid="create-assessment-btn"], button:has-text("Create"), button:has-text("New")'
     );
     if ((await createBtn.count()) > 0) {
-      await createBtn.first().click().catch(() => {});
+      await createBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -196,8 +215,12 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     expect(body).not.toContain('[object Object]');
   });
 
-  test('campaign title input — accepts text without crash', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
+  test('campaign title input — accepts text without crash', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/assessments/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const titleInput = page.locator(
@@ -215,7 +238,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   test('respondent selection — page renders respondent picker or user list', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Look for respondent-related UI
@@ -231,14 +256,19 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   });
 
   test('deadline setting — date picker does not crash', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const deadlineInput = page.locator(
       '[data-testid="deadline-input"], input[type="date"], input[name="deadline"], input[placeholder*="deadline" i]'
     );
     if ((await deadlineInput.count()) > 0) {
-      await deadlineInput.first().fill('2026-06-01').catch(() => {});
+      await deadlineInput
+        .first()
+        .fill('2026-06-01')
+        .catch(() => {});
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -249,7 +279,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   test('results aggregation — assessment detail page renders scores', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/assessments/a-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/a-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -264,11 +296,15 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
-        errors: [{ message: 'PermissionDenied: insufficient role for results' }],
+        errors: [
+          { message: 'PermissionDenied: insufficient role for results' },
+        ],
       });
     });
 
-    await page.goto(`${BASE_URL}/assessments/a-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/a-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -277,14 +313,19 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   });
 
   test('export button — does not crash when clicked', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments/a-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/a-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const exportBtn = page.locator(
       '[data-testid="export-results-btn"], button:has-text("Export"), button:has-text("Download")'
     );
     if ((await exportBtn.count()) > 0) {
-      await exportBtn.first().click().catch(() => {});
+      await exportBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -293,15 +334,22 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
     });
   });
 
-  test('anonymity toggle — toggling does not crash the form', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
+  test('anonymity toggle — toggling does not crash the form', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/assessments/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const anonToggle = page.locator(
       '[data-testid="anonymous-toggle"], [role="switch"]:near(:text("Anonymous")), input[name="anonymous"]'
     );
     if ((await anonToggle.count()) > 0) {
-      await anonToggle.first().click().catch(() => {});
+      await anonToggle
+        .first()
+        .click()
+        .catch(() => {});
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -314,7 +362,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   test('assessment list shows status badges without raw enum values', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -345,7 +395,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/assessments/a-empty`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/a-empty`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -379,7 +431,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -389,14 +443,20 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   test('assessment description input — accepts long text without crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/assessments/new`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments/new`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const descInput = page.locator(
       '[data-testid="assessment-description"], textarea[name="description"], textarea[placeholder*="description" i]'
     );
     if ((await descInput.count()) > 0) {
-      await descInput.first().fill('This is a comprehensive 360-degree assessment campaign designed to evaluate leadership competencies across the entire organization for Q2 2026.');
+      await descInput
+        .first()
+        .fill(
+          'This is a comprehensive 360-degree assessment campaign designed to evaluate leadership competencies across the entire organization for Q2 2026.'
+        );
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -405,7 +465,9 @@ test.describe('360° Assessments — campaign and respondent flows', () => {
   });
 
   test('visual regression — assessments list page', async ({ page }) => {
-    await page.goto(`${BASE_URL}/assessments`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/assessments`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('assessments-list-mocked.png', {

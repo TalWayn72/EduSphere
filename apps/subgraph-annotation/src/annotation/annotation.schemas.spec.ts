@@ -188,7 +188,11 @@ describe('TextRangeInputSchema', () => {
   });
 
   it('accepts explicit rangeType', () => {
-    const result = TextRangeInputSchema.parse({ start: 0, end: 100, rangeType: 'word' });
+    const result = TextRangeInputSchema.parse({
+      start: 0,
+      end: 100,
+      rangeType: 'word',
+    });
     expect(result.rangeType).toBe('word');
   });
 

@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
-import type { ExamSession, ExamResult, ExamBlueprint } from '@/types/exam-entities';
+import type {
+  ExamSession,
+  ExamResult,
+  ExamBlueprint,
+} from '@/types/exam-entities';
 
 const EXAM_BLUEPRINT_QUERY = `
   query ExamBlueprint($id: ID!) {
@@ -42,7 +46,9 @@ const EXAM_RESULT_QUERY = `
 
 export function useExamBlueprint(blueprintId: string) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_BLUEPRINT_QUERY,
@@ -58,7 +64,9 @@ export function useExamBlueprint(blueprintId: string) {
 
 export function useExamSession(sessionId: string) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_SESSION_QUERY,
@@ -74,7 +82,9 @@ export function useExamSession(sessionId: string) {
 
 export function useExamResult(sessionId: string) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery({
     query: EXAM_RESULT_QUERY,

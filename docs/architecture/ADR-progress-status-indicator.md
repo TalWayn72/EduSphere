@@ -17,13 +17,13 @@ for any operation whose duration is uncertain or long.
 
 ### Affected Operations (known today)
 
-| Operation | Component / Hook | Current State | Target State |
-|---|---|---|---|
-| AI course generation | `AiCourseCreatorModal` | Static `Loader2` + "Generating…" | Rotating AI messages |
-| File upload (presign→PUT→confirm) | `useFileUpload` | Phase label only | Phase-aware message sets |
-| Content import | `ImportProgressPanel` | Static "Importing…" | Rotating import messages |
-| Quiz grading | `useGradeQuiz` | No feedback (silent `loading`) | Rotating grading messages |
-| Knowledge-graph queries | `KnowledgeGraph` | `LoadingSpinner` | Optional rotating messages |
+| Operation                         | Component / Hook       | Current State                    | Target State               |
+| --------------------------------- | ---------------------- | -------------------------------- | -------------------------- |
+| AI course generation              | `AiCourseCreatorModal` | Static `Loader2` + "Generating…" | Rotating AI messages       |
+| File upload (presign→PUT→confirm) | `useFileUpload`        | Phase label only                 | Phase-aware message sets   |
+| Content import                    | `ImportProgressPanel`  | Static "Importing…"              | Rotating import messages   |
+| Quiz grading                      | `useGradeQuiz`         | No feedback (silent `loading`)   | Rotating grading messages  |
+| Knowledge-graph queries           | `KnowledgeGraph`       | `LoadingSpinner`                 | Optional rotating messages |
 
 ---
 
@@ -240,11 +240,11 @@ Output:
 
 Following the project's Memory Safety rules (CLAUDE.md):
 
-| Resource | Storage | Cleanup |
-|---|---|---|
-| `setInterval` handle | `intervalRef = useRef<ReturnType<typeof setInterval> \| null>(null)` | `clearInterval(intervalRef.current)` in `useEffect` cleanup |
-| Mounted guard | `mountedRef = useRef(true)` | Set `false` in cleanup |
-| `active` change listener | `useEffect([active])` | Clears old interval before starting new |
+| Resource                 | Storage                                                              | Cleanup                                                     |
+| ------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `setInterval` handle     | `intervalRef = useRef<ReturnType<typeof setInterval> \| null>(null)` | `clearInterval(intervalRef.current)` in `useEffect` cleanup |
+| Mounted guard            | `mountedRef = useRef(true)`                                          | Set `false` in cleanup                                      |
+| `active` change listener | `useEffect([active])`                                                | Clears old interval before starting new                     |
 
 No `useState` for the interval index — only for the displayed string. This is critical:
 incrementing a ref does not cause a parent re-render.
@@ -298,6 +298,7 @@ The parent only passes `active` and `messageSetId`. When only the status text ch
 (interval tick), React re-renders `ProgressStatus` alone, not the parent modal.
 
 This is guaranteed by:
+
 1. `useProgressStatus` is called inside `ProgressStatus`, not the parent.
 2. The parent does not subscribe to the current message at all.
 
@@ -407,11 +408,11 @@ replacement for fast query states.
 
 ### 9.1 Re-render Isolation
 
-| Component | Re-renders on interval tick? | Reason |
-|---|---|---|
-| `ProgressStatus` | Yes — intentional | Owns `currentMessage` state |
-| Parent modal/page | No | Does not subscribe to message state |
-| Siblings in the modal | No | React reconciles only changed subtree |
+| Component             | Re-renders on interval tick? | Reason                                |
+| --------------------- | ---------------------------- | ------------------------------------- |
+| `ProgressStatus`      | Yes — intentional            | Owns `currentMessage` state           |
+| Parent modal/page     | No                           | Does not subscribe to message state   |
+| Siblings in the modal | No                           | React reconciles only changed subtree |
 
 The isolation is achieved by keeping `useProgressStatus` inside `ProgressStatus`, not
 hoisted to the parent. This is a deliberate inversion from the usual "hoist state up"
@@ -486,14 +487,14 @@ sequenceDiagram
 
 ## 12. Testing Requirements
 
-| Test Type | File | Coverage |
-|---|---|---|
-| Unit — hook cycling | `useProgressStatus.memory.test.ts` | `clearInterval` called on unmount; index wraps at array length; `active=false` clears interval |
-| Unit — hook cycling | `useProgressStatus.test.ts` | Message advances on tick; `active` toggle starts/stops; `phaseOverride` immediately updates message |
-| Unit — component | `ProgressStatus.test.tsx` | Renders with `role="status"`; text updates; reduced-motion disables animation class |
-| Unit — registry | `progress-messages.test.ts` | All `MessageSetId` values resolve to non-empty arrays; all keys exist in `common.json` |
-| i18n completeness | (existing `completeness.test.ts`) | After adding `progress.*` keys to all locale files, completeness test validates all 10 locales |
-| E2E | `apps/web/e2e/progress-status.spec.ts` | AI course generation shows rotating text; upload shows phase-aware text; screenshot regression |
+| Test Type           | File                                   | Coverage                                                                                            |
+| ------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Unit — hook cycling | `useProgressStatus.memory.test.ts`     | `clearInterval` called on unmount; index wraps at array length; `active=false` clears interval      |
+| Unit — hook cycling | `useProgressStatus.test.ts`            | Message advances on tick; `active` toggle starts/stops; `phaseOverride` immediately updates message |
+| Unit — component    | `ProgressStatus.test.tsx`              | Renders with `role="status"`; text updates; reduced-motion disables animation class                 |
+| Unit — registry     | `progress-messages.test.ts`            | All `MessageSetId` values resolve to non-empty arrays; all keys exist in `common.json`              |
+| i18n completeness   | (existing `completeness.test.ts`)      | After adding `progress.*` keys to all locale files, completeness test validates all 10 locales      |
+| E2E                 | `apps/web/e2e/progress-status.spec.ts` | AI course generation shows rotating text; upload shows phase-aware text; screenshot regression      |
 
 Memory safety test (mandatory per CLAUDE.md):
 
@@ -502,7 +503,11 @@ Memory safety test (mandatory per CLAUDE.md):
 it('clears interval on unmount', () => {
   const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
   const { unmount } = renderHook(() =>
-    useProgressStatus({ messageKeys: ['k1', 'k2'], intervalMs: 100, active: true })
+    useProgressStatus({
+      messageKeys: ['k1', 'k2'],
+      intervalMs: 100,
+      active: true,
+    })
   );
   unmount();
   expect(clearIntervalSpy).toHaveBeenCalled();
@@ -569,5 +574,5 @@ it('clears interval on unmount', () => {
 
 ---
 
-*ADR format: [Lightweight Architecture Decision Records](https://adr.github.io/)*
-*Last updated: 2026-03-18 | Author: Architecture Division*
+_ADR format: [Lightweight Architecture Decision Records](https://adr.github.io/)_
+_Last updated: 2026-03-18 | Author: Architecture Division_

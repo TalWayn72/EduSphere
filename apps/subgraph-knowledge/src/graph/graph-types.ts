@@ -31,7 +31,9 @@ export function toUserRole(
  */
 export function safeIsoDate(value: number | string | null | undefined): string {
   if (value == null) return new Date().toISOString();
-  const d = new Date(typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value);
+  const d = new Date(
+    typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value
+  );
   if (isNaN(d.getTime())) return new Date().toISOString();
   return d.toISOString();
 }

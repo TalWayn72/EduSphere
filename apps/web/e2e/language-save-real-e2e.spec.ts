@@ -47,12 +47,14 @@ test.describe('Language preference save — REAL E2E (no mocks)', () => {
 
     // Wait for the page heading to confirm we landed on the right page
     // If role guard redirects to /dashboard, this will time out with a clear message
-    await expect(
-      page.getByRole('heading', { name: PAGE_HEADING })
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: PAGE_HEADING })).toBeVisible(
+      { timeout: 15_000 }
+    );
 
     // Wait for the query to load (spinner disappears)
-    await expect(page.getByText('Loading language settings...')).not.toBeVisible({
+    await expect(
+      page.getByText('Loading language settings...')
+    ).not.toBeVisible({
       timeout: 15_000,
     });
 
@@ -71,7 +73,9 @@ test.describe('Language preference save — REAL E2E (no mocks)', () => {
 
     // Step 5: Verify SUCCESS indicator appears — NOT error
     // The component shows: <CheckCircle2> "Language settings saved"
-    await expect(page.getByText(ERROR_TEXT)).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(ERROR_TEXT)).not.toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText(SUCCESS_TEXT)).toBeVisible({ timeout: 15_000 });
 
     // Step 6: Screenshot of success state
@@ -95,10 +99,12 @@ test.describe('Language preference save — REAL E2E (no mocks)', () => {
     await page.goto(`${BASE_URL}/admin/languages`, {
       waitUntil: 'domcontentloaded',
     });
+    await expect(page.getByRole('heading', { name: PAGE_HEADING })).toBeVisible(
+      { timeout: 15_000 }
+    );
     await expect(
-      page.getByRole('heading', { name: PAGE_HEADING })
-    ).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText('Loading language settings...')).not.toBeVisible({
+      page.getByText('Loading language settings...')
+    ).not.toBeVisible({
       timeout: 15_000,
     });
 
@@ -113,10 +119,12 @@ test.describe('Language preference save — REAL E2E (no mocks)', () => {
 
     // Reload the page — data comes from real GraphQL query, no localStorage
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: PAGE_HEADING })).toBeVisible(
+      { timeout: 15_000 }
+    );
     await expect(
-      page.getByRole('heading', { name: PAGE_HEADING })
-    ).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText('Loading language settings...')).not.toBeVisible({
+      page.getByText('Loading language settings...')
+    ).not.toBeVisible({
       timeout: 15_000,
     });
 

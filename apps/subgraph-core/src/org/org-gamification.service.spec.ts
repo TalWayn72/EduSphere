@@ -16,7 +16,8 @@ const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -35,14 +36,30 @@ vi.mock('@edusphere/db', () => ({
     update: mockUpdate,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ select: mockSelect, insert: mockInsert, update: mockUpdate }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({ select: mockSelect, insert: mockInsert, update: mockUpdate })
   ),
   schema: {
-    badges: { id: 'id', tenantId: 'tenant_id', name: 'name', iconUrl: 'icon_url' },
+    badges: {
+      id: 'id',
+      tenantId: 'tenant_id',
+      name: 'name',
+      iconUrl: 'icon_url',
+    },
     userBadges: { id: 'id', userId: 'user_id', badgeId: 'badge_id' },
-    userPoints: { id: 'id', userId: 'user_id', points: 'points', tenantId: 'tenant_id' },
-    pointEvents: { id: 'id', userId: 'user_id', eventType: 'event_type', points: 'points' },
+    userPoints: {
+      id: 'id',
+      userId: 'user_id',
+      points: 'points',
+      tenantId: 'tenant_id',
+    },
+    pointEvents: {
+      id: 'id',
+      userId: 'user_id',
+      eventType: 'event_type',
+      points: 'points',
+    },
     tenants: { id: 'id', settings: 'settings' },
   },
   eq: vi.fn((a: unknown, b: unknown) => ({ eq: [a, b] })),
@@ -52,7 +69,11 @@ vi.mock('@edusphere/db', () => ({
 
 import { OrgGamificationService } from './org-gamification.service.js';
 
-const TENANT_CTX = { tenantId: 'tenant-001', userId: 'admin-001', role: 'ORG_ADMIN' };
+const TENANT_CTX = {
+  tenantId: 'tenant-001',
+  userId: 'admin-001',
+  role: 'ORG_ADMIN',
+};
 
 describe('OrgGamificationService', () => {
   let service: OrgGamificationService;
@@ -72,7 +93,7 @@ describe('OrgGamificationService', () => {
         makeChain([
           { userId: 'u1', points: 500, displayName: 'Alice' },
           { userId: 'u2', points: 450, displayName: 'Bob' },
-        ]),
+        ])
       );
 
       const result = await service.getLeaderboard(TENANT_CTX, { limit: 10 });
@@ -123,7 +144,7 @@ describe('OrgGamificationService', () => {
           description: 'test',
           iconUrl: 'https://cdn.example.com/badge.png',
           criteria: { type: 'MANUAL' },
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -136,8 +157,8 @@ describe('OrgGamificationService', () => {
             description: 'test',
             iconUrl: 'https://cdn.example.com/badge.png',
             criteria: { type: 'MANUAL' },
-          },
-        ),
+          }
+        )
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -159,7 +180,7 @@ describe('OrgGamificationService', () => {
 
     it('rejects negative XP values', async () => {
       await expect(
-        service.updateXPConfig(TENANT_CTX, { courseCompletion: -10 }),
+        service.updateXPConfig(TENANT_CTX, { courseCompletion: -10 })
       ).rejects.toThrow(BadRequestException);
     });
   });

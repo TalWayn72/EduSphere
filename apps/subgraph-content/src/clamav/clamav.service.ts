@@ -7,10 +7,14 @@ import {
 } from '@nestjs/common';
 
 // node-clamscan is an optional peer dependency — guard against missing install.
- 
-type NodeClamConstructor = new () => { init(opts: unknown): Promise<NodeClamInstance> };
+
+type NodeClamConstructor = new () => {
+  init(opts: unknown): Promise<NodeClamInstance>;
+};
 interface NodeClamInstance {
-  scanBuffer(buf: Buffer): Promise<{ isInfected: boolean | null; viruses: string[] | null }>;
+  scanBuffer(
+    buf: Buffer
+  ): Promise<{ isInfected: boolean | null; viruses: string[] | null }>;
 }
 
 let NodeClam: NodeClamConstructor | null = null;
@@ -37,7 +41,9 @@ export class ClamavService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     if (!NodeClam) {
-      this.logger.warn('[ClamavService] node-clamscan package not installed. Scans will return hasError=true.');
+      this.logger.warn(
+        '[ClamavService] node-clamscan package not installed. Scans will return hasError=true.'
+      );
       return;
     }
 
@@ -57,7 +63,9 @@ export class ClamavService implements OnModuleInit, OnModuleDestroy {
       });
       this.logger.log(`[ClamavService] Connected to clamd at ${host}:${port}`);
     } catch (err) {
-      this.logger.warn(`[ClamavService] ClamAV unavailable (${String(err)}). Scans will return hasError=true.`);
+      this.logger.warn(
+        `[ClamavService] ClamAV unavailable (${String(err)}). Scans will return hasError=true.`
+      );
       this.scanner = null;
     }
   }
@@ -74,7 +82,9 @@ export class ClamavService implements OnModuleInit, OnModuleDestroy {
     }
 
     if (!this.scanner) {
-      this.logger.warn(`[ClamavService] Scanner unavailable, skipping scan for ${filename}`);
+      this.logger.warn(
+        `[ClamavService] Scanner unavailable, skipping scan for ${filename}`
+      );
       return { isInfected: false, viruses: [], hasError: true };
     }
 
@@ -93,7 +103,9 @@ export class ClamavService implements OnModuleInit, OnModuleDestroy {
 
       return { isInfected: infected, viruses: virusList, hasError: false };
     } catch (err) {
-      this.logger.error(`[ClamavService] Scan error for ${filename}: ${String(err)}`);
+      this.logger.error(
+        `[ClamavService] Scan error for ${filename}: ${String(err)}`
+      );
       return { isInfected: false, viruses: [], hasError: true };
     }
   }

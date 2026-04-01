@@ -35,7 +35,9 @@ export function TrialBanner() {
   const { t } = useTranslation('orgOnboarding');
   const [dismissed, setDismissed] = useState(false);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data }] = useQuery<{ trialStatus: TrialData }>({
     query: TRIAL_STATUS_QUERY,
@@ -62,7 +64,9 @@ export function TrialBanner() {
         variant="secondary"
         size="sm"
         className="text-xs"
-        onClick={() => { window.location.href = trial.upgradeUrl; }}
+        onClick={() => {
+          window.location.href = trial.upgradeUrl;
+        }}
       >
         {t('trial.upgrade')}
       </Button>

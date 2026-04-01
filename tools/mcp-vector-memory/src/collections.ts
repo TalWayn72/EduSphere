@@ -40,7 +40,7 @@ export async function getCollection(name: CollectionName): Promise<Collection> {
   const client = getClient();
   const collection = await withRetry(
     () => client.getOrCreateCollection({ name }),
-    { maxAttempts: 3, initialDelayMs: 500 },
+    { maxAttempts: 3, initialDelayMs: 500 }
   );
   collectionCache.set(name, collection);
   return collection;
@@ -50,7 +50,9 @@ export async function getCollection(name: CollectionName): Promise<Collection> {
  * Safe version of getCollection — returns null instead of throwing.
  * Logs the error to stderr when ChromaDB is unreachable.
  */
-export async function getCollectionSafe(name: CollectionName): Promise<Collection | null> {
+export async function getCollectionSafe(
+  name: CollectionName
+): Promise<Collection | null> {
   try {
     return await getCollection(name);
   } catch (e) {

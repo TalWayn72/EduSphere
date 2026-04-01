@@ -42,7 +42,8 @@ export class ChavrutaPartnerMatchResolver {
 
   @Mutation('createChavrutaPartnerSession')
   async createChavrutaPartnerSession(
-    @Args('input') input: { partnerId: string; courseId: string; topic: string },
+    @Args('input')
+    input: { partnerId: string; courseId: string; topic: string },
     @Context() ctx: GraphQLContext
   ) {
     const { userId, tenantId } = this.getAuth(ctx);

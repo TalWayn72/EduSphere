@@ -45,8 +45,11 @@ export class CoursePublishService {
     const course = await findById(courseId);
     if (!course) throw new NotFoundException(`Course ${courseId} not found`);
 
-    const hasTitle = !!course['title'] && String(course['title']).trim().length > 0;
-    const hasDesc = !!course['description'] && String(course['description']).trim().length > 0;
+    const hasTitle =
+      !!course['title'] && String(course['title']).trim().length > 0;
+    const hasDesc =
+      !!course['description'] &&
+      String(course['description']).trim().length > 0;
     checks.push({
       name: 'has_title',
       passed: hasTitle,
@@ -59,9 +62,15 @@ export class CoursePublishService {
     });
 
     const lessons = await withReadReplica((db) =>
-      db.select().from(schema.lessons).where(
-        and(eq(schema.lessons.course_id, courseId), isNull(schema.lessons.deleted_at))
-      )
+      db
+        .select()
+        .from(schema.lessons)
+        .where(
+          and(
+            eq(schema.lessons.course_id, courseId),
+            isNull(schema.lessons.deleted_at)
+          )
+        )
     );
     const hasLessons = lessons.length > 0;
     checks.push({
@@ -70,22 +79,29 @@ export class CoursePublishService {
       message: hasLessons ? null : 'Course must have at least one lesson',
     });
 
-    const allReady = hasLessons && lessons.every((l) => {
-      const s = (l as Record<string, unknown>)['status'] as string;
-      return s === 'READY' || s === 'PUBLISHED';
-    });
+    const allReady =
+      hasLessons &&
+      lessons.every((l) => {
+        const s = (l as Record<string, unknown>)['status'] as string;
+        return s === 'READY' || s === 'PUBLISHED';
+      });
     checks.push({
       name: 'lessons_ready',
       passed: allReady,
-      message: allReady ? null : 'All lessons must have status READY or PUBLISHED',
+      message: allReady
+        ? null
+        : 'All lessons must have status READY or PUBLISHED',
     });
 
     let hasPipelineResults = false;
     if (hasLessons) {
-      const lessonIds = lessons.map((l) => (l as Record<string, unknown>)['id'] as string);
+      const lessonIds = lessons.map(
+        (l) => (l as Record<string, unknown>)['id'] as string
+      );
       for (const lid of lessonIds) {
         const [result] = await withReadReplica((db) =>
-          db.select({ cnt: count() })
+          db
+            .select({ cnt: count() })
             .from(schema.lesson_pipeline_runs)
             .where(eq(schema.lesson_pipeline_runs.lesson_id, lid))
             .limit(1)
@@ -99,7 +115,9 @@ export class CoursePublishService {
     checks.push({
       name: 'has_pipeline_results',
       passed: hasPipelineResults,
-      message: hasPipelineResults ? null : 'At least one lesson must have pipeline results',
+      message: hasPipelineResults
+        ? null
+        : 'At least one lesson must have pipeline results',
     });
 
     const ready = checks.every((c) => c.passed);

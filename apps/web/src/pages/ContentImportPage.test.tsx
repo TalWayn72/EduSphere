@@ -10,7 +10,12 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
     ...actual,
     useMutation: vi.fn(() => ({
       mutateAsync: vi.fn().mockResolvedValue({
-        importFromYoutube: { id: 'job-1', status: 'COMPLETE', lessonCount: 5, estimatedMinutes: 1 },
+        importFromYoutube: {
+          id: 'job-1',
+          status: 'COMPLETE',
+          lessonCount: 5,
+          estimatedMinutes: 1,
+        },
       }),
       isPending: false,
     })),
@@ -23,7 +28,9 @@ vi.mock('graphql-request', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // ContentImportPage uses useAuthRole (not AuthProvider)
@@ -70,7 +77,10 @@ function renderWithRouter(courseId = 'course-123') {
   return render(
     <MemoryRouter initialEntries={[`/courses/${courseId}/import`]}>
       <Routes>
-        <Route path="/courses/:courseId/import" element={<ContentImportPage />} />
+        <Route
+          path="/courses/:courseId/import"
+          element={<ContentImportPage />}
+        />
       </Routes>
     </MemoryRouter>
   );
@@ -89,7 +99,9 @@ describe('ContentImportPage', () => {
 
   it('renders "Import Content" heading', () => {
     renderWithRouter();
-    expect(screen.getByRole('heading', { name: /import content/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /import content/i })
+    ).toBeInTheDocument();
   });
 
   it('renders ImportSourceSelector', () => {
@@ -100,7 +112,9 @@ describe('ContentImportPage', () => {
   it('shows YouTube URL input after selecting YouTube source', () => {
     renderWithRouter();
     fireEvent.click(screen.getByTestId('source-youtube'));
-    expect(screen.getByPlaceholderText(/youtube.com\/playlist/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/youtube.com\/playlist/i)
+    ).toBeInTheDocument();
   });
 
   it('redirects to /dashboard when user role is STUDENT', async () => {
@@ -122,7 +136,12 @@ describe('ContentImportPage', () => {
       importFromYoutube: vi.fn(),
       importFromWebsite: vi.fn(),
       cancelImport: vi.fn(),
-      importJob: { id: 'job-1', status: 'COMPLETE', lessonCount: 5, estimatedMinutes: 1 },
+      importJob: {
+        id: 'job-1',
+        status: 'COMPLETE',
+        lessonCount: 5,
+        estimatedMinutes: 1,
+      },
       isImporting: false,
       error: null,
     });
@@ -144,6 +163,8 @@ describe('ContentImportPage', () => {
     });
     renderWithRouter();
     fireEvent.click(screen.getByTestId('source-youtube'));
-    expect(screen.getByRole('alert')).toHaveTextContent('YouTube API quota exceeded');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'YouTube API quota exceeded'
+    );
   });
 });

@@ -51,7 +51,9 @@ vi.mock('@/components/ContentViewerBreadcrumb', () => ({
 
 /* ── PageHeader ── */
 vi.mock('@/components/PageHeader', () => ({
-  PageHeader: ({ title }: { title: string }) => <h1 data-testid="page-header-title">{title}</h1>,
+  PageHeader: ({ title }: { title: string }) => (
+    <h1 data-testid="page-header-title">{title}</h1>
+  ),
 }));
 
 /* ── Sub-panels ── */

@@ -18,7 +18,11 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@tanstack/react-query', () => ({
   QueryClientProvider: ({ children }: { children: React.ReactNode }) =>
-    React.createElement('div', { 'data-testid': 'query-client-provider' }, children),
+    React.createElement(
+      'div',
+      { 'data-testid': 'query-client-provider' },
+      children
+    ),
   QueryClient: vi.fn(() => ({})),
 }));
 

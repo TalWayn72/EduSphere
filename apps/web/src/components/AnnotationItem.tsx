@@ -87,7 +87,11 @@ export function AnnotationItem({
             </span>
             <span className="text-sm font-semibold">
               {annotation.userName}
-              {isOwn && <span className="text-gray-500 dark:text-slate-400 ml-1">(You)</span>}
+              {isOwn && (
+                <span className="text-gray-500 dark:text-slate-400 ml-1">
+                  (You)
+                </span>
+              )}
             </span>
             {annotation.timestamp && (
               <span className="text-xs text-gray-500 dark:text-slate-400 font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">

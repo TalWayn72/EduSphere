@@ -12,10 +12,7 @@
  *   - Edge cases: network failure, Keycloak down, concurrent signups
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  BadRequestException,
-  ConflictException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 
 // ── DB mock ───────────────────────────────────────────────────────────────────
 
@@ -26,7 +23,8 @@ const mockDelete = vi.fn();
 const mockTransaction = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -49,8 +47,14 @@ vi.mock('@edusphere/db', () => ({
     transaction: mockTransaction,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ insert: mockInsert, select: mockSelect, update: mockUpdate, delete: mockDelete }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({
+        insert: mockInsert,
+        select: mockSelect,
+        update: mockUpdate,
+        delete: mockDelete,
+      })
   ),
   schema: {
     tenants: {
@@ -117,7 +121,19 @@ const VALID_INPUT = {
   idempotencyKey: 'idem-key-001',
 };
 
-const RESERVED_SLUGS = ['admin', 'api', 'www', 'mail', 'support', 'app', 'dashboard', 'status', 'docs', 'blog', 'help'];
+const RESERVED_SLUGS = [
+  'admin',
+  'api',
+  'www',
+  'mail',
+  'support',
+  'app',
+  'dashboard',
+  'status',
+  'docs',
+  'blog',
+  'help',
+];
 
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
@@ -131,10 +147,15 @@ describe('OrgProvisioningService', () => {
     mockSelect.mockReturnValue(makeChain([]));
     // Default: insert returns new tenant
     mockInsert.mockReturnValue(
-      makeChain([{ id: 'tenant-new-001', slug: VALID_INPUT.slug }]),
+      makeChain([{ id: 'tenant-new-001', slug: VALID_INPUT.slug }])
     );
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => unknown) =>
-      fn({ insert: mockInsert, select: mockSelect, update: mockUpdate, delete: mockDelete }),
+      fn({
+        insert: mockInsert,
+        select: mockSelect,
+        update: mockUpdate,
+        delete: mockDelete,
+      })
     );
 
     service = new OrgProvisioningService();
@@ -145,55 +166,52 @@ describe('OrgProvisioningService', () => {
   describe('slug validation', () => {
     it('rejects slugs with uppercase letters', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, slug: 'AcmeUniversity' }),
+        service.createOrganization({ ...VALID_INPUT, slug: 'AcmeUniversity' })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects slugs with spaces', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, slug: 'acme university' }),
+        service.createOrganization({ ...VALID_INPUT, slug: 'acme university' })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects slugs with special characters', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, slug: 'acme_university!' }),
+        service.createOrganization({ ...VALID_INPUT, slug: 'acme_university!' })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects slugs shorter than 3 characters', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, slug: 'ab' }),
+        service.createOrganization({ ...VALID_INPUT, slug: 'ab' })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects slugs longer than 63 characters', async () => {
       const longSlug = 'a'.repeat(64);
       await expect(
-        service.createOrganization({ ...VALID_INPUT, slug: longSlug }),
+        service.createOrganization({ ...VALID_INPUT, slug: longSlug })
       ).rejects.toThrow(BadRequestException);
     });
 
-    it.each(RESERVED_SLUGS)(
-      'rejects reserved slug "%s"',
-      async (reserved) => {
-        await expect(
-          service.createOrganization({ ...VALID_INPUT, slug: reserved }),
-        ).rejects.toThrow(BadRequestException);
-      },
-    );
+    it.each(RESERVED_SLUGS)('rejects reserved slug "%s"', async (reserved) => {
+      await expect(
+        service.createOrganization({ ...VALID_INPUT, slug: reserved })
+      ).rejects.toThrow(BadRequestException);
+    });
 
     it('accepts valid slug with lowercase letters, numbers, and hyphens', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, slug: 'acme-uni-123' }),
+        service.createOrganization({ ...VALID_INPUT, slug: 'acme-uni-123' })
       ).resolves.toBeDefined();
     });
 
     it('rejects slug that is already taken', async () => {
       mockSelect.mockReturnValue(makeChain([{ id: 'existing-tenant' }]));
-      await expect(
-        service.createOrganization(VALID_INPUT),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.createOrganization(VALID_INPUT)).rejects.toThrow(
+        ConflictException
+      );
     });
   });
 
@@ -203,7 +221,7 @@ describe('OrgProvisioningService', () => {
     it('rejects org names over 255 characters', async () => {
       const longName = 'A'.repeat(256);
       await expect(
-        service.createOrganization({ ...VALID_INPUT, orgName: longName }),
+        service.createOrganization({ ...VALID_INPUT, orgName: longName })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -221,7 +239,7 @@ describe('OrgProvisioningService', () => {
 
     it('rejects empty org name', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, orgName: '' }),
+        service.createOrganization({ ...VALID_INPUT, orgName: '' })
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -253,18 +271,18 @@ describe('OrgProvisioningService', () => {
     it('creates Keycloak group with slug prefix', async () => {
       await service.createOrganization(VALID_INPUT);
       expect(mockKeycloakAdmin.createGroup).toHaveBeenCalledWith(
-        expect.stringContaining(VALID_INPUT.slug),
+        expect.stringContaining(VALID_INPUT.slug)
       );
     });
 
     it('creates admin user in Keycloak with ORG_ADMIN role', async () => {
       await service.createOrganization(VALID_INPUT);
       expect(mockKeycloakAdmin.createUser).toHaveBeenCalledWith(
-        expect.objectContaining({ email: VALID_INPUT.adminEmail }),
+        expect.objectContaining({ email: VALID_INPUT.adminEmail })
       );
       expect(mockKeycloakAdmin.assignRole).toHaveBeenCalledWith(
         expect.anything(),
-        'ORG_ADMIN',
+        'ORG_ADMIN'
       );
     });
 
@@ -293,7 +311,13 @@ describe('OrgProvisioningService', () => {
       mockSelect.mockReturnValueOnce(makeChain([]));
       // Second call: idempotency check returns existing tenant
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'existing-tenant', slug: VALID_INPUT.slug, provisioningStatus: 'ACTIVE' }]),
+        makeChain([
+          {
+            id: 'existing-tenant',
+            slug: VALID_INPUT.slug,
+            provisioningStatus: 'ACTIVE',
+          },
+        ])
       );
 
       const result = await service.createOrganization(VALID_INPUT);
@@ -305,22 +329,22 @@ describe('OrgProvisioningService', () => {
 
   describe('rollback (compensating saga)', () => {
     it('rolls back Keycloak group when admin user creation fails', async () => {
-      mockKeycloakAdmin.createUser.mockRejectedValueOnce(new Error('Keycloak user creation failed'));
+      mockKeycloakAdmin.createUser.mockRejectedValueOnce(
+        new Error('Keycloak user creation failed')
+      );
 
-      await expect(
-        service.createOrganization(VALID_INPUT),
-      ).rejects.toThrow();
+      await expect(service.createOrganization(VALID_INPUT)).rejects.toThrow();
 
       // Keycloak group should be rolled back
       expect(mockKeycloakAdmin.deleteGroup).toHaveBeenCalled();
     });
 
     it('rolls back tenant record when Keycloak group creation fails', async () => {
-      mockKeycloakAdmin.createGroup.mockRejectedValueOnce(new Error('Keycloak unavailable'));
+      mockKeycloakAdmin.createGroup.mockRejectedValueOnce(
+        new Error('Keycloak unavailable')
+      );
 
-      await expect(
-        service.createOrganization(VALID_INPUT),
-      ).rejects.toThrow();
+      await expect(service.createOrganization(VALID_INPUT)).rejects.toThrow();
 
       // Tenant should be cleaned up
       expect(mockDelete).toHaveBeenCalled();
@@ -337,19 +361,17 @@ describe('OrgProvisioningService', () => {
         return makeChain([{ id: 'new-item' }]);
       });
 
-      await expect(
-        service.createOrganization(VALID_INPUT),
-      ).rejects.toThrow();
+      await expect(service.createOrganization(VALID_INPUT)).rejects.toThrow();
 
       expect(mockMinioService.deleteBucket).toHaveBeenCalled();
     });
 
     it('sets provisioning_status to FAILED after rollback', async () => {
-      mockKeycloakAdmin.createGroup.mockRejectedValueOnce(new Error('Keycloak down'));
+      mockKeycloakAdmin.createGroup.mockRejectedValueOnce(
+        new Error('Keycloak down')
+      );
 
-      await expect(
-        service.createOrganization(VALID_INPUT),
-      ).rejects.toThrow();
+      await expect(service.createOrganization(VALID_INPUT)).rejects.toThrow();
 
       expect(mockUpdate).toHaveBeenCalled();
     });
@@ -360,7 +382,10 @@ describe('OrgProvisioningService', () => {
   describe('admin email validation', () => {
     it('rejects invalid email format', async () => {
       await expect(
-        service.createOrganization({ ...VALID_INPUT, adminEmail: 'not-an-email' }),
+        service.createOrganization({
+          ...VALID_INPUT,
+          adminEmail: 'not-an-email',
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -368,11 +393,13 @@ describe('OrgProvisioningService', () => {
       // First call: slug not taken. Second: email already exists
       mockSelect
         .mockReturnValueOnce(makeChain([]))
-        .mockReturnValueOnce(makeChain([{ id: 'existing-user', tenantId: 'other-tenant' }]));
+        .mockReturnValueOnce(
+          makeChain([{ id: 'existing-user', tenantId: 'other-tenant' }])
+        );
 
-      await expect(
-        service.createOrganization(VALID_INPUT),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.createOrganization(VALID_INPUT)).rejects.toThrow(
+        ConflictException
+      );
     });
   });
 

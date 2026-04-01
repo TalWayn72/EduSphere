@@ -212,7 +212,9 @@ test.describe('Subtitle Tracks — Phase 32', () => {
       .catch(() => {});
     await page.locator('[data-testid="subtitle-selector-btn"]').click();
 
-    await expect(page.locator('[data-testid="subtitle-lang-off"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="subtitle-lang-off"]')
+    ).toBeVisible();
   });
 
   test('raw technical strings are NOT shown to users', async ({ page }) => {

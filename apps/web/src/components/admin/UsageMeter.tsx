@@ -32,12 +32,7 @@ export function UsageMeter({ current, limit, label }: UsageMeterProps) {
       role="img"
       aria-label={label ?? `Usage: ${current} of ${limit}`}
     >
-      <svg
-        width="128"
-        height="128"
-        viewBox="0 0 128 128"
-        aria-hidden="true"
-      >
+      <svg width="128" height="128" viewBox="0 0 128 128" aria-hidden="true">
         {/* Background track */}
         <circle
           cx="64"
@@ -98,9 +93,7 @@ export function UsageMeter({ current, limit, label }: UsageMeterProps) {
         {pct}% utilized
       </p>
 
-      {label && (
-        <p className="text-xs font-medium text-center">{label}</p>
-      )}
+      {label && <p className="text-xs font-medium text-center">{label}</p>}
     </div>
   );
 }

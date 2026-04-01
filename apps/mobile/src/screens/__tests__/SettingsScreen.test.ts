@@ -7,13 +7,16 @@
 import { describe, it, expect } from 'vitest';
 
 // --- Toggle logic (mirrors SettingsScreen behavior) ---
-function applyToggle(settings: Record<string, boolean>, key: string): Record<string, boolean> {
+function applyToggle(
+  settings: Record<string, boolean>,
+  key: string
+): Record<string, boolean> {
   return { ...settings, [key]: !settings[key] };
 }
 
 function mergeSettings(
   current: Record<string, boolean>,
-  update: Record<string, boolean>,
+  update: Record<string, boolean>
 ): Record<string, boolean> {
   return { ...current, ...update };
 }
@@ -21,12 +24,23 @@ function mergeSettings(
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
 // --- Locale logic ---
-const SUPPORTED_LOCALES = ['en', 'he', 'ar', 'fr', 'de', 'es', 'pt', 'zh', 'ja'] as const;
+const SUPPORTED_LOCALES = [
+  'en',
+  'he',
+  'ar',
+  'fr',
+  'de',
+  'es',
+  'pt',
+  'zh',
+  'ja',
+] as const;
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 function isValidLocale(locale: string): locale is SupportedLocale {
@@ -74,7 +88,10 @@ describe('SettingsScreen — settings merge', () => {
 
   it('new keys are added', () => {
     const current = { notifications: true };
-    const merged = mergeSettings(current, { wifiOnly: true } as Record<string, boolean>);
+    const merged = mergeSettings(current, { wifiOnly: true } as Record<
+      string,
+      boolean
+    >);
     expect(merged.wifiOnly).toBe(true);
     expect(merged.notifications).toBe(true);
   });

@@ -34,13 +34,15 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
   });
 
   for (const pg of PUBLIC_PAGES) {
     test(`${pg.name} — small mobile screenshot`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE_URL}${pg.path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
 
@@ -55,7 +57,9 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
     const hasOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth
     );
     expect(hasOverflow).toBe(false);
   });
@@ -85,7 +89,9 @@ test.describe('Visual Regression — Small Mobile 320×568 @visual', () => {
     // Check that no text element extends beyond the viewport
     const overflowingElements = await page.evaluate(() => {
       const viewportWidth = document.documentElement.clientWidth;
-      const allElements = document.querySelectorAll('h1, h2, h3, p, span, a, button');
+      const allElements = document.querySelectorAll(
+        'h1, h2, h3, p, span, a, button'
+      );
       let count = 0;
       allElements.forEach((el) => {
         const rect = el.getBoundingClientRect();

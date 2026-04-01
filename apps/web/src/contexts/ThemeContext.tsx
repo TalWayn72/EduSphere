@@ -44,11 +44,9 @@ const DEFAULT_PREFERENCES: UserThemePreferences = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [tenantPrimitives, setTenantPrimitives] = useState<ThemePrimitives>(
-    {}
-  );
-  const [userPreferences, setUserPreferences] =
-    useState<UserThemePreferences>(() => {
+  const [tenantPrimitives, setTenantPrimitives] = useState<ThemePrimitives>({});
+  const [userPreferences, setUserPreferences] = useState<UserThemePreferences>(
+    () => {
       try {
         const stored = localStorage.getItem('edusphere-user-prefs');
         return stored
@@ -57,7 +55,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       } catch {
         return DEFAULT_PREFERENCES;
       }
-    });
+    }
+  );
 
   const resolvedMode =
     userPreferences.mode === 'system'
@@ -110,16 +109,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setUserPreferences((prev) => ({ ...prev, readingMode }));
   }, []);
 
-  const setMotionPreference = useCallback((motionPreference: MotionPreference) => {
-    setUserPreferences((prev) => ({ ...prev, motionPreference }));
-  }, []);
-
-  const previewThemeChanges = useCallback(
-    (primitives: ThemePrimitives) => {
-      return previewTheme(primitives);
+  const setMotionPreference = useCallback(
+    (motionPreference: MotionPreference) => {
+      setUserPreferences((prev) => ({ ...prev, motionPreference }));
     },
     []
   );
+
+  const previewThemeChanges = useCallback((primitives: ThemePrimitives) => {
+    return previewTheme(primitives);
+  }, []);
 
   return (
     <ThemeContext.Provider

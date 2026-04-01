@@ -39,7 +39,10 @@ vi.mock('@edusphere/db', () => ({
     vi.fn((str: TemplateStringsArray) => str),
     { placeholder: vi.fn() }
   ),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) => cb(mockTx)),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) =>
+      cb(mockTx)
+  ),
   closeAllPools: vi.fn(),
 }));
 
@@ -92,7 +95,9 @@ describe('GDPR Erasure — annotation data lifecycle', () => {
       returning: mockReturning,
       orderBy: mockOrderBy,
     });
-    mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+    mockOrderBy.mockReturnValue({
+      limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+    });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
@@ -104,19 +109,27 @@ describe('GDPR Erasure — annotation data lifecycle', () => {
     // Simulate deleting each of user's annotations (GDPR right to erasure)
     // First annotation
     mockLimit.mockResolvedValueOnce([USER_ANNOTATION_1]);
-    mockReturning.mockResolvedValueOnce([{ ...USER_ANNOTATION_1, deleted_at: new Date() }]);
+    mockReturning.mockResolvedValueOnce([
+      { ...USER_ANNOTATION_1, deleted_at: new Date() },
+    ]);
     const del1 = await service.delete('ann-g1', userAuth);
     expect(del1).toBe(true);
 
     // Reset for second annotation
     vi.clearAllMocks();
     mockSet.mockReturnValue({ where: mockWhere });
-    mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning, orderBy: mockOrderBy });
+    mockWhere.mockReturnValue({
+      limit: mockLimit,
+      returning: mockReturning,
+      orderBy: mockOrderBy,
+    });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
     mockUpdate.mockReturnValue({ set: mockSet });
 
     mockLimit.mockResolvedValueOnce([USER_ANNOTATION_2]);
-    mockReturning.mockResolvedValueOnce([{ ...USER_ANNOTATION_2, deleted_at: new Date() }]);
+    mockReturning.mockResolvedValueOnce([
+      { ...USER_ANNOTATION_2, deleted_at: new Date() },
+    ]);
     const del2 = await service.delete('ann-g2', userAuth);
     expect(del2).toBe(true);
   });

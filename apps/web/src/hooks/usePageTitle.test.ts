@@ -28,9 +28,12 @@ describe('usePageTitle', () => {
   });
 
   it('updates title when hook argument changes', () => {
-    const { rerender } = renderHook(({ title }: { title: string }) => usePageTitle(title), {
-      initialProps: { title: 'Page One' },
-    });
+    const { rerender } = renderHook(
+      ({ title }: { title: string }) => usePageTitle(title),
+      {
+        initialProps: { title: 'Page One' },
+      }
+    );
     expect(document.title).toBe('Page One — EduSphere');
 
     rerender({ title: 'Page Two' });

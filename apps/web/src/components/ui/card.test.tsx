@@ -1,7 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from './card';
 
 describe('Card', () => {
   it('renders a div', () => {
@@ -10,7 +17,11 @@ describe('Card', () => {
   });
 
   it('forwards className', () => {
-    render(<Card className="mt-4" data-testid="card">Content</Card>);
+    render(
+      <Card className="mt-4" data-testid="card">
+        Content
+      </Card>
+    );
     expect(screen.getByTestId('card')).toHaveClass('mt-4');
   });
 
@@ -32,7 +43,11 @@ describe('Card', () => {
 
 describe('CardHeader', () => {
   it('renders and forwards className', () => {
-    render(<CardHeader className="mt-2" data-testid="header">Header</CardHeader>);
+    render(
+      <CardHeader className="mt-2" data-testid="header">
+        Header
+      </CardHeader>
+    );
     const el = screen.getByTestId('header');
     expect(el).toBeInTheDocument();
     expect(el).toHaveClass('mt-2');
@@ -56,7 +71,11 @@ describe('CardTitle', () => {
   });
 
   it('forwards className', () => {
-    render(<CardTitle className="text-xl" data-testid="title">T</CardTitle>);
+    render(
+      <CardTitle className="text-xl" data-testid="title">
+        T
+      </CardTitle>
+    );
     expect(screen.getByTestId('title')).toHaveClass('text-xl');
   });
 
@@ -72,7 +91,11 @@ describe('CardDescription', () => {
   });
 
   it('forwards className', () => {
-    render(<CardDescription className="italic" data-testid="desc">D</CardDescription>);
+    render(
+      <CardDescription className="italic" data-testid="desc">
+        D
+      </CardDescription>
+    );
     expect(screen.getByTestId('desc')).toHaveClass('italic');
   });
 
@@ -83,7 +106,11 @@ describe('CardDescription', () => {
 
 describe('CardContent', () => {
   it('renders and forwards className', () => {
-    render(<CardContent className="px-2" data-testid="content">Body</CardContent>);
+    render(
+      <CardContent className="px-2" data-testid="content">
+        Body
+      </CardContent>
+    );
     const el = screen.getByTestId('content');
     expect(el).toBeInTheDocument();
     expect(el).toHaveClass('px-2');
@@ -96,7 +123,11 @@ describe('CardContent', () => {
 
 describe('CardFooter', () => {
   it('renders and forwards className', () => {
-    render(<CardFooter className="mt-1" data-testid="footer">Foot</CardFooter>);
+    render(
+      <CardFooter className="mt-1" data-testid="footer">
+        Foot
+      </CardFooter>
+    );
     const el = screen.getByTestId('footer');
     expect(el).toBeInTheDocument();
     expect(el).toHaveClass('mt-1');

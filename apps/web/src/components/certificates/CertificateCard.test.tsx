@@ -22,11 +22,11 @@ const MOCK_CERT_NO_NAME: Certificate = {
   pdfUrl: 'https://example.com/cert2.pdf',
 };
 
-function renderCard(
-  cert: Certificate = MOCK_CERT,
-  onDownload = vi.fn(),
-) {
-  return { ...render(<CertificateCard cert={cert} onDownload={onDownload} />), onDownload };
+function renderCard(cert: Certificate = MOCK_CERT, onDownload = vi.fn()) {
+  return {
+    ...render(<CertificateCard cert={cert} onDownload={onDownload} />),
+    onDownload,
+  };
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -66,7 +66,9 @@ describe('CertificateCard', () => {
     renderCard();
     const copyBtn = screen.getByTestId('copy-code-btn');
     fireEvent.click(copyBtn);
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('VERIFY-ABC-123');
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      'VERIFY-ABC-123'
+    );
   });
 
   it('calls onDownload with cert id on download button click', () => {
@@ -78,13 +80,17 @@ describe('CertificateCard', () => {
 
   it('has an accessible copy button with aria-label', () => {
     renderCard();
-    const copyBtn = screen.getByRole('button', { name: /copy verification code/i });
+    const copyBtn = screen.getByRole('button', {
+      name: /copy verification code/i,
+    });
     expect(copyBtn).toBeInTheDocument();
   });
 
   it('has a download button with visible text', () => {
     renderCard();
-    expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /download pdf/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the certificate card container with data-testid', () => {

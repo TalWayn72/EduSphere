@@ -29,10 +29,12 @@ import { CertExamGenService } from './cert-exam-gen.service.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeContext(overrides: Partial<{
-  userId: string | null;
-  tenantId: string | null;
-}> = {}) {
+function makeContext(
+  overrides: Partial<{
+    userId: string | null;
+    tenantId: string | null;
+  }> = {}
+) {
   return {
     authContext: {
       userId: 'userId' in overrides ? overrides.userId : 'user-1',

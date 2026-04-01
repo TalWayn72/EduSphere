@@ -27,9 +27,7 @@ export class OrgProvisioningService {
   private readonly logger = new Logger(OrgProvisioningService.name);
   private readonly domainService: DomainProvisioningService;
 
-  constructor(
-    private readonly helpers: OrgProvisioningHelpersService
-  ) {
+  constructor(private readonly helpers: OrgProvisioningHelpersService) {
     this.domainService = new DomainProvisioningService();
   }
 
@@ -135,7 +133,9 @@ export class OrgProvisioningService {
         '[OrgProvisioningService] Provisioning failed — running compensating saga'
       );
       await this.helpers.compensatingSaga(tenantId, steps);
-      throw new InternalServerErrorException('Organization provisioning failed');
+      throw new InternalServerErrorException(
+        'Organization provisioning failed'
+      );
     }
   }
 }

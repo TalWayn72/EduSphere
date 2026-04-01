@@ -20,10 +20,24 @@ const { mockDb } = vi.hoisted(() => {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn().mockReturnValue(mockDb),
   schema: {
-    lesson_pipelines: { id: 'id', lesson_id: 'lesson_id', nodes: 'nodes', status: 'status' },
-    lesson_assets: { lesson_id: 'lesson_id', asset_type: 'asset_type', source_url: 'source_url', file_url: 'file_url' },
+    lesson_pipelines: {
+      id: 'id',
+      lesson_id: 'lesson_id',
+      nodes: 'nodes',
+      status: 'status',
+    },
+    lesson_assets: {
+      lesson_id: 'lesson_id',
+      asset_type: 'asset_type',
+      source_url: 'source_url',
+      file_url: 'file_url',
+    },
     lesson_pipeline_results: {},
-    lesson_pipeline_runs: { id: 'id', status: 'status', completed_at: 'completed_at' },
+    lesson_pipeline_runs: {
+      id: 'id',
+      status: 'status',
+      completed_at: 'completed_at',
+    },
     lessons: { id: 'id', status: 'status' },
   },
   eq: vi.fn((a: unknown, b: unknown) => ({ eq: [a, b] })),
@@ -39,7 +53,9 @@ const mockNatsConnect = vi.fn().mockResolvedValue({
 
 vi.mock('nats', () => ({
   connect: (...args: unknown[]) => mockNatsConnect(...args),
-  StringCodec: vi.fn().mockReturnValue({ encode: vi.fn().mockReturnValue(new Uint8Array()) }),
+  StringCodec: vi
+    .fn()
+    .mockReturnValue({ encode: vi.fn().mockReturnValue(new Uint8Array()) }),
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
@@ -53,14 +69,34 @@ vi.mock('@edusphere/nats-client', () => ({
 // ── LangGraph workflow mocks ──────────────────────────────────────────────────
 
 vi.mock('@edusphere/langgraph-workflows', () => ({
-  createLessonIngestionWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ bundle: {} }) }),
-  createHebrewNERWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ entities: [], enrichedTranscript: '' }) }),
-  createContentCleaningWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ cleanedText: '' }) }),
-  createSummarizationWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ shortSummary: '', longSummary: '', keyPoints: [] }) }),
-  createStructuredNotesWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ outputMarkdown: '' }) }),
-  createDiagramGeneratorWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ mermaidSrc: '', svgOutput: '' }) }),
-  createCitationVerifierWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ matchReport: [] }) }),
-  createQAWorkflow: vi.fn().mockReturnValue({ run: vi.fn().mockResolvedValue({ overallScore: 9, fixList: [] }) }),
+  createLessonIngestionWorkflow: vi
+    .fn()
+    .mockReturnValue({ run: vi.fn().mockResolvedValue({ bundle: {} }) }),
+  createHebrewNERWorkflow: vi.fn().mockReturnValue({
+    run: vi.fn().mockResolvedValue({ entities: [], enrichedTranscript: '' }),
+  }),
+  createContentCleaningWorkflow: vi
+    .fn()
+    .mockReturnValue({ run: vi.fn().mockResolvedValue({ cleanedText: '' }) }),
+  createSummarizationWorkflow: vi.fn().mockReturnValue({
+    run: vi.fn().mockResolvedValue({
+      shortSummary: '',
+      longSummary: '',
+      keyPoints: [],
+    }),
+  }),
+  createStructuredNotesWorkflow: vi.fn().mockReturnValue({
+    run: vi.fn().mockResolvedValue({ outputMarkdown: '' }),
+  }),
+  createDiagramGeneratorWorkflow: vi.fn().mockReturnValue({
+    run: vi.fn().mockResolvedValue({ mermaidSrc: '', svgOutput: '' }),
+  }),
+  createCitationVerifierWorkflow: vi
+    .fn()
+    .mockReturnValue({ run: vi.fn().mockResolvedValue({ matchReport: [] }) }),
+  createQAWorkflow: vi.fn().mockReturnValue({
+    run: vi.fn().mockResolvedValue({ overallScore: 9, fixList: [] }),
+  }),
 }));
 
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service.js';
@@ -111,7 +147,10 @@ describe('LessonPipelineOrchestratorService', () => {
   });
 
   it('drains NATS connection on destroy if connected', async () => {
-    const mockNc = { drain: vi.fn().mockResolvedValue(undefined), publish: vi.fn() };
+    const mockNc = {
+      drain: vi.fn().mockResolvedValue(undefined),
+      publish: vi.fn(),
+    };
     // @ts-expect-error — accessing private field for testing
     service['nc'] = mockNc;
     await service.onModuleDestroy();
@@ -135,7 +174,11 @@ describe('LessonPipelineOrchestratorService', () => {
       }),
     });
     await expect(
-      service.executeRun('run-1', 'pipe-missing', { tenantId: 't1', userId: 'u1', userRole: 'STUDENT' })
+      service.executeRun('run-1', 'pipe-missing', {
+        tenantId: 't1',
+        userId: 'u1',
+        userRole: 'STUDENT',
+      })
     ).rejects.toThrow('not found');
   });
 });

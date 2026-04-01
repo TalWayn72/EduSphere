@@ -120,7 +120,11 @@ export class SocialResolver {
   ) {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.getSocialFeed(ctx.authContext.userId, tenantId, limit);
+    return this.socialService.getSocialFeed(
+      ctx.authContext.userId,
+      tenantId,
+      limit
+    );
   }
 
   @Query('socialRecommendations')
@@ -130,7 +134,11 @@ export class SocialResolver {
   ) {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.getSocialRecommendations(ctx.authContext.userId, tenantId, limit);
+    return this.socialService.getSocialRecommendations(
+      ctx.authContext.userId,
+      tenantId,
+      limit
+    );
   }
 
   @Query('searchUsers')

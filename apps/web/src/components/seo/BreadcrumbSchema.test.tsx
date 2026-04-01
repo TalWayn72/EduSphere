@@ -16,7 +16,9 @@ const ITEMS = [
 
 describe('BreadcrumbSchema', () => {
   it('renders without throwing', () => {
-    expect(() => renderWithHelmet(<BreadcrumbSchema items={ITEMS} />)).not.toThrow();
+    expect(() =>
+      renderWithHelmet(<BreadcrumbSchema items={ITEMS} />)
+    ).not.toThrow();
   });
 
   it('builds correct BreadcrumbList schema structure', () => {
@@ -36,7 +38,10 @@ describe('BreadcrumbSchema', () => {
   });
 
   it('serializes to valid JSON', () => {
-    const schema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList' };
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+    };
     expect(() => JSON.parse(safeJsonLd(schema))).not.toThrow();
   });
 });

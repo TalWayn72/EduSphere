@@ -13,7 +13,10 @@ export default meta;
 type Story = StoryObj<typeof CatQuestionCard>;
 
 const OPTIONS = [
-  { id: 'a', text: 'Apache AGE stores data as property graphs with vertices and edges' },
+  {
+    id: 'a',
+    text: 'Apache AGE stores data as property graphs with vertices and edges',
+  },
   { id: 'b', text: 'Apache AGE is a document database engine' },
   { id: 'c', text: 'Apache AGE only supports directed acyclic graphs' },
   { id: 'd', text: 'Apache AGE requires a separate server instance' },

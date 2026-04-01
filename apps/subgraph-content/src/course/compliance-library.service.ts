@@ -5,7 +5,12 @@
  * Template courses are identified by fixed UUIDs and the isTemplate flag.
  * Memory safety: OnModuleDestroy clears DB pool via closeAllPools.
  */
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { closeAllPools } from '@edusphere/db';
 
 export interface ComplianceCourse {
@@ -30,21 +35,24 @@ const COMPLIANCE_COURSES: Omit<ComplianceCourse, 'isTemplate'>[] = [
   {
     id: '00000000-0000-0000-0000-000000000c02',
     title: 'GDPR for Employees',
-    description: 'Essential GDPR knowledge for employees handling EU personal data.',
+    description:
+      'Essential GDPR knowledge for employees handling EU personal data.',
     category: 'compliance',
     tags: ['GDPR', 'privacy', 'EU'],
   },
   {
     id: '00000000-0000-0000-0000-000000000c03',
     title: 'HIPAA Overview',
-    description: 'Core HIPAA requirements for protecting healthcare information.',
+    description:
+      'Core HIPAA requirements for protecting healthcare information.',
     category: 'compliance',
     tags: ['HIPAA', 'healthcare', 'privacy'],
   },
   {
     id: '00000000-0000-0000-0000-000000000c04',
     title: 'Cybersecurity Fundamentals',
-    description: 'Essential cybersecurity practices to protect organizational assets.',
+    description:
+      'Essential cybersecurity practices to protect organizational assets.',
     category: 'compliance',
     tags: ['cybersecurity', 'security'],
   },
@@ -100,7 +108,9 @@ export class ComplianceLibraryService implements OnModuleDestroy {
   ): Promise<ComplianceCourse> {
     const template = COMPLIANCE_COURSES.find((c) => c.id === templateCourseId);
     if (!template) {
-      throw new NotFoundException(`Compliance template not found: ${templateCourseId}`);
+      throw new NotFoundException(
+        `Compliance template not found: ${templateCourseId}`
+      );
     }
 
     // Production: deep copy course + modules + lessons for the tenant

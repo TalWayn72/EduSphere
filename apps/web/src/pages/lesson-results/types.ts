@@ -38,17 +38,24 @@ export interface LessonQueryData {
 
 export function getResult(results: PipelineResult[], moduleName: string) {
   return results.find(
-    (r) => r.moduleName === moduleName || r.moduleName === moduleName.toLowerCase()
+    (r) =>
+      r.moduleName === moduleName || r.moduleName === moduleName.toLowerCase()
   );
 }
 
-export function getString(data: Record<string, unknown> | null | undefined, key: string): string | null {
+export function getString(
+  data: Record<string, unknown> | null | undefined,
+  key: string
+): string | null {
   if (!data) return null;
   const v = data[key];
   return v != null && v !== '' ? String(v) : null;
 }
 
-export function getArray<T>(data: Record<string, unknown> | null | undefined, key: string): T[] | null {
+export function getArray<T>(
+  data: Record<string, unknown> | null | undefined,
+  key: string
+): T[] | null {
   if (!data) return null;
   const v = data[key];
   return Array.isArray(v) && v.length > 0 ? (v as T[]) : null;

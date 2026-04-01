@@ -23,10 +23,7 @@ vi.mock('@edusphere/db', () => ({
   sql: vi.fn((...args) => args),
 }));
 
-import {
-  PartnerTierService,
-  TIER_THRESHOLDS,
-} from './partner-tier.service.js';
+import { PartnerTierService, TIER_THRESHOLDS } from './partner-tier.service.js';
 
 describe('PartnerTierService — calculateTier', () => {
   let service: PartnerTierService;
@@ -160,9 +157,7 @@ describe('PartnerTierService — getProgress', () => {
   it('getProgress returns PLATINUM with null nextTier at top tier', async () => {
     mockSelect.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([
-          { grossRevUsd: 25_000_000 },
-        ]),
+        where: vi.fn().mockResolvedValue([{ grossRevUsd: 25_000_000 }]),
       }),
     });
 
@@ -176,10 +171,12 @@ describe('PartnerTierService — getProgress', () => {
   it('getProgress computes YTD by summing all monthly rows', async () => {
     mockSelect.mockReturnValue({
       from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([
-          { grossRevUsd: 500_000 },
-          { grossRevUsd: 600_000 },
-        ]),
+        where: vi
+          .fn()
+          .mockResolvedValue([
+            { grossRevUsd: 500_000 },
+            { grossRevUsd: 600_000 },
+          ]),
       }),
     });
 

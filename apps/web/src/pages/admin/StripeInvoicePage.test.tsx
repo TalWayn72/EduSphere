@@ -11,7 +11,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -29,9 +31,33 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 const MOCK_INVOICES = [
-  { id: 'inv-001', tenant: 'Acme University', plan: 'ENTERPRISE', year: 2025, amount: 12000, status: 'paid', pdfUrl: 'https://example.com/inv-001.pdf' },
-  { id: 'inv-002', tenant: 'TechCorp Inc', plan: 'PROFESSIONAL', year: 2025, amount: 4800, status: 'overdue', pdfUrl: '' },
-  { id: 'inv-003', tenant: 'Global Learn', plan: 'STARTER', year: 2026, amount: 1200, status: 'draft', pdfUrl: '#' },
+  {
+    id: 'inv-001',
+    tenant: 'Acme University',
+    plan: 'ENTERPRISE',
+    year: 2025,
+    amount: 12000,
+    status: 'paid',
+    pdfUrl: 'https://example.com/inv-001.pdf',
+  },
+  {
+    id: 'inv-002',
+    tenant: 'TechCorp Inc',
+    plan: 'PROFESSIONAL',
+    year: 2025,
+    amount: 4800,
+    status: 'overdue',
+    pdfUrl: '',
+  },
+  {
+    id: 'inv-003',
+    tenant: 'Global Learn',
+    plan: 'STARTER',
+    year: 2026,
+    amount: 1200,
+    status: 'draft',
+    pdfUrl: '#',
+  },
 ];
 
 vi.mock('urql', async (importOriginal) => {
@@ -47,12 +73,23 @@ vi.mock('urql', async (importOriginal) => {
 });
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => open ? <div>{children}</div> : null,
-  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
-  DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
+    open ? <div>{children}</div> : null,
+  DialogContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2>{children}</h2>
+  ),
+  DialogDescription: ({ children }: { children: React.ReactNode }) => (
+    <p>{children}</p>
+  ),
+  DialogFooter: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 import { useAuthRole } from '@/hooks/useAuthRole';
@@ -116,7 +153,9 @@ describe('StripeInvoicePage', () => {
   it('shows stripe-setup-notice', () => {
     renderPage();
     expect(screen.getByTestId('stripe-setup-notice')).toBeInTheDocument();
-    expect(screen.getByTestId('stripe-setup-notice').textContent).toMatch(/STRIPE_SECRET_KEY/);
+    expect(screen.getByTestId('stripe-setup-notice').textContent).toMatch(
+      /STRIPE_SECRET_KEY/
+    );
   });
 
   it('renders invoice rows with tenant names', () => {

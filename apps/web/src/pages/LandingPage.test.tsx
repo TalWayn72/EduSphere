@@ -10,24 +10,42 @@ vi.mock('urql', async () => {
   return {
     ...actual,
     useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
-    useQuery: vi.fn(() => [{ fetching: false, data: undefined, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { fetching: false, data: undefined, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
 // Mock react-router-dom Link
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return {
     ...actual,
-    Link: ({ to, children, ...rest }: { to: string; children: React.ReactNode; [k: string]: unknown }) => (
-      <a href={to as string} {...rest}>{children}</a>
+    Link: ({
+      to,
+      children,
+      ...rest
+    }: {
+      to: string;
+      children: React.ReactNode;
+      [k: string]: unknown;
+    }) => (
+      <a href={to as string} {...rest}>
+        {children}
+      </a>
     ),
   };
 });
 
 // Mock PublicLayout — nav and footer are tested in their own test files
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 function renderLanding() {
@@ -54,8 +72,12 @@ describe('LandingPage', () => {
     renderLanding();
     const hero = screen.getByTestId('hero-section');
     expect(hero).toHaveTextContent(/\$12,000/i);
-    expect(screen.getAllByRole('link', { name: /Request Demo/i }).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByRole('link', { name: /Pilot/i }).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByRole('link', { name: /Request Demo/i }).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByRole('link', { name: /Pilot/i }).length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('renders compliance badges section', () => {
@@ -124,7 +146,10 @@ describe('LandingPage', () => {
       'public-layout',
     ];
     for (const id of requiredIds) {
-      expect(screen.getByTestId(id), `Missing data-testid="${id}"`).toBeInTheDocument();
+      expect(
+        screen.getByTestId(id),
+        `Missing data-testid="${id}"`
+      ).toBeInTheDocument();
     }
   });
 });

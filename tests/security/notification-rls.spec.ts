@@ -49,8 +49,7 @@ describe('Phase 65 — Notification RLS policies', () => {
           // Filter out correct app.current_user_id and app.current_user_role
           const badMatches = matches.filter(
             (m) =>
-              !m.includes('current_user_id') &&
-              !m.includes('current_user_role')
+              !m.includes('current_user_id') && !m.includes('current_user_role')
           );
           expect(badMatches).toHaveLength(0);
         }
@@ -77,7 +76,7 @@ describe('Phase 65 — Notification RLS policies', () => {
       'utf-8'
     );
     // Field exists (we validate encryption at application layer via SI-3)
-    expect(content).toContain("phone_number");
+    expect(content).toContain('phone_number');
     // Comment documents SI-3 encryption requirement
     expect(content).toMatch(/encrypt|SI-3/i);
   });

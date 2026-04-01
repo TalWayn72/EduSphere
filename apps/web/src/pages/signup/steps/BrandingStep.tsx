@@ -11,7 +11,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { OrgSignupFormData } from '../OrgSignupWizard.schema';
 
 const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2 MB
-const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
+const ALLOWED_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/svg+xml',
+  'image/webp',
+];
 
 interface BrandingPreviewProps {
   orgName: string;
@@ -20,23 +25,36 @@ interface BrandingPreviewProps {
   tagline: string;
 }
 
-function BrandingPreview({ orgName, primaryColor, logoPreview, tagline }: BrandingPreviewProps) {
+function BrandingPreview({
+  orgName,
+  primaryColor,
+  logoPreview,
+  tagline,
+}: BrandingPreviewProps) {
   const { t } = useTranslation('orgOnboarding');
   return (
     <Card className="border-dashed" data-testid="branding-preview">
       <CardContent className="p-4">
-        <p className="text-xs text-muted-foreground mb-2">{t('branding.previewLabel')}</p>
+        <p className="text-xs text-muted-foreground mb-2">
+          {t('branding.previewLabel')}
+        </p>
         <div
           className="rounded-lg p-4 text-white flex items-center gap-3 dark:text-white"
           style={{ backgroundColor: primaryColor || '#2563eb' }}
         >
           {logoPreview ? (
-            <img src={logoPreview} alt="" className="h-8 w-8 rounded object-contain bg-white/20" />
+            <img
+              src={logoPreview}
+              alt=""
+              className="h-8 w-8 rounded object-contain bg-white/20"
+            />
           ) : (
             <div className="h-8 w-8 rounded bg-white/20" />
           )}
           <div>
-            <p className="font-semibold text-sm">{orgName || t('branding.previewOrgName')}</p>
+            <p className="font-semibold text-sm">
+              {orgName || t('branding.previewOrgName')}
+            </p>
             {tagline && <p className="text-xs opacity-80">{tagline}</p>}
           </div>
         </div>
@@ -48,7 +66,10 @@ function BrandingPreview({ orgName, primaryColor, logoPreview, tagline }: Brandi
 export function BrandingStep() {
   const { t } = useTranslation('orgOnboarding');
   const {
-    register, formState: { errors }, setValue, watch,
+    register,
+    formState: { errors },
+    setValue,
+    watch,
   } = useFormContext<OrgSignupFormData>();
   const fileRef = useRef<HTMLInputElement>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -101,13 +122,17 @@ export function BrandingStep() {
           {t('branding.logoHint')}
         </p>
         {logoError && (
-          <p className="text-destructive text-xs" role="alert">{logoError}</p>
+          <p className="text-destructive text-xs" role="alert">
+            {logoError}
+          </p>
         )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="primaryColor">{t('branding.primaryColorLabel')}</Label>
+          <Label htmlFor="primaryColor">
+            {t('branding.primaryColorLabel')}
+          </Label>
           <div className="flex items-center gap-2">
             <input
               id="primaryColor"

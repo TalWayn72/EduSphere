@@ -15,19 +15,19 @@
 
 Each task is decomposed and routed to the relevant division(s). Each division must internally approve before passing control.
 
-| # | Division | Responsibility |
-|---|----------|----------------|
-| 1 | **Orchestrator** | Sole external communicator. Coordinates all divisions, tracks % completion, enforces quality gates, reports progress every 3 min |
-| 2 | **Product & Requirements** | PRD delta, functional/non-functional reqs, risk matrix, acceptance criteria |
-| 3 | **Software Architecture** | System impact, scalability, service boundaries, domain modeling, performance budgets |
-| 4 | **UX/UI Design** | User flows, WCAG accessibility, design system compliance, mobile/desktop parity |
-| 5 | **Frontend Engineering** | Component architecture, state management, rendering performance, responsive behavior |
-| 6 | **Backend Engineering** | Business logic, API consistency, validation rules, error resilience |
-| 7 | **Database & Data Eng.** | Schema changes, query optimization, migrations, rollback strategy |
-| 8 | **Security & Compliance** | Threat modeling, vulnerability scan, auth validation, GDPR/privacy (SI-1 through SI-10) |
-| 9 | **QA & Validation** | Unit + Integration + E2E + Load + Playwright visual regression. 100% pass required. No partial approval. |
-| 10 | **Documentation** | Update all affected docs (README, API, runbooks, release notes) after QA approval |
-| 11 | **DevOps & Release** | CI/CD validation, build, staging, prod readiness, rollback plan, post-deploy monitoring |
+| #   | Division                   | Responsibility                                                                                                                   |
+| --- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Orchestrator**           | Sole external communicator. Coordinates all divisions, tracks % completion, enforces quality gates, reports progress every 3 min |
+| 2   | **Product & Requirements** | PRD delta, functional/non-functional reqs, risk matrix, acceptance criteria                                                      |
+| 3   | **Software Architecture**  | System impact, scalability, service boundaries, domain modeling, performance budgets                                             |
+| 4   | **UX/UI Design**           | User flows, WCAG accessibility, design system compliance, mobile/desktop parity                                                  |
+| 5   | **Frontend Engineering**   | Component architecture, state management, rendering performance, responsive behavior                                             |
+| 6   | **Backend Engineering**    | Business logic, API consistency, validation rules, error resilience                                                              |
+| 7   | **Database & Data Eng.**   | Schema changes, query optimization, migrations, rollback strategy                                                                |
+| 8   | **Security & Compliance**  | Threat modeling, vulnerability scan, auth validation, GDPR/privacy (SI-1 through SI-10)                                          |
+| 9   | **QA & Validation**        | Unit + Integration + E2E + Load + Playwright visual regression. 100% pass required. No partial approval.                         |
+| 10  | **Documentation**          | Update all affected docs (README, API, runbooks, release notes) after QA approval                                                |
+| 11  | **DevOps & Release**       | CI/CD validation, build, staging, prod readiness, rollback plan, post-deploy monitoring                                          |
 
 ## C. Mandatory Execution Order — Wave-Based Parallel Model
 
@@ -43,6 +43,7 @@ Wave 5 (sequential): Stage 10 (Post-release verification)
 ```
 
 **Wave launch rules:**
+
 - Wave 1 launches ALL 3 stages in a single message (3 parallel agents)
 - Wave 2 launches AFTER Wave 1 approvals — but ALL 5+ agents launch together (dev x 3 + security + QA prep)
 - Wave 3 launches AFTER Wave 2 approvals — both agents in parallel
@@ -111,11 +112,11 @@ Before starting any task:
 
 **Format:** `Agent-N` = per-task sequence index (temporary). `Division` = one of the 11 Enterprise Divisions (mandatory). `Mission` = specific deliverable for this run (mandatory).
 
-| ID      | Division          | Mission                       | Status     |
-| ------- | ----------------- | ----------------------------- | ---------- |
-| Agent-1 | Architecture      | Building docker-compose.yml   | Running    |
-| Agent-2 | Database & Data   | Generating Drizzle migrations | Waiting    |
-| Agent-3 | QA & Validation   | Writing health-check tests    | Done       |
+| ID      | Division        | Mission                       | Status  |
+| ------- | --------------- | ----------------------------- | ------- |
+| Agent-1 | Architecture    | Building docker-compose.yml   | Running |
+| Agent-2 | Database & Data | Generating Drizzle migrations | Waiting |
+| Agent-3 | QA & Validation | Writing health-check tests    | Done    |
 
 ### OOM Protection
 
@@ -183,15 +184,18 @@ Phase progress: 65% — estimated 8 min remaining
 ## Autonomous Execution Rules
 
 ### 1. Phase Completion Announcement (MANDATORY)
+
 After EVERY phase or major milestone completes, Claude MUST proactively announce what was built, test counts, what is next, and then proceed autonomously without waiting for user approval.
 
 ### 2. No Inter-Phase Pauses
+
 - NEVER ask "should I continue to the next phase?" between phases
 - NEVER wait for user confirmation between phases
 - Proceed directly from phase to phase
 - Only stop for: logical contradiction, security violation, missing credentials
 
 ### 3. Maximum Parallelism — Wave Execution Model
+
 - Always spawn the MAXIMUM number of parallel agents the task allows
 - Frontend + Backend + DB agents ALWAYS run in parallel
 - Never run sequentially what can run in parallel
@@ -202,6 +206,7 @@ After EVERY phase or major milestone completes, Claude MUST proactively announce
 - The total agent count per task may reach 10-15+, but they execute in waves of 5, not all at once
 
 ### 4. Protocol Compliance
+
 - Run Session Completion Gate after EVERY phase (not just at session end)
 - Every new feature = E2E Playwright spec (no exceptions)
 - Every UI change = visual regression screenshot

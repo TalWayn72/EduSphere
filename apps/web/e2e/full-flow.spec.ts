@@ -108,9 +108,9 @@ test('complete learning loop — student session from login to logout', async ({
   await page.goto('/search');
   await page.waitForLoadState('domcontentloaded');
 
-  const searchInput = page.locator(
-    'input[placeholder*="Search"], input[type="search"]'
-  ).first();
+  const searchInput = page
+    .locator('input[placeholder*="Search"], input[type="search"]')
+    .first();
   await expect(searchInput).toBeVisible({ timeout: 8_000 });
 
   // Type a topic related to the course content
@@ -121,7 +121,9 @@ test('complete learning loop — student session from login to logout', async ({
   // Results appear from mock transcript segments — in DEV_MODE, transcript search matches
   // segments with "Talmud" in text; their title is 'Introduction to Talmudic Reasoning'
   // (course results come from GraphQL which is paused in DEV_MODE without backend)
-  await expect(page.getByText('Introduction to Talmudic Reasoning')).toBeVisible({
+  await expect(
+    page.getByText('Introduction to Talmudic Reasoning')
+  ).toBeVisible({
     timeout: 5_000,
   });
   const results = page.getByText('Introduction to Talmudic Reasoning');
@@ -204,7 +206,9 @@ test('navigation sidebar links are reachable from any page', async ({
   const nav = page.locator('nav');
   await expect(nav.getByRole('link', { name: /My Courses/i })).toBeVisible();
   await expect(nav.getByRole('link', { name: /Discover/i })).toBeVisible();
-  await expect(nav.getByRole('link', { name: /Knowledge Graph/i })).toBeVisible();
+  await expect(
+    nav.getByRole('link', { name: /Knowledge Graph/i })
+  ).toBeVisible();
   await expect(nav.getByRole('link', { name: /AI Tutor/i })).toBeVisible();
 });
 

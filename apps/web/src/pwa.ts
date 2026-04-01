@@ -15,7 +15,9 @@ import { registerSW } from 'virtual:pwa-register';
 function registerSwMessageListener(): void {
   if (!('serviceWorker' in navigator)) return;
   navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
-    if ((event.data as { type?: string } | undefined)?.type === 'PUSH_RECEIVED') {
+    if (
+      (event.data as { type?: string } | undefined)?.type === 'PUSH_RECEIVED'
+    ) {
       // Reserved for future use: update badge counts or refresh notification list
     }
   });

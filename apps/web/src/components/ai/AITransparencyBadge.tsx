@@ -8,7 +8,11 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type AIContentType = 'assessment' | 'recommendation' | 'content' | 'chat';
+export type AIContentType =
+  | 'assessment'
+  | 'recommendation'
+  | 'content'
+  | 'chat';
 
 interface AITransparencyBadgeProps {
   type: AIContentType;
@@ -52,7 +56,9 @@ export function AITransparencyBadge({
   const config = BADGE_CONFIG[type];
   const tooltipId = `${TOOLTIP_ID_PREFIX}-${type}`;
   const confidenceText =
-    confidence !== undefined ? ` (${Math.round(confidence * 100)}% confidence)` : '';
+    confidence !== undefined
+      ? ` (${Math.round(confidence * 100)}% confidence)`
+      : '';
 
   return (
     <TooltipProvider>

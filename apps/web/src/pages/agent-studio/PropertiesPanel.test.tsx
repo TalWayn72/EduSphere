@@ -23,7 +23,8 @@ vi.mock('@/components/ui/button', () => ({
 }));
 
 vi.mock('@/lib/utils', () => ({
-  cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
+  cn: (...classes: (string | undefined | false)[]) =>
+    classes.filter(Boolean).join(' '),
 }));
 
 // ── fixtures ──────────────────────────────────────────────────────────────────

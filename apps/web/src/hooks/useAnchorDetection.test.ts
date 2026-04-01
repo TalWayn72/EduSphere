@@ -66,9 +66,7 @@ describe('useAnchorDetection', () => {
 
   it('returns null when no anchors provided', () => {
     const containerRef = { current: makeContainer() };
-    const { result } = renderHook(() =>
-      useAnchorDetection([], containerRef)
-    );
+    const { result } = renderHook(() => useAnchorDetection([], containerRef));
     expect(result.current.activeAnchorId).toBeNull();
   });
 

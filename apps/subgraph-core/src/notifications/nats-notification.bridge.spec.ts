@@ -87,7 +87,10 @@ describe('NatsNotificationBridge — SUBJECT_MAP registrations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     subscribedSubjects = [];
-    bridge = new NatsNotificationBridge(makeMockPubSub(), makeMockPushDispatch());
+    bridge = new NatsNotificationBridge(
+      makeMockPubSub(),
+      makeMockPushDispatch()
+    );
   });
 
   afterEach(async () => {
@@ -120,7 +123,11 @@ describe('NatsNotificationBridge — SUBJECT_MAP registrations', () => {
 describe('Phase 45 — New Social Notification Types', () => {
   let bridge: NatsNotificationBridge;
   let pubSub: NotificationPubSub;
-  let publishedNotifications: Array<{ type: NotificationType; title: string; body: string }>;
+  let publishedNotifications: Array<{
+    type: NotificationType;
+    title: string;
+    body: string;
+  }>;
 
   // We test published notifications by intercepting pubSub.publish, then
   // manually triggering NATS messages through a helper that bypasses the
@@ -134,7 +141,16 @@ describe('Phase 45 — New Social Notification Types', () => {
     publishedNotifications = [];
     pubSub = {
       publish: vi.fn().mockImplementation(
-        (_channel: string, payload: { notificationReceived: { type: NotificationType; title: string; body: string } }) => {
+        (
+          _channel: string,
+          payload: {
+            notificationReceived: {
+              type: NotificationType;
+              title: string;
+              body: string;
+            };
+          }
+        ) => {
           publishedNotifications.push(payload.notificationReceived);
         }
       ),
@@ -180,10 +196,7 @@ describe('NATS Notification Bridge — Phase 45 Social Types (source assertions)
     resolve(__dirname, 'nats-notification.bridge.ts'),
     'utf8'
   );
-  const sdl = readFileSync(
-    resolve(__dirname, 'notifications.graphql'),
-    'utf8'
-  );
+  const sdl = readFileSync(resolve(__dirname, 'notifications.graphql'), 'utf8');
   const events = readFileSync(
     resolve(root, 'packages/nats-client/src/events.ts'),
     'utf8'

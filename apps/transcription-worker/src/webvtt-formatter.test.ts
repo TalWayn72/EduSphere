@@ -60,13 +60,19 @@ describe('formatToWebVTT', () => {
   });
 
   it('formats timestamps in HH:MM:SS.mmm format', () => {
-    const result = formatToWebVTT([{ start: 0, end: 3.5, text: 'First caption.' }]);
+    const result = formatToWebVTT([
+      { start: 0, end: 3.5, text: 'First caption.' },
+    ]);
     expect(result).toContain('00:00:00.000 --> 00:00:03.500');
   });
 
   it('generates correct single-cue output', () => {
-    const result = formatToWebVTT([{ start: 0, end: 2.5, text: 'Hello world' }]);
-    expect(result).toBe('WEBVTT\n\n1\n00:00:00.000 --> 00:00:02.500\nHello world\n');
+    const result = formatToWebVTT([
+      { start: 0, end: 2.5, text: 'Hello world' },
+    ]);
+    expect(result).toBe(
+      'WEBVTT\n\n1\n00:00:00.000 --> 00:00:02.500\nHello world\n'
+    );
   });
 
   it('generates multiple cues with sequential 1-based numbering', () => {
@@ -103,12 +109,16 @@ describe('formatToWebVTT', () => {
   });
 
   it('handles hour-range timestamps correctly', () => {
-    const result = formatToWebVTT([{ start: 3600, end: 3660, text: 'One hour mark' }]);
+    const result = formatToWebVTT([
+      { start: 3600, end: 3660, text: 'One hour mark' },
+    ]);
     expect(result).toContain('01:00:00.000 --> 01:01:00.000');
   });
 
   it('handles special HTML characters without escaping (VTT handles display)', () => {
-    const result = formatToWebVTT([{ start: 0, end: 1, text: 'Hello & <world>' }]);
+    const result = formatToWebVTT([
+      { start: 0, end: 1, text: 'Hello & <world>' },
+    ]);
     expect(result).toContain('Hello & <world>');
   });
 

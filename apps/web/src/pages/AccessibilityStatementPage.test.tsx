@@ -4,7 +4,9 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('@/components/PublicLayout', () => ({
-  PublicLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="public-layout">{children}</div>,
+  PublicLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="public-layout">{children}</div>
+  ),
 }));
 
 import { AccessibilityStatementPage } from './AccessibilityStatementPage';
@@ -91,8 +93,6 @@ describe('AccessibilityStatementPage', () => {
 
   it('shows the "Last updated" date', () => {
     renderPage();
-    expect(
-      screen.getByText(/last updated.*march 2026/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/last updated.*march 2026/i)).toBeInTheDocument();
   });
 });

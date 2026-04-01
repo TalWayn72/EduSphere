@@ -14,9 +14,13 @@ import { BASE_URL } from './env';
 test.use({ viewport: { width: 768, height: 1024 } });
 
 /** Assert no horizontal scrollbar is present on the page. */
-async function assertNoHorizontalOverflow(page: import('@playwright/test').Page) {
+async function assertNoHorizontalOverflow(
+  page: import('@playwright/test').Page
+) {
   const hasOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth
   );
   expect(hasOverflow).toBe(false);
 }
@@ -28,15 +32,21 @@ test.describe('Tablet Viewport — iPad 768×1024', () => {
 
   // ─── 1. Dashboard ──────────────────────────────────────────────────────────
 
-  test('dashboard — layout renders without horizontal overflow', async ({ page }) => {
+  test('dashboard — layout renders without horizontal overflow', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
-    await expect(page.getByTestId('welcome-heading')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
+      timeout: 10_000,
+    });
     await assertNoHorizontalOverflow(page);
   });
 
   test('dashboard — visual regression', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(page.getByTestId('welcome-heading')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page).toHaveScreenshot('tablet-dashboard.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.05,

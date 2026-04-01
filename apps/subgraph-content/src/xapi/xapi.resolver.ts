@@ -3,7 +3,11 @@
  * All business logic delegated to XapiTokenService and XapiStatementService.
  */
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { z } from 'zod';
 import {
   createDatabaseConnection,
@@ -31,7 +35,7 @@ export class XapiResolver {
   constructor(
     private readonly tokenService: XapiTokenService,
     private readonly statementService: XapiStatementService,
-    private readonly exportService: XapiExportService,
+    private readonly exportService: XapiExportService
   ) {}
 
   @Query('xapiTokens')
@@ -109,7 +113,7 @@ export class XapiResolver {
   @Mutation('clearXapiStatements')
   async clearXapiStatements(
     @Args('olderThanDays') olderThanDays: number,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<number> {
     const auth = ctx.authContext;
     if (!auth?.tenantId)
@@ -117,7 +121,9 @@ export class XapiResolver {
 
     const parsed = clearStatementsSchema.safeParse({ olderThanDays });
     if (!parsed.success) {
-      throw new BadRequestException(parsed.error.issues[0]?.message ?? 'Invalid input');
+      throw new BadRequestException(
+        parsed.error.issues[0]?.message ?? 'Invalid input'
+      );
     }
 
     const tenantId = auth.tenantId;
@@ -127,7 +133,11 @@ export class XapiResolver {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
-    const tenantCtx: TenantContext = { tenantId, userId, userRole: 'SUPER_ADMIN' };
+    const tenantCtx: TenantContext = {
+      tenantId,
+      userId,
+      userRole: 'SUPER_ADMIN',
+    };
     const deleted = await withTenantContext(this.db, tenantCtx, async (tx) => {
       const conditions = [eq(schema.xapiStatements.tenantId, tenantId)];
       if (olderThanDays > 0) {
@@ -147,11 +157,18 @@ export class XapiResolver {
         userId,
         action: 'XAPI_STATEMENTS_CLEARED',
         resourceType: 'xapi_statements',
-        metadata: { olderThanDays, deletedCount: deleted, cutoffDate: cutoffDate.toISOString() },
-      }),
+        metadata: {
+          olderThanDays,
+          deletedCount: deleted,
+          cutoffDate: cutoffDate.toISOString(),
+        },
+      })
     );
 
-    this.logger.log({ tenantId, deleted, olderThanDays }, 'xAPI statements cleared');
+    this.logger.log(
+      { tenantId, deleted, olderThanDays },
+      'xAPI statements cleared'
+    );
     return deleted;
   }
 }

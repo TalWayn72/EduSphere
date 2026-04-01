@@ -3,7 +3,10 @@
  * Re-exports from MobileThemeProvider with convenience helpers.
  */
 import { useMemo } from 'react';
-import { useMobileTheme, type MobileBrandingData } from '../providers/MobileThemeProvider';
+import {
+  useMobileTheme,
+  type MobileBrandingData,
+} from '../providers/MobileThemeProvider';
 
 interface TenantBrandingResult {
   /** Current tenant branding data */
@@ -34,22 +37,22 @@ export function useTenantBranding(): TenantBrandingResult {
 
   const primaryStyle = useMemo(
     () => ({ color: branding.primaryColor }),
-    [branding.primaryColor],
+    [branding.primaryColor]
   );
 
   const primaryBgStyle = useMemo(
     () => ({ backgroundColor: branding.primaryColor }),
-    [branding.primaryColor],
+    [branding.primaryColor]
   );
 
   const accentStyle = useMemo(
     () => ({ color: branding.accentColor }),
-    [branding.accentColor],
+    [branding.accentColor]
   );
 
   const backgroundStyle = useMemo(
     () => ({ backgroundColor: branding.backgroundColor }),
-    [branding.backgroundColor],
+    [branding.backgroundColor]
   );
 
   return {

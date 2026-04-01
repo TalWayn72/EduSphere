@@ -55,10 +55,14 @@ export function BrandingSettingsPage() {
   const [form, setForm] = useState<BrandingFormState>(DEFAULT_FORM);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [queryResult] = useQuery<BrandingQueryResult>({
     query: TENANT_BRANDING_QUERY,
     pause: !mounted,
@@ -78,7 +82,10 @@ export function BrandingSettingsPage() {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[BrandingSettingsPage] cleanup: saved timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[BrandingSettingsPage] cleanup: saved timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -105,7 +112,10 @@ export function BrandingSettingsPage() {
     } else {
       setSaved(true);
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-      savedTimerRef.current = setTimeout(() => setSaved(false), SAVED_CONFIRMATION_MS);
+      savedTimerRef.current = setTimeout(
+        () => setSaved(false),
+        SAVED_CONFIRMATION_MS
+      );
     }
   };
 
@@ -113,10 +123,7 @@ export function BrandingSettingsPage() {
     <Layout>
       <PageShell size="sm" className="max-w-3xl">
         <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Branding' },
-          ]}
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'Branding' }]}
         />
         <div className="flex items-center gap-3">
           <Paintbrush className="h-6 w-6 text-primary" />

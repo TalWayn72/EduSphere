@@ -407,7 +407,12 @@ describe('AnnotationResolver', () => {
     };
 
     it('passes textRange to service.create for INLINE_COMMENT type', async () => {
-      const mockResult = { ...MOCK_ANNOTATION, annotation_type: 'INLINE_COMMENT', text_start: 10, text_end: 40 };
+      const mockResult = {
+        ...MOCK_ANNOTATION,
+        annotation_type: 'INLINE_COMMENT',
+        text_start: 10,
+        text_end: 40,
+      };
       mockAnnotationService.create.mockResolvedValue(mockResult);
       await resolver.createAnnotation(inlineInput, ctxWith(MOCK_AUTH));
       expect(mockAnnotationService.create).toHaveBeenCalledWith(
@@ -431,7 +436,11 @@ describe('AnnotationResolver', () => {
       expect(mockAnnotationService.create).toHaveBeenCalledWith(
         expect.objectContaining({
           annotationType: 'SUGGESTION',
-          textRange: expect.objectContaining({ start: 0, end: 20, rangeType: 'word' }),
+          textRange: expect.objectContaining({
+            start: 0,
+            end: 20,
+            rangeType: 'word',
+          }),
         }),
         MOCK_AUTH
       );

@@ -28,21 +28,25 @@ import { ExportAnalyticsButton } from './TenantAnalyticsPage.export';
 
 describe('ExportAnalyticsButton', () => {
   beforeEach(() => {
-    vi.mocked(urql.useMutation).mockReturnValue(
-      [{ fetching: false }, vi.fn().mockResolvedValue({ data: undefined })] as never
-    );
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      vi.fn().mockResolvedValue({ data: undefined }),
+    ] as never);
   });
 
   it('renders Export CSV button', () => {
     render(<ExportAnalyticsButton period="THIRTY_DAYS" />);
-    expect(screen.getByRole('button', { name: /Export analytics as CSV/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Export analytics as CSV/i })
+    ).toBeInTheDocument();
     expect(screen.getByText('Export CSV')).toBeInTheDocument();
   });
 
   it('is disabled while exporting', () => {
-    vi.mocked(urql.useMutation).mockReturnValue(
-      [{ fetching: true }, vi.fn()] as never
-    );
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: true },
+      vi.fn(),
+    ] as never);
     render(<ExportAnalyticsButton period="THIRTY_DAYS" />);
     expect(screen.getByRole('button')).toBeDisabled();
     expect(screen.getByText('Exporting…')).toBeInTheDocument();

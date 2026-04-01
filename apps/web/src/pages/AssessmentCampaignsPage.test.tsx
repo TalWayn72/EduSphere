@@ -5,7 +5,9 @@ import * as urql from 'urql';
 import { AssessmentCampaignsPage } from './AssessmentCampaignsPage';
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('urql', async () => ({
@@ -14,7 +16,10 @@ vi.mock('urql', async () => ({
   useMutation: vi.fn(),
 }));
 
-const NOOP_QUERY = [{ data: undefined, fetching: false, error: undefined }, vi.fn()] as never;
+const NOOP_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+  vi.fn(),
+] as never;
 
 describe('AssessmentCampaignsPage', () => {
   beforeEach(() => {
@@ -27,7 +32,9 @@ describe('AssessmentCampaignsPage', () => {
         <AssessmentCampaignsPage />
       </MemoryRouter>
     );
-    expect(screen.getByRole('heading', { name: /Assessment/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Assessment/i })
+    ).toBeInTheDocument();
   });
 
   it('renders My Assessments tab', () => {

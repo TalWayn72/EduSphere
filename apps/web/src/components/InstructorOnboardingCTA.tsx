@@ -15,7 +15,10 @@ export interface InstructorOnboardingCTAProps {
   userRole: string;
 }
 
-export function InstructorOnboardingCTA({ courseCount, userRole }: InstructorOnboardingCTAProps) {
+export function InstructorOnboardingCTA({
+  courseCount,
+  userRole,
+}: InstructorOnboardingCTAProps) {
   const { t } = useTranslation('dashboard');
 
   if (userRole !== 'INSTRUCTOR' || courseCount > 0) {
@@ -23,7 +26,10 @@ export function InstructorOnboardingCTA({ courseCount, userRole }: InstructorOnb
   }
 
   return (
-    <Card data-testid="instructor-onboarding-cta" className="border-primary/20 bg-primary/5">
+    <Card
+      data-testid="instructor-onboarding-cta"
+      className="border-primary/20 bg-primary/5"
+    >
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Sparkles className="h-5 w-5 text-primary" />

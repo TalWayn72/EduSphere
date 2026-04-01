@@ -41,7 +41,7 @@ function collectSdlFiles(): { path: string; content: string }[] {
 function walkDir(
   dir: string,
   results: { path: string; content: string }[],
-  relPrefix: string,
+  relPrefix: string
 ): void {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -61,9 +61,7 @@ function walkDir(
  * Extract individual mutation field definitions from a Mutation block.
  * Returns array of { name, slice } where slice is the SDL text for that field.
  */
-function extractMutationFields(
-  sdl: string,
-): { name: string; slice: string }[] {
+function extractMutationFields(sdl: string): { name: string; slice: string }[] {
   const fields: { name: string; slice: string }[] = [];
   // Match both `type Mutation {` and `extend type Mutation {`
   const mutBlockRegex = /(?:extend\s+)?type\s+Mutation\s*\{/g;
@@ -79,8 +77,7 @@ function extractMutationFields(
     }
     const blockBody = sdl.slice(startBrace, pos - 1);
     // Parse individual field definitions (name starts after newline + optional whitespace)
-    const fieldRegex =
-      /^\s+(\w+)\s*\(/gm;
+    const fieldRegex = /^\s+(\w+)\s*\(/gm;
     let fieldMatch: RegExpExecArray | null;
     const fieldStarts: { name: string; idx: number }[] = [];
     while ((fieldMatch = fieldRegex.exec(blockBody)) !== null) {
@@ -88,9 +85,7 @@ function extractMutationFields(
     }
     for (let i = 0; i < fieldStarts.length; i++) {
       const end =
-        i + 1 < fieldStarts.length
-          ? fieldStarts[i + 1].idx
-          : blockBody.length;
+        i + 1 < fieldStarts.length ? fieldStarts[i + 1].idx : blockBody.length;
       fields.push({
         name: fieldStarts[i].name,
         slice: blockBody.slice(fieldStarts[i].idx, end),
@@ -209,11 +204,9 @@ describe('#54: Cross-role mutation authorization — SDL static analysis', () =>
         !m.slice.includes('@authenticated') &&
         !m.slice.includes('@requiresRole') &&
         !m.slice.includes('@requiresScopes') &&
-        !EXEMPT.includes(m.name),
+        !EXEMPT.includes(m.name)
     );
-    expect(
-      missing.map((m) => `${m.file} :: ${m.name}`),
-    ).toEqual([]);
+    expect(missing.map((m) => `${m.file} :: ${m.name}`)).toEqual([]);
   });
 
   // ── Test 4: Admin mutations have @requiresRole ──────────────────────────
@@ -263,7 +256,7 @@ describe('#54: Cross-role mutation authorization — SDL static analysis', () =>
       if (!found) continue;
       if (found.slice.includes('@requiresRole')) {
         violations.push(
-          `${found.file} :: ${selfMut} has @requiresRole but should be self-service`,
+          `${found.file} :: ${selfMut} has @requiresRole but should be self-service`
         );
       }
     }
@@ -272,17 +265,14 @@ describe('#54: Cross-role mutation authorization — SDL static analysis', () =>
 
   // ── Test 8: SUPER_ADMIN-only mutations exclude ORG_ADMIN ───────────────
   it('SUPER_ADMIN-only mutations (pilot approve/reject) exclude ORG_ADMIN', () => {
-    const superAdminOnly = [
-      'approvePilotRequest',
-      'rejectPilotRequest',
-    ];
+    const superAdminOnly = ['approvePilotRequest', 'rejectPilotRequest'];
     const violations: string[] = [];
     for (const mutName of superAdminOnly) {
       const found = allMutationFields.find((m) => m.name === mutName);
       if (!found) continue;
       if (found.slice.includes('ORG_ADMIN')) {
         violations.push(
-          `${found.file} :: ${mutName} allows ORG_ADMIN but should be SUPER_ADMIN only`,
+          `${found.file} :: ${mutName} allows ORG_ADMIN but should be SUPER_ADMIN only`
         );
       }
     }
@@ -324,11 +314,9 @@ describe('#54: Cross-role mutation authorization — SDL static analysis', () =>
         !m.slice.includes('@authenticated') &&
         !m.slice.includes('@requiresRole') &&
         !m.slice.includes('@requiresScopes') &&
-        !EXEMPT.includes(m.name),
+        !EXEMPT.includes(m.name)
     );
-    expect(
-      unguarded.map((m) => `${m.file} :: ${m.name}`),
-    ).toEqual([]);
+    expect(unguarded.map((m) => `${m.file} :: ${m.name}`)).toEqual([]);
   });
 
   // ── Test 11: Admin queries also have @requiresRole ──────────────────────
@@ -402,9 +390,7 @@ describe('#54: Cross-role mutation authorization — SDL static analysis', () =>
 
   // ── Test 15: Compliance mutations have @authenticated ───────────────────
   it('compliance mutations (generateComplianceReport, updateCourseComplianceSettings) have @authenticated', () => {
-    const sdl = read(
-      'apps/subgraph-content/src/compliance/compliance.graphql',
-    );
+    const sdl = read('apps/subgraph-content/src/compliance/compliance.graphql');
     for (const mutName of [
       'generateComplianceReport',
       'updateCourseComplianceSettings',

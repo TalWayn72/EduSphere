@@ -39,12 +39,13 @@ describe('telemetry', () => {
     const blob = sendBeaconSpy.mock.calls[0][1] as Blob;
     const text = await blob.text();
     const payload = JSON.parse(text);
-    const attributes = payload.resourceSpans[0].scopeSpans[0].spans[0].attributes;
+    const attributes =
+      payload.resourceSpans[0].scopeSpans[0].spans[0].attributes;
     const attrMap = Object.fromEntries(
       attributes.map((a: { key: string; value: { stringValue: string } }) => [
         a.key,
         a.value.stringValue,
-      ]),
+      ])
     );
 
     expect(attrMap['edusphere.tenant_id']).toBe('tenant-1');
@@ -72,12 +73,13 @@ describe('telemetry', () => {
     const blob = sendBeaconSpy.mock.calls[0][1] as Blob;
     const text = await blob.text();
     const payload = JSON.parse(text);
-    const attributes = payload.resourceSpans[0].scopeSpans[0].spans[0].attributes;
+    const attributes =
+      payload.resourceSpans[0].scopeSpans[0].spans[0].attributes;
     const attrMap = Object.fromEntries(
       attributes.map((a: { key: string; value: { stringValue: string } }) => [
         a.key,
         a.value.stringValue,
-      ]),
+      ])
     );
 
     expect(attrMap['custom.key']).toBe('custom-value');

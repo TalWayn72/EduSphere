@@ -16,9 +16,7 @@ vi.mock('@/components/Layout', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => (
-    <div>{children}</div>
-  ),
+  Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
@@ -93,9 +91,7 @@ describe('KnowledgeGraph — Personal wiki viewMode', () => {
   it('clicking My Wiki tab hides the main graph SVG search bar', () => {
     renderKG();
     // The search input is only shown in global mode
-    expect(
-      document.querySelector('input[placeholder]')
-    ).toBeInTheDocument();
+    expect(document.querySelector('input[placeholder]')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('kg-tab-personal'));
     // Search input should be gone in personal mode
     expect(

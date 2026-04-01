@@ -24,7 +24,9 @@ const BASE_RESULT: ExamResult = {
 
 describe('ExamScoreCard', () => {
   it('renders score display prominently', () => {
-    render(<ExamScoreCard result={BASE_RESULT} scoreDisplay={85} scoreMax={100} />);
+    render(
+      <ExamScoreCard result={BASE_RESULT} scoreDisplay={85} scoreMax={100} />
+    );
     expect(screen.getByText('85')).toBeInTheDocument();
     expect(screen.getByText('out of 100')).toBeInTheDocument();
   });
@@ -41,12 +43,18 @@ describe('ExamScoreCard', () => {
   });
 
   it('does not show confidence interval when absent', () => {
-    render(<ExamScoreCard result={BASE_RESULT} scoreDisplay={85} scoreMax={100} />);
-    expect(screen.queryByText('95% Confidence Interval')).not.toBeInTheDocument();
+    render(
+      <ExamScoreCard result={BASE_RESULT} scoreDisplay={85} scoreMax={100} />
+    );
+    expect(
+      screen.queryByText('95% Confidence Interval')
+    ).not.toBeInTheDocument();
   });
 
   it('shows graded date', () => {
-    render(<ExamScoreCard result={BASE_RESULT} scoreDisplay={85} scoreMax={100} />);
+    render(
+      <ExamScoreCard result={BASE_RESULT} scoreDisplay={85} scoreMax={100} />
+    );
     // Date is rendered via toLocaleDateString — just confirm "Completed:" prefix exists
     expect(screen.getByText(/Completed:/)).toBeInTheDocument();
   });

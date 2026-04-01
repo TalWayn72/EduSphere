@@ -68,7 +68,8 @@ test.describe('Gamification Badges (F-12)', () => {
                 description: body.variables?.input?.description ?? '',
                 iconUrl: null,
                 xpRequired: body.variables?.input?.xpRequired ?? 100,
-                autoAwardCriteria: body.variables?.input?.autoAwardCriteria ?? null,
+                autoAwardCriteria:
+                  body.variables?.input?.autoAwardCriteria ?? null,
                 isActive: true,
                 createdAt: '2026-03-22T00:00:00Z',
               },
@@ -89,9 +90,7 @@ test.describe('Gamification Badges (F-12)', () => {
     page,
   }) => {
     await page.goto('/admin/org-gamification');
-    await expect(
-      page.getByTestId('gamification-config-page')
-    ).toBeVisible();
+    await expect(page.getByTestId('gamification-config-page')).toBeVisible();
   });
 
   test('should show auto-award editor in badge form', async ({ page }) => {
@@ -126,8 +125,6 @@ test.describe('Gamification Badges (F-12)', () => {
     });
 
     await page.goto('/leaderboard');
-    await expect(
-      page.getByText('leaderboardDisabledByOrg')
-    ).toBeVisible();
+    await expect(page.getByText('leaderboardDisabledByOrg')).toBeVisible();
   });
 });

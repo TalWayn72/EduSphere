@@ -33,7 +33,8 @@ export const Disabled: Story = {
 
 export const WithDefaultValue: Story = {
   args: {
-    defaultValue: 'This course covers advanced topics in GraphQL Federation including entity resolution, schema composition, and performance optimization.',
+    defaultValue:
+      'This course covers advanced topics in GraphQL Federation including entity resolution, schema composition, and performance optimization.',
   },
 };
 
@@ -42,7 +43,9 @@ export const WithError: Story = {
     <div className="grid w-full max-w-sm gap-1.5">
       <Label htmlFor="bio">Bio</Label>
       <Textarea id="bio" className="border-destructive" defaultValue="Hi" />
-      <p className="text-sm text-destructive">Bio must be at least 20 characters.</p>
+      <p className="text-sm text-destructive">
+        Bio must be at least 20 characters.
+      </p>
     </div>
   ),
 };

@@ -20,9 +20,7 @@ const emptyConfig: PortalConfig = { blocks: [] };
 
 describe('PortalBlockEditor', () => {
   it('renders "Add blocks" palette with all 5 block type buttons', () => {
-    render(
-      <PortalBlockEditor value={emptyConfig} onChange={vi.fn()} />
-    );
+    render(<PortalBlockEditor value={emptyConfig} onChange={vi.fn()} />);
 
     expect(
       screen.getByRole('button', { name: /Add Hero Banner block/i })
@@ -42,20 +40,18 @@ describe('PortalBlockEditor', () => {
   });
 
   it('renders empty state message when no blocks', () => {
-    render(
-      <PortalBlockEditor value={emptyConfig} onChange={vi.fn()} />
-    );
+    render(<PortalBlockEditor value={emptyConfig} onChange={vi.fn()} />);
 
     expect(
-      screen.getByText(/Add blocks from the palette above to build your portal/i)
+      screen.getByText(
+        /Add blocks from the palette above to build your portal/i
+      )
     ).toBeInTheDocument();
   });
 
   it('addBlock appends a block to the list', () => {
     const onChange = vi.fn();
-    render(
-      <PortalBlockEditor value={emptyConfig} onChange={onChange} />
-    );
+    render(<PortalBlockEditor value={emptyConfig} onChange={onChange} />);
 
     fireEvent.click(
       screen.getByRole('button', { name: /Add Hero Banner block/i })
@@ -70,14 +66,10 @@ describe('PortalBlockEditor', () => {
   it('removeBlock removes a block from the list', () => {
     const onChange = vi.fn();
     const configWithBlock: PortalConfig = {
-      blocks: [
-        { id: 'block-1', type: 'hero', props: { title: 'Welcome' } },
-      ],
+      blocks: [{ id: 'block-1', type: 'hero', props: { title: 'Welcome' } }],
     };
 
-    render(
-      <PortalBlockEditor value={configWithBlock} onChange={onChange} />
-    );
+    render(<PortalBlockEditor value={configWithBlock} onChange={onChange} />);
 
     // The block container with testid should be present
     expect(screen.getByTestId('block-block-1')).toBeInTheDocument();

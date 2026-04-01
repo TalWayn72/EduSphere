@@ -9,15 +9,12 @@ vi.mock('urql', () => ({
     strings.reduce(
       (acc: string, str: string, i: number) =>
         acc + str + String(values[i] ?? ''),
-      '',
+      ''
     ),
   useQuery: vi.fn(() => [
     { data: undefined, fetching: false, error: undefined },
   ]),
-  useMutation: vi.fn(() => [
-    { fetching: false, error: undefined },
-    vi.fn(),
-  ]),
+  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
 }));
 
 // Mock auth used by utils

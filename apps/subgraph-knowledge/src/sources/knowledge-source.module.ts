@@ -21,6 +21,12 @@ import { TesseractOcrService } from '../services/tesseract-ocr.service.js';
     TesseractOcrService,
     MinioUrlService,
   ],
-  exports: [KnowledgeSourceService, ContentIngestionPipelineService, TesseractOcrService, DocumentParserService, MinioUrlService],
+  exports: [
+    KnowledgeSourceService,
+    ContentIngestionPipelineService,
+    TesseractOcrService,
+    DocumentParserService,
+    MinioUrlService,
+  ],
 })
 export class KnowledgeSourceModule {}

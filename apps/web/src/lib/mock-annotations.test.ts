@@ -99,7 +99,9 @@ describe('filterAnnotationsByLayers', () => {
   ];
 
   it('filters to a single layer', () => {
-    const result = filterAnnotationsByLayers(annotations, [AnnotationLayer.PERSONAL]);
+    const result = filterAnnotationsByLayers(annotations, [
+      AnnotationLayer.PERSONAL,
+    ]);
     expect(result).toHaveLength(1);
     expect(result[0]!.id).toBe('a');
   });

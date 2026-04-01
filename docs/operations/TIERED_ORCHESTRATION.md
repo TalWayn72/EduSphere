@@ -46,13 +46,13 @@ flowchart TD
 
 ### When to Use
 
-| Criterion | Threshold |
-|-----------|-----------|
-| Files affected | 1-3 |
-| Packages affected | 1 (same package) |
-| Database changes | None |
+| Criterion             | Threshold          |
+| --------------------- | ------------------ |
+| Files affected        | 1-3                |
+| Packages affected     | 1 (same package)   |
+| Database changes      | None               |
 | Cross-package imports | None added/changed |
-| Security impact | None |
+| Security impact       | None               |
 
 ### Examples
 
@@ -87,6 +87,7 @@ sequenceDiagram
 The Orchestrator spawns exactly 1 specialist directly, skipping the Lead layer entirely.
 
 **Specialist prompt must include:**
+
 - Exact problem description (symptom only)
 - Affected package name
 - Gate requirement: `pnpm turbo typecheck --filter=<package>` + `pnpm turbo lint --filter=<package>`
@@ -94,12 +95,12 @@ The Orchestrator spawns exactly 1 specialist directly, skipping the Lead layer e
 
 ### Quality Gate (Tier 1)
 
-| # | Check | Command | Required |
-|---|-------|---------|----------|
-| 1 | TypeScript | `pnpm turbo typecheck --filter=<package>` | 0 errors |
-| 2 | Lint | `pnpm turbo lint --filter=<package>` | 0 errors |
-| 3 | File size | `wc -l` on changed files | All ≤300 lines |
-| 4 | Unit tests | `pnpm turbo test --filter=<package>` | 100% pass |
+| #   | Check      | Command                                   | Required       |
+| --- | ---------- | ----------------------------------------- | -------------- |
+| 1   | TypeScript | `pnpm turbo typecheck --filter=<package>` | 0 errors       |
+| 2   | Lint       | `pnpm turbo lint --filter=<package>`      | 0 errors       |
+| 3   | File size  | `wc -l` on changed files                  | All ≤300 lines |
+| 4   | Unit tests | `pnpm turbo test --filter=<package>`      | 100% pass      |
 
 **Not required for Tier 1:** Health check, 5-user auth, E2E Playwright, Docker verification, HIVEMIND storage.
 
@@ -109,13 +110,13 @@ The Orchestrator spawns exactly 1 specialist directly, skipping the Lead layer e
 
 ### When to Use
 
-| Criterion | Threshold |
-|-----------|-----------|
-| Files affected | 4-15 |
-| Packages affected | 1-2 (same division) |
-| Database changes | Simple (single migration) |
-| Cross-package imports | Minimal |
-| Security impact | Low (no auth changes) |
+| Criterion             | Threshold                 |
+| --------------------- | ------------------------- |
+| Files affected        | 4-15                      |
+| Packages affected     | 1-2 (same division)       |
+| Database changes      | Simple (single migration) |
+| Cross-package imports | Minimal                   |
+| Security impact       | Low (no auth changes)     |
 
 ### Examples
 
@@ -156,14 +157,14 @@ Orchestrator spawns 1-2 Division Leads using the [Lead Brief Template](../archit
 
 ### Quality Gate (Tier 2 — Session Completion Lite)
 
-| # | Check | Command | Required |
-|---|-------|---------|----------|
-| 1 | TypeScript | `pnpm turbo typecheck` | 0 errors |
-| 2 | Lint | `pnpm turbo lint` | 0 errors |
-| 3 | File size | `wc -l` on changed files | All ≤300 lines |
-| 4 | Unit tests | `pnpm turbo test --filter=<affected>` | 100% pass |
-| 5 | E2E (if UI) | Playwright spec for changed feature | Pass |
-| 6 | Health check | `./scripts/health-check.sh` | All services UP |
+| #   | Check        | Command                               | Required        |
+| --- | ------------ | ------------------------------------- | --------------- |
+| 1   | TypeScript   | `pnpm turbo typecheck`                | 0 errors        |
+| 2   | Lint         | `pnpm turbo lint`                     | 0 errors        |
+| 3   | File size    | `wc -l` on changed files              | All ≤300 lines  |
+| 4   | Unit tests   | `pnpm turbo test --filter=<affected>` | 100% pass       |
+| 5   | E2E (if UI)  | Playwright spec for changed feature   | Pass            |
+| 6   | Health check | `./scripts/health-check.sh`           | All services UP |
 
 **Not required for Tier 2:** Full 5-user auth verification, GitHub CI check, HIVEMIND storage (unless major decision made), Docker rebuild.
 
@@ -173,13 +174,13 @@ Orchestrator spawns 1-2 Division Leads using the [Lead Brief Template](../archit
 
 ### When to Use
 
-| Criterion | Threshold |
-|-----------|-----------|
-| Files affected | 16+ |
-| Packages affected | 3+ (cross-division) |
-| Database changes | Complex (multiple migrations, RLS) |
-| Cross-package imports | Significant |
-| Security impact | Any auth/RLS/JWT changes |
+| Criterion             | Threshold                          |
+| --------------------- | ---------------------------------- |
+| Files affected        | 16+                                |
+| Packages affected     | 3+ (cross-division)                |
+| Database changes      | Complex (multiple migrations, RLS) |
+| Cross-package imports | Significant                        |
+| Security impact       | Any auth/RLS/JWT changes           |
 
 ### Examples
 
@@ -206,21 +207,21 @@ Wave 5 (sequential): Post-release verification
 
 All 11 checks from [SESSION_COMPLETION_GATE.md](SESSION_COMPLETION_GATE.md):
 
-| # | Check | Required |
-|---|-------|----------|
-| -1 | Orchestrator compliance audit | 0 violations |
-| 0 | Docker containers healthy | >=5 healthy |
-| 1 | Unit tests | 100% pass |
-| 2 | TypeScript | 0 errors |
-| 3 | Lint | 0 errors |
-| 4 | Security tests | 0 failures |
-| 5 | E2E Playwright | All pass |
-| 6 | Health check | All UP |
-| 7 | 5-user auth | All login OK |
-| 8 | GitHub CI | All green |
-| 9 | Git push | Commit pushed |
-| 10 | OPEN_ISSUES.md | Updated |
-| 11 | HIVEMIND | Decisions stored |
+| #   | Check                         | Required         |
+| --- | ----------------------------- | ---------------- |
+| -1  | Orchestrator compliance audit | 0 violations     |
+| 0   | Docker containers healthy     | >=5 healthy      |
+| 1   | Unit tests                    | 100% pass        |
+| 2   | TypeScript                    | 0 errors         |
+| 3   | Lint                          | 0 errors         |
+| 4   | Security tests                | 0 failures       |
+| 5   | E2E Playwright                | All pass         |
+| 6   | Health check                  | All UP           |
+| 7   | 5-user auth                   | All login OK     |
+| 8   | GitHub CI                     | All green        |
+| 9   | Git push                      | Commit pushed    |
+| 10  | OPEN_ISSUES.md                | Updated          |
+| 11  | HIVEMIND                      | Decisions stored |
 
 ---
 
@@ -251,16 +252,16 @@ graph LR
     style T3 fill:#e74c3c,color:#fff
 ```
 
-| Aspect | Tier 1 | Tier 2 | Tier 3 |
-|--------|--------|--------|--------|
-| Agents spawned | 1 | 3-10 | 12-40+ |
-| Lead layer | Skipped | 1-2 Leads | All applicable Leads |
-| HIVEMIND | Not used | Optional | Required |
-| Lead Brief template | Not used | Required | Required |
-| Quality gate | 4 checks | 6 checks | 11 checks |
-| Typical duration | 5 min | 15-30 min | 45-120 min |
+| Aspect              | Tier 1       | Tier 2            | Tier 3                      |
+| ------------------- | ------------ | ----------------- | --------------------------- |
+| Agents spawned      | 1            | 3-10              | 12-40+                      |
+| Lead layer          | Skipped      | 1-2 Leads         | All applicable Leads        |
+| HIVEMIND            | Not used     | Optional          | Required                    |
+| Lead Brief template | Not used     | Required          | Required                    |
+| Quality gate        | 4 checks     | 6 checks          | 11 checks                   |
+| Typical duration    | 5 min        | 15-30 min         | 45-120 min                  |
 | Docker verification | Not required | Health check only | Full container verification |
-| E2E tests | Not required | If UI changed | Always required |
+| E2E tests           | Not required | If UI changed     | Always required             |
 
 ---
 
@@ -268,15 +269,16 @@ graph LR
 
 A task may **escalate** from a lower tier to a higher tier during execution:
 
-| Trigger | Action |
-|---------|--------|
-| Specialist discovers cross-package impact | Tier 1 escalates to Tier 2 |
-| Lead discovers multi-division dependency | Tier 2 escalates to Tier 3 |
-| Security vulnerability found during fix | Any tier escalates to Tier 3 |
-| Database schema change discovered | Tier 1 escalates to Tier 2+ |
-| Test failure reveals systemic issue | Current tier escalates one level |
+| Trigger                                   | Action                           |
+| ----------------------------------------- | -------------------------------- |
+| Specialist discovers cross-package impact | Tier 1 escalates to Tier 2       |
+| Lead discovers multi-division dependency  | Tier 2 escalates to Tier 3       |
+| Security vulnerability found during fix   | Any tier escalates to Tier 3     |
+| Database schema change discovered         | Tier 1 escalates to Tier 2+      |
+| Test failure reveals systemic issue       | Current tier escalates one level |
 
 **Escalation protocol:**
+
 1. Agent reports blocker to parent (Specialist to Lead, or Lead to Orchestrator)
 2. Orchestrator re-evaluates scope with expanded Glob/Grep analysis
 3. Orchestrator re-routes to appropriate tier

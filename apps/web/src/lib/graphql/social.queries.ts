@@ -5,7 +5,6 @@ export const SOCIAL_FEED_QUERY = gql`
     socialFeed(limit: $limit) {
       id
       actorId
-      actorDisplayName
       verb
       objectType
       objectId
@@ -22,7 +21,6 @@ export const SOCIAL_RECOMMENDATIONS_QUERY = gql`
       contentTitle
       followersCount
       isMutualFollower
-      lastActivity
     }
   }
 `;

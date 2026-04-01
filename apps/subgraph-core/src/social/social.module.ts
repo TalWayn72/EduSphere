@@ -5,7 +5,12 @@ import { SocialService } from './social.service';
 import { SocialResolver } from './social.resolver';
 
 @Module({
-  providers: [SocialFollowService, SocialFeedService, SocialService, SocialResolver],
+  providers: [
+    SocialFollowService,
+    SocialFeedService,
+    SocialService,
+    SocialResolver,
+  ],
   exports: [SocialService],
 })
 export class SocialModule {}

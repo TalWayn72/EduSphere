@@ -61,7 +61,9 @@ export class XapiNatsBridgeService implements OnModuleInit, OnModuleDestroy {
       await this.nc.drain().catch(() => undefined);
       this.nc = null;
     }
-    this.logger.log('XapiNatsBridgeService destroyed — all subscriptions closed');
+    this.logger.log(
+      'XapiNatsBridgeService destroyed — all subscriptions closed'
+    );
   }
 
   private async processMessages(
@@ -70,9 +72,10 @@ export class XapiNatsBridgeService implements OnModuleInit, OnModuleDestroy {
   ): Promise<void> {
     for await (const msg of sub) {
       try {
-        const payload = JSON.parse(
-          this.sc.decode(msg.data)
-        ) as Record<string, unknown>;
+        const payload = JSON.parse(this.sc.decode(msg.data)) as Record<
+          string,
+          unknown
+        >;
 
         const tenantId = payload['tenantId'];
         const userId = payload['userId'];
@@ -85,9 +88,10 @@ export class XapiNatsBridgeService implements OnModuleInit, OnModuleDestroy {
         }
 
         const statement = natsToXapiStatement(subject, payload);
-        const statementWithId = { id: randomUUID(), ...statement } as Parameters<
-          typeof this.statementService.storeStatement
-        >[1];
+        const statementWithId = {
+          id: randomUUID(),
+          ...statement,
+        } as Parameters<typeof this.statementService.storeStatement>[1];
 
         await this.statementService.storeStatement(tenantId, statementWithId);
       } catch (err) {

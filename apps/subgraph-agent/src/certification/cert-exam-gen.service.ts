@@ -55,7 +55,7 @@ export class CertExamGenService implements OnModuleDestroy {
 
   constructor(
     private readonly consentGuard: LlmConsentGuard,
-    @Inject(EXECUTION_PUBSUB) private readonly pubSub: typeof executionPubSub,
+    @Inject(EXECUTION_PUBSUB) private readonly pubSub: typeof executionPubSub
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -65,10 +65,15 @@ export class CertExamGenService implements OnModuleDestroy {
   private getModel(): LanguageModel {
     const ollamaUrl = process.env['OLLAMA_URL'] ?? 'http://localhost:11434';
     const ollama = createOllama({ baseURL: ollamaUrl + '/api' });
-    return ollama(process.env['OLLAMA_MODEL'] ?? 'llama3.2') as unknown as LanguageModel;
+    return ollama(
+      process.env['OLLAMA_MODEL'] ?? 'llama3.2'
+    ) as unknown as LanguageModel;
   }
 
-  private async ensureAgentDef(userId: string, tenantId: string): Promise<string> {
+  private async ensureAgentDef(
+    userId: string,
+    tenantId: string
+  ): Promise<string> {
     if (this.agentDefId) return this.agentDefId;
 
     const [existing] = await this.db
@@ -77,8 +82,8 @@ export class CertExamGenService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.agent_definitions.name, AGENT_NAME),
-          eq(schema.agent_definitions.tenant_id, tenantId),
-        ),
+          eq(schema.agent_definitions.tenant_id, tenantId)
+        )
       )
       .limit(1);
 
@@ -99,7 +104,10 @@ export class CertExamGenService implements OnModuleDestroy {
       .returning({ id: schema.agent_definitions.id });
 
     const id = rows[0]?.id;
-    if (!id) throw new InternalServerErrorException('Failed to create agent definition');
+    if (!id)
+      throw new InternalServerErrorException(
+        'Failed to create agent definition'
+      );
     this.agentDefId = id;
     return id;
   }
@@ -110,7 +118,9 @@ export class CertExamGenService implements OnModuleDestroy {
     tenantId: string,
     searchFn?: CitationSearchFn
   ): Promise<ExamGenRecord> {
-    const isExternal = Boolean(process.env['OPENAI_API_KEY'] || process.env['ANTHROPIC_API_KEY']);
+    const isExternal = Boolean(
+      process.env['OPENAI_API_KEY'] || process.env['ANTHROPIC_API_KEY']
+    );
     await this.consentGuard.assertConsent(userId, isExternal);
 
     const agentId = await this.ensureAgentDef(userId, tenantId);
@@ -126,21 +136,31 @@ export class CertExamGenService implements OnModuleDestroy {
       })
       .returning();
 
-    if (!execution) throw new InternalServerErrorException('Failed to create execution');
+    if (!execution)
+      throw new InternalServerErrorException('Failed to create execution');
 
     const executionId = execution.id;
 
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Exam generation timed out after 10 min')), WORKFLOW_TIMEOUT_MS)
+      setTimeout(
+        () => reject(new Error('Exam generation timed out after 10 min')),
+        WORKFLOW_TIMEOUT_MS
+      )
     );
     Promise.race([
       this.runAsync(executionId, options, searchFn),
       timeoutPromise,
     ]).catch(async (err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error({ executionId, err: msg }, '[CertExamGenService] workflow failed');
+      this.logger.error(
+        { executionId, err: msg },
+        '[CertExamGenService] workflow failed'
+      );
       await this.markFailed(executionId, msg).catch((e) =>
-        this.logger.error({ executionId, e }, '[CertExamGenService] markFailed error')
+        this.logger.error(
+          { executionId, e },
+          '[CertExamGenService] markFailed error'
+        )
       );
     });
 
@@ -175,7 +195,11 @@ export class CertExamGenService implements OnModuleDestroy {
         .where(eq(schema.agent_executions.id, executionId));
 
       this.pubSub.publish(`executionStatus_${executionId}`, {
-        executionStatusChanged: { id: executionId, status: 'COMPLETED', output },
+        executionStatusChanged: {
+          id: executionId,
+          status: 'COMPLETED',
+          output,
+        },
       });
 
       this.logger.log(
@@ -194,7 +218,11 @@ export class CertExamGenService implements OnModuleDestroy {
       .set({ status: 'FAILED', output: { error }, completed_at: new Date() })
       .where(eq(schema.agent_executions.id, executionId));
     this.pubSub.publish(`executionStatus_${executionId}`, {
-      executionStatusChanged: { id: executionId, status: 'FAILED', output: { error } },
+      executionStatusChanged: {
+        id: executionId,
+        status: 'FAILED',
+        output: { error },
+      },
     });
     this.logger.error({ executionId, error }, '[CertExamGenService] failed');
   }
@@ -209,6 +237,10 @@ export class CertExamGenService implements OnModuleDestroy {
     if (!execution) return null;
     const output = execution.output as Record<string, unknown> | null;
     const items = (output?.items as unknown[]) ?? [];
-    return { executionId: execution.id, status: execution.status, itemCount: items.length };
+    return {
+      executionId: execution.id,
+      status: execution.status,
+      itemCount: items.length,
+    };
   }
 }

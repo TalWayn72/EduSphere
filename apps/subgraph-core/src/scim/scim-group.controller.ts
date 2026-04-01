@@ -68,7 +68,10 @@ export class ScimGroupController {
       this.auth.scimError(res, 400, 'displayName is required');
       return;
     }
-    const group = await this.groupService.createGroup(authResult.tenantId, body);
+    const group = await this.groupService.createGroup(
+      authResult.tenantId,
+      body
+    );
     res.status(201).type(SCIM_CT).json(group);
   }
 

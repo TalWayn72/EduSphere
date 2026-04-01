@@ -64,7 +64,10 @@ export class AdminOverviewService implements OnModuleDestroy {
         storageUsedMb: 0,
       };
     } catch (err) {
-      this.logger.error({ tenantId, err }, '[AdminOverviewService] getDashboardStats failed');
+      this.logger.error(
+        { tenantId, err },
+        '[AdminOverviewService] getDashboardStats failed'
+      );
       return {
         totalUsers: 0,
         activeUsers: 0,

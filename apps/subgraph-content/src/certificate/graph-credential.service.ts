@@ -5,7 +5,12 @@
  * Uses userCourses completion status as proxy for concept mastery.
  * A COMPLETED enrollment implies 100% coverage; ACTIVE uses lesson progress.
  */
-import { Injectable, Logger, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   withTenantContext,
@@ -26,9 +31,7 @@ export interface KnowledgePathCoverageResult {
 
 @Injectable()
 export class GraphGroundedCredentialService implements OnModuleDestroy {
-  private readonly logger = new Logger(
-    GraphGroundedCredentialService.name,
-  );
+  private readonly logger = new Logger(GraphGroundedCredentialService.name);
   private readonly db: Database = createDatabaseConnection();
 
   async onModuleDestroy(): Promise<void> {
@@ -44,7 +47,7 @@ export class GraphGroundedCredentialService implements OnModuleDestroy {
     tenantId: string,
     courseId: string,
     requiredConceptIds: string[],
-    masteryThreshold = 0.7,
+    masteryThreshold = 0.7
   ): Promise<KnowledgePathCoverageResult> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
@@ -58,15 +61,15 @@ export class GraphGroundedCredentialService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.userCourses.userId, userId),
-            eq(schema.userCourses.courseId, courseId),
-          ),
+            eq(schema.userCourses.courseId, courseId)
+          )
         )
         .limit(1);
 
       if (!enrollment) {
         this.logger.warn(
           `[GraphGroundedCredentialService] No enrollment found userId=${userId} courseId=${courseId}`,
-          { tenantId },
+          { tenantId }
         );
         return {
           covered: false,
@@ -79,14 +82,14 @@ export class GraphGroundedCredentialService implements OnModuleDestroy {
 
       const coverageScore = enrollment.status === 'COMPLETED' ? 1.0 : 0.5;
       const coveredCount = Math.floor(
-        requiredConceptIds.length * coverageScore,
+        requiredConceptIds.length * coverageScore
       );
       const coveredConcepts = requiredConceptIds.slice(0, coveredCount);
       const missingConcepts = requiredConceptIds.slice(coveredCount);
 
       this.logger.log(
         `[GraphGroundedCredentialService] Coverage verified userId=${userId} courseId=${courseId} score=${coverageScore}`,
-        { tenantId, userId, coverageScore, coveredCount },
+        { tenantId, userId, coverageScore, coveredCount }
       );
 
       return {
@@ -106,7 +109,7 @@ export class GraphGroundedCredentialService implements OnModuleDestroy {
     userId: string,
     tenantId: string,
     badgeAssertionId: string,
-    coverage: KnowledgePathCoverageResult,
+    coverage: KnowledgePathCoverageResult
   ): Promise<{ credentialId: string }> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
@@ -126,11 +129,14 @@ export class GraphGroundedCredentialService implements OnModuleDestroy {
         .returning({ id: schema.knowledgePathCredentials.id });
 
       const credId = rows[0]?.id;
-      if (!credId) throw new InternalServerErrorException('Credential insert returned no record');
+      if (!credId)
+        throw new InternalServerErrorException(
+          'Credential insert returned no record'
+        );
 
       this.logger.log(
         `[GraphGroundedCredentialService] Credential recorded id=${credId}`,
-        { tenantId, userId, badgeAssertionId },
+        { tenantId, userId, badgeAssertionId }
       );
 
       return { credentialId: credId };

@@ -51,11 +51,18 @@ describe('BadgeEventHandlersService', () => {
       ]);
       await service.handleCourseEvents(sub, delegate);
       expect(delegate.awardPoints).toHaveBeenCalledWith(
-        'u1', 't1', 'course.completed', 100, 'Course completed'
+        'u1',
+        't1',
+        'course.completed',
+        100,
+        'Course completed'
       );
       expect(delegate.countUserCourses).toHaveBeenCalledWith('u1', 't1');
       expect(delegate.checkAndAwardBadges).toHaveBeenCalledWith(
-        'u1', 't1', 'courses_completed', 5
+        'u1',
+        't1',
+        'courses_completed',
+        5
       );
     });
 
@@ -87,16 +94,21 @@ describe('BadgeEventHandlersService', () => {
   describe('handleAnnotationEvents', () => {
     it('awards points for annotation.created', async () => {
       const delegate = createMockDelegate();
-      const sub = createMockSub([
-        { userId: 'u1', tenantId: 't1' },
-      ]);
+      const sub = createMockSub([{ userId: 'u1', tenantId: 't1' }]);
       await service.handleAnnotationEvents(sub, delegate);
       expect(delegate.awardPoints).toHaveBeenCalledWith(
-        'u1', 't1', 'annotation.created', 10, 'Annotation created'
+        'u1',
+        't1',
+        'annotation.created',
+        10,
+        'Annotation created'
       );
       expect(delegate.countUserAnnotations).toHaveBeenCalledWith('u1', 't1');
       expect(delegate.checkAndAwardBadges).toHaveBeenCalledWith(
-        'u1', 't1', 'annotations_created', 10
+        'u1',
+        't1',
+        'annotations_created',
+        10
       );
     });
 
@@ -134,10 +146,17 @@ describe('BadgeEventHandlersService', () => {
       ]);
       await service.handleStreakEvents(sub, delegate);
       expect(delegate.awardPoints).toHaveBeenCalledWith(
-        'u1', 't1', 'streak.milestone.7', 200, '7-day streak'
+        'u1',
+        't1',
+        'streak.milestone.7',
+        200,
+        '7-day streak'
       );
       expect(delegate.checkAndAwardBadges).toHaveBeenCalledWith(
-        'u1', 't1', 'streak_days', 7
+        'u1',
+        't1',
+        'streak_days',
+        7
       );
     });
 
@@ -148,7 +167,11 @@ describe('BadgeEventHandlersService', () => {
       ]);
       await service.handleStreakEvents(sub, delegate);
       expect(delegate.awardPoints).toHaveBeenCalledWith(
-        'u1', 't1', 'streak.milestone.30', 1000, '30-day streak'
+        'u1',
+        't1',
+        'streak.milestone.30',
+        1000,
+        '30-day streak'
       );
     });
 
@@ -162,7 +185,10 @@ describe('BadgeEventHandlersService', () => {
       expect(delegate.awardPoints).not.toHaveBeenCalled();
       // But badges should still be checked
       expect(delegate.checkAndAwardBadges).toHaveBeenCalledWith(
-        'u1', 't1', 'streak_days', 3
+        'u1',
+        't1',
+        'streak_days',
+        3
       );
     });
   });

@@ -34,7 +34,9 @@ export class WhatsAppChannelService implements OnModuleDestroy {
     languageCode = 'en'
   ): Promise<string | null> {
     if (!this.phoneNumberId) {
-      this.logger.warn('[WhatsAppChannelService] WHATSAPP_PHONE_NUMBER_ID not configured');
+      this.logger.warn(
+        '[WhatsAppChannelService] WHATSAPP_PHONE_NUMBER_ID not configured'
+      );
       return null;
     }
 
@@ -62,7 +64,9 @@ export class WhatsAppChannelService implements OnModuleDestroy {
    */
   async sendText(phoneNumber: string, text: string): Promise<string | null> {
     if (!this.phoneNumberId) {
-      this.logger.warn('[WhatsAppChannelService] WHATSAPP_PHONE_NUMBER_ID not configured');
+      this.logger.warn(
+        '[WhatsAppChannelService] WHATSAPP_PHONE_NUMBER_ID not configured'
+      );
       return null;
     }
 

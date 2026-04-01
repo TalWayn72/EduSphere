@@ -22,11 +22,36 @@ const MASTERED_IDS_RESPONSE = {
 
 const ALL_CONTENT_RESPONSE = {
   rows: [
-    { id: 'ci-mastered-1', title: 'Intro to React', estimated_minutes: 15, order_index: 1 },
-    { id: 'ci-mastered-2', title: 'State Management', estimated_minutes: 20, order_index: 2 },
-    { id: 'ci-gap-1', title: 'Advanced Hooks', estimated_minutes: 25, order_index: 3 },
-    { id: 'ci-gap-2', title: 'Performance', estimated_minutes: 40, order_index: 4 },
-    { id: 'ci-gap-3', title: 'Testing React', estimated_minutes: 10, order_index: 5 },
+    {
+      id: 'ci-mastered-1',
+      title: 'Intro to React',
+      estimated_minutes: 15,
+      order_index: 1,
+    },
+    {
+      id: 'ci-mastered-2',
+      title: 'State Management',
+      estimated_minutes: 20,
+      order_index: 2,
+    },
+    {
+      id: 'ci-gap-1',
+      title: 'Advanced Hooks',
+      estimated_minutes: 25,
+      order_index: 3,
+    },
+    {
+      id: 'ci-gap-2',
+      title: 'Performance',
+      estimated_minutes: 40,
+      order_index: 4,
+    },
+    {
+      id: 'ci-gap-3',
+      title: 'Testing React',
+      estimated_minutes: 10,
+      order_index: 5,
+    },
   ],
 };
 
@@ -89,7 +114,9 @@ describe('AdaptivePathService', () => {
       );
 
       // ci-gap-3 (10 min) should get GAP_BASE + TIME_BONUS = 1.2
-      const testingItem = result.items.find((i) => i.contentItemId === 'ci-gap-3');
+      const testingItem = result.items.find(
+        (i) => i.contentItemId === 'ci-gap-3'
+      );
       expect(testingItem!.priorityScore).toBeCloseTo(1.2);
 
       // ci-gap-2 (40 min) should get only GAP_BASE = 1.0 (no bonus)

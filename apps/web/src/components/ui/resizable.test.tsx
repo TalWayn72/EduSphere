@@ -4,14 +4,40 @@ import { describe, it, expect, vi } from 'vitest';
 
 // Mock react-resizable-panels (aliased to tiptap-stub in vitest config)
 vi.mock('react-resizable-panels', () => ({
-  Group: function MockGroup({ children, className, orientation, ...props }: Record<string, unknown>) {
-    return <div data-testid="panel-group" data-orientation={orientation} className={className as string} {...props}>{children as React.ReactNode}</div>;
+  Group: function MockGroup({
+    children,
+    className,
+    orientation,
+    ...props
+  }: Record<string, unknown>) {
+    return (
+      <div
+        data-testid="panel-group"
+        data-orientation={orientation}
+        className={className as string}
+        {...props}
+      >
+        {children as React.ReactNode}
+      </div>
+    );
   },
   Panel: function MockPanel({ children, ...props }: Record<string, unknown>) {
-    return <div data-testid="panel" {...props}>{children as React.ReactNode}</div>;
+    return (
+      <div data-testid="panel" {...props}>
+        {children as React.ReactNode}
+      </div>
+    );
   },
-  Separator: function MockSeparator({ children, className, ...props }: Record<string, unknown>) {
-    return <div data-testid="separator" className={className as string} {...props}>{children as React.ReactNode}</div>;
+  Separator: function MockSeparator({
+    children,
+    className,
+    ...props
+  }: Record<string, unknown>) {
+    return (
+      <div data-testid="separator" className={className as string} {...props}>
+        {children as React.ReactNode}
+      </div>
+    );
   },
 }));
 
@@ -22,7 +48,11 @@ vi.mock('lucide-react', () => ({
   },
 }));
 
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './resizable';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from './resizable';
 
 describe('ResizablePanelGroup', () => {
   it('renders children', () => {
@@ -49,7 +79,10 @@ describe('ResizablePanelGroup', () => {
         <div>V</div>
       </ResizablePanelGroup>
     );
-    expect(screen.getByTestId('panel-group')).toHaveAttribute('data-orientation', 'vertical');
+    expect(screen.getByTestId('panel-group')).toHaveAttribute(
+      'data-orientation',
+      'vertical'
+    );
   });
 });
 

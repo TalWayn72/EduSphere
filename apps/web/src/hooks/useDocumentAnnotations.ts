@@ -90,8 +90,14 @@ export function useDocumentAnnotations(
   contentId: string
 ): UseDocumentAnnotationsReturn {
   // Delegate query + subscription to useAnnotations — one urql subscription only.
-  const { annotations, fetching, error, refetch, createFlashcard, promoteAnnotation } =
-    useAnnotations(contentId, ALL_LAYERS);
+  const {
+    annotations,
+    fetching,
+    error,
+    refetch,
+    createFlashcard,
+    promoteAnnotation,
+  } = useAnnotations(contentId, ALL_LAYERS);
 
   const { focusedAnnotationId, setFocusedAnnotationId } = useUIStore();
 

@@ -6,9 +6,14 @@ vi.mock('@edusphere/db', () => {
   const mockTx = { execute: mockExecute };
   return {
     createDatabaseConnection: vi.fn(() => ({
-      transaction: vi.fn((fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)),
+      transaction: vi.fn((fn: (tx: typeof mockTx) => Promise<unknown>) =>
+        fn(mockTx)
+      ),
     })),
-    sql: vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values })),
+    sql: vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => ({
+      strings,
+      values,
+    })),
     withTenantContext: vi.fn(
       async (
         _db: unknown,
@@ -72,7 +77,11 @@ describe('StreakService', () => {
       await service.getStreak('user-123', 'tenant-456');
       expect(withTenantContext).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ userId: 'user-123', tenantId: 'tenant-456', userRole: 'STUDENT' }),
+        expect.objectContaining({
+          userId: 'user-123',
+          tenantId: 'tenant-456',
+          userRole: 'STUDENT',
+        }),
         expect.any(Function)
       );
     });

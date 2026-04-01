@@ -24,7 +24,9 @@ vi.mock('unzipper', () => ({
 }));
 
 vi.mock('pdf-parse', () => {
-  const mockGetText = vi.fn().mockResolvedValue({ text: 'Parsed PDF text', total: 3 });
+  const mockGetText = vi
+    .fn()
+    .mockResolvedValue({ text: 'Parsed PDF text', total: 3 });
   const mockDestroy = vi.fn().mockResolvedValue(undefined);
   return {
     PDFParse: vi.fn().mockImplementation(() => ({
@@ -45,7 +47,9 @@ vi.mock('nats', () => ({
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
-  buildNatsOptions: vi.fn().mockReturnValue({ servers: ['nats://localhost:4222'] }),
+  buildNatsOptions: vi
+    .fn()
+    .mockReturnValue({ servers: ['nats://localhost:4222'] }),
 }));
 
 import {
@@ -87,7 +91,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('pdf'),
         'test.pdf',
-        'tenant-1',
+        'tenant-1'
       );
       // pdf-parse may or may not work in test env; text is either parsed or empty
       expect(typeof result.extractedText).toBe('string');
@@ -101,7 +105,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('pdf'),
         'test.pdf',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.aiCaption).toBeNull();
     });
@@ -114,10 +118,12 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('pdf'),
         'test.pdf',
-        'tenant-1',
+        'tenant-1'
       );
       // pageCount is number when pdf-parse succeeds, null on failure
-      expect(result.pageCount === null || typeof result.pageCount === 'number').toBe(true);
+      expect(
+        result.pageCount === null || typeof result.pageCount === 'number'
+      ).toBe(true);
     });
 
     it('returns EMBEDDED_TEXT with ocrConfidence 0 when pdf-parse fails', async () => {
@@ -132,7 +138,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('bad-pdf'),
         'broken.pdf',
-        'tenant-1',
+        'tenant-1'
       );
       // On failure, still returns EMBEDDED_TEXT method
       expect(result.ocrMethod).toBe('EMBEDDED_TEXT');
@@ -151,7 +157,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(32),
         'lecture.mp4',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('NONE');
     });
@@ -164,11 +170,11 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(32),
         'lecture.mp4',
-        'tenant-1',
+        'tenant-1'
       );
       // Without NATS connection, warning about NATS not connected
       const natsWarning = result.warnings.find((w) =>
-        w.includes('NATS not connected'),
+        w.includes('NATS not connected')
       );
       expect(natsWarning).toBeDefined();
     });
@@ -181,7 +187,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(32),
         'vid.mp4',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.extractedText).toBe('');
     });
@@ -194,10 +200,10 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(32),
         'vid.mp4',
-        'tenant-1',
+        'tenant-1'
       );
       const transcriptWarning = result.warnings.find((w) =>
-        w.includes('transcription worker'),
+        w.includes('transcription worker')
       );
       expect(transcriptWarning).toBeDefined();
     });
@@ -214,7 +220,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from([0x89, 0x50, 0x4e, 0x47]),
         'slide.png',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('NONE');
       expect(result.ocrConfidence).toBe(0);
@@ -228,7 +234,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(4),
         'photo.jpg',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('NONE');
     });
@@ -241,7 +247,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(4),
         'banner.webp',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('NONE');
     });
@@ -254,7 +260,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(4),
         'img.png',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.extractedText).toBe('');
     });
@@ -267,7 +273,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(4),
         'note.png',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.isHandwritten).toBe(false);
     });
@@ -280,10 +286,10 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(4),
         'scan.png',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.warnings).toContain(
-        'Image OCR: not yet available — text extraction skipped',
+        'Image OCR: not yet available — text extraction skipped'
       );
     });
   });
@@ -296,7 +302,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from(text),
         'notes.txt',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.extractedText).toBe(text);
       expect(result.ocrMethod).toBe('NONE');
@@ -307,7 +313,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from(text),
         'long.txt',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.estimatedDuration).toBe(Math.ceil(3000 / 1500));
     });
@@ -316,7 +322,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('content'),
         'file.txt',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.warnings).toHaveLength(0);
     });
@@ -326,7 +332,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from(md),
         'lesson.md',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.extractedText).toContain('Title');
     });
@@ -343,7 +349,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(16),
         'report.docx',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.warnings[0]).toContain('LibreOffice');
       expect(result.ocrMethod).toBe('NONE');
@@ -357,7 +363,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.alloc(16),
         'report.odt',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('NONE');
     });
@@ -378,8 +384,8 @@ describe('ContentIngestionPipelineService — handler tests', () => {
         service.ingest(
           Buffer.from([0x50, 0x4b, 0x03, 0x04, ...Buffer.alloc(26)]),
           'evil.zip',
-          'tenant-1',
-        ),
+          'tenant-1'
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -395,8 +401,8 @@ describe('ContentIngestionPipelineService — handler tests', () => {
         service.ingest(
           Buffer.from([0x50, 0x4b, 0x03, 0x04, ...Buffer.alloc(26)]),
           'rootkit.zip',
-          'tenant-1',
-        ),
+          'tenant-1'
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -412,8 +418,8 @@ describe('ContentIngestionPipelineService — handler tests', () => {
         service.ingest(
           Buffer.from([0x50, 0x4b, 0x03, 0x04, ...Buffer.alloc(26)]),
           'bomb.zip',
-          'tenant-1',
-        ),
+          'tenant-1'
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -431,7 +437,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from([0x50, 0x4b, 0x03, 0x04, ...Buffer.alloc(26)]),
         'content.zip',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.extractedText).toContain('2 files');
       expect(result.ocrMethod).toBe('NONE');
@@ -447,14 +453,14 @@ describe('ContentIngestionPipelineService — handler tests', () => {
         ext: 'exe',
       });
       await expect(
-        service.ingest(Buffer.from([0x4d, 0x5a]), 'malware.exe', 'tenant-1'),
+        service.ingest(Buffer.from([0x4d, 0x5a]), 'malware.exe', 'tenant-1')
       ).rejects.toThrow(UnsupportedMediaTypeException);
     });
 
     it('throws for unknown MIME type with no extension match', async () => {
       vi.mocked(fileTypeFromBuffer).mockResolvedValue(undefined);
       await expect(
-        service.ingest(Buffer.alloc(4), 'unknown.xyz', 'tenant-1'),
+        service.ingest(Buffer.alloc(4), 'unknown.xyz', 'tenant-1')
       ).rejects.toThrow(UnsupportedMediaTypeException);
     });
   });
@@ -467,7 +473,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('text content'),
         'notes.txt',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('NONE');
       expect(result.extractedText).toContain('text content');
@@ -478,7 +484,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('fake-pdf'),
         'doc.pdf',
-        'tenant-1',
+        'tenant-1'
       );
       expect(result.ocrMethod).toBe('EMBEDDED_TEXT');
     });
@@ -491,7 +497,7 @@ describe('ContentIngestionPipelineService — handler tests', () => {
       const result = await service.ingest(
         Buffer.from('hello'),
         'test.txt',
-        'tenant-1',
+        'tenant-1'
       );
       const keys: (keyof IngestionResult)[] = [
         'extractedText',

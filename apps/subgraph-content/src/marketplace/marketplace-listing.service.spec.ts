@@ -73,7 +73,12 @@ describe('MarketplaceListingService', () => {
     mockWithTenantContext.mockResolvedValueOnce([listing]);
 
     const result = await svc.createListing(
-      {} as never, COURSE_ID, 2999, 'USD', 70, TENANT_ID
+      {} as never,
+      COURSE_ID,
+      2999,
+      'USD',
+      70,
+      TENANT_ID
     );
 
     expect(result).toEqual(listing);
@@ -85,7 +90,12 @@ describe('MarketplaceListingService', () => {
     mockWithTenantContext.mockResolvedValueOnce([listing]);
 
     const result = await svc.createListing(
-      {} as never, COURSE_ID, 5000, 'EUR', 150, TENANT_ID
+      {} as never,
+      COURSE_ID,
+      5000,
+      'EUR',
+      150,
+      TENANT_ID
     );
 
     expect(result.revenueSplitPercent).toBeLessThanOrEqual(100);
@@ -96,7 +106,12 @@ describe('MarketplaceListingService', () => {
     mockWithTenantContext.mockResolvedValueOnce([listing]);
 
     const result = await svc.createListing(
-      {} as never, COURSE_ID, 1000, 'ILS', -50, TENANT_ID
+      {} as never,
+      COURSE_ID,
+      1000,
+      'ILS',
+      -50,
+      TENANT_ID
     );
 
     expect(result.revenueSplitPercent).toBeGreaterThanOrEqual(0);

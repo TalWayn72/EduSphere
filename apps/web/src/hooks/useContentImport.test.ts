@@ -24,7 +24,7 @@ vi.mock('graphql-request', () => ({
     strings.reduce(
       (acc: string, str: string, i: number) =>
         acc + str + String(values[i] ?? ''),
-      '',
+      ''
     ),
 }));
 
@@ -110,7 +110,9 @@ describe('useContentImport', () => {
     const { result } = renderHook(() => useContentImport('course-1'));
 
     await act(async () => {
-      await result.current.importFromYoutube('https://youtube.com/playlist?list=abc');
+      await result.current.importFromYoutube(
+        'https://youtube.com/playlist?list=abc'
+      );
     });
 
     expect(mockRequest).toHaveBeenCalledWith(
@@ -122,7 +124,7 @@ describe('useContentImport', () => {
           courseId: 'course-1',
           moduleId: '',
         },
-      },
+      }
     );
     expect(result.current.importJob).toEqual(job);
   });
@@ -147,7 +149,7 @@ describe('useContentImport', () => {
           courseId: 'course-2',
           moduleId: '',
         },
-      },
+      }
     );
     expect(result.current.importJob).toEqual(job);
   });
@@ -173,7 +175,7 @@ describe('useContentImport', () => {
           courseId: 'course-3',
           moduleId: '',
         },
-      },
+      }
     );
     expect(result.current.importJob).toEqual(job);
   });
@@ -209,7 +211,7 @@ describe('useContentImport', () => {
     expect(mockRequest).toHaveBeenCalledWith(
       expect.any(String),
       expect.any(String),
-      { jobId: 'job-to-cancel' },
+      { jobId: 'job-to-cancel' }
     );
   });
 
@@ -262,7 +264,7 @@ describe('useContentImport', () => {
     mockRequest.mockReturnValueOnce(
       new Promise((resolve) => {
         resolveRequest = resolve;
-      }),
+      })
     );
 
     const { result, unmount } = renderHook(() => useContentImport('course-1'));

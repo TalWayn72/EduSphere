@@ -8,8 +8,20 @@ const MOCK_DASHBOARD = {
   status: 'ACTIVE',
   apiKey: 'esph_abc123def456ghi789',
   revenueByMonth: [
-    { month: 'January 2026', grossRevenue: 3000, platformCut: 900, payout: 2100, status: 'PAID' },
-    { month: 'February 2026', grossRevenue: 4000, platformCut: 1200, payout: 2800, status: 'PENDING' },
+    {
+      month: 'January 2026',
+      grossRevenue: 3000,
+      platformCut: 900,
+      payout: 2100,
+      status: 'PAID',
+    },
+    {
+      month: 'February 2026',
+      grossRevenue: 4000,
+      platformCut: 1200,
+      payout: 2800,
+      status: 'PENDING',
+    },
   ],
 };
 
@@ -18,7 +30,11 @@ vi.mock('urql', async (importOriginal) => {
   return {
     ...actual,
     useQuery: vi.fn(() => [
-      { fetching: false, data: { myPartnerDashboard: MOCK_DASHBOARD }, error: undefined },
+      {
+        fetching: false,
+        data: { myPartnerDashboard: MOCK_DASHBOARD },
+        error: undefined,
+      },
     ]),
     useMutation: vi.fn(() => [{ fetching: false, data: null }, vi.fn()]),
   };
@@ -29,7 +45,9 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return { ...actual, useNavigate: vi.fn(() => vi.fn()) };
 });
 
-vi.mock('@/hooks/useAuthRole', () => ({ useAuthRole: vi.fn(() => 'ORG_ADMIN') }));
+vi.mock('@/hooks/useAuthRole', () => ({
+  useAuthRole: vi.fn(() => 'ORG_ADMIN'),
+}));
 
 vi.mock('@/components/admin/AdminLayout', () => ({
   AdminLayout: ({ children }: { children: React.ReactNode }) => (
@@ -38,7 +56,9 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -46,7 +66,9 @@ vi.mock('@/components/PageHeader', () => ({
 }));
 
 vi.mock('@/components/partners/PartnerTierBadge', () => ({
-  PartnerTierBadge: ({ tier }: { tier: string }) => <span data-testid="tier-badge">{tier}</span>,
+  PartnerTierBadge: ({ tier }: { tier: string }) => (
+    <span data-testid="tier-badge">{tier}</span>
+  ),
 }));
 
 function renderPage() {
@@ -84,7 +106,9 @@ describe('PartnerDashboardPage', () => {
 
   it('shows masked API key', () => {
     renderPage();
-    expect(screen.getByTestId('api-key-display').textContent).toMatch(/esph_abc/);
+    expect(screen.getByTestId('api-key-display').textContent).toMatch(
+      /esph_abc/
+    );
   });
 
   it('shows platform cut column header', () => {

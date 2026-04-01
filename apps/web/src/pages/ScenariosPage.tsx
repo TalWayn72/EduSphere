@@ -56,9 +56,14 @@ export function ScenariosPage() {
     null
   );
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY, pause: !mounted });
+  const [result] = useQuery({
+    query: SCENARIO_TEMPLATES_QUERY,
+    pause: !mounted,
+  });
 
   const scenarios: ScenarioTemplate[] =
     (result.data?.scenarioTemplates as ScenarioTemplate[] | undefined) ?? [];
@@ -118,7 +123,8 @@ export function ScenariosPage() {
               <Briefcase className="h-5 w-5" />
             );
             const iconClass =
-              DOMAIN_COLORS[scenario.domain] ?? 'text-muted-foreground bg-muted';
+              DOMAIN_COLORS[scenario.domain] ??
+              'text-muted-foreground bg-muted';
             const badgeClass =
               DIFFICULTY_BADGES[scenario.difficultyLevel] ??
               'bg-muted text-foreground';

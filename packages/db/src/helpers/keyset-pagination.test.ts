@@ -33,12 +33,16 @@ describe('keyset-pagination', () => {
     });
 
     it('returns null for valid base64 but missing fields', () => {
-      const bad = Buffer.from(JSON.stringify({ foo: 'bar' })).toString('base64');
+      const bad = Buffer.from(JSON.stringify({ foo: 'bar' })).toString(
+        'base64'
+      );
       expect(decodeCursor(bad)).toBeNull();
     });
 
     it('returns null for valid base64 with wrong field types', () => {
-      const bad = Buffer.from(JSON.stringify({ createdAt: 123, id: true })).toString('base64');
+      const bad = Buffer.from(
+        JSON.stringify({ createdAt: 123, id: true })
+      ).toString('base64');
       expect(decodeCursor(bad)).toBeNull();
     });
   });

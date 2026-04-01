@@ -68,7 +68,9 @@ export async function executeCypher<T = Record<string, unknown>>(
           `SELECT * FROM cypher('${graphName}', $$${query}$$, $1) AS (result agtype)`,
           [JSON.stringify(params)]
         );
-        return result.rows.map((row: Record<string, unknown>) => unwrapAgeRow(row)) as T[];
+        return result.rows.map((row: Record<string, unknown>) =>
+          unwrapAgeRow(row)
+        ) as T[];
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         if (
@@ -81,14 +83,18 @@ export async function executeCypher<T = Record<string, unknown>>(
         const result = await client.query(
           `SELECT * FROM cypher('${graphName}', $$${substituted}$$) AS (result agtype)`
         );
-        return result.rows.map((row: Record<string, unknown>) => unwrapAgeRow(row)) as T[];
+        return result.rows.map((row: Record<string, unknown>) =>
+          unwrapAgeRow(row)
+        ) as T[];
       }
     }
 
     const result = await client.query(
       `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`
     );
-    return result.rows.map((row: Record<string, unknown>) => unwrapAgeRow(row)) as T[];
+    return result.rows.map((row: Record<string, unknown>) =>
+      unwrapAgeRow(row)
+    ) as T[];
   } finally {
     client.release();
   }

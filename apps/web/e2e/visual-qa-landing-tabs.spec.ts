@@ -17,7 +17,14 @@ const __filename2 = fileURLToPath(import.meta.url);
 const __dirname2 = dirname(__filename2);
 
 const TARGET_URL = BASE_URL;
-const SCREENSHOT_DIR = resolve(__dirname2, '..', '..', '..', 'docs', 'screenshots');
+const SCREENSHOT_DIR = resolve(
+  __dirname2,
+  '..',
+  '..',
+  '..',
+  'docs',
+  'screenshots'
+);
 
 // Ensure screenshot dir exists
 mkdirSync(SCREENSHOT_DIR, { recursive: true });
@@ -31,7 +38,7 @@ mkdirSync(SCREENSHOT_DIR, { recursive: true });
 async function verifyAnchorNav(
   page: import('@playwright/test').Page,
   sectionId: string,
-  label: string,
+  label: string
 ) {
   const url = new URL(page.url());
   expect(url.pathname).toBe('/landing');
@@ -47,7 +54,9 @@ async function verifyAnchorNav(
     console.log(`[${label}] Section #${sectionId} visible — PASS`);
   } else {
     // Section may not exist in DOM (test still passes — we verify no navigation)
-    console.log(`[${label}] Section #${sectionId} not found — OK (stayed on /landing)`);
+    console.log(
+      `[${label}] Section #${sectionId} not found — OK (stayed on /landing)`
+    );
   }
 }
 
@@ -124,10 +133,17 @@ test.describe('Visual QA — Landing Tab Navigation (BUG-070)', () => {
     // Now click Features — must still work after Compliance
     await featuresLink.click();
     await page.waitForTimeout(500);
-    await verifyAnchorNav(page, 'features', 'Reverse: Features after Compliance');
+    await verifyAnchorNav(
+      page,
+      'features',
+      'Reverse: Features after Compliance'
+    );
 
     await page.screenshot({
-      path: resolve(SCREENSHOT_DIR, 'landing-tab-qa-07-features-after-compliance.png'),
+      path: resolve(
+        SCREENSHOT_DIR,
+        'landing-tab-qa-07-features-after-compliance.png'
+      ),
       fullPage: false,
     });
 

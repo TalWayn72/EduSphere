@@ -58,12 +58,33 @@ async function mockEmbeddingDashboard(page: Page): Promise<void> {
         body: JSON.stringify({
           data: {
             embeddingStats: {
-              totalSources: 50, indexedSources: 40, pendingSources: 5, failedSources: 5,
+              totalSources: 50,
+              indexedSources: 40,
+              pendingSources: 5,
+              failedSources: 5,
               totalChunks: 1200,
               courseBreakdown: [
-                { courseId: 'c1', courseTitle: 'AI Basics', sourceCount: 20, indexedCount: 18, chunkCount: 500 },
-                { courseId: 'c2', courseTitle: 'ML Advanced', sourceCount: 30, indexedCount: 22, chunkCount: 700 },
-                { courseId: 'c3', courseTitle: 'Data Science 101', sourceCount: 10, indexedCount: 3, chunkCount: 80 },
+                {
+                  courseId: 'c1',
+                  courseTitle: 'AI Basics',
+                  sourceCount: 20,
+                  indexedCount: 18,
+                  chunkCount: 500,
+                },
+                {
+                  courseId: 'c2',
+                  courseTitle: 'ML Advanced',
+                  sourceCount: 30,
+                  indexedCount: 22,
+                  chunkCount: 700,
+                },
+                {
+                  courseId: 'c3',
+                  courseTitle: 'Data Science 101',
+                  sourceCount: 10,
+                  indexedCount: 3,
+                  chunkCount: 80,
+                },
               ],
             },
           },
@@ -79,9 +100,30 @@ async function mockEmbeddingDashboard(page: Page): Promise<void> {
         body: JSON.stringify({
           data: {
             embeddingActivity: [
-              { id: 'a1', timestamp: '2026-03-27T10:00:00Z', courseName: 'AI Basics', operation: 'index', status: 'completed', count: 42 },
-              { id: 'a2', timestamp: '2026-03-27T09:30:00Z', courseName: 'ML Advanced', operation: 'reindex', status: 'in_progress', count: 15 },
-              { id: 'a3', timestamp: '2026-03-27T09:00:00Z', courseName: 'Data Science 101', operation: 'index', status: 'failed', count: 0 },
+              {
+                id: 'a1',
+                timestamp: '2026-03-27T10:00:00Z',
+                courseName: 'AI Basics',
+                operation: 'index',
+                status: 'completed',
+                count: 42,
+              },
+              {
+                id: 'a2',
+                timestamp: '2026-03-27T09:30:00Z',
+                courseName: 'ML Advanced',
+                operation: 'reindex',
+                status: 'in_progress',
+                count: 15,
+              },
+              {
+                id: 'a3',
+                timestamp: '2026-03-27T09:00:00Z',
+                courseName: 'Data Science 101',
+                operation: 'index',
+                status: 'failed',
+                count: 0,
+              },
             ],
           },
         }),
@@ -89,7 +131,11 @@ async function mockEmbeddingDashboard(page: Page): Promise<void> {
       return;
     }
 
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: {} }),
+    });
   });
 }
 
@@ -108,19 +154,49 @@ async function mockSourceManager(page: Page): Promise<void> {
       });
       return;
     }
-    const body = req.postDataJSON() as { operationName?: string; query?: string } | null;
+    const body = req.postDataJSON() as {
+      operationName?: string;
+      query?: string;
+    } | null;
     const op = body?.operationName ?? '';
 
-    if (op.includes('KnowledgeSources') || body?.query?.includes('knowledgeSources')) {
+    if (
+      op.includes('KnowledgeSources') ||
+      body?.query?.includes('knowledgeSources')
+    ) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           data: {
             knowledgeSources: [
-              { id: 's1', title: 'Ready PDF Doc', sourceType: 'FILE_PDF', status: 'READY', chunkCount: 12, errorMessage: null, createdAt: '2026-03-01T10:00:00Z' },
-              { id: 's2', title: 'Processing Source', sourceType: 'URL', status: 'PROCESSING', chunkCount: 0, errorMessage: null, createdAt: '2026-03-02T08:00:00Z' },
-              { id: 's3', title: 'Not Indexed Yet', sourceType: 'FILE_TXT', status: 'PENDING', chunkCount: 0, errorMessage: null, createdAt: '2026-03-03T12:00:00Z' },
+              {
+                id: 's1',
+                title: 'Ready PDF Doc',
+                sourceType: 'FILE_PDF',
+                status: 'READY',
+                chunkCount: 12,
+                errorMessage: null,
+                createdAt: '2026-03-01T10:00:00Z',
+              },
+              {
+                id: 's2',
+                title: 'Processing Source',
+                sourceType: 'URL',
+                status: 'PROCESSING',
+                chunkCount: 0,
+                errorMessage: null,
+                createdAt: '2026-03-02T08:00:00Z',
+              },
+              {
+                id: 's3',
+                title: 'Not Indexed Yet',
+                sourceType: 'FILE_TXT',
+                status: 'PENDING',
+                chunkCount: 0,
+                errorMessage: null,
+                createdAt: '2026-03-03T12:00:00Z',
+              },
             ],
           },
         }),
@@ -128,7 +204,11 @@ async function mockSourceManager(page: Page): Promise<void> {
       return;
     }
 
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: {} }),
+    });
   });
 }
 
@@ -147,7 +227,11 @@ async function mockSearchEmpty(page: Page): Promise<void> {
       });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: {} }),
+    });
   });
 }
 
@@ -164,7 +248,10 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1000);
 
-    await expect(page).toHaveScreenshot('source-manager-status-badges.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'source-manager-status-badges.png',
+      STABLE_OPTS
+    );
   });
 
   test('search page empty state', async ({ page }) => {
@@ -176,13 +263,18 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
     await expect(page).toHaveScreenshot('search-empty-state.png', STABLE_OPTS);
   });
 
-  test('admin embedding dashboard with stats, chart, and table', async ({ page }) => {
+  test('admin embedding dashboard with stats, chart, and table', async ({
+    page,
+  }) => {
     await mockEmbeddingDashboard(page);
     await page.goto('/admin/embeddings', { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1500);
 
-    await expect(page).toHaveScreenshot('admin-embedding-dashboard.png', LOOSE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'admin-embedding-dashboard.png',
+      LOOSE_OPTS
+    );
   });
 
   test('PDF viewer with toolbar controls', async ({ page }) => {
@@ -200,27 +292,44 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
         });
         return;
       }
-      const body = req.postDataJSON() as { operationName?: string; query?: string } | null;
+      const body = req.postDataJSON() as {
+        operationName?: string;
+        query?: string;
+      } | null;
       const op = body?.operationName ?? '';
 
-      if (op.includes('KnowledgeSources') || body?.query?.includes('knowledgeSources')) {
+      if (
+        op.includes('KnowledgeSources') ||
+        body?.query?.includes('knowledgeSources')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
             data: {
-              knowledgeSources: [{
-                id: 'pdf1', title: 'Visual Test PDF', sourceType: 'FILE_PDF', status: 'READY',
-                chunkCount: 10, errorMessage: null, fileUrl: 'https://cdn.edusphere.io/docs/test.pdf',
-                createdAt: '2026-03-01T10:00:00Z',
-              }],
+              knowledgeSources: [
+                {
+                  id: 'pdf1',
+                  title: 'Visual Test PDF',
+                  sourceType: 'FILE_PDF',
+                  status: 'READY',
+                  chunkCount: 10,
+                  errorMessage: null,
+                  fileUrl: 'https://cdn.edusphere.io/docs/test.pdf',
+                  createdAt: '2026-03-01T10:00:00Z',
+                },
+              ],
             },
           }),
         });
         return;
       }
 
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await page.goto('/learn', { waitUntil: 'domcontentloaded' });
@@ -230,7 +339,10 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
     // If PDF viewer toolbar is visible, take a screenshot
     const toolbar = page.locator('[role="toolbar"]').first();
     if (await toolbar.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(page).toHaveScreenshot('pdf-viewer-toolbar.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'pdf-viewer-toolbar.png',
+        STABLE_OPTS
+      );
     }
   });
 
@@ -249,7 +361,11 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
         });
         return;
       }
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: {} }),
+      });
     });
 
     await page.goto('/learn', { waitUntil: 'domcontentloaded' });
@@ -257,7 +373,9 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
     await page.waitForTimeout(500);
 
     // Click PDF source and switch to sketch mode if available
-    const pdfLink = page.locator('text=Test PDF Document, text=Visual Test PDF').first();
+    const pdfLink = page
+      .locator('text=Test PDF Document, text=Visual Test PDF')
+      .first();
     if (await pdfLink.isVisible({ timeout: 3000 }).catch(() => false)) {
       await pdfLink.click();
       await page.waitForTimeout(1000);
@@ -267,7 +385,10 @@ test.describe('Visual Regression — RAG Features @visual-rag', () => {
         await sketchBtn.click();
         await page.waitForTimeout(500);
 
-        await expect(page).toHaveScreenshot('pdf-viewer-sketch-mode.png', LOOSE_OPTS);
+        await expect(page).toHaveScreenshot(
+          'pdf-viewer-sketch-mode.png',
+          LOOSE_OPTS
+        );
       }
     }
   });

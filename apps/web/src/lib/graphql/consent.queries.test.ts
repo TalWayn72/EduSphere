@@ -5,11 +5,16 @@ describe('consent.queries', () => {
   it('exports UPDATE_CONSENT_MUTATION as a mutation DocumentNode', () => {
     expect(UPDATE_CONSENT_MUTATION).toBeDefined();
     expect(UPDATE_CONSENT_MUTATION.kind).toBe('Document');
-    expect(UPDATE_CONSENT_MUTATION.definitions.length).toBeGreaterThanOrEqual(1);
-    const def = UPDATE_CONSENT_MUTATION.definitions[0] as { kind: string; operation: string; name?: { value: string } };
+    expect(UPDATE_CONSENT_MUTATION.definitions.length).toBeGreaterThanOrEqual(
+      1
+    );
+    const def = UPDATE_CONSENT_MUTATION.definitions[0] as {
+      kind: string;
+      operation: string;
+      name?: { value: string };
+    };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
     expect(def.name?.value).toBe('UpdateConsent');
   });
-
 });

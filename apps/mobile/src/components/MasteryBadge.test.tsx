@@ -127,15 +127,18 @@ describe('MasteryBadge — WCAG 1.4.1 accessible label', () => {
     mastered: 4,
   };
 
-  it.each(ALL_LEVELS)('level "%s" has accessible label with name and level number', (level) => {
-    const label = LEVEL_LABEL[level];
-    const num = LEVEL_NUMBER[level];
-    const expected = `Mastery: ${label} (level ${num} of 4)`;
-    // Verify the expected accessible label string is correctly formed
-    expect(expected).toMatch(/^Mastery: .+ \(level \d of 4\)$/);
-    expect(expected).toContain(label);
-    expect(expected).toContain(String(num));
-  });
+  it.each(ALL_LEVELS)(
+    'level "%s" has accessible label with name and level number',
+    (level) => {
+      const label = LEVEL_LABEL[level];
+      const num = LEVEL_NUMBER[level];
+      const expected = `Mastery: ${label} (level ${num} of 4)`;
+      // Verify the expected accessible label string is correctly formed
+      expect(expected).toMatch(/^Mastery: .+ \(level \d of 4\)$/);
+      expect(expected).toContain(label);
+      expect(expected).toContain(String(num));
+    }
+  );
 
   it('showLabel defaults to true (WCAG 1.4.1 — text is primary indicator)', () => {
     // The default value in the component signature must be true

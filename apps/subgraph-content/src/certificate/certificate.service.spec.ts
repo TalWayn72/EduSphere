@@ -5,7 +5,9 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 const mockS3Destroy = vi.hoisted(() => vi.fn());
 const mockS3Send = vi.hoisted(() => vi.fn().mockResolvedValue({}));
 const mockGetSignedUrl = vi.hoisted(() =>
-  vi.fn().mockResolvedValue('https://minio.example.com/presigned-url?expires=900')
+  vi
+    .fn()
+    .mockResolvedValue('https://minio.example.com/presigned-url?expires=900')
 );
 
 // ── DB mock ──────────────────────────────────────────────────────────────────
@@ -50,7 +52,10 @@ vi.mock('nats', () => ({
 // ── S3 / presigner mock ───────────────────────────────────────────────────────
 vi.mock('@aws-sdk/client-s3', () => {
   // Use regular constructor functions (not arrow) so `new` works correctly
-  function S3Client(this: { send: typeof mockS3Send; destroy: typeof mockS3Destroy }) {
+  function S3Client(this: {
+    send: typeof mockS3Send;
+    destroy: typeof mockS3Destroy;
+  }) {
     this.send = mockS3Send;
     this.destroy = mockS3Destroy;
   }
@@ -199,7 +204,10 @@ describe('CertificateDownloadService', () => {
 
   describe('getCertificateDownloadUrl', () => {
     it('returns a presigned URL when certificate belongs to the requesting user', async () => {
-      const certWithPdf = { ...MOCK_CERT, pdf_url: 'tenant-1/certificates/user-1/cert.pdf' };
+      const certWithPdf = {
+        ...MOCK_CERT,
+        pdf_url: 'tenant-1/certificates/user-1/cert.pdf',
+      };
       const limit = vi.fn().mockResolvedValue([certWithPdf]);
       const where = vi.fn().mockReturnValue({ limit });
       const from = vi.fn().mockReturnValue({ where });
@@ -222,7 +230,11 @@ describe('CertificateDownloadService', () => {
       mockSelect.mockReturnValue({ from });
 
       await expect(
-        downloadService.getCertificateDownloadUrl('cert-1', 'other-user', 'tenant-1')
+        downloadService.getCertificateDownloadUrl(
+          'cert-1',
+          'other-user',
+          'tenant-1'
+        )
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -234,7 +246,11 @@ describe('CertificateDownloadService', () => {
       mockSelect.mockReturnValue({ from });
 
       await expect(
-        downloadService.getCertificateDownloadUrl('cert-1', 'user-1', 'tenant-1')
+        downloadService.getCertificateDownloadUrl(
+          'cert-1',
+          'user-1',
+          'tenant-1'
+        )
       ).rejects.toThrow(BadRequestException);
     });
   });

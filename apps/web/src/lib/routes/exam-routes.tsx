@@ -56,21 +56,45 @@ const ExamResultPage = lazy(() =>
  */
 export const examRoutes: RouteObject[] = [
   // Instructor: item bank & editor
-  { path: '/courses/:courseId/exams/items', element: guarded(<ExamItemBankPage />) },
-  { path: '/courses/:courseId/exams/items/new', element: guarded(<ExamItemEditorPage />) },
-  { path: '/courses/:courseId/exams/items/:itemId', element: guarded(<ExamItemEditorPage />) },
+  {
+    path: '/courses/:courseId/exams/items',
+    element: guarded(<ExamItemBankPage />),
+  },
+  {
+    path: '/courses/:courseId/exams/items/new',
+    element: guarded(<ExamItemEditorPage />),
+  },
+  {
+    path: '/courses/:courseId/exams/items/:itemId',
+    element: guarded(<ExamItemEditorPage />),
+  },
   // Instructor: blueprints
-  { path: '/courses/:courseId/exams/blueprints', element: guarded(<ExamBlueprintListPage />) },
-  { path: '/courses/:courseId/exams/blueprints/new', element: guarded(<ExamBlueprintBuilderPage />) },
+  {
+    path: '/courses/:courseId/exams/blueprints',
+    element: guarded(<ExamBlueprintListPage />),
+  },
+  {
+    path: '/courses/:courseId/exams/blueprints/new',
+    element: guarded(<ExamBlueprintBuilderPage />),
+  },
   {
     path: '/courses/:courseId/exams/blueprints/:blueprintId',
     element: guarded(<ExamBlueprintBuilderPage />),
   },
   // Instructor: analytics & AI generation
-  { path: '/courses/:courseId/exams/analytics', element: guarded(<ExamAnalyticsDashboard />) },
-  { path: '/courses/:courseId/exams/generate', element: guarded(<ExamItemGeneratorPage />) },
+  {
+    path: '/courses/:courseId/exams/analytics',
+    element: guarded(<ExamAnalyticsDashboard />),
+  },
+  {
+    path: '/courses/:courseId/exams/generate',
+    element: guarded(<ExamItemGeneratorPage />),
+  },
   // Student: exam sessions
   { path: '/exams/:blueprintId/start', element: guarded(<ExamStartPage />) },
   { path: '/exams/session/:sessionId', element: guarded(<ExamTakingPage />) },
-  { path: '/exams/session/:sessionId/results', element: guarded(<ExamResultPage />) },
+  {
+    path: '/exams/session/:sessionId/results',
+    element: guarded(<ExamResultPage />),
+  },
 ];

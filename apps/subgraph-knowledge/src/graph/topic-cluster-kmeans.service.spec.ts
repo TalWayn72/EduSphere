@@ -142,7 +142,10 @@ describe('TopicClusterKMeansService', () => {
     });
 
     it('returns k centroids even when k > point count', () => {
-      const points = [[1, 0], [0, 1]];
+      const points = [
+        [1, 0],
+        [0, 1],
+      ];
       const centroids = service.initCentroidsKMeansPlusPlus(points, 5);
       expect(centroids).toHaveLength(5);
     });

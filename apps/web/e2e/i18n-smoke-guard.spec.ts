@@ -66,8 +66,8 @@ const FALSE_POSITIVE_PATTERNS = [
   /e\.g\./,
   /i\.e\./,
   /vs\./,
-  /v\d+\.\d+/,  // version numbers like v2.0
-  /\d+\.\d+/,   // decimal numbers like 3.14
+  /v\d+\.\d+/, // version numbers like v2.0
+  /\d+\.\d+/, // decimal numbers like 3.14
 ];
 
 /**

@@ -27,23 +27,37 @@ describe('FolderUploadZone', () => {
 
   it('calls onFilesSelected with sorted valid files', () => {
     const onFilesSelected = vi.fn();
-    render(<FolderUploadZone courseId="course-1" onFilesSelected={onFilesSelected} />);
+    render(
+      <FolderUploadZone courseId="course-1" onFilesSelected={onFilesSelected} />
+    );
 
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     const mockFiles = [
-      Object.assign(new File([''], '02_lesson.mp4', { type: 'video/mp4' }), { webkitRelativePath: 'course/02_lesson.mp4' }),
-      Object.assign(new File([''], '01_intro.pdf', { type: 'application/pdf' }), { webkitRelativePath: 'course/01_intro.pdf' }),
+      Object.assign(new File([''], '02_lesson.mp4', { type: 'video/mp4' }), {
+        webkitRelativePath: 'course/02_lesson.mp4',
+      }),
+      Object.assign(
+        new File([''], '01_intro.pdf', { type: 'application/pdf' }),
+        { webkitRelativePath: 'course/01_intro.pdf' }
+      ),
     ];
 
     Object.defineProperty(input, 'files', {
-      value: { length: mockFiles.length, ...mockFiles, [Symbol.iterator]: [][Symbol.iterator] },
+      value: {
+        length: mockFiles.length,
+        ...mockFiles,
+        [Symbol.iterator]: [][Symbol.iterator],
+      },
       configurable: true,
     });
     fireEvent.change(input);
 
     // Should have been called with files
     expect(onFilesSelected).toHaveBeenCalled();
-    const calledWith: Array<{ relativePath: string }> = onFilesSelected.mock.calls[0][0];
+    const calledWith: Array<{ relativePath: string }> =
+      onFilesSelected.mock.calls[0][0];
     // Sorted: 01_ before 02_
     expect(calledWith[0].relativePath).toContain('01_');
     expect(calledWith[1].relativePath).toContain('02_');
@@ -51,22 +65,36 @@ describe('FolderUploadZone', () => {
 
   it('filters out unsupported file types (e.g. .exe)', () => {
     const onFilesSelected = vi.fn();
-    render(<FolderUploadZone courseId="course-1" onFilesSelected={onFilesSelected} />);
+    render(
+      <FolderUploadZone courseId="course-1" onFilesSelected={onFilesSelected} />
+    );
 
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     const mockFiles = [
-      Object.assign(new File(['MZ'], 'virus.exe', { type: 'application/octet-stream' }), { webkitRelativePath: 'virus.exe' }),
-      Object.assign(new File([''], 'lesson.mp4', { type: 'video/mp4' }), { webkitRelativePath: 'lesson.mp4' }),
+      Object.assign(
+        new File(['MZ'], 'virus.exe', { type: 'application/octet-stream' }),
+        { webkitRelativePath: 'virus.exe' }
+      ),
+      Object.assign(new File([''], 'lesson.mp4', { type: 'video/mp4' }), {
+        webkitRelativePath: 'lesson.mp4',
+      }),
     ];
 
     Object.defineProperty(input, 'files', {
-      value: { length: mockFiles.length, ...mockFiles, [Symbol.iterator]: [][Symbol.iterator] },
+      value: {
+        length: mockFiles.length,
+        ...mockFiles,
+        [Symbol.iterator]: [][Symbol.iterator],
+      },
       configurable: true,
     });
     fireEvent.change(input);
 
     expect(onFilesSelected).toHaveBeenCalled();
-    const calledWith: Array<{ relativePath: string }> = onFilesSelected.mock.calls[0][0];
+    const calledWith: Array<{ relativePath: string }> =
+      onFilesSelected.mock.calls[0][0];
     // Only lesson.mp4 should be passed (exe filtered out)
     expect(calledWith).toHaveLength(1);
     expect(calledWith[0].relativePath).toBe('lesson.mp4');
@@ -74,9 +102,13 @@ describe('FolderUploadZone', () => {
 
   it('shows size warning for files over 500MB', () => {
     const onFilesSelected = vi.fn();
-    render(<FolderUploadZone courseId="course-1" onFilesSelected={onFilesSelected} />);
+    render(
+      <FolderUploadZone courseId="course-1" onFilesSelected={onFilesSelected} />
+    );
 
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     const bigFile = Object.assign(
       new File([''], 'big.mp4', { type: 'video/mp4' }),
       { webkitRelativePath: 'big.mp4' }
@@ -95,13 +127,21 @@ describe('FolderUploadZone', () => {
   it('shows selected file list after files are chosen', () => {
     render(<FolderUploadZone courseId="course-1" />);
 
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     const mockFiles = [
-      Object.assign(new File([''], 'intro.pdf', { type: 'application/pdf' }), { webkitRelativePath: 'course/intro.pdf' }),
+      Object.assign(new File([''], 'intro.pdf', { type: 'application/pdf' }), {
+        webkitRelativePath: 'course/intro.pdf',
+      }),
     ];
 
     Object.defineProperty(input, 'files', {
-      value: { length: 1, 0: mockFiles[0], [Symbol.iterator]: [][Symbol.iterator] },
+      value: {
+        length: 1,
+        0: mockFiles[0],
+        [Symbol.iterator]: [][Symbol.iterator],
+      },
       configurable: true,
     });
     fireEvent.change(input);

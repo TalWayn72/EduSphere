@@ -50,9 +50,7 @@ describe('useAnchorDetection — memory safety', () => {
     const cancelSpy = vi.spyOn(globalThis, 'cancelAnimationFrame');
     const containerRef = { current: document.createElement('div') };
 
-    const { unmount } = renderHook(() =>
-      useAnchorDetection([], containerRef)
-    );
+    const { unmount } = renderHook(() => useAnchorDetection([], containerRef));
 
     expect(() => unmount()).not.toThrow();
     // rAF should not have been requested when anchor list is empty

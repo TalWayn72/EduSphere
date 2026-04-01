@@ -4,6 +4,11 @@
 # MUST run before any Playwright/E2E test execution.
 # Ensures Docker is running and all services are healthy.
 # Exit codes: 0 = ready for E2E, 1 = services down, 2 = Docker unreachable
+#
+# In CI (GitHub Actions), the pre-e2e-gate is skipped because services are
+# provided by the workflow's `services:` block (postgres, nats) and Docker
+# Compose is not available. The test:e2e command handles CI mode via
+# Playwright config (CI=true → Vite dev server auto-start, no backend).
 
 set -uo pipefail
 
@@ -13,6 +18,13 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 echo "=== Pre-E2E Gate ==="
+
+# In CI environments, skip Docker-based checks entirely.
+# CI runners use workflow-level service containers instead.
+if [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  echo -e "${GREEN}CI environment detected — skipping Docker gate (services provided by workflow)${NC}"
+  exit 0
+fi
 
 # Step 1: Ensure Docker daemon is available
 if ! bash "$SCRIPT_DIR/ensure-docker.sh"; then

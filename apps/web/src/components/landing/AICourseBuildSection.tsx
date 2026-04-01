@@ -79,7 +79,9 @@ export function AICourseBuildSection() {
                 >
                   {step.num}
                 </span>
-                <span className="text-slate-200 text-sm font-medium dark:text-slate-700">{t(`landing.aiCourseBuild.${step.key}`)}</span>
+                <span className="text-slate-200 text-sm font-medium dark:text-slate-700">
+                  {t(`landing.aiCourseBuild.${step.key}`)}
+                </span>
               </li>
             ))}
           </ol>
@@ -97,7 +99,9 @@ export function AICourseBuildSection() {
               >
                 {count.toLocaleString()}
               </div>
-              <p className="text-slate-300 text-sm dark:text-slate-600">{t('landing.aiCourseBuild.hoursPerYear')}</p>
+              <p className="text-slate-300 text-sm dark:text-slate-600">
+                {t('landing.aiCourseBuild.hoursPerYear')}
+              </p>
               <p className="mt-4 text-xs text-slate-300 dark:text-slate-600">
                 {t('landing.aiCourseBuild.basedOn')}
               </p>
@@ -108,7 +112,18 @@ export function AICourseBuildSection() {
                 className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold w-full lg:w-auto dark:bg-indigo-500 dark:text-white"
                 asChild
               >
-                <Link to="/#pilot-cta" onClick={(e) => { const el = document.getElementById('pilot-cta'); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }}>{t('landing.aiCourseBuild.seeDemo')}</Link>
+                <Link
+                  to="/#pilot-cta"
+                  onClick={(e) => {
+                    const el = document.getElementById('pilot-cta');
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  {t('landing.aiCourseBuild.seeDemo')}
+                </Link>
               </Button>
             </div>
           </div>

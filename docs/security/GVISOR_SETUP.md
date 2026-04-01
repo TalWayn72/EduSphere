@@ -45,14 +45,14 @@ docker-compose -f docker-compose.yml -f docker-compose.gvisor.yml up -d
 
 ## Services Using gVisor
 
-| Service           | gVisor  | Reason                                          |
-| ----------------- | ------- | ----------------------------------------------- |
-| `subgraph-agent`  | YES     | Executes LLM tool calls and AI-generated code   |
-| `postgres`        | NO      | Performance-critical; no user code execution    |
-| `redis`           | NO      | Performance-critical; no user code execution    |
-| `nats`            | NO      | Message routing only; no user code execution    |
-| `keycloak`        | NO      | Auth server; no user code execution             |
-| `minio`           | NO      | Object storage; no user code execution          |
+| Service          | gVisor | Reason                                        |
+| ---------------- | ------ | --------------------------------------------- |
+| `subgraph-agent` | YES    | Executes LLM tool calls and AI-generated code |
+| `postgres`       | NO     | Performance-critical; no user code execution  |
+| `redis`          | NO     | Performance-critical; no user code execution  |
+| `nats`           | NO     | Message routing only; no user code execution  |
+| `keycloak`       | NO     | Auth server; no user code execution           |
+| `minio`          | NO     | Object storage; no user code execution        |
 
 ## Kubernetes RuntimeClass
 
@@ -92,12 +92,12 @@ Expect 5-15% throughput reduction vs runc for typical agent workloads.
 
 ## Troubleshooting
 
-| Error                                         | Cause                                              | Fix                                                      |
-| --------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------- |
-| `unknown runtime specified: runsc`            | gVisor not installed or daemon not restarted       | Install `runsc`, update `daemon.json`, restart Docker    |
-| `OCI runtime exec failed: runsc`              | gVisor version incompatible with kernel            | Upgrade gVisor: `apt-get install --only-upgrade runsc`   |
-| Container hangs on start                      | gVisor KVM mode requires nested virt in VM         | Use `--platform=systrap` in runsc flags                  |
-| `permission denied /dev/kvm`                  | Host does not expose KVM to Docker                 | Add `--device /dev/kvm` or switch to systrap mode        |
+| Error                              | Cause                                        | Fix                                                    |
+| ---------------------------------- | -------------------------------------------- | ------------------------------------------------------ |
+| `unknown runtime specified: runsc` | gVisor not installed or daemon not restarted | Install `runsc`, update `daemon.json`, restart Docker  |
+| `OCI runtime exec failed: runsc`   | gVisor version incompatible with kernel      | Upgrade gVisor: `apt-get install --only-upgrade runsc` |
+| Container hangs on start           | gVisor KVM mode requires nested virt in VM   | Use `--platform=systrap` in runsc flags                |
+| `permission denied /dev/kvm`       | Host does not expose KVM to Docker           | Add `--device /dev/kvm` or switch to systrap mode      |
 
 ## References
 

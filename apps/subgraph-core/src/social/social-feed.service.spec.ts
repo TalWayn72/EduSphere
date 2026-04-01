@@ -11,11 +11,20 @@ const { mockTx } = vi.hoisted(() => {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockTx),
   schema: {
-    userFollows: { id: 'id', followerId: 'follower_id', followingId: 'following_id' },
+    userFollows: {
+      id: 'id',
+      followerId: 'follower_id',
+      followingId: 'following_id',
+    },
     socialFeedItems: {
-      id: 'id', tenantId: 'tenant_id', actorId: 'actor_id',
-      verb: 'verb', objectType: 'object_type', objectId: 'object_id',
-      objectTitle: 'object_title', createdAt: 'created_at',
+      id: 'id',
+      tenantId: 'tenant_id',
+      actorId: 'actor_id',
+      verb: 'verb',
+      objectType: 'object_type',
+      objectId: 'object_id',
+      objectTitle: 'object_title',
+      createdAt: 'created_at',
     },
     users: { id: 'id', tenant_id: 'tenant_id', display_name: 'display_name' },
   },
@@ -62,16 +71,22 @@ describe('SocialFeedService', () => {
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
             orderBy: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([
-                { id: 'feed-1', actorId: 'u2', verb: 'COMPLETED' },
-              ]),
+              limit: vi
+                .fn()
+                .mockResolvedValue([
+                  { id: 'feed-1', actorId: 'u2', verb: 'COMPLETED' },
+                ]),
             }),
           }),
         }),
       });
       const result = await service.getSocialFeed('u1', 'tenant-1', 20);
       expect(result).toHaveLength(1);
-      expect(followService.getFollowing).toHaveBeenCalledWith('u1', 'tenant-1', 100);
+      expect(followService.getFollowing).toHaveBeenCalledWith(
+        'u1',
+        'tenant-1',
+        100
+      );
     });
 
     it('uses provided limit parameter', async () => {
@@ -131,9 +146,10 @@ describe('SocialFeedService', () => {
       const mockSub = {
         [Symbol.asyncIterator]() {
           return {
-            next: () => new Promise<IteratorResult<unknown>>(() => {
-              // Never resolves — simulates a long-running subscription
-            }),
+            next: () =>
+              new Promise<IteratorResult<unknown>>(() => {
+                // Never resolves — simulates a long-running subscription
+              }),
           };
         },
       };

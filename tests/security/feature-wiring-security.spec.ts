@@ -32,7 +32,8 @@ function readDir(relativePath: string): string[] {
   const abs = resolve(ROOT, relativePath);
   if (!existsSync(abs)) return [];
   return readdirSync(abs).filter(
-    (f) => f.endsWith('.ts') && !f.endsWith('.test.ts') && !f.endsWith('.spec.ts')
+    (f) =>
+      f.endsWith('.ts') && !f.endsWith('.test.ts') && !f.endsWith('.spec.ts')
   );
 }
 
@@ -96,7 +97,9 @@ describe('Feature Security: Stripe billing (webhook signature, key hygiene)', ()
   let stripeService: string;
 
   beforeAll(() => {
-    stripeService = read('apps/subgraph-core/src/billing/stripe-invoice.service.ts');
+    stripeService = read(
+      'apps/subgraph-core/src/billing/stripe-invoice.service.ts'
+    );
   });
 
   it('stripe-invoice.service.ts exists', () => {
@@ -115,14 +118,20 @@ describe('Feature Security: Stripe billing (webhook signature, key hygiene)', ()
 
   it('webhook warns when signature is missing', () => {
     // Must validate signature presence — warn or reject if absent
-    expect(stripeService).toMatch(/!signature|signature.*missing|without.*Signature/i);
+    expect(stripeService).toMatch(
+      /!signature|signature.*missing|without.*Signature/i
+    );
   });
 
   it('does NOT log STRIPE_SECRET_KEY value (env var name in warnings is OK)', () => {
     // Logger calls must never interpolate the actual secret value (process.env.STRIPE_SECRET_KEY)
     // Mentioning the env var NAME in a warning message (e.g. "set STRIPE_SECRET_KEY to enable") is safe
-    expect(stripeService).not.toMatch(/this\.logger\.[a-z]+\(.*process\.env\.STRIPE_SECRET_KEY/);
-    expect(stripeService).not.toMatch(/this\.logger\.[a-z]+\([^)]*secretKey[^)]*\)/);
+    expect(stripeService).not.toMatch(
+      /this\.logger\.[a-z]+\(.*process\.env\.STRIPE_SECRET_KEY/
+    );
+    expect(stripeService).not.toMatch(
+      /this\.logger\.[a-z]+\([^)]*secretKey[^)]*\)/
+    );
   });
 
   it('uses NestJS Logger (not console.log)', () => {
@@ -151,9 +160,15 @@ describe('Feature Security: HRIS credentials (SI-3 encryption, no secret logging
   let hrisService: string;
 
   beforeAll(() => {
-    hrisInterface = read('apps/subgraph-core/src/integrations/hris/hris-adapter.interface.ts');
-    workdayAdapter = read('apps/subgraph-core/src/integrations/hris/workday.adapter.ts');
-    hrisService = read('apps/subgraph-core/src/integrations/hris/hris-integration.service.ts');
+    hrisInterface = read(
+      'apps/subgraph-core/src/integrations/hris/hris-adapter.interface.ts'
+    );
+    workdayAdapter = read(
+      'apps/subgraph-core/src/integrations/hris/workday.adapter.ts'
+    );
+    hrisService = read(
+      'apps/subgraph-core/src/integrations/hris/hris-integration.service.ts'
+    );
   });
 
   it('HrisConfig interface exists and declares credential fields', () => {
@@ -169,9 +184,15 @@ describe('Feature Security: HRIS credentials (SI-3 encryption, no secret logging
   });
 
   it('Workday adapter does NOT log clientSecret or raw credentials', () => {
-    expect(workdayAdapter).not.toMatch(/this\.logger\.[a-z]+\([^)]*clientSecret[^)]*\)/);
-    expect(workdayAdapter).not.toMatch(/this\.logger\.[a-z]+\([^)]*credentials[^)]*\)/);
-    expect(workdayAdapter).not.toMatch(/this\.logger\.[a-z]+\([^)]*password[^)]*\)/i);
+    expect(workdayAdapter).not.toMatch(
+      /this\.logger\.[a-z]+\([^)]*clientSecret[^)]*\)/
+    );
+    expect(workdayAdapter).not.toMatch(
+      /this\.logger\.[a-z]+\([^)]*credentials[^)]*\)/
+    );
+    expect(workdayAdapter).not.toMatch(
+      /this\.logger\.[a-z]+\([^)]*password[^)]*\)/i
+    );
   });
 
   it('Workday adapter testConnection does NOT expose credentials in error messages', () => {
@@ -213,8 +234,12 @@ describe('Feature Security: Web Push VAPID (private key never on frontend)', () 
 
   beforeAll(() => {
     webPushFrontend = read('apps/web/src/lib/webPush.ts');
-    pushDispatch = read('apps/subgraph-core/src/notifications/push-dispatch.service.ts');
-    pushTokenService = read('apps/subgraph-core/src/notifications/push-token.service.ts');
+    pushDispatch = read(
+      'apps/subgraph-core/src/notifications/push-dispatch.service.ts'
+    );
+    pushTokenService = read(
+      'apps/subgraph-core/src/notifications/push-token.service.ts'
+    );
   });
 
   it('frontend webPush.ts uses ONLY the VAPID public key (VITE_VAPID_PUBLIC_KEY)', () => {
@@ -279,7 +304,9 @@ describe('Feature Security: GDPR Art.17 erasure (hard-delete, audit, cascading)'
   let erasureService: string;
 
   beforeAll(() => {
-    erasureService = read('apps/subgraph-core/src/user/user-erasure.service.ts');
+    erasureService = read(
+      'apps/subgraph-core/src/user/user-erasure.service.ts'
+    );
   });
 
   it('user-erasure.service.ts exists', () => {
@@ -424,11 +451,19 @@ describe('Feature Security: Google Drive import (OAuth tokens, file validation)'
   let importGraphql: string;
 
   beforeAll(() => {
-    driveClient = read('apps/subgraph-content/src/content-import/google-drive.client.ts');
-    importService = read('apps/subgraph-content/src/content-import/content-import.service.ts');
+    driveClient = read(
+      'apps/subgraph-content/src/content-import/google-drive.client.ts'
+    );
+    importService = read(
+      'apps/subgraph-content/src/content-import/content-import.service.ts'
+    );
     // Drive-specific logic may be in a separate service after refactoring
-    driveIngestion = read('apps/subgraph-content/src/content-import/drive-ingestion.service.ts');
-    importGraphql = read('apps/subgraph-content/src/content-import/content-import.graphql');
+    driveIngestion = read(
+      'apps/subgraph-content/src/content-import/drive-ingestion.service.ts'
+    );
+    importGraphql = read(
+      'apps/subgraph-content/src/content-import/content-import.graphql'
+    );
   });
 
   it('google-drive.client.ts exists', () => {
@@ -447,12 +482,16 @@ describe('Feature Security: Google Drive import (OAuth tokens, file validation)'
   it('Drive client reads GOOGLE_CLIENT_SECRET from env (not hardcoded)', () => {
     expect(driveClient).toContain("process.env['GOOGLE_CLIENT_SECRET']");
     // Must not contain a literal client secret
-    expect(driveClient).not.toMatch(/client_secret\s*[:=]\s*['"][A-Za-z0-9_-]{20,}/);
+    expect(driveClient).not.toMatch(
+      /client_secret\s*[:=]\s*['"][A-Za-z0-9_-]{20,}/
+    );
   });
 
   it('Drive client error messages do NOT expose access token', () => {
     // BadRequestException messages must not include the token
-    expect(driveClient).not.toMatch(/BadRequestException\([^)]*accessToken[^)]*\)/);
+    expect(driveClient).not.toMatch(
+      /BadRequestException\([^)]*accessToken[^)]*\)/
+    );
   });
 
   it('importFromDrive mutation requires @authenticated directive', () => {
@@ -512,7 +551,9 @@ describe('Feature Security: annotation proposals (role gating, tenant isolation)
   let mergeQueuePage: string;
 
   beforeAll(() => {
-    annotationGraphql = read('apps/subgraph-annotation/src/annotation/annotation.graphql');
+    annotationGraphql = read(
+      'apps/subgraph-annotation/src/annotation/annotation.graphql'
+    );
     mergeQueuePage = read('apps/web/src/pages/InstructorMergeQueuePage.tsx');
   });
 
@@ -576,7 +617,9 @@ describe('Feature Security: partner API key (hash storage, one-time reveal)', ()
 
   beforeAll(() => {
     partnerService = read('apps/subgraph-core/src/partners/partner.service.ts');
-    partnerController = read('apps/subgraph-core/src/partners/partner.controller.ts');
+    partnerController = read(
+      'apps/subgraph-core/src/partners/partner.controller.ts'
+    );
   });
 
   it('partner.service.ts exists', () => {
@@ -641,7 +684,9 @@ describe('Feature Security: OCR content ingestion (SSRF, file size, path travers
   let ingestionPipeline: string;
 
   beforeAll(() => {
-    ingestionGraphql = read('apps/subgraph-knowledge/src/sources/content-ingestion.graphql');
+    ingestionGraphql = read(
+      'apps/subgraph-knowledge/src/sources/content-ingestion.graphql'
+    );
     ingestionPipeline = read(
       'apps/subgraph-knowledge/src/services/content-ingestion-pipeline.service.ts'
     );
@@ -661,8 +706,10 @@ describe('Feature Security: OCR content ingestion (SSRF, file size, path travers
     const start = ingestionGraphql.indexOf('ingestContent');
     const b = ingestionGraphql.slice(start, start + 300);
     // Authorization can be enforced via @requiresRole(INSTRUCTOR) or @requiresScopes(course:write)
-    const hasRoleGuard = b.includes('@requiresRole') && b.includes('INSTRUCTOR');
-    const hasScopeGuard = b.includes('@requiresScopes') && b.includes('course:write');
+    const hasRoleGuard =
+      b.includes('@requiresRole') && b.includes('INSTRUCTOR');
+    const hasScopeGuard =
+      b.includes('@requiresScopes') && b.includes('course:write');
     expect(hasRoleGuard || hasScopeGuard).toBe(true);
   });
 

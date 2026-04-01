@@ -10,8 +10,13 @@ import type { GeneratedItem, GeneratedItemOption } from '../types';
 const ABSOLUTE_TERMS = ['always', 'never', 'all', 'none', 'every', 'only'];
 const AOTA_NOTA = ['all of the above', 'none of the above'];
 
-function avgLength(options: GeneratedItemOption[], excludeCorrect: boolean): number {
-  const filtered = excludeCorrect ? options.filter((o) => !o.isCorrect) : options;
+function avgLength(
+  options: GeneratedItemOption[],
+  excludeCorrect: boolean
+): number {
+  const filtered = excludeCorrect
+    ? options.filter((o) => !o.isCorrect)
+    : options;
   if (filtered.length === 0) return 0;
   return filtered.reduce((sum, o) => sum + o.text.length, 0) / filtered.length;
 }
@@ -56,16 +61,25 @@ function checkOptionLengthVariance(item: GeneratedItem): boolean {
 function checkNegativeStem(item: GeneratedItem): boolean {
   const negWords = ['not', 'except'];
   const lower = item.question.toLowerCase();
-  const hasNeg = negWords.some((w) => lower.includes(` ${w} `) || lower.includes(` ${w}?`));
+  const hasNeg = negWords.some(
+    (w) => lower.includes(` ${w} `) || lower.includes(` ${w}?`)
+  );
   if (!hasNeg) return false;
-  return item.question === item.question.toLowerCase() || !(/\bNOT\b|\bEXCEPT\b/.test(item.question));
+  return (
+    item.question === item.question.toLowerCase() ||
+    !/\bNOT\b|\bEXCEPT\b/.test(item.question)
+  );
 }
 
 function checkConvergence(item: GeneratedItem): boolean {
   const distractors = item.options.filter((o) => !o.isCorrect);
   if (distractors.length < 3) return false;
-  const words = distractors.map((d) => new Set(d.text.toLowerCase().split(/\s+/)));
-  const common = [...words[0]!].filter((w) => w.length > 3 && words[1]!.has(w) && words[2]!.has(w));
+  const words = distractors.map(
+    (d) => new Set(d.text.toLowerCase().split(/\s+/))
+  );
+  const common = [...words[0]!].filter(
+    (w) => w.length > 3 && words[1]!.has(w) && words[2]!.has(w)
+  );
   if (common.length === 0) return false;
   const correct = item.options.find((o) => o.isCorrect);
   const correctWords = new Set(correct?.text.toLowerCase().split(/\s+/) ?? []);
@@ -93,7 +107,9 @@ export function detectItemWritingFlaws(item: GeneratedItem): string[] {
 
 const MAX_IWF_FLAGS = 2;
 
-export function detectIWFNode(state: CertExamGenState): Partial<CertExamGenState> {
+export function detectIWFNode(
+  state: CertExamGenState
+): Partial<CertExamGenState> {
   const items = state.bloomValidated;
   const checked = items
     .map((item) => ({ ...item, iwfFlags: detectItemWritingFlaws(item) }))

@@ -15,7 +15,10 @@ interface RubricScorerProps {
   onChange: (scores: Record<string, number>) => void;
 }
 
-export default function RubricScorer({ criteria, onChange }: RubricScorerProps) {
+export default function RubricScorer({
+  criteria,
+  onChange,
+}: RubricScorerProps) {
   const [scores, setScores] = useState<Record<string, number>>(() =>
     Object.fromEntries(criteria.map((c) => [c.id, 0]))
   );

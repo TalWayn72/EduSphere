@@ -41,7 +41,8 @@ export function ChallengeDetailPage() {
 
   const [submitResult, submitScore] = useMutation(SUBMIT_SCORE_MUTATION);
 
-  const entries: LeaderboardEntry[] = leaderboardResult.data?.challengeLeaderboard ?? [];
+  const entries: LeaderboardEntry[] =
+    leaderboardResult.data?.challengeLeaderboard ?? [];
 
   const handleSubmitScore = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +73,9 @@ export function ChallengeDetailPage() {
         />
 
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-foreground">{t('challenge.pageTitle')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {t('challenge.pageTitle')}
+          </h1>
           {!showScoreForm && (
             <button
               onClick={() => setShowScoreForm(true)}
@@ -88,10 +91,15 @@ export function ChallengeDetailPage() {
             onSubmit={handleSubmitScore}
             className="mb-6 rounded-lg border border-border bg-card p-4 flex flex-col gap-3"
           >
-            <h2 className="text-sm font-semibold text-foreground">{t('challenge.submitYourScore')}</h2>
+            <h2 className="text-sm font-semibold text-foreground">
+              {t('challenge.submitYourScore')}
+            </h2>
             <div className="flex gap-2 items-end">
               <div className="flex-1">
-                <label htmlFor="score-input" className="text-xs text-muted-foreground block mb-1">
+                <label
+                  htmlFor="score-input"
+                  className="text-xs text-muted-foreground block mb-1"
+                >
                   {t('challenge.scoreLabel')}
                 </label>
                 <input
@@ -110,11 +118,16 @@ export function ChallengeDetailPage() {
                 disabled={submitResult.fetching}
                 className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {submitResult.fetching ? t('challenge.submitting') : t('challenge.submit')}
+                {submitResult.fetching
+                  ? t('challenge.submitting')
+                  : t('challenge.submit')}
               </button>
               <button
                 type="button"
-                onClick={() => { setShowScoreForm(false); setSubmitError(null); }}
+                onClick={() => {
+                  setShowScoreForm(false);
+                  setSubmitError(null);
+                }}
                 className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
               >
                 {t('challenge.cancel')}
@@ -127,15 +140,25 @@ export function ChallengeDetailPage() {
         )}
 
         {leaderboardResult.fetching && (
-          <p className="text-sm text-muted-foreground mb-4">{t('challenge.loadingLeaderboard')}</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            {t('challenge.loadingLeaderboard')}
+          </p>
         )}
 
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-muted-foreground">{entries.length === 1 ? t('challenge.participantCount', { count: entries.length }) : t('challenge.participantCountPlural', { count: entries.length })}</p>
+          <p className="text-sm text-muted-foreground">
+            {entries.length === 1
+              ? t('challenge.participantCount', { count: entries.length })
+              : t('challenge.participantCountPlural', {
+                  count: entries.length,
+                })}
+          </p>
           {id && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <span>{t('challenge.endsIn')}</span>
-              <CountdownTimer endDate={new Date(Date.now() + 7 * 86400000).toISOString()} />
+              <CountdownTimer
+                endDate={new Date(Date.now() + 7 * 86400000).toISOString()}
+              />
             </div>
           )}
         </div>

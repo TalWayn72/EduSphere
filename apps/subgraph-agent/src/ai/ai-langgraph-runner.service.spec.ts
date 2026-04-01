@@ -7,9 +7,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
-const mockRunLangGraphDebate = vi.fn().mockResolvedValue({ text: 'debate', usage: {} });
-const mockRunLangGraphQuiz = vi.fn().mockResolvedValue({ text: 'quiz', usage: {} });
-const mockRunLangGraphTutor = vi.fn().mockResolvedValue({ text: 'tutor', usage: {} });
+const mockRunLangGraphDebate = vi
+  .fn()
+  .mockResolvedValue({ text: 'debate', usage: {} });
+const mockRunLangGraphQuiz = vi
+  .fn()
+  .mockResolvedValue({ text: 'quiz', usage: {} });
+const mockRunLangGraphTutor = vi
+  .fn()
+  .mockResolvedValue({ text: 'tutor', usage: {} });
 
 vi.mock('./ai.langgraph.js', () => ({
   runLangGraphDebate: (...args: unknown[]) => mockRunLangGraphDebate(...args),
@@ -71,7 +77,11 @@ describe('AiLanggraphRunnerService', () => {
   it('dispatches CHAVRUTA_DEBATE to runLangGraphDebate', async () => {
     await service.run('sess-1', 'hello', 'CHAVRUTA_DEBATE', {}, 'en');
     expect(mockRunLangGraphDebate).toHaveBeenCalledWith(
-      'sess-1', 'hello', {}, 'en', expect.anything()
+      'sess-1',
+      'hello',
+      {},
+      'en',
+      expect.anything()
     );
   });
 

@@ -2,40 +2,147 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const ROW_KEYS = [
-  { key: 'knowledgeGraphAI', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
-  { key: 'visualAnchoringSidebar', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
-  { key: 'airGappedOnPremise', edu: true, canvas: false, d2l: 'partial', bb: 'partial', docebo: false },
-  { key: 'aiChavruta', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
-  { key: 'aiCourseBuilder10min', edu: true, canvas: 'partial', d2l: 'partial', bb: false, docebo: 'partial' },
-  { key: 'graphRAG', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
-  { key: 'whiteLabelIncluded', edu: true, canvas: false, d2l: false, bb: false, docebo: 'partial' },
-  { key: 'ferpaGdprAirGapped', edu: true, canvas: 'partial', d2l: 'partial', bb: 'partial', docebo: false },
-  { key: 'yauPricing', edu: true, canvas: false, d2l: false, bb: false, docebo: 'partial' },
-  { key: 'openSourceCore', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
-  { key: 'offlineFirstMobile', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
-  { key: 'b2b2cPartnerApi', edu: true, canvas: false, d2l: false, bb: false, docebo: false },
+  {
+    key: 'knowledgeGraphAI',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
+  {
+    key: 'visualAnchoringSidebar',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
+  {
+    key: 'airGappedOnPremise',
+    edu: true,
+    canvas: false,
+    d2l: 'partial',
+    bb: 'partial',
+    docebo: false,
+  },
+  {
+    key: 'aiChavruta',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
+  {
+    key: 'aiCourseBuilder10min',
+    edu: true,
+    canvas: 'partial',
+    d2l: 'partial',
+    bb: false,
+    docebo: 'partial',
+  },
+  {
+    key: 'graphRAG',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
+  {
+    key: 'whiteLabelIncluded',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: 'partial',
+  },
+  {
+    key: 'ferpaGdprAirGapped',
+    edu: true,
+    canvas: 'partial',
+    d2l: 'partial',
+    bb: 'partial',
+    docebo: false,
+  },
+  {
+    key: 'yauPricing',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: 'partial',
+  },
+  {
+    key: 'openSourceCore',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
+  {
+    key: 'offlineFirstMobile',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
+  {
+    key: 'b2b2cPartnerApi',
+    edu: true,
+    canvas: false,
+    d2l: false,
+    bb: false,
+    docebo: false,
+  },
 ] as const;
 
 type CellValue = boolean | 'partial';
 
-function Cell({ val, highlight = false }: { val: CellValue; highlight?: boolean }) {
+function Cell({
+  val,
+  highlight = false,
+}: {
+  val: CellValue;
+  highlight?: boolean;
+}) {
   if (val === true) {
     return (
-      <td className={`px-4 py-3 text-center text-base ${highlight ? 'bg-indigo-50' : ''}`}>
-        <span className="text-green-600 font-bold dark:text-green-400" aria-label="Yes">✅</span>
+      <td
+        className={`px-4 py-3 text-center text-base ${highlight ? 'bg-indigo-50' : ''}`}
+      >
+        <span
+          className="text-green-600 font-bold dark:text-green-400"
+          aria-label="Yes"
+        >
+          ✅
+        </span>
       </td>
     );
   }
   if (val === 'partial') {
     return (
       <td className="px-4 py-3 text-center text-base">
-        <span className="text-amber-500 font-bold dark:text-amber-400" aria-label="Partial">⚠️</span>
+        <span
+          className="text-amber-500 font-bold dark:text-amber-400"
+          aria-label="Partial"
+        >
+          ⚠️
+        </span>
       </td>
     );
   }
   return (
     <td className="px-4 py-3 text-center text-base">
-      <span className="text-red-400 font-bold dark:text-red-400" aria-label="No">❌</span>
+      <span
+        className="text-red-400 font-bold dark:text-red-400"
+        aria-label="No"
+      >
+        ❌
+      </span>
     </td>
   );
 }
@@ -59,7 +166,11 @@ export function VsCompetitorsSection() {
           </p>
         </div>
         <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm dark:border-slate-600">
-          <table className="w-full min-w-[700px] bg-white dark:bg-gray-900" role="table" aria-label="LMS comparison table">
+          <table
+            className="w-full min-w-[700px] bg-white dark:bg-gray-900"
+            role="table"
+            aria-label="LMS comparison table"
+          >
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-600">
                 <th className="px-4 py-4 text-left text-sm font-semibold text-slate-700 bg-slate-50 sticky left-0 z-10 min-w-[220px] dark:text-slate-200 dark:bg-slate-800">
@@ -68,10 +179,18 @@ export function VsCompetitorsSection() {
                 <th className="px-4 py-4 text-center text-sm font-bold text-indigo-700 bg-indigo-50 min-w-[110px] dark:text-indigo-300 dark:bg-indigo-950">
                   EduSphere
                 </th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">Canvas</th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">D2L</th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[110px] dark:text-slate-300">Blackboard</th>
-                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">Docebo</th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">
+                  Canvas
+                </th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">
+                  D2L
+                </th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[110px] dark:text-slate-300">
+                  Blackboard
+                </th>
+                <th className="px-4 py-4 text-center text-sm font-semibold text-slate-600 min-w-[90px] dark:text-slate-300">
+                  Docebo
+                </th>
               </tr>
             </thead>
             <tbody>

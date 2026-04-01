@@ -3,12 +3,7 @@
  * Extracted from TenantAnalyticsService for file-size compliance (<300 lines).
  */
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  schema,
-  withTenantContext,
-  sql,
-  and,
-} from '@edusphere/db';
+import { schema, withTenantContext, sql, and } from '@edusphere/db';
 import { count, avg } from 'drizzle-orm';
 import type { Database } from '@edusphere/db';
 import type { DailyMetric, TopCourse } from './tenant-analytics.types.js';
@@ -90,7 +85,10 @@ export class TenantAnalyticsAggregationService {
         const completions = Number(r.completions);
         return {
           date: String(r.date),
-          value: enrollments > 0 ? Math.round((completions / enrollments) * 1000) / 10 : 0,
+          value:
+            enrollments > 0
+              ? Math.round((completions / enrollments) * 1000) / 10
+              : 0,
         };
       });
     });

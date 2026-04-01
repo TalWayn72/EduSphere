@@ -5,9 +5,11 @@
 ## Context
 
 **Problem:** The `/courses` page repeatedly shows:
+
 > `⚠ Failed to fetch — [GraphQL] Unexpected error [Network] — מציג נתונים מהמטמון.`
 
 This message is **doubly confusing** because:
+
 - `CourseList.tsx:314` manually prepends `[Network] Failed to fetch — ` to `error.message`
 - `error.message` from urql for a network error is itself `[GraphQL] Unexpected error [Network]`
 - Result: repeated/redundant technical jargon shown to users
@@ -15,6 +17,7 @@ This message is **doubly confusing** because:
 **Why it recurs:** No visual/E2E test verifies this banner's content. Every time the gateway is unavailable (dev startup order, container restart, CI), this banner fires with the raw urql error string.
 
 **Requested additions:**
+
 1. Systematic similar-issue search across ALL pages after identifying a bug
 2. Full round of fixes ending in complete tests (unit + visual)
 3. Logging on failure
@@ -25,34 +28,42 @@ This message is **doubly confusing** because:
 ## Root Cause Analysis
 
 ### Primary Bug Location
+
 **File:** `apps/web/src/pages/CourseList.tsx:312-316`
+
 ```tsx
-{error && (
-  <OfflineBanner
-    message={`[Network] Failed to fetch — ${error.message}`}  // ← BROKEN
-    cachedLabel={t('showingCachedData')}
-  />
-)}
+{
+  error && (
+    <OfflineBanner
+      message={`[Network] Failed to fetch — ${error.message}`} // ← BROKEN
+      cachedLabel={t('showingCachedData')}
+    />
+  );
+}
 ```
 
 When urql's network fetch fails → `error.message = "[GraphQL] Unexpected error [Network]"`:
+
 - Displayed: `[Network] Failed to fetch — [GraphQL] Unexpected error [Network] — מציג נתונים מהמטמון`
 - OfflineBanner shows even when MOCK_COURSES_FALLBACK is already displayed (page still works!)
 - No retry button
 - `useQuery` lacks a `reexecute` binding (second destructure element unused)
 
 ### urql-client.ts Issues
+
 **File:** `apps/web/src/lib/urql-client.ts`
+
 - `authErrorExchange` only logs auth errors — network errors are silently swallowed
 - No network error structured log (violates "no logs = part of the bug" iron rule)
 
 ### Similar Pattern Found Across Pages (from multi-agent scan)
-| Page | File | Error Handling | Missing |
-|------|------|----------------|---------|
-| CollaborationPage | `pages/CollaborationPage.tsx:74-88` | Error destructured, `isSchemaValidationError` checked, **no UI shown** | Error banner UI |
-| AgentsPage | `pages/AgentsPage.tsx:384-402` | `hasTemplatesError` shown as tiny text | No retry |
-| CourseAnalyticsPage | `pages/CourseAnalyticsPage.tsx:148-150` | Shows generic error state | No retry |
-| CourseList | `pages/CourseList.tsx:312-316` | **Primary bug**: raw urql string | Fix message + retry |
+
+| Page                | File                                    | Error Handling                                                         | Missing             |
+| ------------------- | --------------------------------------- | ---------------------------------------------------------------------- | ------------------- |
+| CollaborationPage   | `pages/CollaborationPage.tsx:74-88`     | Error destructured, `isSchemaValidationError` checked, **no UI shown** | Error banner UI     |
+| AgentsPage          | `pages/AgentsPage.tsx:384-402`          | `hasTemplatesError` shown as tiny text                                 | No retry            |
+| CourseAnalyticsPage | `pages/CourseAnalyticsPage.tsx:148-150` | Shows generic error state                                              | No retry            |
+| CourseList          | `pages/CourseList.tsx:312-316`          | **Primary bug**: raw urql string                                       | Fix message + retry |
 
 ---
 
@@ -63,6 +74,7 @@ When urql's network fetch fails → `error.message = "[GraphQL] Unexpected error
 **File:** `apps/web/src/pages/CourseList.tsx`
 
 Changes:
+
 1. Destructure `reexecute` from `useQuery` (currently unused second element)
 2. Rewrite `OfflineBanner` component:
    - Accept `onRetry: () => void` instead of raw `message: string`
@@ -74,6 +86,7 @@ Changes:
 4. Add `console.error('[CourseList] GraphQL network error:', error.message)` for devtools logging
 
 **i18n key to add** in `apps/web/public/locales/he/courses.json` and `en/courses.json`:
+
 - `"networkUnavailable": "שרת לא נגיש — מציג נתוני גיבוי"` (he)
 - `"networkUnavailable": "Server unavailable — showing backup data"` (en)
 - `"retry": "נסה שוב"` (he) / `"retry": "Retry"` (en)
@@ -83,6 +96,7 @@ Changes:
 **File:** `apps/web/src/lib/urql-client.ts`
 
 Change `authErrorExchange`'s `onError` handler to also log network errors:
+
 ```typescript
 // NEW: log network errors (always, not just auth errors)
 if (error.networkError) {
@@ -97,17 +111,20 @@ This gives devtools-visible trace without exposing details to UI.
 ### Wave 3 — Fix Similar Pages
 
 #### CollaborationPage (`apps/web/src/pages/CollaborationPage.tsx`)
+
 - Add an inline banner when `error && !DEV_MODE && !isSchemaValidationError`
 - Use same i18n key pattern (`networkUnavailable`)
 - Add `data-testid="collab-network-error"` for testability
 
 #### AgentsPage (`apps/web/src/pages/AgentsPage.tsx`)
+
 - Upgrade existing `<p className="text-xs text-destructive">` to use the shared inline error style
 - Add retry trigger for `templatesResult`
 
 ### Wave 4 — Unit Tests
 
 #### `apps/web/src/pages/CourseList.test.tsx` — Add tests:
+
 1. `'shows clean offline banner when GraphQL network error occurs'`
    - Mock `useQuery` to return `error: { message: '[GraphQL] Unexpected error [Network]', ... }`
    - Assert: `screen.getByTestId('offline-banner')` is visible
@@ -121,6 +138,7 @@ This gives devtools-visible trace without exposing details to UI.
    - Assert: `queryByTestId('offline-banner')` is `null`
 
 #### `apps/web/src/lib/urql-client.test.ts` — Add tests:
+
 1. `'logs network errors to console.warn'`
    - Spy on `console.warn`
    - Simulate operation with `networkError`
@@ -129,6 +147,7 @@ This gives devtools-visible trace without exposing details to UI.
 ### Wave 5 — Playwright E2E Visual Test
 
 **File:** `apps/web/e2e/courses.spec.ts` — Add test group:
+
 ```
 test.describe('Course List — offline/network error state', () => {
   test('shows clean offline banner when GraphQL fails', async ({ page }) => {
@@ -172,7 +191,7 @@ In `CLAUDE.md`, update the **Bug Fix Protocol** section to add Step 4 (similar i
    - Variants (similar logic with slightly different naming/structure)
    - Same component/hook type in ALL pages (not just the reported page)
    - Any page that uses the same API/hook/component
-   Fix ALL instances found before declaring the bug fixed. Track each in OPEN_ISSUES.md.
+     Fix ALL instances found before declaring the bug fixed. Track each in OPEN_ISSUES.md.
 5. **Fix in rounds** — Fix root cause + all similar issues. Each round ends with:
    - Full test suite pass (`pnpm --filter @edusphere/web test --run`)
    - TypeScript check pass (`pnpm --filter @edusphere/web exec tsc --noEmit`)
@@ -188,6 +207,7 @@ In `CLAUDE.md`, update the **Bug Fix Protocol** section to add Step 4 (similar i
    - Files, problem, root cause, solution, tests
 
 **Iron rules:**
+
 - Never fix a bug without reading the logs first. No logs = part of the bug.
 - After finding a bug, ALWAYS search for the same pattern across ALL pages before declaring it fixed.
 - No fix is complete without a regression test that would catch the bug if it reappears.
@@ -197,6 +217,7 @@ In `CLAUDE.md`, update the **Bug Fix Protocol** section to add Step 4 (similar i
 ### Wave 7 — Deployment Verification
 
 After all fixes and tests pass:
+
 1. `docker-compose up -d` — bring up all infra
 2. `pnpm --filter @edusphere/web dev` — start frontend
 3. `pnpm --filter @edusphere/gateway dev` — start gateway
@@ -209,20 +230,20 @@ After all fixes and tests pass:
 
 ## Critical Files to Modify
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/CourseList.tsx` | Fix OfflineBanner: clean message, retry button, data-testid |
-| `apps/web/src/lib/urql-client.ts` | Add network error logging in errorExchange |
-| `apps/web/src/pages/CollaborationPage.tsx` | Add missing error UI |
-| `apps/web/src/pages/AgentsPage.tsx` | Upgrade error display, add retry |
-| `apps/web/src/pages/CourseList.test.tsx` | 3 new tests for error/offline state |
-| `apps/web/src/lib/urql-client.test.ts` | 1 new test for network error logging |
-| `apps/web/e2e/courses.spec.ts` | New E2E group: offline banner visual test |
-| `apps/web/public/locales/he/courses.json` | Add `networkUnavailable`, `retry` keys |
-| `apps/web/public/locales/en/courses.json` | Add `networkUnavailable`, `retry` keys |
-| `CLAUDE.md` | Update Bug Fix Protocol (Steps 4-6) |
-| `OPEN_ISSUES.md` | Document as BUG-039 |
-| `docs/plans/` | Move this plan file here |
+| File                                       | Change                                                      |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| `apps/web/src/pages/CourseList.tsx`        | Fix OfflineBanner: clean message, retry button, data-testid |
+| `apps/web/src/lib/urql-client.ts`          | Add network error logging in errorExchange                  |
+| `apps/web/src/pages/CollaborationPage.tsx` | Add missing error UI                                        |
+| `apps/web/src/pages/AgentsPage.tsx`        | Upgrade error display, add retry                            |
+| `apps/web/src/pages/CourseList.test.tsx`   | 3 new tests for error/offline state                         |
+| `apps/web/src/lib/urql-client.test.ts`     | 1 new test for network error logging                        |
+| `apps/web/e2e/courses.spec.ts`             | New E2E group: offline banner visual test                   |
+| `apps/web/public/locales/he/courses.json`  | Add `networkUnavailable`, `retry` keys                      |
+| `apps/web/public/locales/en/courses.json`  | Add `networkUnavailable`, `retry` keys                      |
+| `CLAUDE.md`                                | Update Bug Fix Protocol (Steps 4-6)                         |
+| `OPEN_ISSUES.md`                           | Document as BUG-039                                         |
+| `docs/plans/`                              | Move this plan file here                                    |
 
 ## Reusable Patterns to Reference
 

@@ -47,7 +47,11 @@ describe('AlertTitle', () => {
   });
 
   it('forwards className', () => {
-    render(<AlertTitle className="text-lg" data-testid="title">T</AlertTitle>);
+    render(
+      <AlertTitle className="text-lg" data-testid="title">
+        T
+      </AlertTitle>
+    );
     expect(screen.getByTestId('title')).toHaveClass('text-lg');
   });
 
@@ -63,7 +67,11 @@ describe('AlertDescription', () => {
   });
 
   it('forwards className', () => {
-    render(<AlertDescription className="italic" data-testid="desc">D</AlertDescription>);
+    render(
+      <AlertDescription className="italic" data-testid="desc">
+        D
+      </AlertDescription>
+    );
     expect(screen.getByTestId('desc')).toHaveClass('italic');
   });
 

@@ -115,7 +115,9 @@ describe('CoursesScreen — Apollo query states', () => {
 
   it('unpublished courses have isPublished=false', () => {
     const result = mockUseQuery();
-    const unpublished = result.data.courses.filter((c: Course) => !c.isPublished);
+    const unpublished = result.data.courses.filter(
+      (c: Course) => !c.isPublished
+    );
     expect(unpublished).toHaveLength(1);
     expect(unpublished[0].id).toBe('c2');
   });
@@ -155,7 +157,7 @@ describe('CoursesScreen — SQLite cache fallback', () => {
     expect(mockCacheQuery).toHaveBeenCalledWith(
       'query',
       {},
-      { courses: MOCK_COURSES },
+      { courses: MOCK_COURSES }
     );
   });
 });

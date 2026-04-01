@@ -15,17 +15,29 @@ describe('ScrollArea', () => {
   });
 
   it('applies horizontal orientation', () => {
-    render(<ScrollArea orientation="horizontal" data-testid="scroll">C</ScrollArea>);
+    render(
+      <ScrollArea orientation="horizontal" data-testid="scroll">
+        C
+      </ScrollArea>
+    );
     expect(screen.getByTestId('scroll')).toHaveClass('overflow-x-auto');
   });
 
   it('applies both orientation', () => {
-    render(<ScrollArea orientation="both" data-testid="scroll">C</ScrollArea>);
+    render(
+      <ScrollArea orientation="both" data-testid="scroll">
+        C
+      </ScrollArea>
+    );
     expect(screen.getByTestId('scroll')).toHaveClass('overflow-auto');
   });
 
   it('forwards className', () => {
-    render(<ScrollArea className="h-64" data-testid="scroll">C</ScrollArea>);
+    render(
+      <ScrollArea className="h-64" data-testid="scroll">
+        C
+      </ScrollArea>
+    );
     expect(screen.getByTestId('scroll')).toHaveClass('h-64');
   });
 

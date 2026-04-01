@@ -14,7 +14,7 @@ import path from 'node:path';
 const SEED_SOURCE_PATH = path.resolve(
   __dirname,
   '..',
-  'nahar-shalom-source.ts',
+  'nahar-shalom-source.ts'
 );
 
 describe('Seed Embeddings — nahar-shalom-source', () => {
@@ -26,11 +26,15 @@ describe('Seed Embeddings — nahar-shalom-source', () => {
     });
 
     it('uses a stable SOURCE_ID', () => {
-      expect(seedSource).toContain("SOURCE_ID = 'dd000000-0000-0000-0000-000000000001'");
+      expect(seedSource).toContain(
+        "SOURCE_ID = 'dd000000-0000-0000-0000-000000000001'"
+      );
     });
 
     it('uses the demo tenant ID', () => {
-      expect(seedSource).toContain("DEMO_TENANT = '00000000-0000-0000-0000-000000000000'");
+      expect(seedSource).toContain(
+        "DEMO_TENANT = '00000000-0000-0000-0000-000000000000'"
+      );
     });
 
     it('sets source status to PENDING for background processing', () => {
@@ -100,7 +104,9 @@ describe('Seed Embeddings — nahar-shalom-source', () => {
     });
 
     it('exports seedNaharShalomSource function', () => {
-      expect(seedSource).toContain('export async function seedNaharShalomSource');
+      expect(seedSource).toContain(
+        'export async function seedNaharShalomSource'
+      );
     });
   });
 });

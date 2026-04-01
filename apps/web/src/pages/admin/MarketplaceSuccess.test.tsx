@@ -26,7 +26,7 @@ describe('MarketplaceSuccess', () => {
     render(
       <MemoryRouter initialEntries={['/admin/marketplace/success']}>
         <MarketplaceSuccess />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByTestId('marketplace-success-page')).toBeInTheDocument();
   });
@@ -35,7 +35,7 @@ describe('MarketplaceSuccess', () => {
     render(
       <MemoryRouter initialEntries={['/admin/marketplace/success']}>
         <MarketplaceSuccess />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText('Purchase Complete!')).toBeInTheDocument();
   });
@@ -44,18 +44,20 @@ describe('MarketplaceSuccess', () => {
     render(
       <MemoryRouter initialEntries={['/admin/marketplace/success']}>
         <MarketplaceSuccess />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
-    expect(
-      screen.getByText(/course has been licensed/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/course has been licensed/i)).toBeInTheDocument();
   });
 
   it('shows session ID when present in URL', () => {
     render(
-      <MemoryRouter initialEntries={['/admin/marketplace/success?session_id=cs_test_abcdefghijklmnopqrst']}>
+      <MemoryRouter
+        initialEntries={[
+          '/admin/marketplace/success?session_id=cs_test_abcdefghijklmnopqrst',
+        ]}
+      >
         <MarketplaceSuccess />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText(/cs_test_abcdefghijkl/)).toBeInTheDocument();
   });
@@ -64,7 +66,7 @@ describe('MarketplaceSuccess', () => {
     render(
       <MemoryRouter initialEntries={['/admin/marketplace/success']}>
         <MarketplaceSuccess />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.queryByText(/Session/)).not.toBeInTheDocument();
   });
@@ -73,7 +75,7 @@ describe('MarketplaceSuccess', () => {
     render(
       <MemoryRouter initialEntries={['/admin/marketplace/success']}>
         <MarketplaceSuccess />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText('View Purchases')).toBeInTheDocument();
     expect(screen.getByText('Continue Browsing')).toBeInTheDocument();

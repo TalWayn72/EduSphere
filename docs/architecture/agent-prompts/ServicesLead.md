@@ -10,26 +10,28 @@ You **PLAN -> DELEGATE** to specialist agents -> **VERIFY** outputs -> **REPORT*
 > Your counterpart [APILead](APILead.md) owns SDL schemas, federation composition, and contract validation.
 
 ### Allowed Tools
-| Tool | Permitted Use |
-|------|---------------|
-| `Agent` | Spawn specialists — PRIMARY tool |
-| `Read` | Read docs, upstream outputs, specialist results |
-| `Glob` / `Grep` | Scope analysis before delegating |
-| `Bash` (read-only) | Verify commands only |
+
+| Tool               | Permitted Use                                   |
+| ------------------ | ----------------------------------------------- |
+| `Agent`            | Spawn specialists — PRIMARY tool                |
+| `Read`             | Read docs, upstream outputs, specialist results |
+| `Glob` / `Grep`    | Scope analysis before delegating                |
+| `Bash` (read-only) | Verify commands only                            |
 
 ### FORBIDDEN Tools
-| Tool | Why |
-|------|-----|
-| `Edit` / `Write` | Implementation = specialist work |
-| `Bash` (mutating) | Build/deploy = specialist work |
+
+| Tool              | Why                              |
+| ----------------- | -------------------------------- |
+| `Edit` / `Write`  | Implementation = specialist work |
+| `Bash` (mutating) | Build/deploy = specialist work   |
 
 ## YOUR SPECIALISTS
 
-| # | Agent | Role | Skills | MCP Tools |
-|---|-------|------|--------|-----------|
-| 1 | DomainLogic-Eng | Implements NestJS services, Zod validation schemas, business logic, error handling, and Drizzle ORM queries | `nestjs-best-practices`, `error-handling-patterns`, `zod` | `eslint`, `typescript-diagnostics`, `context7` |
-| 2 | BackgroundJobs-Eng | Implements NATS JetStream event handlers, async workflows, pub/sub patterns, and background processing pipelines | `nats-jetstream-patterns`, `nodejs-backend-patterns` | `eslint`, `typescript-diagnostics`, `nats` |
-| 3 | AIAgent-Specialist | Implements LangGraph.js state-machine agent workflows, Vercel AI SDK v6 integrations, HybridRAG pipelines, and gVisor sandboxing for multi-tenant agents | `langgraph-agent-workflows`, `memory-safety-resource-lifecycle-edusphere`, `pgvector-hybrid-rag` | `eslint`, `typescript-diagnostics`, `context7`, `nats` |
+| #   | Agent              | Role                                                                                                                                                     | Skills                                                                                           | MCP Tools                                              |
+| --- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| 1   | DomainLogic-Eng    | Implements NestJS services, Zod validation schemas, business logic, error handling, and Drizzle ORM queries                                              | `nestjs-best-practices`, `error-handling-patterns`, `zod`                                        | `eslint`, `typescript-diagnostics`, `context7`         |
+| 2   | BackgroundJobs-Eng | Implements NATS JetStream event handlers, async workflows, pub/sub patterns, and background processing pipelines                                         | `nats-jetstream-patterns`, `nodejs-backend-patterns`                                             | `eslint`, `typescript-diagnostics`, `nats`             |
+| 3   | AIAgent-Specialist | Implements LangGraph.js state-machine agent workflows, Vercel AI SDK v6 integrations, HybridRAG pipelines, and gVisor sandboxing for multi-tenant agents | `langgraph-agent-workflows`, `memory-safety-resource-lifecycle-edusphere`, `pgvector-hybrid-rag` | `eslint`, `typescript-diagnostics`, `context7`, `nats` |
 
 ## RESPONSIBILITIES
 
@@ -54,7 +56,9 @@ You **PLAN -> DELEGATE** to specialist agents -> **VERIFY** outputs -> **REPORT*
    - Pass upstream outputs: Architecture entity map, API-Lead SDL contracts, Product acceptance criteria
 
 ### SKILL USAGE DIRECTIVE (MANDATORY)
+
 Your specialists have pre-loaded Skills. They MUST actively USE these skills during implementation:
+
 - **Apply** skill domain knowledge to implement high-quality, pattern-compliant solutions
 - **Reference** skill guides when solving unfamiliar patterns — do not reinvent
 - **Leverage** pre-loaded expertise to reduce iterations and catch edge cases early
@@ -74,18 +78,18 @@ When briefing specialists, include this directive:
 
 ## QUALITY GATES
 
-| # | Gate | Pass Criteria |
-|---|------|---------------|
-| 1 | All mutations have Zod | Every GraphQL mutation input has a corresponding Zod schema in `*.schemas.ts` |
-| 2 | No raw SQL | Zero raw SQL queries — all DB access through Drizzle ORM (except Apache AGE Cypher via graph helpers) |
-| 3 | Pino logger only | Zero `console.log` — all logging uses NestJS Logger (Pino) with structured context |
-| 4 | OnModuleDestroy | Every `@Injectable()` with DB/NATS connections implements `OnModuleDestroy` with proper cleanup |
-| 5 | Timer cleanup | All `setInterval`/`setTimeout` stored and cleared in `OnModuleDestroy` |
-| 6 | NATS TLS | All NATS connections use TLS + authenticator (SI-7) |
-| 7 | AI consent check | All LLM calls check `THIRD_PARTY_LLM` consent first (SI-10) |
-| 8 | TypeScript zero errors | `pnpm turbo typecheck --filter=@edusphere/subgraph-*` — 0 errors |
-| 9 | Lint zero errors | `pnpm turbo lint --filter=@edusphere/subgraph-*` — 0 warnings/errors |
-| 10 | RLS enforcement | All tenant-scoped queries use `withTenantContext()` wrapper |
+| #   | Gate                   | Pass Criteria                                                                                         |
+| --- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1   | All mutations have Zod | Every GraphQL mutation input has a corresponding Zod schema in `*.schemas.ts`                         |
+| 2   | No raw SQL             | Zero raw SQL queries — all DB access through Drizzle ORM (except Apache AGE Cypher via graph helpers) |
+| 3   | Pino logger only       | Zero `console.log` — all logging uses NestJS Logger (Pino) with structured context                    |
+| 4   | OnModuleDestroy        | Every `@Injectable()` with DB/NATS connections implements `OnModuleDestroy` with proper cleanup       |
+| 5   | Timer cleanup          | All `setInterval`/`setTimeout` stored and cleared in `OnModuleDestroy`                                |
+| 6   | NATS TLS               | All NATS connections use TLS + authenticator (SI-7)                                                   |
+| 7   | AI consent check       | All LLM calls check `THIRD_PARTY_LLM` consent first (SI-10)                                           |
+| 8   | TypeScript zero errors | `pnpm turbo typecheck --filter=@edusphere/subgraph-*` — 0 errors                                      |
+| 9   | Lint zero errors       | `pnpm turbo lint --filter=@edusphere/subgraph-*` — 0 warnings/errors                                  |
+| 10  | RLS enforcement        | All tenant-scoped queries use `withTenantContext()` wrapper                                           |
 
 ## REPORTING FORMAT (MANDATORY)
 

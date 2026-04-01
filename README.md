@@ -59,13 +59,13 @@ pnpm dev
 
 ### Demo User Accounts
 
-| Email | Role | Password |
-|-------|------|----------|
+| Email                     | Role        | Password       |
+| ------------------------- | ----------- | -------------- |
 | super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
-| instructor@example.com | INSTRUCTOR | Instructor123! |
-| org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
-| researcher@example.com | RESEARCHER | Researcher123! |
-| student@example.com | STUDENT | Student123! |
+| instructor@example.com    | INSTRUCTOR  | Instructor123! |
+| org.admin@example.com     | ORG_ADMIN   | OrgAdmin123!   |
+| researcher@example.com    | RESEARCHER  | Researcher123! |
+| student@example.com       | STUDENT     | Student123!    |
 
 > **Note:** To reset passwords, run: `node scripts/reset-keycloak-passwords.cjs`
 
@@ -201,20 +201,20 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 
 ### Core Infrastructure
 
-| Layer                | Technology                  | Version                 | License    | Why                                                                  |
-| -------------------- | --------------------------- | ----------------------- | ---------- | -------------------------------------------------------------------- |
+| Layer                | Technology                  | Version                  | License    | Why                                                                  |
+| -------------------- | --------------------------- | ------------------------ | ---------- | -------------------------------------------------------------------- |
 | **Monorepo**         | pnpm workspaces + Turborepo | pnpm 10.x + Turbo latest | MIT        | 60-80% disk savings, 3-5x faster than npm, parallel builds           |
-| **Gateway**          | Hive Gateway v2             | v2.x                    | MIT        | Federation v2.7, 2x faster than competitors, MIT-licensed (not ELv2) |
-| **Subgraph Runtime** | GraphQL Yoga + NestJS       | Yoga 5.x + NestJS 11.x  | MIT        | `YogaFederationDriver`, enterprise DI, guards, interceptors          |
-| **Database**         | PostgreSQL 16+              | 16.x                    | PostgreSQL | RLS, extensions (AGE, pgvector), ACID, mature ecosystem              |
-| **Graph DB**         | Apache AGE                  | 1.5.0                   | Apache 2.0 | openCypher in PostgreSQL, coexists with relational + vector          |
-| **Vector Search**    | pgvector + pgvectorscale    | 0.8.0                   | PostgreSQL | 471 QPS @ 99% recall (50M vectors), HNSW indexes, 768-dim            |
-| **ORM**              | Drizzle ORM                 | 1.x                     | Apache 2.0 | Native RLS, SQL-first, 14x lower latency vs N+1, 7.4 KB bundle       |
-| **Auth**             | Keycloak                    | v26.x                   | Apache 2.0 | OIDC/JWT, multi-tenant orgs, JWKS, SSO, RBAC                         |
-| **Messaging**        | NATS JetStream              | latest                  | Apache 2.0 | 20 MB binary, 128-256 MB RAM, subject wildcarding, KV store          |
-| **Object Storage**   | MinIO                       | latest                  | AGPLv3     | S3-compatible, presigned URLs, local dev + prod compatibility        |
-| **Reverse Proxy**    | Traefik                     | v3.6                    | MIT        | Auto-discovery, Let's Encrypt, K8s Ingress, dashboards               |
-| **Telemetry**        | OpenTelemetry → Jaeger      | latest                  | Apache 2.0 | Distributed tracing, spans, metrics, Hive Gateway native integration |
+| **Gateway**          | Hive Gateway v2             | v2.x                     | MIT        | Federation v2.7, 2x faster than competitors, MIT-licensed (not ELv2) |
+| **Subgraph Runtime** | GraphQL Yoga + NestJS       | Yoga 5.x + NestJS 11.x   | MIT        | `YogaFederationDriver`, enterprise DI, guards, interceptors          |
+| **Database**         | PostgreSQL 16+              | 16.x                     | PostgreSQL | RLS, extensions (AGE, pgvector), ACID, mature ecosystem              |
+| **Graph DB**         | Apache AGE                  | 1.5.0                    | Apache 2.0 | openCypher in PostgreSQL, coexists with relational + vector          |
+| **Vector Search**    | pgvector + pgvectorscale    | 0.8.0                    | PostgreSQL | 471 QPS @ 99% recall (50M vectors), HNSW indexes, 768-dim            |
+| **ORM**              | Drizzle ORM                 | 1.x                      | Apache 2.0 | Native RLS, SQL-first, 14x lower latency vs N+1, 7.4 KB bundle       |
+| **Auth**             | Keycloak                    | v26.x                    | Apache 2.0 | OIDC/JWT, multi-tenant orgs, JWKS, SSO, RBAC                         |
+| **Messaging**        | NATS JetStream              | latest                   | Apache 2.0 | 20 MB binary, 128-256 MB RAM, subject wildcarding, KV store          |
+| **Object Storage**   | MinIO                       | latest                   | AGPLv3     | S3-compatible, presigned URLs, local dev + prod compatibility        |
+| **Reverse Proxy**    | Traefik                     | v3.6                     | MIT        | Auto-discovery, Let's Encrypt, K8s Ingress, dashboards               |
+| **Telemetry**        | OpenTelemetry → Jaeger      | latest                   | Apache 2.0 | Distributed tracing, spans, metrics, Hive Gateway native integration |
 
 ### Frontend
 
@@ -438,63 +438,63 @@ sequenceDiagram
 
 ## Development Phases
 
-| Phase            | Description                                                                            | Duration   | Status      |
-| ---------------- | -------------------------------------------------------------------------------------- | ---------- | ----------- |
-| **Phase 0**      | Foundation -- Monorepo, Docker stack, Hello World query                                | 1-2 days   | ✅ Complete |
-| **Phase 1**      | Data Layer -- 16 tables, RLS, AGE graph, pgvector, seed                                | 2-3 days   | ✅ Complete |
-| **Phase 2**      | Core + Content Subgraphs -- Auth, JWT, Tenants, Users, Courses, Media                  | 3-5 days   | ✅ Complete |
-| **Phase 3**      | Annotation + Collaboration -- Layers, CRDT, WebSocket, presence                        | 3-4 days   | ✅ Complete |
-| **Phase 4**      | Knowledge Subgraph -- Graph traversal, embeddings, HybridRAG                           | 4-5 days   | ✅ Complete |
-| **Phase 5**      | Agent Subgraph -- LangGraph workflows, templates, sandboxing                           | 4-5 days   | ✅ Complete |
-| **Phase 6**      | Frontend -- React SPA, TanStack Query, video player, AI chat                           | 5-7 days   | ✅ Complete |
-| **Phase 7**      | Production Hardening -- Performance, K8s, load tests, security                         | 5-7 days   | ✅ Complete |
-| **Phase 8**      | Mobile + Advanced -- Expo app, transcription worker, Chavruta                          | 5-7 days   | ✅ Complete |
-| **Phase 9**      | Dashboard Analytics -- Heatmap, progress bars, activity feed                           | 2-3 days   | ✅ Complete |
-| **Phases 10-14** | Frontend Core UX -- Video player, search, AI chat, knowledge graph, annotation overlay | 12-20 days | ✅ Complete |
-| **Phases 15-17** | Frontend UX polish -- User menu, course wizard, Tiptap collaboration editor            | 5-8 days   | ✅ Complete |
-| **Phases 18-24** | i18n, Admin Dashboard, AI Tutor, Offline Mode, Knowledge Graph enhancements            | 10-15 days | ✅ Complete |
-| **Phase 25**     | UI/UX Revolution -- Design System, ThemeProvider, AppSidebar, WCAG 2.2 AAA             | 3-5 days   | ✅ Complete |
-| **Phase 26**     | Skill Tree, Course Discovery, Mobile Design System alignment                            | 2-3 days   | ✅ Complete |
-| **Phase 27**     | Live Sessions, Offline Web, AdminActivityFeed, Knowledge Graph course context           | 3-4 days   | ✅ Complete |
-| **Phase 28**     | Live Sessions mutations, Offline sync, PWA, SI-3 fix                                   | 2-3 days   | ✅ Complete |
-| **Phase 29**     | Stripe checkout flow + Visual Anchoring & Asset Linking System                          | 1-2 days   | ✅ Complete |
-| **Phase 30**     | Personal KG wiki + Annotation merge request                                             | 2-3 days   | ✅ Complete |
-| **Phase 31**     | Video sketch 6 tools                                                                    | 1-2 days   | ✅ Complete |
-| **Phase 32**     | AI subtitle translation                                                                 | 2-3 days   | ✅ Complete |
-| **Phase 33**     | Remote proctoring                                                                       | 2-3 days   | ✅ Complete |
-| **Phase 34**     | 3D Models & Simulations                                                                 | 2-3 days   | ✅ Complete |
-| **Phase 35**     | i18n sync, at-risk analytics, XP foundation, scoring algorithm, pipeline builder        | 3-4 days   | ✅ Complete |
-| **Phase 36**     | AtRisk Analytics, Lesson Pipeline Builder, XP Gamification (commit 09b8690)             | 2-3 days   | ✅ Complete |
-| **Phase 37**     | Recommendation scoring, skill-gap improvements, supergraph sync                         | 1-2 days   | ✅ Complete    |
-| **Phase 38**     | Certificate download URL, CourseListing JOIN fix, MarketplacePage filters, QuizBuilder, mobile SRS + Certificates | 2-3 days   | ✅ Complete    |
-| **Phase 39**     | Motion Design (Framer Motion + GSAP + Remotion), WCAG 2.2 AA, Argos CI visual regression, Semgrep SAST, CycloneDX SBOM, Storybook 8 | 4 days   | ✅ Complete    |
-| **Phase 40**     | Smart Content Import (YouTube playlist, website crawl, folder/ZIP upload), AI Ingestion Pipeline (OCR 3-tier, handwriting TrOCR, Moondream captions, HEIC, PPTX→PDF) | 4 days   | ✅ Complete    |
-| **Phase 41**     | xAPI NATS Bridge (6 verbs), Google Drive OAuth import, Mobile xAPI offline queue (expo-sqlite, 500-row cap) | 3 days   | ✅ Complete    |
-| **Phase 42**     | White-Label Runtime per Tenant (useTenantBranding, BrandingContext, publicBranding query, AppSidebar dynamic logo, Login page per-tenant branding) | 2 days   | ✅ Complete    |
-| **Phase 43**     | SCORM 2004 Player, cmi5 AU Launcher, InstructorAnalyticsDashboard, MyProgressPage, Microlearning resolvers, AI Usage service, Expo SDK 55 upgrade | 3 days   | ✅ Complete    |
-| **Phase 44**     | Skills-Based Learning Paths DB schema (skills, skill_prerequisites, skill_paths, learner_skill_progress) + migration 0026 with RLS (SI-1 compliant) | 1 day    | ✅ Complete    |
-| **Phase 45**     | Social Learning Experience — Discussion Threads UI, Social Feed + Following wire-up, Peer Review (service + UI + IDOR guard), 360° Assessment UI + RadarChart, AI Discussion Insights (Ollama SEC-6), migration 0027, 4 E2E specs, 32 security assertions | 6 days   | ✅ Complete    |
-| **Phase 46**     | Group Challenges + KG Peer Matching — GroupChallengeService (NATS score events), PeerMatchingService (Apache AGE complementary skill gap), Leaderboard, CountdownTimer, migration 0028 | 2 days   | ✅ Complete    |
-| **Phase 47**     | AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials — ChavrutaPartnerMatchService (AGE + SQL), findMentorsByPathTopology (AGE Cypher STUDIED path), getCohortInsights (cohort_id), GraphGroundedCredentialService + issueGraphGroundedBadge, migration 0029 | 2 days   | ✅ Complete    |
-| **Phase 48**     | Session closure, P2 debt cleanup, security gate (knowledge-graph-credentials.spec.ts), cohort-insights route wiring, pause:true admin page markers | 1 day    | ✅ Complete    |
-| **Phase 49**     | UI bug batch BUG-058..062 (nav keys, layout offset, logo fallback, SRS error, language persistence) + E2E regression suite | 1 day    | ✅ Complete    |
-| **Phase 50**     | WCAG 2.2 AA (SC 2.5.7, 2.1.1, 3.1.1, 1.4.1, 1.2.2, 3.2.6, 3.3.7), EU AI Act (Art. 14 + Art. 50), HTTP Security Headers, pgvector RLS cross-tenant fix (OWASP LLM06), Keycloak MFA, Linkerd mTLS, K8s NetworkPolicy, 10 compliance docs, +90 security tests | 3 days   | ✅ Complete    |
-| **Phase 51**     | B2B GTM Core — LandingPage rewrite (12 sections), PilotSignupPage + PilotRequestsAdminPage, PricingPage (4 tiers), OrgUsagePage + ROI dashboard, SEO/AEO (robots.txt, llms.txt, sitemap.xml, JsonLd), billing schema migration 0030 | 3 days   | ✅ Complete    |
-| **Phase 52**     | Air-Gapped deployment (LocalInferenceService + GraphragAuditService + Helm/Zarf), Partner Portal (migration 0031 + PartnerService SHA-256 + PartnerSignupPage), HRIS integrations (ScimAdapter RFC 7643/7644 + Workday/SAP/Banner), InvestorDeckPage (10 slides) | 3 days   | ✅ Complete    |
-| **Phase 53**     | Auto-Grading + Gap Analysis + Stripe Invoicing + Partner Tiers                          | 2 days   | ✅ Complete    |
-| **Phase 54**     | E2E Protocol Closure — 8 Playwright specs for Phases 51-53 (220+ assertions)           | 1 day    | ✅ Complete    |
-| **Phase 55**     | 27 admin/settings pages wired (removed pause:true stubs)                                | 1 day    | ✅ Complete    |
-| **Phase 56**     | HRIS cron scheduler + Partner API middleware + AEO pre-render script                    | 1 day    | ✅ Complete    |
-| **Phase 57**     | Full i18n — 9 languages (HE, EN, AR, FR, ES, DE, RU, ZH, PT) + I18nProvider + switcher | 2 days   | ✅ Complete    |
-| **Phase 58**     | Lesson Pipeline Builder (LangGraph workflow + Pipeline Canvas UI)                       | 2 days   | ✅ Complete    |
-| **Phase 59**     | InstructorPayoutService (70/30 revenue split) + InstructorEarningsPage                  | 1 day    | ✅ Complete    |
-| **Phase 60**     | PeerReviewRubricService + AssessmentResultsDetailPage (RadarChart)                      | 1 day    | ✅ Complete    |
-| **Phase 61**     | OpenBadges 3.0 — BadgeIssuerService (W3C VC JSON + SHA-256 proof)                      | 1 day    | ✅ Complete    |
-| **Phase 62**     | SCORM 2004 Export — ScormExportService (imsmanifest.xml + entry HTML)                   | 1 day    | ✅ Complete    |
-| **Phase 63**     | Portal Builder — PortalBlockEditor (@dnd-kit/sortable, 5 block types)                  | 1 day    | ✅ Complete    |
-| **Phase 64**     | Compliance Library — 8 compliance course seeds + ComplianceLibraryService               | 1 day    | ✅ Complete    |
-| **Phase 65**     | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Gen, Browser Lockdown | 2 days   | ✅ Complete    |
-| **Phase D**      | Technical Debt — ~99 new test files, ~1,360 new tests, all backend subgraphs >90% coverage, all files <300 lines, 0 lint warnings | 1 day    | ✅ Complete    |
+| Phase            | Description                                                                                                                                                                                                                                                             | Duration   | Status      |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------- |
+| **Phase 0**      | Foundation -- Monorepo, Docker stack, Hello World query                                                                                                                                                                                                                 | 1-2 days   | ✅ Complete |
+| **Phase 1**      | Data Layer -- 16 tables, RLS, AGE graph, pgvector, seed                                                                                                                                                                                                                 | 2-3 days   | ✅ Complete |
+| **Phase 2**      | Core + Content Subgraphs -- Auth, JWT, Tenants, Users, Courses, Media                                                                                                                                                                                                   | 3-5 days   | ✅ Complete |
+| **Phase 3**      | Annotation + Collaboration -- Layers, CRDT, WebSocket, presence                                                                                                                                                                                                         | 3-4 days   | ✅ Complete |
+| **Phase 4**      | Knowledge Subgraph -- Graph traversal, embeddings, HybridRAG                                                                                                                                                                                                            | 4-5 days   | ✅ Complete |
+| **Phase 5**      | Agent Subgraph -- LangGraph workflows, templates, sandboxing                                                                                                                                                                                                            | 4-5 days   | ✅ Complete |
+| **Phase 6**      | Frontend -- React SPA, TanStack Query, video player, AI chat                                                                                                                                                                                                            | 5-7 days   | ✅ Complete |
+| **Phase 7**      | Production Hardening -- Performance, K8s, load tests, security                                                                                                                                                                                                          | 5-7 days   | ✅ Complete |
+| **Phase 8**      | Mobile + Advanced -- Expo app, transcription worker, Chavruta                                                                                                                                                                                                           | 5-7 days   | ✅ Complete |
+| **Phase 9**      | Dashboard Analytics -- Heatmap, progress bars, activity feed                                                                                                                                                                                                            | 2-3 days   | ✅ Complete |
+| **Phases 10-14** | Frontend Core UX -- Video player, search, AI chat, knowledge graph, annotation overlay                                                                                                                                                                                  | 12-20 days | ✅ Complete |
+| **Phases 15-17** | Frontend UX polish -- User menu, course wizard, Tiptap collaboration editor                                                                                                                                                                                             | 5-8 days   | ✅ Complete |
+| **Phases 18-24** | i18n, Admin Dashboard, AI Tutor, Offline Mode, Knowledge Graph enhancements                                                                                                                                                                                             | 10-15 days | ✅ Complete |
+| **Phase 25**     | UI/UX Revolution -- Design System, ThemeProvider, AppSidebar, WCAG 2.2 AAA                                                                                                                                                                                              | 3-5 days   | ✅ Complete |
+| **Phase 26**     | Skill Tree, Course Discovery, Mobile Design System alignment                                                                                                                                                                                                            | 2-3 days   | ✅ Complete |
+| **Phase 27**     | Live Sessions, Offline Web, AdminActivityFeed, Knowledge Graph course context                                                                                                                                                                                           | 3-4 days   | ✅ Complete |
+| **Phase 28**     | Live Sessions mutations, Offline sync, PWA, SI-3 fix                                                                                                                                                                                                                    | 2-3 days   | ✅ Complete |
+| **Phase 29**     | Stripe checkout flow + Visual Anchoring & Asset Linking System                                                                                                                                                                                                          | 1-2 days   | ✅ Complete |
+| **Phase 30**     | Personal KG wiki + Annotation merge request                                                                                                                                                                                                                             | 2-3 days   | ✅ Complete |
+| **Phase 31**     | Video sketch 6 tools                                                                                                                                                                                                                                                    | 1-2 days   | ✅ Complete |
+| **Phase 32**     | AI subtitle translation                                                                                                                                                                                                                                                 | 2-3 days   | ✅ Complete |
+| **Phase 33**     | Remote proctoring                                                                                                                                                                                                                                                       | 2-3 days   | ✅ Complete |
+| **Phase 34**     | 3D Models & Simulations                                                                                                                                                                                                                                                 | 2-3 days   | ✅ Complete |
+| **Phase 35**     | i18n sync, at-risk analytics, XP foundation, scoring algorithm, pipeline builder                                                                                                                                                                                        | 3-4 days   | ✅ Complete |
+| **Phase 36**     | AtRisk Analytics, Lesson Pipeline Builder, XP Gamification (commit 09b8690)                                                                                                                                                                                             | 2-3 days   | ✅ Complete |
+| **Phase 37**     | Recommendation scoring, skill-gap improvements, supergraph sync                                                                                                                                                                                                         | 1-2 days   | ✅ Complete |
+| **Phase 38**     | Certificate download URL, CourseListing JOIN fix, MarketplacePage filters, QuizBuilder, mobile SRS + Certificates                                                                                                                                                       | 2-3 days   | ✅ Complete |
+| **Phase 39**     | Motion Design (Framer Motion + GSAP + Remotion), WCAG 2.2 AA, Argos CI visual regression, Semgrep SAST, CycloneDX SBOM, Storybook 8                                                                                                                                     | 4 days     | ✅ Complete |
+| **Phase 40**     | Smart Content Import (YouTube playlist, website crawl, folder/ZIP upload), AI Ingestion Pipeline (OCR 3-tier, handwriting TrOCR, Moondream captions, HEIC, PPTX→PDF)                                                                                                    | 4 days     | ✅ Complete |
+| **Phase 41**     | xAPI NATS Bridge (6 verbs), Google Drive OAuth import, Mobile xAPI offline queue (expo-sqlite, 500-row cap)                                                                                                                                                             | 3 days     | ✅ Complete |
+| **Phase 42**     | White-Label Runtime per Tenant (useTenantBranding, BrandingContext, publicBranding query, AppSidebar dynamic logo, Login page per-tenant branding)                                                                                                                      | 2 days     | ✅ Complete |
+| **Phase 43**     | SCORM 2004 Player, cmi5 AU Launcher, InstructorAnalyticsDashboard, MyProgressPage, Microlearning resolvers, AI Usage service, Expo SDK 55 upgrade                                                                                                                       | 3 days     | ✅ Complete |
+| **Phase 44**     | Skills-Based Learning Paths DB schema (skills, skill_prerequisites, skill_paths, learner_skill_progress) + migration 0026 with RLS (SI-1 compliant)                                                                                                                     | 1 day      | ✅ Complete |
+| **Phase 45**     | Social Learning Experience — Discussion Threads UI, Social Feed + Following wire-up, Peer Review (service + UI + IDOR guard), 360° Assessment UI + RadarChart, AI Discussion Insights (Ollama SEC-6), migration 0027, 4 E2E specs, 32 security assertions               | 6 days     | ✅ Complete |
+| **Phase 46**     | Group Challenges + KG Peer Matching — GroupChallengeService (NATS score events), PeerMatchingService (Apache AGE complementary skill gap), Leaderboard, CountdownTimer, migration 0028                                                                                  | 2 days     | ✅ Complete |
+| **Phase 47**     | AI Chavruta + Mentor Path + Cohort Insights + Graph Credentials — ChavrutaPartnerMatchService (AGE + SQL), findMentorsByPathTopology (AGE Cypher STUDIED path), getCohortInsights (cohort_id), GraphGroundedCredentialService + issueGraphGroundedBadge, migration 0029 | 2 days     | ✅ Complete |
+| **Phase 48**     | Session closure, P2 debt cleanup, security gate (knowledge-graph-credentials.spec.ts), cohort-insights route wiring, pause:true admin page markers                                                                                                                      | 1 day      | ✅ Complete |
+| **Phase 49**     | UI bug batch BUG-058..062 (nav keys, layout offset, logo fallback, SRS error, language persistence) + E2E regression suite                                                                                                                                              | 1 day      | ✅ Complete |
+| **Phase 50**     | WCAG 2.2 AA (SC 2.5.7, 2.1.1, 3.1.1, 1.4.1, 1.2.2, 3.2.6, 3.3.7), EU AI Act (Art. 14 + Art. 50), HTTP Security Headers, pgvector RLS cross-tenant fix (OWASP LLM06), Keycloak MFA, Linkerd mTLS, K8s NetworkPolicy, 10 compliance docs, +90 security tests              | 3 days     | ✅ Complete |
+| **Phase 51**     | B2B GTM Core — LandingPage rewrite (12 sections), PilotSignupPage + PilotRequestsAdminPage, PricingPage (4 tiers), OrgUsagePage + ROI dashboard, SEO/AEO (robots.txt, llms.txt, sitemap.xml, JsonLd), billing schema migration 0030                                     | 3 days     | ✅ Complete |
+| **Phase 52**     | Air-Gapped deployment (LocalInferenceService + GraphragAuditService + Helm/Zarf), Partner Portal (migration 0031 + PartnerService SHA-256 + PartnerSignupPage), HRIS integrations (ScimAdapter RFC 7643/7644 + Workday/SAP/Banner), InvestorDeckPage (10 slides)        | 3 days     | ✅ Complete |
+| **Phase 53**     | Auto-Grading + Gap Analysis + Stripe Invoicing + Partner Tiers                                                                                                                                                                                                          | 2 days     | ✅ Complete |
+| **Phase 54**     | E2E Protocol Closure — 8 Playwright specs for Phases 51-53 (220+ assertions)                                                                                                                                                                                            | 1 day      | ✅ Complete |
+| **Phase 55**     | 27 admin/settings pages wired (removed pause:true stubs)                                                                                                                                                                                                                | 1 day      | ✅ Complete |
+| **Phase 56**     | HRIS cron scheduler + Partner API middleware + AEO pre-render script                                                                                                                                                                                                    | 1 day      | ✅ Complete |
+| **Phase 57**     | Full i18n — 9 languages (HE, EN, AR, FR, ES, DE, RU, ZH, PT) + I18nProvider + switcher                                                                                                                                                                                  | 2 days     | ✅ Complete |
+| **Phase 58**     | Lesson Pipeline Builder (LangGraph workflow + Pipeline Canvas UI)                                                                                                                                                                                                       | 2 days     | ✅ Complete |
+| **Phase 59**     | InstructorPayoutService (70/30 revenue split) + InstructorEarningsPage                                                                                                                                                                                                  | 1 day      | ✅ Complete |
+| **Phase 60**     | PeerReviewRubricService + AssessmentResultsDetailPage (RadarChart)                                                                                                                                                                                                      | 1 day      | ✅ Complete |
+| **Phase 61**     | OpenBadges 3.0 — BadgeIssuerService (W3C VC JSON + SHA-256 proof)                                                                                                                                                                                                       | 1 day      | ✅ Complete |
+| **Phase 62**     | SCORM 2004 Export — ScormExportService (imsmanifest.xml + entry HTML)                                                                                                                                                                                                   | 1 day      | ✅ Complete |
+| **Phase 63**     | Portal Builder — PortalBlockEditor (@dnd-kit/sortable, 5 block types)                                                                                                                                                                                                   | 1 day      | ✅ Complete |
+| **Phase 64**     | Compliance Library — 8 compliance course seeds + ComplianceLibraryService                                                                                                                                                                                               | 1 day      | ✅ Complete |
+| **Phase 65**     | Certification Exam System — Item Bank, CAT, Psychometrics, AI Question Gen, Browser Lockdown                                                                                                                                                                            | 2 days     | ✅ Complete |
+| **Phase D**      | Technical Debt — ~99 new test files, ~1,360 new tests, all backend subgraphs >90% coverage, all files <300 lines, 0 lint warnings                                                                                                                                       | 1 day      | ✅ Complete |
 
 **Current Status:** All 65 phases + Phase D Tech Debt complete ✅ — Backend + Frontend + Mobile fully built. Branch: `feat/compliance-accessibility-security`. WCAG 2.2 AA certified. EU AI Act compliant (Art. 14 + Art. 50). 9 languages supported. B2B GTM platform, Air-Gapped deployment, Partner Portal, HRIS integrations, Auto-Grading, Gap Analysis, Marketplace, 360° Assessments, OpenBadges 3.0, SCORM 2004 Export, Portal Builder, Compliance Library, Certification Exam System all complete. GraphQL federation active across all 6 subgraphs. **~9,560+ tests passing** (web ~5,653 / 547 files | security 1,370 / 48 files | 134 E2E Playwright specs | subgraph-content ~1,700 | subgraph-agent ~1,000 | subgraph-core ~1,200 | subgraph-knowledge ~870). TypeScript: 0 errors. Lint: 0 warnings. All files under 300-line limit. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
@@ -594,17 +594,17 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 ## Testing
 
-| Category                | Framework               | Location                                     | Status                                             |
-| ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~5,653+ tests passing** (~547 test files)  |
-| **Security Tests**      | Vitest                  | `tests/security/*.spec.ts`                   | ✅ **1,370 tests passing** (48 spec files)     |
+| Category                | Framework               | Location                                     | Status                                                                    |
+| ----------------------- | ----------------------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **~5,653+ tests passing** (~547 test files)                            |
+| **Security Tests**      | Vitest                  | `tests/security/*.spec.ts`                   | ✅ **1,370 tests passing** (48 spec files)                                |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (core ~1,200 / content ~1,700 / agent ~1,000 / knowledge ~870) |
-| **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ✅ **134 E2E specs**                           |
-| **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |
-| **RLS Validation**      | Vitest                  | `packages/db/src/rls/*.test.ts`              | ⏳ Planned Phase 7                                 |
-| **GraphQL Tests**       | Vitest + SuperTest      | `apps/*/src/test/graphql/*.spec.ts`          | ⏳ Planned Phase 7                                 |
-| **Federation Tests**    | Vitest                  | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7                                 |
-| **Load Tests**          | k6                      | `infrastructure/k6/*.js`                     | ⏳ Planned Phase 7                                 |
+| **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ✅ **134 E2E specs**                                                      |
+| **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                                        |
+| **RLS Validation**      | Vitest                  | `packages/db/src/rls/*.test.ts`              | ⏳ Planned Phase 7                                                        |
+| **GraphQL Tests**       | Vitest + SuperTest      | `apps/*/src/test/graphql/*.spec.ts`          | ⏳ Planned Phase 7                                                        |
+| **Federation Tests**    | Vitest                  | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7                                                        |
+| **Load Tests**          | k6                      | `infrastructure/k6/*.js`                     | ⏳ Planned Phase 7                                                        |
 
 **Test Suites (selected highlights, all green):**
 

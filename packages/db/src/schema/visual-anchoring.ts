@@ -92,10 +92,9 @@ export const visualAnchors = pgTable(
     pos_x_end: numeric('pos_x_end', { precision: 8, scale: 6 }),
     pos_y_end: numeric('pos_y_end', { precision: 8, scale: 6 }),
     // Assigned visual asset (null until instructor assigns image)
-    visual_asset_id: uuid('visual_asset_id').references(
-      () => visualAssets.id,
-      { onDelete: 'set null' }
-    ),
+    visual_asset_id: uuid('visual_asset_id').references(() => visualAssets.id, {
+      onDelete: 'set null',
+    }),
     // DOM document order (0-based) — used for tie-breaking centermost detection
     document_order: integer('document_order').notNull().default(0),
     // Set to true by sync tool when anchor_text no longer matches document content

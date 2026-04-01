@@ -32,7 +32,11 @@ vi.mock('@edusphere/db', () => ({
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   withTenantContext: vi.fn(
-    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      fn: (tx: unknown) => Promise<unknown>
+    ) =>
       fn({
         select: mockSelect,
         insert: mockInsert,
@@ -165,8 +169,18 @@ describe('SkillService', () => {
 
     // getMySkillProgress returns both skills mastered
     const progress = [
-      { skillId: 'skill-a', masteryLevel: 'MASTERED', tenantId: 'tenant-1', userId: 'user-1' },
-      { skillId: 'skill-b', masteryLevel: 'PROFICIENT', tenantId: 'tenant-1', userId: 'user-1' },
+      {
+        skillId: 'skill-a',
+        masteryLevel: 'MASTERED',
+        tenantId: 'tenant-1',
+        userId: 'user-1',
+      },
+      {
+        skillId: 'skill-b',
+        masteryLevel: 'PROFICIENT',
+        tenantId: 'tenant-1',
+        userId: 'user-1',
+      },
     ];
     const mockWhereProgress = vi.fn().mockResolvedValueOnce(progress);
     const mockFromProgress = vi.fn(() => ({ where: mockWhereProgress }));

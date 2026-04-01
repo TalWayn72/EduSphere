@@ -99,9 +99,7 @@ export function CourseLibraryPage() {
   });
 
   if (isLoading) {
-    return (
-      <LoadingSpinner />
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -117,102 +115,106 @@ export function CourseLibraryPage() {
   return (
     <Layout>
       <PageShell size="xl" className="p-6">
-      <h1 className="text-3xl font-bold mb-1">Compliance Course Library</h1>
-      <p className="text-muted-foreground mb-6">
-        Activate pre-built compliance courses to add them to your catalog
-        instantly.
-      </p>
+        <h1 className="text-3xl font-bold mb-1">Compliance Course Library</h1>
+        <p className="text-muted-foreground mb-6">
+          Activate pre-built compliance courses to add them to your catalog
+          instantly.
+        </p>
 
-      <Tabs value={activeTopic} onValueChange={setActiveTopic} className="mb-6">
-        <TabsList className="flex-wrap h-auto gap-1">
-          {TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+        <Tabs
+          value={activeTopic}
+          onValueChange={setActiveTopic}
+          className="mb-6"
+        >
+          <TabsList className="flex-wrap h-auto gap-1">
+            {TABS.map((t) => (
+              <TabsTrigger key={t.value} value={t.value}>
+                {t.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-      {courses.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          No courses available for this category.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => (
-            <Card key={course.id} className="flex flex-col">
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TOPIC_COLORS[course.topic] ?? 'bg-gray-100 text-gray-800'}`}
-                  >
-                    {course.topic.replace('_', ' ')}
-                  </span>
-                  {course.licenseType === 'FREE' && (
-                    <Badge variant="secondary" className="text-xs">
-                      FREE
+        {courses.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            No courses available for this category.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course) => (
+              <Card key={course.id} className="flex flex-col">
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span
+                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TOPIC_COLORS[course.topic] ?? 'bg-gray-100 text-gray-800'}`}
+                    >
+                      {course.topic.replace('_', ' ')}
+                    </span>
+                    {course.licenseType === 'FREE' && (
+                      <Badge variant="secondary" className="text-xs">
+                        FREE
+                      </Badge>
+                    )}
+                  </div>
+                  <CardTitle className="text-base leading-tight">
+                    {course.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1 text-sm text-muted-foreground">
+                  <p className="line-clamp-3">{course.description}</p>
+                  <p className="mt-3 text-xs font-medium">
+                    {course.durationMinutes} min
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  {course.isActivated ? (
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-center py-2 text-green-700 border-green-300 dark:text-green-300 dark:border-green-600"
+                    >
+                      Activated
                     </Badge>
+                  ) : (
+                    <Button
+                      className="w-full"
+                      variant="default"
+                      onClick={() => setConfirmCourse(course)}
+                    >
+                      Activate
+                    </Button>
                   )}
-                </div>
-                <CardTitle className="text-base leading-tight">
-                  {course.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 text-sm text-muted-foreground">
-                <p className="line-clamp-3">{course.description}</p>
-                <p className="mt-3 text-xs font-medium">
-                  {course.durationMinutes} min
-                </p>
-              </CardContent>
-              <CardFooter>
-                {course.isActivated ? (
-                  <Badge
-                    variant="outline"
-                    className="w-full justify-center py-2 text-green-700 border-green-300 dark:text-green-300 dark:border-green-600"
-                  >
-                    Activated
-                  </Badge>
-                ) : (
-                  <Button
-                    className="w-full"
-                    variant="default"
-                    onClick={() => setConfirmCourse(course)}
-                  >
-                    Activate
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
 
-      <Dialog
-        open={confirmCourse !== null}
-        onOpenChange={() => setConfirmCourse(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Activate Course</DialogTitle>
-            <DialogDescription>
-              This will add <strong>{confirmCourse?.title}</strong> to your
-              tenant catalog. Learners will be able to enroll once you publish
-              it.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmCourse(null)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => confirmCourse && activate(confirmCourse.id)}
-              disabled={isPending}
-            >
-              {isPending ? 'Activating...' : 'Confirm Activate'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <Dialog
+          open={confirmCourse !== null}
+          onOpenChange={() => setConfirmCourse(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Activate Course</DialogTitle>
+              <DialogDescription>
+                This will add <strong>{confirmCourse?.title}</strong> to your
+                tenant catalog. Learners will be able to enroll once you publish
+                it.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfirmCourse(null)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => confirmCourse && activate(confirmCourse.id)}
+                disabled={isPending}
+              >
+                {isPending ? 'Activating...' : 'Confirm Activate'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </PageShell>
     </Layout>
   );

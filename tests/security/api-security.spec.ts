@@ -196,7 +196,9 @@ describe('Phase 41: xAPI NATS Bridge Security', () => {
       'apps/subgraph-content/src/xapi/xapi-nats-bridge.service.ts'
     );
     // Must check for tenantId or userId before calling storeStatement
-    expect(bridgeSrc).toMatch(/tenantId.*userId|userId.*tenantId|!tenantId|!userId/);
+    expect(bridgeSrc).toMatch(
+      /tenantId.*userId|userId.*tenantId|!tenantId|!userId/
+    );
   });
 
   it('xAPI tokens use SHA-256 hash — never raw token stored', () => {
@@ -213,7 +215,9 @@ describe('Phase 41: xAPI NATS Bridge Security', () => {
       'apps/subgraph-content/src/content-import/content-import.service.ts'
     );
     // accessToken must not appear in any Drizzle insert context
-    expect(importSrc).not.toMatch(/drizzle.*accessToken|db\.insert.*accessToken/i);
+    expect(importSrc).not.toMatch(
+      /drizzle.*accessToken|db\.insert.*accessToken/i
+    );
   });
 
   it('importFromDrive resolver takes tenantId from JWT context, not args', () => {
@@ -222,20 +226,18 @@ describe('Phase 41: xAPI NATS Bridge Security', () => {
     );
     // Must use ctx.authContext (tenantId from JWT), not accept tenantId from args
     expect(resolverSrc).toMatch(/ctx\.authContext|authContext\.tenantId/);
-    expect(resolverSrc).not.toMatch(/@Args\([^)]*tenantId|args\.tenantId|input\.tenantId/);
+    expect(resolverSrc).not.toMatch(
+      /@Args\([^)]*tenantId|args\.tenantId|input\.tenantId/
+    );
   });
 
   it('xapiStatementCount query requires elevated role in SDL', () => {
-    const sdl = read(
-      'apps/subgraph-content/src/xapi/xapi.graphql'
-    );
+    const sdl = read('apps/subgraph-content/src/xapi/xapi.graphql');
     expect(sdl).toMatch(/xapiStatementCount[\s\S]*?@requiresRole/);
   });
 
   it('mobile xAPI queue has eviction cap — no unbounded growth', () => {
-    const queueSrc = read(
-      'apps/mobile/src/services/XapiOfflineQueue.ts'
-    );
+    const queueSrc = read('apps/mobile/src/services/XapiOfflineQueue.ts');
     // Must have a max-row eviction function
     expect(queueSrc).toContain('evictOldStatements');
     expect(queueSrc).toMatch(/500/); // 500-row cap
@@ -277,10 +279,17 @@ describe('Phase 42 — White-label security', () => {
     );
     // Find the publicBranding query field line
     const lines = graphqlFile.split('\n');
-    const publicBrandingLine = lines.findIndex((l) => l.includes('publicBranding(slug'));
-    expect(publicBrandingLine, 'publicBranding field must exist in tenant.graphql').toBeGreaterThan(-1);
+    const publicBrandingLine = lines.findIndex((l) =>
+      l.includes('publicBranding(slug')
+    );
+    expect(
+      publicBrandingLine,
+      'publicBranding field must exist in tenant.graphql'
+    ).toBeGreaterThan(-1);
     // Neither the field line nor the immediately following line may carry @authenticated
-    const surroundingText = lines.slice(publicBrandingLine, publicBrandingLine + 2).join('\n');
+    const surroundingText = lines
+      .slice(publicBrandingLine, publicBrandingLine + 2)
+      .join('\n');
     expect(surroundingText).not.toContain('@authenticated');
   });
 });
@@ -308,9 +317,7 @@ describe('Phase 43 — SCORM 2004 + cmi5 Security', () => {
   });
 
   it('SCORM 2004 suspend_data has no 4096-byte length limit (unlike SCORM 1.2)', () => {
-    const modelFile = read(
-      'apps/web/src/lib/scorm/scorm2004-data-model.ts'
-    );
+    const modelFile = read('apps/web/src/lib/scorm/scorm2004-data-model.ts');
     expect(modelFile.length).toBeGreaterThan(0);
     // SCORM 2004 uses unlimited CMI suspend_data — the model must not impose 4096 cap
     expect(modelFile).not.toContain('4096');
@@ -373,7 +380,8 @@ describe('Phase 44 — Skills Security', () => {
       'utf-8'
     );
     // Both tenant-scoped tables must have RLS
-    const rlsCount = (migration.match(/ENABLE ROW LEVEL SECURITY/g) ?? []).length;
+    const rlsCount = (migration.match(/ENABLE ROW LEVEL SECURITY/g) ?? [])
+      .length;
     expect(rlsCount).toBeGreaterThanOrEqual(2);
   });
 
@@ -393,7 +401,9 @@ describe('Phase 44 — Skills Security', () => {
     );
     // Regex matches 'app.current_user' NOT followed by _id — catches the SI-1 violation pattern
     // The negative lookahead ensures 'app.current_user_id' does NOT trigger this
-    expect(migration).not.toMatch(/current_setting\s*\(\s*'app\.current_user'\s*,/);
+    expect(migration).not.toMatch(
+      /current_setting\s*\(\s*'app\.current_user'\s*,/
+    );
   });
 
   it('skills schema is exported from packages/db/src/schema/index.ts', () => {

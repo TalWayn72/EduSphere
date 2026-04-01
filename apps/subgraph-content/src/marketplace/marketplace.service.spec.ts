@@ -436,10 +436,7 @@ describe('MarketplaceService', () => {
     });
 
     // ilike was called with search term wrapped in wildcards
-    expect(mockIlike).toHaveBeenCalledWith(
-      expect.anything(),
-      '%TypeScript%'
-    );
+    expect(mockIlike).toHaveBeenCalledWith(expect.anything(), '%TypeScript%');
     expect(result).toHaveLength(1);
     expect(result[0]?.title).toBe('TypeScript Basics');
   });
@@ -454,9 +451,6 @@ describe('MarketplaceService', () => {
     });
 
     // priceMax=9.99 → priceCents lte 999
-    expect(mockLte).toHaveBeenCalledWith(
-      expect.anything(),
-      999
-    );
+    expect(mockLte).toHaveBeenCalledWith(expect.anything(), 999);
   });
 });

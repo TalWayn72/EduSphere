@@ -56,9 +56,7 @@ export class LiveSessionService implements OnModuleDestroy {
   private readonly logger = new Logger(LiveSessionService.name);
   private readonly db = createDatabaseConnection();
 
-  constructor(
-    private readonly recordingService: LiveSessionRecordingService
-  ) {}
+  constructor(private readonly recordingService: LiveSessionRecordingService) {}
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
@@ -100,19 +98,35 @@ export class LiveSessionService implements OnModuleDestroy {
     const [session] = await this.db
       .insert(schema.liveSessions)
       .values({
-        contentItemId, tenantId, bbbMeetingId, meetingName, scheduledAt,
-        attendeePasswordEnc, moderatorPasswordEnc, status: 'SCHEDULED',
+        contentItemId,
+        tenantId,
+        bbbMeetingId,
+        meetingName,
+        scheduledAt,
+        attendeePasswordEnc,
+        moderatorPasswordEnc,
+        status: 'SCHEDULED',
       })
       .returning();
 
-    if (!session) throw new InternalServerErrorException('Failed to insert live session');
+    if (!session)
+      throw new InternalServerErrorException('Failed to insert live session');
 
-    await this.recordingService.publishSessionCreated(session.id, tenantId, scheduledAt);
+    await this.recordingService.publishSessionCreated(
+      session.id,
+      tenantId,
+      scheduledAt
+    );
 
     const bbb = createBbbClient();
     if (bbb) {
       try {
-        await bbb.createMeeting(bbbMeetingId, meetingName, attendeePassword, moderatorPassword);
+        await bbb.createMeeting(
+          bbbMeetingId,
+          meetingName,
+          attendeePassword,
+          moderatorPassword
+        );
         this.logger.log(`BBB meeting created: ${bbbMeetingId}`);
       } catch (err) {
         this.logger.warn(`BBB createMeeting failed (non-fatal): ${err}`);
@@ -129,11 +143,14 @@ export class LiveSessionService implements OnModuleDestroy {
     tenantId: string
   ): Promise<LiveSessionResult | null> {
     const [row] = await this.db
-      .select().from(schema.liveSessions)
-      .where(and(
-        eq(schema.liveSessions.contentItemId, contentItemId),
-        eq(schema.liveSessions.tenantId, tenantId)
-      ))
+      .select()
+      .from(schema.liveSessions)
+      .where(
+        and(
+          eq(schema.liveSessions.contentItemId, contentItemId),
+          eq(schema.liveSessions.tenantId, tenantId)
+        )
+      )
       .limit(1);
     return row ? this.map(row as DbLiveSession) : null;
   }
@@ -145,17 +162,22 @@ export class LiveSessionService implements OnModuleDestroy {
     userRole: string
   ): Promise<string> {
     const [session] = await this.db
-      .select().from(schema.liveSessions)
-      .where(and(
-        eq(schema.liveSessions.id, sessionId),
-        eq(schema.liveSessions.tenantId, tenantId)
-      ))
+      .select()
+      .from(schema.liveSessions)
+      .where(
+        and(
+          eq(schema.liveSessions.id, sessionId),
+          eq(schema.liveSessions.tenantId, tenantId)
+        )
+      )
       .limit(1);
 
-    if (!session) throw new NotFoundException(`LiveSession ${sessionId} not found`);
+    if (!session)
+      throw new NotFoundException(`LiveSession ${sessionId} not found`);
 
     const typedSession = session as DbLiveSession;
-    if (typedSession.status === 'ENDED') throw new ForbiddenException('Session has ended');
+    if (typedSession.status === 'ENDED')
+      throw new ForbiddenException('Session has ended');
 
     const isModerator = MODERATOR_ROLES.includes(userRole);
     const tenantKey = deriveTenantKey(tenantId);
@@ -164,11 +186,17 @@ export class LiveSessionService implements OnModuleDestroy {
       : typedSession.attendeePasswordEnc;
     const password = decryptField(encryptedPassword, tenantKey);
 
-    await this.recordingService.publishParticipantJoined(sessionId, tenantId, userName);
+    await this.recordingService.publishParticipantJoined(
+      sessionId,
+      tenantId,
+      userName
+    );
 
     const bbb = createBbbClient();
     if (!bbb) {
-      this.logger.debug(`BBB not configured - returning demo join URL for session=${sessionId}`);
+      this.logger.debug(
+        `BBB not configured - returning demo join URL for session=${sessionId}`
+      );
       return BBB_DEMO_JOIN_URL;
     }
     return bbb.buildJoinUrl(typedSession.bbbMeetingId, userName, password);
@@ -181,24 +209,33 @@ export class LiveSessionService implements OnModuleDestroy {
     const [updated] = await this.db
       .update(schema.liveSessions)
       .set({ status: 'ENDED', endedAt: new Date() })
-      .where(and(
-        eq(schema.liveSessions.id, sessionId),
-        eq(schema.liveSessions.tenantId, tenantId)
-      ))
+      .where(
+        and(
+          eq(schema.liveSessions.id, sessionId),
+          eq(schema.liveSessions.tenantId, tenantId)
+        )
+      )
       .returning();
 
-    if (!updated) throw new NotFoundException(`LiveSession ${sessionId} not found`);
+    if (!updated)
+      throw new NotFoundException(`LiveSession ${sessionId} not found`);
 
     const typedUpdated = updated as DbLiveSession;
     const endedAt = typedUpdated.endedAt ?? new Date();
     const durationSeconds = typedUpdated.startedAt
-      ? Math.round((endedAt.getTime() - typedUpdated.startedAt.getTime()) / 1000)
+      ? Math.round(
+          (endedAt.getTime() - typedUpdated.startedAt.getTime()) / 1000
+        )
       : null;
 
     this.logger.log(`[LiveSessionService] Session ended: ${sessionId}`);
 
     await this.recordingService.publishSessionEnded(
-      sessionId, tenantId, endedAt, typedUpdated.startedAt ?? null, durationSeconds
+      sessionId,
+      tenantId,
+      endedAt,
+      typedUpdated.startedAt ?? null,
+      durationSeconds
     );
     this.recordingService.publishLegacySessionEnded(sessionId, tenantId);
 
@@ -212,12 +249,21 @@ export class LiveSessionService implements OnModuleDestroy {
     offset = 0
   ): Promise<LiveSessionResult[]> {
     const rows = await this.db
-      .select().from(schema.liveSessions)
+      .select()
+      .from(schema.liveSessions)
       .where(
         status
           ? and(
               eq(schema.liveSessions.tenantId, tenantId),
-              eq(schema.liveSessions.status, status as 'SCHEDULED' | 'LIVE' | 'ENDED' | 'RECORDING' | 'CANCELLED')
+              eq(
+                schema.liveSessions.status,
+                status as
+                  | 'SCHEDULED'
+                  | 'LIVE'
+                  | 'ENDED'
+                  | 'RECORDING'
+                  | 'CANCELLED'
+              )
             )
           : eq(schema.liveSessions.tenantId, tenantId)
       )
@@ -232,11 +278,14 @@ export class LiveSessionService implements OnModuleDestroy {
     tenantId: string
   ): Promise<LiveSessionResult | null> {
     const [row] = await this.db
-      .select().from(schema.liveSessions)
-      .where(and(
-        eq(schema.liveSessions.id, sessionId),
-        eq(schema.liveSessions.tenantId, tenantId)
-      ))
+      .select()
+      .from(schema.liveSessions)
+      .where(
+        and(
+          eq(schema.liveSessions.id, sessionId),
+          eq(schema.liveSessions.tenantId, tenantId)
+        )
+      )
       .limit(1);
     return row ? this.map(row as DbLiveSession) : null;
   }

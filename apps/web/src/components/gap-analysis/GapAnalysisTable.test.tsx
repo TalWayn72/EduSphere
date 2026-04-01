@@ -54,7 +54,7 @@ describe('GapAnalysisTable', () => {
   it('shows empty state when no gaps provided', () => {
     renderTable([]);
     expect(
-      screen.getByText('No knowledge gaps detected. All concepts mastered!'),
+      screen.getByText('No knowledge gaps detected. All concepts mastered!')
     ).toBeInTheDocument();
   });
 
@@ -107,12 +107,16 @@ describe('GapAnalysisTable', () => {
 
   it('shows "No recommendations available" when titles are empty', () => {
     renderTable([EMPTY_REC_GAP]);
-    expect(screen.getByText('No recommendations available')).toBeInTheDocument();
+    expect(
+      screen.getByText('No recommendations available')
+    ).toBeInTheDocument();
   });
 
   it('has accessible table with aria-label', () => {
     renderTable();
-    const table = screen.getByRole('table', { name: /knowledge gap analysis/i });
+    const table = screen.getByRole('table', {
+      name: /knowledge gap analysis/i,
+    });
     expect(table).toBeInTheDocument();
   });
 

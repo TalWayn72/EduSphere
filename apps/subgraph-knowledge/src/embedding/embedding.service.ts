@@ -50,7 +50,10 @@ export class EmbeddingService implements OnModuleDestroy {
 
   // -- Generation ------------------------------------------------------------
 
-  async generateEmbedding(text: string, segmentId: string): Promise<EmbeddingRecord> {
+  async generateEmbedding(
+    text: string,
+    segmentId: string
+  ): Promise<EmbeddingRecord> {
     const vector = await this.callEmbeddingProvider(text);
     if (this.store) return this.store.upsertContentEmbedding(segmentId, vector);
     return this.fallback.upsertContent(segmentId, vector);
@@ -67,12 +70,16 @@ export class EmbeddingService implements OnModuleDestroy {
             await this.generateEmbedding(seg.text, seg.id);
             count++;
           } catch (err) {
-            this.logger.error(`Failed to embed segment ${seg.id}: ${String(err)}`);
+            this.logger.error(
+              `Failed to embed segment ${seg.id}: ${String(err)}`
+            );
           }
         })
       );
     }
-    this.logger.log(`Batch embed complete: ${count}/${segments.length} segments`);
+    this.logger.log(
+      `Batch embed complete: ${count}/${segments.length} segments`
+    );
     return count;
   }
 
@@ -88,7 +95,9 @@ export class EmbeddingService implements OnModuleDestroy {
       : !!(process.env.OLLAMA_URL ?? process.env.OPENAI_API_KEY);
 
     if (!hasProvider) {
-      this.logger.warn('No embedding provider -- semantic search falling back to ILIKE');
+      this.logger.warn(
+        'No embedding provider -- semantic search falling back to ILIKE'
+      );
       return this.store
         ? this.store.ilikeFallback(queryText, limit, tenantCtx)
         : this.fallback.ilikeFallback(queryText, limit);
@@ -98,7 +107,9 @@ export class EmbeddingService implements OnModuleDestroy {
     try {
       vector = await this.callEmbeddingProvider(queryText);
     } catch (err) {
-      this.logger.warn(`Embedding provider error (${String(err)}) -- using ILIKE fallback`);
+      this.logger.warn(
+        `Embedding provider error (${String(err)}) -- using ILIKE fallback`
+      );
       return this.store
         ? this.store.ilikeFallback(queryText, limit, tenantCtx)
         : this.fallback.ilikeFallback(queryText, limit);

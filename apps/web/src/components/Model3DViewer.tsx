@@ -71,31 +71,61 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
 
   const onLoadRef = useRef(onLoad);
   const onErrorRef = useRef(onError);
-  useEffect(() => { onLoadRef.current = onLoad; }, [onLoad]);
-  useEffect(() => { onErrorRef.current = onError; }, [onError]);
+  useEffect(() => {
+    onLoadRef.current = onLoad;
+  }, [onLoad]);
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
-  const initViewer = useCallback(async (): Promise<(() => void) | undefined> => {
+  const initViewer = useCallback(async (): Promise<
+    (() => void) | undefined
+  > => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return undefined;
 
     // Dynamic imports — fail gracefully if three is not installed
     let THREE: typeof import('three');
-    let GLTFLoaderModule: { GLTFLoader: new () => { load(url: string, onLoad: (gltf: ThreeGLTFResult) => void, onProgress: undefined, onError: (e: unknown) => void): void } };
-    let OrbitControlsModule: { OrbitControls: new (camera: unknown, domElement: HTMLElement) => ThreeControls };
+    let GLTFLoaderModule: {
+      GLTFLoader: new () => {
+        load(
+          url: string,
+          onLoad: (gltf: ThreeGLTFResult) => void,
+          onProgress: undefined,
+          onError: (e: unknown) => void
+        ): void;
+      };
+    };
+    let OrbitControlsModule: {
+      OrbitControls: new (
+        camera: unknown,
+        domElement: HTMLElement
+      ) => ThreeControls;
+    };
 
     try {
       [THREE, GLTFLoaderModule, OrbitControlsModule] = await Promise.all([
         import('three'),
-        import('three/examples/jsm/loaders/GLTFLoader.js') as Promise<typeof GLTFLoaderModule>,
-        import('three/examples/jsm/controls/OrbitControls.js') as Promise<typeof OrbitControlsModule>,
+        import('three/examples/jsm/loaders/GLTFLoader.js') as Promise<
+          typeof GLTFLoaderModule
+        >,
+        import('three/examples/jsm/controls/OrbitControls.js') as Promise<
+          typeof OrbitControlsModule
+        >,
       ]);
     } catch {
       setViewerState('unavailable');
       return undefined;
     }
 
-    const { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight } = THREE;
+    const {
+      WebGLRenderer,
+      Scene,
+      PerspectiveCamera,
+      AmbientLight,
+      DirectionalLight,
+    } = THREE;
 
     // Scene setup
     const scene = new Scene();
@@ -103,11 +133,15 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
       45,
       canvas.clientWidth / Math.max(canvas.clientHeight, 1),
       0.1,
-      1000,
+      1000
     );
     camera.position.set(0, 1, 3);
 
-    const renderer: ThreeRenderer = new WebGLRenderer({ canvas, antialias: true, alpha: true });
+    const renderer: ThreeRenderer = new WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+    });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
@@ -118,7 +152,10 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
     scene.add(dirLight);
 
     // Controls
-    const controls: ThreeControls = new OrbitControlsModule.OrbitControls(camera, canvas);
+    const controls: ThreeControls = new OrbitControlsModule.OrbitControls(
+      camera,
+      canvas
+    );
 
     // Animation loop
     let rafId = 0;
@@ -138,8 +175,12 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
       const w = container.clientWidth;
       const h = container.clientHeight;
       renderer.setSize(w, h);
-      (camera as unknown as { aspect: number; updateProjectionMatrix(): void }).aspect = w / Math.max(h, 1);
-      (camera as unknown as { updateProjectionMatrix(): void }).updateProjectionMatrix();
+      (
+        camera as unknown as { aspect: number; updateProjectionMatrix(): void }
+      ).aspect = w / Math.max(h, 1);
+      (
+        camera as unknown as { updateProjectionMatrix(): void }
+      ).updateProjectionMatrix();
     });
     resizeObserver.observe(container);
 
@@ -156,11 +197,14 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
       },
       undefined,
       (loadErr) => {
-        const err = loadErr instanceof Error ? loadErr : new Error('Failed to load 3D model');
+        const err =
+          loadErr instanceof Error
+            ? loadErr
+            : new Error('Failed to load 3D model');
         setViewerState('error');
         onErrorRef.current?.(err);
         window.cancelAnimationFrame(rafId);
-      },
+      }
     );
 
     // Cleanup
@@ -176,11 +220,13 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
   useEffect(() => {
     let cleanup: (() => void) | undefined;
 
-    initViewer().then((cleanupFn) => {
-      cleanup = cleanupFn;
-    }).catch(() => {
-      setViewerState('unavailable');
-    });
+    initViewer()
+      .then((cleanupFn) => {
+        cleanup = cleanupFn;
+      })
+      .catch(() => {
+        setViewerState('unavailable');
+      });
 
     return () => {
       cleanup?.();
@@ -213,7 +259,8 @@ export function Model3DViewer({ src, className, onLoad, onError }: Props) {
           className="absolute inset-0 flex items-center justify-center bg-gray-900/90 p-4 dark:bg-gray-100/90"
         >
           <p className="text-red-400 text-sm text-center dark:text-red-400">
-            Unable to load the 3D model. Please check your connection and try again.
+            Unable to load the 3D model. Please check your connection and try
+            again.
           </p>
         </div>
       )}

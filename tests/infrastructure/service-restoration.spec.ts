@@ -178,7 +178,9 @@ describe('Service Restoration Iron Rule', () => {
     it('should have Docker daemon check before container inspection', () => {
       const dockerDaemonIndex = content.indexOf('Checking Docker daemon');
       // Find the actual container inspection command, not comments
-      const containerCheckIndex = content.indexOf('docker inspect edusphere-all-in-one');
+      const containerCheckIndex = content.indexOf(
+        'docker inspect edusphere-all-in-one'
+      );
 
       expect(dockerDaemonIndex).toBeGreaterThanOrEqual(0);
       expect(containerCheckIndex).toBeGreaterThanOrEqual(0);

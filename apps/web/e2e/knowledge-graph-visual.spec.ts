@@ -44,7 +44,8 @@ const MOCK_CONCEPTS = [
     id: 'c1',
     name: 'Free Will',
     type: 'CONCEPT',
-    description: 'The ability to choose between different possible courses of action.',
+    description:
+      'The ability to choose between different possible courses of action.',
     courseIds: [COURSE_ID],
     relatedConceptIds: ['c2', 'c3'],
   },
@@ -52,7 +53,8 @@ const MOCK_CONCEPTS = [
     id: 'c2',
     name: 'Determinism',
     type: 'CONCEPT',
-    description: 'The doctrine that all events are determined completely by previously existing causes.',
+    description:
+      'The doctrine that all events are determined completely by previously existing causes.',
     courseIds: [COURSE_ID],
     relatedConceptIds: ['c1'],
   },
@@ -60,7 +62,8 @@ const MOCK_CONCEPTS = [
     id: 'c3',
     name: 'Moral Responsibility',
     type: 'CONCEPT',
-    description: 'The status of morally deserving praise, blame, reward, or punishment for an act.',
+    description:
+      'The status of morally deserving praise, blame, reward, or punishment for an act.',
     courseIds: [COURSE_ID],
     relatedConceptIds: ['c1', 'c4'],
   },
@@ -68,7 +71,8 @@ const MOCK_CONCEPTS = [
     id: 'c4',
     name: 'Virtue Ethics',
     type: 'CONCEPT',
-    description: 'An approach to ethics that emphasizes the role of character and virtue.',
+    description:
+      'An approach to ethics that emphasizes the role of character and virtue.',
     courseIds: [],
     relatedConceptIds: ['c3'],
   },
@@ -146,7 +150,9 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
     await mockKnowledgeGraphQL(page);
   });
 
-  test('screenshot: global graph — SVG graph canvas visible', async ({ page }) => {
+  test('screenshot: global graph — SVG graph canvas visible', async ({
+    page,
+  }) => {
     await gotoGraph(page, GRAPH_URL);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
@@ -160,9 +166,11 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
 
     // BUG-040 regression guard
     for (const forbidden of FORBIDDEN_GRAPH_STRINGS) {
-      await expect(page.getByText(forbidden, { exact: false })).not.toBeVisible({
-        timeout: 2_000,
-      });
+      await expect(page.getByText(forbidden, { exact: false })).not.toBeVisible(
+        {
+          timeout: 2_000,
+        }
+      );
     }
 
     await expect(page).toHaveScreenshot('knowledge-graph-global-view.png', {
@@ -179,7 +187,9 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
     await page.waitForTimeout(500);
 
     const statsPanel = page.getByText('Graph Statistics').locator('..');
-    const hasStats = await statsPanel.isVisible({ timeout: 8_000 }).catch(() => false);
+    const hasStats = await statsPanel
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
 
     if (hasStats) {
       await expect(statsPanel).toHaveScreenshot(
@@ -197,7 +207,9 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
 
     // Type in the search input
     const searchInput = page.getByPlaceholder('Search concepts...');
-    const hasSearch = await searchInput.isVisible({ timeout: 5_000 }).catch(() => false);
+    const hasSearch = await searchInput
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     if (hasSearch) {
       await searchInput.fill('Free Will');
@@ -212,7 +224,9 @@ test.describe('KnowledgeGraph — global view /knowledge-graph', () => {
     }
   });
 
-  test('screenshot: global graph — no course-context badge', async ({ page }) => {
+  test('screenshot: global graph — no course-context badge', async ({
+    page,
+  }) => {
     await gotoGraph(page, GRAPH_URL);
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
@@ -252,7 +266,9 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     await mockKnowledgeGraphQL(page, COURSE_ID);
   });
 
-  test('screenshot: course-filtered graph with breadcrumb', async ({ page }) => {
+  test('screenshot: course-filtered graph with breadcrumb', async ({
+    page,
+  }) => {
     await gotoGraph(page, COURSE_GRAPH_URL);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
@@ -266,7 +282,9 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
 
     // Verify course-context badge is visible (regression guard for T2.3)
     const badge = page.getByTestId('kg-course-context-badge');
-    const hasBadge = await badge.isVisible({ timeout: 5_000 }).catch(() => false);
+    const hasBadge = await badge
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (hasBadge) {
       await expect(badge).toBeVisible();
       // Badge must contain the courseId
@@ -276,9 +294,11 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
 
     // BUG-040 regression guard
     for (const forbidden of FORBIDDEN_GRAPH_STRINGS) {
-      await expect(page.getByText(forbidden, { exact: false })).not.toBeVisible({
-        timeout: 2_000,
-      });
+      await expect(page.getByText(forbidden, { exact: false })).not.toBeVisible(
+        {
+          timeout: 2_000,
+        }
+      );
     }
 
     await expect(page).toHaveScreenshot('knowledge-graph-course-filtered.png', {
@@ -288,7 +308,9 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     });
   });
 
-  test('screenshot: course-filtered graph — breadcrumb visible', async ({ page }) => {
+  test('screenshot: course-filtered graph — breadcrumb visible', async ({
+    page,
+  }) => {
     await gotoGraph(page, COURSE_GRAPH_URL);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
@@ -305,7 +327,9 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     const breadcrumb = page
       .locator('[aria-label="breadcrumb"], nav[aria-label], nav')
       .first();
-    const hasBreadcrumb = await breadcrumb.isVisible({ timeout: 5_000 }).catch(() => false);
+    const hasBreadcrumb = await breadcrumb
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     if (hasBreadcrumb) {
       await expect(breadcrumb).toHaveScreenshot(
@@ -322,13 +346,18 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     await page.waitForTimeout(500);
 
     const badge = page.getByTestId('kg-course-context-badge');
-    const hasBadge = await badge.isVisible({ timeout: 8_000 }).catch(() => false);
+    const hasBadge = await badge
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
 
     if (hasBadge) {
-      await expect(badge).toHaveScreenshot('knowledge-graph-course-context-badge.png', {
-        threshold: 0.05,
-        animations: 'disabled',
-      });
+      await expect(badge).toHaveScreenshot(
+        'knowledge-graph-course-context-badge.png',
+        {
+          threshold: 0.05,
+          animations: 'disabled',
+        }
+      );
     }
   });
 
@@ -366,18 +395,23 @@ test.describe('KnowledgeGraph — course-filtered view /knowledge-graph/:courseI
     await page.waitForLoadState('domcontentloaded').catch(() => {});
     await page.waitForTimeout(500);
 
-    await expect(page).toHaveScreenshot('knowledge-graph-course-filtered-dark.png', {
-      fullPage: false,
-      threshold: 0.05,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'knowledge-graph-course-filtered-dark.png',
+      {
+        fullPage: false,
+        threshold: 0.05,
+        animations: 'disabled',
+      }
+    );
   });
 });
 
 // ─── Suite 3: Error state — GraphQL gateway blocked ───────────────────────────
 
 test.describe('KnowledgeGraph — error state (GraphQL blocked)', () => {
-  test('screenshot: clean error banner when GraphQL is blocked', async ({ page }) => {
+  test('screenshot: clean error banner when GraphQL is blocked', async ({
+    page,
+  }) => {
     await login(page);
 
     // Block all GraphQL to trigger the error state
@@ -393,7 +427,9 @@ test.describe('KnowledgeGraph — error state (GraphQL blocked)', () => {
     // REGRESSION GUARD: no raw technical strings in error banner
     const body = (await page.locator('body').textContent()) ?? '';
     for (const forbidden of FORBIDDEN_GRAPH_STRINGS) {
-      expect(body, `Body must not contain: "${forbidden}"`).not.toContain(forbidden);
+      expect(body, `Body must not contain: "${forbidden}"`).not.toContain(
+        forbidden
+      );
     }
 
     await expect(page).toHaveScreenshot('knowledge-graph-error-state.png', {

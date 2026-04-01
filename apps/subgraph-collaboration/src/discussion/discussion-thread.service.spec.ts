@@ -148,7 +148,10 @@ describe('DiscussionThreadService', () => {
       mockTx.select.mockReturnValue({ from: mockFrom });
 
       const result = await service.findDiscussionsByCourse(
-        'course-1', 10, 0, authContext
+        'course-1',
+        10,
+        0,
+        authContext
       );
       expect(result).toEqual(discussions);
     });
@@ -179,9 +182,7 @@ describe('DiscussionThreadService', () => {
       let callCount = 0;
       mockTx.select.mockImplementation(() => {
         callCount++;
-        return callCount === 1
-          ? { from: mockFrom1 }
-          : { from: mockFrom2 };
+        return callCount === 1 ? { from: mockFrom1 } : { from: mockFrom2 };
       });
 
       const result = await service.joinDiscussion('disc-1', authContext);

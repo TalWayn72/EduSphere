@@ -116,7 +116,12 @@ describe('KMeansDataService', () => {
   });
 
   it('parses JSON string embeddings', () => {
-    const rows = [{ concept_id: 'c-1', embedding: '[0.1, 0.2, 0.3]' as unknown as number[] }];
+    const rows = [
+      {
+        concept_id: 'c-1',
+        embedding: '[0.1, 0.2, 0.3]' as unknown as number[],
+      },
+    ];
     const result = service.buildConceptsWithEmbeddings(rows, new Map());
     expect(result[0].embedding).toEqual([0.1, 0.2, 0.3]);
   });

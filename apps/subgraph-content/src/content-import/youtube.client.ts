@@ -56,9 +56,7 @@ export class YouTubeClient {
       for (const item of data.items ?? []) {
         const s = item.snippet;
         const videoId =
-          s.resourceId?.videoId ??
-          item.contentDetails?.videoId ??
-          '';
+          s.resourceId?.videoId ?? item.contentDetails?.videoId ?? '';
         results.push({
           title: s.title,
           description: s.description,

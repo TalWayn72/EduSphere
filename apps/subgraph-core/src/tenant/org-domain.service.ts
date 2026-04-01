@@ -2,11 +2,7 @@
  * OrgDomainService — Queries organization domains for a tenant.
  * Uses withTenantContext for RLS compliance (SI-9).
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -50,21 +46,17 @@ export class OrgDomainService implements OnModuleDestroy {
       '[OrgDomainService] findByOrgId'
     );
 
-    const rows = await withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        return db
-          .select({
-            id: schema.tenantDomains.id,
-            domain: schema.tenantDomains.domain,
-            verified: schema.tenantDomains.verified,
-            createdAt: schema.tenantDomains.createdAt,
-          })
-          .from(schema.tenantDomains)
-          .where(eq(schema.tenantDomains.tenantId, orgId));
-      }
-    );
+    const rows = await withTenantContext(this.db, tenantCtx, async (db) => {
+      return db
+        .select({
+          id: schema.tenantDomains.id,
+          domain: schema.tenantDomains.domain,
+          verified: schema.tenantDomains.verified,
+          createdAt: schema.tenantDomains.createdAt,
+        })
+        .from(schema.tenantDomains)
+        .where(eq(schema.tenantDomains.tenantId, orgId));
+    });
 
     return rows;
   }

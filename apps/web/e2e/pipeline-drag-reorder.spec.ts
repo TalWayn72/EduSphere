@@ -45,10 +45,42 @@ const LESSON_WITH_PIPELINE = {
     lessonId: LESSON_ID,
     templateName: 'THEMATIC',
     nodes: [
-      { id: 'n1', moduleType: 'INGESTION', label: 'Ingestion', labelHe: 'איסוף חומרים', enabled: true, order: 0, config: {} },
-      { id: 'n2', moduleType: 'ASR', label: 'Transcription (ASR)', labelHe: 'תמלול', enabled: true, order: 1, config: {} },
-      { id: 'n3', moduleType: 'SUMMARIZATION', label: 'Summarization', labelHe: 'סיכום', enabled: true, order: 2, config: {} },
-      { id: 'n4', moduleType: 'QA_GATE', label: 'QA Gate', labelHe: 'בקרת איכות', enabled: true, order: 3, config: {} },
+      {
+        id: 'n1',
+        moduleType: 'INGESTION',
+        label: 'Ingestion',
+        labelHe: 'איסוף חומרים',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
+      {
+        id: 'n2',
+        moduleType: 'ASR',
+        label: 'Transcription (ASR)',
+        labelHe: 'תמלול',
+        enabled: true,
+        order: 1,
+        config: {},
+      },
+      {
+        id: 'n3',
+        moduleType: 'SUMMARIZATION',
+        label: 'Summarization',
+        labelHe: 'סיכום',
+        enabled: true,
+        order: 2,
+        config: {},
+      },
+      {
+        id: 'n4',
+        moduleType: 'QA_GATE',
+        label: 'QA Gate',
+        labelHe: 'בקרת איכות',
+        enabled: true,
+        order: 3,
+        config: {},
+      },
     ],
     config: {},
     status: 'DRAFT',
@@ -77,13 +109,22 @@ async function setupReorderMocks(page: Page) {
     let op = '';
     let q = rawBody;
     try {
-      const parsed = JSON.parse(rawBody) as { query?: string; operationName?: string };
+      const parsed = JSON.parse(rawBody) as {
+        query?: string;
+        operationName?: string;
+      };
       op = parsed?.operationName ?? '';
       q = parsed?.query ?? rawBody;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     // Lesson query
-    if (op === 'Lesson' || q.includes('lesson(id:') || q.includes('query Lesson')) {
+    if (
+      op === 'Lesson' ||
+      q.includes('lesson(id:') ||
+      q.includes('query Lesson')
+    ) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -121,22 +162,30 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await setupReorderMocks(page);
   });
 
-  test('pipeline nodes are rendered in correct initial order', async ({ page }) => {
+  test('pipeline nodes are rendered in correct initial order', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
     // Wait for nodes to render
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
     await expect(page.getByTestId('pipeline-node-ASR')).toBeVisible();
     await expect(page.getByTestId('pipeline-node-SUMMARIZATION')).toBeVisible();
     await expect(page.getByTestId('pipeline-node-QA_GATE')).toBeVisible();
   });
 
-  test('pipeline nodes have drag handles with role=button', async ({ page }) => {
+  test('pipeline nodes have drag handles with role=button', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Each node should have a drag handle with proper ARIA role
     const dragHandles = page.locator('[data-testid^="drag-handle-"]');
@@ -151,11 +200,15 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     expect(role === 'button' || tabIndex === '0').toBeTruthy();
   });
 
-  test('keyboard reorder: Space picks up, ArrowDown moves, Space drops', async ({ page }) => {
+  test('keyboard reorder: Space picks up, ArrowDown moves, Space drops', async ({
+    page,
+  }) => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Focus the first drag handle (INGESTION)
     const firstHandle = page.getByTestId('drag-handle-INGESTION');
@@ -179,7 +232,8 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     // INGESTION should have moved down — ASR is now first
     // (or INGESTION is now at index 1)
     expect(
-      firstNodeId === 'pipeline-node-ASR' || firstNodeId === 'pipeline-node-INGESTION',
+      firstNodeId === 'pipeline-node-ASR' ||
+        firstNodeId === 'pipeline-node-INGESTION'
     ).toBeTruthy();
   });
 
@@ -187,10 +241,14 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Check for aria-live region existence
-    const liveRegion = page.locator('[aria-live="polite"], [aria-live="assertive"]');
+    const liveRegion = page.locator(
+      '[aria-live="polite"], [aria-live="assertive"]'
+    );
     const liveCount = await liveRegion.count();
     expect(liveCount).toBeGreaterThanOrEqual(1);
 
@@ -223,10 +281,14 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Count initial nodes
-    const initialCount = await page.locator('[data-testid^="pipeline-node-"]').count();
+    const initialCount = await page
+      .locator('[data-testid^="pipeline-node-"]')
+      .count();
 
     // Perform a reorder
     const firstHandle = page.getByTestId('drag-handle-INGESTION');
@@ -236,7 +298,9 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.keyboard.press('Space');
 
     // Count nodes after reorder
-    const afterCount = await page.locator('[data-testid^="pipeline-node-"]').count();
+    const afterCount = await page
+      .locator('[data-testid^="pipeline-node-"]')
+      .count();
     expect(afterCount).toBe(initialCount);
   });
 
@@ -244,10 +308,14 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Get initial order
-    const nodesBefore = await page.locator('[data-testid^="pipeline-node-"]').allTextContents();
+    const nodesBefore = await page
+      .locator('[data-testid^="pipeline-node-"]')
+      .allTextContents();
 
     // Start reorder
     const firstHandle = page.getByTestId('drag-handle-INGESTION');
@@ -259,7 +327,9 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.keyboard.press('Escape');
 
     // Order should be unchanged
-    const nodesAfter = await page.locator('[data-testid^="pipeline-node-"]').allTextContents();
+    const nodesAfter = await page
+      .locator('[data-testid^="pipeline-node-"]')
+      .allTextContents();
     expect(nodesAfter).toEqual(nodesBefore);
   });
 
@@ -267,7 +337,9 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     // Perform reorder
     const firstHandle = page.getByTestId('drag-handle-INGESTION');
@@ -286,7 +358,9 @@ test.describe('Pipeline Drag & Reorder — keyboard interaction', () => {
     await page.goto(PIPELINE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
-    await page.getByTestId('pipeline-node-INGESTION').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('pipeline-node-INGESTION')
+      .waitFor({ timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('pipeline-drag-reorder.png', {
       maxDiffPixels: 300,

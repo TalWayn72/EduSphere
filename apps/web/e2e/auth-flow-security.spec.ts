@@ -36,7 +36,10 @@ async function clearAuthState(page: Page): Promise<void> {
 
 test.describe('Auth Flow Security — Unauthenticated access', () => {
   // DEV_MODE auto-authenticates — unauthenticated tests require VITE_DEV_MODE=false
-  test.skip(IS_DEV_MODE, 'Unauthenticated access tests require VITE_DEV_MODE=false');
+  test.skip(
+    IS_DEV_MODE,
+    'Unauthenticated access tests require VITE_DEV_MODE=false'
+  );
 
   test.beforeEach(async ({ page }) => {
     // Start each test with zero auth state
@@ -47,7 +50,9 @@ test.describe('Auth Flow Security — Unauthenticated access', () => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
 
     // SmartRoot must render LandingPage when not authenticated
-    await expect(page.getByTestId('landing-nav')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByTestId('landing-nav')).toBeVisible({
+      timeout: 8_000,
+    });
 
     // Dashboard must NOT be visible — no data leak to unauthenticated users
     await expect(page.getByTestId('dashboard-page')).not.toBeVisible({
@@ -112,7 +117,9 @@ test.describe('Auth Flow Security — Unauthenticated access', () => {
   test('unauthenticated user accessing /skill-tree redirects to /login', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/skill-tree`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/skill-tree`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForURL(/\/login/, { timeout: 10_000 });
     expect(page.url()).toContain('/login');
   });
@@ -146,22 +153,33 @@ test.describe('Auth Flow Security — Public routes', () => {
 
   test('/landing is publicly accessible without auth', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('landing-nav')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByTestId('landing-nav')).toBeVisible({
+      timeout: 8_000,
+    });
     // Ensure no auth redirect happened
     expect(page.url()).not.toContain('/login');
   });
 
   test('LandingPage Sign In button navigates to /login', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('landing-nav')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByTestId('landing-nav')).toBeVisible({
+      timeout: 8_000,
+    });
     // Click first visible "Log In" / "Get Started" link
-    await page.getByRole('link', { name: /log in|get started/i }).first().click();
+    await page
+      .getByRole('link', { name: /log in|get started/i })
+      .first()
+      .click();
     await page.waitForURL(/\/login/, { timeout: 10_000 });
     expect(page.url()).toContain('/login');
   });
 
-  test('/accessibility is publicly accessible without auth', async ({ page }) => {
-    await page.goto(`${BASE_URL}/accessibility`, { waitUntil: 'domcontentloaded' });
+  test('/accessibility is publicly accessible without auth', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/accessibility`, {
+      waitUntil: 'domcontentloaded',
+    });
     expect(page.url()).not.toContain('/login');
   });
 
@@ -178,7 +196,10 @@ test.describe('Auth Flow Security — Public routes', () => {
 
 test.describe('Auth Flow Security — JWT tampering', () => {
   // JWT tampering tests require a real GraphQL gateway, skip in DEV_MODE
-  test.skip(IS_DEV_MODE, 'JWT tampering tests require VITE_DEV_MODE=false with live gateway');
+  test.skip(
+    IS_DEV_MODE,
+    'JWT tampering tests require VITE_DEV_MODE=false with live gateway'
+  );
 
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
@@ -318,10 +339,9 @@ test.describe('Auth Flow Security — Cross-tenant URL manipulation', () => {
   test('course detail with injected tenantId redirects to /login when unauth', async ({
     page,
   }) => {
-    await page.goto(
-      `${BASE_URL}/courses/real-course-id?tenantId=evil-tenant`,
-      { waitUntil: 'domcontentloaded' }
-    );
+    await page.goto(`${BASE_URL}/courses/real-course-id?tenantId=evil-tenant`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForURL(/\/login/, { timeout: 10_000 });
     expect(page.url()).toContain('/login');
   });

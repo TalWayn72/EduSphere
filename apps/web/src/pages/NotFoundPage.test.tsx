@@ -5,21 +5,24 @@ import { describe, it, expect, vi } from 'vitest';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>(
-    'react-router-dom'
-  );
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_, name) => {
+        if (name === '__esModule') return true;
+        return function MockIcon(props: Record<string, unknown>) {
+          return <span data-testid={`icon-${String(name)}`} {...props} />;
+        };
+      },
+    })
 );
 
 import { NotFoundPage } from './NotFoundPage';
@@ -40,9 +43,9 @@ describe('NotFoundPage', () => {
 
   it('displays the "Page Not Found" title', () => {
     renderPage();
-    expect(
-      screen.getByRole('heading', { level: 1 })
-    ).toHaveTextContent('Page Not Found');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Page Not Found'
+    );
   });
 
   it('displays the description text', () => {

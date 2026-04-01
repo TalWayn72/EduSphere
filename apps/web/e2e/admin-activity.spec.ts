@@ -112,23 +112,31 @@ test.describe('AdminActivityFeed — loading skeleton', () => {
 
     // Look for the skeleton element
     const skeleton = page.getByTestId('activity-skeleton');
-    const hasSkeletonEl = await skeleton.isVisible({ timeout: 8_000 }).catch(() => false);
+    const hasSkeletonEl = await skeleton
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
     if (hasSkeletonEl) {
       // Screenshot just the skeleton card
-      await expect(skeleton).toHaveScreenshot('admin-activity-feed-skeleton.png', {
-        threshold: 0.05,
-        animations: 'disabled',
-      });
+      await expect(skeleton).toHaveScreenshot(
+        'admin-activity-feed-skeleton.png',
+        {
+          threshold: 0.05,
+          animations: 'disabled',
+        }
+      );
     } else {
       // Fall back to full page snapshot (skeleton may be inside a card wrapper)
-      await expect(page).toHaveScreenshot('admin-activity-feed-skeleton-page.png', {
-        fullPage: false,
-        threshold: 0.05,
-        animations: 'disabled',
-      });
+      await expect(page).toHaveScreenshot(
+        'admin-activity-feed-skeleton-page.png',
+        {
+          fullPage: false,
+          threshold: 0.05,
+          animations: 'disabled',
+        }
+      );
     }
   });
 });
@@ -159,10 +167,13 @@ test.describe('AdminActivityFeed — activity feed with items', () => {
     // Component-level screenshot (the card itself)
     const isVisible = await feedCard.isVisible().catch(() => false);
     if (isVisible) {
-      await expect(feedCard).toHaveScreenshot('admin-activity-feed-with-items.png', {
-        threshold: 0.05,
-        animations: 'disabled',
-      });
+      await expect(feedCard).toHaveScreenshot(
+        'admin-activity-feed-with-items.png',
+        {
+          threshold: 0.05,
+          animations: 'disabled',
+        }
+      );
     } else {
       // Full-page fallback
       await expect(page).toHaveScreenshot('admin-activity-feed-page.png', {
@@ -199,7 +210,9 @@ test.describe('AdminActivityFeed — activity feed with items', () => {
     await gotoAdmin(page);
 
     const feedCard = page.getByTestId('admin-activity-feed');
-    const hasFeed = await feedCard.isVisible({ timeout: 10_000 }).catch(() => false);
+    const hasFeed = await feedCard
+      .isVisible({ timeout: 10_000 })
+      .catch(() => false);
 
     if (hasFeed) {
       const feedText = (await feedCard.textContent()) ?? '';
@@ -223,7 +236,9 @@ test.describe('AdminActivityFeed — activity feed with items', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const feedCard = page.getByTestId('admin-activity-feed');
-    const isVisible = await feedCard.isVisible({ timeout: 10_000 }).catch(() => false);
+    const isVisible = await feedCard
+      .isVisible({ timeout: 10_000 })
+      .catch(() => false);
 
     if (isVisible) {
       await expect(feedCard).toHaveScreenshot(
@@ -263,10 +278,14 @@ test.describe('AdminActivityFeed — empty state', () => {
     // We capture whichever state the page is in.
 
     const emptyEl = page.getByTestId('activity-feed-empty');
-    const hasFeedEmpty = await emptyEl.isVisible({ timeout: 5_000 }).catch(() => false);
+    const hasFeedEmpty = await emptyEl
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     const feedCard = page.getByTestId('admin-activity-feed');
-    const hasFeed = await feedCard.isVisible({ timeout: 5_000 }).catch(() => false);
+    const hasFeed = await feedCard
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     if (hasFeedEmpty) {
       await expect(feedCard).toHaveScreenshot('admin-activity-feed-empty.png', {

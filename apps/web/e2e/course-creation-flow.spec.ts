@@ -51,7 +51,9 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
   test('step 0 renders AI builder CTA and title input', async ({ page }) => {
     await loginAndNavigate(page, '/courses/create');
 
-    await expect(page.getByTestId('ai-builder-cta')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('ai-builder-cta')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByTestId('launch-ai-builder-btn')).toBeVisible();
 
     // Title input must be present
@@ -73,7 +75,9 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     await expect(nextBtn).toBeDisabled();
   });
 
-  test('Next button enables after entering title ≥3 chars', async ({ page }) => {
+  test('Next button enables after entering title ≥3 chars', async ({
+    page,
+  }) => {
     await loginAndNavigate(page, '/courses/create');
 
     const titleInput = page.locator('input[name="title"]').first();
@@ -91,7 +95,9 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     });
   });
 
-  test('wizard advances to step 1 (modules) on Next click', async ({ page }) => {
+  test('wizard advances to step 1 (modules) on Next click', async ({
+    page,
+  }) => {
     await loginAndNavigate(page, '/courses/create');
 
     const titleInput = page.locator('input[name="title"]').first();
@@ -104,17 +110,23 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Step 1 content — modules section
-    await expect(page.getByText(/module|add module/i).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/module|add module/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
 
     await expect(page).toHaveScreenshot('course-wizard-step1.png', {
       maxDiffPixelRatio: 0.05,
     });
   });
 
-  test('AI Course Creator modal opens on Launch AI Builder click', async ({ page }) => {
+  test('AI Course Creator modal opens on Launch AI Builder click', async ({
+    page,
+  }) => {
     await loginAndNavigate(page, '/courses/create');
 
-    await page.getByTestId('launch-ai-builder-btn').waitFor({ timeout: 10_000 });
+    await page
+      .getByTestId('launch-ai-builder-btn')
+      .waitFor({ timeout: 10_000 });
     await page.getByTestId('launch-ai-builder-btn').click();
 
     const dialog = page.getByRole('dialog');
@@ -127,7 +139,9 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     });
   });
 
-  test('createCourse success navigates to course detail page', async ({ page }) => {
+  test('createCourse success navigates to course detail page', async ({
+    page,
+  }) => {
     const createdId = 'new-course-uuid-001';
 
     await routeGraphQL(page, (opName) => {
@@ -170,11 +184,15 @@ test.describe('course-creation-flow — T-06: Course Create Wizard', () => {
     }
 
     // Submit on final step
-    const submitBtn = page.getByRole('button', { name: /save draft|save as draft|publish/i }).first();
+    const submitBtn = page
+      .getByRole('button', { name: /save draft|save as draft|publish/i })
+      .first();
     if (await submitBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await submitBtn.click();
       // After success, should navigate to /courses/<id>
-      await page.waitForURL(new RegExp(`/courses/${createdId}`), { timeout: 10_000 }).catch(() => {});
+      await page
+        .waitForURL(new RegExp(`/courses/${createdId}`), { timeout: 10_000 })
+        .catch(() => {});
     }
   });
 });
@@ -204,7 +222,9 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
     await loginAndNavigate(page, `/courses/${COURSE_ID}`);
 
     // Course title should be visible
-    await expect(page.getByRole('heading', { name: /Introduction to Machine Learning/i })).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole('heading', { name: /Introduction to Machine Learning/i })
+    ).toBeVisible({ timeout: 10_000 });
 
     await expect(page).toHaveScreenshot('course-detail-loaded.png', {
       maxDiffPixelRatio: 0.05,
@@ -230,7 +250,14 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
       if (opName === 'EnrollCourse') {
         enrollCalled = true;
         return JSON.stringify({
-          data: { enrollCourse: { id: 'enrollment-001', courseId: COURSE_ID, userId: 'user-001', enrolledAt: '2026-01-01T00:00:00Z' } },
+          data: {
+            enrollCourse: {
+              id: 'enrollment-001',
+              courseId: COURSE_ID,
+              userId: 'user-001',
+              enrolledAt: '2026-01-01T00:00:00Z',
+            },
+          },
         });
       }
       return null;
@@ -238,7 +265,9 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
 
     await loginAndNavigate(page, `/courses/${COURSE_ID}`);
 
-    const enrollBtn = page.getByRole('button', { name: /enroll|start course/i }).first();
+    const enrollBtn = page
+      .getByRole('button', { name: /enroll|start course/i })
+      .first();
     if (await enrollBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await enrollBtn.click();
       await page.waitForLoadState('domcontentloaded');
@@ -246,7 +275,9 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
     }
   });
 
-  test('enroll mutation error shows friendly message (not raw GraphQL)', async ({ page }) => {
+  test('enroll mutation error shows friendly message (not raw GraphQL)', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'CourseDetail' || opName === 'GetCourse') {
         return JSON.stringify({ data: { course: MOCK_COURSE } });
@@ -263,7 +294,13 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
       if (opName === 'EnrollCourse') {
         return JSON.stringify({
           data: { enrollCourse: null },
-          errors: [{ message: 'Cannot insert duplicate key in enrollments table for course_id=00000000-0000-0000-0000-000000000001', extensions: { code: 'CONSTRAINT_VIOLATION' } }],
+          errors: [
+            {
+              message:
+                'Cannot insert duplicate key in enrollments table for course_id=00000000-0000-0000-0000-000000000001',
+              extensions: { code: 'CONSTRAINT_VIOLATION' },
+            },
+          ],
         });
       }
       return null;
@@ -271,7 +308,9 @@ test.describe('course-creation-flow — T-07: Course Detail enroll/unenroll', ()
 
     await loginAndNavigate(page, `/courses/${COURSE_ID}`);
 
-    const enrollBtn = page.getByRole('button', { name: /enroll|start course/i }).first();
+    const enrollBtn = page
+      .getByRole('button', { name: /enroll|start course/i })
+      .first();
     if (await enrollBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await enrollBtn.click();
       await page.waitForLoadState('domcontentloaded');

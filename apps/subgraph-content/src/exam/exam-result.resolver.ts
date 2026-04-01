@@ -1,12 +1,7 @@
 /**
  * ExamResultResolver — Queries for exam results, analytics, and reliability.
  */
-import {
-  Resolver,
-  Query,
-  Args,
-  Context,
-} from '@nestjs/graphql';
+import { Resolver, Query, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException, Logger } from '@nestjs/common';
 import type { GraphQLContext } from '../auth/auth.middleware';
 import type { TenantContext } from '@edusphere/db';
@@ -16,14 +11,12 @@ import { ExamResultQueryService } from './exam-result-query.service';
 export class ExamResultResolver {
   private readonly logger = new Logger(ExamResultResolver.name);
 
-  constructor(
-    private readonly resultQueryService: ExamResultQueryService,
-  ) {}
+  constructor(private readonly resultQueryService: ExamResultQueryService) {}
 
   @Query('examResult')
   async examResult(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.resultQueryService.getResult(sessionId, tc);
@@ -32,7 +25,7 @@ export class ExamResultResolver {
   @Query('myExamResults')
   async myExamResults(
     @Args('courseId') courseId: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.resultQueryService.getMyResults(tc, courseId);
@@ -41,7 +34,7 @@ export class ExamResultResolver {
   @Query('examBlueprintAnalytics')
   async examBlueprintAnalytics(
     @Args('blueprintId') blueprintId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tc = this.extractAuth(ctx);
     return this.resultQueryService.getBlueprintAnalytics(blueprintId, tc);

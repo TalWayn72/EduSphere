@@ -5,14 +5,21 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { LandingFooter } from './LandingFooter';
 
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_, name) => {
-    if (name === '__esModule') return true;
-    return function MockIcon(props: Record<string, unknown>) {
-      return <span data-testid={`icon-${String(name)}`} {...props} />;
-    };
-  },
-}));
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          if (name === '__esModule') return true;
+          return function MockIcon(props: Record<string, unknown>) {
+            return <span data-testid={`icon-${String(name)}`} {...props} />;
+          };
+        },
+      }
+    )
+);
 
 vi.mock('@/components/social', () => ({
   SocialLinksBar: () => <div data-testid="social-links-bar" />,
@@ -23,7 +30,7 @@ function renderFooter() {
   return render(
     <MemoryRouter>
       <LandingFooter />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 

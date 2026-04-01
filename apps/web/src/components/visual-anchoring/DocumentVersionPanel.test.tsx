@@ -14,7 +14,8 @@ vi.mock('urql', () => ({
   useQuery: mockUseQuery,
   useMutation: vi.fn((doc: unknown) => {
     const docStr = String(doc);
-    if (docStr.includes('CreateDocumentVersion')) return [{}, mockCreateVersion];
+    if (docStr.includes('CreateDocumentVersion'))
+      return [{}, mockCreateVersion];
     if (docStr.includes('RollbackToVersion')) return [{}, mockRollback];
     return [{}, vi.fn()];
   }),
@@ -72,9 +73,8 @@ describe('DocumentVersionPanel', () => {
 
   it('renders loading state', async () => {
     mockUseQuery.mockReturnValue([{ data: undefined, fetching: true }]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -84,9 +84,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: [] }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     expect(screen.getByText('No versions yet')).toBeInTheDocument();
@@ -96,9 +95,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: VERSIONS }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     expect(screen.getByText('v1')).toBeInTheDocument();
@@ -109,9 +107,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: VERSIONS }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     expect(screen.getByText(/5 anchors/)).toBeInTheDocument();
@@ -122,9 +119,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: VERSIONS }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     const badges = screen.getAllByTestId('badge');
@@ -141,9 +137,8 @@ describe('DocumentVersionPanel', () => {
         fetching: false,
       },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
@@ -153,9 +148,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: VERSIONS }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-99" />);
 
     fireEvent.click(screen.getByText('Snapshot Now'));
@@ -172,9 +166,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: VERSIONS }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     const restoreButtons = screen.getAllByText('Restore');
@@ -190,9 +183,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: VERSIONS }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     fireEvent.click(screen.getAllByText('Restore')[0]);
@@ -204,9 +196,8 @@ describe('DocumentVersionPanel', () => {
     mockUseQuery.mockReturnValue([
       { data: { getDocumentVersions: [] }, fetching: false },
     ]);
-    const { default: DocumentVersionPanel } = await import(
-      './DocumentVersionPanel'
-    );
+    const { default: DocumentVersionPanel } =
+      await import('./DocumentVersionPanel');
     render(<DocumentVersionPanel mediaAssetId="media-1" />);
 
     expect(screen.getByTestId('document-version-panel')).toBeInTheDocument();

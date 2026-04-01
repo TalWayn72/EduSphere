@@ -36,7 +36,9 @@ vi.mock('@/hooks/useProctoringSession', () => ({
 // ---------------------------------------------------------------------------
 const mockStop = vi.fn();
 const mockGetTracks = vi.fn(() => [{ stop: mockStop }]);
-const mockStream = { getTracks: mockGetTracks } as unknown as { getTracks: () => { stop: () => void }[] };
+const mockStream = { getTracks: mockGetTracks } as unknown as {
+  getTracks: () => { stop: () => void }[];
+};
 
 beforeEach(() => {
   hookState = { ...defaultHookState };
@@ -94,7 +96,12 @@ describe('ProctoringOverlay', () => {
   });
 
   it('shows webcam preview after session becomes active', () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'ACTIVE', isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
     const video = screen.getByTestId('proctoring-webcam-preview');
     expect(video).not.toHaveClass('hidden');
@@ -102,10 +109,17 @@ describe('ProctoringOverlay', () => {
   });
 
   it('proctoring-active-badge visible when session is active', () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'ACTIVE', isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
     expect(screen.getByTestId('proctoring-active-badge')).toBeInTheDocument();
-    expect(screen.getByTestId('proctoring-active-badge')).toHaveTextContent('Proctoring Active');
+    expect(screen.getByTestId('proctoring-active-badge')).toHaveTextContent(
+      'Proctoring Active'
+    );
   });
 
   it('proctoring-active-badge not visible when session is inactive', () => {
@@ -119,46 +133,85 @@ describe('ProctoringOverlay', () => {
   });
 
   it('flag-count shows correct count when greater than 0', () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'FLAGGED', flagCount: 3, isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'FLAGGED',
+      flagCount: 3,
+      isActive: true,
+    };
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
-    expect(screen.getByTestId('proctoring-flag-count')).toHaveTextContent('3 flag(s)');
+    expect(screen.getByTestId('proctoring-flag-count')).toHaveTextContent(
+      '3 flag(s)'
+    );
   });
 
   it('tab visibility change fires flag mutation when document is hidden', async () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'ACTIVE', isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
     mockFlag.mockResolvedValue(undefined);
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
 
     // Simulate document becoming hidden
-    Object.defineProperty(document, 'hidden', { value: true, writable: true, configurable: true });
+    Object.defineProperty(document, 'hidden', {
+      value: true,
+      writable: true,
+      configurable: true,
+    });
     await act(async () => {
       fireEvent(document, new Event('visibilitychange'));
     });
 
     expect(mockFlag).toHaveBeenCalledWith('TAB_SWITCH', 'Tab hidden');
     // Reset
-    Object.defineProperty(document, 'hidden', { value: false, writable: true, configurable: true });
+    Object.defineProperty(document, 'hidden', {
+      value: false,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('visibilitychange listener is NOT fired when session is inactive', async () => {
     // hookState.isActive = false (default)
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
-    Object.defineProperty(document, 'hidden', { value: true, writable: true, configurable: true });
+    Object.defineProperty(document, 'hidden', {
+      value: true,
+      writable: true,
+      configurable: true,
+    });
     await act(async () => {
       fireEvent(document, new Event('visibilitychange'));
     });
     expect(mockFlag).not.toHaveBeenCalled();
-    Object.defineProperty(document, 'hidden', { value: false, writable: true, configurable: true });
+    Object.defineProperty(document, 'hidden', {
+      value: false,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('stop button visible when session is active', () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'ACTIVE', isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
     expect(screen.getByTestId('proctoring-stop-btn')).toBeInTheDocument();
   });
 
   it('stop button calls end() on click', async () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'ACTIVE', isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
     mockEnd.mockResolvedValue(undefined);
     render(<ProctoringOverlay assessmentId="asmnt-1" />);
     await act(async () => {
@@ -178,17 +231,36 @@ describe('ProctoringOverlay', () => {
   });
 
   it('visibilitychange listener removed on unmount (memory safety)', async () => {
-    hookState = { ...defaultHookState, sessionId: 's1', status: 'ACTIVE', isActive: true };
+    hookState = {
+      ...defaultHookState,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
     const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
     const { unmount } = render(<ProctoringOverlay assessmentId="asmnt-1" />);
     unmount();
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'visibilitychange',
+      expect.any(Function)
+    );
   });
 
   it('calls onFlagCountChange with updated count', () => {
     const onFlagCountChange = vi.fn();
-    hookState = { ...defaultHookState, flagCount: 2, sessionId: 's1', status: 'ACTIVE', isActive: true };
-    render(<ProctoringOverlay assessmentId="asmnt-1" onFlagCountChange={onFlagCountChange} />);
+    hookState = {
+      ...defaultHookState,
+      flagCount: 2,
+      sessionId: 's1',
+      status: 'ACTIVE',
+      isActive: true,
+    };
+    render(
+      <ProctoringOverlay
+        assessmentId="asmnt-1"
+        onFlagCountChange={onFlagCountChange}
+      />
+    );
     expect(onFlagCountChange).toHaveBeenCalledWith(2);
   });
 });
@@ -224,19 +296,30 @@ describe('ProctoringReportCard', () => {
       ...baseSession,
       flagCount: 2,
       flags: [
-        { type: 'TAB_SWITCH', timestamp: '2026-01-01T10:05:00Z', detail: 'Tab hidden' },
+        {
+          type: 'TAB_SWITCH',
+          timestamp: '2026-01-01T10:05:00Z',
+          detail: 'Tab hidden',
+        },
         { type: 'FACE_NOT_VISIBLE', timestamp: '2026-01-01T10:10:00Z' },
       ],
     };
     render(<ProctoringReportCard session={session} />);
-    expect(screen.getByTestId('proctoring-flag-item-0')).toHaveTextContent('TAB_SWITCH');
-    expect(screen.getByTestId('proctoring-flag-item-1')).toHaveTextContent('FACE_NOT_VISIBLE');
+    expect(screen.getByTestId('proctoring-flag-item-0')).toHaveTextContent(
+      'TAB_SWITCH'
+    );
+    expect(screen.getByTestId('proctoring-flag-item-1')).toHaveTextContent(
+      'FACE_NOT_VISIBLE'
+    );
   });
 
   it('FLAGGED status shows red badge', () => {
-    const session = { ...baseSession, status: 'FLAGGED', flagCount: 1, flags: [
-      { type: 'TAB_SWITCH', timestamp: '2026-01-01T10:05:00Z' }
-    ]};
+    const session = {
+      ...baseSession,
+      status: 'FLAGGED',
+      flagCount: 1,
+      flags: [{ type: 'TAB_SWITCH', timestamp: '2026-01-01T10:05:00Z' }],
+    };
     render(<ProctoringReportCard session={session} />);
     const badge = screen.getByTestId('proctoring-report-status');
     expect(badge).toHaveClass('bg-red-100');

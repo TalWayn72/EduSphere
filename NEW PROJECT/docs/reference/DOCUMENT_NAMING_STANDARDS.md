@@ -38,30 +38,30 @@ All documentation files in this project follow `SCREAMING_SNAKE_CASE` naming con
 
 ## Folder Structure (Mandatory)
 
-| Artifact Type | Location |
-|---------------|----------|
-| Active implementation plans | `docs/plans/` |
-| Bug fix documents | `docs/plans/bugs/` — named `BUG-NNN-description.md` |
-| Feature plans | `docs/plans/features/` |
-| Completed/old sprint plans | `docs/plans/archive/` |
-| Security & compliance docs | `docs/security/` |
-| Architecture decisions | `docs/architecture/` |
-| **Screenshots (PNG)** | `docs/screenshots/` — **NEVER in project root** |
-| CI/build log files | `docs/logs/` |
-| Reference docs (naming, standards, audits) | `docs/reference/` |
-| Testing plans and checklists | `docs/testing/` |
-| Product plans | `docs/product/` |
-| Deployment & ops guides | `docs/deployment/` |
-| Developer guides | `docs/development/` |
-| API reference | `docs/api/` |
-| AI/ML documentation | `docs/ai/` |
-| Legal documents | `docs/legal/` |
-| Policies | `docs/policies/` |
-| Project status & logs | `docs/project/` |
-| Performance & test reports | `docs/reports/` |
-| Research & analysis | `docs/research/` |
-| Compliance certifications | `docs/compliance/` |
-| Database schema docs | `docs/database/` |
+| Artifact Type                              | Location                                            |
+| ------------------------------------------ | --------------------------------------------------- |
+| Active implementation plans                | `docs/plans/`                                       |
+| Bug fix documents                          | `docs/plans/bugs/` — named `BUG-NNN-description.md` |
+| Feature plans                              | `docs/plans/features/`                              |
+| Completed/old sprint plans                 | `docs/plans/archive/`                               |
+| Security & compliance docs                 | `docs/security/`                                    |
+| Architecture decisions                     | `docs/architecture/`                                |
+| **Screenshots (PNG)**                      | `docs/screenshots/` — **NEVER in project root**     |
+| CI/build log files                         | `docs/logs/`                                        |
+| Reference docs (naming, standards, audits) | `docs/reference/`                                   |
+| Testing plans and checklists               | `docs/testing/`                                     |
+| Product plans                              | `docs/product/`                                     |
+| Deployment & ops guides                    | `docs/deployment/`                                  |
+| Developer guides                           | `docs/development/`                                 |
+| API reference                              | `docs/api/`                                         |
+| AI/ML documentation                        | `docs/ai/`                                          |
+| Legal documents                            | `docs/legal/`                                       |
+| Policies                                   | `docs/policies/`                                    |
+| Project status & logs                      | `docs/project/`                                     |
+| Performance & test reports                 | `docs/reports/`                                     |
+| Research & analysis                        | `docs/research/`                                    |
+| Compliance certifications                  | `docs/compliance/`                                  |
+| Database schema docs                       | `docs/database/`                                    |
 
 **Iron Rule:** No PNG, TXT, or non-config file may exist in the project root.
 Only these files belong in root: `README.md`, `CLAUDE.md`, `OPEN_ISSUES.md`, `IMPLEMENTATION_ROADMAP.md`,
@@ -74,4 +74,4 @@ Plan mode outputs must be migrated to `docs/plans/` with a proper name before or
 
 ---
 
-*Template version: 1.0*
+_Template version: 1.0_

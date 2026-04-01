@@ -168,7 +168,9 @@ describe('EmbeddingStoreService', () => {
     it('deletes embedding rows matching the concept_id and returns count', async () => {
       mockDelete.mockReturnValueOnce({
         where: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([{ id: 'emb-3' }, { id: 'emb-4' }]),
+          returning: vi
+            .fn()
+            .mockResolvedValue([{ id: 'emb-3' }, { id: 'emb-4' }]),
         }),
       });
       const count = await service.deleteByConceptId('conc-1');

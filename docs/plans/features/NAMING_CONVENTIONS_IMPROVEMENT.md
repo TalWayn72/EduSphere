@@ -7,11 +7,12 @@
 ## Context
 
 The user raised three questions that expose a broader naming-hygiene issue across the project:
+
 1. **Are numbered agents (Agent-1, Agent-2) the right convention?**
 2. **Is the folder name really "Worktrees"?**
 3. **Are there skills at skills.sh that can improve our agents?**
 
-The answers led to a full audit of naming consistency across scripts, docs, CLAUDE.md tracking tables, and the skills ecosystem. The goal of this plan is to bring all naming in line with what each thing actually *is* and *does*.
+The answers led to a full audit of naming consistency across scripts, docs, CLAUDE.md tracking tables, and the skills ecosystem. The goal of this plan is to bring all naming in line with what each thing actually _is_ and _does_.
 
 ---
 
@@ -22,11 +23,13 @@ The answers led to a full audit of naming consistency across scripts, docs, CLAU
 **Short answer: For task reporting, yes — but add mandatory role labels.**
 
 Current state in CLAUDE.md:
+
 - `Agent-1 (Architect)`, `Agent-2 (Schema)`, `Agent-3 (Testing)` — used in progress tables
-- The number is a *temporary, per-task sequence index*, not a persistent identity
+- The number is a _temporary, per-task sequence index_, not a persistent identity
 - Git worktrees use auto-generated hex IDs: `agent-a0a338f7` (uncontrollable — set by Claude Code)
 
 **Recommendation:**
+
 - Keep `Agent-N` for sequence ordering in progress reports (it is clear and conventional)
 - Make the role label MANDATORY, not optional: `Agent-1 [Frontend]` not `Agent-1`
 - Add a "mission" column to tracking tables: what this specific agent is responsible for in this run
@@ -53,22 +56,22 @@ Current state in CLAUDE.md:
 
 **Recommended skills (pending user approval):**
 
-| Priority | Skill | Source | Why Relevant |
-|----------|-------|--------|--------------|
-| P1 | `dispatching-parallel-agents` | obra/superpowers | Multi-agent orchestration — directly maps to our 11-division system |
-| P1 | `subagent-driven-development` | obra/superpowers | Sub-agent task decomposition patterns |
-| P1 | `systematic-debugging` | obra/superpowers | Structured debugging — complements our Bug Fix Protocol |
-| P1 | `verification-before-completion` | obra/superpowers | Completion gates — reinforces Session Completion Gate |
-| P1 | `executing-plans` | obra/superpowers | Plan→execution bridge |
-| P2 | `using-git-worktrees` | obra/superpowers | Worktree-based isolation — directly relevant to our .claude/worktrees/ |
-| P2 | `test-driven-development` | obra/superpowers | TDD methodology |
-| P2 | `webapp-testing` | anthropics/skills | Web app test strategies |
-| P2 | `nestjs-best-practices` | kadajett | NestJS-specific patterns |
-| P2 | `postgresql-table-design` | wshobson/agents | PostgreSQL + RLS patterns |
-| P3 | `code-review-excellence` | wshobson/agents | Review workflow patterns |
-| P3 | `typescript-advanced-types` | wshobson/agents | Advanced TS patterns (strict mode) |
-| P3 | `api-design-principles` | wshobson/agents | API contract patterns |
-| P3 | `mcp-builder` | anthropics/skills | Create custom MCP servers |
+| Priority | Skill                            | Source            | Why Relevant                                                           |
+| -------- | -------------------------------- | ----------------- | ---------------------------------------------------------------------- |
+| P1       | `dispatching-parallel-agents`    | obra/superpowers  | Multi-agent orchestration — directly maps to our 11-division system    |
+| P1       | `subagent-driven-development`    | obra/superpowers  | Sub-agent task decomposition patterns                                  |
+| P1       | `systematic-debugging`           | obra/superpowers  | Structured debugging — complements our Bug Fix Protocol                |
+| P1       | `verification-before-completion` | obra/superpowers  | Completion gates — reinforces Session Completion Gate                  |
+| P1       | `executing-plans`                | obra/superpowers  | Plan→execution bridge                                                  |
+| P2       | `using-git-worktrees`            | obra/superpowers  | Worktree-based isolation — directly relevant to our .claude/worktrees/ |
+| P2       | `test-driven-development`        | obra/superpowers  | TDD methodology                                                        |
+| P2       | `webapp-testing`                 | anthropics/skills | Web app test strategies                                                |
+| P2       | `nestjs-best-practices`          | kadajett          | NestJS-specific patterns                                               |
+| P2       | `postgresql-table-design`        | wshobson/agents   | PostgreSQL + RLS patterns                                              |
+| P3       | `code-review-excellence`         | wshobson/agents   | Review workflow patterns                                               |
+| P3       | `typescript-advanced-types`      | wshobson/agents   | Advanced TS patterns (strict mode)                                     |
+| P3       | `api-design-principles`          | wshobson/agents   | API contract patterns                                                  |
+| P3       | `mcp-builder`                    | anthropics/skills | Create custom MCP servers                                              |
 
 > **NOTE:** No skills exist for GraphQL Federation, Apache AGE, pgvector, or LangGraph.js. These are strong candidates for custom skill creation using `skill-creator`.
 
@@ -80,21 +83,21 @@ Current state in CLAUDE.md:
 
 After the full audit, three areas have naming issues:
 
-| Area | Problem | Impact |
-|------|---------|--------|
-| `scripts/` folder | 15+ cryptic CI debug scripts (`_check-059-jobs.cjs`, `check-059c756.cjs`) | High — new developers can't understand purpose |
-| `memory/` folder | Lives at project root, ambiguous whether it's docs or config | Low — functional but placement unclear |
-| `CLAUDE.md` agent tracking | Role label is optional, not enforced | Medium — loses clarity in parallel runs |
+| Area                       | Problem                                                                   | Impact                                         |
+| -------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------- |
+| `scripts/` folder          | 15+ cryptic CI debug scripts (`_check-059-jobs.cjs`, `check-059c756.cjs`) | High — new developers can't understand purpose |
+| `memory/` folder           | Lives at project root, ambiguous whether it's docs or config              | Low — functional but placement unclear         |
+| `CLAUDE.md` agent tracking | Role label is optional, not enforced                                      | Medium — loses clarity in parallel runs        |
 
 ### What Does NOT Need Renaming
 
-| Area | Why Leave Alone |
-|------|----------------|
-| `.claude/worktrees/agent-<hex>/` | Auto-managed by Claude Code SDK — cannot change |
-| `apps/subgraph-*` | Clear domain naming, already correct |
-| `packages/*` | All descriptive and well-named |
-| `docs/**` | Already well-organized (20 subdirs, consistent naming) |
-| `infrastructure/*` | Standard names (docker, k8s, grafana, nats, etc.) |
+| Area                             | Why Leave Alone                                        |
+| -------------------------------- | ------------------------------------------------------ |
+| `.claude/worktrees/agent-<hex>/` | Auto-managed by Claude Code SDK — cannot change        |
+| `apps/subgraph-*`                | Clear domain naming, already correct                   |
+| `packages/*`                     | All descriptive and well-named                         |
+| `docs/**`                        | Already well-organized (20 subdirs, consistent naming) |
+| `infrastructure/*`               | Standard names (docker, k8s, grafana, nats, etc.)      |
 
 ---
 
@@ -106,6 +109,7 @@ After the full audit, three areas have naming issues:
 **Problem:** ~15 files named after CI run IDs or commit SHAs — useless after the bug is fixed
 
 **Sub-steps:**
+
 1. Run `ls scripts/` to get full list
 2. Categorize each script:
    - `keep` — ongoing utility (health-check.sh, reset-keycloak-passwords.cjs, smoke-test.sh, build-docker.sh)
@@ -113,19 +117,20 @@ After the full audit, three areas have naming issues:
    - `delete` — one-off debugging scripts for old CI runs (safe to remove after confirming no references)
 3. Apply renames:
 
-| Current Name | Proposed Name | Reason |
-|---|---|---|
-| `_check-059-jobs.cjs` | DELETE or `debug/check-ci-job-status.cjs` | One-off CI debug for commit 059 |
-| `_check-ci-jobs.cjs` | `check-ci-job-status.cjs` | Clear purpose |
-| `_check-ci-now.cjs` | `check-ci-current-run.cjs` | Clear purpose |
-| `check-059c756.cjs` | DELETE | Specific commit SHA — has no ongoing value |
-| `_check-cd-failure.cjs` | `debug-cd-pipeline-failure.cjs` | Debugging utility |
-| `check-all-docker-jobs.ps1` | `check-docker-service-health.ps1` | More specific |
+| Current Name                | Proposed Name                             | Reason                                     |
+| --------------------------- | ----------------------------------------- | ------------------------------------------ |
+| `_check-059-jobs.cjs`       | DELETE or `debug/check-ci-job-status.cjs` | One-off CI debug for commit 059            |
+| `_check-ci-jobs.cjs`        | `check-ci-job-status.cjs`                 | Clear purpose                              |
+| `_check-ci-now.cjs`         | `check-ci-current-run.cjs`                | Clear purpose                              |
+| `check-059c756.cjs`         | DELETE                                    | Specific commit SHA — has no ongoing value |
+| `_check-cd-failure.cjs`     | `debug-cd-pipeline-failure.cjs`           | Debugging utility                          |
+| `check-all-docker-jobs.ps1` | `check-docker-service-health.ps1`         | More specific                              |
 
 4. Update any references in `package.json`, `Makefile`, or `CLAUDE.md` that point to renamed scripts
 5. Move debugging one-offs to `scripts/debug/` subfolder instead of deleting (preserves history)
 
 **Files modified:**
+
 - `scripts/*.cjs` / `scripts/*.sh` / `scripts/*.ps1` — rename/move
 - `package.json` (root) — update any script references
 - `Makefile` — update references
@@ -138,6 +143,7 @@ After the full audit, three areas have naming issues:
 **File:** `CLAUDE.md` — Agent Tracking Table section
 
 **Current:**
+
 ```
 | Agent               | Task                          | Status     |
 | Agent-1 (Architect) | Building docker-compose.yml   | Running    |
@@ -145,6 +151,7 @@ After the full audit, three areas have naming issues:
 ```
 
 **Proposed — enforce role + mission + owner division:**
+
 ```
 | ID       | Division          | Mission                       | Status     |
 | Agent-1  | Architecture      | Building docker-compose.yml   | Running    |
@@ -156,6 +163,7 @@ After the full audit, three areas have naming issues:
 - Keep `Agent-N` number (sequential, fine for per-task tracking)
 
 **Files modified:**
+
 - `CLAUDE.md` — Agent Tracking Table, Progress Report format examples, Parallel Execution section
 
 ---
@@ -203,13 +211,13 @@ After install, verify with: `npx skills list` — confirm all skills appear.
 
 ## Critical Files
 
-| File | Change Type |
-|------|-------------|
-| `scripts/*.cjs / *.sh / *.ps1` | Rename/move ~15 files |
-| `package.json` (root) | Update script references if any |
-| `Makefile` | Update script references if any |
-| `CLAUDE.md` | Agent tracking table format + Commands Reference |
-| `docs/plans/features/NAMING_CONVENTIONS_IMPROVEMENT.md` | This plan (moved here) |
+| File                                                    | Change Type                                      |
+| ------------------------------------------------------- | ------------------------------------------------ |
+| `scripts/*.cjs / *.sh / *.ps1`                          | Rename/move ~15 files                            |
+| `package.json` (root)                                   | Update script references if any                  |
+| `Makefile`                                              | Update script references if any                  |
+| `CLAUDE.md`                                             | Agent tracking table format + Commands Reference |
+| `docs/plans/features/NAMING_CONVENTIONS_IMPROVEMENT.md` | This plan (moved here)                           |
 
 ---
 

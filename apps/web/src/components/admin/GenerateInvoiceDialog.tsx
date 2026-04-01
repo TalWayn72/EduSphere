@@ -43,7 +43,10 @@ export function GenerateInvoiceDialog({ open, onClose, onGenerate }: Props) {
         <div className="space-y-3">
           <div>
             <label htmlFor="inv-tenant" className="text-sm font-medium">
-              Tenant ID <span aria-hidden="true" className="text-destructive">*</span>
+              Tenant ID{' '}
+              <span aria-hidden="true" className="text-destructive">
+                *
+              </span>
               <span className="sr-only">(required)</span>
             </label>
             <input
@@ -59,7 +62,9 @@ export function GenerateInvoiceDialog({ open, onClose, onGenerate }: Props) {
           </div>
           <div className="flex gap-3">
             <div className="flex-1">
-              <label htmlFor="inv-year" className="text-sm font-medium">Year</label>
+              <label htmlFor="inv-year" className="text-sm font-medium">
+                Year
+              </label>
               <input
                 id="inv-year"
                 type="number"
@@ -70,7 +75,9 @@ export function GenerateInvoiceDialog({ open, onClose, onGenerate }: Props) {
               />
             </div>
             <div className="flex-1">
-              <label htmlFor="inv-plan" className="text-sm font-medium">Plan</label>
+              <label htmlFor="inv-plan" className="text-sm font-medium">
+                Plan
+              </label>
               <select
                 id="inv-plan"
                 data-testid="invoice-plan-select"
@@ -86,8 +93,14 @@ export function GenerateInvoiceDialog({ open, onClose, onGenerate }: Props) {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSubmit} data-testid="submit-invoice-btn" disabled={!tenantId.trim()}>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            data-testid="submit-invoice-btn"
+            disabled={!tenantId.trim()}
+          >
             Generate
           </Button>
         </DialogFooter>

@@ -30,8 +30,12 @@ function read(relativePath: string): string {
 describe('API Key Security: Hash Storage (OWASP A02)', () => {
   it('api-key service file exists', () => {
     const exists =
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/api-keys/api-key.service.ts')) ||
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/org/api-key.service.ts'));
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/api-keys/api-key.service.ts')
+      ) ||
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/org/api-key.service.ts')
+      );
     expect(exists).toBe(true);
   });
 
@@ -39,7 +43,9 @@ describe('API Key Security: Hash Storage (OWASP A02)', () => {
     const content =
       read('apps/subgraph-core/src/api-keys/api-key.service.ts') ||
       read('apps/subgraph-core/src/org/api-key.service.ts');
-    expect(content).toMatch(/createHash.*sha256|bcrypt\.hash|hashSync|import.*bcrypt/);
+    expect(content).toMatch(
+      /createHash.*sha256|bcrypt\.hash|hashSync|import.*bcrypt/
+    );
   });
 
   it('API key verification uses hash comparison', () => {
@@ -47,8 +53,8 @@ describe('API Key Security: Hash Storage (OWASP A02)', () => {
       read('apps/subgraph-core/src/api-keys/api-key.service.ts') ||
       read('apps/subgraph-core/src/org/api-key.service.ts') ||
       read('apps/gateway/src/middleware/api-key-auth.ts');
-    const combined = content +
-      read('apps/gateway/src/middleware/api-key-auth.ts');
+    const combined =
+      content + read('apps/gateway/src/middleware/api-key-auth.ts');
     // SHA-256 hash comparison or bcrypt.compare
     expect(combined).toMatch(/createHash|bcrypt\.compare|compareSync|digest/);
   });
@@ -58,7 +64,9 @@ describe('API Key Security: Hash Storage (OWASP A02)', () => {
       read('apps/subgraph-core/src/api-keys/api-key.service.ts') ||
       read('apps/subgraph-core/src/org/api-key.service.ts');
     // Service must return plaintext in creation response
-    expect(content).toMatch(/plaintext|plainTextKey|raw_key|key.*return|ApiKeyCreated/i);
+    expect(content).toMatch(
+      /plaintext|plainTextKey|raw_key|key.*return|ApiKeyCreated/i
+    );
     // But never store it
     expect(content).not.toMatch(/\.values\(\s*\{[^}]*plaintext/);
   });
@@ -89,8 +97,8 @@ describe('API Key Security: Prefix Lookup Pattern', () => {
       read('apps/subgraph-core/src/api-keys/api-key.service.ts') ||
       read('apps/subgraph-core/src/org/api-key.service.ts') ||
       read('apps/gateway/src/middleware/api-key-auth.ts');
-    const combined = content +
-      read('apps/gateway/src/middleware/api-key-auth.ts');
+    const combined =
+      content + read('apps/gateway/src/middleware/api-key-auth.ts');
     expect(combined).toMatch(/esk_|KEY_PREFIX/);
   });
 
@@ -115,7 +123,9 @@ describe('API Key Security: Prefix Lookup Pattern', () => {
       read('apps/subgraph-core/src/org/api-key.service.ts');
     // Logger should reference prefix, not full key
     if (content.includes('logger') || content.includes('Logger')) {
-      expect(content).not.toMatch(/logger\.[^(]*\([^)]*fullKey|logger\.[^(]*\([^)]*plaintext/i);
+      expect(content).not.toMatch(
+        /logger\.[^(]*\([^)]*fullKey|logger\.[^(]*\([^)]*plaintext/i
+      );
     }
   });
 });
@@ -159,8 +169,12 @@ describe('API Key Security: Key Rotation', () => {
 describe('Webhook Security: HMAC-SHA256 Signing (OWASP A02)', () => {
   it('webhook dispatcher service file exists', () => {
     const exists =
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/webhooks/webhook.service.ts')) ||
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/org/webhook.service.ts'));
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/webhooks/webhook.service.ts')
+      ) ||
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/org/webhook.service.ts')
+      );
     expect(exists).toBe(true);
   });
 
@@ -220,13 +234,14 @@ describe('Webhook Security: Secret Management', () => {
     // The resolver or service should not expose the secret
     if (content.includes('secret')) {
       // Should mask or omit secret in response
-      expect(content).toMatch(/omit.*secret|delete.*secret|mask|undefined|exclude|select.*(?!secret)/i);
+      expect(content).toMatch(
+        /omit.*secret|delete.*secret|mask|undefined|exclude|select.*(?!secret)/i
+      );
     }
   });
 
   it('webhook secret uses crypto.randomBytes (not Math.random)', () => {
-    const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts');
+    const content = read('apps/subgraph-core/src/webhooks/webhook.service.ts');
     if (content.includes('generateSecret') || content.includes('secret')) {
       expect(content).toMatch(/crypto\.randomBytes|randomUUID|randomBytes/);
       expect(content).not.toContain('Math.random');
@@ -263,7 +278,9 @@ describe('Webhook Security: Replay Protection', () => {
     const content =
       read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
       read('apps/subgraph-core/src/org/webhook-dispatcher.service.ts');
-    expect(content).toMatch(/10|failure_count|failureCount|consecutive|disable|is_active.*false/);
+    expect(content).toMatch(
+      /10|failure_count|failureCount|consecutive|disable|is_active.*false/
+    );
   });
 
   it('webhook has exponential backoff retry logic (60s, 300s)', () => {
@@ -282,7 +299,9 @@ describe('Webhook Security: SSRF Protection (OWASP A10)', () => {
       read('apps/subgraph-core/src/webhooks/webhook.service.ts') ||
       read('apps/subgraph-core/src/tenant/org-onboarding.schemas.ts');
     // Must block RFC 1918 private ranges
-    expect(content).toMatch(/10\.\d|172\.(1[6-9]|2\d|3[01])|192\.168|private|SSRF/i);
+    expect(content).toMatch(
+      /10\.\d|172\.(1[6-9]|2\d|3[01])|192\.168|private|SSRF/i
+    );
   });
 
   it('webhook URL validation blocks localhost', () => {
@@ -302,10 +321,11 @@ describe('Webhook Security: SSRF Protection (OWASP A10)', () => {
   });
 
   it('max webhooks per org is enforced (DoS protection)', () => {
-    const content =
-      read('apps/subgraph-core/src/webhooks/webhook.service.ts');
+    const content = read('apps/subgraph-core/src/webhooks/webhook.service.ts');
     // Architecture spec: max 10 webhooks per org
-    expect(content).toMatch(/10|MAX_WEBHOOKS|maxWebhooks|count.*limit|limit.*count/i);
+    expect(content).toMatch(
+      /10|MAX_WEBHOOKS|maxWebhooks|count.*limit|limit.*count/i
+    );
   });
 });
 
@@ -314,7 +334,9 @@ describe('Webhook Security: SSRF Protection (OWASP A10)', () => {
 describe('API Key Service: Scope & Tenant Validation', () => {
   it('API key service file exists', () => {
     const exists =
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/api-keys/api-key.service.ts')) ||
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/api-keys/api-key.service.ts')
+      ) ||
       existsSync(resolve(ROOT, 'apps/gateway/src/middleware/api-key-auth.ts'));
     expect(exists).toBe(true);
   });

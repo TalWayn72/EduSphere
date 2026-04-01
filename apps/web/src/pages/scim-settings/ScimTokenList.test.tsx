@@ -20,8 +20,13 @@ vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card">{children}</div>
   ),
-  CardHeader: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="card-header" {...props}>{children}</div>
+  CardHeader: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="card-header" {...props}>
+      {children}
+    </div>
   ),
   CardTitle: ({ children }: { children: React.ReactNode }) => (
     <h3>{children}</h3>
@@ -83,7 +88,9 @@ describe('ScimTokenList — header', () => {
 
   it('renders the description text', () => {
     renderList();
-    expect(screen.getByText('Bearer tokens for HRIS SCIM authentication')).toBeTruthy();
+    expect(
+      screen.getByText('Bearer tokens for HRIS SCIM authentication')
+    ).toBeTruthy();
   });
 
   it('renders Generate Token button', () => {
@@ -115,7 +122,9 @@ describe('ScimTokenList — loading state', () => {
 describe('ScimTokenList — empty state', () => {
   it('shows empty message when no tokens', () => {
     renderList({ tokens: [] });
-    expect(screen.getByText('No tokens yet. Generate one to get started.')).toBeTruthy();
+    expect(
+      screen.getByText('No tokens yet. Generate one to get started.')
+    ).toBeTruthy();
   });
 });
 

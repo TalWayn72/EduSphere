@@ -31,17 +31,13 @@ export class CollabDocumentService implements OnModuleDestroy {
   private readonly logger = new Logger(CollabDocumentService.name);
   private readonly db: Database;
 
-  constructor(
-    private readonly crdtCompactionService: CrdtCompactionService
-  ) {
+  constructor(private readonly crdtCompactionService: CrdtCompactionService) {
     this.db = createDatabaseConnection();
   }
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
-    this.logger.log(
-      '[CollabDocumentService] onModuleDestroy: cleaned up'
-    );
+    this.logger.log('[CollabDocumentService] onModuleDestroy: cleaned up');
   }
 
   /**
@@ -49,13 +45,8 @@ export class CollabDocumentService implements OnModuleDestroy {
    * 1. Run compaction (merge all updates into snapshot)
    * 2. Return the updated document metadata.
    */
-  async compactDocument(
-    documentId: string
-  ): Promise<CollabDocumentResult> {
-    this.logger.log(
-      { documentId },
-      '[CollabDocumentService] compactDocument'
-    );
+  async compactDocument(documentId: string): Promise<CollabDocumentResult> {
+    this.logger.log({ documentId }, '[CollabDocumentService] compactDocument');
 
     // Verify document exists
     const [doc] = await this.db
@@ -65,21 +56,16 @@ export class CollabDocumentService implements OnModuleDestroy {
       .limit(1);
 
     if (!doc) {
-      throw new NotFoundException(
-        `Document ${documentId} not found`
-      );
+      throw new NotFoundException(`Document ${documentId} not found`);
     }
 
     // Use a far-future cutoff to compact ALL pending updates
-    const farFutureCutoff = new Date(
-      Date.now() + 365 * 24 * 60 * 60 * 1000
-    );
+    const farFutureCutoff = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
-    const compactedCount =
-      await this.crdtCompactionService.compactDocument(
-        documentId,
-        farFutureCutoff
-      );
+    const compactedCount = await this.crdtCompactionService.compactDocument(
+      documentId,
+      farFutureCutoff
+    );
 
     this.logger.log(
       { documentId, compactedCount },

@@ -1,18 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockCloseAllPools, mockUpdate, mockSet: _mockSet, mockWhere: _mockWhere, mockReturning } =
-  vi.hoisted(() => {
-    const mockReturning = vi.fn().mockResolvedValue([]);
-    const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
-    const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
-    return {
-      mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
-      mockUpdate: vi.fn().mockReturnValue({ set: mockSet }),
-      mockSet,
-      mockWhere,
-      mockReturning,
-    };
-  });
+const {
+  mockCloseAllPools,
+  mockUpdate,
+  mockSet: _mockSet,
+  mockWhere: _mockWhere,
+  mockReturning,
+} = vi.hoisted(() => {
+  const mockReturning = vi.fn().mockResolvedValue([]);
+  const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
+  const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
+  return {
+    mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
+    mockUpdate: vi.fn().mockReturnValue({ set: mockSet }),
+    mockSet,
+    mockWhere,
+    mockReturning,
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({

@@ -81,7 +81,10 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
       <CardContent className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm font-medium">
-            {t('branding.organizationNameLabel')} <span className="text-destructive">{t('branding.organizationNameRequired')}</span>
+            {t('branding.organizationNameLabel')}{' '}
+            <span className="text-destructive">
+              {t('branding.organizationNameRequired')}
+            </span>
           </label>
           <input
             type="text"
@@ -92,7 +95,9 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.taglineLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.taglineLabel')}
+          </label>
           <input
             type="text"
             value={form.tagline}
@@ -102,17 +107,24 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.welcomeMessageLabel', 'Welcome Message')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.welcomeMessageLabel', 'Welcome Message')}
+          </label>
           <textarea
             value={form.welcomeMessage}
             onChange={(e) => onChange('welcomeMessage', e.target.value)}
             className="w-full border rounded px-3 py-2 text-sm min-h-[80px] resize-y"
-            placeholder={t('branding.welcomeMessagePlaceholder', 'Displayed on your branded login page')}
+            placeholder={t(
+              'branding.welcomeMessagePlaceholder',
+              'Displayed on your branded login page'
+            )}
             data-testid="welcome-message-input"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.supportEmailLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.supportEmailLabel')}
+          </label>
           <input
             type="email"
             value={form.supportEmail}
@@ -135,7 +147,9 @@ export function BrandingLogosCard({ form, onChange }: Props) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.logoUrlLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.logoUrlLabel')}
+          </label>
           <div className="flex items-center gap-3">
             <input
               type="text"
@@ -156,7 +170,9 @@ export function BrandingLogosCard({ form, onChange }: Props) {
         <div className="space-y-1">
           <label className="text-sm font-medium">
             {t('branding.logoMarkUrlLabel')}{' '}
-            <span className="text-muted-foreground text-xs">{t('branding.logoMarkUrlOptional')}</span>
+            <span className="text-muted-foreground text-xs">
+              {t('branding.logoMarkUrlOptional')}
+            </span>
           </label>
           <input
             type="text"
@@ -167,7 +183,9 @@ export function BrandingLogosCard({ form, onChange }: Props) {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.faviconUrlLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.faviconUrlLabel')}
+          </label>
           <input
             type="text"
             value={form.faviconUrl}
@@ -229,7 +247,9 @@ export function BrandingMiscCard({ form, onChange }: Props) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.fontFamilyLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.fontFamilyLabel')}
+          </label>
           <select
             value={form.fontFamily}
             onChange={(e) => onChange('fontFamily', e.target.value)}
@@ -243,7 +263,9 @@ export function BrandingMiscCard({ form, onChange }: Props) {
           </select>
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.privacyPolicyUrlLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.privacyPolicyUrlLabel')}
+          </label>
           <input
             type="text"
             value={form.privacyPolicyUrl}
@@ -253,7 +275,9 @@ export function BrandingMiscCard({ form, onChange }: Props) {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">{t('branding.termsOfServiceUrlLabel')}</label>
+          <label className="text-sm font-medium">
+            {t('branding.termsOfServiceUrlLabel')}
+          </label>
           <input
             type="text"
             value={form.termsOfServiceUrl}

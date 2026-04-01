@@ -13,7 +13,12 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import type { Request, Response, NextFunction } from 'express';
 import { createHash, timingSafeEqual } from 'crypto';
-import { createDatabaseConnection, schema, eq, closeAllPools } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  closeAllPools,
+} from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 
 function sha256(value: string): string {
@@ -43,8 +48,13 @@ export class PartnerApiMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
     const authHeader = req.headers['authorization'];
     if (!authHeader?.startsWith('Bearer ')) {
-      this.logger.warn({ path: req.path }, 'PARTNER_AUTH_FAILED: missing Bearer token');
-      res.status(401).json({ error: 'PARTNER_AUTH_FAILED', message: 'Invalid API key' });
+      this.logger.warn(
+        { path: req.path },
+        'PARTNER_AUTH_FAILED: missing Bearer token'
+      );
+      res
+        .status(401)
+        .json({ error: 'PARTNER_AUTH_FAILED', message: 'Invalid API key' });
       return;
     }
 
@@ -52,7 +62,11 @@ export class PartnerApiMiddleware implements NestMiddleware {
     const incomingHash = sha256(rawKey);
 
     const partners = await this.db
-      .select({ id: schema.partners.id, status: schema.partners.status, apiKeyHash: schema.partners.apiKeyHash })
+      .select({
+        id: schema.partners.id,
+        status: schema.partners.status,
+        apiKeyHash: schema.partners.apiKeyHash,
+      })
       .from(schema.partners)
       .where(eq(schema.partners.apiKeyHash, incomingHash))
       .limit(1);
@@ -60,14 +74,24 @@ export class PartnerApiMiddleware implements NestMiddleware {
     const partner = partners[0];
 
     if (!partner || !safeCompare(partner.apiKeyHash, incomingHash)) {
-      this.logger.warn({ path: req.path }, 'PARTNER_AUTH_FAILED: key not found');
-      res.status(401).json({ error: 'PARTNER_AUTH_FAILED', message: 'Invalid API key' });
+      this.logger.warn(
+        { path: req.path },
+        'PARTNER_AUTH_FAILED: key not found'
+      );
+      res
+        .status(401)
+        .json({ error: 'PARTNER_AUTH_FAILED', message: 'Invalid API key' });
       return;
     }
 
     if (partner.status === 'suspended') {
-      this.logger.warn({ partnerId: partner.id, path: req.path }, 'PARTNER_AUTH_FAILED: suspended');
-      res.status(401).json({ error: 'PARTNER_AUTH_FAILED', message: 'Invalid API key' });
+      this.logger.warn(
+        { partnerId: partner.id, path: req.path },
+        'PARTNER_AUTH_FAILED: suspended'
+      );
+      res
+        .status(401)
+        .json({ error: 'PARTNER_AUTH_FAILED', message: 'Invalid API key' });
       return;
     }
 

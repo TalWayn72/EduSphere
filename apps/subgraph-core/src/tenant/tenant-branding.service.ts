@@ -48,7 +48,9 @@ export class TenantBrandingService implements OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     this.cache.clear();
     await closeAllPools();
-    this.logger.log('[TenantBrandingService] onModuleDestroy: cache cleared, DB pools closed');
+    this.logger.log(
+      '[TenantBrandingService] onModuleDestroy: cache cleared, DB pools closed'
+    );
   }
 
   private setCached(
@@ -127,7 +129,10 @@ export class TenantBrandingService implements OnModuleDestroy {
         .limit(1);
       return rows[0] ?? null;
     } catch (err) {
-      this.logger.warn({ slug, err }, '[TenantBrandingService] getPublicBranding failed');
+      this.logger.warn(
+        { slug, err },
+        '[TenantBrandingService] getPublicBranding failed'
+      );
       return null;
     }
   }
@@ -138,7 +143,12 @@ export class TenantBrandingService implements OnModuleDestroy {
     primaryColor: string | null;
     secondaryColor: string | null;
     welcomeMessage: string | null;
-    ssoProviders: Array<{ id: string; name: string; type: string; iconUrl: string | null }>;
+    ssoProviders: Array<{
+      id: string;
+      name: string;
+      type: string;
+      iconUrl: string | null;
+    }>;
   } | null> {
     try {
       const rows = await db
@@ -160,7 +170,10 @@ export class TenantBrandingService implements OnModuleDestroy {
         ssoProviders: [], // SSO providers loaded from Keycloak IDP config in future
       };
     } catch (err) {
-      this.logger.warn({ slug, err }, '[TenantBrandingService] getBrandedLoginData failed');
+      this.logger.warn(
+        { slug, err },
+        '[TenantBrandingService] getBrandedLoginData failed'
+      );
       return null;
     }
   }

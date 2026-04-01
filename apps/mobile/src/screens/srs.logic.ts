@@ -15,7 +15,7 @@ export interface SessionStats {
 }
 
 export function computeSessionStats(
-  ratings: { cardId: string; quality: number }[],
+  ratings: { cardId: string; quality: number }[]
 ): SessionStats {
   return {
     total: ratings.length,
@@ -32,7 +32,7 @@ export function formatDueDate(dueDate: string): string {
   const d = new Date(dueDate);
   const today = new Date();
   const diff = Math.floor(
-    (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
   );
   if (diff <= 0) return 'Due today';
   if (diff === 1) return 'Due tomorrow';

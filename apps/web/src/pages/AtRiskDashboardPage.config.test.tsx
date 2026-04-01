@@ -146,7 +146,9 @@ describe('RiskThresholdConfig', () => {
     const input = screen.getByRole('spinbutton');
     fireEvent.change(input, { target: { value: '14' } });
     fireEvent.click(screen.getByRole('button', { name: /Save Thresholds/i }));
-    const stored = JSON.parse(localStorage.getItem('edusphere_risk_thresholds') ?? '{}');
+    const stored = JSON.parse(
+      localStorage.getItem('edusphere_risk_thresholds') ?? '{}'
+    );
     expect(stored.inactiveDays).toBe(14);
     expect(stored.completionThreshold).toBe(30);
   });

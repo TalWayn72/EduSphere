@@ -58,7 +58,11 @@ const MOCK_ANCHOR_2 = {
     mimeType: 'image/png',
     filename: 'traversal-algorithm.png',
     scanStatus: 'CLEAN',
-    metadata: { width: 400, height: 300, altText: 'Traversal algorithm illustration' },
+    metadata: {
+      width: 400,
+      height: 300,
+      altText: 'Traversal algorithm illustration',
+    },
   },
 };
 
@@ -77,7 +81,9 @@ test.describe('Visual Anchoring — Instructor Flow (Part 1)', () => {
 
   test('instructor can upload a visual asset', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetPresignedUploadUrl') {
         await route.fulfill({
           json: {
@@ -97,7 +103,8 @@ test.describe('Visual Anchoring — Instructor Flow (Part 1)', () => {
                 id: 'new-asset-id',
                 scanStatus: 'CLEAN',
                 filename: 'test-visual.png',
-                storageUrl: 'https://placehold.co/200x150/6366f1/ffffff?text=Uploaded',
+                storageUrl:
+                  'https://placehold.co/200x150/6366f1/ffffff?text=Uploaded',
               },
             },
           },
@@ -140,9 +147,13 @@ test.describe('Visual Anchoring — Instructor Flow (Part 1)', () => {
 
   // ── Test 2: Create anchor on text selection ────────────────────────────
 
-  test('instructor can create a visual anchor on text selection', async ({ page }) => {
+  test('instructor can create a visual anchor on text selection', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'CreateVisualAnchor') {
         await route.fulfill({
           json: {
@@ -191,7 +202,9 @@ test.describe('Visual Anchoring — Instructor Flow (Part 1)', () => {
 
   test('InstructorAnchorPanel lists anchors', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
-      const body = route.request().postDataJSON() as { operationName?: string } | null;
+      const body = route.request().postDataJSON() as {
+        operationName?: string;
+      } | null;
       if (body?.operationName === 'GetVisualAnchors') {
         await route.fulfill({
           json: { data: { getVisualAnchors: [MOCK_ANCHOR_1, MOCK_ANCHOR_2] } },

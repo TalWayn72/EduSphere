@@ -13,15 +13,31 @@ const STATUS_BADGE: Record<InvoiceStatus, string> = {
 export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
   return (
     <div className="overflow-x-auto">
-      <table data-testid="invoice-history-table" className="w-full text-sm" aria-label="Invoice history">
+      <table
+        data-testid="invoice-history-table"
+        className="w-full text-sm"
+        aria-label="Invoice history"
+      >
         <thead>
           <tr className="border-b text-left text-muted-foreground">
-            <th scope="col" className="pb-3 pr-4 font-medium">Tenant</th>
-            <th scope="col" className="pb-3 pr-4 font-medium">Plan</th>
-            <th scope="col" className="pb-3 pr-4 font-medium">Year</th>
-            <th scope="col" className="pb-3 pr-4 font-medium">Amount</th>
-            <th scope="col" className="pb-3 pr-4 font-medium">Status</th>
-            <th scope="col" className="pb-3 font-medium">PDF</th>
+            <th scope="col" className="pb-3 pr-4 font-medium">
+              Tenant
+            </th>
+            <th scope="col" className="pb-3 pr-4 font-medium">
+              Plan
+            </th>
+            <th scope="col" className="pb-3 pr-4 font-medium">
+              Year
+            </th>
+            <th scope="col" className="pb-3 pr-4 font-medium">
+              Amount
+            </th>
+            <th scope="col" className="pb-3 pr-4 font-medium">
+              Status
+            </th>
+            <th scope="col" className="pb-3 font-medium">
+              PDF
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -32,7 +48,9 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
               <td className="py-3 pr-4">{inv.year}</td>
               <td className="py-3 pr-4">${inv.amount.toLocaleString()}</td>
               <td className="py-3 pr-4">
-                <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[inv.status]}`}>
+                <span
+                  className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[inv.status]}`}
+                >
                   {inv.status}
                 </span>
               </td>

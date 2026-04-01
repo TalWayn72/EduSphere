@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ExamPlayer } from '@/components/exam/ExamPlayer';
-import { useExamSessionStore, type ExamQuestion } from '@/stores/exam-session.store';
 import {
-  useExamSession,
-  useSubmitExam,
-} from '@/hooks/useExamSession';
+  useExamSessionStore,
+  type ExamQuestion,
+} from '@/stores/exam-session.store';
+import { useExamSession, useSubmitExam } from '@/hooks/useExamSession';
 
 export function ExamTakingPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -22,15 +22,20 @@ export function ExamTakingPage() {
       const questions: ExamQuestion[] = (session.questionOrder ?? []).map(
         (id: string) => ({
           itemId: id,
-          questionData: { type: 'MULTIPLE_CHOICE' as const, question: '', options: [], correctOptionIds: [] },
+          questionData: {
+            type: 'MULTIPLE_CHOICE' as const,
+            question: '',
+            options: [],
+            correctOptionIds: [],
+          },
           domain: '',
           bloomLevel: '',
-        }),
+        })
       );
       store.setSession(
         session.id,
         questions,
-        session.timeRemainingSeconds ?? 0,
+        session.timeRemainingSeconds ?? 0
       );
     }
   }, [session, store]);
@@ -79,10 +84,7 @@ export function ExamTakingPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <ExamPlayer
-        examTitle="Certification Exam"
-        onSubmit={handleSubmit}
-      />
+      <ExamPlayer examTitle="Certification Exam" onSubmit={handleSubmit} />
     </div>
   );
 }

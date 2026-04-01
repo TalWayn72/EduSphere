@@ -11,13 +11,13 @@
 
 Phase 27 built the UI shell for live sessions and the offline queue hook, but left several critical blockers and missing backend mutations unimplemented. Phase 28 closes all outstanding gaps:
 
-| Task | Area | Priority |
-|------|------|----------|
-| T1 | Critical blockers (migration, Husky, Service Worker) | P0 — must land first |
-| T2 | Live sessions backend completeness | P1 |
-| T3 | Offline sync auto-flush on reconnect + TTL eviction | P1 |
-| T4 | Skill tree real data via Drizzle + AGE Cypher | P1 |
-| T5 | ARIA / accessibility gaps | P2 |
+| Task | Area                                                 | Priority             |
+| ---- | ---------------------------------------------------- | -------------------- |
+| T1   | Critical blockers (migration, Husky, Service Worker) | P0 — must land first |
+| T2   | Live sessions backend completeness                   | P1                   |
+| T3   | Offline sync auto-flush on reconnect + TTL eviction  | P1                   |
+| T4   | Skill tree real data via Drizzle + AGE Cypher        | P1                   |
+| T5   | ARIA / accessibility gaps                            | P2                   |
 
 **Constraint:** T1 must merge before any other task because migration 0012 unblocks T2 (the service layer references the renamed columns) and the Husky fix unblocks all CI gates.
 
@@ -28,6 +28,7 @@ Phase 27 built the UI shell for live sessions and the offline queue hook, but le
 ### Live Sessions (apps/subgraph-agent)
 
 The GraphQL schema (`live-sessions.graphql`) exposes only `startLiveSession`. The service (`live-sessions.service.ts`) implements `startLiveSession` with full NATS event publishing and proper RLS, but the following mutations are absent:
+
 - `endLiveSession` — no status transition LIVE → ENDED
 - `joinLiveSession` — no room URL returned to students
 - `cancelLiveSession` — no SCHEDULED → CANCELLED path
@@ -38,11 +39,13 @@ The database schema (`packages/db/src/schema`) added `attendeePasswordEnc` and `
 ### Offline Queue (apps/web/src/hooks/useOfflineQueue.ts)
 
 `useOfflineQueue` already:
+
 - Stores up to 100 items in localStorage with LRU eviction
 - Listens to `storage` events for cross-tab sync
 - Exposes `flush(handler)` for manual replay
 
 Missing:
+
 - `window.addEventListener('online', ...)` auto-flush on reconnect (no cleanup = memory leak)
 - 48-hour TTL eviction on items older than `Date.now() - 48 * 60 * 60 * 1000` (the `createdAt` field already exists on `QueuedItem`)
 
@@ -53,10 +56,12 @@ The service is already real — it queries `content_items` via Drizzle and `user
 ### Husky Pre-commit
 
 `.husky/pre-commit` begins with:
+
 ```sh
 #!/usr/bin/env sh
 . "$(dirname "$0")/_/husky.sh"
 ```
+
 Husky v10 removed the `_/husky.sh` shim. These two lines cause every pre-commit run to fail with `husky.sh: not found`. They must be removed and replaced with the v10-compatible header (`#!/usr/bin/env sh` only, no sourcing).
 
 ### Service Worker
@@ -74,12 +79,14 @@ Husky v10 removed the `_/husky.sh` shim. These two lines cause every pre-commit 
 **File:** `packages/db/src/migrations/0012_live_session_enc_columns.sql`
 
 The `live_sessions` table must rename:
+
 - `attendee_password` → `attendee_password_enc`
 - `moderator_password` → `moderator_password_enc`
 
 The Drizzle schema in `packages/db/src/schema/` must reflect the renamed columns. Both old and new column names must remain functional during the migration window via a `DO $$ ... $$` block that checks for the old name before renaming.
 
 **Acceptance Criteria:**
+
 - [ ] Migration file `0012_live_session_enc_columns.sql` exists and is idempotent
 - [ ] `pnpm --filter @edusphere/db migrate` runs without error on a clean DB and on a DB that already has the old column names
 - [ ] Drizzle schema reflects `attendeePasswordEnc` / `moderatorPasswordEnc`
@@ -93,6 +100,7 @@ The Drizzle schema in `packages/db/src/schema/` must reflect the renamed columns
 Remove the `#!/usr/bin/env sh` shebang + `. "$(dirname -- "$0")/_/husky.sh"` sourcing lines from ALL Husky hook files. Husky v10 hooks are plain shell scripts with no shim.
 
 **Acceptance Criteria:**
+
 - [ ] No hook file contains `husky.sh`
 - [ ] `git commit --dry-run` executes without "husky.sh: not found" error
 - [ ] The root artifact check logic in `pre-commit` is preserved
@@ -119,6 +127,7 @@ export function registerSW(): void {
 In `main.tsx`, call `registerSW()` after `createRoot(...).render(...)`.
 
 **Acceptance Criteria:**
+
 - [ ] `apps/web/src/pwa.ts` exists with SW registration logic
 - [ ] `registerSW()` is called in `main.tsx`
 - [ ] No uncaught promise rejection when SW file is absent (registration is wrapped in `.catch`)
@@ -143,7 +152,11 @@ extend type Mutation {
 }
 
 extend type Query {
-  sessionAttendees(sessionId: ID!, limit: Int, offset: Int): SessionAttendeesResult! @authenticated
+  sessionAttendees(
+    sessionId: ID!
+    limit: Int
+    offset: Int
+  ): SessionAttendeesResult! @authenticated
 }
 
 type EndLiveSessionResult {
@@ -184,6 +197,7 @@ type SessionAttendeesResult {
 Implement the following methods (all follow the existing pattern with `withTenantContext`, Pino logging, and NATS event publishing):
 
 **`endLiveSession(sessionId, tenantId, userId, userRole)`**
+
 - Roles: INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN
 - Transition: LIVE → ENDED only (throw `BadRequestException` if current status is not LIVE)
 - Set `endedAt = NOW()`
@@ -192,6 +206,7 @@ Implement the following methods (all follow the existing pattern with `withTenan
 - Return: `{ sessionId, status: 'ENDED', endedAt, durationSeconds }`
 
 **`joinLiveSession(sessionId, tenantId, userId, userRole)`**
+
 - Any authenticated role (including STUDENT)
 - Validate session `status === 'LIVE'` — throw `BadRequestException('Session is not live')` otherwise
 - Record attendee row in `live_session_attendees` (or upsert) with `joinedAt = NOW()`
@@ -200,6 +215,7 @@ Implement the following methods (all follow the existing pattern with `withTenan
 - `buildRoomUrl`: returns `${process.env['LIVEKIT_URL'] ?? 'https://meet.edusphere.dev'}/room/${sessionId}`
 
 **`cancelLiveSession(sessionId, tenantId, userId, userRole)`**
+
 - Roles: INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN
 - Transition: SCHEDULED → CANCELLED only (throw if not SCHEDULED)
 - Set `cancelledAt = NOW()` on the row
@@ -207,6 +223,7 @@ Implement the following methods (all follow the existing pattern with `withTenan
 - Return: `{ sessionId, status: 'CANCELLED', cancelledAt }`
 
 **`getSessionAttendees(sessionId, tenantId, userId, userRole, limit, offset)`**
+
 - Roles: INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN only
 - Query `live_session_attendees` with pagination
 - Return `{ attendees: [...], total }`
@@ -216,6 +233,7 @@ Implement the following methods (all follow the existing pattern with `withTenan
 **File:** `apps/subgraph-agent/src/live-sessions/live-sessions.resolver.ts` (or module)
 
 Add a NestJS `ThrottlerGuard`-based check or an in-memory sliding window (Map with TTL) on `startLiveSession`:
+
 - Max 5 calls per instructor per hour
 - Key: `${tenantId}:${userId}`
 - On exceed: throw `TooManyRequestsException` with message `"Maximum 5 sessions per hour per instructor"`
@@ -223,6 +241,7 @@ Add a NestJS `ThrottlerGuard`-based check or an in-memory sliding window (Map wi
 - The map MUST be cleared in `onModuleDestroy`
 
 **Acceptance Criteria (T2 full):**
+
 - [ ] `endLiveSession` transitions LIVE → ENDED only; idempotent `ENDED → ENDED` throws
 - [ ] `joinLiveSession` returns a room URL for LIVE sessions; throws for non-LIVE sessions
 - [ ] `cancelLiveSession` transitions SCHEDULED → CANCELLED only
@@ -252,7 +271,7 @@ export interface OfflineQueueOptions {
   onReconnect?: (flush: OfflineQueue['flush']) => void;
 }
 
-export function useOfflineQueue(options?: OfflineQueueOptions): OfflineQueue
+export function useOfflineQueue(options?: OfflineQueueOptions): OfflineQueue;
 ```
 
 Internal implementation:
@@ -312,6 +331,7 @@ if (!isValidCourseId) {
 ```
 
 **Acceptance Criteria (T3 full):**
+
 - [ ] `useOfflineQueue` listens to `online` event only when `onReconnect` option is provided
 - [ ] `online` listener is removed on component unmount (no memory leak)
 - [ ] Memory test: `unmount()` of hook calls `removeEventListener` (verified via spy)
@@ -347,6 +367,7 @@ If the AGE query fails (extension not loaded, graph not initialized), fall back 
 The existing service already queries `user_skill_mastery` via raw SQL. Replace with a proper Drizzle query using the `schema.userSkillMastery` table (assuming migration 0011 created it and the Drizzle schema exports it). If the schema is not yet exported from `packages/db/src/schema/index.ts`, add the export.
 
 **Acceptance Criteria (T4 full):**
+
 - [ ] AGE Cypher traversal is attempted first; linear chain used only as fallback
 - [ ] Fallback is logged at `warn` with `[SkillTreeService]` prefix and `tenantId`/`courseId` context
 - [ ] `user_skill_mastery` query uses Drizzle schema reference (not raw SQL string)
@@ -363,6 +384,7 @@ The existing service already queries `user_skill_mastery` via raw SQL. Replace w
 **File:** `apps/web/src/pages/LiveSessionsPage.tsx`
 
 The tab container already has `role="tablist"` and each button has `role="tab"` and `aria-selected`. Verify and add missing attributes:
+
 - `aria-controls="tab-panel-upcoming"` / `aria-controls="tab-panel-past"` on each tab button
 - `id="tab-upcoming"` / `id="tab-past"` on each tab button
 - The tab panel div must have `role="tabpanel"`, `id="tab-panel-upcoming"` (or `"tab-panel-past"`), `aria-labelledby="tab-upcoming"` (or `"tab-past"`)
@@ -397,6 +419,7 @@ const SkillTreePage = lazy(() =>
 ```
 
 **Acceptance Criteria (T5 full):**
+
 - [ ] axe-core report: 0 critical violations on LiveSessionsPage tabs (both tabs rendered)
 - [ ] `aria-controls`/`aria-labelledby` pairing passes automated ARIA validator
 - [ ] Keyboard: tabbing to tab list, ArrowRight moves focus to next tab and activates it
@@ -416,8 +439,8 @@ const SkillTreePage = lazy(() =>
 mutation EndLiveSession($sessionId: ID!) {
   endLiveSession(sessionId: $sessionId) {
     sessionId
-    status      # "ENDED"
-    endedAt     # ISO 8601
+    status # "ENDED"
+    endedAt # ISO 8601
     durationSeconds
   }
 }
@@ -425,6 +448,7 @@ mutation EndLiveSession($sessionId: ID!) {
 
 **Authorization:** `@authenticated` + role check in resolver (INSTRUCTOR | ORG_ADMIN | SUPER_ADMIN)
 **Error codes:**
+
 - `FORBIDDEN` — caller lacks required role
 - `NOT_FOUND` — session not found for tenant
 - `BAD_USER_INPUT` — session is not in LIVE status
@@ -435,14 +459,15 @@ mutation EndLiveSession($sessionId: ID!) {
 mutation JoinLiveSession($sessionId: ID!) {
   joinLiveSession(sessionId: $sessionId) {
     sessionId
-    roomUrl     # wss://... or https://...
-    role        # caller's role string
+    roomUrl # wss://... or https://...
+    role # caller's role string
   }
 }
 ```
 
 **Authorization:** `@authenticated` (any role)
 **Error codes:**
+
 - `NOT_FOUND` — session not found for tenant
 - `BAD_USER_INPUT` — session is not LIVE (`"Session is not live"`)
 
@@ -452,14 +477,15 @@ mutation JoinLiveSession($sessionId: ID!) {
 mutation CancelLiveSession($sessionId: ID!) {
   cancelLiveSession(sessionId: $sessionId) {
     sessionId
-    status       # "CANCELLED"
-    cancelledAt  # ISO 8601
+    status # "CANCELLED"
+    cancelledAt # ISO 8601
   }
 }
 ```
 
 **Authorization:** `@authenticated` + role check (INSTRUCTOR | ORG_ADMIN | SUPER_ADMIN)
 **Error codes:**
+
 - `FORBIDDEN`
 - `NOT_FOUND`
 - `BAD_USER_INPUT` — session is not in SCHEDULED status
@@ -486,11 +512,11 @@ query SessionAttendees($sessionId: ID!, $limit: Int, $offset: Int) {
 
 ### 4.3 NATS Events
 
-| Event | Subject | Payload |
-|-------|---------|---------|
-| Session ended | `EDUSPHERE.sessions.ended` | `{ sessionId, tenantId, endedAt, durationSeconds }` |
-| Participant joined | `EDUSPHERE.sessions.participant.joined` | `{ sessionId, tenantId, userId }` |
-| Session cancelled | `EDUSPHERE.sessions.cancelled` | `{ sessionId, tenantId, cancelledAt }` |
+| Event              | Subject                                 | Payload                                             |
+| ------------------ | --------------------------------------- | --------------------------------------------------- |
+| Session ended      | `EDUSPHERE.sessions.ended`              | `{ sessionId, tenantId, endedAt, durationSeconds }` |
+| Participant joined | `EDUSPHERE.sessions.participant.joined` | `{ sessionId, tenantId, userId }`                   |
+| Session cancelled  | `EDUSPHERE.sessions.cancelled`          | `{ sessionId, tenantId, cancelledAt }`              |
 
 All events use `StringCodec` JSON encoding. All streams must have `max_age` and `max_bytes` declared per CLAUDE.md infrastructure rules.
 
@@ -509,6 +535,7 @@ All new service methods must use `withTenantContext(tenantId, userId, role, fn)`
 ### Rate Limiting (startLiveSession)
 
 The in-memory sliding window map:
+
 - Key: `${tenantId}:${userId}` (tenant-scoped to prevent cross-tenant key collisions)
 - Value: `Array<number>` of timestamps, max last 5 entries, pruned to last 1h on each access
 - Max map size: 1000 entries with insertion-order LRU eviction
@@ -580,33 +607,33 @@ CREATE POLICY live_session_attendees_tenant_isolation
 
 ### Unit Tests Required
 
-| File | Tests |
-|------|-------|
-| `live-sessions.service.spec.ts` | `endLiveSession`: correct transition, forbidden role, wrong-status error; `joinLiveSession`: returns roomUrl, non-LIVE error; `cancelLiveSession`: correct transition, wrong-status error; `getSessionAttendees`: pagination, INSTRUCTOR-only |
-| `live-sessions.service.spec.ts` (rate limit) | 5 calls succeed, 6th throws `TooManyRequestsException`; map evicts at 1001 entries; `onModuleDestroy` clears map |
-| `useOfflineQueue.test.ts` | `online` event triggers `onReconnect`; `removeEventListener` called on unmount; items older than 48h evicted; items exactly 47h59m old retained |
-| `pwa.test.ts` | `registerSW` no-ops when `serviceWorker` not in navigator; calls `register('/sw.js')` when available |
-| `SkillTreePage.test.tsx` | Invalid courseId shows error, no query fired; valid UUID fires query |
-| `skill-tree.service.spec.ts` | AGE edges returned when graph available; falls back to linear chain on AGE error; mastery levels match DB rows |
+| File                                         | Tests                                                                                                                                                                                                                                         |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `live-sessions.service.spec.ts`              | `endLiveSession`: correct transition, forbidden role, wrong-status error; `joinLiveSession`: returns roomUrl, non-LIVE error; `cancelLiveSession`: correct transition, wrong-status error; `getSessionAttendees`: pagination, INSTRUCTOR-only |
+| `live-sessions.service.spec.ts` (rate limit) | 5 calls succeed, 6th throws `TooManyRequestsException`; map evicts at 1001 entries; `onModuleDestroy` clears map                                                                                                                              |
+| `useOfflineQueue.test.ts`                    | `online` event triggers `onReconnect`; `removeEventListener` called on unmount; items older than 48h evicted; items exactly 47h59m old retained                                                                                               |
+| `pwa.test.ts`                                | `registerSW` no-ops when `serviceWorker` not in navigator; calls `register('/sw.js')` when available                                                                                                                                          |
+| `SkillTreePage.test.tsx`                     | Invalid courseId shows error, no query fired; valid UUID fires query                                                                                                                                                                          |
+| `skill-tree.service.spec.ts`                 | AGE edges returned when graph available; falls back to linear chain on AGE error; mastery levels match DB rows                                                                                                                                |
 
 ### Playwright E2E Tests Required
 
-| Spec | Scenario | Assertion |
-|------|----------|-----------|
-| `live-sessions.spec.ts` | Instructor ends a LIVE session | Status badge changes to "Ended"; `endLiveSession` mutation fired |
-| `live-sessions.spec.ts` | Student joins a LIVE session | Redirected to room URL; `joinLiveSession` mutation fired |
-| `live-sessions.spec.ts` | Instructor cancels a SCHEDULED session | Session disappears from upcoming list |
-| `live-sessions.spec.ts` | Tab keyboard navigation | ArrowRight moves to "Past" tab; tabpanel content updates |
-| `offline-queue.spec.ts` | Enqueue mutation offline, reconnect | `onReconnect` fires flush; mutation replayed |
-| `skill-tree.spec.ts` | Navigate to `/skill-tree/not-a-uuid` | Error state visible; 0 GraphQL requests |
-| `skill-tree.spec.ts` | Navigate to `/skill-tree/<valid-uuid>` | Nodes rendered with mastery indicators |
+| Spec                    | Scenario                               | Assertion                                                        |
+| ----------------------- | -------------------------------------- | ---------------------------------------------------------------- |
+| `live-sessions.spec.ts` | Instructor ends a LIVE session         | Status badge changes to "Ended"; `endLiveSession` mutation fired |
+| `live-sessions.spec.ts` | Student joins a LIVE session           | Redirected to room URL; `joinLiveSession` mutation fired         |
+| `live-sessions.spec.ts` | Instructor cancels a SCHEDULED session | Session disappears from upcoming list                            |
+| `live-sessions.spec.ts` | Tab keyboard navigation                | ArrowRight moves to "Past" tab; tabpanel content updates         |
+| `offline-queue.spec.ts` | Enqueue mutation offline, reconnect    | `onReconnect` fires flush; mutation replayed                     |
+| `skill-tree.spec.ts`    | Navigate to `/skill-tree/not-a-uuid`   | Error state visible; 0 GraphQL requests                          |
+| `skill-tree.spec.ts`    | Navigate to `/skill-tree/<valid-uuid>` | Nodes rendered with mastery indicators                           |
 
 ### Memory Tests Required
 
-| File | Coverage |
-|------|----------|
-| `useOfflineQueue.memory.test.ts` | `unmount()` removes `online` listener (spy on `removeEventListener`) |
-| `live-sessions.service.memory.spec.ts` | `onModuleDestroy` clears rate-limit map and drains NATS |
+| File                                   | Coverage                                                             |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| `useOfflineQueue.memory.test.ts`       | `unmount()` removes `online` listener (spy on `removeEventListener`) |
+| `live-sessions.service.memory.spec.ts` | `onModuleDestroy` clears rate-limit map and drains NATS              |
 
 ---
 
@@ -622,6 +649,7 @@ T5-A + T5-B + T5-C [all independent, can run in parallel with T2-T4]
 ```
 
 Recommended parallel execution plan:
+
 - **Agent-1:** T1-A + T1-B + T1-C (blockers, sequential within agent)
 - **Agent-2:** T2 (after T1-A lands)
 - **Agent-3:** T3 (independent)
@@ -645,4 +673,4 @@ A task is done when ALL of the following pass:
 
 ---
 
-*Last updated: 2026-03-06 | Phase 28 | EduSphere v1.0.0*
+_Last updated: 2026-03-06 | Phase 28 | EduSphere v1.0.0_

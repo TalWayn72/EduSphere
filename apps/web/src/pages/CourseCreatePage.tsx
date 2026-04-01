@@ -13,7 +13,10 @@ import { DRAFT_COURSE_ID } from './CourseCreatePage.types';
 import { useCourseCreate } from './useCourseCreate';
 
 // Re-export for backward compatibility
-export { courseSchema, type CourseSchemaValues } from './CourseCreatePage.types';
+export {
+  courseSchema,
+  type CourseSchemaValues,
+} from './CourseCreatePage.types';
 
 const CourseWizardStep2 = lazy(() =>
   import('./CourseWizardStep2').then((m) => ({ default: m.CourseWizardStep2 }))
@@ -54,10 +57,22 @@ export function CourseCreatePage() {
   } = useCourseCreate();
 
   const STEPS = [
-    { label: t('wizard.step1Label'), description: t('wizard.step1Description') },
-    { label: t('wizard.step2Label'), description: t('wizard.step2Description') },
-    { label: t('wizard.mediaLabel'), description: t('wizard.mediaDescription') },
-    { label: t('wizard.publishLabel'), description: t('wizard.publishDescription') },
+    {
+      label: t('wizard.step1Label'),
+      description: t('wizard.step1Description'),
+    },
+    {
+      label: t('wizard.step2Label'),
+      description: t('wizard.step2Description'),
+    },
+    {
+      label: t('wizard.mediaLabel'),
+      description: t('wizard.mediaDescription'),
+    },
+    {
+      label: t('wizard.publishLabel'),
+      description: t('wizard.publishDescription'),
+    },
   ];
 
   const lastContentStep = STEPS.length - 2;
@@ -67,7 +82,11 @@ export function CourseCreatePage() {
       <PageShell size="sm">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/courses')}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('title')}
           </Button>
@@ -81,13 +100,18 @@ export function CourseCreatePage() {
         <Card className="p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold">{STEPS[step]?.label}</h2>
-            <p className="text-sm text-muted-foreground">{STEPS[step]?.description}</p>
+            <p className="text-sm text-muted-foreground">
+              {STEPS[step]?.description}
+            </p>
           </div>
 
           {step === 0 && (
             <>
               <AiBuilderCta t={t} onLaunch={() => setShowAiModal(true)} />
-              <AiCourseCreatorModal open={showAiModal} onClose={() => setShowAiModal(false)} />
+              <AiCourseCreatorModal
+                open={showAiModal}
+                onClose={() => setShowAiModal(false)}
+              />
             </>
           )}
 
@@ -97,7 +121,10 @@ export function CourseCreatePage() {
           <ErrorBoundary key={step} pageName={`CourseWizard-step${step}`}>
             <Suspense fallback={LazyFallback}>
               {step === 1 && (
-                <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />
+                <CourseWizardStep2
+                  modules={wizardData.modules}
+                  onChange={updateWizard}
+                />
               )}
               {step === 2 && (
                 <CourseWizardMediaStep
@@ -120,13 +147,20 @@ export function CourseCreatePage() {
         {/* Navigation */}
         {step < STEPS.length - 1 && (
           <div className="flex justify-between">
-            <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep((s) => s - 1)}
+              disabled={step === 0}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('wizard.back')}
             </Button>
             <Button
               type="button"
-              onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
+              onClick={
+                step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)
+              }
               disabled={step === 0 && !canAdvanceStep1}
             >
               {t('wizard.next')}
@@ -136,7 +170,11 @@ export function CourseCreatePage() {
         )}
         {step === STEPS.length - 1 && (
           <div className="flex justify-between items-center gap-2 flex-wrap">
-            <Button type="button" variant="outline" onClick={() => setStep(lastContentStep)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep(lastContentStep)}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('wizard.backToMedia')}
             </Button>
@@ -187,13 +225,17 @@ function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
               {i < currentStep ? <Check className="h-4 w-4" /> : i + 1}
             </div>
             <div className="text-center hidden sm:block">
-              <p className={`text-xs font-medium ${i === currentStep ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <p
+                className={`text-xs font-medium ${i === currentStep ? 'text-foreground' : 'text-muted-foreground'}`}
+              >
                 {s.label}
               </p>
             </div>
           </div>
           {i < steps.length - 1 && (
-            <div className={`flex-1 h-0.5 mx-2 transition-colors ${i < currentStep ? 'bg-primary' : 'bg-muted-foreground/20'}`} />
+            <div
+              className={`flex-1 h-0.5 mx-2 transition-colors ${i < currentStep ? 'bg-primary' : 'bg-muted-foreground/20'}`}
+            />
           )}
         </React.Fragment>
       ))}
@@ -201,7 +243,13 @@ function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   );
 }
 
-function AiBuilderCta({ t, onLaunch }: { t: (key: string) => string; onLaunch: () => void }) {
+function AiBuilderCta({
+  t,
+  onLaunch,
+}: {
+  t: (key: string) => string;
+  onLaunch: () => void;
+}) {
   return (
     <div
       data-testid="ai-builder-cta"

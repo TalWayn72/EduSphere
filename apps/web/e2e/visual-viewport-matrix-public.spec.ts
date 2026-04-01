@@ -38,7 +38,7 @@ test.describe('Viewport Matrix — Public Pages @visual', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
     // Inject English locale for consistent test output
     await page.addInitScript(() => {
@@ -54,36 +54,46 @@ test.describe('Viewport Matrix — Public Pages @visual', () => {
 
       for (const pg of PUBLIC_PAGES) {
         test(`${pg.name} — full page`, async ({ page }) => {
-          await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`${BASE_URL}${pg.path}`, {
+            waitUntil: 'domcontentloaded',
+          });
           await page.waitForTimeout(500);
           await expect(page).toHaveScreenshot(
             `vp-${vp.name}-${pg.name}-full.png`,
-            { ...LOOSE_OPTS, mask: dynamicMasks(page) },
+            { ...LOOSE_OPTS, mask: dynamicMasks(page) }
           );
         });
 
         test(`${pg.name} — hero or header`, async ({ page }) => {
-          await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`${BASE_URL}${pg.path}`, {
+            waitUntil: 'domcontentloaded',
+          });
           await page.waitForTimeout(300);
-          const hero = page.locator(
-            '[data-testid="hero-section"], header, [data-testid="page-header"], nav',
-          ).first();
+          const hero = page
+            .locator(
+              '[data-testid="hero-section"], header, [data-testid="page-header"], nav'
+            )
+            .first();
           if (await hero.isVisible().catch(() => false)) {
             await expect(hero).toHaveScreenshot(
               `vp-${vp.name}-${pg.name}-hero.png`,
-              { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+              { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
             );
           }
         });
 
         test(`${pg.name} — footer`, async ({ page }) => {
-          await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+          await page.goto(`${BASE_URL}${pg.path}`, {
+            waitUntil: 'domcontentloaded',
+          });
           await page.waitForTimeout(300);
-          const footer = page.locator('footer, [data-testid="app-footer"]').first();
+          const footer = page
+            .locator('footer, [data-testid="app-footer"]')
+            .first();
           if (await footer.isVisible().catch(() => false)) {
             await expect(footer).toHaveScreenshot(
               `vp-${vp.name}-${pg.name}-footer.png`,
-              { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
+              { maxDiffPixelRatio: 0.01, animations: 'disabled' as const }
             );
           }
         });
@@ -98,12 +108,16 @@ test.describe('Viewport Matrix — Public Pages @visual', () => {
         await page.setViewportSize({ width: vp.width, height: vp.height });
         await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
         await page.waitForTimeout(500);
-        const cta = page.locator('[data-testid="cta-section"], section:has(button), .cta-section').first();
+        const cta = page
+          .locator(
+            '[data-testid="cta-section"], section:has(button), .cta-section'
+          )
+          .first();
         if (await cta.isVisible().catch(() => false)) {
-          await expect(cta).toHaveScreenshot(
-            `vp-${vp.name}-landing-cta.png`,
-            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
-          );
+          await expect(cta).toHaveScreenshot(`vp-${vp.name}-landing-cta.png`, {
+            maxDiffPixelRatio: 0.01,
+            animations: 'disabled' as const,
+          });
         }
       });
 
@@ -111,24 +125,30 @@ test.describe('Viewport Matrix — Public Pages @visual', () => {
         await page.setViewportSize({ width: vp.width, height: vp.height });
         await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
         await page.waitForTimeout(500);
-        const form = page.locator('form, [data-testid="login-form"], .login-form').first();
+        const form = page
+          .locator('form, [data-testid="login-form"], .login-form')
+          .first();
         if (await form.isVisible().catch(() => false)) {
-          await expect(form).toHaveScreenshot(
-            `vp-${vp.name}-login-form.png`,
-            { maxDiffPixelRatio: 0.01, animations: 'disabled' as const },
-          );
+          await expect(form).toHaveScreenshot(`vp-${vp.name}-login-form.png`, {
+            maxDiffPixelRatio: 0.01,
+            animations: 'disabled' as const,
+          });
         }
       });
 
       test(`pricing cards at ${vp.name}`, async ({ page }) => {
         await page.setViewportSize({ width: vp.width, height: vp.height });
-        await page.goto(`${BASE_URL}/pricing`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${BASE_URL}/pricing`, {
+          waitUntil: 'domcontentloaded',
+        });
         await page.waitForTimeout(500);
-        const cards = page.locator('[data-testid="pricing-cards"], .pricing-grid, main').first();
+        const cards = page
+          .locator('[data-testid="pricing-cards"], .pricing-grid, main')
+          .first();
         if (await cards.isVisible().catch(() => false)) {
           await expect(cards).toHaveScreenshot(
             `vp-${vp.name}-pricing-cards.png`,
-            { maxDiffPixelRatio: 0.05, animations: 'disabled' as const },
+            { maxDiffPixelRatio: 0.05, animations: 'disabled' as const }
           );
         }
       });

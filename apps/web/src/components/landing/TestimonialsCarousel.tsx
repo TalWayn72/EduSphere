@@ -13,21 +13,24 @@ interface Testimonial {
 const CAROUSEL_TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
-    quote: 'EduSphere transformed how our team learns. The AI tutor remembers context from previous sessions.',
+    quote:
+      'EduSphere transformed how our team learns. The AI tutor remembers context from previous sessions.',
     author: 'Sarah Chen',
     role: 'L&D Director',
     company: 'TechCorp EU',
   },
   {
     id: '2',
-    quote: 'The knowledge graph feature is unmatched. Concepts link automatically across courses.',
+    quote:
+      'The knowledge graph feature is unmatched. Concepts link automatically across courses.',
     author: 'Marcus Weber',
     role: 'Senior Engineer',
     company: 'DataFlow GmbH',
   },
   {
     id: '3',
-    quote: 'Our WCAG 2.2 compliance needs were fully met. Accessibility is clearly a first-class concern.',
+    quote:
+      'Our WCAG 2.2 compliance needs were fully met. Accessibility is clearly a first-class concern.',
     author: 'Aisha Okonkwo',
     role: 'Accessibility Lead',
     company: 'IncludeFirst',
@@ -47,7 +50,8 @@ export function TestimonialsCarousel() {
     return () => clearInterval(id);
   }, [paused, prefersReducedMotion]);
 
-  const testimonial = CAROUSEL_TESTIMONIALS[current] ?? CAROUSEL_TESTIMONIALS[0];
+  const testimonial =
+    CAROUSEL_TESTIMONIALS[current] ?? CAROUSEL_TESTIMONIALS[0];
 
   return (
     <section

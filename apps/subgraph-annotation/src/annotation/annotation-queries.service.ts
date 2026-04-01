@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -58,7 +55,9 @@ export class AnnotationQueriesService {
 
       conditions.push(
         ...buildLayerVisibilityConditions(
-          schema.annotations, authContext, filters.layer
+          schema.annotations,
+          authContext,
+          filters.layer
         )
       );
 
@@ -90,7 +89,9 @@ export class AnnotationQueriesService {
 
       conditions.push(
         ...buildLayerVisibilityConditions(
-          schema.annotations, authContext, layer
+          schema.annotations,
+          authContext,
+          layer
         )
       );
 

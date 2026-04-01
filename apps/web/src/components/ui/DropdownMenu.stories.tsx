@@ -37,7 +37,9 @@ export const Default: Story = {
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem>Billing</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+        <DropdownMenuItem className="text-destructive">
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),

@@ -14,14 +14,15 @@ export function fisherInformation3PL(
   theta: number,
   a: number,
   b: number,
-  c: number,
+  c: number
 ): number {
   const p = prob3PL(a, b, c, theta);
   const pMinusC = p - c;
   const oneMinusC = 1 - c;
   if (p <= 0 || p >= 1 || oneMinusC === 0) return 0;
-  return (D * D * a * a * pMinusC * pMinusC * (1 - p))
-    / (oneMinusC * oneMinusC * p);
+  return (
+    (D * D * a * a * pMinusC * pMinusC * (1 - p)) / (oneMinusC * oneMinusC * p)
+  );
 }
 
 /**
@@ -37,18 +38,13 @@ export function standardNormalCDF(z: number): number {
   const t = 1 / (1 + 0.2316419 * absZ);
 
   const coeffs = [
-    0.319381530,
-    -0.356563782,
-    1.781477937,
-    -1.821255978,
-    1.330274429,
+    0.31938153, -0.356563782, 1.781477937, -1.821255978, 1.330274429,
   ];
 
-  const poly = t * (coeffs[0]!
-    + t * (coeffs[1]!
-    + t * (coeffs[2]!
-    + t * (coeffs[3]!
-    + t * coeffs[4]!))));
+  const poly =
+    t *
+    (coeffs[0]! +
+      t * (coeffs[1]! + t * (coeffs[2]! + t * (coeffs[3]! + t * coeffs[4]!))));
 
   const pdf = Math.exp(-0.5 * absZ * absZ) / Math.sqrt(2 * Math.PI);
   const cdf = 1 - pdf * poly;
@@ -62,7 +58,7 @@ export function standardNormalCDF(z: number): number {
 export function passingProbability(
   theta: number,
   thetaCut: number,
-  se: number,
+  se: number
 ): number {
   if (se <= 0) return theta >= thetaCut ? 1 : 0;
   return standardNormalCDF((theta - thetaCut) / se);

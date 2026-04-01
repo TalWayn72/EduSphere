@@ -14,12 +14,7 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
-import {
-  connect,
-  NatsConnection,
-  StringCodec,
-  JetStreamManager,
-} from 'nats';
+import { connect, NatsConnection, StringCodec, JetStreamManager } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 
 const PUBLISH_SUBJECT = 'knowledge.concepts.extracted';
@@ -48,7 +43,7 @@ export class ConceptExtractionPublisherService
     } catch (err) {
       this.logger.error(
         { err },
-        '[ConceptExtractionPublisherService] NATS connection failed — publishing disabled',
+        '[ConceptExtractionPublisherService] NATS connection failed — publishing disabled'
       );
     }
   }
@@ -68,12 +63,12 @@ export class ConceptExtractionPublisherService
   async extractAndPublish(
     sourceText: string,
     courseId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<number> {
     if (!sourceText || sourceText.trim().length === 0) {
       this.logger.warn(
         { courseId, tenantId },
-        '[ConceptExtractionPublisherService] Empty source text — skipping extraction',
+        '[ConceptExtractionPublisherService] Empty source text — skipping extraction'
       );
       return 0;
     }
@@ -83,7 +78,7 @@ export class ConceptExtractionPublisherService
     if (concepts.length === 0) {
       this.logger.log(
         { courseId, tenantId },
-        '[ConceptExtractionPublisherService] No concepts extracted from source',
+        '[ConceptExtractionPublisherService] No concepts extracted from source'
       );
       return 0;
     }
@@ -136,11 +131,11 @@ export class ConceptExtractionPublisherService
   private async publishConcepts(
     concepts: ExtractedConcept[],
     courseId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<void> {
     if (!this.connection) {
       this.logger.warn(
-        '[ConceptExtractionPublisherService] NATS not connected — concepts not published',
+        '[ConceptExtractionPublisherService] NATS not connected — concepts not published'
       );
       return;
     }
@@ -152,12 +147,12 @@ export class ConceptExtractionPublisherService
       await js.publish(PUBLISH_SUBJECT, data);
       this.logger.log(
         { courseId, tenantId, conceptCount: concepts.length },
-        '[ConceptExtractionPublisherService] Published concepts to NATS',
+        '[ConceptExtractionPublisherService] Published concepts to NATS'
       );
     } catch (err) {
       this.logger.error(
         { err, courseId, tenantId },
-        '[ConceptExtractionPublisherService] Failed to publish concepts',
+        '[ConceptExtractionPublisherService] Failed to publish concepts'
       );
     }
   }

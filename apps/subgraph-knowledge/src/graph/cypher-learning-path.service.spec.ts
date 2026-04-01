@@ -22,10 +22,7 @@ vi.mock('@edusphere/config', () => ({
 }));
 
 import { CypherLearningPathService } from './cypher-learning-path.service.js';
-import {
-  parseAgtypeScalar,
-  parseAgtypeArray,
-} from './cypher-age-helpers.js';
+import { parseAgtypeScalar, parseAgtypeArray } from './cypher-age-helpers.js';
 
 describe('cypher-age-helpers (pure functions)', () => {
   // ─── parseAgtypeScalar ──────────────────────────────────────────────────────

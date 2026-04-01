@@ -10,14 +10,17 @@ vi.mock('@/components/ui/button', () => ({
   Button: ({
     children,
     ...props
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => (
-    <button {...props}>{children}</button>
-  ),
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: React.ReactNode;
+  }) => <button {...props}>{children}</button>,
 }));
 
 function renderOverlay() {
   return render(
-    <VideoSketchOverlay currentTime={30} onSave={vi.fn().mockResolvedValue(undefined)} />
+    <VideoSketchOverlay
+      currentTime={30}
+      onSave={vi.fn().mockResolvedValue(undefined)}
+    />
   );
 }
 
@@ -26,7 +29,9 @@ function activateSketch() {
 }
 
 describe('VideoSketchOverlay — tool selector', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('shows all 6 tool buttons in active mode', () => {
     renderOverlay();
@@ -42,14 +47,20 @@ describe('VideoSketchOverlay — tool selector', () => {
   it('freehand tool is selected by default (aria-pressed=true)', () => {
     renderOverlay();
     activateSketch();
-    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   it('other tools are not selected by default (aria-pressed=false)', () => {
     renderOverlay();
     activateSketch();
     ['eraser', 'rect', 'arrow', 'ellipse', 'text'].forEach((t) => {
-      expect(screen.getByTestId(`sketch-tool-${t}`)).toHaveAttribute('aria-pressed', 'false');
+      expect(screen.getByTestId(`sketch-tool-${t}`)).toHaveAttribute(
+        'aria-pressed',
+        'false'
+      );
     });
   });
 
@@ -57,36 +68,54 @@ describe('VideoSketchOverlay — tool selector', () => {
     renderOverlay();
     activateSketch();
     fireEvent.click(screen.getByTestId('sketch-tool-eraser'));
-    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('clicking rect tool selects rect', () => {
     renderOverlay();
     activateSketch();
     fireEvent.click(screen.getByTestId('sketch-tool-rect'));
-    expect(screen.getByTestId('sketch-tool-rect')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-rect')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   it('clicking arrow tool selects arrow', () => {
     renderOverlay();
     activateSketch();
     fireEvent.click(screen.getByTestId('sketch-tool-arrow'));
-    expect(screen.getByTestId('sketch-tool-arrow')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-arrow')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   it('clicking ellipse tool selects ellipse', () => {
     renderOverlay();
     activateSketch();
     fireEvent.click(screen.getByTestId('sketch-tool-ellipse'));
-    expect(screen.getByTestId('sketch-tool-ellipse')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-ellipse')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   it('clicking text tool selects text', () => {
     renderOverlay();
     activateSketch();
     fireEvent.click(screen.getByTestId('sketch-tool-text'));
-    expect(screen.getByTestId('sketch-tool-text')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('sketch-tool-text')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   it('only one tool is active at a time', () => {
@@ -95,7 +124,9 @@ describe('VideoSketchOverlay — tool selector', () => {
     fireEvent.click(screen.getByTestId('sketch-tool-rect'));
     const allTools = ['freehand', 'eraser', 'rect', 'arrow', 'ellipse', 'text'];
     const selected = allTools.filter(
-      (t) => screen.getByTestId(`sketch-tool-${t}`).getAttribute('aria-pressed') === 'true'
+      (t) =>
+        screen.getByTestId(`sketch-tool-${t}`).getAttribute('aria-pressed') ===
+        'true'
     );
     expect(selected).toHaveLength(1);
     expect(selected[0]).toBe('rect');
@@ -103,7 +134,9 @@ describe('VideoSketchOverlay — tool selector', () => {
 });
 
 describe('VideoSketchOverlay — color picker', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('renders a color picker input in active mode', () => {
     renderOverlay();
@@ -114,7 +147,9 @@ describe('VideoSketchOverlay — color picker', () => {
   it('color picker has default red color (#ef4444)', () => {
     renderOverlay();
     activateSketch();
-    const picker = screen.getByTestId('sketch-color-picker') as HTMLInputElement;
+    const picker = screen.getByTestId(
+      'sketch-color-picker'
+    ) as HTMLInputElement;
     expect(picker.value).toBe('#ef4444');
   });
 
@@ -141,7 +176,9 @@ describe('VideoSketchOverlay — color picker', () => {
 });
 
 describe('VideoSketchOverlay — text tool', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('clicking canvas in text mode shows a text input', () => {
     renderOverlay();
@@ -149,8 +186,15 @@ describe('VideoSketchOverlay — text tool', () => {
     fireEvent.click(screen.getByTestId('sketch-tool-text'));
     const canvas = document.querySelector('canvas')!;
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-      left: 0, top: 0, width: 200, height: 100,
-      right: 200, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
+      left: 0,
+      top: 0,
+      width: 200,
+      height: 100,
+      right: 200,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     } as DOMRect);
     fireEvent.click(canvas, { clientX: 50, clientY: 30 });
     expect(screen.getByTestId('sketch-text-input')).toBeInTheDocument();
@@ -162,8 +206,15 @@ describe('VideoSketchOverlay — text tool', () => {
     fireEvent.click(screen.getByTestId('sketch-tool-text'));
     const canvas = document.querySelector('canvas')!;
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-      left: 0, top: 0, width: 200, height: 100,
-      right: 200, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
+      left: 0,
+      top: 0,
+      width: 200,
+      height: 100,
+      right: 200,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     } as DOMRect);
     fireEvent.click(canvas, { clientX: 50, clientY: 30 });
     const input = screen.getByTestId('sketch-text-input');
@@ -176,8 +227,15 @@ describe('VideoSketchOverlay — text tool', () => {
     fireEvent.click(screen.getByTestId('sketch-tool-text'));
     const canvas = document.querySelector('canvas')!;
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-      left: 0, top: 0, width: 200, height: 100,
-      right: 200, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
+      left: 0,
+      top: 0,
+      width: 200,
+      height: 100,
+      right: 200,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     } as DOMRect);
     fireEvent.click(canvas, { clientX: 50, clientY: 30 });
     const input = screen.getByTestId('sketch-text-input') as HTMLInputElement;
@@ -203,7 +261,9 @@ describe('VideoSketchOverlay — text tool', () => {
 });
 
 describe('VideoSketchOverlay — eraser tool integration', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('eraser draws with destination-out composite operation', () => {
     renderOverlay();
@@ -222,13 +282,26 @@ describe('VideoSketchOverlay — eraser tool integration', () => {
       moveTo: vi.fn(),
       lineTo: vi.fn(),
       stroke: vi.fn(),
-      get globalCompositeOperation() { return operations[operations.length - 1] ?? 'source-over'; },
-      set globalCompositeOperation(v: string) { operations.push(v); },
+      get globalCompositeOperation() {
+        return operations[operations.length - 1] ?? 'source-over';
+      },
+      set globalCompositeOperation(v: string) {
+        operations.push(v);
+      },
     };
-    vi.spyOn(canvas, 'getContext').mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+    vi.spyOn(canvas, 'getContext').mockReturnValue(
+      ctx as unknown as CanvasRenderingContext2D
+    );
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-      left: 0, top: 0, width: 100, height: 100,
-      right: 100, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      right: 100,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
     } as DOMRect);
 
     // Draw a path with eraser
@@ -241,7 +314,9 @@ describe('VideoSketchOverlay — eraser tool integration', () => {
 });
 
 describe('VideoSketchOverlay — cancel resets tool and color', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('cancelling resets tool to freehand and color to default', () => {
     renderOverlay();
@@ -254,8 +329,13 @@ describe('VideoSketchOverlay — cancel resets tool and color', () => {
     // Re-activate
     fireEvent.click(screen.getByTestId('sketch-toggle-btn'));
 
-    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'true');
-    const repicker = screen.getByTestId('sketch-color-picker') as HTMLInputElement;
+    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    const repicker = screen.getByTestId(
+      'sketch-color-picker'
+    ) as HTMLInputElement;
     expect(repicker.value).toBe('#ef4444');
   });
 });

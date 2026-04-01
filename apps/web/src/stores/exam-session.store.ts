@@ -20,7 +20,7 @@ interface ExamSessionStore {
   setSession(
     sessionId: string,
     questions: ExamQuestion[],
-    timeRemaining: number,
+    timeRemaining: number
   ): void;
   setAnswer(itemId: string, answer: unknown): void;
   toggleFlag(itemId: string): void;

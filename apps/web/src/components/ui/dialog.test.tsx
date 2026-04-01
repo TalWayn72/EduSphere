@@ -44,7 +44,9 @@ describe('Dialog', () => {
 
   it('renders a close button with sr-only text', () => {
     renderDialog(true);
-    expect(screen.getByText('Close', { selector: '.sr-only' })).toBeInTheDocument();
+    expect(
+      screen.getByText('Close', { selector: '.sr-only' })
+    ).toBeInTheDocument();
   });
 
   it('renders the trigger button', () => {
@@ -59,7 +61,11 @@ describe('Dialog', () => {
 
 describe('DialogHeader', () => {
   it('renders children and forwards className', () => {
-    render(<DialogHeader className="mt-2" data-testid="hdr">Header</DialogHeader>);
+    render(
+      <DialogHeader className="mt-2" data-testid="hdr">
+        Header
+      </DialogHeader>
+    );
     const el = screen.getByTestId('hdr');
     expect(el).toHaveClass('mt-2');
     expect(el).toHaveTextContent('Header');
@@ -72,7 +78,11 @@ describe('DialogHeader', () => {
 
 describe('DialogFooter', () => {
   it('renders children and forwards className', () => {
-    render(<DialogFooter className="mt-4" data-testid="ftr">Footer</DialogFooter>);
+    render(
+      <DialogFooter className="mt-4" data-testid="ftr">
+        Footer
+      </DialogFooter>
+    );
     const el = screen.getByTestId('ftr');
     expect(el).toHaveClass('mt-4');
     expect(el).toHaveTextContent('Footer');

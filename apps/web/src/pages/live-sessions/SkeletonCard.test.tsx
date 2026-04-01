@@ -11,6 +11,8 @@ describe('SkeletonCard', () => {
 
   it('has animate-pulse class', () => {
     render(<SkeletonCard />);
-    expect(screen.getByTestId('session-skeleton').className).toContain('animate-pulse');
+    expect(screen.getByTestId('session-skeleton').className).toContain(
+      'animate-pulse'
+    );
   });
 });

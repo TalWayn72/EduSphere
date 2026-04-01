@@ -12,7 +12,13 @@ import { UsageMeter } from '@/components/admin/UsageMeter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuthRole } from '@/hooks/useAuthRole';
 
 const MY_TENANT_USAGE_QUERY = `
@@ -58,7 +64,9 @@ export function OrgUsagePage() {
   const [mounted, setMounted] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery<{ myTenantUsage: TenantUsage }>({
     query: MY_TENANT_USAGE_QUERY,
@@ -81,72 +89,114 @@ export function OrgUsagePage() {
           title="Usage & Seats"
           description="Your organization's yearly active user utilization"
         />
-      <div data-testid="org-usage-page">
-        {/* Year selector */}
-        <div className="flex items-center gap-3 mb-6">
-          <label htmlFor="year-select" className="text-sm font-medium">Year:</label>
-          <Select
-            value={String(selectedYear)}
-            onValueChange={(v) => setSelectedYear(Number(v))}
-          >
-            <SelectTrigger className="w-[120px]" data-testid="year-selector">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {YEAR_OPTIONS.map((y) => (
-                <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {fetching && (
-          <div className="space-y-4">
-            <Skeleton className="h-48 w-48 rounded-full mx-auto" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-20 rounded-lg" />
-              ))}
-            </div>
+        <div data-testid="org-usage-page">
+          {/* Year selector */}
+          <div className="flex items-center gap-3 mb-6">
+            <label htmlFor="year-select" className="text-sm font-medium">
+              Year:
+            </label>
+            <Select
+              value={String(selectedYear)}
+              onValueChange={(v) => setSelectedYear(Number(v))}
+            >
+              <SelectTrigger className="w-[120px]" data-testid="year-selector">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {YEAR_OPTIONS.map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        )}
 
-        {error && !fetching && (
-          <Card>
-            <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load usage data. Please try again later.
-            </CardContent>
-          </Card>
-        )}
-
-        {usage && !fetching && (
-          <>
-            {usage.overageUsers > 0 && (
-              <Card data-testid="overage-callout" className="mb-6 border-destructive bg-destructive/5">
-                <CardContent className="py-4 text-sm text-destructive font-medium">
-                  You have {usage.overageUsers} users over your {usage.seatLimit}-seat limit. Contact us to upgrade.
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-lg font-semibold">{usage.tenantName}</h2>
-              <Badge variant={PLAN_VARIANT[usage.plan] ?? 'outline'}>{usage.plan}</Badge>
+          {fetching && (
+            <div className="space-y-4">
+              <Skeleton className="h-48 w-48 rounded-full mx-auto" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-20 rounded-lg" />
+                ))}
+              </div>
             </div>
+          )}
 
-            <div className="flex justify-center mb-8">
-              <UsageMeter current={usage.yearlyActiveUsers} limit={usage.seatLimit} label="Yearly Active Users" />
-            </div>
+          {error && !fetching && (
+            <Card>
+              <CardContent className="py-8 text-center text-destructive text-sm">
+                Failed to load usage data. Please try again later.
+              </CardContent>
+            </Card>
+          )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card><CardContent className="pt-4"><p className="text-xs text-muted-foreground">YAU</p><p className="text-2xl font-bold">{usage.yearlyActiveUsers}</p></CardContent></Card>
-              <Card><CardContent className="pt-4"><p className="text-xs text-muted-foreground">Monthly Active</p><p className="text-2xl font-bold">{usage.monthlyActiveUsers}</p></CardContent></Card>
-              <Card><CardContent className="pt-4"><p className="text-xs text-muted-foreground">Seat Limit</p><p className="text-2xl font-bold">{usage.seatLimit}</p></CardContent></Card>
-              <Card><CardContent className="pt-4"><p className="text-xs text-muted-foreground">Utilization</p><p className="text-2xl font-bold">{usage.seatUtilizationPct}%</p></CardContent></Card>
-            </div>
-          </>
-        )}
-      </div>
+          {usage && !fetching && (
+            <>
+              {usage.overageUsers > 0 && (
+                <Card
+                  data-testid="overage-callout"
+                  className="mb-6 border-destructive bg-destructive/5"
+                >
+                  <CardContent className="py-4 text-sm text-destructive font-medium">
+                    You have {usage.overageUsers} users over your{' '}
+                    {usage.seatLimit}-seat limit. Contact us to upgrade.
+                  </CardContent>
+                </Card>
+              )}
+
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-lg font-semibold">{usage.tenantName}</h2>
+                <Badge variant={PLAN_VARIANT[usage.plan] ?? 'outline'}>
+                  {usage.plan}
+                </Badge>
+              </div>
+
+              <div className="flex justify-center mb-8">
+                <UsageMeter
+                  current={usage.yearlyActiveUsers}
+                  limit={usage.seatLimit}
+                  label="Yearly Active Users"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-4">
+                    <p className="text-xs text-muted-foreground">YAU</p>
+                    <p className="text-2xl font-bold">
+                      {usage.yearlyActiveUsers}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-4">
+                    <p className="text-xs text-muted-foreground">
+                      Monthly Active
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {usage.monthlyActiveUsers}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-4">
+                    <p className="text-xs text-muted-foreground">Seat Limit</p>
+                    <p className="text-2xl font-bold">{usage.seatLimit}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-4">
+                    <p className="text-xs text-muted-foreground">Utilization</p>
+                    <p className="text-2xl font-bold">
+                      {usage.seatUtilizationPct}%
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </div>
       </PageShell>
     </AdminLayout>
   );

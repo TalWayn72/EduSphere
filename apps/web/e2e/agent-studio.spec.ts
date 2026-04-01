@@ -48,10 +48,7 @@ async function setupGraphQLMocks(page: Page) {
     const op = body?.operationName ?? '';
 
     // createAgentWorkflow mutation
-    if (
-      q.includes('createAgentWorkflow') ||
-      op === 'CreateAgentWorkflow'
-    ) {
+    if (q.includes('createAgentWorkflow') || op === 'CreateAgentWorkflow') {
       workflowMutationCalled = true;
       return route.fulfill({
         status: 200,
@@ -76,16 +73,17 @@ async function setupGraphQLMocks(page: Page) {
  * Playwright does not drive dataTransfer in headless mode, so we dispatch
  * a synthetic DragEvent directly on the canvas element (same as pipeline spec).
  */
-async function dropNodeOnCanvas(
-  page: Page,
-  nodeType: string
-): Promise<void> {
+async function dropNodeOnCanvas(page: Page, nodeType: string): Promise<void> {
   const canvas = page.getByTestId('workflow-canvas');
   await canvas.evaluate((el, type) => {
     const dt = new DataTransfer();
     dt.setData('nodeType', type);
     el.dispatchEvent(
-      new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt })
+      new DragEvent('dragover', {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: dt,
+      })
     );
     el.dispatchEvent(
       new DragEvent('drop', {

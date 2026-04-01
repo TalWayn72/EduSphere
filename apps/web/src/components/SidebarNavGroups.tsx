@@ -76,18 +76,38 @@ const ANALYTICS_ITEMS: NavItem[] = [
 ];
 
 const TEACHING_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
-const ANALYTICS_ROLES = new Set(['INSTRUCTOR', 'RESEARCHER', 'MANAGER', 'ORG_ADMIN', 'SUPER_ADMIN']);
+const ANALYTICS_ROLES = new Set([
+  'INSTRUCTOR',
+  'RESEARCHER',
+  'MANAGER',
+  'ORG_ADMIN',
+  'SUPER_ADMIN',
+]);
 
 export const NAV_GROUPS: NavGroup[] = [
   { key: 'learning', headingKey: 'groupLearning', items: LEARNING_ITEMS },
   { key: 'social', headingKey: 'groupSocial', items: SOCIAL_ITEMS },
-  { key: 'teaching', headingKey: 'groupTeaching', items: TEACHING_ITEMS, allowedRoles: TEACHING_ROLES },
-  { key: 'analytics', headingKey: 'groupAnalytics', items: ANALYTICS_ITEMS, allowedRoles: ANALYTICS_ROLES },
+  {
+    key: 'teaching',
+    headingKey: 'groupTeaching',
+    items: TEACHING_ITEMS,
+    allowedRoles: TEACHING_ROLES,
+  },
+  {
+    key: 'analytics',
+    headingKey: 'groupAnalytics',
+    items: ANALYTICS_ITEMS,
+    allowedRoles: ANALYTICS_ROLES,
+  },
 ];
 
 export const SIDEBAR_KEY = 'edusphere-sidebar-collapsed';
 
-export function getInitials(firstName?: string, lastName?: string, username?: string): string {
+export function getInitials(
+  firstName?: string,
+  lastName?: string,
+  username?: string
+): string {
   const f = firstName?.[0] ?? '';
   const l = lastName?.[0] ?? '';
   return (f + l).toUpperCase() || (username?.[0] ?? 'U').toUpperCase();

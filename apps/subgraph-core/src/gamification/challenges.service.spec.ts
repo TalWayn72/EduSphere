@@ -51,7 +51,11 @@ describe('ChallengesService', () => {
       await service.getUserChallenges('user-abc', 'tenant-xyz');
       expect(withTenantContext).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ userId: 'user-abc', tenantId: 'tenant-xyz', userRole: 'STUDENT' }),
+        expect.objectContaining({
+          userId: 'user-abc',
+          tenantId: 'tenant-xyz',
+          userRole: 'STUDENT',
+        }),
         expect.any(Function)
       );
     });

@@ -43,7 +43,9 @@ export function computeXpProgress(totalXp: number): number {
   const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 100)) + 1);
   const levelStartXp = (level - 1) * (level - 1) * 100;
   const levelEndXp = level * level * 100;
-  return Math.round(((totalXp - levelStartXp) / (levelEndXp - levelStartXp)) * 100);
+  return Math.round(
+    ((totalXp - levelStartXp) / (levelEndXp - levelStartXp)) * 100
+  );
 }
 
 export function formatStreak(days: number): string {
@@ -93,7 +95,12 @@ export function GamificationScreen() {
             style={[styles.tab, activeTab === tab && styles.activeTab]}
             onPress={() => setActiveTab(tab)}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === tab && styles.activeTabText,
+              ]}
+            >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </Text>
           </TouchableOpacity>
@@ -105,8 +112,12 @@ export function GamificationScreen() {
         <View style={styles.section}>
           <View style={styles.card}>
             <Text style={styles.cardLabel}>🔥 Current Streak</Text>
-            <Text style={styles.bigNumber}>{formatStreak(stats?.currentStreak ?? 0)}</Text>
-            <Text style={styles.subText}>Longest: {formatStreak(stats?.longestStreak ?? 0)}</Text>
+            <Text style={styles.bigNumber}>
+              {formatStreak(stats?.currentStreak ?? 0)}
+            </Text>
+            <Text style={styles.subText}>
+              Longest: {formatStreak(stats?.longestStreak ?? 0)}
+            </Text>
           </View>
         </View>
       )}
@@ -118,7 +129,9 @@ export function GamificationScreen() {
           keyExtractor={(item) => item.challengeId}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No active challenges right now.</Text>
+            <Text style={styles.emptyText}>
+              No active challenges right now.
+            </Text>
           }
           renderItem={({ item }) => (
             <View style={[styles.card, item.completed && styles.completedCard]}>
@@ -131,11 +144,15 @@ export function GamificationScreen() {
                 <View
                   style={[
                     styles.progressBar,
-                    { width: `${Math.min(100, (item.currentValue / item.targetValue) * 100)}%` },
+                    {
+                      width: `${Math.min(100, (item.currentValue / item.targetValue) * 100)}%`,
+                    },
                   ]}
                 />
               </View>
-              <Text style={styles.subText}>{item.currentValue} / {item.targetValue}</Text>
+              <Text style={styles.subText}>
+                {item.currentValue} / {item.targetValue}
+              </Text>
             </View>
           )}
         />
@@ -153,7 +170,9 @@ export function GamificationScreen() {
           renderItem={({ item }) => (
             <View style={styles.leaderboardRow}>
               <Text style={styles.rank}>
-                {item.rank <= 3 ? (['🥇', '🥈', '🥉'] as const)[item.rank - 1] : `#${item.rank}`}
+                {item.rank <= 3
+                  ? (['🥇', '🥈', '🥉'] as const)[item.rank - 1]
+                  : `#${item.rank}`}
               </Text>
               <Text style={styles.memberName}>{item.displayName}</Text>
               <Text style={styles.levelBadge}>Lv.{item.level}</Text>
@@ -172,7 +191,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   title: { fontSize: 24, fontWeight: '700', padding: 16, color: '#1A1A2E' },
-  tabBar: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#E5E7EB', backgroundColor: '#FFF' },
+  tabBar: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#FFF',
+  },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
   activeTab: { borderBottomWidth: 2, borderBottomColor: '#6366F1' },
   tabText: { fontSize: 13, color: '#6B7280' },
@@ -189,10 +213,24 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   completedCard: { opacity: 0.6 },
-  cardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardLabel: { fontSize: 12, color: '#6B7280', fontWeight: '500', textTransform: 'uppercase' },
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+    textTransform: 'uppercase',
+  },
   cardTitle: { fontSize: 14, fontWeight: '600', flex: 1 },
-  bigNumber: { fontSize: 36, fontWeight: '800', color: '#F97316', marginTop: 4 },
+  bigNumber: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#F97316',
+    marginTop: 4,
+  },
   subText: { fontSize: 12, color: '#9CA3AF', marginTop: 4 },
   xpBadge: {
     backgroundColor: '#EEF2FF',
@@ -232,5 +270,11 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginRight: 8,
   },
-  xpText: { fontSize: 13, fontWeight: '700', color: '#6366F1', minWidth: 50, textAlign: 'right' },
+  xpText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#6366F1',
+    minWidth: 50,
+    textAlign: 'right',
+  },
 });

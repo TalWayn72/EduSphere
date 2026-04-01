@@ -30,7 +30,8 @@ const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -49,8 +50,9 @@ vi.mock('@edusphere/db', () => ({
     update: mockUpdate,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ insert: mockInsert, select: mockSelect, update: mockUpdate }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({ insert: mockInsert, select: mockSelect, update: mockUpdate })
   ),
   schema: {
     orgInvitations: {
@@ -107,14 +109,16 @@ describe('OrgInvitationService', () => {
     mockSelect.mockReturnValue(makeChain([]));
     // Default: insert returns new invitation
     mockInsert.mockReturnValue(
-      makeChain([{
-        id: 'inv-001',
-        email: VALID_INVITE.email,
-        role: VALID_INVITE.role,
-        token: 'tok-abc-123',
-        status: 'PENDING',
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      }]),
+      makeChain([
+        {
+          id: 'inv-001',
+          email: VALID_INVITE.email,
+          role: VALID_INVITE.role,
+          token: 'tok-abc-123',
+          status: 'PENDING',
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      ])
     );
 
     service = new OrgInvitationService();
@@ -155,12 +159,18 @@ describe('OrgInvitationService', () => {
   describe('role validation', () => {
     it('rejects SUPER_ADMIN role in invitation', async () => {
       await expect(
-        service.createInvitation(TENANT_CTX, { ...VALID_INVITE, role: 'SUPER_ADMIN' as never }),
+        service.createInvitation(TENANT_CTX, {
+          ...VALID_INVITE,
+          role: 'SUPER_ADMIN' as never,
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('accepts STUDENT role', async () => {
-      const result = await service.createInvitation(TENANT_CTX, { ...VALID_INVITE, role: 'STUDENT' as const });
+      const result = await service.createInvitation(TENANT_CTX, {
+        ...VALID_INVITE,
+        role: 'STUDENT' as const,
+      });
       expect(result).toBeDefined();
     });
 
@@ -170,7 +180,10 @@ describe('OrgInvitationService', () => {
     });
 
     it('accepts ORG_ADMIN role', async () => {
-      const result = await service.createInvitation(TENANT_CTX, { ...VALID_INVITE, role: 'ORG_ADMIN' as const });
+      const result = await service.createInvitation(TENANT_CTX, {
+        ...VALID_INVITE,
+        role: 'ORG_ADMIN' as const,
+      });
       expect(result).toBeDefined();
     });
   });
@@ -180,17 +193,21 @@ describe('OrgInvitationService', () => {
   describe('duplicate detection', () => {
     it('rejects duplicate pending invitation for same email', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'existing-inv', email: VALID_INVITE.email, status: 'PENDING' }]),
+        makeChain([
+          { id: 'existing-inv', email: VALID_INVITE.email, status: 'PENDING' },
+        ])
       );
 
       await expect(
-        service.createInvitation(TENANT_CTX, VALID_INVITE),
+        service.createInvitation(TENANT_CTX, VALID_INVITE)
       ).rejects.toThrow(ConflictException);
     });
 
     it('allows re-invite if previous invitation was expired', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'old-inv', email: VALID_INVITE.email, status: 'EXPIRED' }]),
+        makeChain([
+          { id: 'old-inv', email: VALID_INVITE.email, status: 'EXPIRED' },
+        ])
       );
 
       const result = await service.createInvitation(TENANT_CTX, VALID_INVITE);
@@ -203,13 +220,16 @@ describe('OrgInvitationService', () => {
   describe('email validation', () => {
     it('rejects invalid email format', async () => {
       await expect(
-        service.createInvitation(TENANT_CTX, { ...VALID_INVITE, email: 'not-an-email' }),
+        service.createInvitation(TENANT_CTX, {
+          ...VALID_INVITE,
+          email: 'not-an-email',
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
     it('rejects empty email', async () => {
       await expect(
-        service.createInvitation(TENANT_CTX, { ...VALID_INVITE, email: '' }),
+        service.createInvitation(TENANT_CTX, { ...VALID_INVITE, email: '' })
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -219,12 +239,14 @@ describe('OrgInvitationService', () => {
   describe('validateToken()', () => {
     it('returns invitation for valid token', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'inv-001',
-          token: 'valid-tok',
-          status: 'PENDING',
-          expiresAt: new Date(Date.now() + 86400000),
-        }]),
+        makeChain([
+          {
+            id: 'inv-001',
+            token: 'valid-tok',
+            status: 'PENDING',
+            expiresAt: new Date(Date.now() + 86400000),
+          },
+        ])
       );
 
       const result = await service.validateToken('valid-tok');
@@ -234,40 +256,44 @@ describe('OrgInvitationService', () => {
 
     it('rejects expired token', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'inv-expired',
-          token: 'expired-tok',
-          status: 'PENDING',
-          expiresAt: new Date(Date.now() - 86400000), // 1 day ago
-        }]),
+        makeChain([
+          {
+            id: 'inv-expired',
+            token: 'expired-tok',
+            status: 'PENDING',
+            expiresAt: new Date(Date.now() - 86400000), // 1 day ago
+          },
+        ])
       );
 
-      await expect(
-        service.validateToken('expired-tok'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.validateToken('expired-tok')).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('rejects token not found', async () => {
       mockSelect.mockReturnValue(makeChain([]));
 
-      await expect(
-        service.validateToken('nonexistent-tok'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.validateToken('nonexistent-tok')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('rejects already accepted invitation token', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'inv-accepted',
-          token: 'used-tok',
-          status: 'ACCEPTED',
-          expiresAt: new Date(Date.now() + 86400000),
-        }]),
+        makeChain([
+          {
+            id: 'inv-accepted',
+            token: 'used-tok',
+            status: 'ACCEPTED',
+            expiresAt: new Date(Date.now() + 86400000),
+          },
+        ])
       );
 
-      await expect(
-        service.validateToken('used-tok'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.validateToken('used-tok')).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -276,18 +302,22 @@ describe('OrgInvitationService', () => {
   describe('acceptInvitation()', () => {
     it('updates invitation status to ACCEPTED', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'inv-001',
-          token: 'valid-tok',
-          email: 'user@acme.edu',
-          role: 'STUDENT',
-          tenantId: 'tenant-001',
-          status: 'PENDING',
-          expiresAt: new Date(Date.now() + 86400000),
-        }]),
+        makeChain([
+          {
+            id: 'inv-001',
+            token: 'valid-tok',
+            email: 'user@acme.edu',
+            role: 'STUDENT',
+            tenantId: 'tenant-001',
+            status: 'PENDING',
+            expiresAt: new Date(Date.now() + 86400000),
+          },
+        ])
       );
 
-      await service.acceptInvitation('valid-tok', { password: 'SecurePass123!' });
+      await service.acceptInvitation('valid-tok', {
+        password: 'SecurePass123!',
+      });
       expect(mockUpdate).toHaveBeenCalled();
     });
   });
@@ -305,12 +335,17 @@ describe('OrgInvitationService', () => {
     it('rejects batch over 100 emails', async () => {
       const emails = Array.from({ length: 101 }, (_, i) => `user${i}@acme.edu`);
       await expect(
-        service.bulkInvite(TENANT_CTX, emails, 'STUDENT'),
+        service.bulkInvite(TENANT_CTX, emails, 'STUDENT')
       ).rejects.toThrow(BadRequestException);
     });
 
     it('reports invalid emails separately from valid ones', async () => {
-      const emails = ['valid@acme.edu', 'not-an-email', 'also-invalid', 'ok@test.com'];
+      const emails = [
+        'valid@acme.edu',
+        'not-an-email',
+        'also-invalid',
+        'ok@test.com',
+      ];
       const result = await service.bulkInvite(TENANT_CTX, emails, 'STUDENT');
       expect(result.failed).toBeGreaterThan(0);
       expect(result.sent).toBeLessThanOrEqual(2);
@@ -328,7 +363,7 @@ describe('OrgInvitationService', () => {
         .mockReturnValueOnce(makeChain([{ count: 500 }])); // current count
 
       await expect(
-        service.createInvitation(TENANT_CTX, VALID_INVITE),
+        service.createInvitation(TENANT_CTX, VALID_INVITE)
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -338,12 +373,14 @@ describe('OrgInvitationService', () => {
   describe('resendInvitation()', () => {
     it('refreshes expiry date on resend', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'inv-001',
-          email: VALID_INVITE.email,
-          status: 'PENDING',
-          expiresAt: new Date(Date.now() + 86400000),
-        }]),
+        makeChain([
+          {
+            id: 'inv-001',
+            email: VALID_INVITE.email,
+            status: 'PENDING',
+            expiresAt: new Date(Date.now() + 86400000),
+          },
+        ])
       );
 
       await service.resendInvitation(TENANT_CTX, 'inv-001');
@@ -352,11 +389,11 @@ describe('OrgInvitationService', () => {
 
     it('rejects resend for accepted invitation', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'inv-001', status: 'ACCEPTED' }]),
+        makeChain([{ id: 'inv-001', status: 'ACCEPTED' }])
       );
 
       await expect(
-        service.resendInvitation(TENANT_CTX, 'inv-001'),
+        service.resendInvitation(TENANT_CTX, 'inv-001')
       ).rejects.toThrow(BadRequestException);
     });
   });

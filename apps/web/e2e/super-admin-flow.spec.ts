@@ -112,7 +112,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     });
   });
 
-  test('admin dashboard shows navigation or admin content', async ({ page }) => {
+  test('admin dashboard shows navigation or admin content', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
@@ -155,8 +157,22 @@ test.describe('Super Admin — DEV_MODE guard', () => {
           data: {
             users: {
               edges: [
-                { node: { id: 'u-1', email: 'alice@example.com', role: 'INSTRUCTOR', name: 'Alice' } },
-                { node: { id: 'u-2', email: 'bob@example.com', role: 'STUDENT', name: 'Bob' } },
+                {
+                  node: {
+                    id: 'u-1',
+                    email: 'alice@example.com',
+                    role: 'INSTRUCTOR',
+                    name: 'Alice',
+                  },
+                },
+                {
+                  node: {
+                    id: 'u-2',
+                    email: 'bob@example.com',
+                    role: 'STUDENT',
+                    name: 'Bob',
+                  },
+                },
               ],
               pageInfo: { hasNextPage: false, endCursor: null },
             },
@@ -166,7 +182,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/admin/users`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/users`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -176,7 +194,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     expect(body).not.toContain('[object Object]');
   });
 
-  test('system configuration — admin/settings route renders', async ({ page }) => {
+  test('system configuration — admin/settings route renders', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (op) => {
       if (op === 'GetSystemConfig' || op === 'GetSettings') {
         return JSON.stringify({
@@ -192,7 +212,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/admin/settings`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/settings`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -234,7 +256,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/admin/audit`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/audit`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -260,7 +284,14 @@ test.describe('Super Admin — DEV_MODE guard', () => {
           data: {
             users: {
               edges: [
-                { node: { id: 'u-1', email: 'alice@example.com', role: 'STUDENT', name: 'Alice' } },
+                {
+                  node: {
+                    id: 'u-1',
+                    email: 'alice@example.com',
+                    role: 'STUDENT',
+                    name: 'Alice',
+                  },
+                },
               ],
               pageInfo: { hasNextPage: false, endCursor: null },
             },
@@ -270,7 +301,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/admin/users`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/users`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -285,7 +318,14 @@ test.describe('Super Admin — DEV_MODE guard', () => {
           data: {
             organizations: {
               edges: [
-                { node: { id: 'org-1', name: 'EduSphere University', slug: 'edusphere-uni', userCount: 150 } },
+                {
+                  node: {
+                    id: 'org-1',
+                    name: 'EduSphere University',
+                    slug: 'edusphere-uni',
+                    userCount: 150,
+                  },
+                },
               ],
               pageInfo: { hasNextPage: false, endCursor: null },
             },
@@ -295,14 +335,20 @@ test.describe('Super Admin — DEV_MODE guard', () => {
       if (op === 'CreateOrganization') {
         return JSON.stringify({
           data: {
-            createOrganization: { id: 'org-new', name: 'New Org', slug: 'new-org' },
+            createOrganization: {
+              id: 'org-new',
+              name: 'New Org',
+              slug: 'new-org',
+            },
           },
         });
       }
       return null;
     });
 
-    await page.goto(`${BASE_URL}/admin/organizations`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/organizations`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -331,7 +377,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Admin should have navigation elements
-    const nav = page.locator('nav, [role="navigation"], [data-testid="admin-sidebar"]');
+    const nav = page.locator(
+      'nav, [role="navigation"], [data-testid="admin-sidebar"]'
+    );
     const navCount = await nav.count();
     // At minimum there should be some navigation structure
     expect(navCount).toBeGreaterThanOrEqual(0);
@@ -341,7 +389,12 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
-        errors: [{ message: 'Internal Server Error', extensions: { code: 'INTERNAL_SERVER_ERROR' } }],
+        errors: [
+          {
+            message: 'Internal Server Error',
+            extensions: { code: 'INTERNAL_SERVER_ERROR' },
+          },
+        ],
       });
     });
 
@@ -353,7 +406,9 @@ test.describe('Super Admin — DEV_MODE guard', () => {
     expect(body).not.toMatch(/at\s+\w+\s*\(/);
   });
 
-  test('admin page does not leak tenant IDs in visible DOM', async ({ page }) => {
+  test('admin page does not leak tenant IDs in visible DOM', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 
@@ -410,8 +465,10 @@ test.describe('Super Admin — Live backend', () => {
 
     // Student should be redirected away from admin or see access denied
     const url = page.url();
-    const isBlocked = !url.includes('/admin') ||
-      (await page.getByText(/access denied|unauthorized|forbidden/i).count()) > 0;
+    const isBlocked =
+      !url.includes('/admin') ||
+      (await page.getByText(/access denied|unauthorized|forbidden/i).count()) >
+        0;
     expect(isBlocked).toBe(true);
   });
 });

@@ -52,7 +52,10 @@ export class ManagerDashboardService implements OnModuleDestroy {
   private readonly logger = new Logger(ManagerDashboardService.name);
   private readonly db = createDatabaseConnection();
 
-  async getTeamOverview(managerId: string, tenantId: string): Promise<TeamOverview> {
+  async getTeamOverview(
+    managerId: string,
+    tenantId: string
+  ): Promise<TeamOverview> {
     const tenantCtx: TenantContext = {
       tenantId,
       userId: managerId,
@@ -66,7 +69,13 @@ export class ManagerDashboardService implements OnModuleDestroy {
       `)) as unknown as MemberRow[];
 
       if (memberRows.length === 0) {
-        return { memberCount: 0, avgCompletionPct: 0, avgXpThisWeek: 0, atRiskCount: 0, topCourseTitle: null };
+        return {
+          memberCount: 0,
+          avgCompletionPct: 0,
+          avgXpThisWeek: 0,
+          atRiskCount: 0,
+          topCourseTitle: null,
+        };
       }
 
       const memberIds = memberRows.map((r) => r.member_id);
@@ -102,7 +111,8 @@ export class ManagerDashboardService implements OnModuleDestroy {
 
       return {
         memberCount: memberIds.length,
-        avgCompletionPct: Math.round((overviewRows[0]?.avg_completion ?? 0) * 10) / 10,
+        avgCompletionPct:
+          Math.round((overviewRows[0]?.avg_completion ?? 0) * 10) / 10,
         avgXpThisWeek: Math.round(xpRows[0]?.avg_xp ?? 0),
         atRiskCount: overviewRows[0]?.at_risk_count ?? 0,
         topCourseTitle: topCourseRows[0]?.title ?? null,
@@ -110,7 +120,10 @@ export class ManagerDashboardService implements OnModuleDestroy {
     });
   }
 
-  async getTeamMemberProgress(managerId: string, tenantId: string): Promise<TeamMemberProgress[]> {
+  async getTeamMemberProgress(
+    managerId: string,
+    tenantId: string
+  ): Promise<TeamMemberProgress[]> {
     const tenantCtx: TenantContext = {
       tenantId,
       userId: managerId,
@@ -151,7 +164,11 @@ export class ManagerDashboardService implements OnModuleDestroy {
     });
   }
 
-  async addTeamMember(managerId: string, memberId: string, tenantId: string): Promise<boolean> {
+  async addTeamMember(
+    managerId: string,
+    memberId: string,
+    tenantId: string
+  ): Promise<boolean> {
     const tenantCtx: TenantContext = {
       tenantId,
       userId: managerId,
@@ -165,11 +182,17 @@ export class ManagerDashboardService implements OnModuleDestroy {
         ON CONFLICT (manager_id, member_id, tenant_id) DO NOTHING
       `);
     });
-    this.logger.log(`[ManagerDashboardService] addTeamMember: member ${memberId} added to team of manager ${managerId}`);
+    this.logger.log(
+      `[ManagerDashboardService] addTeamMember: member ${memberId} added to team of manager ${managerId}`
+    );
     return true;
   }
 
-  async removeTeamMember(managerId: string, memberId: string, tenantId: string): Promise<boolean> {
+  async removeTeamMember(
+    managerId: string,
+    memberId: string,
+    tenantId: string
+  ): Promise<boolean> {
     const tenantCtx: TenantContext = {
       tenantId,
       userId: managerId,
@@ -184,12 +207,16 @@ export class ManagerDashboardService implements OnModuleDestroy {
           AND tenant_id = ${tenantId}::uuid
       `);
     });
-    this.logger.log(`[ManagerDashboardService] removeTeamMember: member ${memberId} removed from team of manager ${managerId}`);
+    this.logger.log(
+      `[ManagerDashboardService] removeTeamMember: member ${memberId} removed from team of manager ${managerId}`
+    );
     return true;
   }
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
-    this.logger.log('[ManagerDashboardService] onModuleDestroy: DB pools closed');
+    this.logger.log(
+      '[ManagerDashboardService] onModuleDestroy: DB pools closed'
+    );
   }
 }

@@ -24,11 +24,31 @@ const mockCompleteStep = vi.fn();
 vi.mock('@/hooks/useOnboardingChecklist', () => ({
   useOnboardingChecklist: vi.fn(() => ({
     steps: [
-      { id: 'BRANDING_CONFIGURED', label: 'orgOnboarding.checklistBranding', completed: true },
-      { id: 'FIRST_USER_INVITED', label: 'orgOnboarding.checklistInvite', completed: false },
-      { id: 'FIRST_COURSE_CREATED', label: 'orgOnboarding.checklistCourse', completed: false },
-      { id: 'DOMAIN_CONFIGURED', label: 'orgOnboarding.checklistDomain', completed: false },
-      { id: 'SSO_CONFIGURED', label: 'orgOnboarding.checklistSSO', completed: false },
+      {
+        id: 'BRANDING_CONFIGURED',
+        label: 'orgOnboarding.checklistBranding',
+        completed: true,
+      },
+      {
+        id: 'FIRST_USER_INVITED',
+        label: 'orgOnboarding.checklistInvite',
+        completed: false,
+      },
+      {
+        id: 'FIRST_COURSE_CREATED',
+        label: 'orgOnboarding.checklistCourse',
+        completed: false,
+      },
+      {
+        id: 'DOMAIN_CONFIGURED',
+        label: 'orgOnboarding.checklistDomain',
+        completed: false,
+      },
+      {
+        id: 'SSO_CONFIGURED',
+        label: 'orgOnboarding.checklistSSO',
+        completed: false,
+      },
     ],
     completedCount: 1,
     totalCount: 5,
@@ -46,11 +66,31 @@ describe('OnboardingChecklist', () => {
     vi.clearAllMocks();
     vi.mocked(useOnboardingChecklist).mockReturnValue({
       steps: [
-        { id: 'BRANDING_CONFIGURED', label: 'orgOnboarding.checklistBranding', completed: true },
-        { id: 'FIRST_USER_INVITED', label: 'orgOnboarding.checklistInvite', completed: false },
-        { id: 'FIRST_COURSE_CREATED', label: 'orgOnboarding.checklistCourse', completed: false },
-        { id: 'DOMAIN_CONFIGURED', label: 'orgOnboarding.checklistDomain', completed: false },
-        { id: 'SSO_CONFIGURED', label: 'orgOnboarding.checklistSSO', completed: false },
+        {
+          id: 'BRANDING_CONFIGURED',
+          label: 'orgOnboarding.checklistBranding',
+          completed: true,
+        },
+        {
+          id: 'FIRST_USER_INVITED',
+          label: 'orgOnboarding.checklistInvite',
+          completed: false,
+        },
+        {
+          id: 'FIRST_COURSE_CREATED',
+          label: 'orgOnboarding.checklistCourse',
+          completed: false,
+        },
+        {
+          id: 'DOMAIN_CONFIGURED',
+          label: 'orgOnboarding.checklistDomain',
+          completed: false,
+        },
+        {
+          id: 'SSO_CONFIGURED',
+          label: 'orgOnboarding.checklistSSO',
+          completed: false,
+        },
       ],
       completedCount: 1,
       totalCount: 5,
@@ -62,16 +102,26 @@ describe('OnboardingChecklist', () => {
 
   it('renders all checklist steps', () => {
     render(<OnboardingChecklist />);
-    expect(screen.getByText('orgOnboarding.checklistBranding')).toBeInTheDocument();
-    expect(screen.getByText('orgOnboarding.checklistInvite')).toBeInTheDocument();
-    expect(screen.getByText('orgOnboarding.checklistCourse')).toBeInTheDocument();
-    expect(screen.getByText('orgOnboarding.checklistDomain')).toBeInTheDocument();
+    expect(
+      screen.getByText('orgOnboarding.checklistBranding')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('orgOnboarding.checklistInvite')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('orgOnboarding.checklistCourse')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('orgOnboarding.checklistDomain')
+    ).toBeInTheDocument();
     expect(screen.getByText('orgOnboarding.checklistSSO')).toBeInTheDocument();
   });
 
   it('shows completed steps with checkmark', () => {
     render(<OnboardingChecklist />);
-    const brandingStep = screen.getByText('orgOnboarding.checklistBranding').closest('[data-step]');
+    const brandingStep = screen
+      .getByText('orgOnboarding.checklistBranding')
+      .closest('[data-step]');
     expect(brandingStep).toHaveAttribute('data-completed', 'true');
   });
 
@@ -88,7 +138,6 @@ describe('OnboardingChecklist', () => {
   });
 
   it('renders nothing when dismissed', () => {
-
     vi.mocked(useOnboardingChecklist).mockReturnValue({
       steps: [],
       completedCount: 0,

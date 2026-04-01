@@ -3,15 +3,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () =>
-  new Proxy({} as Record<string, unknown>, {
-    get: (_, name) => {
-      if (name === '__esModule') return true;
-      return function MockIcon(props: Record<string, unknown>) {
-        return <span data-testid={`icon-${String(name)}`} {...props} />;
-      };
-    },
-  })
+vi.mock(
+  'lucide-react',
+  () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_, name) => {
+        if (name === '__esModule') return true;
+        return function MockIcon(props: Record<string, unknown>) {
+          return <span data-testid={`icon-${String(name)}`} {...props} />;
+        };
+      },
+    })
 );
 
 // Mock Logo — it has its own tests
@@ -26,7 +28,10 @@ vi.mock('@/components/Logo', () => ({
 // Import after mocks
 import { PublicNav } from './PublicNav';
 
-function renderNav(props: Record<string, unknown> = {}, initialEntries = ['/']) {
+function renderNav(
+  props: Record<string, unknown> = {},
+  initialEntries = ['/']
+) {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <PublicNav {...props} />
@@ -130,7 +135,9 @@ describe('PublicNav', () => {
         const nav = screen.getByTestId('public-nav');
         // Desktop nav links (hidden on mobile, but in DOM)
         for (const hash of anchorHashes) {
-          const links = nav.querySelectorAll<HTMLAnchorElement>(`a[href="${hash}"]`);
+          const links = nav.querySelectorAll<HTMLAnchorElement>(
+            `a[href="${hash}"]`
+          );
           expect(links.length).toBeGreaterThanOrEqual(1);
         }
       });
@@ -197,14 +204,18 @@ describe('PublicNav', () => {
         // After menu opens, mobile links appear in the DOM
         const featuresLink = screen.getAllByText('Features');
         // At least one should have href="#features" (mobile)
-        const hrefs = featuresLink.map((el) => el.closest('a')?.getAttribute('href'));
+        const hrefs = featuresLink.map((el) =>
+          el.closest('a')?.getAttribute('href')
+        );
         expect(hrefs).toContain('#features');
       });
 
       it('on non-landing page, mobile anchor links are prefixed with /landing', () => {
         openMobileMenu('/about');
         const featuresLink = screen.getAllByText('Features');
-        const hrefs = featuresLink.map((el) => el.closest('a')?.getAttribute('href'));
+        const hrefs = featuresLink.map((el) =>
+          el.closest('a')?.getAttribute('href')
+        );
         expect(hrefs).toContain('/landing#features');
         expect(hrefs).not.toContain('#features');
       });
@@ -286,8 +297,8 @@ describe('PublicNav', () => {
       // Should appear at least twice: desktop + mobile
       expect(pilotElements.length).toBeGreaterThanOrEqual(2);
       // Mobile pilot link should have anchor href
-      const mobileHrefs = pilotElements.map(
-        (el) => el.closest('a')?.getAttribute('href')
+      const mobileHrefs = pilotElements.map((el) =>
+        el.closest('a')?.getAttribute('href')
       );
       expect(mobileHrefs).toContain('#pilot-cta');
     });

@@ -15,7 +15,7 @@ export class AtRiskService implements OnModuleDestroy {
 
   constructor(
     private readonly detection: AtRiskDetectionService,
-    private readonly flags: AtRiskFlagService,
+    private readonly flags: AtRiskFlagService
   ) {}
 
   async onModuleDestroy(): Promise<void> {

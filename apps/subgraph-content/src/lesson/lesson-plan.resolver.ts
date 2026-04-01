@@ -36,10 +36,7 @@ export class LessonPlanResolver {
   constructor(private readonly svc: LessonPlanService) {}
 
   @Query('courseLessonPlan')
-  async courseLessonPlan(
-    @Args('id') id: string,
-    @Context() ctx: GqlContext
-  ) {
+  async courseLessonPlan(@Args('id') id: string, @Context() ctx: GqlContext) {
     return this.svc.getPlan(id, requireAuth(ctx));
   }
 
@@ -82,10 +79,7 @@ export class LessonPlanResolver {
   }
 
   @Mutation('publishLessonPlan')
-  async publishLessonPlan(
-    @Args('id') id: string,
-    @Context() ctx: GqlContext
-  ) {
+  async publishLessonPlan(@Args('id') id: string, @Context() ctx: GqlContext) {
     return this.svc.publishPlan(id, requireAuth(ctx));
   }
 }

@@ -37,7 +37,7 @@ const WHISPER_URL = process.env['WHISPER_URL'] ?? 'http://localhost:3200';
  * Returns the parsed body or null if the server is not reachable.
  */
 async function tryWhisperHealth(
-  requestContext: APIRequestContext,
+  requestContext: APIRequestContext
 ): Promise<WhisperHealthResponse | null> {
   try {
     const response = await requestContext.get(`${WHISPER_URL}/health`, {

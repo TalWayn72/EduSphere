@@ -121,7 +121,9 @@ export class PilotService implements OnModuleDestroy {
       .returning();
 
     if (!created) {
-      throw new InternalServerErrorException('[PilotService] Failed to insert pilot_request row');
+      throw new InternalServerErrorException(
+        '[PilotService] Failed to insert pilot_request row'
+      );
     }
 
     this.publish(SUBJ_SUBMITTED, {
@@ -140,11 +142,23 @@ export class PilotService implements OnModuleDestroy {
   }
 
   // Delegation methods — forwarded to PilotApprovalService
-  async approvePilotRequest(requestId: string, approvedByUserId: string, ctx: TenantContext) {
-    return this.approvalService.approvePilotRequest(requestId, approvedByUserId, ctx);
+  async approvePilotRequest(
+    requestId: string,
+    approvedByUserId: string,
+    ctx: TenantContext
+  ) {
+    return this.approvalService.approvePilotRequest(
+      requestId,
+      approvedByUserId,
+      ctx
+    );
   }
 
-  async rejectPilotRequest(requestId: string, reason: string | undefined, ctx: TenantContext) {
+  async rejectPilotRequest(
+    requestId: string,
+    reason: string | undefined,
+    ctx: TenantContext
+  ) {
     return this.approvalService.rejectPilotRequest(requestId, reason, ctx);
   }
 

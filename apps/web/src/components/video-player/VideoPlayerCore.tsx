@@ -29,7 +29,13 @@ export function VideoPlayerCore({
   onDurationChange,
   subtitleTracks = [],
 }: VideoPlayerCoreProps) {
-  const player = useVideoPlayer({ src, hlsSrc, seekTo, onTimeUpdate, onDurationChange });
+  const player = useVideoPlayer({
+    src,
+    hlsSrc,
+    seekTo,
+    onTimeUpdate,
+    onDurationChange,
+  });
 
   return (
     <div
@@ -51,7 +57,7 @@ export function VideoPlayerCore({
         className={cn(
           'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent',
           'p-3 transition-opacity duration-200',
-          player.isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100',
+          player.isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
         )}
       >
         {/* Seek bar */}
@@ -66,7 +72,9 @@ export function VideoPlayerCore({
         >
           <div
             className="h-full bg-primary rounded-full"
-            style={{ width: `${player.duration ? (player.currentTime / player.duration) * 100 : 0}%` }}
+            style={{
+              width: `${player.duration ? (player.currentTime / player.duration) * 100 : 0}%`,
+            }}
           />
           {bookmarks.map((bm) => (
             <div
@@ -79,7 +87,8 @@ export function VideoPlayerCore({
               title={bm.label}
               onClick={(e) => {
                 e.stopPropagation();
-                if (player.videoRef.current) player.videoRef.current.currentTime = bm.timestamp;
+                if (player.videoRef.current)
+                  player.videoRef.current.currentTime = bm.timestamp;
               }}
             />
           ))}

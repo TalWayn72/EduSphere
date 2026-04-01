@@ -42,7 +42,8 @@ function singleBadgeResponse() {
           id: 'assertion-001',
           badgeDefinitionId: 'def-001',
           badgeName: 'Course Completion Hero',
-          badgeDescription: 'Awarded for completing the full EduSphere onboarding.',
+          badgeDescription:
+            'Awarded for completing the full EduSphere onboarding.',
           imageUrl: null,
           recipientId: 'user-001',
           issuedAt: '2025-09-01T10:00:00.000Z',
@@ -236,7 +237,9 @@ test.describe('My Open Badges', () => {
     });
 
     // The "Revoked" status pill must be present (exact: true to avoid matching description text)
-    await expect(page.getByText('Revoked', { exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Revoked', { exact: true })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   // 5. Valid badge shows "Valid" status label (not revoked)
@@ -300,7 +303,9 @@ test.describe('My Open Badges', () => {
             revokedReason: null,
             verifyUrl: 'https://edusphere.io/verify/assertion-010',
             shareUrl: 'https://edusphere.io/share/assertion-010',
-            vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
+            vcDocument: JSON.stringify({
+              '@context': 'https://w3id.org/openbadges/v3',
+            }),
           },
           {
             __typename: 'OpenBadgeAssertion',
@@ -318,7 +323,9 @@ test.describe('My Open Badges', () => {
             revokedReason: null,
             verifyUrl: 'https://edusphere.io/verify/assertion-011',
             shareUrl: 'https://edusphere.io/share/assertion-011',
-            vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
+            vcDocument: JSON.stringify({
+              '@context': 'https://w3id.org/openbadges/v3',
+            }),
           },
           {
             __typename: 'OpenBadgeAssertion',
@@ -336,7 +343,9 @@ test.describe('My Open Badges', () => {
             revokedReason: null,
             verifyUrl: 'https://edusphere.io/verify/assertion-012',
             shareUrl: 'https://edusphere.io/share/assertion-012',
-            vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
+            vcDocument: JSON.stringify({
+              '@context': 'https://w3id.org/openbadges/v3',
+            }),
           },
         ],
       },
@@ -345,9 +354,15 @@ test.describe('My Open Badges', () => {
     await gotoMyBadges(page, multiBadgeResponse);
 
     // All three badge names should be visible
-    await expect(page.getByText('Fast Learner')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Peer Reviewer')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Knowledge Explorer')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Fast Learner')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByText('Peer Reviewer')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByText('Knowledge Explorer')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   // 8. Badge detail modal opens on badge click
@@ -362,8 +377,14 @@ test.describe('My Open Badges', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Look for a modal/dialog or expanded detail view
-    const modal = page.locator('[role="dialog"], [data-testid*="badge-detail"], [data-testid*="modal"]').first();
-    const detailText = page.getByText(/description|criteria|issued|awarded/i).first();
+    const modal = page
+      .locator(
+        '[role="dialog"], [data-testid*="badge-detail"], [data-testid*="modal"]'
+      )
+      .first();
+    const detailText = page
+      .getByText(/description|criteria|issued|awarded/i)
+      .first();
     const modalVisible = await modal.isVisible().catch(() => false);
     const detailVisible = await detailText.isVisible().catch(() => false);
 
@@ -380,9 +401,11 @@ test.describe('My Open Badges', () => {
     });
 
     // Look for a share button
-    const shareBtn = page.locator(
-      'button[aria-label*="share" i], button:has-text("Share"), [data-testid*="share"]'
-    ).first();
+    const shareBtn = page
+      .locator(
+        'button[aria-label*="share" i], button:has-text("Share"), [data-testid*="share"]'
+      )
+      .first();
     const shareExists = await shareBtn.isVisible().catch(() => false);
 
     if (shareExists) {
@@ -390,16 +413,20 @@ test.describe('My Open Badges', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for copy link option
-      const copyLink = page.locator(
-        'button:has-text("Copy"), button[aria-label*="copy" i], [data-testid*="copy"]'
-      ).first();
+      const copyLink = page
+        .locator(
+          'button:has-text("Copy"), button[aria-label*="copy" i], [data-testid*="copy"]'
+        )
+        .first();
       const copyExists = await copyLink.isVisible().catch(() => false);
       expect(copyExists).toBe(true);
     }
   });
 
   // 10. Verify badge — W3C VC verification status
-  test('badge card shows W3C Verifiable Credential indicator', async ({ page }) => {
+  test('badge card shows W3C Verifiable Credential indicator', async ({
+    page,
+  }) => {
     await gotoMyBadges(page, singleBadgeResponse());
 
     await expect(page.getByText('Course Completion Hero')).toBeVisible({
@@ -407,12 +434,16 @@ test.describe('My Open Badges', () => {
     });
 
     // Look for verification-related text or icon
-    const verifyIndicator = page.locator(
-      '[data-testid*="verify"], [data-testid*="credential"], [aria-label*="verified" i]'
-    ).first();
+    const verifyIndicator = page
+      .locator(
+        '[data-testid*="verify"], [data-testid*="credential"], [aria-label*="verified" i]'
+      )
+      .first();
     const verifyText = page.getByText(/verified|credential|W3C/i).first();
 
-    const indicatorExists = await verifyIndicator.isVisible().catch(() => false);
+    const indicatorExists = await verifyIndicator
+      .isVisible()
+      .catch(() => false);
     const textExists = await verifyText.isVisible().catch(() => false);
 
     // W3C VC badge should have some verification indicator
@@ -444,7 +475,9 @@ test.describe('My Open Badges', () => {
   });
 
   // 12. Earned vs locked badge visual distinction
-  test('earned badge has distinct visual styling from revoked', async ({ page }) => {
+  test('earned badge has distinct visual styling from revoked', async ({
+    page,
+  }) => {
     // Load a response with both valid and revoked badges
     const mixedResponse = {
       data: {
@@ -458,16 +491,26 @@ test.describe('My Open Badges', () => {
     await gotoMyBadges(page, mixedResponse);
 
     // Both badges should be visible
-    await expect(page.getByText('Course Completion Hero')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Advanced Scholar')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Course Completion Hero')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByText('Advanced Scholar')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // The valid badge shows "Valid" and revoked shows "Revoked"
-    await expect(page.getByText('Valid', { exact: true })).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Revoked', { exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Valid', { exact: true })).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByText('Revoked', { exact: true })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   // 13. Progress toward next badge (if applicable)
-  test('page renders without crash when badges have mixed states', async ({ page }) => {
+  test('page renders without crash when badges have mixed states', async ({
+    page,
+  }) => {
     const mixedResponse = {
       data: {
         myOpenBadges: [
@@ -491,7 +534,9 @@ test.describe('My Open Badges', () => {
   });
 
   // 14. Visual regression — badges grid
-  test('visual regression — badges grid with multiple badges', async ({ page }) => {
+  test('visual regression — badges grid with multiple badges', async ({
+    page,
+  }) => {
     const multiBadgeResponse = {
       data: {
         myOpenBadges: [
@@ -512,21 +557,31 @@ test.describe('My Open Badges', () => {
         return;
       }
       let operationName = '';
-      try { operationName = route.request().postDataJSON()?.operationName ?? ''; } catch { /* ignore */ }
+      try {
+        operationName = route.request().postDataJSON()?.operationName ?? '';
+      } catch {
+        /* ignore */
+      }
       if (operationName === 'MyOpenBadges') {
         await route.fulfill({
-          status: 200, contentType: 'application/json',
-          headers: CORS_HEADERS, body: JSON.stringify(multiBadgeResponse),
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify(multiBadgeResponse),
         });
       } else if (DEFAULT_RESPONSES[operationName]) {
         await route.fulfill({
-          status: 200, contentType: 'application/json',
-          headers: CORS_HEADERS, body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
         });
       } else {
         await route.fulfill({
-          status: 200, contentType: 'application/json',
-          headers: CORS_HEADERS, body: JSON.stringify({ data: {} }),
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify({ data: {} }),
         });
       }
     });
@@ -555,21 +610,31 @@ test.describe('My Open Badges', () => {
         return;
       }
       let operationName = '';
-      try { operationName = route.request().postDataJSON()?.operationName ?? ''; } catch { /* ignore */ }
+      try {
+        operationName = route.request().postDataJSON()?.operationName ?? '';
+      } catch {
+        /* ignore */
+      }
       if (operationName === 'MyOpenBadges') {
         await route.fulfill({
-          status: 200, contentType: 'application/json',
-          headers: CORS_HEADERS, body: JSON.stringify(emptyBadgesResponse()),
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify(emptyBadgesResponse()),
         });
       } else if (DEFAULT_RESPONSES[operationName]) {
         await route.fulfill({
-          status: 200, contentType: 'application/json',
-          headers: CORS_HEADERS, body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify(DEFAULT_RESPONSES[operationName]),
         });
       } else {
         await route.fulfill({
-          status: 200, contentType: 'application/json',
-          headers: CORS_HEADERS, body: JSON.stringify({ data: {} }),
+          status: 200,
+          contentType: 'application/json',
+          headers: CORS_HEADERS,
+          body: JSON.stringify({ data: {} }),
         });
       }
     });

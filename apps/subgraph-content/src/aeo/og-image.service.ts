@@ -22,7 +22,7 @@ export class OgImageService implements OnModuleDestroy {
   async generateOgImage(
     title: string,
     description: string,
-    type: OgType,
+    type: OgType
   ): Promise<Buffer> {
     const key = createHash('sha256')
       .update(`${title}|${description}|${type}`)
@@ -40,7 +40,7 @@ export class OgImageService implements OnModuleDestroy {
     const svg = this.buildSvg(
       this.safeXmlEscape(title.slice(0, 80)),
       description ? this.safeXmlEscape(description.slice(0, 160)) : '',
-      type,
+      type
     );
 
     const buffer = await sharp(Buffer.from(svg))
@@ -106,7 +106,7 @@ export class OgImageService implements OnModuleDestroy {
       ${titleLines
         .map(
           (line, i) =>
-            `<text x="60" y="${titleY + i * 70}" font-family="'Segoe UI',Arial,sans-serif" font-size="52" font-weight="700" fill="white">${line}</text>`,
+            `<text x="60" y="${titleY + i * 70}" font-family="'Segoe UI',Arial,sans-serif" font-size="52" font-weight="700" fill="white">${line}</text>`
         )
         .join('\n      ')}
       ${

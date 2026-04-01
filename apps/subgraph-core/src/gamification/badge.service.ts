@@ -25,7 +25,9 @@ export type { LeaderboardEntry } from './badge-queries.service';
 const MAX_SUBS = 10;
 
 @Injectable()
-export class BadgeService implements OnModuleInit, OnModuleDestroy, BadgeAwardDelegate {
+export class BadgeService
+  implements OnModuleInit, OnModuleDestroy, BadgeAwardDelegate
+{
   private readonly logger = new Logger(BadgeService.name);
   private db: Database;
   private nats: NatsConnection | null = null;

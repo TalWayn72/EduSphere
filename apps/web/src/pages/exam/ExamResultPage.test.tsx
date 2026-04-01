@@ -29,12 +29,8 @@ function makeResult(overrides: Partial<ExamResult> = {}): ExamResult {
     passed: true,
     rawScore: 0.85,
     scaledScore: 720,
-    domainScores: [
-      { domain: 'Math', total: 10, correct: 9 },
-    ],
-    bloomScores: [
-      { level: 'APPLY', total: 5, correct: 4 },
-    ],
+    domainScores: [{ domain: 'Math', total: 10, correct: 9 }],
+    bloomScores: [{ level: 'APPLY', total: 5, correct: 4 }],
     gradedAt: '2026-03-15T12:00:00Z',
     ...overrides,
   };
@@ -56,33 +52,60 @@ vi.mock('@/components/exam/ExamResultChart', () => ({
 vi.mock('@/components/exam/ExamScoreCard', () => ({
   ExamScoreCard: vi.fn(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ({ scoreDisplay }: any) => <div data-testid="score-card">{scoreDisplay}</div>,
+    ({ scoreDisplay }: any) => (
+      <div data-testid="score-card">{scoreDisplay}</div>
+    )
   ),
 }));
 
 vi.mock('@/lib/utils', () => ({
-  cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
+  cn: (...classes: (string | undefined | false)[]) =>
+    classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card" className={className}>{children}</div>
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card" className={className}>
+      {children}
+    </div>
   ),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: { children: React.ReactNode; onClick?: () => void; variant?: string; className?: string; disabled?: boolean }) => (
-    <button {...props}>{children}</button>
-  ),
+  Button: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    variant?: string;
+    className?: string;
+    disabled?: boolean;
+  }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, className }: { children: React.ReactNode; variant?: string; className?: string }) => (
-    <span className={className}>{children}</span>
-  ),
+  Badge: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    variant?: string;
+    className?: string;
+  }) => <span className={className}>{children}</span>,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -136,12 +159,16 @@ describe('ExamResultPage', () => {
 
   it('shows retake button', () => {
     render(<ExamResultPage />);
-    expect(screen.getByRole('button', { name: /retake exam/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /retake exam/i })
+    ).toBeInTheDocument();
   });
 
   it('shows back to course button', () => {
     render(<ExamResultPage />);
-    expect(screen.getByRole('button', { name: /back to course/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /back to course/i })
+    ).toBeInTheDocument();
   });
 
   it('shows not found when result is null', () => {

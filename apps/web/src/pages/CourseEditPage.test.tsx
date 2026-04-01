@@ -41,11 +41,15 @@ vi.mock('./CourseEditPage.modules', () => ({
   CourseEditModules: vi.fn(() => null),
 }));
 vi.mock('@/components/SourceManager', () => ({
-  SourceManager: vi.fn(() => <div data-testid="source-manager-stub">SourceManager</div>),
+  SourceManager: vi.fn(() => (
+    <div data-testid="source-manager-stub">SourceManager</div>
+  )),
 }));
 
 vi.mock('@/components/PageShell', () => ({
-  PageShell: ({ children }: { children: React.ReactNode }) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/Breadcrumbs', () => ({
@@ -161,7 +165,9 @@ describe('CourseEditPage', () => {
       screen.getByRole('tab', { name: /basic info/i })
     ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /modules/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /knowledge sources/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /knowledge sources/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Publish" button for a draft course', () => {
@@ -192,7 +198,9 @@ describe('CourseEditPage', () => {
     const sourcesTab = screen.getByRole('tab', { name: /knowledge sources/i });
     expect(sourcesTab).toBeInTheDocument();
     // The associated panel should exist in the DOM
-    const sourcesPanel = document.querySelector('[role="tabpanel"][id$="-content-sources"]');
+    const sourcesPanel = document.querySelector(
+      '[role="tabpanel"][id$="-content-sources"]'
+    );
     expect(sourcesPanel).not.toBeNull();
   });
 });

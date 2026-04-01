@@ -7,7 +7,11 @@ import { renderHook, waitFor } from '@testing-library/react';
 
 // ── useOfflineStatus mock ────────────────────────────────────────────────────
 vi.mock('./useOfflineStatus', () => ({
-  useOfflineStatus: () => ({ isOnline: true, isOffline: false, lastOnlineAt: null }),
+  useOfflineStatus: () => ({
+    isOnline: true,
+    isOffline: false,
+    lastOnlineAt: null,
+  }),
 }));
 
 describe('useOfflineAnchors — memory safety', () => {

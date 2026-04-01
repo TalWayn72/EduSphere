@@ -35,7 +35,9 @@ export function ExamBlueprintListPage() {
   const role = useAuthRole();
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { blueprints, fetching } = useExamBlueprints(courseId ?? '');
 
@@ -54,21 +56,31 @@ export function ExamBlueprintListPage() {
             </p>
             <Button
               size="sm"
-              onClick={() => void navigate(`/courses/${courseId}/exams/blueprints/new`)}
+              onClick={() =>
+                void navigate(`/courses/${courseId}/exams/blueprints/new`)
+              }
               data-testid="create-blueprint-btn"
             >
               Create Blueprint
             </Button>
           </div>
 
-          {fetching && <p className="text-sm text-muted-foreground">Loading blueprints...</p>}
+          {fetching && (
+            <p className="text-sm text-muted-foreground">
+              Loading blueprints...
+            </p>
+          )}
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {blueprints.map((bp) => (
               <BlueprintCard
                 key={bp.id}
                 blueprint={bp}
-                onClick={() => void navigate(`/courses/${courseId}/exams/blueprints/${bp.id}`)}
+                onClick={() =>
+                  void navigate(
+                    `/courses/${courseId}/exams/blueprints/${bp.id}`
+                  )
+                }
               />
             ))}
           </div>
@@ -89,8 +101,12 @@ export function ExamBlueprintListPage() {
 // ── Blueprint card sub-component ─────────────────────────────────────────────
 
 function BlueprintCard({
-  blueprint, onClick,
-}: { blueprint: ExamBlueprint; onClick: () => void }) {
+  blueprint,
+  onClick,
+}: {
+  blueprint: ExamBlueprint;
+  onClick: () => void;
+}) {
   return (
     <Card
       className="cursor-pointer hover:shadow-md transition-shadow"
@@ -100,7 +116,9 @@ function BlueprintCard({
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base">{blueprint.title}</CardTitle>
-          <Badge className={STATUS_STYLES[blueprint.status]}>{blueprint.status}</Badge>
+          <Badge className={STATUS_STYLES[blueprint.status]}>
+            {blueprint.status}
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-1">

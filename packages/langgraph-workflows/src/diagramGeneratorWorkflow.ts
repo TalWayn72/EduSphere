@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -85,7 +91,9 @@ IMPORTANT: Mermaid node labels with Hebrew text must be quoted: A["תוכן"]`,
     );
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Generate a ${state.diagramType} Mermaid diagram for these key lesson points:\n${state.keyPoints.slice(0, 15).join('\n')}`,
       schema: z.object({ mermaidSrc: z.string() }),

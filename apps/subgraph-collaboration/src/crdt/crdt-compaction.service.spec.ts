@@ -18,8 +18,12 @@ const {
   const mockLimit = vi.fn().mockResolvedValue([]);
   const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
   const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
-  const mockSet = vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
-  const mockDelete = vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+  const mockSet = vi
+    .fn()
+    .mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+  const mockDelete = vi
+    .fn()
+    .mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
 
   return {
     mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
@@ -96,7 +100,9 @@ describe('CrdtCompactionService', () => {
   it('uses default threshold of 7 days', () => {
     const service = new CrdtCompactionService();
     // Access private thresholdDays via cast
-    expect((service as unknown as { thresholdDays: number }).thresholdDays).toBe(7);
+    expect(
+      (service as unknown as { thresholdDays: number }).thresholdDays
+    ).toBe(7);
   });
 
   it('onModuleDestroy calls closeAllPools', async () => {
@@ -108,8 +114,9 @@ describe('CrdtCompactionService', () => {
   it('runCompaction logs start and end', async () => {
     const service = new CrdtCompactionService();
     const logSpy = vi.spyOn(
-      (service as unknown as { logger: { log: (...a: unknown[]) => void } }).logger,
-      'log',
+      (service as unknown as { logger: { log: (...a: unknown[]) => void } })
+        .logger,
+      'log'
     );
 
     // findDocumentsWithOldUpdates returns empty
@@ -120,18 +127,19 @@ describe('CrdtCompactionService', () => {
     await service.runCompaction();
 
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[CrdtCompaction] Starting daily CRDT compaction'),
+      expect.stringContaining('[CrdtCompaction] Starting daily CRDT compaction')
     );
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('0 document(s), 0 update(s) compacted'),
+      expect.stringContaining('0 document(s), 0 update(s) compacted')
     );
   });
 
   it('runCompaction handles errors gracefully', async () => {
     const service = new CrdtCompactionService();
     const errorSpy = vi.spyOn(
-      (service as unknown as { logger: { error: (...a: unknown[]) => void } }).logger,
-      'error',
+      (service as unknown as { logger: { error: (...a: unknown[]) => void } })
+        .logger,
+      'error'
     );
 
     mockFrom.mockReturnValueOnce({
@@ -141,7 +149,7 @@ describe('CrdtCompactionService', () => {
     await service.runCompaction();
 
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[CrdtCompaction] Compaction failed'),
+      expect.stringContaining('[CrdtCompaction] Compaction failed')
     );
   });
 
@@ -161,9 +169,7 @@ describe('CrdtCompactionService', () => {
     const cutoff = new Date();
 
     // First query: document exists
-    mockLimit.mockResolvedValueOnce([
-      { id: 'doc-1', ydocSnapshot: null },
-    ]);
+    mockLimit.mockResolvedValueOnce([{ id: 'doc-1', ydocSnapshot: null }]);
     // Second query: no old updates (via where on crdt_updates)
     mockWhere
       .mockReturnValueOnce({ limit: mockLimit }) // first call chain (doc lookup)
@@ -181,9 +187,7 @@ describe('CrdtCompactionService', () => {
     const update2 = makeYjsUpdate('b', '2');
 
     // First query: document exists with null snapshot
-    mockLimit.mockResolvedValueOnce([
-      { id: 'doc-1', ydocSnapshot: null },
-    ]);
+    mockLimit.mockResolvedValueOnce([{ id: 'doc-1', ydocSnapshot: null }]);
 
     // Second query: old updates
     mockWhere
@@ -228,9 +232,7 @@ describe('CrdtCompactionService', () => {
     // One old update
     mockWhere
       .mockReturnValueOnce({ limit: mockLimit })
-      .mockResolvedValueOnce([
-        { id: 'upd-3', updateData: newUpdate },
-      ]);
+      .mockResolvedValueOnce([{ id: 'upd-3', updateData: newUpdate }]);
 
     const mockSetWhere = vi.fn().mockResolvedValue(undefined);
     mockSet.mockReturnValueOnce({ where: mockSetWhere });
@@ -246,7 +248,8 @@ describe('CrdtCompactionService', () => {
     // Verify the snapshot passed to set() contains both keys
     const setCall = mockSet.mock.calls[0];
     expect(setCall).toBeDefined();
-    const snapshotArg = (setCall as Array<{ ydoc_snapshot: Buffer }>)[0]!.ydoc_snapshot;
+    const snapshotArg = (setCall as Array<{ ydoc_snapshot: Buffer }>)[0]!
+      .ydoc_snapshot;
     expect(snapshotArg).toBeInstanceOf(Buffer);
 
     // Decode and verify merged content

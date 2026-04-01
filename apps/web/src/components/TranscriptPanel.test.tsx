@@ -165,9 +165,7 @@ describe('TranscriptPanel', () => {
     // Segment 2 (10-20) should be active and have the primary border class
     const activeEl = container.querySelector('.border-primary');
     expect(activeEl).toBeInTheDocument();
-    expect(activeEl?.textContent).toContain(
-      'Today we will discuss the Mishna'
-    );
+    expect(activeEl?.textContent).toContain('Today we will discuss the Mishna');
   });
 
   it('does not show raw i18n keys in the output', () => {

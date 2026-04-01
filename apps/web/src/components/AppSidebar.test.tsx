@@ -31,7 +31,13 @@ vi.mock('@/contexts/ThemeContext', () => ({
     resolvedMode: 'light',
     setThemeMode: mockSetThemeMode,
     tenantPrimitives: {},
-    userPreferences: { mode: 'system', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
+    userPreferences: {
+      mode: 'system',
+      fontSize: 'md',
+      readingMode: false,
+      motionPreference: 'full',
+      contrastMode: 'normal',
+    },
     setTenantTheme: vi.fn(),
     setFontSize: vi.fn(),
     setReadingMode: vi.fn(),
@@ -171,18 +177,28 @@ describe('AppSidebar', () => {
   it('renders group headings when expanded', () => {
     setRole('SUPER_ADMIN');
     renderAt();
-    expect(screen.getByTestId('nav-group-heading-learning')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('nav-group-heading-learning')
+    ).toBeInTheDocument();
     expect(screen.getByTestId('nav-group-heading-social')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-group-heading-teaching')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-group-heading-analytics')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('nav-group-heading-teaching')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('nav-group-heading-analytics')
+    ).toBeInTheDocument();
   });
 
   it('hides group headings when collapsed', () => {
     setRole('SUPER_ADMIN');
     renderAt();
     fireEvent.click(screen.getByTestId('sidebar-collapse-toggle'));
-    expect(screen.queryByTestId('nav-group-heading-learning')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('nav-group-heading-teaching')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('nav-group-heading-learning')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('nav-group-heading-teaching')
+    ).not.toBeInTheDocument();
   });
 
   // ── Existing sidebar tests (updated) ────────────────────────────────────
@@ -206,7 +222,9 @@ describe('AppSidebar', () => {
   it('renders brand name "EduSphere" when expanded', () => {
     renderAt();
     expect(screen.getByTestId('sidebar-brand-name')).toBeInTheDocument();
-    expect(screen.getByTestId('sidebar-brand-name')).toHaveTextContent('EduSphere');
+    expect(screen.getByTestId('sidebar-brand-name')).toHaveTextContent(
+      'EduSphere'
+    );
   });
 
   it('renders logo icon', () => {
@@ -258,11 +276,21 @@ describe('AppSidebar', () => {
   it('renders nav labels in English via i18n', () => {
     renderAt();
     expect(screen.getByTestId('nav-item-home')).toHaveTextContent('Home');
-    expect(screen.getByTestId('nav-item-myCourses')).toHaveTextContent('My Courses');
-    expect(screen.getByTestId('nav-item-discover')).toHaveTextContent('Discover');
-    expect(screen.getByTestId('nav-item-knowledgeGraph')).toHaveTextContent('Knowledge Graph');
-    expect(screen.getByTestId('nav-item-aiTutor')).toHaveTextContent('AI Tutor');
-    expect(screen.getByTestId('nav-item-liveSessions')).toHaveTextContent('Live Sessions');
+    expect(screen.getByTestId('nav-item-myCourses')).toHaveTextContent(
+      'My Courses'
+    );
+    expect(screen.getByTestId('nav-item-discover')).toHaveTextContent(
+      'Discover'
+    );
+    expect(screen.getByTestId('nav-item-knowledgeGraph')).toHaveTextContent(
+      'Knowledge Graph'
+    );
+    expect(screen.getByTestId('nav-item-aiTutor')).toHaveTextContent(
+      'AI Tutor'
+    );
+    expect(screen.getByTestId('nav-item-liveSessions')).toHaveTextContent(
+      'Live Sessions'
+    );
   });
 
   it('renders Settings label via i18n', () => {
@@ -288,8 +316,12 @@ describe('AppSidebar', () => {
       fetching: false,
     });
     renderAt();
-    expect(screen.getByTestId('sidebar-brand-name')).toHaveTextContent('Acme Corp');
-    expect(screen.getByTestId('sidebar-brand-name')).not.toHaveTextContent('EduSphere');
+    expect(screen.getByTestId('sidebar-brand-name')).toHaveTextContent(
+      'Acme Corp'
+    );
+    expect(screen.getByTestId('sidebar-brand-name')).not.toHaveTextContent(
+      'EduSphere'
+    );
   });
 
   it('hides "Powered by EduSphere" when hideEduSphereBranding is true', () => {
@@ -309,13 +341,17 @@ describe('AppSidebar', () => {
       fetching: false,
     });
     renderAt();
-    expect(screen.queryByTestId('powered-by-edusphere')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('powered-by-edusphere')
+    ).not.toBeInTheDocument();
   });
 
   it('shows "Powered by EduSphere" when hideEduSphereBranding is false', () => {
     renderAt();
     expect(screen.getByTestId('powered-by-edusphere')).toBeInTheDocument();
-    expect(screen.getByTestId('powered-by-edusphere')).toHaveTextContent('Powered by EduSphere');
+    expect(screen.getByTestId('powered-by-edusphere')).toHaveTextContent(
+      'Powered by EduSphere'
+    );
   });
 
   // WCAG 3.2.6 — Consistent Help
@@ -332,7 +368,13 @@ describe('AppSidebar', () => {
       resolvedMode: 'dark',
       setThemeMode: mockSetThemeMode,
       tenantPrimitives: {},
-      userPreferences: { mode: 'dark', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
+      userPreferences: {
+        mode: 'dark',
+        fontSize: 'md',
+        readingMode: false,
+        motionPreference: 'full',
+        contrastMode: 'normal',
+      },
       setTenantTheme: vi.fn(),
       setFontSize: vi.fn(),
       setReadingMode: vi.fn(),

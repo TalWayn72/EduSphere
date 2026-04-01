@@ -80,13 +80,20 @@ ruleTester.run('no-orphan-colors', rule, {
     {
       code: '<div className="bg-white" />',
       filename: 'src/pages/Home.tsx',
-      errors: [{ messageId: 'missingDark', data: { cls: 'bg-white', prefix: 'bg' } }],
+      errors: [
+        { messageId: 'missingDark', data: { cls: 'bg-white', prefix: 'bg' } },
+      ],
     },
     // text-gray-900 without dark: variant.
     {
       code: '<div className="text-gray-900" />',
       filename: 'src/pages/Home.tsx',
-      errors: [{ messageId: 'missingDark', data: { cls: 'text-gray-900', prefix: 'text' } }],
+      errors: [
+        {
+          messageId: 'missingDark',
+          data: { cls: 'text-gray-900', prefix: 'text' },
+        },
+      ],
     },
     // Two orphan classes — two warnings.
     {
@@ -94,32 +101,52 @@ ruleTester.run('no-orphan-colors', rule, {
       filename: 'src/pages/Home.tsx',
       errors: [
         { messageId: 'missingDark', data: { cls: 'bg-white', prefix: 'bg' } },
-        { messageId: 'missingDark', data: { cls: 'text-gray-700', prefix: 'text' } },
+        {
+          messageId: 'missingDark',
+          data: { cls: 'text-gray-700', prefix: 'text' },
+        },
       ],
     },
     // bg-slate-100 without dark variant.
     {
       code: '<div className="bg-slate-100" />',
       filename: 'src/pages/Home.tsx',
-      errors: [{ messageId: 'missingDark', data: { cls: 'bg-slate-100', prefix: 'bg' } }],
+      errors: [
+        {
+          messageId: 'missingDark',
+          data: { cls: 'bg-slate-100', prefix: 'bg' },
+        },
+      ],
     },
     // border-gray-300 without dark variant.
     {
       code: '<div className="border-gray-300" />',
       filename: 'src/pages/Home.tsx',
-      errors: [{ messageId: 'missingDark', data: { cls: 'border-gray-300', prefix: 'border' } }],
+      errors: [
+        {
+          messageId: 'missingDark',
+          data: { cls: 'border-gray-300', prefix: 'border' },
+        },
+      ],
     },
     // Template literal with orphan.
     {
       code: '<div className={`bg-gray-50 p-4`} />',
       filename: 'src/pages/Home.tsx',
-      errors: [{ messageId: 'missingDark', data: { cls: 'bg-gray-50', prefix: 'bg' } }],
+      errors: [
+        { messageId: 'missingDark', data: { cls: 'bg-gray-50', prefix: 'bg' } },
+      ],
     },
     // Expression container with string literal.
     {
       code: '<div className={"text-slate-600"} />',
       filename: 'src/pages/Home.tsx',
-      errors: [{ messageId: 'missingDark', data: { cls: 'text-slate-600', prefix: 'text' } }],
+      errors: [
+        {
+          messageId: 'missingDark',
+          data: { cls: 'text-slate-600', prefix: 'text' },
+        },
+      ],
     },
   ],
 });

@@ -46,9 +46,7 @@ test.describe('At-Risk Dashboard — DEV_MODE guard', () => {
       'table tr, [data-testid="learner-row"], [role="row"]'
     );
 
-    const emptyVisible = await emptyState
-      .isVisible()
-      .catch(() => false);
+    const emptyVisible = await emptyState.isVisible().catch(() => false);
     const hasRows = (await tableRow.count()) > 0;
 
     expect(

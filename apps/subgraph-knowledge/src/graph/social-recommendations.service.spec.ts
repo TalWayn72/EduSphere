@@ -34,18 +34,24 @@ const CONTENT_2: ActivityRow = {
 };
 
 // ─── Data service mock factory ──────────────────────────────────────────────
-function makeDataService(overrides: Partial<{
-  followedIds: string[];
-  mutualIds: string[];
-  completedIds: Set<string>;
-  activityRows: ActivityRow[];
-  feedRows: unknown[];
-}>): SocialRecommendationsDataService {
+function makeDataService(
+  overrides: Partial<{
+    followedIds: string[];
+    mutualIds: string[];
+    completedIds: Set<string>;
+    activityRows: ActivityRow[];
+    feedRows: unknown[];
+  }>
+): SocialRecommendationsDataService {
   return {
     getFollowedUserIds: vi.fn().mockResolvedValue(overrides.followedIds ?? []),
     getMutualFollowerIds: vi.fn().mockResolvedValue(overrides.mutualIds ?? []),
-    getCompletedContentIds: vi.fn().mockResolvedValue(overrides.completedIds ?? new Set()),
-    getFollowedActivity: vi.fn().mockResolvedValue(overrides.activityRows ?? []),
+    getCompletedContentIds: vi
+      .fn()
+      .mockResolvedValue(overrides.completedIds ?? new Set()),
+    getFollowedActivity: vi
+      .fn()
+      .mockResolvedValue(overrides.activityRows ?? []),
     getSocialFeedRows: vi.fn().mockResolvedValue(overrides.feedRows ?? []),
   } as unknown as SocialRecommendationsDataService;
 }
@@ -113,8 +119,8 @@ describe('SocialRecommendationsService', () => {
       mutualIds: [FOLLOWED_A],
       completedIds: new Set(),
       activityRows: [
-        { ...CONTENT_2, userId: FOLLOWED_A },   // mutual: weight += 2
-        { ...CONTENT_1, userId: FOLLOWED_B },   // non-mutual: weight += 1
+        { ...CONTENT_2, userId: FOLLOWED_A }, // mutual: weight += 2
+        { ...CONTENT_1, userId: FOLLOWED_B }, // non-mutual: weight += 1
       ],
     });
     service = new SocialRecommendationsService(data);

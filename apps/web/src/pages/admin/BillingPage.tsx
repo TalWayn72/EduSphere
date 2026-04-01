@@ -58,9 +58,13 @@ const STATUS_COLORS: Record<string, string> = {
 export function BillingPage() {
   const { t } = useTranslation('orgAdmin');
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [{ data, fetching }] = useQuery<{ tenantSubscription: SubscriptionData }>({
+  const [{ data, fetching }] = useQuery<{
+    tenantSubscription: SubscriptionData;
+  }>({
     query: SUBSCRIPTION_QUERY,
     pause: !mounted,
   });
@@ -83,16 +87,25 @@ export function BillingPage() {
   };
 
   return (
-    <AdminLayout title={t('billing.title')} description={t('billing.description')}>
+    <AdminLayout
+      title={t('billing.title')}
+      description={t('billing.description')}
+    >
       <h1 className="sr-only">Billing</h1>
       <div data-testid="billing-page" className="space-y-6">
         {fetching ? (
-          <Card><CardContent className="p-6"><Skeleton className="h-32 w-full" /></CardContent></Card>
+          <Card>
+            <CardContent className="p-6">
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
         ) : sub ? (
           <>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{t('billing.currentPlan')}</CardTitle>
+                <CardTitle className="text-base">
+                  {t('billing.currentPlan')}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -109,12 +122,17 @@ export function BillingPage() {
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>{t('billing.yauUsage')}</span>
-                    <span>{sub.yauUsed.toLocaleString()} / {sub.yauLimit.toLocaleString()}</span>
+                    <span>
+                      {sub.yauUsed.toLocaleString()} /{' '}
+                      {sub.yauLimit.toLocaleString()}
+                    </span>
                   </div>
                   <Progress value={yauPercent} className="h-2" />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {t('billing.renewsOn', { date: new Date(sub.currentPeriodEnd).toLocaleDateString() })}
+                  {t('billing.renewsOn', {
+                    date: new Date(sub.currentPeriodEnd).toLocaleDateString(),
+                  })}
                 </p>
                 <Button variant="outline" onClick={handlePortal}>
                   {t('billing.manageSubscription')}
@@ -124,7 +142,10 @@ export function BillingPage() {
 
             <div className="grid gap-4 md:grid-cols-3">
               {['STARTER', 'PROFESSIONAL', 'ENTERPRISE'].map((plan) => (
-                <Card key={plan} className={plan === sub.planName ? 'border-primary' : ''}>
+                <Card
+                  key={plan}
+                  className={plan === sub.planName ? 'border-primary' : ''}
+                >
                   <CardContent className="p-4 text-center space-y-3">
                     <p className="font-semibold">{plan}</p>
                     <Button
@@ -133,7 +154,9 @@ export function BillingPage() {
                       disabled={plan === sub.planName}
                       onClick={() => handleUpgrade(plan.toLowerCase())}
                     >
-                      {plan === sub.planName ? t('billing.currentPlanBadge') : t('billing.upgrade')}
+                      {plan === sub.planName
+                        ? t('billing.currentPlanBadge')
+                        : t('billing.upgrade')}
                     </Button>
                   </CardContent>
                 </Card>

@@ -30,10 +30,14 @@ const LAYER_READABLE_NAMES: Record<AnnotationLayer, string> = {
 
 /** Maps annotation layer to highlight background color. */
 const LAYER_HIGHLIGHT_COLORS: Record<AnnotationLayer, string> = {
-  [AnnotationLayer.PERSONAL]: 'bg-blue-400/30 hover:bg-blue-400/50 border-blue-500',
-  [AnnotationLayer.SHARED]: 'bg-green-400/30 hover:bg-green-400/50 border-green-500',
-  [AnnotationLayer.INSTRUCTOR]: 'bg-orange-400/30 hover:bg-orange-400/50 border-orange-500',
-  [AnnotationLayer.AI_GENERATED]: 'bg-purple-400/30 hover:bg-purple-400/50 border-purple-500',
+  [AnnotationLayer.PERSONAL]:
+    'bg-blue-400/30 hover:bg-blue-400/50 border-blue-500',
+  [AnnotationLayer.SHARED]:
+    'bg-green-400/30 hover:bg-green-400/50 border-green-500',
+  [AnnotationLayer.INSTRUCTOR]:
+    'bg-orange-400/30 hover:bg-orange-400/50 border-orange-500',
+  [AnnotationLayer.AI_GENERATED]:
+    'bg-purple-400/30 hover:bg-purple-400/50 border-purple-500',
 };
 
 interface HighlightRect {
@@ -54,7 +58,7 @@ function computeHighlightRects(
   annotations: Annotation[],
   pageNum: number,
   canvasWidth: number,
-  canvasHeight: number,
+  canvasHeight: number
 ): HighlightRect[] {
   const rects: HighlightRect[] = [];
 
@@ -64,7 +68,9 @@ function computeHighlightRects(
     if (annPage !== pageNum) continue;
 
     // If spatialData contains explicit rects (array of {x,y,w,h} in 0-1 coords)
-    const spatialRects = spatial?.rects as Array<{ x: number; y: number; w: number; h: number }> | undefined;
+    const spatialRects = spatial?.rects as
+      | Array<{ x: number; y: number; w: number; h: number }>
+      | undefined;
     if (spatialRects && spatialRects.length > 0) {
       for (const r of spatialRects) {
         rects.push({
@@ -84,8 +90,10 @@ function computeHighlightRects(
       const endLine = Math.floor(ann.textRange.to / charsPerLine);
 
       for (let line = startLine; line <= endLine; line++) {
-        const startChar = line === startLine ? ann.textRange.from % charsPerLine : 0;
-        const endChar = line === endLine ? ann.textRange.to % charsPerLine : charsPerLine;
+        const startChar =
+          line === startLine ? ann.textRange.from % charsPerLine : 0;
+        const endChar =
+          line === endLine ? ann.textRange.to % charsPerLine : charsPerLine;
         rects.push({
           annotationId: ann.id,
           layer: ann.layer,
@@ -110,8 +118,9 @@ export function PdfAnnotationLayer({
   focusedAnnotationId,
 }: PdfAnnotationLayerProps) {
   const rects = useMemo(
-    () => computeHighlightRects(annotations, pageNum, canvasWidth, canvasHeight),
-    [annotations, pageNum, canvasWidth, canvasHeight],
+    () =>
+      computeHighlightRects(annotations, pageNum, canvasWidth, canvasHeight),
+    [annotations, pageNum, canvasWidth, canvasHeight]
   );
 
   if (rects.length === 0) return null;
@@ -129,7 +138,7 @@ export function PdfAnnotationLayer({
           className={cn(
             'absolute border-b-2 rounded-sm pointer-events-auto cursor-pointer transition-colors focus:outline-2 focus:outline-primary',
             LAYER_HIGHLIGHT_COLORS[rect.layer],
-            focusedAnnotationId === rect.annotationId && 'ring-2 ring-primary',
+            focusedAnnotationId === rect.annotationId && 'ring-2 ring-primary'
           )}
           style={{
             top: rect.top,

@@ -60,7 +60,7 @@ export function useExecutionTracking({
       clearTimers();
       onResult(status, output);
     },
-    [clearTimers, onResult],
+    [clearTimers, onResult]
   );
 
   // Handle subscription data
@@ -88,7 +88,7 @@ export function useExecutionTracking({
             .query<AgentExecutionResult>(
               AGENT_EXECUTION_QUERY,
               { id: executionId },
-              { requestPolicy: 'network-only' },
+              { requestPolicy: 'network-only' }
             )
             .toPromise();
           if (resultHandledRef.current) return;

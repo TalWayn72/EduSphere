@@ -197,8 +197,12 @@ describe('useLessonPipelineStore — moduleStatuses', () => {
   });
 
   it('setModuleStatus() updates status for a module', () => {
-    act(() => useLessonPipelineStore.getState().setModuleStatus('ASR', 'running'));
-    expect(useLessonPipelineStore.getState().moduleStatuses).toEqual({ ASR: 'running' });
+    act(() =>
+      useLessonPipelineStore.getState().setModuleStatus('ASR', 'running')
+    );
+    expect(useLessonPipelineStore.getState().moduleStatuses).toEqual({
+      ASR: 'running',
+    });
   });
 
   it('setModuleStatus() can update multiple modules independently', () => {
@@ -246,7 +250,9 @@ describe('useLessonPipelineStore — undo/redo', () => {
 
     act(() => useLessonPipelineStore.getState().redo());
     expect(useLessonPipelineStore.getState().nodes).toHaveLength(1);
-    expect(useLessonPipelineStore.getState().nodes[0].moduleType).toBe('INGESTION');
+    expect(useLessonPipelineStore.getState().nodes[0].moduleType).toBe(
+      'INGESTION'
+    );
   });
 
   it('undo() is a no-op when undoStack is empty', () => {
@@ -294,7 +300,9 @@ describe('useLessonPipelineStore — undo/redo', () => {
     for (let i = 0; i < 55; i++) {
       act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
     }
-    expect(useLessonPipelineStore.getState().undoStack.length).toBeLessThanOrEqual(50);
+    expect(
+      useLessonPipelineStore.getState().undoStack.length
+    ).toBeLessThanOrEqual(50);
   });
 
   it('undo restores selectedNodeId', () => {
@@ -346,10 +354,12 @@ describe('useLessonPipelineStore — loadServerTemplate', () => {
 
   it('loadServerTemplate assigns correct order values', () => {
     act(() =>
-      useLessonPipelineStore.getState().loadServerTemplate([
-        { moduleType: 'INGESTION' },
-        { moduleType: 'SUMMARIZATION' },
-      ])
+      useLessonPipelineStore
+        .getState()
+        .loadServerTemplate([
+          { moduleType: 'INGESTION' },
+          { moduleType: 'SUMMARIZATION' },
+        ])
     );
 
     const { nodes } = useLessonPipelineStore.getState();
@@ -359,20 +369,22 @@ describe('useLessonPipelineStore — loadServerTemplate', () => {
 
   it('loadServerTemplate sets isDirty to true', () => {
     act(() =>
-      useLessonPipelineStore.getState().loadServerTemplate([
-        { moduleType: 'INGESTION' },
-      ])
+      useLessonPipelineStore
+        .getState()
+        .loadServerTemplate([{ moduleType: 'INGESTION' }])
     );
     expect(useLessonPipelineStore.getState().isDirty).toBe(true);
   });
 
   it('loadServerTemplate filters out unknown module types', () => {
     act(() =>
-      useLessonPipelineStore.getState().loadServerTemplate([
-        { moduleType: 'INGESTION' },
-        { moduleType: 'UNKNOWN_MODULE' },
-        { moduleType: 'QA_GATE' },
-      ])
+      useLessonPipelineStore
+        .getState()
+        .loadServerTemplate([
+          { moduleType: 'INGESTION' },
+          { moduleType: 'UNKNOWN_MODULE' },
+          { moduleType: 'QA_GATE' },
+        ])
     );
 
     const { nodes } = useLessonPipelineStore.getState();
@@ -382,9 +394,9 @@ describe('useLessonPipelineStore — loadServerTemplate', () => {
 
   it('loadServerTemplate uses MODULE_LABELS for label/labelHe', () => {
     act(() =>
-      useLessonPipelineStore.getState().loadServerTemplate([
-        { moduleType: 'SUMMARIZATION' },
-      ])
+      useLessonPipelineStore
+        .getState()
+        .loadServerTemplate([{ moduleType: 'SUMMARIZATION' }])
     );
 
     const node = useLessonPipelineStore.getState().nodes[0];
@@ -395,15 +407,17 @@ describe('useLessonPipelineStore — loadServerTemplate', () => {
   it('loadServerTemplate pushes to undo stack', () => {
     act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
     act(() =>
-      useLessonPipelineStore.getState().loadServerTemplate([
-        { moduleType: 'QA_GATE' },
-      ])
+      useLessonPipelineStore
+        .getState()
+        .loadServerTemplate([{ moduleType: 'QA_GATE' }])
     );
 
     expect(useLessonPipelineStore.getState().canUndo).toBe(true);
     act(() => useLessonPipelineStore.getState().undo());
     // After undo, should restore the single INGESTION node
     expect(useLessonPipelineStore.getState().nodes).toHaveLength(1);
-    expect(useLessonPipelineStore.getState().nodes[0].moduleType).toBe('INGESTION');
+    expect(useLessonPipelineStore.getState().nodes[0].moduleType).toBe(
+      'INGESTION'
+    );
   });
 });

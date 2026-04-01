@@ -17,12 +17,7 @@
  */
 
 import type { Page } from '@playwright/test';
-import {
-  BASE_URL,
-  KEYCLOAK_REALM_URL,
-  TestUser,
-  TEST_USERS,
-} from './env';
+import { BASE_URL, KEYCLOAK_REALM_URL, TestUser, TEST_USERS } from './env';
 
 // ─── DEV_MODE login (no Keycloak required) ───────────────────────────────────
 
@@ -64,7 +59,9 @@ export async function loginInDevMode(page: Page): Promise<void> {
   // may redirect to /dashboard or /admin rather than /learn/, so we use a
   // broad "not /login" predicate instead of a specific path pattern.
   await page
-    .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+    .waitForURL((url) => !url.toString().includes('/login'), {
+      timeout: 20_000,
+    })
     .catch(() => {
       // URL never changed — app may already be on the target route
     });
@@ -187,14 +184,20 @@ export async function login(
   // The process.env.VITE_DEV_MODE flag IS_DEV_MODE may be stale if the test
   // runner reused a server with a different VITE_DEV_MODE setting.
   const devBtn = page.locator('[data-testid="dev-login-btn"]');
-  const isActuallyDevMode = await devBtn.isVisible().catch(() => false) ||
-    await devBtn.waitFor({ timeout: 3_000 }).then(() => true).catch(() => false);
+  const isActuallyDevMode =
+    (await devBtn.isVisible().catch(() => false)) ||
+    (await devBtn
+      .waitFor({ timeout: 3_000 })
+      .then(() => true)
+      .catch(() => false));
 
   if (isActuallyDevMode) {
     // ── DEV_MODE path ──────────────────────────────────────────────────────
     await devBtn.click();
     await page
-      .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+      .waitForURL((url) => !url.toString().includes('/login'), {
+        timeout: 20_000,
+      })
       .catch(() => {});
     await page.waitForLoadState('domcontentloaded');
   } else {

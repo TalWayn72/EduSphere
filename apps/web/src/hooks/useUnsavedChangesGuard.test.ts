@@ -16,7 +16,11 @@ vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...actual,
-    useBlocker: vi.fn(() => ({ state: 'unblocked' as const, proceed: vi.fn(), reset: vi.fn() })),
+    useBlocker: vi.fn(() => ({
+      state: 'unblocked' as const,
+      proceed: vi.fn(),
+      reset: vi.fn(),
+    })),
   };
 });
 
@@ -54,7 +58,7 @@ describe('useUnsavedChangesGuard', () => {
       wrapper: MemoryRouter,
     });
     const calls = addEventListenerSpy.mock.calls.filter(
-      ([event]) => event === 'beforeunload',
+      ([event]) => event === 'beforeunload'
     );
     expect(calls).toHaveLength(0);
   });
@@ -64,7 +68,7 @@ describe('useUnsavedChangesGuard', () => {
       wrapper: MemoryRouter,
     });
     const calls = addEventListenerSpy.mock.calls.filter(
-      ([event]) => event === 'beforeunload',
+      ([event]) => event === 'beforeunload'
     );
     expect(calls).toHaveLength(1);
   });
@@ -72,11 +76,11 @@ describe('useUnsavedChangesGuard', () => {
   it('removes beforeunload listener on unmount', () => {
     const { unmount } = renderHook(
       () => useUnsavedChangesGuard(true, 'TestComponent'),
-      { wrapper: MemoryRouter },
+      { wrapper: MemoryRouter }
     );
     unmount();
     const calls = removeEventListenerSpy.mock.calls.filter(
-      ([event]) => event === 'beforeunload',
+      ([event]) => event === 'beforeunload'
     );
     expect(calls).toHaveLength(1);
   });
@@ -85,13 +89,13 @@ describe('useUnsavedChangesGuard', () => {
     const { rerender, unmount } = renderHook(
       ({ dirty }: { dirty: boolean }) =>
         useUnsavedChangesGuard(dirty, 'TestComponent'),
-      { wrapper: MemoryRouter, initialProps: { dirty: true } },
+      { wrapper: MemoryRouter, initialProps: { dirty: true } }
     );
     // After initial render with dirty=true, handler is registered
     rerender({ dirty: false });
     // After rerender with dirty=false, previous handler should be removed
     const removeCalls = removeEventListenerSpy.mock.calls.filter(
-      ([event]) => event === 'beforeunload',
+      ([event]) => event === 'beforeunload'
     );
     expect(removeCalls.length).toBeGreaterThanOrEqual(1);
     unmount();
@@ -116,11 +120,15 @@ describe('useUnsavedChangesGuard', () => {
   // ── Return value ──────────────────────────────────────────────────────────
 
   it('returns the blocker object from useBlocker', () => {
-    const mockBlocker = { state: 'unblocked' as const, proceed: vi.fn(), reset: vi.fn() };
+    const mockBlocker = {
+      state: 'unblocked' as const,
+      proceed: vi.fn(),
+      reset: vi.fn(),
+    };
     vi.mocked(RRD.useBlocker).mockReturnValue(mockBlocker as never);
     const { result } = renderHook(
       () => useUnsavedChangesGuard(false, 'TestComponent'),
-      { wrapper: MemoryRouter },
+      { wrapper: MemoryRouter }
     );
     expect(result.current).toBe(mockBlocker);
   });
@@ -138,7 +146,7 @@ describe('useUnsavedChangesGuard', () => {
       wrapper: MemoryRouter,
     });
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[LessonPipelinePage]'),
+      expect.stringContaining('[LessonPipelinePage]')
     );
     errorSpy.mockRestore();
   });

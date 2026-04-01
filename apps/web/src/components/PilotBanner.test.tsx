@@ -25,12 +25,16 @@ describe('PilotBanner', () => {
 
   it('shows "days remaining" text', () => {
     renderBanner(30);
-    expect(screen.getByTestId('pilot-banner')).toHaveTextContent(/days remaining/i);
+    expect(screen.getByTestId('pilot-banner')).toHaveTextContent(
+      /days remaining/i
+    );
   });
 
   it('shows singular "day" when 1 day remaining', () => {
     renderBanner(1);
-    expect(screen.getByTestId('pilot-banner')).toHaveTextContent('1 day remaining');
+    expect(screen.getByTestId('pilot-banner')).toHaveTextContent(
+      '1 day remaining'
+    );
   });
 
   it('adds animate-pulse class when daysRemaining < 14', () => {

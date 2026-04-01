@@ -17,9 +17,9 @@ vi.mock('ai', () => ({
 }));
 
 vi.mock('@ai-sdk/openai', () => ({
-  createOpenAI: vi.fn().mockReturnValue(
-    vi.fn().mockReturnValue({ modelId: 'gpt-4o-mini' }),
-  ),
+  createOpenAI: vi
+    .fn()
+    .mockReturnValue(vi.fn().mockReturnValue({ modelId: 'gpt-4o-mini' })),
 }));
 
 vi.mock('@edusphere/config', () => ({
@@ -67,7 +67,7 @@ function mockChatResponse(course: Record<string, unknown> = VALID_COURSE) {
 /** Helper: mock /api/tags then /api/chat for the FIRST test */
 function mockTagsAndChat(
   models: string[] = ['qwen2.5:0.5b'],
-  course: Record<string, unknown> = VALID_COURSE,
+  course: Record<string, unknown> = VALID_COURSE
 ) {
   mockFetch
     .mockResolvedValueOnce({
@@ -95,7 +95,7 @@ describe('CourseSchema', () => {
 
   it('rejects empty modules array', () => {
     expect(() =>
-      CourseSchema.parse({ ...VALID_COURSE, modules: [] }),
+      CourseSchema.parse({ ...VALID_COURSE, modules: [] })
     ).toThrow();
   });
 
@@ -106,12 +106,15 @@ describe('CourseSchema', () => {
       contentItemTitles: [],
     }));
     expect(() =>
-      CourseSchema.parse({ ...VALID_COURSE, modules: tooMany }),
+      CourseSchema.parse({ ...VALID_COURSE, modules: tooMany })
     ).toThrow();
   });
 
   it('defaults description to empty string', () => {
-    const result = CourseSchema.parse({ title: 'Test', modules: [{ title: 'M1' }] });
+    const result = CourseSchema.parse({
+      title: 'Test',
+      modules: [{ title: 'M1' }],
+    });
     expect(result.description).toBe('');
     expect(result.modules[0].description).toBe('');
   });
@@ -217,7 +220,11 @@ describe('createCourseGeneratorWorkflow', () => {
       title: 'Alt Names',
       description: '',
       modules: [
-        { title: 'M1', description: '', content_items: ['Lesson A', 'Lesson B'] },
+        {
+          title: 'M1',
+          description: '',
+          content_items: ['Lesson A', 'Lesson B'],
+        },
       ],
     };
     mockChatResponse(courseWithAltNames);

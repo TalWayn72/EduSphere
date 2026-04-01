@@ -288,9 +288,9 @@ describe('UserResolver', () => {
 
     it('throws UnauthorizedException when not authenticated', async () => {
       const ctx = { req: {} };
-      await expect(
-        resolver.listUsers(undefined, ctx)
-      ).rejects.toBeInstanceOf(Error);
+      await expect(resolver.listUsers(undefined, ctx)).rejects.toBeInstanceOf(
+        Error
+      );
     });
 
     it('delegates to userService.listUsers with empty opts when input undefined', async () => {

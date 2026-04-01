@@ -176,7 +176,11 @@ describe('LiveSessionsService', () => {
         startedAt: new Date('2026-03-06T10:00:00Z'),
         endedAt: null,
       };
-      const updatedSession = { ...existingSession, status: 'ENDED', endedAt: new Date() };
+      const updatedSession = {
+        ...existingSession,
+        status: 'ENDED',
+        endedAt: new Date(),
+      };
 
       setSelectResult([existingSession]);
       setUpdateResult([updatedSession]);
@@ -216,7 +220,12 @@ describe('LiveSessionsService', () => {
   describe('joinLiveSession', () => {
     it('happy path: returns room URL for a LIVE session', async () => {
       setSelectResult([
-        { id: 'session-1', tenantId: 'tenant-1', status: 'LIVE', startedAt: new Date() },
+        {
+          id: 'session-1',
+          tenantId: 'tenant-1',
+          status: 'LIVE',
+          startedAt: new Date(),
+        },
       ]);
 
       const result = await service.joinLiveSession(
@@ -232,7 +241,12 @@ describe('LiveSessionsService', () => {
 
     it('throws BadRequestException when session is not LIVE (SCHEDULED)', async () => {
       setSelectResult([
-        { id: 'session-1', tenantId: 'tenant-1', status: 'SCHEDULED', startedAt: null },
+        {
+          id: 'session-1',
+          tenantId: 'tenant-1',
+          status: 'SCHEDULED',
+          startedAt: null,
+        },
       ]);
 
       await expect(
@@ -242,7 +256,12 @@ describe('LiveSessionsService', () => {
 
     it('throws BadRequestException when session is ENDED', async () => {
       setSelectResult([
-        { id: 'session-1', tenantId: 'tenant-1', status: 'ENDED', startedAt: new Date() },
+        {
+          id: 'session-1',
+          tenantId: 'tenant-1',
+          status: 'ENDED',
+          startedAt: new Date(),
+        },
       ]);
 
       await expect(
@@ -287,7 +306,13 @@ describe('LiveSessionsService', () => {
 
     it('throws BadRequestException when session is already ENDED', async () => {
       setSelectResult([
-        { id: 'session-1', tenantId: 'tenant-1', status: 'ENDED', startedAt: new Date(), endedAt: new Date() },
+        {
+          id: 'session-1',
+          tenantId: 'tenant-1',
+          status: 'ENDED',
+          startedAt: new Date(),
+          endedAt: new Date(),
+        },
       ]);
 
       await expect(
@@ -297,7 +322,13 @@ describe('LiveSessionsService', () => {
 
     it('throws BadRequestException when session is LIVE', async () => {
       setSelectResult([
-        { id: 'session-1', tenantId: 'tenant-1', status: 'LIVE', startedAt: new Date(), endedAt: null },
+        {
+          id: 'session-1',
+          tenantId: 'tenant-1',
+          status: 'LIVE',
+          startedAt: new Date(),
+          endedAt: null,
+        },
       ]);
 
       await expect(
@@ -341,12 +372,7 @@ describe('LiveSessionsService', () => {
 
     it('publishes ended event with null duration when startedAt is null', async () => {
       await expect(
-        service.publishSessionEnded(
-          'session-1',
-          'tenant-1',
-          new Date(),
-          null
-        )
+        service.publishSessionEnded('session-1', 'tenant-1', new Date(), null)
       ).resolves.toBeUndefined();
     });
   });

@@ -11,15 +11,26 @@ const mockStore: Record<string, string> = {};
 vi.mock('@react-native-async-storage/async-storage', () => ({
   default: {
     getItem: vi.fn(async (key: string) => mockStore[key] ?? null),
-    setItem: vi.fn(async (key: string, value: string) => { mockStore[key] = value; }),
-    removeItem: vi.fn(async (key: string) => { delete mockStore[key]; }),
+    setItem: vi.fn(async (key: string, value: string) => {
+      mockStore[key] = value;
+    }),
+    removeItem: vi.fn(async (key: string) => {
+      delete mockStore[key];
+    }),
   },
 }));
 
-import { checkAiConsent, grantAiConsent, AI_CONSENT_KEY } from '../../lib/ai-consent';
+import {
+  checkAiConsent,
+  grantAiConsent,
+  AI_CONSENT_KEY,
+} from '../../lib/ai-consent';
 
 // Mirror resolveSessionId from AITutorScreen
-function resolveSessionId(mutationResult: string | null, fallback: string): string {
+function resolveSessionId(
+  mutationResult: string | null,
+  fallback: string
+): string {
   if (mutationResult && mutationResult.trim().length > 0) return mutationResult;
   return fallback;
 }
@@ -38,7 +49,12 @@ interface AgentMessage {
 }
 
 function createUserMessage(content: string): AgentMessage {
-  return { id: Date.now().toString(), role: 'USER', content, createdAt: new Date().toISOString() };
+  return {
+    id: Date.now().toString(),
+    role: 'USER',
+    content,
+    createdAt: new Date().toISOString(),
+  };
 }
 
 beforeEach(() => {
@@ -63,7 +79,12 @@ describe('AITutorScreen — chat interface rendering logic', () => {
 
   it('AI response appended after user message', () => {
     const messages: AgentMessage[] = [createUserMessage('Hi')];
-    const aiMsg: AgentMessage = { id: 'ai-1', role: 'ASSISTANT', content: 'Hello!', createdAt: new Date().toISOString() };
+    const aiMsg: AgentMessage = {
+      id: 'ai-1',
+      role: 'ASSISTANT',
+      content: 'Hello!',
+      createdAt: new Date().toISOString(),
+    };
     messages.push(aiMsg);
     expect(messages).toHaveLength(2);
     expect(messages[1].role).toBe('ASSISTANT');
@@ -107,7 +128,9 @@ describe('AITutorScreen — consent gate (SI-10)', () => {
 
 describe('AITutorScreen — session creation', () => {
   it('uses mutation result when valid', () => {
-    expect(resolveSessionId('session-real-123', 'demo-session')).toBe('session-real-123');
+    expect(resolveSessionId('session-real-123', 'demo-session')).toBe(
+      'session-real-123'
+    );
   });
 
   it('falls back to demo-session on null', () => {
@@ -132,7 +155,7 @@ describe('AITutorScreen — error handling', () => {
       graphQLErrors: [{ extensions: { code: 'CONSENT_REQUIRED' } }],
     };
     const consentErr = gqlError.graphQLErrors.find(
-      e => e.extensions?.code === 'CONSENT_REQUIRED'
+      (e) => e.extensions?.code === 'CONSENT_REQUIRED'
     );
     expect(consentErr).toBeDefined();
   });
@@ -142,7 +165,7 @@ describe('AITutorScreen — error handling', () => {
       graphQLErrors: [{ extensions: { code: 'INTERNAL_ERROR' } }],
     };
     const consentErr = gqlError.graphQLErrors.find(
-      e => e.extensions?.code === 'CONSENT_REQUIRED'
+      (e) => e.extensions?.code === 'CONSENT_REQUIRED'
     );
     expect(consentErr).toBeUndefined();
   });

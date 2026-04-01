@@ -55,7 +55,12 @@ export class SkillTreeResolver {
       { limit, tenantId, userId },
       '[SkillTreeResolver] myTopMasteryTopics query'
     );
-    return this.skillTreeService.getTopMasteryTopics(tenantId, userId, role, limit);
+    return this.skillTreeService.getTopMasteryTopics(
+      tenantId,
+      userId,
+      role,
+      limit
+    );
   }
 
   @Mutation('updateMasteryLevel')

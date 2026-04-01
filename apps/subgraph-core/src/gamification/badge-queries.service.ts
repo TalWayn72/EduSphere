@@ -123,10 +123,7 @@ export class BadgeQueriesService {
     });
   }
 
-  async countUserCourses(
-    userId: string,
-    tenantId: string
-  ): Promise<number> {
+  async countUserCourses(userId: string, tenantId: string): Promise<number> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
       const rows = await tx.execute<{ count: string }>(sql`

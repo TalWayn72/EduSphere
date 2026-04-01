@@ -18,7 +18,7 @@ function mockGraphQLError(page: import('@playwright/test').Page) {
       body: JSON.stringify({
         errors: [{ message: 'Internal Server Error' }],
       }),
-    }),
+    })
   );
 }
 
@@ -29,7 +29,7 @@ function mockGraphQLEmpty(page: import('@playwright/test').Page) {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ data: {} }),
-    }),
+    })
   );
 }
 
@@ -54,7 +54,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-graphql-dashboard-tablet.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-graphql-dashboard-tablet.png',
+        STABLE_OPTS
+      );
     });
 
     test('GraphQL error on courses at tablet', async ({ page }) => {
@@ -63,7 +66,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/courses');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-graphql-courses-tablet.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-graphql-courses-tablet.png',
+        STABLE_OPTS
+      );
     });
 
     test('empty dashboard at tablet', async ({ page }) => {
@@ -72,7 +78,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-dashboard-tablet.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-dashboard-tablet.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on dashboard at tablet', async ({ page }) => {
@@ -81,7 +90,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-dashboard-tablet.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-dashboard-tablet.png',
+        STABLE_OPTS
+      );
     });
   });
 
@@ -100,7 +112,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-graphql-dashboard-mobile.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-graphql-dashboard-mobile.png',
+        STABLE_OPTS
+      );
     });
 
     test('GraphQL error on courses at mobile', async ({ page }) => {
@@ -109,7 +124,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/courses');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-graphql-courses-mobile.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-graphql-courses-mobile.png',
+        STABLE_OPTS
+      );
     });
 
     test('empty courses at mobile', async ({ page }) => {
@@ -118,13 +136,18 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { courses: { edges: [], pageInfo: { hasNextPage: false } } } }),
-        }),
+          body: JSON.stringify({
+            data: { courses: { edges: [], pageInfo: { hasNextPage: false } } },
+          }),
+        })
       );
       await page.goto('/courses');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-courses-mobile.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-courses-mobile.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on courses at mobile', async ({ page }) => {
@@ -133,18 +156,28 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/courses');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-courses-mobile.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-courses-mobile.png',
+        STABLE_OPTS
+      );
     });
 
     test('500 on dashboard at mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 812 });
       await page.route('**/graphql', (route) =>
-        route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Internal Server Error' }) }),
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Internal Server Error' }),
+        })
       );
       await page.goto('/dashboard');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-500-dashboard-mobile.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-500-dashboard-mobile.png',
+        STABLE_OPTS
+      );
     });
   });
 
@@ -154,13 +187,20 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { notifications: { edges: [], pageInfo: { hasNextPage: false } } } }),
-        }),
+          body: JSON.stringify({
+            data: {
+              notifications: { edges: [], pageInfo: { hasNextPage: false } },
+            },
+          }),
+        })
       );
       await page.goto('/notifications');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-notifications.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-notifications.png',
+        STABLE_OPTS
+      );
     });
 
     test('achievements with no badges', async ({ page }) => {
@@ -169,12 +209,15 @@ test.describe('Visual Regression — Error States', () => {
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({ data: { achievements: [], badges: [] } }),
-        }),
+        })
       );
       await page.goto('/achievements');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-achievements.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-achievements.png',
+        STABLE_OPTS
+      );
     });
 
     test('analytics with no data', async ({ page }) => {
@@ -182,7 +225,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/analytics');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-analytics.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-analytics.png',
+        STABLE_OPTS
+      );
     });
 
     test('knowledge graph with no nodes', async ({ page }) => {
@@ -190,13 +236,18 @@ test.describe('Visual Regression — Error States', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ data: { knowledgeGraph: { nodes: [], edges: [] } } }),
-        }),
+          body: JSON.stringify({
+            data: { knowledgeGraph: { nodes: [], edges: [] } },
+          }),
+        })
       );
       await page.goto('/knowledge-graph');
       await page.waitForLoadState('domcontentloaded').catch(() => {});
       await page.waitForTimeout(500);
-      await expect(page).toHaveScreenshot('error-empty-knowledge-graph.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-empty-knowledge-graph.png',
+        STABLE_OPTS
+      );
     });
   });
 
@@ -206,7 +257,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/exams');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-exams.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-exams.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on social', async ({ page }) => {
@@ -214,7 +268,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/social');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-social.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-social.png',
+        STABLE_OPTS
+      );
     });
 
     test('network error on admin', async ({ page }) => {
@@ -222,7 +279,10 @@ test.describe('Visual Regression — Error States', () => {
       await page.goto('/admin');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
-      await expect(page).toHaveScreenshot('error-network-admin.png', STABLE_OPTS);
+      await expect(page).toHaveScreenshot(
+        'error-network-admin.png',
+        STABLE_OPTS
+      );
     });
   });
 });

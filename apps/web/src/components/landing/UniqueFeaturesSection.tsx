@@ -4,9 +4,21 @@ import { Network, Image, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const FEATURE_KEYS = [
-  { icon: Network, key: 'knowledgeGraph', badgeColor: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-  { icon: Image, key: 'visualAnchoring', badgeColor: 'bg-amber-100 text-amber-700 border-amber-200' },
-  { icon: Zap, key: 'aiCourseBuilder', badgeColor: 'bg-green-100 text-green-700 border-green-200' },
+  {
+    icon: Network,
+    key: 'knowledgeGraph',
+    badgeColor: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+  },
+  {
+    icon: Image,
+    key: 'visualAnchoring',
+    badgeColor: 'bg-amber-100 text-amber-700 border-amber-200',
+  },
+  {
+    icon: Zap,
+    key: 'aiCourseBuilder',
+    badgeColor: 'bg-green-100 text-green-700 border-green-200',
+  },
 ];
 
 export function UniqueFeaturesSection() {
@@ -35,10 +47,16 @@ export function UniqueFeaturesSection() {
               className="bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden hover:shadow-xl transition-shadow dark:bg-gray-900 dark:border-slate-600"
             >
               {/* Indigo gradient top border */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600" aria-hidden="true" />
+              <div
+                className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600"
+                aria-hidden="true"
+              />
               <div className="p-7">
                 <div className="p-3 rounded-xl bg-indigo-50 inline-flex mb-5 dark:bg-indigo-950">
-                  <Icon className="h-7 w-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Icon
+                    className="h-7 w-7 text-indigo-600 dark:text-indigo-400"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="mb-3">
                   <Badge
@@ -48,11 +66,22 @@ export function UniqueFeaturesSection() {
                     {t(`landing.features.${key}.badge`)}
                   </Badge>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3 dark:text-slate-100">{t(`landing.features.${key}.title`)}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-4 dark:text-slate-400">{t(`landing.features.${key}.desc`)}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-3 dark:text-slate-100">
+                  {t(`landing.features.${key}.title`)}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4 dark:text-slate-400">
+                  {t(`landing.features.${key}.desc`)}
+                </p>
                 <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 dark:bg-slate-800">
-                  <span className="text-green-600 font-bold text-sm dark:text-green-400" aria-hidden="true">✓</span>
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t(`landing.features.${key}.detail`)}</span>
+                  <span
+                    className="text-green-600 font-bold text-sm dark:text-green-400"
+                    aria-hidden="true"
+                  >
+                    ✓
+                  </span>
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    {t(`landing.features.${key}.detail`)}
+                  </span>
                 </div>
               </div>
             </div>

@@ -37,13 +37,19 @@ describe('AtRiskThresholdsService', () => {
 
   describe('getThresholds', () => {
     it('returns stored thresholds from tenant settings', async () => {
-      const custom = { inactivityDays: 7, minCompletionPct: 20, minQuizScorePct: 60 };
+      const custom = {
+        inactivityDays: 7,
+        minCompletionPct: 20,
+        minQuizScorePct: 60,
+      };
       mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
         const mockTx = {
           select: vi.fn().mockReturnThis(),
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue([{ settings: { atRiskThresholds: custom } }]),
+          limit: vi
+            .fn()
+            .mockResolvedValue([{ settings: { atRiskThresholds: custom } }]),
         };
         return fn(mockTx as never);
       });
@@ -92,7 +98,11 @@ describe('AtRiskThresholdsService', () => {
 
   describe('saveThresholds', () => {
     it('merges thresholds into existing settings and returns input', async () => {
-      const newThresholds = { inactivityDays: 3, minCompletionPct: 50, minQuizScorePct: 80 };
+      const newThresholds = {
+        inactivityDays: 3,
+        minCompletionPct: 50,
+        minQuizScorePct: 80,
+      };
       let capturedSet: Record<string, unknown> | null = null;
 
       mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
@@ -110,7 +120,11 @@ describe('AtRiskThresholdsService', () => {
         return fn(mockTx as never);
       });
 
-      const result = await service.saveThresholds(TENANT_ID, newThresholds, CTX);
+      const result = await service.saveThresholds(
+        TENANT_ID,
+        newThresholds,
+        CTX
+      );
       expect(result).toEqual(newThresholds);
       expect(capturedSet).toBeDefined();
       expect((capturedSet as Record<string, unknown>)['settings']).toEqual({
@@ -120,7 +134,11 @@ describe('AtRiskThresholdsService', () => {
     });
 
     it('handles null existing settings gracefully', async () => {
-      const newThresholds = { inactivityDays: 5, minCompletionPct: 40, minQuizScorePct: 70 };
+      const newThresholds = {
+        inactivityDays: 5,
+        minCompletionPct: 40,
+        minQuizScorePct: 70,
+      };
 
       mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
         const mockTx = {
@@ -134,15 +152,25 @@ describe('AtRiskThresholdsService', () => {
         return fn(mockTx as never);
       });
 
-      const result = await service.saveThresholds(TENANT_ID, newThresholds, CTX);
+      const result = await service.saveThresholds(
+        TENANT_ID,
+        newThresholds,
+        CTX
+      );
       expect(result).toEqual(newThresholds);
     });
 
     it('propagates DB errors to caller', async () => {
       mockWithTenantContext.mockRejectedValue(new Error('Write failed'));
 
-      const thresholds = { inactivityDays: 1, minCompletionPct: 10, minQuizScorePct: 10 };
-      await expect(service.saveThresholds(TENANT_ID, thresholds, CTX)).rejects.toThrow('Write failed');
+      const thresholds = {
+        inactivityDays: 1,
+        minCompletionPct: 10,
+        minQuizScorePct: 10,
+      };
+      await expect(
+        service.saveThresholds(TENANT_ID, thresholds, CTX)
+      ).rejects.toThrow('Write failed');
     });
   });
 

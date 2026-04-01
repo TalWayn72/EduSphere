@@ -50,9 +50,13 @@ function collectTsFiles(dir: string): string[] {
         ) {
           results.push(full);
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
-  } catch { /* skip */ }
+  } catch {
+    /* skip */
+  }
   return results;
 }
 
@@ -127,7 +131,7 @@ describe('No wildcard CORS in any production source (SI-2 global)', () => {
           const lines = content.split('\n');
           for (let i = 0; i < lines.length; i++) {
             if (
-              lines[i].includes("Access-Control-Allow-Origin") &&
+              lines[i].includes('Access-Control-Allow-Origin') &&
               lines[i].includes("'*'")
             ) {
               violations.push({
@@ -136,16 +140,16 @@ describe('No wildcard CORS in any production source (SI-2 global)', () => {
               });
             }
           }
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
     }
   });
 
   it('must have zero wildcard CORS headers in production TypeScript files', () => {
     if (violations.length > 0) {
-      const details = violations
-        .map((v) => `  ${v.file}:${v.line}`)
-        .join('\n');
+      const details = violations.map((v) => `  ${v.file}:${v.line}`).join('\n');
       expect.fail(
         `Found ${violations.length} wildcard CORS violation(s):\n${details}`
       );

@@ -2,11 +2,7 @@
  * Read-only queries and mappers for lesson pipelines and pipeline runs.
  * Extracted from LessonPipelineService for file-size compliance.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,

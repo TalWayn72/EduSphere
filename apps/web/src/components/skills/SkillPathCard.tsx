@@ -40,11 +40,13 @@ export function SkillPathCard({ path, progress }: SkillPathCardProps) {
   const masteredIds = new Set(
     progress
       .filter((p) => MASTERED_LEVELS.has(p.masteryLevel))
-      .map((p) => p.skillId),
+      .map((p) => p.skillId)
   );
 
   const totalSkills = path.skillIds.length;
-  const masteredCount = path.skillIds.filter((id) => masteredIds.has(id)).length;
+  const masteredCount = path.skillIds.filter((id) =>
+    masteredIds.has(id)
+  ).length;
   const completionPct =
     totalSkills > 0 ? Math.round((masteredCount / totalSkills) * 100) : 0;
 
@@ -60,7 +62,9 @@ export function SkillPathCard({ path, progress }: SkillPathCardProps) {
           )}
         </div>
         {path.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">{path.description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {path.description}
+          </p>
         )}
       </CardHeader>
 
@@ -81,7 +85,11 @@ export function SkillPathCard({ path, progress }: SkillPathCardProps) {
             </span>
             <span className="font-medium">{completionPct}%</span>
           </div>
-          <Progress value={completionPct} className="h-2" aria-label="Skill path completion" />
+          <Progress
+            value={completionPct}
+            className="h-2"
+            aria-label="Skill path completion"
+          />
         </div>
 
         {/* Action row */}
@@ -118,11 +126,14 @@ export function SkillPathCard({ path, progress }: SkillPathCardProps) {
               Skills in this path
             </p>
             {path.skillIds.length === 0 ? (
-              <p className="text-muted-foreground text-xs">No skills defined yet.</p>
+              <p className="text-muted-foreground text-xs">
+                No skills defined yet.
+              </p>
             ) : (
               <p className="text-muted-foreground text-xs">
-                {path.skillIds.length} skill{path.skillIds.length !== 1 ? 's' : ''} — open Gap
-                Analysis for details.
+                {path.skillIds.length} skill
+                {path.skillIds.length !== 1 ? 's' : ''} — open Gap Analysis for
+                details.
               </p>
             )}
           </div>

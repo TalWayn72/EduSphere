@@ -45,7 +45,11 @@ const MOCK_ANCHOR_WITH_IMAGE = {
     mimeType: 'image/png',
     filename: 'epistemology-diagram.png',
     scanStatus: 'CLEAN',
-    metadata: { width: 280, height: 200, altText: 'Epistemology concept diagram' },
+    metadata: {
+      width: 280,
+      height: 200,
+      altText: 'Epistemology concept diagram',
+    },
   },
 };
 
@@ -116,7 +120,10 @@ async function mockGraphQL(
 
 async function mockAnchors(page: Page, anchors: object[]): Promise<void> {
   await mockGraphQL(page, (body) => {
-    if (body.includes('GetVisualAnchors') || body.includes('getVisualAnchors')) {
+    if (
+      body.includes('GetVisualAnchors') ||
+      body.includes('getVisualAnchors')
+    ) {
       return { data: { getVisualAnchors: anchors } };
     }
     return null;
@@ -125,11 +132,23 @@ async function mockAnchors(page: Page, anchors: object[]): Promise<void> {
 
 async function mockInstructorAnchors(page: Page): Promise<void> {
   await mockGraphQL(page, (body) => {
-    if (body.includes('GetVisualAnchors') || body.includes('getVisualAnchors')) {
+    if (
+      body.includes('GetVisualAnchors') ||
+      body.includes('getVisualAnchors')
+    ) {
       return { data: { getVisualAnchors: MOCK_ANCHOR_LIST } };
     }
-    if (body.includes('Mutation') || body.includes('CreateAnchor') || body.includes('DeleteAnchor')) {
-      return { data: { createVisualAnchor: { id: 'new-anchor-1' }, deleteVisualAnchor: { success: true } } };
+    if (
+      body.includes('Mutation') ||
+      body.includes('CreateAnchor') ||
+      body.includes('DeleteAnchor')
+    ) {
+      return {
+        data: {
+          createVisualAnchor: { id: 'new-anchor-1' },
+          deleteVisualAnchor: { success: true },
+        },
+      };
     }
     return null;
   });
@@ -146,7 +165,6 @@ async function loginAndGoto(page: Page, path: string): Promise<void> {
 // ─── Suite: Visual Anchoring — Part 2 ───────────────────────────────────────
 
 test.describe('Visual Anchoring — Visual Regression (Part 2)', () => {
-
   test('InstructorAnchorPanel — with anchor list', async ({ page }) => {
     await mockInstructorAnchors(page);
     await loginAndGoto(page, `${BASE_URL}/learn/media-doc-1`);
@@ -157,9 +175,7 @@ test.describe('Visual Anchoring — Visual Regression (Part 2)', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
 
-    const panel = page
-      .locator('[aria-label="לוח עוגנים חזותיים"]')
-      .first();
+    const panel = page.locator('[aria-label="לוח עוגנים חזותיים"]').first();
     const panelVisible = await panel.isVisible().catch(() => false);
 
     if (panelVisible) {
@@ -173,16 +189,22 @@ test.describe('Visual Anchoring — Visual Regression (Part 2)', () => {
         .first();
       const panelByIdVisible = await panelById.isVisible().catch(() => false);
       if (panelByIdVisible) {
-        await expect(panelById).toHaveScreenshot('instructor-anchor-panel-list.png', {
-          maxDiffPixels: 200,
-          animations: 'disabled',
-        });
+        await expect(panelById).toHaveScreenshot(
+          'instructor-anchor-panel-list.png',
+          {
+            maxDiffPixels: 200,
+            animations: 'disabled',
+          }
+        );
       } else {
-        await expect(page).toHaveScreenshot('instructor-anchor-panel-list.png', {
-          fullPage: false,
-          maxDiffPixels: 200,
-          animations: 'disabled',
-        });
+        await expect(page).toHaveScreenshot(
+          'instructor-anchor-panel-list.png',
+          {
+            fullPage: false,
+            maxDiffPixels: 200,
+            animations: 'disabled',
+          }
+        );
       }
     }
   });
@@ -215,5 +237,4 @@ test.describe('Visual Anchoring — Visual Regression (Part 2)', () => {
       animations: 'disabled',
     });
   });
-
 });

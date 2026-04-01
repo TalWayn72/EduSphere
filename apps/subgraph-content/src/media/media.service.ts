@@ -157,12 +157,18 @@ export class MediaService implements OnModuleDestroy {
       })
       .returning();
 
-    this.logger.log(`Media asset confirmed: id=${asset?.id} course=${courseId}`);
+    this.logger.log(
+      `Media asset confirmed: id=${asset?.id} course=${courseId}`
+    );
 
     if (asset?.id) {
       await this.publishMediaUploaded({
-        assetId: asset.id, fileKey, courseId, tenantId,
-        fileName: title, contentType,
+        assetId: asset.id,
+        fileKey,
+        courseId,
+        tenantId,
+        fileName: title,
+        contentType,
       });
     }
 
@@ -170,13 +176,22 @@ export class MediaService implements OnModuleDestroy {
     try {
       downloadUrl = await this.getPresignedDownloadUrl(fileKey);
     } catch {
-      this.logger.warn(`Could not generate download URL for asset ${asset?.id}`);
+      this.logger.warn(
+        `Could not generate download URL for asset ${asset?.id}`
+      );
     }
 
     return {
-      id: asset?.id ?? '', courseId: asset?.course_id ?? courseId,
-      fileKey, title, contentType, status: 'READY', downloadUrl,
-      hlsManifestUrl: null, captionsUrl: null, altText: null,
+      id: asset?.id ?? '',
+      courseId: asset?.course_id ?? courseId,
+      fileKey,
+      title,
+      contentType,
+      status: 'READY',
+      downloadUrl,
+      hlsManifestUrl: null,
+      captionsUrl: null,
+      altText: null,
     };
   }
 
@@ -186,7 +201,9 @@ export class MediaService implements OnModuleDestroy {
     tenantId: string
   ): Promise<MediaAssetResult> {
     return this.queriesService.updateAltText(
-      mediaId, altText, tenantId,
+      mediaId,
+      altText,
+      tenantId,
       (key) => this.getPresignedDownloadUrl(key)
     );
   }
@@ -199,7 +216,8 @@ export class MediaService implements OnModuleDestroy {
       return await this.getPresignedDownloadUrl(hlsManifestKey);
     } catch (err) {
       this.logger.warn(
-        `Could not generate HLS manifest URL for key=${hlsManifestKey}`, err
+        `Could not generate HLS manifest URL for key=${hlsManifestKey}`,
+        err
       );
       return null;
     }
@@ -208,8 +226,8 @@ export class MediaService implements OnModuleDestroy {
   async getSubtitleTracks(
     assetId: string
   ): Promise<{ language: string; label: string; src: string }[]> {
-    return this.queriesService.getSubtitleTracks(
-      assetId, (key) => this.getPresignedDownloadUrl(key)
+    return this.queriesService.getSubtitleTracks(assetId, (key) =>
+      this.getPresignedDownloadUrl(key)
     );
   }
 
@@ -235,20 +253,27 @@ export class MediaService implements OnModuleDestroy {
     const contentType = contentTypeForModelFormat(normalizedFormat);
 
     const command = new PutObjectCommand({
-      Bucket: this.bucket, Key: key,
-      ContentType: contentType, ContentLength: contentLength,
+      Bucket: this.bucket,
+      Key: key,
+      ContentType: contentType,
+      ContentLength: contentLength,
     });
 
     let uploadUrl: string;
     try {
       uploadUrl = await this.minioBreaker.execute(() =>
-        getSignedUrl(this.s3, command, { expiresIn: PRESIGNED_URL_EXPIRY_SECONDS })
+        getSignedUrl(this.s3, command, {
+          expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
+        })
       );
     } catch (err) {
       this.logger.error(
-        `createModel3DUpload: failed to generate presigned URL for key=${key}`, err
+        `createModel3DUpload: failed to generate presigned URL for key=${key}`,
+        err
       );
-      throw new InternalServerErrorException('Failed to generate 3D model upload URL');
+      throw new InternalServerErrorException(
+        'Failed to generate 3D model upload URL'
+      );
     }
 
     const resolvedCourseId = UUID_RE.test(courseId) ? courseId : null;
@@ -257,11 +282,16 @@ export class MediaService implements OnModuleDestroy {
     const [asset] = await this.db
       .insert(schema.media_assets)
       .values({
-        tenant_id: tenantId, course_id: resolvedCourseId,
-        module_id: resolvedModuleId, title: sanitizedName,
-        media_type: 'MODEL_3D', file_url: key,
-        transcription_status: 'PENDING', model_format: normalizedFormat,
-        model_animations: [], metadata: { uploadedById: userId, contentType },
+        tenant_id: tenantId,
+        course_id: resolvedCourseId,
+        module_id: resolvedModuleId,
+        title: sanitizedName,
+        media_type: 'MODEL_3D',
+        file_url: key,
+        transcription_status: 'PENDING',
+        model_format: normalizedFormat,
+        model_animations: [],
+        metadata: { uploadedById: userId, contentType },
       })
       .returning();
 
@@ -273,16 +303,28 @@ export class MediaService implements OnModuleDestroy {
   }
 
   private async publishMediaUploaded(payload: {
-    assetId: string; fileKey: string; courseId: string;
-    tenantId: string; fileName: string; contentType: string;
+    assetId: string;
+    fileKey: string;
+    courseId: string;
+    tenantId: string;
+    fileName: string;
+    contentType: string;
   }): Promise<void> {
     try {
       const nc = await this.getNatsConnection();
-      nc.publish('EDUSPHERE.media.uploaded', this.sc.encode(JSON.stringify(payload)));
+      nc.publish(
+        'EDUSPHERE.media.uploaded',
+        this.sc.encode(JSON.stringify(payload))
+      );
       await nc.flush();
-      this.logger.debug(`Published EDUSPHERE.media.uploaded: assetId=${payload.assetId}`);
+      this.logger.debug(
+        `Published EDUSPHERE.media.uploaded: assetId=${payload.assetId}`
+      );
     } catch (err) {
-      this.logger.error('Failed to publish EDUSPHERE.media.uploaded to NATS', err);
+      this.logger.error(
+        'Failed to publish EDUSPHERE.media.uploaded to NATS',
+        err
+      );
       this.natsConn = null;
     }
   }

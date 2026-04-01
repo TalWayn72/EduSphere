@@ -173,10 +173,18 @@ describe('DragOrderQuestion', () => {
     render(
       <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
     );
-    expect(screen.getByRole('button', { name: 'Move Observe up' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Move Observe down' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Move Conclude up' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Move Conclude down' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move Observe up' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move Observe down' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move Conclude up' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move Conclude down' })
+    ).toBeInTheDocument();
   });
 
   it('Move up button is disabled on the first item', () => {
@@ -215,7 +223,9 @@ describe('DragOrderQuestion', () => {
     render(
       <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Move Hypothesize up' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Move Hypothesize up' })
+    );
     expect(onChangeMock).toHaveBeenCalledWith(['b', 'a', 'c', 'd']);
   });
 
@@ -252,7 +262,9 @@ describe('DragOrderQuestion', () => {
         disabled
       />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Move Hypothesize down' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Move Hypothesize down' })
+    );
     expect(onChangeMock).not.toHaveBeenCalled();
   });
 });

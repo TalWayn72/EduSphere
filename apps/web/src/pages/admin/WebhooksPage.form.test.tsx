@@ -5,8 +5,22 @@ import { render, screen } from '@testing-library/react';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('@/components/ui/checkbox', () => ({
-  Checkbox: ({ id, checked, onCheckedChange }: { id: string; checked: boolean; onCheckedChange: () => void }) => (
-    <input type="checkbox" id={id} checked={checked} onChange={onCheckedChange} data-testid={`checkbox-${id}`} />
+  Checkbox: ({
+    id,
+    checked,
+    onCheckedChange,
+  }: {
+    id: string;
+    checked: boolean;
+    onCheckedChange: () => void;
+  }) => (
+    <input
+      type="checkbox"
+      id={id}
+      checked={checked}
+      onChange={onCheckedChange}
+      data-testid={`checkbox-${id}`}
+    />
   ),
 }));
 

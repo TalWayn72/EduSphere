@@ -18,12 +18,32 @@ test.use({ reducedMotion: 'reduce' });
 // ─── Shared mock data ───────────────────────────────────────────────────────
 
 const MOCK_GRADING = [
-  { __typename: 'GradingResult', questionId: 'q1', score: 8, maxScore: 10, explanation: 'Good answer.', suggestions: [] },
-  { __typename: 'GradingResult', questionId: 'q2', score: 5, maxScore: 10, explanation: 'Needs work.', suggestions: ['Study more'] },
+  {
+    __typename: 'GradingResult',
+    questionId: 'q1',
+    score: 8,
+    maxScore: 10,
+    explanation: 'Good answer.',
+    suggestions: [],
+  },
+  {
+    __typename: 'GradingResult',
+    questionId: 'q2',
+    score: 5,
+    maxScore: 10,
+    explanation: 'Needs work.',
+    suggestions: ['Study more'],
+  },
 ];
 
 const MOCK_PROFILES = [
-  { __typename: 'SkillProfile', id: 'role-1', roleName: 'Data Engineer', description: 'Data role', requiredConceptsCount: 10 },
+  {
+    __typename: 'SkillProfile',
+    id: 'role-1',
+    roleName: 'Data Engineer',
+    description: 'Data role',
+    requiredConceptsCount: 10,
+  },
 ];
 
 const MOCK_GAP_REPORT = {
@@ -35,17 +55,46 @@ const MOCK_GAP_REPORT = {
   gapCount: 3,
   completionPercentage: 70,
   gaps: [
-    { __typename: 'SkillGap', conceptName: 'Spark', isMastered: false, recommendedContentItems: ['c-1'], recommendedContentTitles: ['Spark Course'], relevanceScore: 0.9 },
-    { __typename: 'SkillGap', conceptName: 'Kafka', isMastered: false, recommendedContentItems: ['c-2'], recommendedContentTitles: ['Kafka Course'], relevanceScore: 0.7 },
-    { __typename: 'SkillGap', conceptName: 'SQL', isMastered: true, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0.3 },
+    {
+      __typename: 'SkillGap',
+      conceptName: 'Spark',
+      isMastered: false,
+      recommendedContentItems: ['c-1'],
+      recommendedContentTitles: ['Spark Course'],
+      relevanceScore: 0.9,
+    },
+    {
+      __typename: 'SkillGap',
+      conceptName: 'Kafka',
+      isMastered: false,
+      recommendedContentItems: ['c-2'],
+      recommendedContentTitles: ['Kafka Course'],
+      relevanceScore: 0.7,
+    },
+    {
+      __typename: 'SkillGap',
+      conceptName: 'SQL',
+      isMastered: true,
+      recommendedContentItems: [],
+      recommendedContentTitles: [],
+      relevanceScore: 0.3,
+    },
   ],
 };
 
 const MOCK_PROPOSALS = [
   {
-    __typename: 'AnnotationProposal', id: 'prop-1', annotationId: 'ann-1', content: 'Federation resolves via @key.',
-    description: 'Clarification.', authorName: 'Alice', courseId: 'c-1',
-    courseName: 'GraphQL Mastery', contentTimestamp: 60, submittedAt: new Date().toISOString(), status: 'pending',
+    __typename: 'AnnotationProposal',
+    id: 'prop-1',
+    annotationId: 'ann-1',
+    content: 'Federation resolves via @key.',
+    description: 'Clarification.',
+    authorName: 'Alice',
+    courseId: 'c-1',
+    courseName: 'GraphQL Mastery',
+    contentTimestamp: 60,
+    submittedAt: new Date().toISOString(),
+    status: 'pending',
   },
 ];
 
@@ -54,14 +103,46 @@ const MOCK_PARTNER = {
   status: 'ACTIVE',
   apiKey: 'esph_live_abc123def456ghi789',
   revenueByMonth: [
-    { __typename: 'PartnerRevenue', month: '2026-01', grossRevenue: 10000, platformCut: 3000, payout: 7000, status: 'PAID' },
-    { __typename: 'PartnerRevenue', month: '2026-02', grossRevenue: 12500, platformCut: 3750, payout: 8750, status: 'PENDING' },
+    {
+      __typename: 'PartnerRevenue',
+      month: '2026-01',
+      grossRevenue: 10000,
+      platformCut: 3000,
+      payout: 7000,
+      status: 'PAID',
+    },
+    {
+      __typename: 'PartnerRevenue',
+      month: '2026-02',
+      grossRevenue: 12500,
+      platformCut: 3750,
+      payout: 8750,
+      status: 'PENDING',
+    },
   ],
 };
 
 const MOCK_INVOICES = [
-  { __typename: 'Invoice', id: 'inv-1', tenant: 'Acme Corp', plan: 'ENTERPRISE', year: 2026, amount: 24000, status: 'paid', pdfUrl: 'https://example.com/inv-1.pdf' },
-  { __typename: 'Invoice', id: 'inv-2', tenant: 'Edu Holdings', plan: 'PROFESSIONAL', year: 2026, amount: 12000, status: 'draft', pdfUrl: '#' },
+  {
+    __typename: 'Invoice',
+    id: 'inv-1',
+    tenant: 'Acme Corp',
+    plan: 'ENTERPRISE',
+    year: 2026,
+    amount: 24000,
+    status: 'paid',
+    pdfUrl: 'https://example.com/inv-1.pdf',
+  },
+  {
+    __typename: 'Invoice',
+    id: 'inv-2',
+    tenant: 'Edu Holdings',
+    plan: 'PROFESSIONAL',
+    year: 2026,
+    amount: 12000,
+    status: 'draft',
+    pdfUrl: '#',
+  },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -69,12 +150,20 @@ const MOCK_INVOICES = [
 function mockAllData(page: Page): Promise<void> {
   return routeGraphQL(page, (op, body) => {
     const q = (body.query as string | undefined) ?? '';
-    if (q.includes('autoGradingResults')) return JSON.stringify({ data: { autoGradingResults: MOCK_GRADING } });
-    if (q.includes('skillProfiles')) return JSON.stringify({ data: { skillProfiles: MOCK_PROFILES } });
-    if (q.includes('skillGapReport')) return JSON.stringify({ data: { skillGapReport: MOCK_GAP_REPORT } });
-    if (q.includes('pendingAnnotationProposals')) return JSON.stringify({ data: { pendingAnnotationProposals: MOCK_PROPOSALS } });
-    if (q.includes('myPartnerDashboard')) return JSON.stringify({ data: { myPartnerDashboard: MOCK_PARTNER } });
-    if (q.includes('invoices') && !q.includes('generate')) return JSON.stringify({ data: { invoices: MOCK_INVOICES } });
+    if (q.includes('autoGradingResults'))
+      return JSON.stringify({ data: { autoGradingResults: MOCK_GRADING } });
+    if (q.includes('skillProfiles'))
+      return JSON.stringify({ data: { skillProfiles: MOCK_PROFILES } });
+    if (q.includes('skillGapReport'))
+      return JSON.stringify({ data: { skillGapReport: MOCK_GAP_REPORT } });
+    if (q.includes('pendingAnnotationProposals'))
+      return JSON.stringify({
+        data: { pendingAnnotationProposals: MOCK_PROPOSALS },
+      });
+    if (q.includes('myPartnerDashboard'))
+      return JSON.stringify({ data: { myPartnerDashboard: MOCK_PARTNER } });
+    if (q.includes('invoices') && !q.includes('generate'))
+      return JSON.stringify({ data: { invoices: MOCK_INVOICES } });
     return null;
   });
 }
@@ -82,12 +171,18 @@ function mockAllData(page: Page): Promise<void> {
 function mockAllEmpty(page: Page): Promise<void> {
   return routeGraphQL(page, (op, body) => {
     const q = (body.query as string | undefined) ?? '';
-    if (q.includes('autoGradingResults')) return JSON.stringify({ data: { autoGradingResults: [] } });
-    if (q.includes('skillProfiles')) return JSON.stringify({ data: { skillProfiles: [] } });
-    if (q.includes('skillGapReport')) return JSON.stringify({ data: { skillGapReport: null } });
-    if (q.includes('pendingAnnotationProposals')) return JSON.stringify({ data: { pendingAnnotationProposals: [] } });
-    if (q.includes('myPartnerDashboard')) return JSON.stringify({ data: { myPartnerDashboard: null } });
-    if (q.includes('invoices') && !q.includes('generate')) return JSON.stringify({ data: { invoices: [] } });
+    if (q.includes('autoGradingResults'))
+      return JSON.stringify({ data: { autoGradingResults: [] } });
+    if (q.includes('skillProfiles'))
+      return JSON.stringify({ data: { skillProfiles: [] } });
+    if (q.includes('skillGapReport'))
+      return JSON.stringify({ data: { skillGapReport: null } });
+    if (q.includes('pendingAnnotationProposals'))
+      return JSON.stringify({ data: { pendingAnnotationProposals: [] } });
+    if (q.includes('myPartnerDashboard'))
+      return JSON.stringify({ data: { myPartnerDashboard: null } });
+    if (q.includes('invoices') && !q.includes('generate'))
+      return JSON.stringify({ data: { invoices: [] } });
     return null;
   });
 }
@@ -100,21 +195,36 @@ test.describe('Visual — Auto-Grading Results', () => {
   test('data-loaded state screenshot', async ({ page }) => {
     await mockAllData(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-vis`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-vis`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="auto-grading-page"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('auto-grading-data.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="auto-grading-page"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
+    await expect(page).toHaveScreenshot(
+      'auto-grading-data.png',
+      SCREENSHOT_OPTS
+    );
   });
 
   test('empty state screenshot', async ({ page }) => {
     await mockAllEmpty(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/auto-grading?submissionId=sub-vis-empty`, { waitUntil: 'domcontentloaded' });
+    await page.goto(
+      `${BASE_URL}/admin/auto-grading?submissionId=sub-vis-empty`,
+      { waitUntil: 'domcontentloaded' }
+    );
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('auto-grading-empty.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveScreenshot(
+      'auto-grading-empty.png',
+      SCREENSHOT_OPTS
+    );
   });
 });
 
@@ -124,21 +234,35 @@ test.describe('Visual — Gap Analysis Dashboard', () => {
   test('data-loaded state screenshot', async ({ page }) => {
     await mockAllData(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/gap-analysis`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/gap-analysis`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="gap-analysis-page"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('gap-analysis-data.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="gap-analysis-page"]')).toBeVisible(
+      { timeout: 10_000 }
+    );
+    await expect(page).toHaveScreenshot(
+      'gap-analysis-data.png',
+      SCREENSHOT_OPTS
+    );
   });
 
   test('empty state screenshot', async ({ page }) => {
     await mockAllEmpty(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/gap-analysis`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/gap-analysis`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('gap-analysis-empty.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveScreenshot(
+      'gap-analysis-empty.png',
+      SCREENSHOT_OPTS
+    );
   });
 });
 
@@ -148,21 +272,35 @@ test.describe('Visual — Instructor Merge Queue', () => {
   test('data-loaded state screenshot', async ({ page }) => {
     await mockAllData(page);
     await login(page);
-    await page.goto(`${BASE_URL}/instructor/merge-queue?courseId=c-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/instructor/merge-queue?courseId=c-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="merge-queue-list"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('merge-queue-data.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="merge-queue-list"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveScreenshot(
+      'merge-queue-data.png',
+      SCREENSHOT_OPTS
+    );
   });
 
   test('empty state screenshot', async ({ page }) => {
     await mockAllEmpty(page);
     await login(page);
-    await page.goto(`${BASE_URL}/instructor/merge-queue?courseId=c-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/instructor/merge-queue?courseId=c-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('merge-queue-empty.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveScreenshot(
+      'merge-queue-empty.png',
+      SCREENSHOT_OPTS
+    );
   });
 });
 
@@ -172,21 +310,35 @@ test.describe('Visual — Partner Dashboard', () => {
   test('data-loaded state screenshot', async ({ page }) => {
     await mockAllData(page);
     await login(page);
-    await page.goto(`${BASE_URL}/partner/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/partner/dashboard`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="partner-dashboard-page"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('partner-dashboard-data.png', SCREENSHOT_OPTS);
+    await expect(
+      page.locator('[data-testid="partner-dashboard-page"]')
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(page).toHaveScreenshot(
+      'partner-dashboard-data.png',
+      SCREENSHOT_OPTS
+    );
   });
 
   test('empty state screenshot', async ({ page }) => {
     await mockAllEmpty(page);
     await login(page);
-    await page.goto(`${BASE_URL}/partner/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/partner/dashboard`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('partner-dashboard-empty.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveScreenshot(
+      'partner-dashboard-empty.png',
+      SCREENSHOT_OPTS
+    );
   });
 });
 
@@ -196,20 +348,34 @@ test.describe('Visual — Stripe Invoices', () => {
   test('data-loaded state screenshot', async ({ page }) => {
     await mockAllData(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/invoices`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/invoices`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="stripe-invoice-page"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('stripe-invoices-data.png', SCREENSHOT_OPTS);
+    await expect(
+      page.locator('[data-testid="stripe-invoice-page"]')
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(page).toHaveScreenshot(
+      'stripe-invoices-data.png',
+      SCREENSHOT_OPTS
+    );
   });
 
   test('empty state screenshot', async ({ page }) => {
     await mockAllEmpty(page);
     await login(page);
-    await page.goto(`${BASE_URL}/admin/invoices`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/admin/invoices`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(500);
-    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({ timeout: 10_000 });
-    await expect(page).toHaveScreenshot('stripe-invoices-empty.png', SCREENSHOT_OPTS);
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveScreenshot(
+      'stripe-invoices-empty.png',
+      SCREENSHOT_OPTS
+    );
   });
 });

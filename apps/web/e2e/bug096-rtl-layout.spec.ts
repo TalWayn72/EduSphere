@@ -26,7 +26,9 @@ async function loginWithHebrewLocale(page: import('@playwright/test').Page) {
   await devBtn.waitFor({ timeout: 10_000 });
   await devBtn.click();
   await page
-    .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+    .waitForURL((url) => !url.toString().includes('/login'), {
+      timeout: 20_000,
+    })
     .catch(() => {
       // URL may already be on target route
     });
@@ -68,12 +70,10 @@ test.describe('BUG-096: RTL layout — Hebrew locale', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
 
     // Check for sidebar element — try multiple possible selectors
-    const sidebar =
-      page.getByTestId('app-sidebar').or(
-        page.locator('aside').first()
-      ).or(
-        page.locator('[data-sidebar]').first()
-      );
+    const sidebar = page
+      .getByTestId('app-sidebar')
+      .or(page.locator('aside').first())
+      .or(page.locator('[data-sidebar]').first());
 
     const sidebarVisible = await sidebar.isVisible().catch(() => false);
     if (sidebarVisible) {
@@ -98,12 +98,10 @@ test.describe('BUG-096: RTL layout — Hebrew locale', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
 
     // Check the main content area for RTL-aware styling
-    const mainContent =
-      page.getByTestId('layout-main').or(
-        page.locator('main').first()
-      ).or(
-        page.locator('[role="main"]').first()
-      );
+    const mainContent = page
+      .getByTestId('layout-main')
+      .or(page.locator('main').first())
+      .or(page.locator('[role="main"]').first());
 
     const mainVisible = await mainContent.isVisible().catch(() => false);
     if (mainVisible) {

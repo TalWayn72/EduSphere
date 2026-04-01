@@ -12,8 +12,22 @@ vi.mock('@/components/admin/AdminLayout', () => ({
 
 const MOCK_ENTRIES = {
   nodes: [
-    { id: 'a1', timestamp: '2026-03-17T10:00:00Z', user: 'admin@example.com', action: 'USER_CREATED', target: 'user:u123', details: 'Created user Alice' },
-    { id: 'a2', timestamp: '2026-03-17T09:00:00Z', user: 'admin@example.com', action: 'COURSE_PUBLISHED', target: 'course:c456', details: 'Published Intro to AI' },
+    {
+      id: 'a1',
+      timestamp: '2026-03-17T10:00:00Z',
+      user: 'admin@example.com',
+      action: 'USER_CREATED',
+      target: 'user:u123',
+      details: 'Created user Alice',
+    },
+    {
+      id: 'a2',
+      timestamp: '2026-03-17T09:00:00Z',
+      user: 'admin@example.com',
+      action: 'COURSE_PUBLISHED',
+      target: 'course:c456',
+      details: 'Published Intro to AI',
+    },
   ],
   totalCount: 2,
 };

@@ -20,13 +20,17 @@ interface BlueprintDistributionEditorProps {
 }
 
 export function BlueprintDistributionEditor({
-  title, items, onChange,
+  title,
+  items,
+  onChange,
 }: BlueprintDistributionEditorProps) {
   const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
   const isValid = totalWeight >= 98 && totalWeight <= 102;
 
   const updateItem = (index: number, patch: Partial<DistributionItem>) => {
-    const next = items.map((item, i) => i === index ? { ...item, ...patch } : item);
+    const next = items.map((item, i) =>
+      i === index ? { ...item, ...patch } : item
+    );
     onChange(next);
   };
 
@@ -34,7 +38,9 @@ export function BlueprintDistributionEditor({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-semibold">{title}</Label>
-        <span className={`text-sm font-mono ${isValid ? 'text-green-600' : 'text-red-600'}`}>
+        <span
+          className={`text-sm font-mono ${isValid ? 'text-green-600' : 'text-red-600'}`}
+        >
           Total: {totalWeight}%
         </span>
       </div>
@@ -83,7 +89,11 @@ interface DistributionRowProps {
   onUpdate: (patch: Partial<DistributionItem>) => void;
 }
 
-function DistributionRow({ item, index: _index, onUpdate }: DistributionRowProps) {
+function DistributionRow({
+  item,
+  index: _index,
+  onUpdate,
+}: DistributionRowProps) {
   return (
     <div className="grid grid-cols-[140px_1fr_70px_70px] items-center gap-3">
       <span className="text-sm font-medium truncate">{item.label}</span>

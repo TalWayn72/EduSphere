@@ -14,7 +14,8 @@ export const JWKS_URL =
 export const KEYCLOAK_ISSUER = `${process.env.KEYCLOAK_ISSUER_URL || process.env.KEYCLOAK_URL || 'http://localhost:8080'}/realms/${process.env.KEYCLOAK_REALM || 'edusphere'}`;
 
 // SEC-3: JWT audience check — validates token was issued for our client
-export const KEYCLOAK_AUDIENCE = process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web';
+export const KEYCLOAK_AUDIENCE =
+  process.env['KEYCLOAK_CLIENT_ID'] ?? 'edusphere-web';
 
 export const APP_ROLES = new Set([
   'SUPER_ADMIN',

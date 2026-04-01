@@ -48,22 +48,18 @@ export class TenantPlanService implements OnModuleDestroy {
     createdAt: Date;
     updatedAt: Date;
   }> {
-    this.logger.log(
-      { tenantId, plan },
-      '[TenantPlanService] updatePlan'
-    );
+    this.logger.log({ tenantId, plan }, '[TenantPlanService] updatePlan');
 
-    const rows = await withTenantContext(
-      this.db,
-      tenantCtx,
-      async (db) => {
-        return db
-          .update(schema.tenants)
-          .set({ plan: plan as 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE', updated_at: new Date() })
-          .where(eq(schema.tenants.id, tenantId))
-          .returning();
-      }
-    );
+    const rows = await withTenantContext(this.db, tenantCtx, async (db) => {
+      return db
+        .update(schema.tenants)
+        .set({
+          plan: plan as 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE',
+          updated_at: new Date(),
+        })
+        .where(eq(schema.tenants.id, tenantId))
+        .returning();
+    });
 
     const updated = rows[0];
     if (!updated) {

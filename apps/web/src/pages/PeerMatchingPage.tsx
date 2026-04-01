@@ -52,7 +52,8 @@ export function PeerMatchingPage() {
   const [, respondToPeerMatch] = useMutation(RESPOND_PEER_MATCH_MUTATION);
 
   const peerMatches: PeerMatch[] = peerMatchesResult.data?.peerMatches ?? [];
-  const matchRequests: MatchRequest[] = myRequestsResult.data?.myPeerMatchRequests ?? [];
+  const matchRequests: MatchRequest[] =
+    myRequestsResult.data?.myPeerMatchRequests ?? [];
 
   const incomingRequests = matchRequests.filter((r) => r.status === 'PENDING');
   const outgoingRequests = matchRequests.filter((r) => r.status !== 'PENDING');
@@ -72,21 +73,29 @@ export function PeerMatchingPage() {
   return (
     <Layout>
       <PageShell size="md" className="py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">{t('peerMatching')}</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">
+          {t('peerMatching')}
+        </h1>
 
         {/* Suggested Matches */}
         <section className="mb-8">
           <h2 className="text-base font-semibold text-foreground mb-3">
             {t('suggestedMatches')}
-            <span className="ml-2 text-xs font-normal text-muted-foreground">({t('aiPowered')})</span>
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
+              ({t('aiPowered')})
+            </span>
           </h2>
 
           {peerMatchesResult.fetching && (
-            <p className="text-sm text-muted-foreground">{t('findingMatches')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('findingMatches')}
+            </p>
           )}
           {!peerMatchesResult.fetching && peerMatches.length === 0 && (
             <div className="rounded-lg border border-border bg-card p-6 text-center">
-              <p className="text-sm text-muted-foreground">{t('noSuggestedMatches')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('noSuggestedMatches')}
+              </p>
             </div>
           )}
           {peerMatches.length > 0 && (
@@ -108,15 +117,21 @@ export function PeerMatchingPage() {
 
         {/* Match Requests */}
         <section>
-          <h2 className="text-base font-semibold text-foreground mb-3">{t('matchRequests')}</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3">
+            {t('matchRequests')}
+          </h2>
 
           {myRequestsResult.fetching && (
-            <p className="text-sm text-muted-foreground">{t('loadingRequests')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('loadingRequests')}
+            </p>
           )}
 
           {!myRequestsResult.fetching && matchRequests.length === 0 && (
             <div className="rounded-lg border border-border bg-card p-6 text-center">
-              <p className="text-sm text-muted-foreground">{t('noMatchRequests')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('noMatchRequests')}
+              </p>
             </div>
           )}
 
@@ -135,7 +150,9 @@ export function PeerMatchingPage() {
                       <p className="text-sm font-medium text-foreground">
                         {t('learnerLabel', { id: req.requesterId.slice(0, 6) })}
                       </p>
-                      <p className="text-xs text-muted-foreground">{req.matchReason}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {req.matchReason}
+                      </p>
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <button
@@ -172,9 +189,13 @@ export function PeerMatchingPage() {
                   >
                     <div>
                       <p className="text-sm font-medium text-foreground">
-                        {t('learnerLabel', { id: req.matchedUserId.slice(0, 6) })}
+                        {t('learnerLabel', {
+                          id: req.matchedUserId.slice(0, 6),
+                        })}
                       </p>
-                      <p className="text-xs text-muted-foreground">{req.matchReason}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {req.matchReason}
+                      </p>
                     </div>
                     <span
                       className={[
@@ -182,8 +203,8 @@ export function PeerMatchingPage() {
                         req.status === 'ACCEPTED'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                           : req.status === 'DECLINED'
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                          : 'bg-muted text-muted-foreground',
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                            : 'bg-muted text-muted-foreground',
                       ].join(' ')}
                     >
                       {req.status}

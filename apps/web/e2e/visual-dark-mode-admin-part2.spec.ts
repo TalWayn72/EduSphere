@@ -40,16 +40,25 @@ test.describe('Visual Regression — Dark Mode Admin SCIM @visual-dark', () => {
 
   test('SCIM — full page dark', async ({ page }) => {
     await goToDark(page, '/admin/scim');
-    await expect(page).toHaveScreenshot('dark-admin-scim-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-admin-scim-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('SCIM — header dark', async ({ page }) => {
     await goToDark(page, '/admin/scim');
     const header = page.locator('header').or(page.locator('h1')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-admin-scim-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-admin-scim-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-scim-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-scim-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -57,9 +66,15 @@ test.describe('Visual Regression — Dark Mode Admin SCIM @visual-dark', () => {
     await goToDark(page, '/admin/scim');
     const main = page.locator('main').or(page.locator('[role="main"]')).first();
     if (await main.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(main).toHaveScreenshot('dark-admin-scim-main.png', ELEMENT_OPTS);
+      await expect(main).toHaveScreenshot(
+        'dark-admin-scim-main.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-scim-main.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-scim-main.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -67,9 +82,15 @@ test.describe('Visual Regression — Dark Mode Admin SCIM @visual-dark', () => {
     await goToDark(page, '/admin/scim');
     const list = page.locator('table').or(page.locator('ul')).first();
     if (await list.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(list).toHaveScreenshot('dark-admin-scim-endpoints.png', ELEMENT_OPTS);
+      await expect(list).toHaveScreenshot(
+        'dark-admin-scim-endpoints.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-scim-endpoints.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-scim-endpoints.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -77,9 +98,15 @@ test.describe('Visual Regression — Dark Mode Admin SCIM @visual-dark', () => {
     await goToDark(page, '/admin/scim');
     const sync = page.locator('.status').or(page.locator('section')).first();
     if (await sync.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sync).toHaveScreenshot('dark-admin-scim-sync.png', ELEMENT_OPTS);
+      await expect(sync).toHaveScreenshot(
+        'dark-admin-scim-sync.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-scim-sync.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-scim-sync.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -87,9 +114,15 @@ test.describe('Visual Regression — Dark Mode Admin SCIM @visual-dark', () => {
     await goToDark(page, '/admin/scim');
     const controls = page.locator('form').or(page.locator('.controls')).first();
     if (await controls.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(controls).toHaveScreenshot('dark-admin-scim-controls.png', ELEMENT_OPTS);
+      await expect(controls).toHaveScreenshot(
+        'dark-admin-scim-controls.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-scim-controls.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-scim-controls.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });
@@ -106,16 +139,25 @@ test.describe('Visual Regression — Dark Mode Admin Settings @visual-dark', () 
 
   test('settings — full page dark', async ({ page }) => {
     await goToDark(page, '/admin/settings');
-    await expect(page).toHaveScreenshot('dark-admin-settings-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'dark-admin-settings-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('settings — header dark', async ({ page }) => {
     await goToDark(page, '/admin/settings');
     const header = page.locator('header').or(page.locator('h1')).first();
     if (await header.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(header).toHaveScreenshot('dark-admin-settings-header.png', ELEMENT_OPTS);
+      await expect(header).toHaveScreenshot(
+        'dark-admin-settings-header.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-settings-header.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-settings-header.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -123,19 +165,34 @@ test.describe('Visual Regression — Dark Mode Admin Settings @visual-dark', () 
     await goToDark(page, '/admin/settings');
     const form = page.locator('form').or(page.locator('main')).first();
     if (await form.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(form).toHaveScreenshot('dark-admin-settings-form.png', ELEMENT_OPTS);
+      await expect(form).toHaveScreenshot(
+        'dark-admin-settings-form.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-settings-form.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-settings-form.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
   test('settings — navigation tabs dark', async ({ page }) => {
     await goToDark(page, '/admin/settings');
-    const tabs = page.locator('[role="tablist"]').or(page.locator('.tabs')).first();
+    const tabs = page
+      .locator('[role="tablist"]')
+      .or(page.locator('.tabs'))
+      .first();
     if (await tabs.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(tabs).toHaveScreenshot('dark-admin-settings-tabs.png', ELEMENT_OPTS);
+      await expect(tabs).toHaveScreenshot(
+        'dark-admin-settings-tabs.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-settings-tabs.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-settings-tabs.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
@@ -143,19 +200,34 @@ test.describe('Visual Regression — Dark Mode Admin Settings @visual-dark', () 
     await goToDark(page, '/admin/settings');
     const actions = page.locator('footer').or(page.locator('.actions')).first();
     if (await actions.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(actions).toHaveScreenshot('dark-admin-settings-actions.png', ELEMENT_OPTS);
+      await expect(actions).toHaveScreenshot(
+        'dark-admin-settings-actions.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-settings-actions.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-settings-actions.png',
+        ELEMENT_OPTS
+      );
     }
   });
 
   test('settings — theme preview dark', async ({ page }) => {
     await goToDark(page, '/admin/settings');
-    const preview = page.locator('.preview').or(page.locator('section')).first();
+    const preview = page
+      .locator('.preview')
+      .or(page.locator('section'))
+      .first();
     if (await preview.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(preview).toHaveScreenshot('dark-admin-settings-preview.png', ELEMENT_OPTS);
+      await expect(preview).toHaveScreenshot(
+        'dark-admin-settings-preview.png',
+        ELEMENT_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('dark-admin-settings-preview.png', ELEMENT_OPTS);
+      await expect(page).toHaveScreenshot(
+        'dark-admin-settings-preview.png',
+        ELEMENT_OPTS
+      );
     }
   });
 });

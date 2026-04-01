@@ -12,12 +12,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const EVENTS = [
-  'user.created', 'user.updated', 'course.completed',
-  'enrollment.created', 'badge.earned', 'subscription.changed',
+  'user.created',
+  'user.updated',
+  'course.completed',
+  'enrollment.created',
+  'badge.earned',
+  'subscription.changed',
 ] as const;
 
 const webhookSchema = z.object({
-  url: z.string().url('Must be a valid HTTPS URL').startsWith('https://', 'URL must use HTTPS'),
+  url: z
+    .string()
+    .url('Must be a valid HTTPS URL')
+    .startsWith('https://', 'URL must use HTTPS'),
   events: z.array(z.string()).min(1, 'Select at least one event'),
 });
 
@@ -29,7 +36,14 @@ interface WebhookFormProps {
 }
 
 export function WebhookForm({ t, onSubmit }: WebhookFormProps) {
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<WebhookFormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<WebhookFormData>({
     resolver: zodResolver(webhookSchema),
     defaultValues: { events: [] },
   });
@@ -54,7 +68,11 @@ export function WebhookForm({ t, onSubmit }: WebhookFormProps) {
         <CardTitle className="text-base">{t('webhooks.createTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(handleCreate)} className="space-y-4" noValidate>
+        <form
+          onSubmit={handleSubmit(handleCreate)}
+          className="space-y-4"
+          noValidate
+        >
           <div className="space-y-2">
             <Label htmlFor="webhook-url">{t('webhooks.urlLabel')}</Label>
             <Input
@@ -64,12 +82,16 @@ export function WebhookForm({ t, onSubmit }: WebhookFormProps) {
               aria-required="true"
             />
             {errors.url && (
-              <p className="text-destructive text-xs" role="alert">{errors.url.message}</p>
+              <p className="text-destructive text-xs" role="alert">
+                {errors.url.message}
+              </p>
             )}
           </div>
 
           <fieldset>
-            <legend className="text-sm font-medium mb-2">{t('webhooks.eventsLabel')}</legend>
+            <legend className="text-sm font-medium mb-2">
+              {t('webhooks.eventsLabel')}
+            </legend>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {EVENTS.map((event) => (
                 <div key={event} className="flex items-center gap-2">
@@ -85,7 +107,9 @@ export function WebhookForm({ t, onSubmit }: WebhookFormProps) {
               ))}
             </div>
             {errors.events && (
-              <p className="text-destructive text-xs mt-1" role="alert">{errors.events.message}</p>
+              <p className="text-destructive text-xs mt-1" role="alert">
+                {errors.events.message}
+              </p>
             )}
           </fieldset>
 

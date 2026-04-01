@@ -8,7 +8,11 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
-export const pushPlatformEnum = pgEnum('push_platform', ['web', 'ios', 'android']);
+export const pushPlatformEnum = pgEnum('push_platform', [
+  'web',
+  'ios',
+  'android',
+]);
 
 export const pushNotificationTokens = pgTable('push_notification_tokens', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -18,8 +22,12 @@ export const pushNotificationTokens = pgTable('push_notification_tokens', {
   platform: pushPlatformEnum('platform').notNull(),
   expoPushToken: text('expo_push_token'),
   webPushSubscription: json('web_push_subscription'),
-  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const pushNotificationTokensRLS = sql`
@@ -39,4 +47,5 @@ CREATE INDEX IF NOT EXISTS idx_push_tokens_platform
 `;
 
 export type PushNotificationToken = typeof pushNotificationTokens.$inferSelect;
-export type NewPushNotificationToken = typeof pushNotificationTokens.$inferInsert;
+export type NewPushNotificationToken =
+  typeof pushNotificationTokens.$inferInsert;

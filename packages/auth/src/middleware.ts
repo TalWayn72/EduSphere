@@ -101,9 +101,7 @@ export class AuthMiddleware {
       // The request proceeds unauthenticated; resolvers using
       // extractAuthContext() will reject it if @authenticated is required.
       const reason = error instanceof Error ? error.message : String(error);
-      this.logger.warn(
-        `[AuthMiddleware] JWT validation failed: ${reason}`
-      );
+      this.logger.warn(`[AuthMiddleware] JWT validation failed: ${reason}`);
 
       // Fallback: if gateway already validated the JWT and forwarded identity
       // headers (x-user-id, x-tenant-id, x-user-role), use those to populate

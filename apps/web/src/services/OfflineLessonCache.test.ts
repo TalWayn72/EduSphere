@@ -9,8 +9,12 @@ const store: Map<string, unknown> = new Map();
 
 vi.mock('idb-keyval', () => ({
   get: vi.fn(async (key: string) => store.get(key)),
-  set: vi.fn(async (key: string, value: unknown) => { store.set(key, value); }),
-  del: vi.fn(async (key: string) => { store.delete(key); }),
+  set: vi.fn(async (key: string, value: unknown) => {
+    store.set(key, value);
+  }),
+  del: vi.fn(async (key: string) => {
+    store.delete(key);
+  }),
   keys: vi.fn(async () => Array.from(store.keys())),
 }));
 
@@ -37,16 +41,24 @@ describe('OfflineLessonCache', () => {
       });
 
       expect(store.size).toBe(1);
-      const entry = store.get('offline_lesson_lesson-1') as { lessonId: string };
+      const entry = store.get('offline_lesson_lesson-1') as {
+        lessonId: string;
+      };
       expect(entry.lessonId).toBe('lesson-1');
     });
 
     it('adds downloadedAt timestamp', async () => {
       const before = Date.now();
-      await cacheLesson('lesson-2', { title: 'T', content: 'C', transcript: '' });
+      await cacheLesson('lesson-2', {
+        title: 'T',
+        content: 'C',
+        transcript: '',
+      });
       const after = Date.now();
 
-      const entry = store.get('offline_lesson_lesson-2') as { downloadedAt: number };
+      const entry = store.get('offline_lesson_lesson-2') as {
+        downloadedAt: number;
+      };
       expect(entry.downloadedAt).toBeGreaterThanOrEqual(before);
       expect(entry.downloadedAt).toBeLessThanOrEqual(after);
     });
@@ -80,7 +92,11 @@ describe('OfflineLessonCache', () => {
     });
 
     it('returns true after caching a lesson', async () => {
-      await cacheLesson('lesson-4', { title: 'T', content: 'C', transcript: '' });
+      await cacheLesson('lesson-4', {
+        title: 'T',
+        content: 'C',
+        transcript: '',
+      });
       const result = await isCached('lesson-4');
       expect(result).toBe(true);
     });
@@ -111,7 +127,11 @@ describe('OfflineLessonCache', () => {
     });
 
     it('does not remove entries within maxAge', async () => {
-      await cacheLesson('fresh', { title: 'Fresh', content: 'C', transcript: '' });
+      await cacheLesson('fresh', {
+        title: 'Fresh',
+        content: 'C',
+        transcript: '',
+      });
       const removed = await clearOldCache(7 * 24 * 60 * 60 * 1000);
       expect(removed).toBe(0);
       expect(await isCached('fresh')).toBe(true);
@@ -129,7 +149,11 @@ describe('OfflineLessonCache', () => {
 
   describe('removeCachedLesson', () => {
     it('removes a specific lesson', async () => {
-      await cacheLesson('lesson-del', { title: 'T', content: 'C', transcript: '' });
+      await cacheLesson('lesson-del', {
+        title: 'T',
+        content: 'C',
+        transcript: '',
+      });
       expect(await isCached('lesson-del')).toBe(true);
 
       await removeCachedLesson('lesson-del');

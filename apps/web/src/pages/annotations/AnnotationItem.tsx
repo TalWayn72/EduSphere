@@ -12,7 +12,11 @@ interface AnnotationItemProps {
   onDeleteRequest: (id: string) => void;
 }
 
-export function AnnotationItem({ ann, onSeek, onDeleteRequest }: AnnotationItemProps) {
+export function AnnotationItem({
+  ann,
+  onSeek,
+  onDeleteRequest,
+}: AnnotationItemProps) {
   const { t } = useTranslation('annotations');
   return (
     <div className="relative group">

@@ -67,7 +67,9 @@ function statusVariant(
 export function InstructorEarningsPage() {
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data, isLoading } = useQuery<{ instructorEarnings: EarningsSummary }>(
     {
@@ -87,116 +89,114 @@ export function InstructorEarningsPage() {
   const earnings = data?.instructorEarnings;
 
   if (isLoading) {
-    return (
-      <LoadingSpinner />
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <Layout>
       <PageShell size="md" className="p-6">
-      <Breadcrumbs
-        className="mb-4"
-        items={[
-          { label: 'Instructor', href: '/instructor' },
-          { label: 'Earnings' },
-        ]}
-      />
-      <h1 className="text-3xl font-bold mb-6">Instructor Earnings</h1>
+        <Breadcrumbs
+          className="mb-4"
+          items={[
+            { label: 'Instructor', href: '/instructor' },
+            { label: 'Earnings' },
+          ]}
+        />
+        <h1 className="text-3xl font-bold mb-6">Instructor Earnings</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">
+                Total Earned
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-primary">
+                {formatCents(earnings?.totalEarnedCents ?? 0)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">
+                Pending Payout
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                {formatCents(earnings?.pendingPayoutCents ?? 0)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">
+                Paid Out
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                {formatCents(earnings?.paidOutCents ?? 0)}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-end mb-4">
+          <Button
+            onClick={() => requestPayout()}
+            disabled={
+              isRequestingPayout || (earnings?.pendingPayoutCents ?? 0) <= 0
+            }
+          >
+            {isRequestingPayout ? 'Requesting...' : 'Request Payout'}
+          </Button>
+        </div>
+
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
-              Total Earned
-            </CardTitle>
+          <CardHeader>
+            <CardTitle>Purchase History</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-primary">
-              {formatCents(earnings?.totalEarnedCents ?? 0)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
-              Pending Payout
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-              {formatCents(earnings?.pendingPayoutCents ?? 0)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
-              Paid Out
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {formatCents(earnings?.paidOutCents ?? 0)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex justify-end mb-4">
-        <Button
-          onClick={() => requestPayout()}
-          disabled={
-            isRequestingPayout || (earnings?.pendingPayoutCents ?? 0) <= 0
-          }
-        >
-          {isRequestingPayout ? 'Requesting...' : 'Request Payout'}
-        </Button>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Purchase History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {(earnings?.purchases ?? []).length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No purchases yet.
-            </p>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 pr-4">Course</th>
-                  <th className="text-right py-2 pr-4">Amount</th>
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-left py-2">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {earnings!.purchases.map((p) => (
-                  <tr key={p.id} className="border-b last:border-0">
-                    <td className="py-2 pr-4 font-mono text-xs">
-                      {p.courseId.slice(0, 8)}...
-                    </td>
-                    <td className="py-2 pr-4 text-right">
-                      {formatCents(p.amountCents)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {new Date(p.purchasedAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-2">
-                      <Badge variant={statusVariant(p.status)}>
-                        {p.status}
-                      </Badge>
-                    </td>
+            {(earnings?.purchases ?? []).length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No purchases yet.
+              </p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 pr-4">Course</th>
+                    <th className="text-right py-2 pr-4">Amount</th>
+                    <th className="text-left py-2 pr-4">Date</th>
+                    <th className="text-left py-2">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </CardContent>
-      </Card>
+                </thead>
+                <tbody>
+                  {earnings!.purchases.map((p) => (
+                    <tr key={p.id} className="border-b last:border-0">
+                      <td className="py-2 pr-4 font-mono text-xs">
+                        {p.courseId.slice(0, 8)}...
+                      </td>
+                      <td className="py-2 pr-4 text-right">
+                        {formatCents(p.amountCents)}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {new Date(p.purchasedAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-2">
+                        <Badge variant={statusVariant(p.status)}>
+                          {p.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </CardContent>
+        </Card>
       </PageShell>
     </Layout>
   );

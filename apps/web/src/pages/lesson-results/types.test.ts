@@ -5,7 +5,12 @@ import type { PipelineResult, LessonAsset, LessonQueryData } from './types';
 describe('lesson-results/types', () => {
   describe('getResult', () => {
     const results: PipelineResult[] = [
-      { id: '1', moduleName: 'transcription', outputType: 'text', outputData: null },
+      {
+        id: '1',
+        moduleName: 'transcription',
+        outputType: 'text',
+        outputData: null,
+      },
       { id: '2', moduleName: 'Summary', outputType: 'text', outputData: null },
     ];
 
@@ -17,7 +22,12 @@ describe('lesson-results/types', () => {
       // getResult checks r.moduleName === moduleName.toLowerCase()
       // so searching 'Summary' matches 'Summary' exactly
       const lowerResults: PipelineResult[] = [
-        { id: '1', moduleName: 'summary', outputType: 'text', outputData: null },
+        {
+          id: '1',
+          moduleName: 'summary',
+          outputType: 'text',
+          outputData: null,
+        },
       ];
       expect(getResult(lowerResults, 'Summary')).toBe(lowerResults[0]);
     });

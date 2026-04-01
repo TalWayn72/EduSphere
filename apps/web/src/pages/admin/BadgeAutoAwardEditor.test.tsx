@@ -4,7 +4,10 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BadgeAutoAwardEditor, type AutoAwardCriteria } from './BadgeAutoAwardEditor';
+import {
+  BadgeAutoAwardEditor,
+  type AutoAwardCriteria,
+} from './BadgeAutoAwardEditor';
 
 const t = (key: string) => key;
 

@@ -160,7 +160,11 @@ async function buildService(opts: {
     getPresignedUrl: vi.fn().mockResolvedValue('https://minio.test/presigned'),
   };
 
-  const svc = new KnowledgeSourceService(parser as never, embeddings as never, minioUrl as never);
+  const svc = new KnowledgeSourceService(
+    parser as never,
+    embeddings as never,
+    minioUrl as never
+  );
   // Override db after construction (constructor receives mock from vi.mock above)
   Object.defineProperty(svc, 'db', { value: db, writable: true });
 
@@ -173,7 +177,9 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
   beforeEach(() => {
     // Only fake setTimeout/clearTimeout — leave Promise/queueMicrotask untouched
     // to avoid blocking async resolution inside createAndProcess
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'],
+    });
   });
 
   afterEach(async () => {

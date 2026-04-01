@@ -17,6 +17,11 @@ import { LiveSessionExtensionsResolver } from './live-session-extensions.resolve
     PollVoteService,
     LiveSessionExtensionsResolver,
   ],
-  exports: [LiveSessionService, LiveSessionRecordingService, BreakoutService, PollService],
+  exports: [
+    LiveSessionService,
+    LiveSessionRecordingService,
+    BreakoutService,
+    PollService,
+  ],
 })
 export class LiveSessionModule {}

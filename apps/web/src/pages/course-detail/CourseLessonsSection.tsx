@@ -66,9 +66,7 @@ export function CourseLessonsSection({ courseId, lessons, canEdit }: Props) {
         </div>
       ) : (
         <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-          {canEdit
-            ? t('noLessonsYetInstructor')
-            : t('noLessonsYetStudent')}
+          {canEdit ? t('noLessonsYetInstructor') : t('noLessonsYetStudent')}
         </div>
       )}
     </div>

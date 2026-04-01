@@ -4,7 +4,13 @@
  * Stub provides type-safe structure for future implementation.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import type { IHrisAdapter, HrisConfig, HrisUser, HrisGroup, HrisSyncResult } from './hris-adapter.interface.js';
+import type {
+  IHrisAdapter,
+  HrisConfig,
+  HrisUser,
+  HrisGroup,
+  HrisSyncResult,
+} from './hris-adapter.interface.js';
 
 @Injectable()
 export class WorkdayAdapter implements IHrisAdapter {
@@ -40,7 +46,10 @@ export class WorkdayAdapter implements IHrisAdapter {
     return [];
   }
 
-  async syncUsers(_config: HrisConfig, _tenantId: string): Promise<HrisSyncResult> {
+  async syncUsers(
+    _config: HrisConfig,
+    _tenantId: string
+  ): Promise<HrisSyncResult> {
     return {
       usersUpserted: 0,
       usersDeactivated: 0,

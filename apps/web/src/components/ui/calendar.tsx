@@ -18,8 +18,13 @@ export interface CalendarProps {
 }
 
 const DAY_KEYS = [
-  'sunday', 'monday', 'tuesday', 'wednesday',
-  'thursday', 'friday', 'saturday',
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
 ] as const;
 
 function getDaysInMonth(year: number, month: number): number {
@@ -39,10 +44,16 @@ function isSameDay(a: Date, b: Date): boolean {
 }
 
 function isDateDisabled(date: Date, min?: Date, max?: Date): boolean {
-  if (min && date < new Date(min.getFullYear(), min.getMonth(), min.getDate())) {
+  if (
+    min &&
+    date < new Date(min.getFullYear(), min.getMonth(), min.getDate())
+  ) {
     return true;
   }
-  if (max && date > new Date(max.getFullYear(), max.getMonth(), max.getDate())) {
+  if (
+    max &&
+    date > new Date(max.getFullYear(), max.getMonth(), max.getDate())
+  ) {
     return true;
   }
   return false;
@@ -56,9 +67,7 @@ export function Calendar({
   className,
 }: CalendarProps) {
   const { t } = useTranslation('common');
-  const [viewDate, setViewDate] = React.useState(
-    () => selected ?? new Date()
-  );
+  const [viewDate, setViewDate] = React.useState(() => selected ?? new Date());
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -70,10 +79,8 @@ export function Calendar({
     year: 'numeric',
   });
 
-  const prevMonth = () =>
-    setViewDate(new Date(year, month - 1, 1));
-  const nextMonth = () =>
-    setViewDate(new Date(year, month + 1, 1));
+  const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
 
   const days: (number | null)[] = [
     ...Array.from<null>({ length: firstDay }).fill(null),
@@ -144,7 +151,7 @@ export function Calendar({
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 'disabled:pointer-events-none disabled:opacity-50',
                 isSelected &&
-                  'bg-primary text-primary-foreground hover:bg-primary/90',
+                  'bg-primary text-primary-foreground hover:bg-primary/90'
               )}
             >
               {day}

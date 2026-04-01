@@ -9,11 +9,7 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
-import {
-  connect,
-  StringCodec,
-  type NatsConnection,
-} from 'nats';
+import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   createDatabaseConnection,
@@ -43,7 +39,10 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
       this.natsConn = await connect(buildNatsOptions());
       this.logger.log('PeerReviewCoreService NATS connected');
     } catch (err) {
-      this.logger.warn({ err }, 'PeerReviewCoreService NATS connect failed — running without events');
+      this.logger.warn(
+        { err },
+        'PeerReviewCoreService NATS connect failed — running without events'
+      );
     }
   }
 
@@ -53,7 +52,9 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
       this.natsConn = null;
     }
     await closeAllPools();
-    this.logger.log('PeerReviewCoreService destroyed — NATS drained, DB pools closed');
+    this.logger.log(
+      'PeerReviewCoreService destroyed — NATS drained, DB pools closed'
+    );
   }
 
   getDb() {
@@ -66,7 +67,7 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
 
   async createRubric(
     input: CreateRubricInput,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<typeof schema.peerReviewRubrics.$inferSelect> {
     const tenantCtx: TenantContext = {
       tenantId: ctx.tenantId,
@@ -84,18 +85,22 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
           minReviewers: input.minReviewers ?? DEFAULT_MIN_REVIEWERS,
           isAnonymous: input.isAnonymous ?? false,
         })
-        .returning(),
+        .returning()
     );
     this.logger.log(
-      { rubricId: rubric!.id, contentItemId: input.contentItemId, tenantId: ctx.tenantId },
-      'Peer review rubric created',
+      {
+        rubricId: rubric!.id,
+        contentItemId: input.contentItemId,
+        tenantId: ctx.tenantId,
+      },
+      'Peer review rubric created'
     );
     return rubric!;
   }
 
   async getRubric(
     contentItemId: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<typeof schema.peerReviewRubrics.$inferSelect | null> {
     const tenantCtx: TenantContext = {
       tenantId: ctx.tenantId,
@@ -109,9 +114,9 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
         .where(
           and(
             eq(schema.peerReviewRubrics.contentItemId, contentItemId),
-            eq(schema.peerReviewRubrics.tenantId, ctx.tenantId),
-          ),
-        ),
+            eq(schema.peerReviewRubrics.tenantId, ctx.tenantId)
+          )
+        )
     );
     return rows[0] ?? null;
   }
@@ -122,7 +127,7 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
 
   async getMyAssignmentsToReview(
     reviewerId: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<(typeof schema.peerReviewAssignments.$inferSelect)[]> {
     const tenantCtx: TenantContext = {
       tenantId: ctx.tenantId,
@@ -137,15 +142,15 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
           and(
             eq(schema.peerReviewAssignments.reviewerId, reviewerId),
             eq(schema.peerReviewAssignments.tenantId, ctx.tenantId),
-            eq(schema.peerReviewAssignments.status, 'PENDING'),
-          ),
-        ),
+            eq(schema.peerReviewAssignments.status, 'PENDING')
+          )
+        )
     );
   }
 
   async getMySubmissions(
     submitterId: string,
-    ctx: AuthContext,
+    ctx: AuthContext
   ): Promise<(typeof schema.peerReviewAssignments.$inferSelect)[]> {
     const tenantCtx: TenantContext = {
       tenantId: ctx.tenantId,
@@ -159,9 +164,9 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
         .where(
           and(
             eq(schema.peerReviewAssignments.submitterId, submitterId),
-            eq(schema.peerReviewAssignments.tenantId, ctx.tenantId),
-          ),
-        ),
+            eq(schema.peerReviewAssignments.tenantId, ctx.tenantId)
+          )
+        )
     );
   }
 
@@ -182,22 +187,27 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
     submitterId: string,
     contentItemId: string,
     ctx: AuthContext,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<void> {
-    const allAssignments = await withTenantContext(this.db, tenantCtx, async (tx) =>
-      tx
-        .select()
-        .from(schema.peerReviewAssignments)
-        .where(
-          and(
-            eq(schema.peerReviewAssignments.submitterId, submitterId),
-            eq(schema.peerReviewAssignments.contentItemId, contentItemId),
-            eq(schema.peerReviewAssignments.tenantId, ctx.tenantId),
-          ),
-        ),
+    const allAssignments = await withTenantContext(
+      this.db,
+      tenantCtx,
+      async (tx) =>
+        tx
+          .select()
+          .from(schema.peerReviewAssignments)
+          .where(
+            and(
+              eq(schema.peerReviewAssignments.submitterId, submitterId),
+              eq(schema.peerReviewAssignments.contentItemId, contentItemId),
+              eq(schema.peerReviewAssignments.tenantId, ctx.tenantId)
+            )
+          )
     );
 
-    const allDone = allAssignments.length > 0 && allAssignments.every((a) => a.status !== 'PENDING');
+    const allDone =
+      allAssignments.length > 0 &&
+      allAssignments.every((a) => a.status !== 'PENDING');
     if (allDone) {
       this.publishEvent(NATS_PEER_REVIEW_COMPLETED, {
         submitterId,
@@ -207,7 +217,7 @@ export class PeerReviewCoreService implements OnModuleInit, OnModuleDestroy {
       });
       this.logger.log(
         { submitterId, contentItemId, tenantId: ctx.tenantId },
-        'All peer reviews complete — published NATS event',
+        'All peer reviews complete — published NATS event'
       );
     }
   }

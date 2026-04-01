@@ -30,7 +30,7 @@ export default function MessageComposer({
         discussionId,
         input: { content: text.trim(), parentMessageId: replyToId ?? null },
       },
-      {},
+      {}
     );
     setText('');
     if (replyToId && onReplyCleared) {
@@ -49,7 +49,11 @@ export default function MessageComposer({
       {replyToId && replyToContent && (
         <div className="flex items-start gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
           <span className="flex-1 truncate">
-            Replying to: <span className="italic">{replyToContent.slice(0, 80)}{replyToContent.length > 80 ? '…' : ''}</span>
+            Replying to:{' '}
+            <span className="italic">
+              {replyToContent.slice(0, 80)}
+              {replyToContent.length > 80 ? '…' : ''}
+            </span>
           </span>
           {onReplyCleared && (
             <button

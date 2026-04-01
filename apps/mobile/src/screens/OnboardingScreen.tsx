@@ -1,7 +1,13 @@
 import { useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, TextInput, TouchableOpacity,
-  ScrollView, ActivityIndicator, Alert
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useQuery, useMutation } from '@apollo/client';
 import { gql } from '@apollo/client';
@@ -9,7 +15,12 @@ import { gql } from '@apollo/client';
 const MY_ONBOARDING_STATE_QUERY = gql`
   query MyOnboardingState {
     myOnboardingState {
-      userId currentStep totalSteps completed skipped role
+      userId
+      currentStep
+      totalSteps
+      completed
+      skipped
+      role
     }
   }
 `;
@@ -17,20 +28,30 @@ const MY_ONBOARDING_STATE_QUERY = gql`
 const UPDATE_ONBOARDING_STEP_MUTATION = gql`
   mutation UpdateOnboardingStep($input: UpdateOnboardingStepInput!) {
     updateOnboardingStep(input: $input) {
-      userId currentStep totalSteps completed skipped
+      userId
+      currentStep
+      totalSteps
+      completed
+      skipped
     }
   }
 `;
 
 const COMPLETE_ONBOARDING_MUTATION = gql`
   mutation CompleteOnboarding {
-    completeOnboarding { userId completed }
+    completeOnboarding {
+      userId
+      completed
+    }
   }
 `;
 
 const SKIP_ONBOARDING_MUTATION = gql`
   mutation SkipOnboarding {
-    skipOnboarding { userId skipped }
+    skipOnboarding {
+      userId
+      skipped
+    }
   }
 `;
 
@@ -58,8 +79,17 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
   const { loading } = useQuery(MY_ONBOARDING_STATE_QUERY, {
-    onCompleted: (data: { myOnboardingState?: { completed?: boolean; skipped?: boolean; currentStep?: number } }) => {
-      if (data?.myOnboardingState?.completed || data?.myOnboardingState?.skipped) {
+    onCompleted: (data: {
+      myOnboardingState?: {
+        completed?: boolean;
+        skipped?: boolean;
+        currentStep?: number;
+      };
+    }) => {
+      if (
+        data?.myOnboardingState?.completed ||
+        data?.myOnboardingState?.skipped
+      ) {
         navigation.replace('Main');
       } else if (data?.myOnboardingState?.currentStep) {
         setStep(data.myOnboardingState.currentStep);
@@ -71,7 +101,14 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
   const [completeOnboarding] = useMutation(COMPLETE_ONBOARDING_MUTATION);
   const [skipOnboarding] = useMutation(SKIP_ONBOARDING_MUTATION);
 
-  const topics = ['Torah Study', 'Talmud', 'Halacha', 'Jewish History', 'Hebrew', 'Prayer'];
+  const topics = [
+    'Torah Study',
+    'Talmud',
+    'Halacha',
+    'Jewish History',
+    'Hebrew',
+    'Prayer',
+  ];
   const totalSteps = 3;
 
   const handleNext = useCallback(async () => {
@@ -80,7 +117,9 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
       return;
     }
     try {
-      await updateStep({ variables: { input: { step, data: { displayName, selectedTopics } } } });
+      await updateStep({
+        variables: { input: { step, data: { displayName, selectedTopics } } },
+      });
       if (step < totalSteps) {
         setStep(step + 1);
       } else {
@@ -90,7 +129,15 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
     } catch {
       Alert.alert('Something went wrong, please try again');
     }
-  }, [step, displayName, selectedTopics, updateStep, completeOnboarding, navigation, totalSteps]);
+  }, [
+    step,
+    displayName,
+    selectedTopics,
+    updateStep,
+    completeOnboarding,
+    navigation,
+    totalSteps,
+  ]);
 
   const handleSkip = useCallback(async () => {
     await skipOnboarding();
@@ -98,10 +145,12 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
   }, [skipOnboarding, navigation]);
 
   const toggleTopic = useCallback((topic: string) => {
-    setSelectedTopics(prev =>
+    setSelectedTopics((prev) =>
       prev.includes(topic)
-        ? prev.filter(t => t !== topic)
-        : prev.length < 3 ? [...prev, topic] : prev
+        ? prev.filter((t) => t !== topic)
+        : prev.length < 3
+          ? [...prev, topic]
+          : prev
     );
   }, []);
 
@@ -139,7 +188,9 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
 
       {step === 2 && (
         <View style={styles.section}>
-          <Text style={styles.subtitle}>Pick up to 3 topics you want to learn</Text>
+          <Text style={styles.subtitle}>
+            Pick up to 3 topics you want to learn
+          </Text>
           <View style={styles.topicGrid}>
             {topics.map((topic) => (
               <TouchableOpacity
@@ -150,10 +201,12 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
                 ]}
                 onPress={() => toggleTopic(topic)}
               >
-                <Text style={[
-                  styles.topicText,
-                  selectedTopics.includes(topic) && styles.topicTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.topicText,
+                    selectedTopics.includes(topic) && styles.topicTextSelected,
+                  ]}
+                >
                   {topic}
                 </Text>
               </TouchableOpacity>
@@ -185,23 +238,79 @@ export function OnboardingScreen({ navigation }: OnboardingScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 24, backgroundColor: '#F8F9FA', alignItems: 'center' },
+  container: {
+    flexGrow: 1,
+    padding: 24,
+    backgroundColor: '#F8F9FA',
+    alignItems: 'center',
+  },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  progressDots: { flexDirection: 'row', gap: 8, marginBottom: 32, marginTop: 48 },
+  progressDots: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 32,
+    marginTop: 48,
+  },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#E5E7EB' },
   dotActive: { backgroundColor: '#6366F1' },
-  title: { fontSize: 24, fontWeight: '700', color: '#1A1A2E', marginBottom: 24, textAlign: 'center' },
-  subtitle: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 16 },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1A2E',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
   section: { width: '100%', marginBottom: 24, alignItems: 'center' },
-  label: { fontSize: 14, fontWeight: '500', color: '#374151', marginBottom: 8, alignSelf: 'flex-start' },
-  input: { width: '100%', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: '#1A1A2E', backgroundColor: '#FFF' },
-  topicGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
-  topicChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#E5E7EB', backgroundColor: '#FFF' },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+  },
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: '#1A1A2E',
+    backgroundColor: '#FFF',
+  },
+  topicGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'center',
+  },
+  topicChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFF',
+  },
   topicChipSelected: { backgroundColor: '#EEF2FF', borderColor: '#6366F1' },
   topicText: { fontSize: 13, color: '#374151' },
   topicTextSelected: { color: '#6366F1', fontWeight: '600' },
   emoji: { fontSize: 48, marginBottom: 16 },
-  primaryButton: { width: '100%', backgroundColor: '#6366F1', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 12 },
+  primaryButton: {
+    width: '100%',
+    backgroundColor: '#6366F1',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   primaryButtonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
   skipText: { fontSize: 14, color: '#9CA3AF' },
 });

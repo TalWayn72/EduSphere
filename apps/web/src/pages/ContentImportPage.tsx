@@ -23,8 +23,14 @@ export function ContentImportPage() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
 
-  const { importFromYoutube, importFromWebsite, importFromDrive, importJob, isImporting, error } =
-    useContentImport(courseId ?? '');
+  const {
+    importFromYoutube,
+    importFromWebsite,
+    importFromDrive,
+    importJob,
+    isImporting,
+    error,
+  } = useContentImport(courseId ?? '');
 
   // Role gate: only instructors and admins
   const allowedRoles = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'];
@@ -46,7 +52,9 @@ export function ContentImportPage() {
   return (
     <Layout>
       <PageShell size="sm" className="max-w-3xl p-6" spacing="normal">
-        <h1 className="text-3xl font-bold mb-2">{t('contentImport.pageTitle')}</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          {t('contentImport.pageTitle')}
+        </h1>
         <p className="text-muted-foreground mb-8">
           {t('contentImport.pageDescription')}
         </p>
@@ -60,7 +68,10 @@ export function ContentImportPage() {
 
             {selectedSource === 'youtube' && (
               <div>
-                <label htmlFor="youtube-url" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="youtube-url"
+                  className="block text-sm font-medium mb-1"
+                >
                   {t('contentImport.youtubeLabel')}
                 </label>
                 <input
@@ -77,7 +88,10 @@ export function ContentImportPage() {
 
             {selectedSource === 'website' && (
               <div>
-                <label htmlFor="website-url" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="website-url"
+                  className="block text-sm font-medium mb-1"
+                >
                   {t('contentImport.websiteLabel')}
                 </label>
                 <input
@@ -100,7 +114,9 @@ export function ContentImportPage() {
               <DriveImportCard
                 courseId={courseId ?? ''}
                 moduleId=""
-                onImport={(folderId, accessToken) => void importFromDrive(folderId, accessToken)}
+                onImport={(folderId, accessToken) =>
+                  void importFromDrive(folderId, accessToken)
+                }
                 isImporting={isImporting}
               />
             )}
@@ -111,25 +127,32 @@ export function ContentImportPage() {
               </p>
             )}
 
-            {selectedSource && selectedSource !== 'folder' && selectedSource !== 'drive' && (
-              <div className="flex items-center gap-4">
-                <button
-                  type="submit"
-                  disabled={isImporting}
-                  className="bg-primary text-primary-foreground px-6 py-2 rounded font-medium disabled:opacity-50"
-                >
-                  {isImporting ? t('contentImport.importing') : t('contentImport.startImport')}
-                </button>
-                <ProgressStatus
-                  messages={[...CONTENT_IMPORT_MESSAGES]}
-                  active={isImporting}
-                  variant="inline"
-                />
-              </div>
-            )}
+            {selectedSource &&
+              selectedSource !== 'folder' &&
+              selectedSource !== 'drive' && (
+                <div className="flex items-center gap-4">
+                  <button
+                    type="submit"
+                    disabled={isImporting}
+                    className="bg-primary text-primary-foreground px-6 py-2 rounded font-medium disabled:opacity-50"
+                  >
+                    {isImporting
+                      ? t('contentImport.importing')
+                      : t('contentImport.startImport')}
+                  </button>
+                  <ProgressStatus
+                    messages={[...CONTENT_IMPORT_MESSAGES]}
+                    active={isImporting}
+                    variant="inline"
+                  />
+                </div>
+              )}
           </form>
         ) : (
-          <ImportProgressPanel job={importJob} onDone={() => navigate(`/courses/${courseId}`)} />
+          <ImportProgressPanel
+            job={importJob}
+            onDone={() => navigate(`/courses/${courseId}`)}
+          />
         )}
       </PageShell>
     </Layout>

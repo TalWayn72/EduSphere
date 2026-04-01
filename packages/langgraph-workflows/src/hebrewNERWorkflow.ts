@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -123,7 +129,9 @@ Return a JSON array of entities with text, type, canonicalName, bookName, locati
     for (const chunk of chunks.slice(0, 10)) {
       // Process max 10 chunks to avoid token overflow
       const { object } = await generateObject({
-        model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+        model: openai(this.model) as unknown as Parameters<
+          typeof generateObject
+        >[0]['model'],
         system: systemPrompt,
         prompt: `Extract all Hebrew religious entities from this transcript chunk:\n\n${chunk}`,
         schema: z.object({
@@ -149,7 +157,9 @@ Known books: ספר עץ חיים (Etz Chaim), תלמוד בבלי, תלמוד �
     );
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Enrich these entities with canonical locations:\n${JSON.stringify(state.entities.slice(0, 50), null, 2)}`,
       schema: z.object({
@@ -183,7 +193,9 @@ Known books: ספר עץ חיים (Etz Chaim), תלמוד בבלי, תלמוד �
     const truncatedTranscript = state.transcript.slice(0, 4000);
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Mark the following entities in the transcript with [ENTITY:type] tags:
 Entities found:

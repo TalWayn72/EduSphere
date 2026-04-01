@@ -65,7 +65,12 @@ describe('AeoController', () => {
     it('returns courses from service', async () => {
       const svc = new AeoService();
       vi.spyOn(svc, 'getPublicCourses').mockResolvedValue([
-        { id: 'abc-123', title: 'Intro to AI', description: 'Learn AI basics', slug: 'intro-to-ai' },
+        {
+          id: 'abc-123',
+          title: 'Intro to AI',
+          description: 'Learn AI basics',
+          slug: 'intro-to-ai',
+        },
       ]);
       const ctrl = new AeoController(svc);
       const courses = await ctrl.getCourses();
@@ -85,12 +90,18 @@ describe('AeoController', () => {
   describe('getSitemap', () => {
     it('calls generateSitemapXml and sends XML via res.send', async () => {
       const svc = new AeoService();
-      vi.spyOn(svc, 'generateSitemapXml').mockResolvedValue('<?xml version="1.0"?><urlset/>');
+      vi.spyOn(svc, 'generateSitemapXml').mockResolvedValue(
+        '<?xml version="1.0"?><urlset/>'
+      );
       const ctrl = new AeoController(svc);
-      const mockRes = { send: vi.fn() } as unknown as import('express').Response;
+      const mockRes = {
+        send: vi.fn(),
+      } as unknown as import('express').Response;
       await ctrl.getSitemap(mockRes);
       expect(svc.generateSitemapXml).toHaveBeenCalledOnce();
-      expect(mockRes.send).toHaveBeenCalledWith(expect.stringContaining('<?xml'));
+      expect(mockRes.send).toHaveBeenCalledWith(
+        expect.stringContaining('<?xml')
+      );
     });
   });
 

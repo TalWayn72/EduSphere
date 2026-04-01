@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  isAgentSessionEvent,
-  isAgentMessageEvent,
-} from './agent-events.js';
+import { isAgentSessionEvent, isAgentMessageEvent } from './agent-events.js';
 
 describe('agent-events type guards', () => {
   describe('isAgentSessionEvent', () => {
@@ -70,9 +67,9 @@ describe('agent-events type guards', () => {
     });
 
     it('returns false when sessionId is not a string', () => {
-      expect(
-        isAgentSessionEvent({ ...validSession, sessionId: 123 })
-      ).toBe(false);
+      expect(isAgentSessionEvent({ ...validSession, sessionId: 123 })).toBe(
+        false
+      );
     });
   });
 
@@ -97,9 +94,9 @@ describe('agent-events type guards', () => {
     });
 
     it('returns true for stream.end', () => {
-      expect(
-        isAgentMessageEvent({ ...validMessage, type: 'stream.end' })
-      ).toBe(true);
+      expect(isAgentMessageEvent({ ...validMessage, type: 'stream.end' })).toBe(
+        true
+      );
     });
 
     it('returns true for stream.error', () => {
@@ -124,9 +121,9 @@ describe('agent-events type guards', () => {
     });
 
     it('returns false when sessionId is not a string', () => {
-      expect(
-        isAgentMessageEvent({ ...validMessage, sessionId: 42 })
-      ).toBe(false);
+      expect(isAgentMessageEvent({ ...validMessage, sessionId: 42 })).toBe(
+        false
+      );
     });
 
     it('accepts message without optional fields', () => {

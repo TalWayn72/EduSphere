@@ -65,7 +65,9 @@ test.describe('XP Dashboard — DEV_MODE guard', () => {
     expect(text).toMatch(/Lv\.\s*\d+/);
   });
 
-  test('no [object Object] serialization in dashboard DOM', async ({ page }) => {
+  test('no [object Object] serialization in dashboard DOM', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
 

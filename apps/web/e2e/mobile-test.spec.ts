@@ -21,9 +21,11 @@ async function login(page: any) {
     await devBtn.waitFor({ timeout: 10_000 });
     await devBtn.click();
     // SmartRoot redirects to /dashboard; /learn/ is also acceptable
-    await page.waitForURL(/\/(learn|dashboard)\//, { timeout: 15_000 }).catch(async () => {
-      await page.waitForLoadState('domcontentloaded');
-    });
+    await page
+      .waitForURL(/\/(learn|dashboard)\//, { timeout: 15_000 })
+      .catch(async () => {
+        await page.waitForLoadState('domcontentloaded');
+      });
     return;
   }
   await page.goto(`${BASE_URL}/login`);
@@ -54,7 +56,9 @@ test('M-01 mobile hamburger menu visible', async ({ page }) => {
     fullPage: false,
   });
   // Hamburger button should be visible on mobile
-  const hamburger = page.locator('button[aria-label*="menu"], button[aria-label*="Menu"]').first();
+  const hamburger = page
+    .locator('button[aria-label*="menu"], button[aria-label*="Menu"]')
+    .first();
   await expect(hamburger).toBeVisible({ timeout: 5000 });
   console.log('BUG-12 HAMBURGER: visible ✅');
 });
@@ -124,7 +128,9 @@ test('M-05 touch scroll works on dashboard', async ({ page }) => {
   expect(newScrollY).toBeGreaterThanOrEqual(initialScrollY);
 });
 
-test('M-06 responsive layout — cards stack vertically on mobile', async ({ page }) => {
+test('M-06 responsive layout — cards stack vertically on mobile', async ({
+  page,
+}) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
@@ -148,7 +154,10 @@ test('M-06 responsive layout — cards stack vertically on mobile', async ({ pag
     }
   }
 
-  await page.screenshot({ path: `${SHOTS}/m06-cards-stacked.png`, fullPage: true });
+  await page.screenshot({
+    path: `${SHOTS}/m06-cards-stacked.png`,
+    fullPage: true,
+  });
 });
 
 test('M-07 bottom nav or hamburger is visible on mobile', async ({ page }) => {
@@ -157,12 +166,14 @@ test('M-07 bottom nav or hamburger is visible on mobile', async ({ page }) => {
   await page.waitForLoadState('domcontentloaded');
 
   // Either a bottom nav bar or a hamburger menu should be visible
-  const bottomNav = page.locator(
-    '[data-testid="bottom-nav"], nav[class*="bottom"], [role="navigation"][class*="fixed"]'
-  ).first();
-  const hamburger = page.locator(
-    'button[aria-label*="menu" i], button[aria-label*="Menu"]'
-  ).first();
+  const bottomNav = page
+    .locator(
+      '[data-testid="bottom-nav"], nav[class*="bottom"], [role="navigation"][class*="fixed"]'
+    )
+    .first();
+  const hamburger = page
+    .locator('button[aria-label*="menu" i], button[aria-label*="Menu"]')
+    .first();
 
   const hasBottomNav = await bottomNav.isVisible().catch(() => false);
   const hasHamburger = await hamburger.isVisible().catch(() => false);
@@ -176,9 +187,11 @@ test('M-08 search on mobile — search input is accessible', async ({ page }) =>
   await page.waitForLoadState('domcontentloaded');
 
   // Search input should be usable on mobile
-  const searchInput = page.locator(
-    'input[type="search"], input[placeholder*="search" i], input[aria-label*="search" i]'
-  ).first();
+  const searchInput = page
+    .locator(
+      'input[type="search"], input[placeholder*="search" i], input[aria-label*="search" i]'
+    )
+    .first();
   const searchExists = await searchInput.isVisible().catch(() => false);
 
   if (searchExists) {
@@ -208,12 +221,17 @@ test('M-09 settings page on mobile', async ({ page }) => {
 
   // No horizontal overflow on mobile
   const overflows = await page.evaluate(() => {
-    return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+    return (
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth
+    );
   });
   // Acceptable if slight overflow exists due to sidebar, but flag major issues
   if (overflows) {
     const diff = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
     );
     expect(diff).toBeLessThan(50); // Allow small overflow for sidebar
   }
@@ -240,7 +258,10 @@ test('M-11 courses grid becomes list on mobile', async ({ page }) => {
   await page.goto(`${BASE_URL}/courses`);
   await page.waitForLoadState('domcontentloaded');
 
-  await page.screenshot({ path: `${SHOTS}/m11-courses-list.png`, fullPage: true });
+  await page.screenshot({
+    path: `${SHOTS}/m11-courses-list.png`,
+    fullPage: true,
+  });
 
   // On 390px viewport, courses should not display in a multi-column grid
   const courseCards = page.locator(
@@ -275,14 +296,19 @@ test('M-12 zoom/pinch is not disabled via viewport meta', async ({ page }) => {
   expect(viewportContent).not.toContain('user-scalable=0');
 });
 
-test('M-13 swipe navigation — no horizontal scroll on dashboard', async ({ page }) => {
+test('M-13 swipe navigation — no horizontal scroll on dashboard', async ({
+  page,
+}) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
 
   // On mobile, the page should not have unintended horizontal scroll
   const hasHorizontalScroll = await page.evaluate(() => {
-    return document.documentElement.scrollWidth > document.documentElement.clientWidth + 20;
+    return (
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth + 20
+    );
   });
 
   expect(hasHorizontalScroll).toBe(false);
@@ -375,7 +401,9 @@ test('M-17 mobile — text is readable (minimum font size)', async ({ page }) =>
   expect(tooSmallTexts).toBeLessThan(5);
 });
 
-test('M-18 mobile — focus is visible on interactive elements', async ({ page }) => {
+test('M-18 mobile — focus is visible on interactive elements', async ({
+  page,
+}) => {
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
@@ -389,14 +417,19 @@ test('M-18 mobile — focus is visible on interactive elements', async ({ page }
   expect(activeTag).toBeTruthy();
 });
 
-test('M-19 mobile — landscape orientation does not break layout', async ({ page }) => {
+test('M-19 mobile — landscape orientation does not break layout', async ({
+  page,
+}) => {
   // Switch to landscape
   await page.setViewportSize({ width: 844, height: 390 });
   await login(page);
   await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('domcontentloaded');
 
-  await page.screenshot({ path: `${SHOTS}/m19-landscape.png`, fullPage: false });
+  await page.screenshot({
+    path: `${SHOTS}/m19-landscape.png`,
+    fullPage: false,
+  });
 
   // Should not crash in landscape
   await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

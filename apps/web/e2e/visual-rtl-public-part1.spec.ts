@@ -29,7 +29,10 @@ test.describe('Visual RTL -- Public Pages Part 1 @visual @rtl', () => {
   test('landing -- full page RTL layout', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('rtl-public-landing-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'rtl-public-landing-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('landing -- header RTL alignment', async ({ page }) => {
@@ -112,7 +115,10 @@ test.describe('Visual RTL -- Public Pages Part 1 @visual @rtl', () => {
   test('login -- full page RTL layout', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('rtl-public-login-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'rtl-public-login-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('login -- form RTL alignment', async ({ page }) => {
@@ -165,7 +171,10 @@ test.describe('Visual RTL -- Public Pages Part 1 @visual @rtl', () => {
   test('about -- full page RTL layout', async ({ page }) => {
     await page.goto(`${BASE_URL}/about`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
-    await expect(page).toHaveScreenshot('rtl-public-about-full.png', STABLE_OPTS);
+    await expect(page).toHaveScreenshot(
+      'rtl-public-about-full.png',
+      STABLE_OPTS
+    );
   });
 
   test('about -- header RTL alignment', async ({ page }) => {
@@ -212,5 +221,4 @@ test.describe('Visual RTL -- Public Pages Part 1 @visual @rtl', () => {
       });
     }
   });
-
 });

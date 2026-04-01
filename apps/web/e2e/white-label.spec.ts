@@ -16,7 +16,9 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('White-label runtime', () => {
-  test('login page shows default EduSphere branding when no tenant slug', async ({ page }) => {
+  test('login page shows default EduSphere branding when no tenant slug', async ({
+    page,
+  }) => {
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
 
@@ -28,12 +30,17 @@ test.describe('White-label runtime', () => {
     await expect(emptyImgs).toHaveCount(0);
   });
 
-  test('login page with ?tenant=demo shows public branding from API', async ({ page }) => {
+  test('login page with ?tenant=demo shows public branding from API', async ({
+    page,
+  }) => {
     // Intercept the GraphQL publicBranding query and return mock data
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       const body = req.postDataJSON?.() as Record<string, unknown> | null;
-      if (typeof body?.query === 'string' && body.query.includes('publicBranding')) {
+      if (
+        typeof body?.query === 'string' &&
+        body.query.includes('publicBranding')
+      ) {
         await route.fulfill({
           contentType: 'application/json',
           body: JSON.stringify({
@@ -62,14 +69,19 @@ test.describe('White-label runtime', () => {
     await expect(page.getByText('Learn smarter, not harder')).toBeVisible();
   });
 
-  test('login page does not leak customCss or hideEduSphereBranding in public endpoint', async ({ page }) => {
+  test('login page does not leak customCss or hideEduSphereBranding in public endpoint', async ({
+    page,
+  }) => {
     // Capture the exact query the frontend sends to the publicBranding endpoint
     let publicBrandingPayload: Record<string, unknown> | null = null;
 
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       const body = req.postDataJSON?.() as Record<string, unknown> | null;
-      if (typeof body?.query === 'string' && body.query.includes('publicBranding')) {
+      if (
+        typeof body?.query === 'string' &&
+        body.query.includes('publicBranding')
+      ) {
         publicBrandingPayload = body;
         await route.fulfill({
           contentType: 'application/json',
@@ -86,19 +98,32 @@ test.describe('White-label runtime', () => {
     // If the frontend sent a publicBranding query, verify it does NOT request
     // privileged fields that belong only to the authenticated myTenantBranding query
     if (publicBrandingPayload !== null) {
-      const queryStr = String((publicBrandingPayload as Record<string, unknown>).query ?? '');
-      expect(queryStr, 'publicBranding query must not request hideEduSphereBranding').not.toContain('hideEduSphereBranding');
-      expect(queryStr, 'publicBranding query must not request customCss').not.toContain('customCss');
+      const queryStr = String(
+        (publicBrandingPayload as Record<string, unknown>).query ?? ''
+      );
+      expect(
+        queryStr,
+        'publicBranding query must not request hideEduSphereBranding'
+      ).not.toContain('hideEduSphereBranding');
+      expect(
+        queryStr,
+        'publicBranding query must not request customCss'
+      ).not.toContain('customCss');
     }
   });
 
-  test('authenticated sidebar shows custom org name from tenant branding', async ({ page }) => {
+  test('authenticated sidebar shows custom org name from tenant branding', async ({
+    page,
+  }) => {
     // Stub the myTenantBranding query so if the app reaches an authenticated page
     // it renders the mocked org name instead of the default
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       const body = req.postDataJSON?.() as Record<string, unknown> | null;
-      if (typeof body?.query === 'string' && body.query.includes('myTenantBranding')) {
+      if (
+        typeof body?.query === 'string' &&
+        body.query.includes('myTenantBranding')
+      ) {
         await route.fulfill({
           contentType: 'application/json',
           body: JSON.stringify({
@@ -132,18 +157,28 @@ test.describe('White-label runtime', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // The page body must never expose raw GraphQL error text or stack traces to users
-    const bodyText = await page.locator('body').textContent() ?? '';
-    expect(bodyText, 'Raw [GraphQL] error text must not be visible to users').not.toContain('[GraphQL]');
-    expect(bodyText, 'Stack traces must not be visible to users').not.toContain('stack');
+    const bodyText = (await page.locator('body').textContent()) ?? '';
+    expect(
+      bodyText,
+      'Raw [GraphQL] error text must not be visible to users'
+    ).not.toContain('[GraphQL]');
+    expect(bodyText, 'Stack traces must not be visible to users').not.toContain(
+      'stack'
+    );
   });
 
-  test('custom CSS is injected via style tag textContent not innerHTML', async ({ page }) => {
+  test('custom CSS is injected via style tag textContent not innerHTML', async ({
+    page,
+  }) => {
     const customCssValue = ':root { --test-custom: #abc123; }';
 
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       const body = req.postDataJSON?.() as Record<string, unknown> | null;
-      if (typeof body?.query === 'string' && body.query.includes('myTenantBranding')) {
+      if (
+        typeof body?.query === 'string' &&
+        body.query.includes('myTenantBranding')
+      ) {
         await route.fulfill({
           contentType: 'application/json',
           body: JSON.stringify({
@@ -181,8 +216,11 @@ test.describe('White-label runtime', () => {
     const styleEl = page.locator('#tenant-custom-css');
     const count = await styleEl.count();
     if (count > 0) {
-      const content = await styleEl.textContent() ?? '';
-      expect(content, 'Injected style tag must contain the custom CSS value').toContain('--test-custom');
+      const content = (await styleEl.textContent()) ?? '';
+      expect(
+        content,
+        'Injected style tag must contain the custom CSS value'
+      ).toContain('--test-custom');
       // The style element must not have been set via innerHTML (verified structurally:
       // if textContent contains our value, it was set safely)
       expect(content).toContain('#abc123');
@@ -192,14 +230,21 @@ test.describe('White-label runtime', () => {
   test('login page visual snapshot', async ({ page }) => {
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
-    await expect(page).toHaveScreenshot('login-default-branding.png', { fullPage: false });
+    await expect(page).toHaveScreenshot('login-default-branding.png', {
+      fullPage: false,
+    });
   });
 
-  test('login page with invalid tenant slug handles error gracefully', async ({ page }) => {
+  test('login page with invalid tenant slug handles error gracefully', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       const body = req.postDataJSON?.() as Record<string, unknown> | null;
-      if (typeof body?.query === 'string' && body.query.includes('publicBranding')) {
+      if (
+        typeof body?.query === 'string' &&
+        body.query.includes('publicBranding')
+      ) {
         await route.fulfill({
           contentType: 'application/json',
           body: JSON.stringify({
@@ -233,11 +278,16 @@ test.describe('White-label runtime', () => {
     });
   });
 
-  test('branding API network failure falls back to default branding', async ({ page }) => {
+  test('branding API network failure falls back to default branding', async ({
+    page,
+  }) => {
     await page.route('**/graphql', async (route) => {
       const req = route.request();
       const body = req.postDataJSON?.() as Record<string, unknown> | null;
-      if (typeof body?.query === 'string' && body.query.includes('publicBranding')) {
+      if (
+        typeof body?.query === 'string' &&
+        body.query.includes('publicBranding')
+      ) {
         await route.abort('connectionrefused');
       } else {
         await route.continue();

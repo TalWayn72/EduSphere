@@ -45,12 +45,7 @@ export const WeeklyActivityBar: React.FC<WeeklyActivityBarProps> = ({
                   testID={`bar-${day.label}`}
                 />
               </View>
-              <Text
-                style={[
-                  styles.dayLabel,
-                  isToday && styles.dayLabelToday,
-                ]}
-              >
+              <Text style={[styles.dayLabel, isToday && styles.dayLabelToday]}>
                 {day.label}
               </Text>
             </View>

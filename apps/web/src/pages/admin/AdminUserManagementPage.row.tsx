@@ -13,11 +13,12 @@ interface UserTableRowProps {
   onToggle: (id: string) => void;
 }
 
-const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive'> = {
-  active: 'default',
-  inactive: 'secondary',
-  suspended: 'destructive',
-};
+const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive'> =
+  {
+    active: 'default',
+    inactive: 'secondary',
+    suspended: 'destructive',
+  };
 
 export function UserTableRow({ user, selected, onToggle }: UserTableRowProps) {
   const { t } = useTranslation('admin');
@@ -33,14 +34,18 @@ export function UserTableRow({ user, selected, onToggle }: UserTableRowProps) {
       </TableCell>
       <TableCell className="font-medium">{user.name}</TableCell>
       <TableCell>{user.email}</TableCell>
-      <TableCell><Badge variant="outline">{user.role}</Badge></TableCell>
+      <TableCell>
+        <Badge variant="outline">{user.role}</Badge>
+      </TableCell>
       <TableCell>
         <Badge variant={STATUS_VARIANT[user.status] ?? 'secondary'}>
           {user.status}
         </Badge>
       </TableCell>
       <TableCell className="text-muted-foreground text-sm">
-        {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : t('users.never')}
+        {user.lastLogin
+          ? new Date(user.lastLogin).toLocaleDateString()
+          : t('users.never')}
       </TableCell>
     </TableRow>
   );

@@ -49,7 +49,8 @@ test.describe('Performance Smoke — LCP', () => {
       await page.waitForLoadState('networkidle').catch(() => {});
 
       const lcp = await page.evaluate(
-        () => (window as unknown as Record<string, unknown>).__LCP_VALUE__ as number
+        () =>
+          (window as unknown as Record<string, unknown>).__LCP_VALUE__ as number
       );
 
       // LCP of 0 means no LCP entry was recorded (e.g. empty page) — still passes

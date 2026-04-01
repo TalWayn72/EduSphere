@@ -45,7 +45,9 @@ export function DocumentAnnotationPage() {
   // Mounted guard: prevent urql cache dispatch during sibling route render
   // (content viewer pages share CONTENT_ITEM_QUERY across sibling routes).
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [result] = useQuery<ContentItemResult>({
     query: CONTENT_ITEM_QUERY,
@@ -153,9 +155,7 @@ export function DocumentAnnotationPage() {
   }, []);
 
   if (fetching || annotationsFetching) {
-    return (
-      <LoadingSpinner containerHeight="h-screen" />
-    );
+    return <LoadingSpinner containerHeight="h-screen" />;
   }
 
   // Fallback to mock document when gateway is offline (dev mode)

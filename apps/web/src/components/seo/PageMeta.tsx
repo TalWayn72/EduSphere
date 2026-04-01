@@ -22,13 +22,17 @@ export function PageMeta({
 }: PageMetaProps) {
   const fullTitle = `${title} | EduSphere`;
   const canonicalUrl =
-    canonical ?? (typeof window !== 'undefined' ? window.location.href : BASE_URL);
+    canonical ??
+    (typeof window !== 'undefined' ? window.location.href : BASE_URL);
 
   return (
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
-      <meta name="robots" content={noIndex ? 'noindex, follow' : 'index, follow'} />
+      <meta
+        name="robots"
+        content={noIndex ? 'noindex, follow' : 'index, follow'}
+      />
       <link rel="canonical" href={canonicalUrl} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />

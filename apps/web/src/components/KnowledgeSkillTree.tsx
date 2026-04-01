@@ -4,7 +4,13 @@
  * WCAG 2.1 + ARIA APG Tree View pattern:
  * https://www.w3.org/WAI/ARIA/apg/patterns/treeview/
  */
-import { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+} from 'react';
 import { cn } from '@/lib/utils';
 import { useTreeKeyboard, getVisibleOrder } from './useTreeKeyboard';
 import { layoutNodes } from './skillTreeLayout';
@@ -12,16 +18,26 @@ import { SkillTreeNode } from './SkillTreeNode';
 import { NODE_W, NODE_H } from './KnowledgeSkillTree.types';
 
 // Re-export types + data for backward compatibility
-export type { MasteryLevel, SkillNode, KnowledgeSkillTreeProps } from './KnowledgeSkillTree.types';
+export type {
+  MasteryLevel,
+  SkillNode,
+  KnowledgeSkillTreeProps,
+} from './KnowledgeSkillTree.types';
 export { SAMPLE_SKILL_TREE_DATA } from './KnowledgeSkillTree.data';
 
 import type { KnowledgeSkillTreeProps } from './KnowledgeSkillTree.types';
 
 const TREE_INSTRUCTIONS_ID = 'skill-tree-keyboard-instructions';
 
-export function KnowledgeSkillTree({ nodes, onNodeClick, className }: KnowledgeSkillTreeProps) {
+export function KnowledgeSkillTree({
+  nodes,
+  onNodeClick,
+  className,
+}: KnowledgeSkillTreeProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [focusedId, setFocusedId] = useState<string | null>(nodes[0]?.id ?? null);
+  const [focusedId, setFocusedId] = useState<string | null>(
+    nodes[0]?.id ?? null
+  );
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
     () => new Set(nodes.filter((n) => n.children.length > 0).map((n) => n.id))
   );
@@ -32,7 +48,9 @@ export function KnowledgeSkillTree({ nodes, onNodeClick, className }: KnowledgeS
   const laid = layoutNodes(nodes);
 
   useEffect(() => {
-    setExpandedIds(new Set(nodes.filter((n) => n.children.length > 0).map((n) => n.id)));
+    setExpandedIds(
+      new Set(nodes.filter((n) => n.children.length > 0).map((n) => n.id))
+    );
     setFocusedId(nodes[0]?.id ?? null);
   }, [nodes]);
 
@@ -89,7 +107,13 @@ export function KnowledgeSkillTree({ nodes, onNodeClick, className }: KnowledgeS
   });
 
   const idMap = new Map(laid.map((n) => [n.id, n]));
-  const edges: { id: string; x1: number; y1: number; x2: number; y2: number }[] = [];
+  const edges: {
+    id: string;
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  }[] = [];
   laid.forEach((parent) => {
     parent.children.forEach((childId) => {
       const child = idMap.get(childId);
@@ -120,14 +144,19 @@ export function KnowledgeSkillTree({ nodes, onNodeClick, className }: KnowledgeS
   return (
     <>
       <div className="sr-only" id={TREE_INSTRUCTIONS_ID}>
-        Use arrow keys to navigate the skill tree. Press Enter or Space to select a skill.
-        Press ArrowRight to expand a node, ArrowLeft to collapse or move to parent.
+        Use arrow keys to navigate the skill tree. Press Enter or Space to
+        select a skill. Press ArrowRight to expand a node, ArrowLeft to collapse
+        or move to parent.
       </div>
 
       <div
         ref={(el) => {
-          (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-          (svgContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          (
+            containerRef as React.MutableRefObject<HTMLDivElement | null>
+          ).current = el;
+          (
+            svgContainerRef as React.MutableRefObject<HTMLDivElement | null>
+          ).current = el;
         }}
         role="tree"
         aria-label="Knowledge skill tree"
@@ -157,7 +186,9 @@ export function KnowledgeSkillTree({ nodes, onNodeClick, className }: KnowledgeS
           ))}
         </svg>
 
-        <div style={{ width: svgSize.w, height: svgSize.h, position: 'relative' }}>
+        <div
+          style={{ width: svgSize.w, height: svgSize.h, position: 'relative' }}
+        >
           {laid.map((node) => {
             const siblings = levelGroups.get(node.depth) ?? [node.id];
             const isVisible = visibleOrder.includes(node.id);

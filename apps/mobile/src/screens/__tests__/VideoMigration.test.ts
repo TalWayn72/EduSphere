@@ -11,8 +11,16 @@ import { execSync } from 'child_process';
 const MOBILE_ROOT = resolve(__dirname, '../../..');
 const SRC_ROOT = resolve(__dirname, '../..');
 
-function readPkg(): Record<string, unknown> & { dependencies?: Record<string, string>; devDependencies?: Record<string, string> } {
-  return JSON.parse(readFileSync(resolve(MOBILE_ROOT, 'package.json'), 'utf8')) as Record<string, unknown> & { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
+function readPkg(): Record<string, unknown> & {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+} {
+  return JSON.parse(
+    readFileSync(resolve(MOBILE_ROOT, 'package.json'), 'utf8')
+  ) as Record<string, unknown> & {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+  };
 }
 
 describe('Expo SDK 55 migration checks', () => {
@@ -47,13 +55,15 @@ describe('Expo SDK 55 migration checks', () => {
   it('no source files import from expo-av', () => {
     const result = execSync(
       'grep -rl "expo-av" src/ --include="*.ts" --include="*.tsx" 2>/dev/null || true',
-      { cwd: MOBILE_ROOT, encoding: 'utf8' },
+      { cwd: MOBILE_ROOT, encoding: 'utf8' }
     ) as string;
     expect(result.trim()).toBe('');
   });
 
   it('app.json has edgeToEdgeEnabled for Android 16+', () => {
-    const appJson = JSON.parse(readFileSync(resolve(MOBILE_ROOT, 'app.json'), 'utf8')) as {
+    const appJson = JSON.parse(
+      readFileSync(resolve(MOBILE_ROOT, 'app.json'), 'utf8')
+    ) as {
       expo?: { android?: { edgeToEdgeEnabled?: boolean } };
     };
     expect(appJson.expo?.android?.edgeToEdgeEnabled).toBe(true);

@@ -14,7 +14,9 @@ import { useOptimisticEnrollment } from './useOptimisticEnrollment';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeOptions(overrides: Partial<Parameters<typeof useOptimisticEnrollment>[0]> = {}) {
+function makeOptions(
+  overrides: Partial<Parameters<typeof useOptimisticEnrollment>[0]> = {}
+) {
   return {
     courseId: 'course-1',
     isEnrolled: false,
@@ -64,7 +66,10 @@ describe('useOptimisticEnrollment', () => {
 
   it('calls unenrollMutation when enrolled and handleEnroll is called', async () => {
     const unenrollFn = vi.fn().mockResolvedValue({ error: null });
-    const opts = makeOptions({ isEnrolled: true, unenrollMutation: unenrollFn });
+    const opts = makeOptions({
+      isEnrolled: true,
+      unenrollMutation: unenrollFn,
+    });
     const { result } = renderHook(() => useOptimisticEnrollment(opts));
 
     await act(async () => {
@@ -108,14 +113,22 @@ describe('useOptimisticEnrollment', () => {
         message: '[GraphQL] Not allowed',
       },
     });
-    const opts = makeOptions({ isEnrolled: false, enrollMutation: enrollFn, onSuccess, onError });
+    const opts = makeOptions({
+      isEnrolled: false,
+      enrollMutation: enrollFn,
+      onSuccess,
+      onError,
+    });
     const { result } = renderHook(() => useOptimisticEnrollment(opts));
 
     await act(async () => {
       result.current.handleEnroll();
     });
 
-    expect(onError).toHaveBeenCalledWith('Not allowed', expect.objectContaining({ graphQLErrors: expect.any(Array) }));
+    expect(onError).toHaveBeenCalledWith(
+      'Not allowed',
+      expect.objectContaining({ graphQLErrors: expect.any(Array) })
+    );
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
@@ -128,14 +141,22 @@ describe('useOptimisticEnrollment', () => {
         message: 'Network error',
       },
     });
-    const opts = makeOptions({ isEnrolled: true, unenrollMutation: unenrollFn, onSuccess, onError });
+    const opts = makeOptions({
+      isEnrolled: true,
+      unenrollMutation: unenrollFn,
+      onSuccess,
+      onError,
+    });
     const { result } = renderHook(() => useOptimisticEnrollment(opts));
 
     await act(async () => {
       result.current.handleEnroll();
     });
 
-    expect(onError).toHaveBeenCalledWith('Network error', expect.objectContaining({ message: 'Network error' }));
+    expect(onError).toHaveBeenCalledWith(
+      'Network error',
+      expect.objectContaining({ message: 'Network error' })
+    );
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
@@ -144,14 +165,21 @@ describe('useOptimisticEnrollment', () => {
     const enrollFn = vi.fn().mockResolvedValue({
       error: { graphQLErrors: [], message: 'Connection refused' },
     });
-    const opts = makeOptions({ isEnrolled: false, enrollMutation: enrollFn, onError });
+    const opts = makeOptions({
+      isEnrolled: false,
+      enrollMutation: enrollFn,
+      onError,
+    });
     const { result } = renderHook(() => useOptimisticEnrollment(opts));
 
     await act(async () => {
       result.current.handleEnroll();
     });
 
-    expect(onError).toHaveBeenCalledWith('Connection refused', expect.anything());
+    expect(onError).toHaveBeenCalledWith(
+      'Connection refused',
+      expect.anything()
+    );
   });
 
   it('isEnrolling is false after mutation resolves', async () => {
@@ -169,7 +197,10 @@ describe('useOptimisticEnrollment', () => {
   // React 19 useOptimistic reverts to isEnrolled (base state) once the transition ends.
   it('optimisticEnrolled reverts to base isEnrolled after failed mutation (regression guard)', async () => {
     const enrollFn = vi.fn().mockResolvedValue({
-      error: { graphQLErrors: [{ message: 'Not allowed' }], message: 'Not allowed' },
+      error: {
+        graphQLErrors: [{ message: 'Not allowed' }],
+        message: 'Not allowed',
+      },
     });
     const opts = makeOptions({ isEnrolled: false, enrollMutation: enrollFn });
     const { result } = renderHook(() => useOptimisticEnrollment(opts));

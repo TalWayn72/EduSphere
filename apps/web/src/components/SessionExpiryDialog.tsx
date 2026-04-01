@@ -22,7 +22,12 @@ export function SessionExpiryDialog({
   onReLogin,
 }: SessionExpiryDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={() => { /* prevent dismiss */ }}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        /* prevent dismiss */
+      }}
+    >
       <DialogContent
         className="sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}

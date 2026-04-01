@@ -37,39 +37,62 @@ export function GapAnalysisTable({ gaps }: { gaps: GapItem[] }) {
 
   return (
     <Card>
-      <CardHeader><CardTitle>Knowledge Gaps</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Knowledge Gaps</CardTitle>
+      </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table data-testid="critical-gaps-table" className="w-full text-sm" aria-label="Knowledge gap analysis results">
+          <table
+            data-testid="critical-gaps-table"
+            className="w-full text-sm"
+            aria-label="Knowledge gap analysis results"
+          >
             <thead>
               <tr className="border-b text-left text-muted-foreground">
-                <th scope="col" className="pb-3 pr-4 font-medium">Concept</th>
-                <th scope="col" className="pb-3 pr-4 font-medium">Status</th>
-                <th scope="col" className="pb-3 pr-4 font-medium">Relevance</th>
-                <th scope="col" className="pb-3 font-medium">Recommended Content</th>
+                <th scope="col" className="pb-3 pr-4 font-medium">
+                  Concept
+                </th>
+                <th scope="col" className="pb-3 pr-4 font-medium">
+                  Status
+                </th>
+                <th scope="col" className="pb-3 pr-4 font-medium">
+                  Relevance
+                </th>
+                <th scope="col" className="pb-3 font-medium">
+                  Recommended Content
+                </th>
               </tr>
             </thead>
             <tbody>
-              {gaps.filter((g) => !g.isMastered).map((gap) => (
-                <tr key={gap.conceptName} className="border-b hover:bg-muted/30">
-                  <td className="py-3 pr-4 font-medium">{gap.conceptName}</td>
-                  <td className="py-3 pr-4">
-                    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${MASTERY_BADGE[String(gap.isMastered)]}`}>
-                      {gap.isMastered ? 'Mastered' : 'Gap'}
-                    </span>
-                  </td>
-                  <td className="py-3 pr-4">
-                    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${relevanceBadge(gap.relevanceScore)}`}>
-                      {Math.round(gap.relevanceScore * 100)}%
-                    </span>
-                  </td>
-                  <td className="py-3 text-muted-foreground">
-                    {gap.recommendedContentTitles.length > 0
-                      ? gap.recommendedContentTitles.join(', ')
-                      : 'No recommendations available'}
-                  </td>
-                </tr>
-              ))}
+              {gaps
+                .filter((g) => !g.isMastered)
+                .map((gap) => (
+                  <tr
+                    key={gap.conceptName}
+                    className="border-b hover:bg-muted/30"
+                  >
+                    <td className="py-3 pr-4 font-medium">{gap.conceptName}</td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${MASTERY_BADGE[String(gap.isMastered)]}`}
+                      >
+                        {gap.isMastered ? 'Mastered' : 'Gap'}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${relevanceBadge(gap.relevanceScore)}`}
+                      >
+                        {Math.round(gap.relevanceScore * 100)}%
+                      </span>
+                    </td>
+                    <td className="py-3 text-muted-foreground">
+                      {gap.recommendedContentTitles.length > 0
+                        ? gap.recommendedContentTitles.join(', ')
+                        : 'No recommendations available'}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

@@ -7,6 +7,7 @@ If you discover a security vulnerability in EduSphere, please report it responsi
 **Email:** security@edusphere.dev
 
 Please include:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
@@ -14,19 +15,19 @@ Please include:
 
 ## Response Timeline
 
-| Action | Timeline |
-|--------|----------|
+| Action             | Timeline        |
+| ------------------ | --------------- |
 | Acknowledge report | Within 48 hours |
 | Initial assessment | Within 72 hours |
-| Critical fix | Within 7 days |
-| Non-critical fix | Within 30 days |
+| Critical fix       | Within 7 days   |
+| Non-critical fix   | Within 30 days  |
 
 ## Supported Versions
 
 | Version | Supported |
-|---------|-----------|
-| 1.0.x | Yes |
-| < 1.0 | No |
+| ------- | --------- |
+| 1.0.x   | Yes       |
+| < 1.0   | No        |
 
 ## Security Measures
 

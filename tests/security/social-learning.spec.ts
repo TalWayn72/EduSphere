@@ -84,7 +84,9 @@ describe('SEC-3: XSS in discussion messages', () => {
     const src = read(
       'apps/subgraph-collaboration/src/discussion/discussion-message.service.ts'
     );
-    expect(src).toMatch(/DOMPurify|sanitize|strip.*tags|ALLOWED_TAGS|replace\(.*<[^>]*>/i);
+    expect(src).toMatch(
+      /DOMPurify|sanitize|strip.*tags|ALLOWED_TAGS|replace\(.*<[^>]*>/i
+    );
   });
 
   it('message content has max length constraint', () => {
@@ -92,13 +94,15 @@ describe('SEC-3: XSS in discussion messages', () => {
       'apps/subgraph-collaboration/src/discussion/discussion-message.service.ts'
     );
     const hasMaxLength =
-      /max\(2000\)|maxLength.*2000|\.max.*2000|length.*>.*2000|2000.*character/i.test(serviceSrc);
+      /max\(2000\)|maxLength.*2000|\.max.*2000|length.*>.*2000|2000.*character/i.test(
+        serviceSrc
+      );
     const schemasPath =
       'apps/subgraph-collaboration/src/discussion/discussion.schemas.ts';
     const schemasSrc = exists(schemasPath) ? read(schemasPath) : '';
-    expect(
-      hasMaxLength || /max\(2000\)|maxLength.*2000/.test(schemasSrc)
-    ).toBe(true);
+    expect(hasMaxLength || /max\(2000\)|maxLength.*2000/.test(schemasSrc)).toBe(
+      true
+    );
   });
 });
 
@@ -233,7 +237,9 @@ describe('Cross-feature: RLS tenant isolation on new tables', () => {
 
   it('all 4 new tables call enableRLS()', () => {
     // 3 in peer-review.ts (rubrics, assignments, discussion_likes) + 1 in social.ts (social_feed_items)
-    expect(allSchemas.match(/\.enableRLS\(\)/g)?.length ?? 0).toBeGreaterThanOrEqual(4);
+    expect(
+      allSchemas.match(/\.enableRLS\(\)/g)?.length ?? 0
+    ).toBeGreaterThanOrEqual(4);
   });
 });
 

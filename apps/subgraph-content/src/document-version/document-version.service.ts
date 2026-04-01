@@ -58,7 +58,10 @@ export class DocumentVersionService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  async getVersionHistory(mediaAssetId: string, authCtx: TenantContext): Promise<DocumentVersionRow[]> {
+  async getVersionHistory(
+    mediaAssetId: string,
+    authCtx: TenantContext
+  ): Promise<DocumentVersionRow[]> {
     const rows = await withTenantContext(this.db, authCtx, (tx) =>
       tx
         .select()
@@ -123,14 +126,21 @@ export class DocumentVersionService implements OnModuleDestroy {
         tx
           .select()
           .from(schema.documentVersions)
-          .where(eq(schema.documentVersions.id, (prevVersion as unknown as { id: string }).id ?? ''))
+          .where(
+            eq(
+              schema.documentVersions.id,
+              (prevVersion as unknown as { id: string }).id ?? ''
+            )
+          )
       );
       if (prevRow[0]) {
-        const prevSnap = (prevRow[0].anchors_snapshot ?? []) as AnchorSnapshot[];
+        const prevSnap = (prevRow[0].anchors_snapshot ??
+          []) as AnchorSnapshot[];
         const added = snapshot.length - prevSnap.length;
-        diffSummary = added >= 0
-          ? `+${added} anchors added`
-          : `${Math.abs(added)} anchors removed`;
+        diffSummary =
+          added >= 0
+            ? `+${added} anchors added`
+            : `${Math.abs(added)} anchors removed`;
       }
     }
 
@@ -155,7 +165,10 @@ export class DocumentVersionService implements OnModuleDestroy {
         .returning()
     );
 
-    if (!version) throw new InternalServerErrorException('Failed to create document version');
+    if (!version)
+      throw new InternalServerErrorException(
+        'Failed to create document version'
+      );
 
     this.logger.log(
       `[DocumentVersionService] Created version=${nextVersion} mediaAssetId=${mediaAssetId} tenantId=${authCtx.tenantId}`
@@ -168,13 +181,22 @@ export class DocumentVersionService implements OnModuleDestroy {
     };
   }
 
-  async rollbackToVersion(versionId: string, authCtx: TenantContext): Promise<boolean> {
-    const allowedRoles: TenantContext['userRole'][] = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'];
+  async rollbackToVersion(
+    versionId: string,
+    authCtx: TenantContext
+  ): Promise<boolean> {
+    const allowedRoles: TenantContext['userRole'][] = [
+      'INSTRUCTOR',
+      'ORG_ADMIN',
+      'SUPER_ADMIN',
+    ];
     if (!allowedRoles.includes(authCtx.userRole)) {
       this.logger.warn(
         `[DocumentVersionService] rollbackToVersion denied: userId=${authCtx.userId} role=${authCtx.userRole}`
       );
-      throw new ForbiddenException('Only instructors and admins can roll back document versions');
+      throw new ForbiddenException(
+        'Only instructors and admins can roll back document versions'
+      );
     }
     // 1. Load the target version
     const [versionRow] = await withTenantContext(this.db, authCtx, (tx) =>
@@ -207,29 +229,27 @@ export class DocumentVersionService implements OnModuleDestroy {
     // 3. Re-insert anchors from snapshot
     if (snapshot.length > 0) {
       await withTenantContext(this.db, authCtx, (tx) =>
-        tx
-          .insert(schema.visualAnchors)
-          .values(
-            snapshot.map((s) => ({
-              id: randomUUID(), // new UUIDs
-              tenant_id: authCtx.tenantId,
-              media_asset_id: mediaAssetId,
-              created_by: authCtx.userId,
-              anchor_text: s.anchor_text,
-              anchor_hash: s.anchor_hash,
-              page_number: s.page_number,
-              pos_x: s.pos_x,
-              pos_y: s.pos_y,
-              pos_w: s.pos_w,
-              pos_h: s.pos_h,
-              page_end: s.page_end,
-              pos_x_end: s.pos_x_end,
-              pos_y_end: s.pos_y_end,
-              visual_asset_id: s.visual_asset_id,
-              document_order: s.document_order,
-              is_broken: false, // reset broken flag on rollback
-            }))
-          )
+        tx.insert(schema.visualAnchors).values(
+          snapshot.map((s) => ({
+            id: randomUUID(), // new UUIDs
+            tenant_id: authCtx.tenantId,
+            media_asset_id: mediaAssetId,
+            created_by: authCtx.userId,
+            anchor_text: s.anchor_text,
+            anchor_hash: s.anchor_hash,
+            page_number: s.page_number,
+            pos_x: s.pos_x,
+            pos_y: s.pos_y,
+            pos_w: s.pos_w,
+            pos_h: s.pos_h,
+            page_end: s.page_end,
+            pos_x_end: s.pos_x_end,
+            pos_y_end: s.pos_y_end,
+            visual_asset_id: s.visual_asset_id,
+            document_order: s.document_order,
+            is_broken: false, // reset broken flag on rollback
+          }))
+        )
       );
     }
 
@@ -239,7 +259,9 @@ export class DocumentVersionService implements OnModuleDestroy {
     return true;
   }
 
-  private mapVersion(r: typeof schema.documentVersions.$inferSelect): DocumentVersionRow {
+  private mapVersion(
+    r: typeof schema.documentVersions.$inferSelect
+  ): DocumentVersionRow {
     const snapshot = (r.anchors_snapshot ?? []) as AnchorSnapshot[];
     const broken = (r.broken_anchors ?? []) as string[];
     return {

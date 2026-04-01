@@ -47,7 +47,9 @@ export class EmbeddingProviderService {
       return json.data[0]!.embedding;
     }
 
-    throw new BadRequestException('No embedding provider: set OLLAMA_URL or OPENAI_API_KEY');
+    throw new BadRequestException(
+      'No embedding provider: set OLLAMA_URL or OPENAI_API_KEY'
+    );
   }
 
   hasProvider(): boolean {

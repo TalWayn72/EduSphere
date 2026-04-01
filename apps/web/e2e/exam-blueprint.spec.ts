@@ -89,21 +89,28 @@ test.describe('exam-blueprint', () => {
 
   test('blueprint list page shows all blueprints', async ({ page }) => {
     await page.goto('/exam/blueprints');
-    await expect(page.getByText('Midterm Certification')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Midterm Certification')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText('Final Assessment')).toBeVisible();
   });
 
   test('shows status badges for ACTIVE and DRAFT', async ({ page }) => {
     await page.goto('/exam/blueprints');
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText('ACTIVE').or(page.getByText('Active'))).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('DRAFT').or(page.getByText('Draft'))).toBeVisible();
+    await expect(
+      page.getByText('ACTIVE').or(page.getByText('Active'))
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByText('DRAFT').or(page.getByText('Draft'))
+    ).toBeVisible();
   });
 
   test('navigate to create new blueprint page', async ({ page }) => {
     await page.goto('/exam/blueprints');
     await page.waitForLoadState('domcontentloaded');
-    const createBtn = page.getByRole('link', { name: /create|new blueprint/i })
+    const createBtn = page
+      .getByRole('link', { name: /create|new blueprint/i })
       .or(page.getByRole('button', { name: /create|new blueprint/i }));
     await expect(createBtn).toBeVisible({ timeout: 10_000 });
     await createBtn.click();
@@ -114,7 +121,9 @@ test.describe('exam-blueprint', () => {
     await page.goto('/exam/blueprints/new');
     await page.waitForLoadState('domcontentloaded');
     // Should show title input and time limit
-    const titleInput = page.locator('input[name="title"]').or(page.getByLabel(/title/i));
+    const titleInput = page
+      .locator('input[name="title"]')
+      .or(page.getByLabel(/title/i));
     await expect(titleInput).toBeVisible({ timeout: 10_000 });
   });
 });

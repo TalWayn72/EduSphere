@@ -8,7 +8,12 @@
  * Memory safety: interval handle cleared in onModuleDestroy().
  * HRIS_SYNC_ENABLED env var guard — disabled by default in dev.
  */
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { HrisIntegrationService } from './hris-integration.service.js';
 import type { HrisConfig } from './hris-adapter.interface.js';
 
@@ -37,12 +42,19 @@ export class HrisSyncCron implements OnModuleInit, OnModuleDestroy {
       return;
     }
     const delayMs = msUntil3Am();
-    this.logger.log(`HRIS nightly sync scheduled in ${Math.round(delayMs / 60000)} min`);
+    this.logger.log(
+      `HRIS nightly sync scheduled in ${Math.round(delayMs / 60000)} min`
+    );
     this.initTimeout = setTimeout(() => {
       this.initTimeout = null;
       void this.runSync();
       // Re-schedule every 24h after first run
-      this.intervalHandle = setInterval(() => { void this.runSync(); }, 24 * 60 * 60 * 1000);
+      this.intervalHandle = setInterval(
+        () => {
+          void this.runSync();
+        },
+        24 * 60 * 60 * 1000
+      );
     }, delayMs);
   }
 
@@ -64,9 +76,15 @@ export class HrisSyncCron implements OnModuleInit, OnModuleDestroy {
     for (const config of configs) {
       try {
         const result = await this.hrisService.syncTenant(config);
-        this.logger.log({ tenantId: config.tenantId, result }, 'HRIS tenant sync complete');
+        this.logger.log(
+          { tenantId: config.tenantId, result },
+          'HRIS tenant sync complete'
+        );
       } catch (err) {
-        this.logger.error({ tenantId: config.tenantId, err }, 'HRIS tenant sync failed');
+        this.logger.error(
+          { tenantId: config.tenantId, err },
+          'HRIS tenant sync failed'
+        );
       }
     }
     this.logger.log('HRIS nightly sync finished');

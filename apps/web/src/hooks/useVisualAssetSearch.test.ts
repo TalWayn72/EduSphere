@@ -37,9 +37,21 @@ const makeAsset = (
 });
 
 const CLEAN_ASSETS: VisualAsset[] = [
-  makeAsset({ id: '1', filename: 'photosynthesis.png', metadata: { altText: 'diagram of photosynthesis' } }),
-  makeAsset({ id: '2', filename: 'mitosis.png', metadata: { altText: 'cell division diagram' } }),
-  makeAsset({ id: '3', filename: 'newton-laws.png', metadata: { altText: null } }),
+  makeAsset({
+    id: '1',
+    filename: 'photosynthesis.png',
+    metadata: { altText: 'diagram of photosynthesis' },
+  }),
+  makeAsset({
+    id: '2',
+    filename: 'mitosis.png',
+    metadata: { altText: 'cell division diagram' },
+  }),
+  makeAsset({
+    id: '3',
+    filename: 'newton-laws.png',
+    metadata: { altText: null },
+  }),
 ];
 
 const ALL_ASSETS: VisualAsset[] = [
@@ -72,7 +84,9 @@ describe('useVisualAssetSearch', () => {
     await waitFor(() => expect(result.current.fetching).toBe(false));
 
     expect(result.current.results).toHaveLength(3);
-    expect(result.current.results.every((a) => a.scanStatus === 'CLEAN')).toBe(true);
+    expect(result.current.results.every((a) => a.scanStatus === 'CLEAN')).toBe(
+      true
+    );
   });
 
   it('does NOT include INFECTED assets', async () => {

@@ -102,7 +102,9 @@ export class PeerMatchingService implements OnModuleDestroy {
               WHERE e.tenant_id = ${tenantId}::uuid AND e.user_id <> ${userId}::uuid
               GROUP BY e.user_id ORDER BY 2 DESC LIMIT 5`;
       const result = await tx.execute(query);
-      return (result.rows as Array<{ userId: string; sharedCourseCount: number }>).map((r) => ({
+      return (
+        result.rows as Array<{ userId: string; sharedCourseCount: number }>
+      ).map((r) => ({
         userId: r.userId,
         matchReason: 'Enrolled in same course(s)',
         complementarySkills: [],
@@ -128,10 +130,17 @@ export class PeerMatchingService implements OnModuleDestroy {
       matchReason: 'User-initiated peer match request',
       status: 'PENDING',
     };
-    return withTenantContext(db, this.ctx(tenantId, requesterId), async (tx) => {
-      const [row] = await tx.insert(peerMatchRequests).values(values).returning();
-      return row;
-    });
+    return withTenantContext(
+      db,
+      this.ctx(tenantId, requesterId),
+      async (tx) => {
+        const [row] = await tx
+          .insert(peerMatchRequests)
+          .values(values)
+          .returning();
+        return row;
+      }
+    );
   }
 
   async respondToPeerMatch(
@@ -150,7 +159,9 @@ export class PeerMatchingService implements OnModuleDestroy {
       if (!request) throw new NotFoundException('Peer match request not found');
       // IDOR guard: only the matched user can respond
       if (request.matchedUserId !== userId) {
-        throw new BadRequestException('Only the matched user can respond to this request');
+        throw new BadRequestException(
+          'Only the matched user can respond to this request'
+        );
       }
 
       const [updated] = await tx
@@ -208,7 +219,9 @@ export class PeerMatchingService implements OnModuleDestroy {
         return rows.map((r) => ({
           mentorId: String(r.mentorId).replace(/"/g, ''),
           pathOverlapScore: Math.min(1, Number(r.sharedCount) / 10),
-          sharedConcepts: Array.isArray(r.sharedConcepts) ? r.sharedConcepts : [],
+          sharedConcepts: Array.isArray(r.sharedConcepts)
+            ? r.sharedConcepts
+            : [],
         }));
       }
     } catch (err) {

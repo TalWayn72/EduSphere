@@ -26,7 +26,9 @@ export function useDashboardData() {
 
   // Mounted guard: prevents urql cache dispatch during sibling render (BUG-052 pattern)
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Onboarding banner state
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
@@ -37,10 +39,11 @@ export function useDashboardData() {
     pause: !mounted,
   });
 
-  const showOnboardingBanner = !onboardingDismissed
-    && !!onboardingData?.myOnboardingState
-    && !onboardingData.myOnboardingState.completed
-    && !onboardingData.myOnboardingState.skipped;
+  const showOnboardingBanner =
+    !onboardingDismissed &&
+    !!onboardingData?.myOnboardingState &&
+    !onboardingData.myOnboardingState.completed &&
+    !onboardingData.myOnboardingState.skipped;
 
   // Cleanup banner timer on unmount
   useEffect(() => {
@@ -100,7 +103,14 @@ export function useDashboardData() {
   const rawInProgress = inProgressResult.data?.myInProgressCourses;
   const inProgressCourses: MockCourse[] = rawInProgress?.length
     ? rawInProgress.map(
-        (c: { id: string; courseId: string; title: string; progress: number; lastAccessedAt: string | null; instructorName: string }) => ({
+        (c: {
+          id: string;
+          courseId: string;
+          title: string;
+          progress: number;
+          lastAccessedAt: string | null;
+          instructorName: string;
+        }) => ({
           id: c.id,
           title: c.title,
           progress: c.progress,
@@ -113,7 +123,12 @@ export function useDashboardData() {
   const rawRecommended = recommendedResult.data?.myRecommendedCourses;
   const recommendedCourses: MockCourse[] = rawRecommended?.length
     ? rawRecommended.map(
-        (c: { courseId: string; title: string; instructorName: string; reason: string }) => ({
+        (c: {
+          courseId: string;
+          title: string;
+          instructorName: string;
+          reason: string;
+        }) => ({
           id: c.courseId,
           title: c.title,
           progress: 0,
@@ -126,7 +141,12 @@ export function useDashboardData() {
   const rawActivity = activityResult.data?.myActivityFeed;
   const activity: MockActivity[] = rawActivity?.length
     ? rawActivity.map(
-        (a: { id: string; eventType: string; description: string; occurredAt: string }) => ({
+        (a: {
+          id: string;
+          eventType: string;
+          description: string;
+          occurredAt: string;
+        }) => ({
           id: a.id,
           icon: a.eventType,
           action: a.description,

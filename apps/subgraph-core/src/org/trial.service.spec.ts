@@ -12,10 +12,7 @@
  *   - Edge cases: clock skew, already-expired, duplicate events
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 // ── DB mock ───────────────────────────────────────────────────────────────────
 
@@ -24,7 +21,8 @@ const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -42,8 +40,9 @@ vi.mock('@edusphere/db', () => ({
     update: mockUpdate,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ select: mockSelect, update: mockUpdate }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({ select: mockSelect, update: mockUpdate })
   ),
   schema: {
     tenantSubscriptions: {
@@ -98,7 +97,9 @@ describe('TrialService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSelect.mockReturnValue(makeChain([ACTIVE_TRIAL]));
-    mockUpdate.mockReturnValue(makeChain([{ ...ACTIVE_TRIAL, status: 'trialing' }]));
+    mockUpdate.mockReturnValue(
+      makeChain([{ ...ACTIVE_TRIAL, status: 'trialing' }])
+    );
 
     service = new TrialService();
   });
@@ -108,7 +109,7 @@ describe('TrialService', () => {
   describe('startTrial()', () => {
     it('creates subscription with status "trialing"', async () => {
       mockInsert.mockReturnValue(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(90) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(90) }])
       );
 
       const result = await service.startTrial('tenant-001', 'plan-starter');
@@ -118,7 +119,7 @@ describe('TrialService', () => {
     it('sets pilotEndsAt to 90 days from now', async () => {
       const before = Date.now();
       mockInsert.mockReturnValue(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(90) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(90) }])
       );
 
       const result = await service.startTrial('tenant-001', 'plan-starter');
@@ -129,11 +130,11 @@ describe('TrialService', () => {
 
     it('rejects starting trial for tenant with active subscription', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, status: 'active' }]),
+        makeChain([{ ...ACTIVE_TRIAL, status: 'active' }])
       );
 
       await expect(
-        service.startTrial('tenant-001', 'plan-starter'),
+        service.startTrial('tenant-001', 'plan-starter')
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -143,7 +144,7 @@ describe('TrialService', () => {
   describe('getDaysRemaining()', () => {
     it('returns correct days remaining for active trial', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(30) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(30) }])
       );
 
       const days = await service.getDaysRemaining('tenant-001');
@@ -153,7 +154,7 @@ describe('TrialService', () => {
 
     it('returns 0 for expired trial', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysAgo(5) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysAgo(5) }])
       );
 
       const days = await service.getDaysRemaining('tenant-001');
@@ -166,7 +167,7 @@ describe('TrialService', () => {
   describe('checkWarningTriggers()', () => {
     it('triggers 15-day warning at day 75', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(15) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(15) }])
       );
 
       const triggers = await service.checkWarningTriggers('tenant-001');
@@ -175,7 +176,7 @@ describe('TrialService', () => {
 
     it('triggers 7-day warning at day 83', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(7) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(7) }])
       );
 
       const triggers = await service.checkWarningTriggers('tenant-001');
@@ -184,7 +185,7 @@ describe('TrialService', () => {
 
     it('triggers 2-day warning at day 88', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(2) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(2) }])
       );
 
       const triggers = await service.checkWarningTriggers('tenant-001');
@@ -193,7 +194,7 @@ describe('TrialService', () => {
 
     it('triggers expiry notification at day 90', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(0) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(0) }])
       );
 
       const triggers = await service.checkWarningTriggers('tenant-001');
@@ -202,7 +203,7 @@ describe('TrialService', () => {
 
     it('returns empty array when trial has many days left', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(60) }]),
+        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysFromNow(60) }])
       );
 
       const triggers = await service.checkWarningTriggers('tenant-001');
@@ -215,7 +216,9 @@ describe('TrialService', () => {
   describe('processExpiredTrials()', () => {
     it('transitions expired trial to "past_due" (grace period)', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysAgo(1), status: 'trialing' }]),
+        makeChain([
+          { ...ACTIVE_TRIAL, pilotEndsAt: daysAgo(1), status: 'trialing' },
+        ])
       );
 
       await service.processExpiredTrials();
@@ -224,7 +227,9 @@ describe('TrialService', () => {
 
     it('marks data for deletion after 30-day grace period', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: daysAgo(31), status: 'past_due' }]),
+        makeChain([
+          { ...ACTIVE_TRIAL, pilotEndsAt: daysAgo(31), status: 'past_due' },
+        ])
       );
 
       await service.processExpiredTrials();
@@ -247,14 +252,14 @@ describe('TrialService', () => {
 
     it('rejects conversion for already active subscription', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, status: 'active' }]),
+        makeChain([{ ...ACTIVE_TRIAL, status: 'active' }])
       );
 
       await expect(
         service.convertToPaid('tenant-001', {
           stripeSubscriptionId: 'sub_123',
           stripeCustomerId: 'cus_456',
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -269,17 +274,17 @@ describe('TrialService', () => {
 
     it('rejects extension by non-SUPER_ADMIN', async () => {
       await expect(
-        service.extendTrial('tenant-001', 30, 'ORG_ADMIN'),
+        service.extendTrial('tenant-001', 30, 'ORG_ADMIN')
       ).rejects.toThrow(ForbiddenException);
     });
 
     it('rejects extension of non-trialing subscription', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, status: 'active' }]),
+        makeChain([{ ...ACTIVE_TRIAL, status: 'active' }])
       );
 
       await expect(
-        service.extendTrial('tenant-001', 30, 'SUPER_ADMIN'),
+        service.extendTrial('tenant-001', 30, 'SUPER_ADMIN')
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -290,7 +295,9 @@ describe('TrialService', () => {
     it('applies 1-hour tolerance for expiry checks', async () => {
       // Trial ends exactly now — within 1hr tolerance, should still be "active"
       mockSelect.mockReturnValueOnce(
-        makeChain([{ ...ACTIVE_TRIAL, pilotEndsAt: new Date(), status: 'trialing' }]),
+        makeChain([
+          { ...ACTIVE_TRIAL, pilotEndsAt: new Date(), status: 'trialing' },
+        ])
       );
 
       const days = await service.getDaysRemaining('tenant-001');

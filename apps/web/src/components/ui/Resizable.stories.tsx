@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './resizable';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from './resizable';
 
 const meta: Meta<typeof ResizablePanelGroup> = {
   title: 'UI/Resizable',
@@ -12,7 +16,10 @@ type Story = StoryObj<typeof ResizablePanelGroup>;
 
 export const Horizontal: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className="min-h-[200px] max-w-md rounded-lg border">
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className="min-h-[200px] max-w-md rounded-lg border"
+    >
       <ResizablePanel defaultSize={50}>
         <div className="flex h-full items-center justify-center p-6">
           <span className="font-semibold">Panel A</span>
@@ -30,7 +37,10 @@ export const Horizontal: Story = {
 
 export const Vertical: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="vertical" className="min-h-[300px] max-w-md rounded-lg border">
+    <ResizablePanelGroup
+      orientation="vertical"
+      className="min-h-[300px] max-w-md rounded-lg border"
+    >
       <ResizablePanel defaultSize={50}>
         <div className="flex h-full items-center justify-center p-6">
           <span className="font-semibold">Top Panel</span>
@@ -48,7 +58,10 @@ export const Vertical: Story = {
 
 export const WithHandle: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className="min-h-[200px] max-w-md rounded-lg border">
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className="min-h-[200px] max-w-md rounded-lg border"
+    >
       <ResizablePanel defaultSize={30}>
         <div className="flex h-full items-center justify-center p-6">
           <span className="font-semibold">Sidebar</span>
@@ -66,17 +79,26 @@ export const WithHandle: Story = {
 
 export const ThreePanels: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className="min-h-[200px] max-w-lg rounded-lg border">
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className="min-h-[200px] max-w-lg rounded-lg border"
+    >
       <ResizablePanel defaultSize={25}>
-        <div className="flex h-full items-center justify-center p-4 text-sm">Nav</div>
+        <div className="flex h-full items-center justify-center p-4 text-sm">
+          Nav
+        </div>
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={50}>
-        <div className="flex h-full items-center justify-center p-4 text-sm">Main</div>
+        <div className="flex h-full items-center justify-center p-4 text-sm">
+          Main
+        </div>
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={25}>
-        <div className="flex h-full items-center justify-center p-4 text-sm">Details</div>
+        <div className="flex h-full items-center justify-center p-4 text-sm">
+          Details
+        </div>
       </ResizablePanel>
     </ResizablePanelGroup>
   ),

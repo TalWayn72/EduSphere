@@ -113,7 +113,7 @@ describe('AtRiskFlagService', () => {
           tenantId: 't1',
           riskScore: 85,
           status: 'active',
-        }),
+        })
       );
     });
   });
@@ -126,7 +126,7 @@ describe('AtRiskFlagService', () => {
       await service.resolveFlag('flag-1', ctx);
 
       expect(chain.set).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'resolved' }),
+        expect.objectContaining({ status: 'resolved' })
       );
     });
   });
@@ -134,18 +134,18 @@ describe('AtRiskFlagService', () => {
   describe('publishFlagEvent()', () => {
     it('publishes to NATS without throwing', async () => {
       await expect(
-        service.publishFlagEvent('l1', 'c1', 't1', 85),
+        service.publishFlagEvent('l1', 'c1', 't1', 85)
       ).resolves.toBeUndefined();
     });
 
     it('does not throw when NATS connect fails', async () => {
       const { connect } = await import('nats');
       (connect as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('NATS down'),
+        new Error('NATS down')
       );
 
       await expect(
-        service.publishFlagEvent('l1', 'c1', 't1', 85),
+        service.publishFlagEvent('l1', 'c1', 't1', 85)
       ).resolves.toBeUndefined();
     });
   });
@@ -173,7 +173,10 @@ describe('AtRiskFlagService', () => {
         riskScore: 80,
       });
       expect(result[0]!.riskFactors).toEqual([
-        { key: 'inactiveForDays', description: 'No activity for more than 7 days' },
+        {
+          key: 'inactiveForDays',
+          description: 'No activity for more than 7 days',
+        },
       ]);
     });
 
@@ -195,7 +198,7 @@ describe('AtRiskFlagService', () => {
 
       expect(result).toBe(true);
       expect(chain.set).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'dismissed' }),
+        expect.objectContaining({ status: 'dismissed' })
       );
     });
   });

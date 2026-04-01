@@ -43,9 +43,15 @@ import {
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 const TENANT_ID = 'tenant-001';
-const CTX = { tenantId: TENANT_ID, userId: 'user-1', userRole: 'ORG_ADMIN' as const };
+const CTX = {
+  tenantId: TENANT_ID,
+  userId: 'user-1',
+  userRole: 'ORG_ADMIN' as const,
+};
 
-function makeInput(overrides: Partial<PublishToMarketplaceInput> = {}): PublishToMarketplaceInput {
+function makeInput(
+  overrides: Partial<PublishToMarketplaceInput> = {}
+): PublishToMarketplaceInput {
   return {
     courseId: 'course-abc',
     title: 'Test Course',
@@ -101,7 +107,8 @@ describe('MarketplaceOrgService', () => {
     mockWithTenantContext.mockImplementationOnce(
       async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
         fn({
-          execute: vi.fn()
+          execute: vi
+            .fn()
             .mockResolvedValueOnce({ rows: [row] })
             .mockResolvedValueOnce({ rows: [tenantRow] }),
         })
@@ -123,9 +130,9 @@ describe('MarketplaceOrgService', () => {
         })
     );
 
-    await expect(
-      svc.publishToMarketplace(makeInput(), CTX)
-    ).rejects.toThrow(BadRequestException);
+    await expect(svc.publishToMarketplace(makeInput(), CTX)).rejects.toThrow(
+      BadRequestException
+    );
   });
 
   it('publishToMarketplace maps null price_per_seat to null', async () => {
@@ -133,7 +140,8 @@ describe('MarketplaceOrgService', () => {
     mockWithTenantContext.mockImplementationOnce(
       async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
         fn({
-          execute: vi.fn()
+          execute: vi
+            .fn()
             .mockResolvedValueOnce({ rows: [row] })
             .mockResolvedValueOnce({ rows: [{ name: 'Org' }] }),
         })

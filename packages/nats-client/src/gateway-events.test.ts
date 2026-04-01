@@ -76,7 +76,9 @@ describe('gateway-events type guards', () => {
     });
 
     it('returns false for non-string values', () => {
-      expect(isSubmissionCreatedEvent({ ...valid, submissionId: 0 })).toBe(false);
+      expect(isSubmissionCreatedEvent({ ...valid, submissionId: 0 })).toBe(
+        false
+      );
     });
 
     it('returns false for empty object', () => {
@@ -147,7 +149,9 @@ describe('gateway-events type guards', () => {
     });
 
     it('contains NOTIFICATION_DISPATCH subject', () => {
-      expect(NatsSubjects.NOTIFICATION_DISPATCH).toBe('EDUSPHERE.notification.dispatch');
+      expect(NatsSubjects.NOTIFICATION_DISPATCH).toBe(
+        'EDUSPHERE.notification.dispatch'
+      );
     });
 
     it('contains ADMIN_ALERT subject', () => {

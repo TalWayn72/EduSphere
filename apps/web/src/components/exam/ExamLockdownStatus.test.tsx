@@ -15,7 +15,7 @@ import { ExamLockdownStatus } from './ExamLockdownStatus';
 describe('ExamLockdownStatus', () => {
   it('returns null when not active', () => {
     const { container } = render(
-      <ExamLockdownStatus active={false} violationCount={0} />,
+      <ExamLockdownStatus active={false} violationCount={0} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -44,7 +44,9 @@ describe('ExamLockdownStatus', () => {
 
   it('has aria-label with violation count', () => {
     render(<ExamLockdownStatus active={true} violationCount={3} />);
-    expect(screen.getByLabelText('Secure mode active — 3 violation(s)')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Secure mode active — 3 violation(s)')
+    ).toBeInTheDocument();
   });
 
   it('has clean aria-label when no violations', () => {
@@ -53,7 +55,13 @@ describe('ExamLockdownStatus', () => {
   });
 
   it('applies custom className', () => {
-    render(<ExamLockdownStatus active={true} violationCount={0} className="my-class" />);
+    render(
+      <ExamLockdownStatus
+        active={true}
+        violationCount={0}
+        className="my-class"
+      />
+    );
     const el = screen.getByRole('status');
     expect(el.className).toContain('my-class');
   });

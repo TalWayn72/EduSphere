@@ -25,7 +25,9 @@ vi.mock('@aws-sdk/client-s3', () => ({
   GetObjectCommand: vi.fn(),
 }));
 vi.mock('@aws-sdk/s3-request-presigner', () => ({
-  getSignedUrl: vi.fn().mockResolvedValue('https://minio.example.com/bucket/cert.pdf?signed=1'),
+  getSignedUrl: vi
+    .fn()
+    .mockResolvedValue('https://minio.example.com/bucket/cert.pdf?signed=1'),
 }));
 vi.mock('@edusphere/auth', () => ({}));
 
@@ -73,7 +75,10 @@ describe('CertificateResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new CertificateResolver(mockCertificateService, mockCertificateDownloadService);
+    resolver = new CertificateResolver(
+      mockCertificateService,
+      mockCertificateDownloadService
+    );
   });
 
   // ── getMyCertificates ─────────────────────────────────────────────────────────
@@ -167,7 +172,11 @@ describe('CertificateResolver', () => {
 
       expect(result).toBe(presignedUrl);
       // Must use userId from JWT context (ctx.authContext.userId = 'u1'), not a client arg
-      expect(mockGetCertificateDownloadUrl).toHaveBeenCalledWith('cert-1', 'u1', 't1');
+      expect(mockGetCertificateDownloadUrl).toHaveBeenCalledWith(
+        'cert-1',
+        'u1',
+        't1'
+      );
     });
 
     it('throws UnauthorizedException when no auth context is present', async () => {

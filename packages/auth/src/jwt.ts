@@ -77,7 +77,9 @@ export class JWTValidator {
       token === 'dev-token-mock-jwt'
     ) {
       const devRole = (process.env['DEV_TOKEN_ROLE'] as UserRole) ?? 'STUDENT';
-      const validRole = UserRole.safeParse(devRole).success ? devRole : 'STUDENT';
+      const validRole = UserRole.safeParse(devRole).success
+        ? devRole
+        : 'STUDENT';
       return {
         userId: '00000000-0000-0000-0000-000000000001',
         email: 'super.admin@edusphere.dev',

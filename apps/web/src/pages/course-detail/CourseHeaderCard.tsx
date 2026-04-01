@@ -27,7 +27,9 @@ interface Props {
   canEdit: boolean;
   isEnrolled: boolean;
   optimisticEnrolled: boolean;
-  progress: { totalItems: number; completedItems: number; percentComplete: number } | undefined;
+  progress:
+    | { totalItems: number; completedItems: number; percentComplete: number }
+    | undefined;
   isEnrolling: boolean;
   isForkingCourse: boolean;
   isSavingTitle: boolean;
@@ -66,14 +68,15 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
   const navigate = useNavigate();
   const role = useAuthRole();
   const [publishOpen, setPublishOpen] = useState(false);
-  const canPublish = canEdit && !course.isPublished && EDITOR_ROLES.has(role ?? '');
+  const canPublish =
+    canEdit && !course.isPublished && EDITOR_ROLES.has(role ?? '');
   const handlePublished = useCallback(() => {
     // Force parent to re-fetch course data after publish
     window.location.reload();
   }, []);
   const progressBarStyle = useMemo(
-    () => progress ? { width: `${progress.percentComplete}%` } : undefined,
-    [progress],
+    () => (progress ? { width: `${progress.percentComplete}%` } : undefined),
+    [progress]
   );
   const totalItems = course.modules.reduce(
     (n, m) => n + m.contentItems.length,
@@ -223,10 +226,17 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                   courseId={courseId}
                   courseTitle={course.title}
                   isPublished={course.isPublished}
-                  onDeleted={() => navigate('/courses', {
-                    replace: true,
-                    state: { deleted: true, message: t('courseDeletedSuccess', { title: course.title }) },
-                  })}
+                  onDeleted={() =>
+                    navigate('/courses', {
+                      replace: true,
+                      state: {
+                        deleted: true,
+                        message: t('courseDeletedSuccess', {
+                          title: course.title,
+                        }),
+                      },
+                    })
+                  }
                 />
               )}
               <Button

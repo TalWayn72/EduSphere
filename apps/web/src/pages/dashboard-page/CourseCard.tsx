@@ -8,8 +8,14 @@ interface CourseCardProps {
   progressLabel: string;
 }
 
-export const CourseCard = React.memo(function CourseCard({ course, progressLabel }: CourseCardProps) {
-  const progressStyle = useMemo(() => ({ width: `${course.progress}%` }), [course.progress]);
+export const CourseCard = React.memo(function CourseCard({
+  course,
+  progressLabel,
+}: CourseCardProps) {
+  const progressStyle = useMemo(
+    () => ({ width: `${course.progress}%` }),
+    [course.progress]
+  );
 
   return (
     <Link
@@ -19,10 +25,17 @@ export const CourseCard = React.memo(function CourseCard({ course, progressLabel
       dir="ltr"
     >
       <div className="flex items-start justify-between gap-2 mb-3">
-        <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden />
-        <span className="text-xs text-muted-foreground">{course.lastStudied}</span>
+        <BookOpen
+          className="h-5 w-5 text-primary shrink-0 mt-0.5"
+          aria-hidden
+        />
+        <span className="text-xs text-muted-foreground">
+          {course.lastStudied}
+        </span>
       </div>
-      <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-2">{course.title}</h3>
+      <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-2">
+        {course.title}
+      </h3>
       <p className="text-xs text-muted-foreground mb-3">{course.instructor}</p>
       <div className="space-y-1">
         <div className="flex justify-between text-xs text-muted-foreground">

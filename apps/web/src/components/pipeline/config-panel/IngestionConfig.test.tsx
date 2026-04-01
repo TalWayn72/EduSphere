@@ -124,19 +124,25 @@ describe('IngestionConfig — rendering', () => {
 describe('IngestionConfig — asset picker', () => {
   it('shows video assets in dropdown', () => {
     renderConfig({ videoAssets: [mockVideoAsset] });
-    const option = screen.getByText(/cdn\.test\/video\.mp4.*pipeline\.assetVideo/);
+    const option = screen.getByText(
+      /cdn\.test\/video\.mp4.*pipeline\.assetVideo/
+    );
     expect(option).toBeTruthy();
   });
 
   it('shows audio assets in dropdown', () => {
     renderConfig({ audioAssets: [mockAudioAsset] });
-    const option = screen.getByText(/cdn\.test\/audio\.mp3.*pipeline\.assetAudio/);
+    const option = screen.getByText(
+      /cdn\.test\/audio\.mp3.*pipeline\.assetAudio/
+    );
     expect(option).toBeTruthy();
   });
 
   it('shows notes assets in dropdown', () => {
     renderConfig({ notesAssets: [mockNotesAsset] });
-    const option = screen.getByText(/cdn\.test\/notes\.pdf.*pipeline\.assetNotes/);
+    const option = screen.getByText(
+      /cdn\.test\/notes\.pdf.*pipeline\.assetNotes/
+    );
     expect(option).toBeTruthy();
   });
 
@@ -146,7 +152,10 @@ describe('IngestionConfig — asset picker', () => {
     fireEvent.change(screen.getByTestId('ingestion-asset-picker'), {
       target: { value: 'https://cdn.test/video.mp4' },
     });
-    expect(onChange).toHaveBeenCalledWith('sourceUrl', 'https://cdn.test/video.mp4');
+    expect(onChange).toHaveBeenCalledWith(
+      'sourceUrl',
+      'https://cdn.test/video.mp4'
+    );
   });
 
   it('calls onChange with undefined when empty option selected', () => {
@@ -162,7 +171,9 @@ describe('IngestionConfig — asset picker', () => {
 describe('IngestionConfig — manual URL input', () => {
   it('shows current URL from config', () => {
     renderConfig({ config: { sourceUrl: 'https://example.com/vid.mp4' } });
-    const input = screen.getByTestId('ingestion-source-url') as HTMLInputElement;
+    const input = screen.getByTestId(
+      'ingestion-source-url'
+    ) as HTMLInputElement;
     expect(input.value).toBe('https://example.com/vid.mp4');
   });
 

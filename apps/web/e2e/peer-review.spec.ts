@@ -17,7 +17,9 @@ test.describe('Peer Review — DEV_MODE guard', () => {
   });
 
   test('peer review dashboard renders heading', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -26,24 +28,32 @@ test.describe('Peer Review — DEV_MODE guard', () => {
   });
 
   test('peer review page has no crash overlay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
     });
   });
 
   test('no [object Object] in peer review DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
 
   test('peer review shows assignments or empty state', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
-    const hasAssignments = await page.locator('[data-testid="peer-review-assignment"]').count();
+    const hasAssignments = await page
+      .locator('[data-testid="peer-review-assignment"]')
+      .count();
     const hasEmpty = await page
       .getByText(/No reviews assigned|No pending reviews|No assignments/i)
       .count();
@@ -61,7 +71,9 @@ test.describe('Peer Review — Live backend', () => {
   });
 
   test('peer review dashboard renders with screenshot', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(
@@ -92,7 +104,9 @@ test.describe('Peer Review — Live backend', () => {
       }
     });
 
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Raw exception class name must not be visible to the user
@@ -106,7 +120,11 @@ test.describe('Peer Review — Live backend', () => {
 test.describe('Peer Review — assignment and feedback flows', () => {
   test.beforeEach(async ({ page }) => {
     await routeGraphQL(page, (op) => {
-      if (op === 'GetPeerReviews' || op === 'ListPeerReviews' || op === 'GetPeerReviewAssignments') {
+      if (
+        op === 'GetPeerReviews' ||
+        op === 'ListPeerReviews' ||
+        op === 'GetPeerReviewAssignments'
+      ) {
         return JSON.stringify({
           data: {
             peerReviews: {
@@ -150,10 +168,30 @@ test.describe('Peer Review — assignment and feedback flows', () => {
               submissionContent: 'This is the student submission text...',
               rubric: {
                 criteria: [
-                  { id: 'c-1', name: 'Content Quality', maxScore: 25, description: 'Accuracy and depth of content' },
-                  { id: 'c-2', name: 'Organization', maxScore: 25, description: 'Logical flow and structure' },
-                  { id: 'c-3', name: 'Technical Accuracy', maxScore: 25, description: 'Correct use of terminology' },
-                  { id: 'c-4', name: 'Presentation', maxScore: 25, description: 'Clarity and formatting' },
+                  {
+                    id: 'c-1',
+                    name: 'Content Quality',
+                    maxScore: 25,
+                    description: 'Accuracy and depth of content',
+                  },
+                  {
+                    id: 'c-2',
+                    name: 'Organization',
+                    maxScore: 25,
+                    description: 'Logical flow and structure',
+                  },
+                  {
+                    id: 'c-3',
+                    name: 'Technical Accuracy',
+                    maxScore: 25,
+                    description: 'Correct use of terminology',
+                  },
+                  {
+                    id: 'c-4',
+                    name: 'Presentation',
+                    maxScore: 25,
+                    description: 'Clarity and formatting',
+                  },
                 ],
               },
               isAnonymous: true,
@@ -172,8 +210,12 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     await login(page);
   });
 
-  test('review assignment list — displays assignment cards', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+  test('review assignment list — displays assignment cards', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -186,7 +228,9 @@ test.describe('Peer Review — assignment and feedback flows', () => {
   test('rubric display — review detail page shows rubric criteria', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/peer-review/pr-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review/pr-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -201,21 +245,30 @@ test.describe('Peer Review — assignment and feedback flows', () => {
   test('feedback submission — textarea and submit button do not crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/peer-review/pr-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review/pr-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const feedbackInput = page.locator(
       '[data-testid="feedback-input"], textarea[name="feedback"], textarea[placeholder*="feedback" i]'
     );
     if ((await feedbackInput.count()) > 0) {
-      await feedbackInput.first().fill('Great work on the knowledge graph design. Consider adding more detail on entity resolution.');
+      await feedbackInput
+        .first()
+        .fill(
+          'Great work on the knowledge graph design. Consider adding more detail on entity resolution.'
+        );
     }
 
     const submitBtn = page.locator(
       '[data-testid="submit-review-btn"], button:has-text("Submit Review"), button:has-text("Submit")'
     );
     if ((await submitBtn.count()) > 0) {
-      await submitBtn.first().click().catch(() => {});
+      await submitBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -225,7 +278,9 @@ test.describe('Peer Review — assignment and feedback flows', () => {
   });
 
   test('scoring — score inputs accept numeric values', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review/pr-1`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review/pr-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const scoreInputs = page.locator(
@@ -244,7 +299,9 @@ test.describe('Peer Review — assignment and feedback flows', () => {
   test('reviewer anonymity — anonymous review does not show reviewer name', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // For anonymous reviews, real reviewer identity should not be visible
@@ -257,7 +314,9 @@ test.describe('Peer Review — assignment and feedback flows', () => {
   test('deadline display — due dates are formatted, not raw ISO strings', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -271,7 +330,11 @@ test.describe('Peer Review — assignment and feedback flows', () => {
   }) => {
     await page.unroute('**/graphql');
     await routeGraphQL(page, (op) => {
-      if (op === 'GetPeerReviews' || op === 'ListPeerReviews' || op === 'GetPeerReviewAssignments') {
+      if (
+        op === 'GetPeerReviews' ||
+        op === 'ListPeerReviews' ||
+        op === 'GetPeerReviewAssignments'
+      ) {
         return JSON.stringify({
           data: {
             peerReviews: {
@@ -297,7 +360,9 @@ test.describe('Peer Review — assignment and feedback flows', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -312,11 +377,17 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
-        errors: [{ message: 'DrizzleORMError: relation "peer_reviews" does not exist' }],
+        errors: [
+          {
+            message: 'DrizzleORMError: relation "peer_reviews" does not exist',
+          },
+        ],
       });
     });
 
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -324,8 +395,12 @@ test.describe('Peer Review — assignment and feedback flows', () => {
     expect(body).not.toContain('does not exist');
   });
 
-  test('visual regression — peer review list page (mocked)', async ({ page }) => {
-    await page.goto(`${BASE_URL}/peer-review`, { waitUntil: 'domcontentloaded' });
+  test('visual regression — peer review list page (mocked)', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/peer-review`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('peer-review-list-mocked.png', {

@@ -17,7 +17,9 @@ test.describe('Marketplace Page — DEV_MODE guard', () => {
   });
 
   test('marketplace page renders without crash overlay', async ({ page }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -26,7 +28,9 @@ test.describe('Marketplace Page — DEV_MODE guard', () => {
   });
 
   test('no MOCK_ sentinel strings in marketplace DOM', async ({ page }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -36,11 +40,15 @@ test.describe('Marketplace Page — DEV_MODE guard', () => {
   test('marketplace page is not stuck in an infinite loading spinner', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Loading spinners should NOT be visible after domcontentloaded
-    const loadingSpinners = await page.locator('[aria-label="loading"]').count();
+    const loadingSpinners = await page
+      .locator('[aria-label="loading"]')
+      .count();
     expect(loadingSpinners).toBe(0);
   });
 });
@@ -57,7 +65,9 @@ test.describe('Marketplace Page — Live backend', () => {
   test('marketplace page loads real listings (not paused query)', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Mounted guard fix: query should execute, not remain paused
@@ -66,7 +76,9 @@ test.describe('Marketplace Page — Live backend', () => {
     expect(content).not.toContain('pause: true');
 
     // Loading spinner should not remain stuck
-    const loadingSpinners = await page.locator('[aria-label="loading"]').count();
+    const loadingSpinners = await page
+      .locator('[aria-label="loading"]')
+      .count();
     expect(loadingSpinners).toBe(0);
 
     await expect(page).toHaveScreenshot('marketplace-loaded.png', {
@@ -77,7 +89,9 @@ test.describe('Marketplace Page — Live backend', () => {
   test('marketplace shows course listing cards or empty state', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const hasCourses = await page
@@ -95,7 +109,11 @@ test.describe('Marketplace Page — Live backend', () => {
 test.describe('Marketplace — browse, filter, and course details', () => {
   test.beforeEach(async ({ page }) => {
     await routeGraphQL(page, (op) => {
-      if (op === 'GetMarketplaceCourses' || op === 'ListCourses' || op === 'GetCourses') {
+      if (
+        op === 'GetMarketplaceCourses' ||
+        op === 'ListCourses' ||
+        op === 'GetCourses'
+      ) {
         return JSON.stringify({
           data: {
             courses: {
@@ -104,7 +122,8 @@ test.describe('Marketplace — browse, filter, and course details', () => {
                   node: {
                     id: 'c-1',
                     title: 'Advanced GraphQL Federation',
-                    description: 'Master federation patterns with real-world examples',
+                    description:
+                      'Master federation patterns with real-world examples',
                     price: 79.99,
                     currency: 'USD',
                     category: 'Engineering',
@@ -119,7 +138,8 @@ test.describe('Marketplace — browse, filter, and course details', () => {
                   node: {
                     id: 'c-2',
                     title: 'Introduction to Knowledge Graphs',
-                    description: 'Learn the basics of graph databases and semantic modeling',
+                    description:
+                      'Learn the basics of graph databases and semantic modeling',
                     price: 0,
                     currency: 'USD',
                     category: 'Data Science',
@@ -134,7 +154,8 @@ test.describe('Marketplace — browse, filter, and course details', () => {
                   node: {
                     id: 'c-3',
                     title: 'AI Agent Workflows with LangGraph',
-                    description: 'Build state-machine AI agents for production use',
+                    description:
+                      'Build state-machine AI agents for production use',
                     price: 59.99,
                     currency: 'USD',
                     category: 'AI/ML',
@@ -171,7 +192,9 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   test('browse — marketplace renders course cards with mocked data', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -182,7 +205,9 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   });
 
   test('filter — search input filters without crash', async ({ page }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const searchInput = page.locator(
@@ -201,14 +226,19 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   test('category navigation — clicking category does not crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const categoryLink = page.locator(
       '[data-testid="category-link"], a:has-text("Engineering"), button:has-text("Engineering"), [role="tab"]:has-text("Engineering")'
     );
     if ((await categoryLink.count()) > 0) {
-      await categoryLink.first().click().catch(() => {});
+      await categoryLink
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -220,7 +250,9 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   test('price display — prices are formatted, not raw numbers', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -231,7 +263,9 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   });
 
   test('free courses — shows "Free" label or $0 badge', async ({ page }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Page should render free course without error
@@ -245,7 +279,9 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   test('instructor info — course cards show instructor names', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -255,10 +291,16 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     expect(body).not.toContain('[object Object]');
   });
 
-  test('empty search results — shows friendly empty state', async ({ page }) => {
+  test('empty search results — shows friendly empty state', async ({
+    page,
+  }) => {
     await page.unroute('**/graphql');
     await routeGraphQL(page, (op) => {
-      if (op === 'GetMarketplaceCourses' || op === 'ListCourses' || op === 'GetCourses') {
+      if (
+        op === 'GetMarketplaceCourses' ||
+        op === 'ListCourses' ||
+        op === 'GetCourses'
+      ) {
         return JSON.stringify({
           data: {
             courses: {
@@ -271,7 +313,9 @@ test.describe('Marketplace — browse, filter, and course details', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -284,14 +328,19 @@ test.describe('Marketplace — browse, filter, and course details', () => {
   test('course card click — navigates to course detail without crash', async ({
     page,
   }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const courseCard = page.locator(
       '[data-testid="course-card"], [data-testid="listing-card"]'
     );
     if ((await courseCard.count()) > 0) {
-      await courseCard.first().click().catch(() => {});
+      await courseCard
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -307,11 +356,18 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
-        errors: [{ message: 'ConnectionPoolError: too many connections at pool.connect' }],
+        errors: [
+          {
+            message:
+              'ConnectionPoolError: too many connections at pool.connect',
+          },
+        ],
       });
     });
 
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
@@ -319,10 +375,16 @@ test.describe('Marketplace — browse, filter, and course details', () => {
     expect(body).not.toContain('pool.connect');
   });
 
-  test('marketplace — no XSS via course title in mock data', async ({ page }) => {
+  test('marketplace — no XSS via course title in mock data', async ({
+    page,
+  }) => {
     await page.unroute('**/graphql');
     await routeGraphQL(page, (op) => {
-      if (op === 'GetMarketplaceCourses' || op === 'ListCourses' || op === 'GetCourses') {
+      if (
+        op === 'GetMarketplaceCourses' ||
+        op === 'ListCourses' ||
+        op === 'GetCourses'
+      ) {
         return JSON.stringify({
           data: {
             courses: {
@@ -348,15 +410,21 @@ test.describe('Marketplace — browse, filter, and course details', () => {
       return null;
     });
 
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     const body = await page.textContent('body');
     expect(body).not.toContain('<script>');
   });
 
-  test('visual regression — marketplace with mocked courses', async ({ page }) => {
-    await page.goto(`${BASE_URL}/marketplace`, { waitUntil: 'domcontentloaded' });
+  test('visual regression — marketplace with mocked courses', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE_URL}/marketplace`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page).toHaveScreenshot('marketplace-mocked-courses.png', {

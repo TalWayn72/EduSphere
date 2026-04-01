@@ -10,7 +10,11 @@ import React from 'react';
 // ── Mock dependencies ──────────────────────────────────────────────────
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (k: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+    t: (
+      k: string,
+      fallbackOrOpts?: string | Record<string, unknown>,
+      opts?: Record<string, unknown>
+    ) => {
       const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : k;
       const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
       if (!vars) return fallback;
@@ -22,7 +26,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 const mockReexecute = vi.fn();
-const mockReindex = vi.fn().mockResolvedValue({ data: { reindexCourseEmbeddings: { success: true } } });
+const mockReindex = vi
+  .fn()
+  .mockResolvedValue({ data: { reindexCourseEmbeddings: { success: true } } });
 let mockQueryResult: Record<string, unknown>;
 let mockMutationResult: Record<string, unknown>;
 
@@ -40,15 +46,22 @@ vi.mock('@/lib/graphql/embedding.queries', () => ({
 const toastSuccess = vi.fn();
 const toastError = vi.fn();
 vi.mock('sonner', () => ({
-  toast: { success: (...args: unknown[]) => toastSuccess(...args), error: (...args: unknown[]) => toastError(...args) },
+  toast: {
+    success: (...args: unknown[]) => toastSuccess(...args),
+    error: (...args: unknown[]) => toastError(...args),
+  },
 }));
 
 vi.mock('@/components/admin/AdminLayout', () => ({
-  AdminLayout: ({ children }: { children: React.ReactNode }) => <div data-testid="admin-layout">{children}</div>,
+  AdminLayout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="admin-layout">{children}</div>
+  ),
 }));
 
 vi.mock('./EmbeddingDashboardPage.stats', () => ({
-  StatsCards: ({ stats }: { stats: unknown }) => <div data-testid="stats-cards">{JSON.stringify(stats)}</div>,
+  StatsCards: ({ stats }: { stats: unknown }) => (
+    <div data-testid="stats-cards">{JSON.stringify(stats)}</div>
+  ),
   CourseTable: () => <div data-testid="course-table" />,
 }));
 
@@ -67,8 +80,20 @@ const MOCK_STATS = {
   failedSources: 5,
   totalChunks: 1200,
   courseBreakdown: [
-    { courseId: 'c1', courseTitle: 'AI Basics', sourceCount: 20, indexedCount: 18, chunkCount: 500 },
-    { courseId: 'c2', courseTitle: 'ML Advanced', sourceCount: 30, indexedCount: 22, chunkCount: 700 },
+    {
+      courseId: 'c1',
+      courseTitle: 'AI Basics',
+      sourceCount: 20,
+      indexedCount: 18,
+      chunkCount: 500,
+    },
+    {
+      courseId: 'c2',
+      courseTitle: 'ML Advanced',
+      sourceCount: 30,
+      indexedCount: 22,
+      chunkCount: 700,
+    },
   ],
 };
 
@@ -84,7 +109,9 @@ describe('EmbeddingDashboardPage', () => {
     mockReindex.mockClear();
     toastSuccess.mockClear();
     toastError.mockClear();
-    mockReindex.mockResolvedValue({ data: { reindexCourseEmbeddings: { success: true } } });
+    mockReindex.mockResolvedValue({
+      data: { reindexCourseEmbeddings: { success: true } },
+    });
   });
 
   async function renderPage() {
@@ -121,9 +148,15 @@ describe('EmbeddingDashboardPage', () => {
   });
 
   it('shows error state on query failure', async () => {
-    mockQueryResult = { data: undefined, fetching: false, error: new Error('fail') };
+    mockQueryResult = {
+      data: undefined,
+      fetching: false,
+      error: new Error('fail'),
+    };
     await renderPage();
-    expect(screen.getByText(/Failed to load embedding statistics/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Failed to load embedding statistics/)
+    ).toBeInTheDocument();
   });
 
   it('opens reindex confirmation dialog on Reindex All click', async () => {
@@ -140,7 +173,9 @@ describe('EmbeddingDashboardPage', () => {
     expect(screen.getByTestId('reindex-confirm-dialog')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('reindex-cancel-btn'));
     await waitFor(() => {
-      expect(screen.queryByTestId('reindex-confirm-dialog')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('reindex-confirm-dialog')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -153,7 +188,9 @@ describe('EmbeddingDashboardPage', () => {
       expect(mockReindex).toHaveBeenCalledTimes(1);
     });
     await waitFor(() => {
-      expect(toastSuccess).toHaveBeenCalledWith(expect.stringContaining('successfully'));
+      expect(toastSuccess).toHaveBeenCalledWith(
+        expect.stringContaining('successfully')
+      );
     });
   });
 
@@ -164,14 +201,18 @@ describe('EmbeddingDashboardPage', () => {
     fireEvent.click(screen.getByTestId('reindex-confirm-btn'));
 
     await waitFor(() => {
-      expect(toastError).toHaveBeenCalledWith(expect.stringContaining('failed'));
+      expect(toastError).toHaveBeenCalledWith(
+        expect.stringContaining('failed')
+      );
     });
   });
 
   it('refresh button triggers query reexecution', async () => {
     await renderPage();
     fireEvent.click(screen.getByTestId('refresh-stats-btn'));
-    expect(mockReexecute).toHaveBeenCalledWith({ requestPolicy: 'network-only' });
+    expect(mockReexecute).toHaveBeenCalledWith({
+      requestPolicy: 'network-only',
+    });
   });
 
   it('has accessible sr-only heading', async () => {
@@ -215,7 +256,11 @@ describe('EmbeddingDashboardPage — Accessibility', () => {
   });
 
   it('error state uses role="alert"', async () => {
-    mockQueryResult = { data: undefined, fetching: false, error: new Error('fail') };
+    mockQueryResult = {
+      data: undefined,
+      fetching: false,
+      error: new Error('fail'),
+    };
     await renderPage();
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });

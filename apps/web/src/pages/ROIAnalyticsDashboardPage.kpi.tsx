@@ -26,10 +26,7 @@ export function KpiGrid({
       <Card>
         <CardContent className="pt-4">
           <p className="text-xs text-muted-foreground">Yearly Active Users</p>
-          <p
-            data-testid="kpi-yau"
-            className="text-2xl font-bold"
-          >
+          <p data-testid="kpi-yau" className="text-2xl font-bold">
             {yearlyActiveUsers.toLocaleString()}
           </p>
         </CardContent>
@@ -37,10 +34,7 @@ export function KpiGrid({
       <Card>
         <CardContent className="pt-4">
           <p className="text-xs text-muted-foreground">Monthly Active Users</p>
-          <p
-            data-testid="kpi-mau"
-            className="text-2xl font-bold"
-          >
+          <p data-testid="kpi-mau" className="text-2xl font-bold">
             {monthlyActiveUsers.toLocaleString()}
           </p>
         </CardContent>
@@ -48,10 +42,7 @@ export function KpiGrid({
       <Card>
         <CardContent className="pt-4">
           <p className="text-xs text-muted-foreground">Seat Utilization</p>
-          <p
-            data-testid="kpi-utilization"
-            className="text-2xl font-bold"
-          >
+          <p data-testid="kpi-utilization" className="text-2xl font-bold">
             {seatUtilizationPct.toFixed(1)}%
           </p>
         </CardContent>
@@ -59,10 +50,7 @@ export function KpiGrid({
       <Card>
         <CardContent className="pt-4">
           <p className="text-xs text-muted-foreground">Current Plan</p>
-          <p
-            data-testid="kpi-plan"
-            className="text-2xl font-bold"
-          >
+          <p data-testid="kpi-plan" className="text-2xl font-bold">
             {plan}
           </p>
         </CardContent>
@@ -92,7 +80,9 @@ export function CostPerUser({ plan, yearlyActiveUsers }: CostPerUserProps) {
   return (
     <Card data-testid="cost-per-user" className="mb-6">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">Cost Per Active User</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          Cost Per Active User
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {showContactPricing ? (
@@ -101,7 +91,8 @@ export function CostPerUser({ plan, yearlyActiveUsers }: CostPerUserProps) {
           </p>
         ) : (
           <p className="text-2xl font-bold">
-            ${yearlyActiveUsers > 0
+            $
+            {yearlyActiveUsers > 0
               ? (planCost / yearlyActiveUsers).toFixed(2)
               : '—'}
             <span className="text-sm font-normal text-muted-foreground ml-2">

@@ -41,10 +41,19 @@ const ReviewAssignmentPage = lazy(() =>
 export const assessmentRoutes: RouteObject[] = [
   // 360-degree assessment learner view
   { path: '/assessments', element: guarded(<AssessmentCampaignsPage />) },
-  { path: '/assessments/:id/respond', element: guarded(<AssessmentResponsePage />) },
-  { path: '/assessments/:id/results', element: guarded(<AssessmentResultPage />) },
+  {
+    path: '/assessments/:id/respond',
+    element: guarded(<AssessmentResponsePage />),
+  },
+  {
+    path: '/assessments/:id/results',
+    element: guarded(<AssessmentResultPage />),
+  },
   // Phase 60 — 360-degree multi-rater detail view
-  { path: '/assessments/:id/results-detail', element: guarded(<AssessmentResultsDetailPage />) },
+  {
+    path: '/assessments/:id/results-detail',
+    element: guarded(<AssessmentResultsDetailPage />),
+  },
   { path: '/assessment/:assessmentId', element: guarded(<AssessmentPage />) },
   // Peer review
   { path: '/peer-review', element: guarded(<PeerReviewPage />) },

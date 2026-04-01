@@ -52,8 +52,10 @@ export const notificationPreferences = pgTable(
   ]
 ).enableRLS();
 
-export type NotificationPreference = typeof notificationPreferences.$inferSelect;
-export type NewNotificationPreference = typeof notificationPreferences.$inferInsert;
+export type NotificationPreference =
+  typeof notificationPreferences.$inferSelect;
+export type NewNotificationPreference =
+  typeof notificationPreferences.$inferInsert;
 
 export const tenantNotificationDefaults = pgTable(
   'tenant_notification_defaults',
@@ -85,5 +87,7 @@ export const tenantNotificationDefaults = pgTable(
   ]
 ).enableRLS();
 
-export type TenantNotificationDefault = typeof tenantNotificationDefaults.$inferSelect;
-export type NewTenantNotificationDefault = typeof tenantNotificationDefaults.$inferInsert;
+export type TenantNotificationDefault =
+  typeof tenantNotificationDefaults.$inferSelect;
+export type NewTenantNotificationDefault =
+  typeof tenantNotificationDefaults.$inferInsert;

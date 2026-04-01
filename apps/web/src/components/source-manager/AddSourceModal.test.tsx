@@ -74,7 +74,7 @@ describe('AddSourceModal — BUG-098 regression', () => {
   it('has a DialogDescription for accessibility', () => {
     renderModal();
     expect(
-      screen.getByText(/Attach a URL, text, YouTube video, or file/),
+      screen.getByText(/Attach a URL, text, YouTube video, or file/)
     ).toBeInTheDocument();
   });
 

@@ -31,7 +31,9 @@ describe('Path Traversal — MinIO file_key sanitization', () => {
 
   beforeAll(() => {
     // Path traversal logic extracted to knowledge-source-processing.service.ts
-    src = read(`${KNOWLEDGE_SRC}/sources/knowledge-source-processing.service.ts`);
+    src = read(
+      `${KNOWLEDGE_SRC}/sources/knowledge-source-processing.service.ts`
+    );
   });
 
   it('file exists and is non-empty', () => {
@@ -354,9 +356,14 @@ describe('Auth Directives — Knowledge Source GraphQL SDL', () => {
 
   it('all mutations have @authenticated directive', () => {
     // Extract all mutation lines
-    const mutationLines = sdl.split('\n').filter(
-      (line) => line.trim().startsWith('add') || line.trim().startsWith('delete') || line.trim().startsWith('reindex'),
-    );
+    const mutationLines = sdl
+      .split('\n')
+      .filter(
+        (line) =>
+          line.trim().startsWith('add') ||
+          line.trim().startsWith('delete') ||
+          line.trim().startsWith('reindex')
+      );
     for (const line of mutationLines) {
       // The directive may be on the same line or the next line
       const fullBlock = sdl.slice(sdl.indexOf(line));

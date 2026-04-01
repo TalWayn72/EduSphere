@@ -5,13 +5,21 @@ import { ResultCard, ExpandableText } from './ResultCard';
 
 describe('ResultCard', () => {
   it('renders title and icon', () => {
-    render(<ResultCard icon="📊" title="Summary" testId="summary-card"><p>Content</p></ResultCard>);
+    render(
+      <ResultCard icon="📊" title="Summary" testId="summary-card">
+        <p>Content</p>
+      </ResultCard>
+    );
     expect(screen.getByText(/Summary/)).toBeInTheDocument();
     expect(screen.getByTestId('summary-card')).toBeInTheDocument();
   });
 
   it('renders children', () => {
-    render(<ResultCard icon="📊" title="Test" testId="test-card"><span>Child text</span></ResultCard>);
+    render(
+      <ResultCard icon="📊" title="Test" testId="test-card">
+        <span>Child text</span>
+      </ResultCard>
+    );
     expect(screen.getByText('Child text')).toBeInTheDocument();
   });
 });

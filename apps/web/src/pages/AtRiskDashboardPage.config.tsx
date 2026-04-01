@@ -51,16 +51,23 @@ function persistThresholds(thresholds: RiskThresholds): void {
 export function RiskThresholdConfig() {
   const defaults = loadThresholds();
   const [inactiveDays, setInactiveDays] = useState(defaults.inactiveDays);
-  const [completionThreshold, setCompletionThreshold] = useState(defaults.completionThreshold);
+  const [completionThreshold, setCompletionThreshold] = useState(
+    defaults.completionThreshold
+  );
   const [saving, setSaving] = useState(false);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[RiskThresholdConfig] cleanup: save timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[RiskThresholdConfig] cleanup: save timer cleared on unmount'
+          );
       }
     };
   }, []);

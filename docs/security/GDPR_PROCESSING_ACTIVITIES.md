@@ -37,18 +37,18 @@ EduSphere maintains this Record of Processing Activities (RoPA) as required by *
 
 ### RPA-002: Security Monitoring and Audit Logging
 
-| Field                       | Value                                                                                                |
-| --------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Activity ID**             | RPA-002                                                                                              |
+| Field                       | Value                                                                                                 |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Activity ID**             | RPA-002                                                                                               |
 | **Purpose**                 | Detect security incidents; monitor platform integrity; audit log all access (GDPR Art.32, SOC2 CC7.2) |
-| **Legal Basis**             | Art.6(1)(f) — Legitimate Interest (security monitoring)                                              |
-| **Data Categories**         | IP addresses, user IDs, action timestamps, API endpoint accessed                                     |
-| **Data Subjects**           | All platform users                                                                                   |
-| **Recipients**              | EduSphere Security Team; Wazuh SIEM (self-hosted)                                                    |
-| **Third-Country Transfers** | None (all self-hosted in EU)                                                                         |
-| **Retention**               | 7 years (SOC2 audit requirement)                                                                     |
-| **Security Measures**       | Encrypted storage, role-based access (security team only)                                            |
-| **Sub-processors**          | AWS (infrastructure)                                                                                 |
+| **Legal Basis**             | Art.6(1)(f) — Legitimate Interest (security monitoring)                                               |
+| **Data Categories**         | IP addresses, user IDs, action timestamps, API endpoint accessed                                      |
+| **Data Subjects**           | All platform users                                                                                    |
+| **Recipients**              | EduSphere Security Team; Wazuh SIEM (self-hosted)                                                     |
+| **Third-Country Transfers** | None (all self-hosted in EU)                                                                          |
+| **Retention**               | 7 years (SOC2 audit requirement)                                                                      |
+| **Security Measures**       | Encrypted storage, role-based access (security team only)                                             |
+| **Sub-processors**          | AWS (infrastructure)                                                                                  |
 
 ### RPA-003: Platform Analytics (Anonymized)
 
@@ -87,19 +87,19 @@ EduSphere maintains this Record of Processing Activities (RoPA) as required by *
 
 ### RPA-005: AI-Powered Learning (Consent-Gated)
 
-| Field                       | Value                                                                                        |
-| --------------------------- | -------------------------------------------------------------------------------------------- |
-| **Activity ID**             | RPA-005                                                                                      |
-| **Purpose**                 | Personalized AI tutoring, quiz generation, knowledge graph navigation via AI Consent gate    |
-| **Legal Basis**             | Art.6(1)(a) — User consent (`AI_PROCESSING` + `THIRD_PARTY_LLM` consent flags)               |
-| **Data Categories**         | Learning context, questions asked, AI responses; PII-scrubbed before external LLM call       |
-| **Data Subjects**           | Users who have granted AI processing consent                                                 |
-| **Data Controller**         | Customer organization (tenant) + user (for consent)                                          |
-| **Recipients**              | EduSphere Agent subgraph; OpenAI (if `THIRD_PARTY_LLM` consent); Anthropic (if consent)      |
-| **Third-Country Transfers** | US (OpenAI/Anthropic) — Standard Contractual Clauses (SCC) + explicit user consent           |
-| **Retention**               | Agent messages: 90 days default (tenant-configurable); per RPA-004 thereafter                |
-| **Security Measures**       | Consent gate (LLM guard SI-10), PII scrubber before external calls, AES-256-GCM storage      |
-| **Sub-processors**          | AWS; OpenAI (with consent + SCC); Anthropic (with consent + SCC)                             |
+| Field                       | Value                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| **Activity ID**             | RPA-005                                                                                   |
+| **Purpose**                 | Personalized AI tutoring, quiz generation, knowledge graph navigation via AI Consent gate |
+| **Legal Basis**             | Art.6(1)(a) — User consent (`AI_PROCESSING` + `THIRD_PARTY_LLM` consent flags)            |
+| **Data Categories**         | Learning context, questions asked, AI responses; PII-scrubbed before external LLM call    |
+| **Data Subjects**           | Users who have granted AI processing consent                                              |
+| **Data Controller**         | Customer organization (tenant) + user (for consent)                                       |
+| **Recipients**              | EduSphere Agent subgraph; OpenAI (if `THIRD_PARTY_LLM` consent); Anthropic (if consent)   |
+| **Third-Country Transfers** | US (OpenAI/Anthropic) — Standard Contractual Clauses (SCC) + explicit user consent        |
+| **Retention**               | Agent messages: 90 days default (tenant-configurable); per RPA-004 thereafter             |
+| **Security Measures**       | Consent gate (LLM guard SI-10), PII scrubber before external calls, AES-256-GCM storage   |
+| **Sub-processors**          | AWS; OpenAI (with consent + SCC); Anthropic (with consent + SCC)                          |
 
 ### RPA-006: Personal Annotations
 

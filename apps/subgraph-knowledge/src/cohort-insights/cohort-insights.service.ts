@@ -3,11 +3,7 @@
  * Retrieves past-cohort social feed activity related to a concept/course.
  * Uses raw SQL for cohort_id column (added in migration 0029, not yet in Drizzle schema).
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   withTenantContext,
@@ -58,7 +54,7 @@ export class CohortInsightsService implements OnModuleDestroy {
     courseId: string,
     tenantId: string,
     userId: string,
-    limit = 5,
+    limit = 5
   ): Promise<CohortInsightsResult> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
@@ -75,22 +71,24 @@ export class CohortInsightsService implements OnModuleDestroy {
         LIMIT ${limit}
       `)) as unknown as FeedRow[];
 
-      return rows.map((item, idx): CohortInsight => ({
-        annotationId: item.id,
-        content: `${item.verb}: ${item.objectTitle ?? 'Learning activity'}`,
-        conceptId,
-        authorCohortLabel: `Cohort ${item.cohortId?.slice(0, 8) ?? 'past'}`,
-        relevanceScore: Math.max(0.5, 1.0 - idx * 0.1),
-        createdAt:
-          item.createdAt instanceof Date
-            ? item.createdAt.toISOString()
-            : new Date().toISOString(),
-      }));
+      return rows.map(
+        (item, idx): CohortInsight => ({
+          annotationId: item.id,
+          content: `${item.verb}: ${item.objectTitle ?? 'Learning activity'}`,
+          conceptId,
+          authorCohortLabel: `Cohort ${item.cohortId?.slice(0, 8) ?? 'past'}`,
+          relevanceScore: Math.max(0.5, 1.0 - idx * 0.1),
+          createdAt:
+            item.createdAt instanceof Date
+              ? item.createdAt.toISOString()
+              : new Date().toISOString(),
+        })
+      );
     });
 
     this.logger.log(
       `[CohortInsightsService] Found ${insights.length} insights for concept=${conceptId} course=${courseId}`,
-      { tenantId, userId, conceptId, courseId },
+      { tenantId, userId, conceptId, courseId }
     );
 
     return {

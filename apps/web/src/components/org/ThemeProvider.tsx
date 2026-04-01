@@ -31,21 +31,28 @@ interface OrgThemeProviderProps {
   children: React.ReactNode;
 }
 
-export function OrgThemeProvider({ slug: _slug, children }: OrgThemeProviderProps) {
+export function OrgThemeProvider({
+  slug: _slug,
+  children,
+}: OrgThemeProviderProps) {
   const { branding } = useTenantBranding();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const theme: OrgTheme = useMemo(() => branding
-    ? {
-        primaryColor: branding.primaryColor,
-        secondaryColor: branding.secondaryColor,
-        accentColor: branding.accentColor,
-        backgroundColor: branding.backgroundColor,
-        fontFamily: branding.fontFamily,
-        logoUrl: branding.logoUrl,
-        orgName: branding.organizationName,
-      }
-    : DEFAULT_THEME, [branding]);
+  const theme: OrgTheme = useMemo(
+    () =>
+      branding
+        ? {
+            primaryColor: branding.primaryColor,
+            secondaryColor: branding.secondaryColor,
+            accentColor: branding.accentColor,
+            backgroundColor: branding.backgroundColor,
+            fontFamily: branding.fontFamily,
+            logoUrl: branding.logoUrl,
+            orgName: branding.organizationName,
+          }
+        : DEFAULT_THEME,
+    [branding]
+  );
 
   useEffect(() => {
     const el = wrapperRef.current;

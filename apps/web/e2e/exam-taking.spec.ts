@@ -88,8 +88,12 @@ const MOCK_RESULT = {
   passed: true,
   rawScore: 0.9,
   scaledScore: 780,
-  domainScores: [{ domain: 'Testing', itemCount: 3, correctCount: 3, percentage: 100 }],
-  bloomScores: [{ level: 'APPLY', itemCount: 1, correctCount: 1, percentage: 100 }],
+  domainScores: [
+    { domain: 'Testing', itemCount: 3, correctCount: 3, percentage: 100 },
+  ],
+  bloomScores: [
+    { level: 'APPLY', itemCount: 1, correctCount: 1, percentage: 100 },
+  ],
   gradedAt: '2026-03-15T12:00:00Z',
 };
 
@@ -101,7 +105,9 @@ function handleGraphQL(op: string): string | null {
     return JSON.stringify({ data: { startExamSession: MOCK_SESSION } });
   }
   if (op === 'SubmitExamResponse') {
-    return JSON.stringify({ data: { submitExamResponse: { id: 'resp-1', flagged: false } } });
+    return JSON.stringify({
+      data: { submitExamResponse: { id: 'resp-1', flagged: false } },
+    });
   }
   if (op === 'SubmitExam' || op === 'FinalizeExamSession') {
     return JSON.stringify({ data: { finalizeExamSession: MOCK_RESULT } });
@@ -118,14 +124,22 @@ test.describe('exam-taking', () => {
     await loginInDevMode(page);
   });
 
-  test('exam start page shows blueprint info and start button', async ({ page }) => {
+  test('exam start page shows blueprint info and start button', async ({
+    page,
+  }) => {
     await page.goto('/exam/start/bp-1');
-    await expect(page.getByText('Unit Test Certification')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Unit Test Certification')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/30 minutes/)).toBeVisible();
-    await expect(page.getByRole('button', { name: /start exam/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /start exam/i })
+    ).toBeVisible();
   });
 
-  test('start button is disabled until agreement checkbox is checked', async ({ page }) => {
+  test('start button is disabled until agreement checkbox is checked', async ({
+    page,
+  }) => {
     await page.goto('/exam/start/bp-1');
     await page.waitForLoadState('domcontentloaded');
     const startBtn = page.getByRole('button', { name: /start exam/i });
@@ -147,14 +161,16 @@ test.describe('exam-taking', () => {
   test('exam result page shows pass/fail banner', async ({ page }) => {
     await page.goto('/exam/result/sess-1');
     await expect(
-      page.getByText(/congratulations|passed/i).or(page.getByText('PASS')),
+      page.getByText(/congratulations|passed/i).or(page.getByText('PASS'))
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('exam result page shows retake button', async ({ page }) => {
     await page.goto('/exam/result/sess-1');
     await expect(
-      page.getByRole('button', { name: /retake/i }).or(page.getByRole('link', { name: /retake/i })),
+      page
+        .getByRole('button', { name: /retake/i })
+        .or(page.getByRole('link', { name: /retake/i }))
     ).toBeVisible({ timeout: 10_000 });
   });
 });

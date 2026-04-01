@@ -1,4 +1,10 @@
-import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
+import {
+  StateGraph,
+  END,
+  START,
+  Annotation,
+  type BaseCheckpointSaver,
+} from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -107,7 +113,9 @@ Return the cleaned text and a list of removed/replaced instructions.`,
     );
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Clean this Hebrew lesson transcript:\n\n${state.rawText.slice(0, 6000)}`,
       schema: z.object({
@@ -135,7 +143,9 @@ Preserve the original meaning while making citations explicit and verifiable.`,
     );
 
     const { object } = await generateObject({
-      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
+      model: openai(this.model) as unknown as Parameters<
+        typeof generateObject
+      >[0]['model'],
       system: systemPrompt,
       prompt: `Format citations in this text:\n\n${textToProcess.slice(0, 6000)}`,
       schema: z.object({

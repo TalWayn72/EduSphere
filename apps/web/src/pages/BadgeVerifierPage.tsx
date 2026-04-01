@@ -34,7 +34,7 @@ interface VerifyBadgeResponse {
 
 function downloadVcJson(
   assertionId: string,
-  assertion: BadgeAssertionResult,
+  assertion: BadgeAssertionResult
 ): void {
   const vcJson = {
     '@context': [
@@ -122,7 +122,10 @@ export function BadgeVerifierPage(): React.ReactElement {
             <CardContent className="space-y-4">
               {isLoading && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden="true"
+                  />
                   <span>Verifying credential...</span>
                 </div>
               )}

@@ -37,7 +37,9 @@ vi.mock('@edusphere/db', () => ({
   // Keyset pagination helpers — use real implementations
   encodeCursor: (createdAt: string | Date, id: string) => {
     const iso = createdAt instanceof Date ? createdAt.toISOString() : createdAt;
-    return Buffer.from(JSON.stringify({ createdAt: iso, id })).toString('base64');
+    return Buffer.from(JSON.stringify({ createdAt: iso, id })).toString(
+      'base64'
+    );
   },
   buildRelayConnection: (
     rows: { id: string; createdAt?: string }[],
@@ -48,7 +50,9 @@ vi.mock('@edusphere/db', () => ({
     const hasNextPage = rows.length > first;
     const trimmed = hasNextPage ? rows.slice(0, first) : rows;
     const edges = trimmed.map((node) => ({
-      cursor: Buffer.from(JSON.stringify({ createdAt: node.createdAt ?? '', id: node.id })).toString('base64'),
+      cursor: Buffer.from(
+        JSON.stringify({ createdAt: node.createdAt ?? '', id: node.id })
+      ).toString('base64'),
       node,
     }));
     return {
@@ -403,7 +407,10 @@ describe('UserService', () => {
     });
 
     it('sets hasNextPage true when more results exist', async () => {
-      const manyUsers = Array.from({ length: 21 }, (_, i) => ({ ...MOCK_USER, id: `u-${String(i)}` }));
+      const manyUsers = Array.from({ length: 21 }, (_, i) => ({
+        ...MOCK_USER,
+        id: `u-${String(i)}`,
+      }));
       const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
         users: manyUsers as never[],
         total: 21,

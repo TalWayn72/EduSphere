@@ -37,13 +37,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const slug = detectTenantSlug();
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const [{ data, fetching }] = useQuery<{ tenantBranding: TenantBrandingData }>({
-    query: TENANT_BRANDING_QUERY,
-    variables: { slug },
-    pause: !mounted,
-  });
+  const [{ data, fetching }] = useQuery<{ tenantBranding: TenantBrandingData }>(
+    {
+      query: TENANT_BRANDING_QUERY,
+      variables: { slug },
+      pause: !mounted,
+    }
+  );
 
   const branding = data?.tenantBranding ?? DEFAULT_BRANDING;
 

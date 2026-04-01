@@ -118,7 +118,9 @@ describe('FormDescription', () => {
   it('forwards className', () => {
     render(
       <TestForm>
-        <FormDescription className="italic" data-testid="desc">D</FormDescription>
+        <FormDescription className="italic" data-testid="desc">
+          D
+        </FormDescription>
       </TestForm>
     );
     expect(screen.getByTestId('desc')).toHaveClass('italic');

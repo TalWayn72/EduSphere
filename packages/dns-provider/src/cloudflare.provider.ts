@@ -15,8 +15,7 @@ import type {
 
 const CF_API = 'https://api.cloudflare.com/client/v4';
 const BASE_DOMAIN = process.env['EDUSPHERE_BASE_DOMAIN'] ?? 'edusphere.io';
-const GATEWAY_IP =
-  process.env['EDUSPHERE_GATEWAY_IP'] ?? '203.0.113.1'; // placeholder
+const GATEWAY_IP = process.env['EDUSPHERE_GATEWAY_IP'] ?? '203.0.113.1'; // placeholder
 
 interface CfDnsRecord {
   id: string;
@@ -73,18 +72,13 @@ export class CloudflareDnsProvider implements DnsProvider {
     const { token, zoneId } = getConfig();
     const fqdn = `${slug}.${BASE_DOMAIN}`;
 
-    const resp = await cfFetch(
-      `/zones/${zoneId}/dns_records`,
-      token,
-      'POST',
-      {
-        type: 'A',
-        name: fqdn,
-        content: GATEWAY_IP,
-        ttl: 300,
-        proxied: true,
-      }
-    );
+    const resp = await cfFetch(`/zones/${zoneId}/dns_records`, token, 'POST', {
+      type: 'A',
+      name: fqdn,
+      content: GATEWAY_IP,
+      ttl: 300,
+      proxied: true,
+    });
 
     if (!resp.success) {
       const msg = resp.errors?.[0]?.message ?? 'Unknown Cloudflare error';

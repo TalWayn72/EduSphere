@@ -52,12 +52,8 @@ test.describe('Theme Settings — page presence', () => {
     await expect(selector).toBeVisible({ timeout: 10_000 });
 
     // Light / Dark / System radio inputs with aria-label
-    await expect(
-      selector.getByRole('radio', { name: 'Light' })
-    ).toBeAttached();
-    await expect(
-      selector.getByRole('radio', { name: 'Dark' })
-    ).toBeAttached();
+    await expect(selector.getByRole('radio', { name: 'Light' })).toBeAttached();
+    await expect(selector.getByRole('radio', { name: 'Dark' })).toBeAttached();
     await expect(
       selector.getByRole('radio', { name: 'System' })
     ).toBeAttached();
@@ -82,9 +78,13 @@ test.describe('Theme Settings — page presence', () => {
 
     // FONT_SIZES: sm=Small, md=Medium, lg=Large, xl=Extra Large
     await expect(selector.getByRole('radio', { name: 'Small' })).toBeAttached();
-    await expect(selector.getByRole('radio', { name: 'Medium' })).toBeAttached();
+    await expect(
+      selector.getByRole('radio', { name: 'Medium' })
+    ).toBeAttached();
     await expect(selector.getByRole('radio', { name: 'Large' })).toBeAttached();
-    await expect(selector.getByRole('radio', { name: 'Extra Large' })).toBeAttached();
+    await expect(
+      selector.getByRole('radio', { name: 'Extra Large' })
+    ).toBeAttached();
   });
 });
 
@@ -103,7 +103,10 @@ test.describe('Theme Settings — theme switching', () => {
     await darkRadio.waitFor({ timeout: 10_000 });
 
     // Click the label (radio is visually hidden via sr-only)
-    await page.locator('[data-testid="theme-mode-selector"] label').filter({ hasText: 'Dark' }).click();
+    await page
+      .locator('[data-testid="theme-mode-selector"] label')
+      .filter({ hasText: 'Dark' })
+      .click();
 
     // The ThemeContext applies "dark" class to <html>
     // ThemeSettingsPage calls setThemeMode('dark') which updates context
@@ -112,13 +115,21 @@ test.describe('Theme Settings — theme switching', () => {
 
   test('clicking Light theme radio reflects in DOM', async ({ page }) => {
     // First switch to dark so we have a state change to observe
-    await page.locator('[data-testid="theme-mode-selector"] label').filter({ hasText: 'Dark' }).click();
+    await page
+      .locator('[data-testid="theme-mode-selector"] label')
+      .filter({ hasText: 'Dark' })
+      .click();
     await page.waitForLoadState('domcontentloaded');
 
-    await page.locator('[data-testid="theme-mode-selector"] label').filter({ hasText: 'Light' }).click();
+    await page
+      .locator('[data-testid="theme-mode-selector"] label')
+      .filter({ hasText: 'Light' })
+      .click();
 
     // In light mode the html element should NOT have the "dark" class
-    await expect(page.locator('html')).not.toHaveClass(/dark/, { timeout: 3_000 });
+    await expect(page.locator('html')).not.toHaveClass(/dark/, {
+      timeout: 3_000,
+    });
   });
 
   test('no raw technical error strings visible', async ({ page }) => {

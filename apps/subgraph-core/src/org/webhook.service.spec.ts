@@ -24,7 +24,8 @@ const mockUpdate = vi.fn();
 const mockDelete = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -44,8 +45,14 @@ vi.mock('@edusphere/db', () => ({
     delete: mockDelete,
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
-    fn({ select: mockSelect, insert: mockInsert, update: mockUpdate, delete: mockDelete }),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) =>
+      fn({
+        select: mockSelect,
+        insert: mockInsert,
+        update: mockUpdate,
+        delete: mockDelete,
+      })
   ),
   schema: {
     webhookEndpoints: {
@@ -82,7 +89,11 @@ vi.mock('nats', () => ({
 
 import { WebhookService } from './webhook.service.js';
 
-const TENANT_CTX = { tenantId: 'tenant-001', userId: 'admin-001', role: 'ORG_ADMIN' };
+const TENANT_CTX = {
+  tenantId: 'tenant-001',
+  userId: 'admin-001',
+  role: 'ORG_ADMIN',
+};
 
 const VALID_EVENTS = [
   'user.created',
@@ -98,7 +109,9 @@ describe('WebhookService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSelect.mockReturnValue(makeChain([]));
-    mockInsert.mockReturnValue(makeChain([{ id: 'endpoint-001', secret: 'whsec_test123' }]));
+    mockInsert.mockReturnValue(
+      makeChain([{ id: 'endpoint-001', secret: 'whsec_test123' }])
+    );
     service = new WebhookService();
   });
 
@@ -121,7 +134,7 @@ describe('WebhookService', () => {
         service.registerEndpoint(TENANT_CTX, {
           url: 'http://insecure.com/webhook',
           events: ['user.created'],
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -130,7 +143,7 @@ describe('WebhookService', () => {
         service.registerEndpoint(TENANT_CTX, {
           url: 'not-a-url',
           events: ['user.created'],
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -139,7 +152,7 @@ describe('WebhookService', () => {
         service.registerEndpoint(TENANT_CTX, {
           url: 'https://api.acme.com/webhooks',
           events: [],
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -148,7 +161,7 @@ describe('WebhookService', () => {
         service.registerEndpoint(TENANT_CTX, {
           url: 'https://api.acme.com/webhooks',
           events: ['invalid.event.type'],
-        }),
+        })
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -159,8 +172,8 @@ describe('WebhookService', () => {
           {
             url: 'https://api.acme.com/webhooks',
             events: ['user.created'],
-          },
-        ),
+          }
+        )
       ).rejects.toThrow(ForbiddenException);
     });
 
@@ -179,12 +192,26 @@ describe('WebhookService', () => {
     it('sends event to all matching endpoints', async () => {
       mockSelect.mockReturnValueOnce(
         makeChain([
-          { id: 'ep-001', url: 'https://api.acme.com/webhooks', secret: 'sec1', events: ['user.created'], isActive: true },
-          { id: 'ep-002', url: 'https://api.other.com/hooks', secret: 'sec2', events: ['user.created'], isActive: true },
-        ]),
+          {
+            id: 'ep-001',
+            url: 'https://api.acme.com/webhooks',
+            secret: 'sec1',
+            events: ['user.created'],
+            isActive: true,
+          },
+          {
+            id: 'ep-002',
+            url: 'https://api.other.com/hooks',
+            secret: 'sec2',
+            events: ['user.created'],
+            isActive: true,
+          },
+        ])
       );
 
-      await service.dispatchEvent('tenant-001', 'user.created', { userId: 'u-001' });
+      await service.dispatchEvent('tenant-001', 'user.created', {
+        userId: 'u-001',
+      });
       // Should have created delivery records for both endpoints
       expect(mockInsert).toHaveBeenCalled();
     });
@@ -192,22 +219,38 @@ describe('WebhookService', () => {
     it('skips inactive endpoints', async () => {
       mockSelect.mockReturnValueOnce(
         makeChain([
-          { id: 'ep-001', url: 'https://disabled.com', secret: 'sec', events: ['user.created'], isActive: false },
-        ]),
+          {
+            id: 'ep-001',
+            url: 'https://disabled.com',
+            secret: 'sec',
+            events: ['user.created'],
+            isActive: false,
+          },
+        ])
       );
 
-      await service.dispatchEvent('tenant-001', 'user.created', { userId: 'u-001' });
+      await service.dispatchEvent('tenant-001', 'user.created', {
+        userId: 'u-001',
+      });
       // No delivery should be attempted
     });
 
     it('skips endpoints not subscribed to this event', async () => {
       mockSelect.mockReturnValueOnce(
         makeChain([
-          { id: 'ep-001', url: 'https://api.com/hooks', secret: 'sec', events: ['course.completed'], isActive: true },
-        ]),
+          {
+            id: 'ep-001',
+            url: 'https://api.com/hooks',
+            secret: 'sec',
+            events: ['course.completed'],
+            isActive: true,
+          },
+        ])
       );
 
-      await service.dispatchEvent('tenant-001', 'user.created', { userId: 'u-001' });
+      await service.dispatchEvent('tenant-001', 'user.created', {
+        userId: 'u-001',
+      });
       // Endpoint subscribed to course.completed should not receive user.created
     });
   });
@@ -216,7 +259,10 @@ describe('WebhookService', () => {
 
   describe('HMAC signing', () => {
     it('generates valid HMAC-SHA256 signature for payload', () => {
-      const payload = JSON.stringify({ event: 'user.created', data: { id: 'u-001' } });
+      const payload = JSON.stringify({
+        event: 'user.created',
+        data: { id: 'u-001' },
+      });
       const secret = 'whsec_test_secret_123';
 
       const signature = service.generateSignature(payload, secret);
@@ -255,7 +301,11 @@ describe('WebhookService', () => {
       const secret = 'test-secret';
       const signature = service.generateSignature('{"original": true}', secret);
 
-      const isValid = service.verifySignature('{"tampered": true}', secret, signature);
+      const isValid = service.verifySignature(
+        '{"tampered": true}',
+        secret,
+        signature
+      );
       expect(isValid).toBe(false);
     });
   });
@@ -265,13 +315,15 @@ describe('WebhookService', () => {
   describe('retry logic', () => {
     it('retries failed delivery up to 3 times', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'delivery-001',
-          endpointId: 'ep-001',
-          attempts: 1,
-          statusCode: 500,
-          payload: '{}',
-        }]),
+        makeChain([
+          {
+            id: 'delivery-001',
+            endpointId: 'ep-001',
+            attempts: 1,
+            statusCode: 500,
+            payload: '{}',
+          },
+        ])
       );
 
       await service.processRetries();
@@ -280,13 +332,15 @@ describe('WebhookService', () => {
 
     it('marks delivery as failed after 3 attempts', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{
-          id: 'delivery-001',
-          endpointId: 'ep-001',
-          attempts: 3,
-          statusCode: 500,
-          payload: '{}',
-        }]),
+        makeChain([
+          {
+            id: 'delivery-001',
+            endpointId: 'ep-001',
+            attempts: 3,
+            statusCode: 500,
+            payload: '{}',
+          },
+        ])
       );
 
       await service.processRetries();
@@ -312,7 +366,7 @@ describe('WebhookService', () => {
         service.registerEndpoint(TENANT_CTX, {
           url: 'https://api.acme.com/webhooks',
           events: ['user.created'],
-        }),
+        })
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -322,7 +376,7 @@ describe('WebhookService', () => {
   describe('deleteEndpoint()', () => {
     it('deletes owned endpoint', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'ep-001', tenantId: TENANT_CTX.tenantId }]),
+        makeChain([{ id: 'ep-001', tenantId: TENANT_CTX.tenantId }])
       );
 
       await service.deleteEndpoint(TENANT_CTX, 'ep-001');
@@ -331,11 +385,11 @@ describe('WebhookService', () => {
 
     it('rejects deleting endpoint from another tenant', async () => {
       mockSelect.mockReturnValueOnce(
-        makeChain([{ id: 'ep-001', tenantId: 'other-tenant' }]),
+        makeChain([{ id: 'ep-001', tenantId: 'other-tenant' }])
       );
 
       await expect(
-        service.deleteEndpoint(TENANT_CTX, 'ep-001'),
+        service.deleteEndpoint(TENANT_CTX, 'ep-001')
       ).rejects.toThrow(ForbiddenException);
     });
 
@@ -343,7 +397,7 @@ describe('WebhookService', () => {
       mockSelect.mockReturnValue(makeChain([]));
 
       await expect(
-        service.deleteEndpoint(TENANT_CTX, 'nonexistent'),
+        service.deleteEndpoint(TENANT_CTX, 'nonexistent')
       ).rejects.toThrow(NotFoundException);
     });
   });

@@ -85,8 +85,12 @@ const SAMPLE_ITEMS: MarketplaceItem[] = [
 ];
 
 const CATEGORIES = [
-  'technology', 'business', 'design', 'science',
-  'humanities', 'compliance',
+  'technology',
+  'business',
+  'design',
+  'science',
+  'humanities',
+  'compliance',
 ];
 
 export function useContentMarketplace(): UseContentMarketplaceReturn {
@@ -99,11 +103,12 @@ export function useContentMarketplace(): UseContentMarketplaceReturn {
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      const matchesSearch = !searchQuery
-        || item.title.toLowerCase().includes(searchQuery.toLowerCase())
-        || item.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = !selectedCategory
-        || item.category === selectedCategory;
+      const matchesSearch =
+        !searchQuery ||
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        !selectedCategory || item.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
   }, [items, searchQuery, selectedCategory]);
@@ -116,11 +121,14 @@ export function useContentMarketplace(): UseContentMarketplaceReturn {
   const addToCart = useCallback((item: MarketplaceItem) => {
     setCart((prev) => {
       if (prev.some((ci) => ci.itemId === item.id)) return prev;
-      return [...prev, {
-        itemId: item.id,
-        title: item.title,
-        priceUsdCents: item.priceUsdCents,
-      }];
+      return [
+        ...prev,
+        {
+          itemId: item.id,
+          title: item.title,
+          priceUsdCents: item.priceUsdCents,
+        },
+      ];
     });
   }, []);
 

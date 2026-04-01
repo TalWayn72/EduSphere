@@ -43,9 +43,9 @@ test.describe('Landing Page — Phase 1 (core sections)', () => {
   });
 
   test('hero section is visible', async ({ page }) => {
-    await expect(
-      page.locator('[data-testid="hero-section"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="hero-section"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('hero heading contains "AI-Powered Learning"', async ({ page }) => {
@@ -57,7 +57,9 @@ test.describe('Landing Page — Phase 1 (core sections)', () => {
   test('primary CTA button "Get Started Free" is present and links to /login', async ({
     page,
   }) => {
-    const ctaLink = page.getByRole('link', { name: /Get Started Free/i }).first();
+    const ctaLink = page
+      .getByRole('link', { name: /Get Started Free/i })
+      .first();
     await expect(ctaLink).toBeVisible({ timeout: 10_000 });
     const href = await ctaLink.getAttribute('href');
     expect(href).toBe('/login');
@@ -79,10 +81,14 @@ test.describe('Landing Page — Phase 1 (core sections)', () => {
 
   test('nav contains "Features", "Pricing" anchor links', async ({ page }) => {
     const nav = page.locator('[data-testid="landing-nav"]');
-    await expect(nav.getByRole('link', { name: /Features/i }).first()).toBeVisible({
+    await expect(
+      nav.getByRole('link', { name: /Features/i }).first()
+    ).toBeVisible({
       timeout: 10_000,
     });
-    await expect(nav.getByRole('link', { name: /Pricing/i }).first()).toBeVisible();
+    await expect(
+      nav.getByRole('link', { name: /Pricing/i }).first()
+    ).toBeVisible();
   });
 
   test('stats bar is visible with key metrics', async ({ page }) => {
@@ -107,7 +113,9 @@ test.describe('Landing Page — Phase 1 (features & pricing)', () => {
   }) => {
     const section = page.locator('[data-testid="features-section"]');
     await expect(section).toBeVisible({ timeout: 10_000 });
-    await expect(section.getByRole('heading', { name: /Why EduSphere/i })).toBeVisible();
+    await expect(
+      section.getByRole('heading', { name: /Why EduSphere/i })
+    ).toBeVisible();
   });
 
   test('all 6 feature card titles are visible', async ({ page }) => {
@@ -133,7 +141,9 @@ test.describe('Landing Page — Phase 1 (features & pricing)', () => {
     await pricingLink.click();
 
     // PLANS array: Free, Pro, Enterprise
-    await expect(page.getByText('Free').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Free').first()).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText('Pro').first()).toBeVisible({ timeout: 5_000 });
   });
 });
@@ -146,9 +156,9 @@ test.describe('Landing Page — Phase 1 (responsive & navigation)', () => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     // The mobile menu toggle has aria-label "Open menu" / "Close menu"
-    await expect(
-      page.getByRole('button', { name: /Open menu/i })
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /Open menu/i })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('mobile hamburger opens mobile menu with nav links', async ({
@@ -206,9 +216,9 @@ test.describe('SmartRoot — "/" route behaviour', () => {
     );
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     // SmartRoot → isAuthenticated()=false → renders LandingPage
-    await expect(
-      page.locator('[data-testid="hero-section"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="hero-section"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('"Log In" button on landing page at "/" navigates to /login', async ({
@@ -240,9 +250,9 @@ test.describe('SmartRoot — "/" route behaviour', () => {
     await page.waitForURL(/\/(dashboard|learn)/, { timeout: 10_000 });
     expect(page.url()).not.toContain('/landing');
     // Landing page hero section should NOT be visible
-    await expect(
-      page.locator('[data-testid="hero-section"]')
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.locator('[data-testid="hero-section"]')).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('LandingPage at /landing is accessible without auth in all modes', async ({
@@ -250,9 +260,9 @@ test.describe('SmartRoot — "/" route behaviour', () => {
   }) => {
     // /landing is a direct public route (not mediated by SmartRoot)
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
-    await expect(
-      page.locator('[data-testid="hero-section"]')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="hero-section"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('no raw technical strings at "/" in any auth mode', async ({ page }) => {
@@ -268,7 +278,9 @@ test.describe('SmartRoot — "/" route behaviour', () => {
 // ─── Suite 5: Phase 39 — Hero video & VideoSection ────────────────────────────
 
 test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
-  test('hero has Remotion Player background (KnowledgeGraphGrow)', async ({ page }) => {
+  test('hero has Remotion Player background (KnowledgeGraphGrow)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     // Remotion Player renders inside the hero section as an iframe or div
@@ -276,11 +288,15 @@ test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
     await expect(heroSection).toBeVisible({ timeout: 10_000 });
 
     // The Remotion Player container should exist (aria-hidden div wrapping the Player)
-    const remotionContainer = heroSection.locator('[aria-hidden="true"]').first();
+    const remotionContainer = heroSection
+      .locator('[aria-hidden="true"]')
+      .first();
     await expect(remotionContainer).toBeVisible({ timeout: 10_000 });
   });
 
-  test('hero background is not empty (gradient + video layers)', async ({ page }) => {
+  test('hero background is not empty (gradient + video layers)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const heroSection = page.locator('[data-testid="hero-section"]');
@@ -291,7 +307,9 @@ test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
     await expect(bgGradient).toBeAttached();
   });
 
-  test('VideoSection exists with data-testid and aria-label="Product demo"', async ({ page }) => {
+  test('VideoSection exists with data-testid and aria-label="Product demo"', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const videoSection = page.locator('[data-testid="video-section"]');
@@ -299,7 +317,9 @@ test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
     await expect(videoSection).toHaveAttribute('aria-label', 'Product demo');
   });
 
-  test('VideoSection has Remotion Player (LiveCollab demo)', async ({ page }) => {
+  test('VideoSection has Remotion Player (LiveCollab demo)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const videoSection = page.locator('[data-testid="video-section"]');
@@ -309,7 +329,9 @@ test.describe('Landing Page — Phase 39 (hero video & VideoSection)', () => {
     await expect(playerContainer).toBeVisible({ timeout: 10_000 });
   });
 
-  test('VideoSection heading "See EduSphere in Action" is visible', async ({ page }) => {
+  test('VideoSection heading "See EduSphere in Action" is visible', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     await expect(
@@ -324,7 +346,9 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
   // All tests in this suite use prefers-reduced-motion: reduce
   test.use({ reducedMotion: 'reduce' });
 
-  test('h1 heading is immediately visible — no GSAP opacity:0 initial state', async ({ page }) => {
+  test('h1 heading is immediately visible — no GSAP opacity:0 initial state', async ({
+    page,
+  }) => {
     // With reduced-motion, GSAP useGSAP callback exits early (prefersReducedMotion=true)
     // so hero-animate elements are never set to opacity:0 — h1 must be visible right away.
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
@@ -333,10 +357,14 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
     await expect(h1).toBeVisible({ timeout: 3_000 });
   });
 
-  test('.hero-animate elements are visible (GSAP skipped for reduced-motion)', async ({ page }) => {
+  test('.hero-animate elements are visible (GSAP skipped for reduced-motion)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const heroAnimateEls = page.locator('[data-testid="hero-section"] .hero-animate');
+    const heroAnimateEls = page.locator(
+      '[data-testid="hero-section"] .hero-animate'
+    );
     const count = await heroAnimateEls.count();
     // HeroSection has 3 .hero-animate elements: h1, p, and the button div
     expect(count).toBeGreaterThan(0);
@@ -346,7 +374,9 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
     }
   });
 
-  test('MotionCard feature cards render as plain divs (framer-motion bypassed)', async ({ page }) => {
+  test('MotionCard feature cards render as plain divs (framer-motion bypassed)', async ({
+    page,
+  }) => {
     // MotionCard: if prefersReducedMotion → returns <div> (no motion.div)
     // This means feature cards should be visible immediately without animation delay
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
@@ -354,13 +384,22 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
     const featuresSection = page.locator('[data-testid="features-section"]');
     await expect(featuresSection).toBeVisible({ timeout: 10_000 });
     // All 6 feature card titles must be visible — no framer-motion initial opacity:0
-    const featureTitles = ['AI Tutoring', 'Knowledge Graph', 'Gamification', 'Enterprise Grade', 'Multi-language', 'Live Sessions'];
+    const featureTitles = [
+      'AI Tutoring',
+      'Knowledge Graph',
+      'Gamification',
+      'Enterprise Grade',
+      'Multi-language',
+      'Live Sessions',
+    ];
     for (const title of featureTitles) {
       await expect(page.getByText(title)).toBeVisible({ timeout: 5_000 });
     }
   });
 
-  test('AnimatedCounter shows final value immediately (no rAF animation)', async ({ page }) => {
+  test('AnimatedCounter shows final value immediately (no rAF animation)', async ({
+    page,
+  }) => {
     // AnimatedCounter: if prefersReducedMotion → setValue(target) immediately
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -368,56 +407,78 @@ test.describe('Landing Page — Phase 39 (reduced-motion)', () => {
     await expect(statsBar).toBeVisible({ timeout: 10_000 });
     // With reduced-motion, counters show final values immediately (no count-up animation)
     await expect(statsBar.getByText('10,000+')).toBeVisible({ timeout: 3_000 });
-    await expect(statsBar.getByText('500,000+')).toBeVisible({ timeout: 3_000 });
+    await expect(statsBar.getByText('500,000+')).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
-  test('TestimonialsCarousel does not auto-advance (reduced-motion pauses it)', async ({ page }) => {
+  test('TestimonialsCarousel does not auto-advance (reduced-motion pauses it)', async ({
+    page,
+  }) => {
     // TestimonialsCarousel: if prefersReducedMotion → setInterval is never started
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 
     // Get initial quote text
-    const initialQuote = await carousel.locator('blockquote').first().textContent();
+    const initialQuote = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
 
     // Wait 5 seconds — with reduced-motion the carousel must NOT auto-advance
     await page.waitForLoadState('networkidle').catch(() => {});
-    const quoteAfterWait = await carousel.locator('blockquote').first().textContent();
+    const quoteAfterWait = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
 
     // The carousel must not have auto-advanced (same quote still showing)
     expect(quoteAfterWait).toBe(initialQuote);
   });
 
-  test('cta-shimmer animation is disabled for reduced-motion', async ({ page }) => {
+  test('cta-shimmer animation is disabled for reduced-motion', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     // CTABanner has <div class="cta-shimmer"> with CSS animation
     // Tailwind's motion-safe: prefix ensures animations only run without reduced-motion
     const shimmerEl = page.locator('.cta-shimmer');
-    if (await shimmerEl.count() > 0) {
-      const animationName = await shimmerEl.evaluate((el) =>
-        window.getComputedStyle(el).animationName
+    if ((await shimmerEl.count()) > 0) {
+      const animationName = await shimmerEl.evaluate(
+        (el) => window.getComputedStyle(el).animationName
       );
       // Under prefers-reduced-motion: reduce, animation-name must be 'none'
       expect(animationName).toBe('none');
     }
   });
 
-  test('reduced-motion screenshot baseline — above-fold (argos)', async ({ page }) => {
+  test('reduced-motion screenshot baseline — above-fold (argos)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
-    await argosScreenshot(page, 'landing-page-reduced-motion', { fullPage: false });
+    await argosScreenshot(page, 'landing-page-reduced-motion', {
+      fullPage: false,
+    });
   });
 });
 
 // ─── Suite 7: Phase 39 — TestimonialsCarousel ARIA & interaction ───────────────
 
 test.describe('Landing Page — Phase 39 (TestimonialsCarousel)', () => {
-  test('carousel section has aria-live="polite" (WCAG 2.2.2)', async ({ page }) => {
+  test('carousel section has aria-live="polite" (WCAG 2.2.2)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await expect(carousel).toBeVisible({ timeout: 10_000 });
     await expect(carousel).toHaveAttribute('aria-live', 'polite');
   });
@@ -425,7 +486,9 @@ test.describe('Landing Page — Phase 39 (TestimonialsCarousel)', () => {
   test('carousel has dot navigation with role="tablist"', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const tablist = page.locator('[role="tablist"][aria-label="Testimonial navigation"]');
+    const tablist = page.locator(
+      '[role="tablist"][aria-label="Testimonial navigation"]'
+    );
     await expect(tablist).toBeVisible({ timeout: 10_000 });
 
     // Should have exactly 3 tabs (one per CAROUSEL_TESTIMONIALS entry)
@@ -436,7 +499,9 @@ test.describe('Landing Page — Phase 39 (TestimonialsCarousel)', () => {
   test('carousel tab click changes active testimonial', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const tablist = page.locator('[role="tablist"][aria-label="Testimonial navigation"]');
+    const tablist = page.locator(
+      '[role="tablist"][aria-label="Testimonial navigation"]'
+    );
     await expect(tablist).toBeVisible({ timeout: 10_000 });
     const tabs = tablist.locator('[role="tab"]');
 
@@ -449,22 +514,32 @@ test.describe('Landing Page — Phase 39 (TestimonialsCarousel)', () => {
     await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'false');
   });
 
-  test('carousel pauses on mouse hover (WCAG 2.2.2 Pause, Stop, Hide)', async ({ page }) => {
+  test('carousel pauses on mouse hover (WCAG 2.2.2 Pause, Stop, Hide)', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const carousel = page.locator('[aria-label="Customer testimonials carousel"]');
+    const carousel = page.locator(
+      '[aria-label="Customer testimonials carousel"]'
+    );
     await carousel.scrollIntoViewIfNeeded();
     await expect(carousel).toBeVisible({ timeout: 10_000 });
 
     // Get current quote
-    const initialQuote = await carousel.locator('blockquote').first().textContent();
+    const initialQuote = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
 
     // Hover over carousel — this sets paused=true via onMouseEnter
     await carousel.hover();
 
     // Wait 6 seconds (carousel advances every 4s — should NOT advance while hovered)
     await page.waitForLoadState('networkidle').catch(() => {});
-    const quoteDuringHover = await carousel.locator('blockquote').first().textContent();
+    const quoteDuringHover = await carousel
+      .locator('blockquote')
+      .first()
+      .textContent();
 
     // Quote must not have changed while hovered
     expect(quoteDuringHover).toBe(initialQuote);
@@ -474,7 +549,9 @@ test.describe('Landing Page — Phase 39 (TestimonialsCarousel)', () => {
 // ─── Suite 8: Phase 39 — LCP / performance invariants ─────────────────────────
 
 test.describe('Landing Page — Phase 39 (LCP / performance)', () => {
-  test('no render-blocking video elements in hero (preload=none guard)', async ({ page }) => {
+  test('no render-blocking video elements in hero (preload=none guard)', async ({
+    page,
+  }) => {
     // Collect all video elements in hero; ALL must have preload="none"
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
@@ -487,7 +564,9 @@ test.describe('Landing Page — Phase 39 (LCP / performance)', () => {
     }
   });
 
-  test('h1 is present in DOM within 2s of domcontentloaded (LCP candidate)', async ({ page }) => {
+  test('h1 is present in DOM within 2s of domcontentloaded (LCP candidate)', async ({
+    page,
+  }) => {
     // The h1 is the primary LCP candidate — it must be in DOM quickly
     const startTime = Date.now();
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
@@ -501,7 +580,9 @@ test.describe('Landing Page — Phase 39 (LCP / performance)', () => {
     console.info(`[LCP] domcontentloaded in ${elapsed}ms, h1 attached`);
   });
 
-  test('stats bar shows formatted values (no raw unformatted numbers)', async ({ page }) => {
+  test('stats bar shows formatted values (no raw unformatted numbers)', async ({
+    page,
+  }) => {
     // AnimatedCounter uses Intl.NumberFormat — 500000 → "500,000", not "500000"
     // With reducedMotion, the final value renders immediately
     await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -520,26 +601,36 @@ test.describe('Landing Page — Phase 39 (LCP / performance)', () => {
 // ─── Suite 9: Phase 39 — CTABanner & footer ───────────────────────────────────
 
 test.describe('Landing Page — Phase 39 (CTABanner & footer)', () => {
-  test('CTA banner is visible with "Ready to Transform Your Learning?" heading', async ({ page }) => {
+  test('CTA banner is visible with "Ready to Transform Your Learning?" heading', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const ctaBanner = page.locator('[data-testid="cta-banner"]');
     await expect(ctaBanner).toBeVisible({ timeout: 10_000 });
     await expect(
-      ctaBanner.getByRole('heading', { name: /Ready to Transform Your Learning/i })
+      ctaBanner.getByRole('heading', {
+        name: /Ready to Transform Your Learning/i,
+      })
     ).toBeVisible();
   });
 
-  test('CTA banner "Start Free Today" button links to /login', async ({ page }) => {
+  test('CTA banner "Start Free Today" button links to /login', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
-    const ctaLink = page.locator('[data-testid="cta-banner"]').getByRole('link', { name: /Start Free Today/i });
+    const ctaLink = page
+      .locator('[data-testid="cta-banner"]')
+      .getByRole('link', { name: /Start Free Today/i });
     await expect(ctaLink).toBeVisible({ timeout: 10_000 });
     const href = await ctaLink.getAttribute('href');
     expect(href).toBe('/login');
   });
 
-  test('footer is present with EduSphere brand and social links', async ({ page }) => {
+  test('footer is present with EduSphere brand and social links', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
 
     const footer = page.locator('[data-testid="landing-footer"]');
@@ -581,17 +672,22 @@ test.describe('Landing Page — @visual', () => {
     await argosScreenshot(page, 'landing-page-mobile');
   });
 
-  test('visual regression — landing page with reduced-motion (Phase 39 baseline)', async ({ page }) => {
+  test('visual regression — landing page with reduced-motion (Phase 39 baseline)', async ({
+    page,
+  }) => {
     // Explicit reduced-motion baseline — captures stable layout without any animation
     await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('domcontentloaded');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page).toHaveScreenshot('landing-page-reduced-motion-desktop.png', {
-      fullPage: false,
-      maxDiffPixels: 150,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'landing-page-reduced-motion-desktop.png',
+      {
+        fullPage: false,
+        maxDiffPixels: 150,
+        animations: 'disabled',
+      }
+    );
     await argosScreenshot(page, 'landing-page-reduced-motion');
   });
 });

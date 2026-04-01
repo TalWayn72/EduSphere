@@ -19,14 +19,38 @@ import { routeGraphQL } from './graphql-mock.helpers';
 const MARKETPLACE_ROUTE = '/admin/marketplace';
 
 const MOCK_LISTINGS = [
-  { id: 'l1', title: 'Machine Learning 101', category: 'Technology', priceUsdCents: 9900, instructor: 'Dr. AI' },
-  { id: 'l2', title: 'Leadership Skills', category: 'Business', priceUsdCents: 4900, instructor: 'Prof. Leader' },
-  { id: 'l3', title: 'Data Analytics', category: 'Technology', priceUsdCents: 7900, instructor: 'Dr. Data' },
+  {
+    id: 'l1',
+    title: 'Machine Learning 101',
+    category: 'Technology',
+    priceUsdCents: 9900,
+    instructor: 'Dr. AI',
+  },
+  {
+    id: 'l2',
+    title: 'Leadership Skills',
+    category: 'Business',
+    priceUsdCents: 4900,
+    instructor: 'Prof. Leader',
+  },
+  {
+    id: 'l3',
+    title: 'Data Analytics',
+    category: 'Technology',
+    priceUsdCents: 7900,
+    instructor: 'Dr. Data',
+  },
 ];
 
-async function mockMarketplaceAPIs(page: import('@playwright/test').Page): Promise<void> {
+async function mockMarketplaceAPIs(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await routeGraphQL(page, (op) => {
-    if (op === 'BrowseMarketplace' || op.toLowerCase().includes('marketplace') || op.toLowerCase().includes('browse')) {
+    if (
+      op === 'BrowseMarketplace' ||
+      op.toLowerCase().includes('marketplace') ||
+      op.toLowerCase().includes('browse')
+    ) {
       return JSON.stringify({
         data: { browseMarketplace: { items: MOCK_LISTINGS, totalCount: 3 } },
       });
@@ -38,7 +62,9 @@ async function mockMarketplaceAPIs(page: import('@playwright/test').Page): Promi
     }
     if (op === 'Me' || op.toLowerCase().includes('me')) {
       return JSON.stringify({
-        data: { me: { id: 'user-001', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' } },
+        data: {
+          me: { id: 'user-001', roles: ['ORG_ADMIN'], tenantId: 'tenant-001' },
+        },
       });
     }
     return null;
@@ -48,12 +74,18 @@ async function mockMarketplaceAPIs(page: import('@playwright/test').Page): Promi
 test.describe('Marketplace Browse — Catalog', () => {
   test.beforeEach(async ({ page }) => {
     await mockMarketplaceAPIs(page);
-    await page.goto(`${BASE_URL}${MARKETPLACE_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="marketplace-page"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${MARKETPLACE_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="marketplace-page"]')
+      .waitFor({ timeout: 15_000 });
   });
 
   test('displays course listings', async ({ page }) => {
-    await expect(page.getByText('Machine Learning 101')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Machine Learning 101')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText('Leadership Skills')).toBeVisible();
     await expect(page.getByText('Data Analytics')).toBeVisible();
   });
@@ -70,7 +102,9 @@ test.describe('Marketplace Browse — Catalog', () => {
   });
 
   test('category filter is available', async ({ page }) => {
-    await expect(page.locator('[data-testid="category-filter"]')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="category-filter"]')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('license button visible on each listing', async ({ page }) => {
@@ -85,19 +119,31 @@ test.describe('Marketplace Browse — License', () => {
   test('clicking license shows confirmation dialog', async ({ page }) => {
     test.skip(!RUN_WRITE_TESTS, 'Write tests disabled');
     await mockMarketplaceAPIs(page);
-    await page.goto(`${BASE_URL}${MARKETPLACE_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="marketplace-page"]').waitFor({ timeout: 15_000 });
+    await page.goto(`${BASE_URL}${MARKETPLACE_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="marketplace-page"]')
+      .waitFor({ timeout: 15_000 });
 
     await page.locator('[data-testid="btn-license"]').first().click();
-    await expect(page.locator('[role="alertdialog"]')).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('[role="alertdialog"]')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 });
 
 test.describe('Marketplace Browse — Visual', () => {
   test('visual regression — catalog page', async ({ page }) => {
     await mockMarketplaceAPIs(page);
-    await page.goto(`${BASE_URL}${MARKETPLACE_ROUTE}`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-testid="marketplace-page"]').waitFor({ timeout: 15_000 });
-    await expect(page).toHaveScreenshot('marketplace-browse.png', { maxDiffPixelRatio: 0.05 });
+    await page.goto(`${BASE_URL}${MARKETPLACE_ROUTE}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page
+      .locator('[data-testid="marketplace-page"]')
+      .waitFor({ timeout: 15_000 });
+    await expect(page).toHaveScreenshot('marketplace-browse.png', {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });

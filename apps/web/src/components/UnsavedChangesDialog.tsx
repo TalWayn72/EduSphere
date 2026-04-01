@@ -34,7 +34,12 @@ export function UnsavedChangesDialog({ open, onLeave, onStay }: Props) {
   const { t } = useTranslation('common');
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onStay(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onStay();
+      }}
+    >
       <DialogContent data-testid="unsaved-changes-dialog" className="max-w-sm">
         <DialogHeader>
           <DialogTitle data-testid="unsaved-changes-title">

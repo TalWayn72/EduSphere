@@ -44,7 +44,10 @@ describe('useExamMutations', () => {
         data: { startExamSession: sessionData },
         error: undefined,
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useStartExamSession());
 
@@ -65,7 +68,10 @@ describe('useExamMutations', () => {
         data: undefined,
         error: { message: 'Server error' },
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useStartExamSession());
 
@@ -79,7 +85,10 @@ describe('useExamMutations', () => {
 
     it('handles thrown errors', async () => {
       const mockExecute = vi.fn().mockRejectedValue(new Error('Network error'));
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useStartExamSession());
 
@@ -98,7 +107,10 @@ describe('useExamMutations', () => {
         data: { submitExamAnswer: true },
         error: undefined,
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useSubmitExamAnswer());
 
@@ -118,7 +130,10 @@ describe('useExamMutations', () => {
         data: undefined,
         error: { message: 'Failed' },
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useSubmitExamAnswer());
 
@@ -137,7 +152,10 @@ describe('useExamMutations', () => {
         data: { flagExamQuestion: true },
         error: undefined,
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useFlagExamQuestion());
 
@@ -156,7 +174,10 @@ describe('useExamMutations', () => {
         data: undefined,
         error: { message: 'Flag failed' },
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useFlagExamQuestion());
 
@@ -175,7 +196,10 @@ describe('useExamMutations', () => {
         data: { submitExam: examResult },
         error: undefined,
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useSubmitExam());
 
@@ -193,7 +217,10 @@ describe('useExamMutations', () => {
         data: undefined,
         error: { message: 'Submit failed' },
       });
-      vi.mocked(urql.useMutation).mockReturnValue([defaultMutationState, mockExecute] as never);
+      vi.mocked(urql.useMutation).mockReturnValue([
+        defaultMutationState,
+        mockExecute,
+      ] as never);
 
       const { result } = renderHook(() => useSubmitExam());
 

@@ -7,10 +7,12 @@
 ## Problem
 
 Current acceptance criteria focus on technical execution:
+
 - "API returns 200 with correct payload" ✅
 - "Database migration applies without error" ✅
 
 But miss user outcomes:
+
 - "Student can find and start the course they need within 30 seconds" ❌
 - "Instructor sees their upload progress and can retry on failure" ❌
 
@@ -20,19 +22,19 @@ But miss user outcomes:
 
 #### User Outcome Criteria (mandatory)
 
-| # | As a... | I can... | So that... | Measured by |
-|---|---------|----------|------------|-------------|
-| UO-1 | [Role] | [Action] | [Benefit] | [Measurable condition] |
-| UO-2 | [Role] | [Action] | [Benefit] | [Measurable condition] |
-| UO-3 | [Role] | [Action] | [Benefit] | [Measurable condition] |
+| #    | As a... | I can... | So that... | Measured by            |
+| ---- | ------- | -------- | ---------- | ---------------------- |
+| UO-1 | [Role]  | [Action] | [Benefit]  | [Measurable condition] |
+| UO-2 | [Role]  | [Action] | [Benefit]  | [Measurable condition] |
+| UO-3 | [Role]  | [Action] | [Benefit]  | [Measurable condition] |
 
 #### Technical Criteria (supporting)
 
-| # | Check | Command/Test | Pass Condition |
-|---|-------|-------------|----------------|
-| TC-1 | API returns data | `curl /api` | 200 + valid JSON |
-| TC-2 | Migration applies | `{PACKAGE_MANAGER} db migrate` | Exit 0 |
-| TC-3 | TypeScript clean | `{PACKAGE_MANAGER} {BUILD_ORCHESTRATOR} typecheck` | 0 errors |
+| #    | Check             | Command/Test                                       | Pass Condition   |
+| ---- | ----------------- | -------------------------------------------------- | ---------------- |
+| TC-1 | API returns data  | `curl /api`                                        | 200 + valid JSON |
+| TC-2 | Migration applies | `{PACKAGE_MANAGER} db migrate`                     | Exit 0           |
+| TC-3 | TypeScript clean  | `{PACKAGE_MANAGER} {BUILD_ORCHESTRATOR} typecheck` | 0 errors         |
 
 #### Quality Criteria (non-negotiable)
 
@@ -44,7 +46,7 @@ But miss user outcomes:
 
 ## Rules
 
-1. **Every feature MUST have at least 2 User Outcome Criteria** (UO-*)
+1. **Every feature MUST have at least 2 User Outcome Criteria** (UO-\*)
 2. UO criteria are tested with E2E specs, not unit tests
 3. Technical criteria support UO criteria but never replace them
 4. "API works" is NOT an acceptance criterion — "User can accomplish [task]" IS
@@ -52,4 +54,4 @@ But miss user outcomes:
 
 ---
 
-*Template version: 1.0*
+_Template version: 1.0_

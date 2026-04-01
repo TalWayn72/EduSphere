@@ -25,7 +25,13 @@ export const Completed: Story = {
 };
 
 export const Enrolled: Story = {
-  args: { item: { ...SAMPLE_ITEM, verb: 'ENROLLED', objectTitle: 'React 19 Patterns' } },
+  args: {
+    item: {
+      ...SAMPLE_ITEM,
+      verb: 'ENROLLED',
+      objectTitle: 'React 19 Patterns',
+    },
+  },
 };
 
 export const AchievedBadge: Story = {

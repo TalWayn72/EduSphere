@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PeerReviewAssignmentService } from './peer-review-assignment.service';
 
 const mockTx = {
@@ -67,15 +64,28 @@ describe('PeerReviewAssignmentService', () => {
       mockTx.select.mockReturnValue({ from: enrollChain.from });
 
       const createdRows = [
-        { id: 'a1', reviewerId: 'r1', contentItemId: 'ci1', submitterId: 'submitter-1' },
-        { id: 'a2', reviewerId: 'r2', contentItemId: 'ci1', submitterId: 'submitter-1' },
+        {
+          id: 'a1',
+          reviewerId: 'r1',
+          contentItemId: 'ci1',
+          submitterId: 'submitter-1',
+        },
+        {
+          id: 'a2',
+          reviewerId: 'r2',
+          contentItemId: 'ci1',
+          submitterId: 'submitter-1',
+        },
       ];
       const returning = vi.fn().mockResolvedValue(createdRows);
       const values = vi.fn().mockReturnValue({ returning });
       mockTx.insert.mockReturnValue({ values });
 
       const result = await service.createAssignment(
-        'ci1', 'submitter-1', 'My submission', CTX,
+        'ci1',
+        'submitter-1',
+        'My submission',
+        CTX
       );
       expect(result).toHaveLength(2);
       expect(mockCore.publishEvent).toHaveBeenCalledTimes(2);
@@ -88,7 +98,10 @@ describe('PeerReviewAssignmentService', () => {
       mockTx.select.mockReturnValue({ from: enrollChain.from });
 
       const result = await service.createAssignment(
-        'ci1', 'submitter-1', 'text', CTX,
+        'ci1',
+        'submitter-1',
+        'text',
+        CTX
       );
       expect(result).toEqual([]);
     });
@@ -96,8 +109,10 @@ describe('PeerReviewAssignmentService', () => {
     it('uses DEFAULT_MIN_REVIEWERS=3 when rubric has no minReviewers', async () => {
       mockCore.getRubric.mockResolvedValue(null);
       const enrollChain = makeSelectChain([
-        { userId: 'r1' }, { userId: 'r2' },
-        { userId: 'r3' }, { userId: 'r4' },
+        { userId: 'r1' },
+        { userId: 'r2' },
+        { userId: 'r3' },
+        { userId: 'r4' },
       ]);
       mockTx.select.mockReturnValue({ from: enrollChain.from });
 
@@ -112,7 +127,10 @@ describe('PeerReviewAssignmentService', () => {
       });
 
       const result = await service.createAssignment(
-        'ci1', 'submitter-1', 'text', CTX,
+        'ci1',
+        'submitter-1',
+        'text',
+        CTX
       );
       expect(result).toHaveLength(3);
     });
@@ -139,11 +157,16 @@ describe('PeerReviewAssignmentService', () => {
 
   describe('submitReview()', () => {
     it('submits review and updates assignment status', async () => {
-      const chain = makeSelectChain([{
-        id: 'a1', reviewerId: 'reviewer-1',
-        submitterId: 'sub-1', contentItemId: 'ci1',
-        tenantId: 'tenant-1', status: 'PENDING',
-      }]);
+      const chain = makeSelectChain([
+        {
+          id: 'a1',
+          reviewerId: 'reviewer-1',
+          submitterId: 'sub-1',
+          contentItemId: 'ci1',
+          tenantId: 'tenant-1',
+          status: 'PENDING',
+        },
+      ]);
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const updateWhere = vi.fn().mockResolvedValue(undefined);
@@ -153,9 +176,11 @@ describe('PeerReviewAssignmentService', () => {
       mockCore.checkAndPublishCompletion.mockResolvedValue(undefined);
 
       const result = await service.submitReview(
-        'a1', 'reviewer-1',
+        'a1',
+        'reviewer-1',
         JSON.stringify({ clarity: 8, depth: 9 }),
-        'Good work!', CTX,
+        'Good work!',
+        CTX
       );
       expect(result).toBe(true);
       expect(mockTx.update).toHaveBeenCalled();
@@ -167,29 +192,39 @@ describe('PeerReviewAssignmentService', () => {
       mockTx.select.mockReturnValue({ from: chain.from });
 
       await expect(
-        service.submitReview('bad-id', 'r1', '{}', 'fb', CTX),
+        service.submitReview('bad-id', 'r1', '{}', 'fb', CTX)
       ).rejects.toThrow(NotFoundException);
     });
 
     it('throws UnauthorizedException on IDOR attempt', async () => {
-      const chain = makeSelectChain([{
-        id: 'a1', reviewerId: 'real-reviewer',
-        submitterId: 'sub-1', contentItemId: 'ci1',
-        tenantId: 'tenant-1', status: 'PENDING',
-      }]);
+      const chain = makeSelectChain([
+        {
+          id: 'a1',
+          reviewerId: 'real-reviewer',
+          submitterId: 'sub-1',
+          contentItemId: 'ci1',
+          tenantId: 'tenant-1',
+          status: 'PENDING',
+        },
+      ]);
       mockTx.select.mockReturnValue({ from: chain.from });
 
       await expect(
-        service.submitReview('a1', 'attacker-id', '{}', 'fb', CTX),
+        service.submitReview('a1', 'attacker-id', '{}', 'fb', CTX)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('calculates average score from criteria scores', async () => {
-      const chain = makeSelectChain([{
-        id: 'a1', reviewerId: 'r1',
-        submitterId: 's1', contentItemId: 'ci1',
-        tenantId: 'tenant-1', status: 'PENDING',
-      }]);
+      const chain = makeSelectChain([
+        {
+          id: 'a1',
+          reviewerId: 'r1',
+          submitterId: 's1',
+          contentItemId: 'ci1',
+          tenantId: 'tenant-1',
+          status: 'PENDING',
+        },
+      ]);
       mockTx.select.mockReturnValue({ from: chain.from });
 
       const updateWhere = vi.fn().mockResolvedValue(undefined);
@@ -198,9 +233,11 @@ describe('PeerReviewAssignmentService', () => {
       mockCore.checkAndPublishCompletion.mockResolvedValue(undefined);
 
       await service.submitReview(
-        'a1', 'r1',
+        'a1',
+        'r1',
         JSON.stringify({ a: 80, b: 90 }),
-        'Nice', CTX,
+        'Nice',
+        CTX
       );
       // Verify the set was called with score = 85
       const setArg = updateSet.mock.calls[0]?.[0];

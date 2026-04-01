@@ -110,7 +110,10 @@ async function mockGraphQL(
     }
 
     // CREATE_LIVE_SESSION_MUTATION
-    if (op === 'CreateLiveSession' || op.toLowerCase().includes('createsession')) {
+    if (
+      op === 'CreateLiveSession' ||
+      op.toLowerCase().includes('createsession')
+    ) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -170,7 +173,7 @@ test.describe('Live Sessions Page — Structure', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const upcomingTab = page.locator('[data-testid="tab-upcoming"]');
-    if (await upcomingTab.count() > 0) {
+    if ((await upcomingTab.count()) > 0) {
       await expect(upcomingTab).toHaveAttribute('role', 'tab');
       await expect(upcomingTab).toHaveAttribute('aria-selected', 'true');
     }
@@ -181,7 +184,7 @@ test.describe('Live Sessions Page — Structure', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const pastTab = page.locator('[data-testid="tab-past"]');
-    if (await pastTab.count() > 0) {
+    if ((await pastTab.count()) > 0) {
       await expect(pastTab).toHaveAttribute('role', 'tab');
       await expect(pastTab).toHaveAttribute('aria-selected', 'false');
     }
@@ -194,7 +197,7 @@ test.describe('Live Sessions Page — Structure', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const pastTab = page.locator('[data-testid="tab-past"]');
-    if (await pastTab.count() > 0) {
+    if ((await pastTab.count()) > 0) {
       await pastTab.click();
       await expect(pastTab).toHaveAttribute('aria-selected', 'true');
 
@@ -208,7 +211,7 @@ test.describe('Live Sessions Page — Structure', () => {
     await page.waitForLoadState('domcontentloaded');
 
     const tablist = page.locator('[role="tablist"]');
-    if (await tablist.count() > 0) {
+    if ((await tablist.count()) > 0) {
       const label = await tablist.first().getAttribute('aria-label');
       expect(label).toBeTruthy();
       expect(label?.length).toBeGreaterThan(0);
@@ -229,7 +232,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
 
     // DEV_MODE user is SUPER_ADMIN which maps to isInstructor=true
     const createBtn = page.locator('[data-testid="create-session-btn"]');
-    if (await createBtn.count() > 0) {
+    if ((await createBtn.count()) > 0) {
       await expect(createBtn).toBeVisible({ timeout: 5_000 });
     } else {
       // Alternate: look for button by accessible name
@@ -250,12 +253,16 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
     await page
       .locator('[data-testid="sessions-grid"], [data-testid="sessions-empty"]')
       .waitFor({ timeout: 8_000 })
-      .catch(() => {/* sessions may be in loading state, proceed gracefully */});
+      .catch(() => {
+        /* sessions may be in loading state, proceed gracefully */
+      });
 
     const startBtn = page.locator('[data-testid="session-action-btn"]', {
       hasText: /Start Session/i,
     });
-    const startVisible = await startBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const startVisible = await startBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     if (startVisible) {
       await expect(startBtn.first()).toBeVisible();
@@ -281,7 +288,9 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
     const manageBtn = page.locator('[data-testid="session-action-btn"]', {
       hasText: /Manage/i,
     });
-    const manageVisible = await manageBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const manageVisible = await manageBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
 
     if (manageVisible) {
       await expect(manageBtn.first()).toBeVisible();
@@ -296,7 +305,7 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
 
     // Switch to Past tab
     const pastTab = page.locator('[data-testid="tab-past"]');
-    if (await pastTab.count() > 0) {
+    if ((await pastTab.count()) > 0) {
       await pastTab.click();
       await page.waitForLoadState('domcontentloaded');
 
@@ -324,9 +333,9 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
 
     if (hasTrigger) {
       await createBtn.click();
-      const modal = page.locator('[data-testid="create-session-modal"]').or(
-        page.locator('[role="dialog"]')
-      );
+      const modal = page
+        .locator('[data-testid="create-session-modal"]')
+        .or(page.locator('[role="dialog"]'));
       await expect(modal.first()).toBeVisible({ timeout: 5_000 });
     }
   });
@@ -345,9 +354,9 @@ test.describe('Live Sessions — INSTRUCTOR View', () => {
 
     if (hasTrigger) {
       await createBtn.click();
-      const modal = page.locator('[data-testid="create-session-modal"]').or(
-        page.locator('[role="dialog"]')
-      );
+      const modal = page
+        .locator('[data-testid="create-session-modal"]')
+        .or(page.locator('[role="dialog"]'));
       await modal.first().waitFor({ timeout: 5_000 });
 
       const cancelBtn = modal.first().getByRole('button', { name: /Cancel/i });
@@ -440,15 +449,15 @@ test.describe('Live Sessions — Mutations (write)', () => {
     test.skip(!hasTrigger, 'Create Session button not available');
 
     await createBtn.click();
-    const modal = page.locator('[data-testid="create-session-modal"]').or(
-      page.locator('[role="dialog"]')
-    );
+    const modal = page
+      .locator('[data-testid="create-session-modal"]')
+      .or(page.locator('[role="dialog"]'));
     await modal.first().waitFor({ timeout: 5_000 });
 
     // Fill form
-    const nameInput = page.locator('[data-testid="session-name-input"]').or(
-      page.locator('#session-name')
-    );
+    const nameInput = page
+      .locator('[data-testid="session-name-input"]')
+      .or(page.locator('#session-name'));
     await nameInput.first().fill('E2E Test Session');
 
     const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -458,15 +467,15 @@ test.describe('Live Sessions — Mutations (write)', () => {
       .toISOString()
       .slice(0, 16);
 
-    const timeInput = page.locator('[data-testid="session-time-input"]').or(
-      page.locator('#session-time')
-    );
+    const timeInput = page
+      .locator('[data-testid="session-time-input"]')
+      .or(page.locator('#session-time'));
     await timeInput.first().fill(localIso);
 
     // Submit
-    const submitBtn = page.locator('[data-testid="create-session-submit"]').or(
-      modal.first().getByRole('button', { name: /Create Session/i })
-    );
+    const submitBtn = page
+      .locator('[data-testid="create-session-submit"]')
+      .or(modal.first().getByRole('button', { name: /Create Session/i }));
     await submitBtn.first().click();
 
     // Modal closes on success
@@ -487,7 +496,10 @@ test.describe('Live Sessions — Error and Empty States', () => {
     // Intercept GraphQL and return an error response
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
-      if (body.toLowerCase().includes('livesession') || body.includes('ListLive')) {
+      if (
+        body.toLowerCase().includes('livesession') ||
+        body.includes('ListLive')
+      ) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -513,7 +525,9 @@ test.describe('Live Sessions — Error and Empty States', () => {
     // "Internal server error" should NOT be exposed verbatim to users
     // (the component shows "Failed to load sessions" instead)
     const errorEl = page.locator('[data-testid="sessions-error"]');
-    const errorVisible = await errorEl.isVisible({ timeout: 3_000 }).catch(() => false);
+    const errorVisible = await errorEl
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
     if (errorVisible) {
       const errorText = (await errorEl.textContent()) ?? '';
       expect(errorText).not.toContain('Internal server error');
@@ -534,8 +548,12 @@ test.describe('Live Sessions — Error and Empty States', () => {
     const emptyEl = page.locator('[data-testid="sessions-empty"]');
     const gridEl = page.locator('[data-testid="sessions-grid"]');
 
-    const emptyVisible = await emptyEl.isVisible({ timeout: 5_000 }).catch(() => false);
-    const gridVisible = await gridEl.isVisible({ timeout: 2_000 }).catch(() => false);
+    const emptyVisible = await emptyEl
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    const gridVisible = await gridEl
+      .isVisible({ timeout: 2_000 })
+      .catch(() => false);
 
     // At least one of these should be present
     expect(emptyVisible || gridVisible).toBe(true);
@@ -559,14 +577,11 @@ test.describe('Live Sessions — Visual Regression', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page).toHaveScreenshot(
-      'live-session-instructor-actions.png',
-      {
-        fullPage: false,
-        maxDiffPixelRatio: 0.05,
-        animations: 'disabled',
-      }
-    );
+    await expect(page).toHaveScreenshot('live-session-instructor-actions.png', {
+      fullPage: false,
+      maxDiffPixelRatio: 0.05,
+      animations: 'disabled',
+    });
   });
 
   test('visual: /sessions page — with mock LIVE session', async ({ page }) => {

@@ -3,11 +3,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import type { KnowledgeSource } from './types';
-import {
-  SOURCE_ICONS,
-  STATUS_COLORS,
-  STATUS_I18N_KEYS,
-} from './types';
+import { SOURCE_ICONS, STATUS_COLORS, STATUS_I18N_KEYS } from './types';
 import { getFriendlySourceErrorKey } from './utils';
 
 interface SourceCardProps {
@@ -24,7 +20,12 @@ export function SourceCard({ source, onSelect, onDelete }: SourceCardProps) {
       role="button"
       tabIndex={0}
       onClick={() => onSelect(source.id)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(source.id); } }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(source.id);
+        }
+      }}
       aria-label={`${source.title} - ${t(STATUS_I18N_KEYS[source.status])}`}
       className="flex items-start gap-3 p-3 rounded-xl bg-white border hover:border-blue-300 cursor-pointer transition-all group focus:outline-2 focus:outline-primary dark:bg-gray-900"
     >
@@ -46,7 +47,9 @@ export function SourceCard({ source, onSelect, onDelete }: SourceCardProps) {
           </p>
         )}
         <div className="flex items-center gap-2 mt-1.5">
-          <span className={`text-xs font-medium ${STATUS_COLORS[source.status]}`}>
+          <span
+            className={`text-xs font-medium ${STATUS_COLORS[source.status]}`}
+          >
             {t(STATUS_I18N_KEYS[source.status])}
           </span>
           {source.status === 'READY' && source.chunkCount > 0 && (
@@ -79,8 +82,7 @@ export function SourceCard({ source, onSelect, onDelete }: SourceCardProps) {
           )}
           {source.status === 'FAILED' && (
             <span className="text-xs text-red-400 truncate dark:text-red-400">
-              &mdash;{' '}
-              {t(getFriendlySourceErrorKey(source.errorMessage))}
+              &mdash; {t(getFriendlySourceErrorKey(source.errorMessage))}
             </span>
           )}
         </div>
@@ -88,7 +90,10 @@ export function SourceCard({ source, onSelect, onDelete }: SourceCardProps) {
       <button
         onClick={(e) => onDelete(e, source.id)}
         className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all text-lg leading-none mt-0.5 shrink-0 dark:text-gray-600"
-        aria-label={t('sources.deleteSourceLabel', { title: source.title, defaultValue: `Delete source: ${source.title}` })}
+        aria-label={t('sources.deleteSourceLabel', {
+          title: source.title,
+          defaultValue: `Delete source: ${source.title}`,
+        })}
         title={t('sources.deleteTitle')}
       >
         <span aria-hidden="true">&#x2715;</span>

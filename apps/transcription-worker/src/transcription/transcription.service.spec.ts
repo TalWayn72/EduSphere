@@ -235,7 +235,9 @@ describe('TranscriptionService', () => {
       // S3 send must have been called at least once (VTT upload)
       expect(s3SendMock).toHaveBeenCalled();
       // The PutObjectCommand arg carries Key and ContentType
-      const callArg = s3SendMock.mock.calls[0][0] as { args: Record<string, unknown> };
+      const callArg = s3SendMock.mock.calls[0][0] as {
+        args: Record<string, unknown>;
+      };
       const putArgs = callArg.args;
       expect(putArgs).toMatchObject({
         Key: expect.stringContaining('captions/'),
@@ -251,7 +253,9 @@ describe('TranscriptionService', () => {
       s3SendMock.mockRejectedValueOnce(new Error('MinIO down'));
 
       // Must still complete successfully (VTT failure is non-fatal)
-      await expect(service.transcribeFile(makeEvent())).resolves.toBeUndefined();
+      await expect(
+        service.transcribeFile(makeEvent())
+      ).resolves.toBeUndefined();
       expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
         expect.objectContaining({ assetId: 'asset-uuid' })

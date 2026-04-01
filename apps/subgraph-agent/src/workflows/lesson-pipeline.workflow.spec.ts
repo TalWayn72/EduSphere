@@ -21,7 +21,9 @@ import type { LanguageModel } from 'ai';
 
 const mockModel = { modelId: 'test-model' } as unknown as LanguageModel;
 
-function makeInput(overrides: Partial<LessonPipelineInput> = {}): LessonPipelineInput {
+function makeInput(
+  overrides: Partial<LessonPipelineInput> = {}
+): LessonPipelineInput {
   return {
     prompt: 'Teach about Talmudic hermeneutics',
     archetype: 'THEMATIC',
@@ -47,11 +49,7 @@ describe('runLessonPipeline', () => {
         .mockResolvedValueOnce({ text: '# Section 1\n## Point A' }) // generateOutline
         .mockResolvedValueOnce({ text: '# Full Lesson Content' }); // exportMarkdown
 
-      const result = await runLessonPipeline(
-        makeInput(),
-        mockModel,
-        'exec-1'
-      );
+      const result = await runLessonPipeline(makeInput(), mockModel, 'exec-1');
 
       expect(result.status).toBe('COMPLETE');
       expect(result.executionId).toBe('exec-1');
@@ -62,7 +60,12 @@ describe('runLessonPipeline', () => {
 
     it('includes citations when searchFn is provided', async () => {
       const searchFn: CitationSearchFn = vi.fn().mockResolvedValue([
-        { id: 'ref-1', text: 'Citation text', similarity: 0.9, source: 'Talmud' },
+        {
+          id: 'ref-1',
+          text: 'Citation text',
+          similarity: 0.9,
+          source: 'Talmud',
+        },
         { id: 'ref-2', text: 'Another citation', similarity: 0.8 },
       ]);
 
@@ -90,11 +93,7 @@ describe('runLessonPipeline', () => {
         .mockResolvedValueOnce({ text: '# Outline' })
         .mockResolvedValueOnce({ text: '# Content' });
 
-      const result = await runLessonPipeline(
-        makeInput(),
-        mockModel,
-        'exec-3'
-      );
+      const result = await runLessonPipeline(makeInput(), mockModel, 'exec-3');
 
       expect(result.citations).toEqual([]);
     });

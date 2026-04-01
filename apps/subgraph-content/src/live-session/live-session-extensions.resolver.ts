@@ -122,7 +122,10 @@ export class LiveSessionExtensionsResolver {
   }
 
   @Mutation('closePoll')
-  async closePoll(@Args('pollId') pollId: string, @Context() ctx: GraphQLContext) {
+  async closePoll(
+    @Args('pollId') pollId: string,
+    @Context() ctx: GraphQLContext
+  ) {
     return this.pollService.closePoll(
       pollId,
       this.tenantId(ctx),

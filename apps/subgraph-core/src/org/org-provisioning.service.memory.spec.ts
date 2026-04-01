@@ -29,7 +29,9 @@ vi.mock('@edusphere/db', () => ({
     transaction: vi.fn(),
   })),
   closeAllPools: mockCloseAllPools,
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) => fn({})),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (arg: unknown) => unknown) => fn({})
+  ),
   schema: {
     tenants: { id: 'id', slug: 'slug' },
     orgOnboardingChecklist: { tenantId: 'tenant_id' },
@@ -100,7 +102,9 @@ describe('OrgProvisioningService — memory safety', () => {
 
   it('provisioning state map does not grow unboundedly', async () => {
     // Access internal state map if exposed
-    const stateMap = (service as unknown as Record<string, unknown>)['provisioningStates'];
+    const stateMap = (service as unknown as Record<string, unknown>)[
+      'provisioningStates'
+    ];
     if (stateMap instanceof Map) {
       // Simulate many entries
       for (let i = 0; i < 1100; i++) {

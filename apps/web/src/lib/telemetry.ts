@@ -44,7 +44,10 @@ function generateSpanId(): string {
 }
 
 /** Report an error to the OTLP collector. */
-export function reportError(error: Error, extra?: Record<string, string>): void {
+export function reportError(
+  error: Error,
+  extra?: Record<string, string>
+): void {
   const span: ErrorSpan = {
     traceId: generateTraceId(),
     spanId: generateSpanId(),
@@ -59,7 +62,8 @@ export function reportError(error: Error, extra?: Record<string, string>): void 
       'error.stack': error.stack?.slice(0, 2000) || '',
       'browser.url': globalThis.location?.href || '',
       'browser.userAgent': globalThis.navigator?.userAgent || '',
-      ...((_context.tenantId && { 'edusphere.tenant_id': _context.tenantId }) || {}),
+      ...((_context.tenantId && { 'edusphere.tenant_id': _context.tenantId }) ||
+        {}),
       ...((_context.userId && { 'edusphere.user_id': _context.userId }) || {}),
       ...extra,
     },
@@ -69,7 +73,11 @@ export function reportError(error: Error, extra?: Record<string, string>): void 
   const payload = JSON.stringify({
     resourceSpans: [
       {
-        resource: { attributes: [{ key: 'service.name', value: { stringValue: SERVICE_NAME } }] },
+        resource: {
+          attributes: [
+            { key: 'service.name', value: { stringValue: SERVICE_NAME } },
+          ],
+        },
         scopeSpans: [
           {
             spans: [
@@ -80,10 +88,12 @@ export function reportError(error: Error, extra?: Record<string, string>): void 
                 startTimeUnixNano: String(span.timestamp),
                 endTimeUnixNano: String(span.timestamp),
                 status: { code: 2, message: span.attributes['error.message'] },
-                attributes: Object.entries(span.attributes).map(([key, value]) => ({
-                  key,
-                  value: { stringValue: value },
-                })),
+                attributes: Object.entries(span.attributes).map(
+                  ([key, value]) => ({
+                    key,
+                    value: { stringValue: value },
+                  })
+                ),
               },
             ],
           },
@@ -93,7 +103,10 @@ export function reportError(error: Error, extra?: Record<string, string>): void 
   });
 
   if (typeof navigator?.sendBeacon === 'function') {
-    navigator.sendBeacon(OTLP_ENDPOINT, new Blob([payload], { type: 'application/json' }));
+    navigator.sendBeacon(
+      OTLP_ENDPOINT,
+      new Blob([payload], { type: 'application/json' })
+    );
   } else {
     fetch(OTLP_ENDPOINT, {
       method: 'POST',

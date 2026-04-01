@@ -22,13 +22,13 @@ export function CatProgressIndicator({
 }: CatProgressIndicatorProps) {
   const range = maxItems - minItems;
   const effectiveMax = range > 0 ? maxItems : minItems;
-  const percent = effectiveMax > 0
-    ? Math.min(100, Math.round((currentItemNumber / effectiveMax) * 100))
-    : 0;
+  const percent =
+    effectiveMax > 0
+      ? Math.min(100, Math.round((currentItemNumber / effectiveMax) * 100))
+      : 0;
 
-  const minPercent = effectiveMax > 0
-    ? Math.round((minItems / effectiveMax) * 100)
-    : 50;
+  const minPercent =
+    effectiveMax > 0 ? Math.round((minItems / effectiveMax) * 100) : 50;
 
   return (
     <div className={cn('space-y-2', className)}>

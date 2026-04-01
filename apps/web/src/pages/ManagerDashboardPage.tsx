@@ -82,7 +82,10 @@ export function ManagerDashboardPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <Users className="h-8 w-8 text-indigo-500 dark:text-indigo-400" aria-hidden />
+        <Users
+          className="h-8 w-8 text-indigo-500 dark:text-indigo-400"
+          aria-hidden
+        />
         <h1 className="text-3xl font-bold">{t('manager.title')}</h1>
       </div>
 
@@ -91,7 +94,9 @@ export function ManagerDashboardPage() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <CardTitle className="text-sm font-medium">{t('manager.teamMembers')}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('manager.teamMembers')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{overview?.memberCount ?? 0}</p>
@@ -101,17 +106,26 @@ export function ManagerDashboardPage() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
             <TrendingUp className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <CardTitle className="text-sm font-medium">{t('manager.avgCompletion')}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('manager.avgCompletion')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{overview?.avgCompletionPct ?? 0}%</p>
+            <p className="text-3xl font-bold">
+              {overview?.avgCompletionPct ?? 0}%
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" aria-hidden />
-            <CardTitle className="text-sm font-medium">{t('manager.atRiskLearners')}</CardTitle>
+            <AlertTriangle
+              className="h-4 w-4 text-amber-500 dark:text-amber-400"
+              aria-hidden
+            />
+            <CardTitle className="text-sm font-medium">
+              {t('manager.atRiskLearners')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p
@@ -124,8 +138,13 @@ export function ManagerDashboardPage() {
 
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center gap-2">
-            <Star className="h-4 w-4 text-yellow-500 dark:text-yellow-400" aria-hidden />
-            <CardTitle className="text-sm font-medium">{t('manager.avgXpThisWeek')}</CardTitle>
+            <Star
+              className="h-4 w-4 text-yellow-500 dark:text-yellow-400"
+              aria-hidden
+            />
+            <CardTitle className="text-sm font-medium">
+              {t('manager.avgXpThisWeek')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{overview?.avgXpThisWeek ?? 0}</p>
@@ -168,7 +187,9 @@ export function ManagerDashboardPage() {
                     <td className="p-4 text-sm">{m.coursesEnrolled}</td>
                     <td className="p-4 text-sm">{m.avgCompletionPct}%</td>
                     <td className="p-4">
-                      <Badge variant="outline">{tGamification('level')} {m.level}</Badge>
+                      <Badge variant="outline">
+                        {tGamification('level')} {m.level}
+                      </Badge>
                     </td>
                     <td className="p-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                       {m.totalXp.toLocaleString()}

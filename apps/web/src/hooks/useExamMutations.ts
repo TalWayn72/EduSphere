@@ -48,7 +48,10 @@ export function useStartExamSession() {
       try {
         const res = await executeMutation({ blueprintId });
         if (res.error) {
-          console.error('[useStartExamSession] Start failed:', res.error.message);
+          console.error(
+            '[useStartExamSession] Start failed:',
+            res.error.message
+          );
           setError('Failed to start exam session.');
           return null;
         }
@@ -61,7 +64,7 @@ export function useStartExamSession() {
         setLoading(false);
       }
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   return { startSession, loading, error };
@@ -79,7 +82,10 @@ export function useSubmitExamAnswer() {
       try {
         const res = await executeMutation({ sessionId, itemId, answer });
         if (res.error) {
-          console.error('[useSubmitExamAnswer] Submit failed:', res.error.message);
+          console.error(
+            '[useSubmitExamAnswer] Submit failed:',
+            res.error.message
+          );
           setError('Failed to submit answer.');
           return null;
         }
@@ -92,7 +98,7 @@ export function useSubmitExamAnswer() {
         setLoading(false);
       }
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   return { submitAnswer, loading, error };
@@ -110,7 +116,10 @@ export function useFlagExamQuestion() {
       try {
         const res = await executeMutation({ sessionId, itemId });
         if (res.error) {
-          console.error('[useFlagExamQuestion] Flag failed:', res.error.message);
+          console.error(
+            '[useFlagExamQuestion] Flag failed:',
+            res.error.message
+          );
           setError('Failed to flag question.');
           return null;
         }
@@ -123,7 +132,7 @@ export function useFlagExamQuestion() {
         setLoading(false);
       }
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   return { flagQuestion, loading, error };
@@ -154,7 +163,7 @@ export function useSubmitExam() {
         setLoading(false);
       }
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   return { submitExam, loading, error };

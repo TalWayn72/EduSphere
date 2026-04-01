@@ -63,16 +63,18 @@ import { closeAllPools } from '@edusphere/db';
 
 // ── Helper builders ───────────────────────────────────────────────────────────
 
-function makeRow(overrides: Partial<{
-  id: string;
-  assessment_id: string;
-  user_id: string;
-  tenant_id: string;
-  status: string;
-  started_at: Date | null;
-  ended_at: Date | null;
-  flags: unknown;
-}> = {}) {
+function makeRow(
+  overrides: Partial<{
+    id: string;
+    assessment_id: string;
+    user_id: string;
+    tenant_id: string;
+    status: string;
+    started_at: Date | null;
+    ended_at: Date | null;
+    flags: unknown;
+  }> = {}
+) {
   return {
     id: 'sess-1',
     assessment_id: 'assess-1',
@@ -136,21 +138,35 @@ describe('ProctoringService', () => {
   it('startSession throws if insert returns empty array', async () => {
     mockInsertReturning.mockResolvedValueOnce([]);
 
-    await expect(service.startSession('assess-1', 'tenant-1', 'user-1')).rejects.toThrow(
-      'Failed to create proctoring session'
-    );
+    await expect(
+      service.startSession('assess-1', 'tenant-1', 'user-1')
+    ).rejects.toThrow('Failed to create proctoring session');
   });
 
   // ── flagEvent ──────────────────────────────────────────────────────────────
 
   it('flagEvent appends flag to flags array', async () => {
     const existing = makeRow({ flags: [] });
-    const updated = makeRow({ flags: [{ type: 'TAB_SWITCH', timestamp: '2026-01-01T00:00:00.000Z', detail: null }], status: 'FLAGGED' });
+    const updated = makeRow({
+      flags: [
+        {
+          type: 'TAB_SWITCH',
+          timestamp: '2026-01-01T00:00:00.000Z',
+          detail: null,
+        },
+      ],
+      status: 'FLAGGED',
+    });
 
     mockSelectLimit.mockResolvedValueOnce([existing]);
     mockReturning.mockResolvedValueOnce([updated]);
 
-    const result = await service.flagEvent('sess-1', 'TAB_SWITCH', null, 'tenant-1');
+    const result = await service.flagEvent(
+      'sess-1',
+      'TAB_SWITCH',
+      null,
+      'tenant-1'
+    );
 
     expect(result.flags).toHaveLength(1);
     expect(result.flags[0]?.type).toBe('TAB_SWITCH');
@@ -158,26 +174,58 @@ describe('ProctoringService', () => {
 
   it('flagEvent sets status=FLAGGED', async () => {
     const existing = makeRow({ flags: [] });
-    const updated = makeRow({ flags: [{ type: 'GAZE_AWAY', timestamp: '2026-01-01T00:00:00.000Z', detail: null }], status: 'FLAGGED' });
+    const updated = makeRow({
+      flags: [
+        {
+          type: 'GAZE_AWAY',
+          timestamp: '2026-01-01T00:00:00.000Z',
+          detail: null,
+        },
+      ],
+      status: 'FLAGGED',
+    });
 
     mockSelectLimit.mockResolvedValueOnce([existing]);
     mockReturning.mockResolvedValueOnce([updated]);
 
-    const result = await service.flagEvent('sess-1', 'GAZE_AWAY', null, 'tenant-1');
+    const result = await service.flagEvent(
+      'sess-1',
+      'GAZE_AWAY',
+      null,
+      'tenant-1'
+    );
 
     expect(result.status).toBe('FLAGGED');
   });
 
   it('flagEvent returns updated session with flagCount incremented', async () => {
-    const existingFlags = [{ type: 'TAB_SWITCH', timestamp: '2026-01-01T00:00:00.000Z', detail: null }];
+    const existingFlags = [
+      {
+        type: 'TAB_SWITCH',
+        timestamp: '2026-01-01T00:00:00.000Z',
+        detail: null,
+      },
+    ];
     const existing = makeRow({ flags: existingFlags });
-    const newFlags = [...existingFlags, { type: 'COPY_PASTE', timestamp: '2026-01-01T00:01:00.000Z', detail: 'ctrl+c' }];
+    const newFlags = [
+      ...existingFlags,
+      {
+        type: 'COPY_PASTE',
+        timestamp: '2026-01-01T00:01:00.000Z',
+        detail: 'ctrl+c',
+      },
+    ];
     const updated = makeRow({ flags: newFlags, status: 'FLAGGED' });
 
     mockSelectLimit.mockResolvedValueOnce([existing]);
     mockReturning.mockResolvedValueOnce([updated]);
 
-    const result = await service.flagEvent('sess-1', 'COPY_PASTE', 'ctrl+c', 'tenant-1');
+    const result = await service.flagEvent(
+      'sess-1',
+      'COPY_PASTE',
+      'ctrl+c',
+      'tenant-1'
+    );
 
     expect(result.flagCount).toBe(2);
   });
@@ -185,7 +233,9 @@ describe('ProctoringService', () => {
   it('flagEvent throws NotFoundException for missing session', async () => {
     mockSelectLimit.mockResolvedValueOnce([]);
 
-    await expect(service.flagEvent('nonexistent', 'TAB_SWITCH', null, 'tenant-1')).rejects.toThrow(NotFoundException);
+    await expect(
+      service.flagEvent('nonexistent', 'TAB_SWITCH', null, 'tenant-1')
+    ).rejects.toThrow(NotFoundException);
   });
 
   // ── endSession ─────────────────────────────────────────────────────────────
@@ -218,7 +268,9 @@ describe('ProctoringService', () => {
   it('endSession throws NotFoundException for missing session (tenantId mismatch)', async () => {
     mockSelectLimit.mockResolvedValueOnce([]);
 
-    await expect(service.endSession('nonexistent', 'wrong-tenant')).rejects.toThrow(NotFoundException);
+    await expect(
+      service.endSession('nonexistent', 'wrong-tenant')
+    ).rejects.toThrow(NotFoundException);
   });
 
   // ── getSession ─────────────────────────────────────────────────────────────
@@ -244,7 +296,10 @@ describe('ProctoringService', () => {
   // ── getReport ──────────────────────────────────────────────────────────────
 
   it('getReport returns all sessions for assessment', async () => {
-    const rows = [makeRow({ id: 'sess-1' }), makeRow({ id: 'sess-2', user_id: 'user-2' })];
+    const rows = [
+      makeRow({ id: 'sess-1' }),
+      makeRow({ id: 'sess-2', user_id: 'user-2' }),
+    ];
     // getReport uses select().from().where() without .limit()
     mockSelectWhere.mockResolvedValueOnce(rows);
     mockSelectFrom.mockReturnValueOnce({ where: mockSelectWhere });
@@ -259,7 +314,13 @@ describe('ProctoringService', () => {
   // ── mapSession (via public methods) ───────────────────────────────────────
 
   it('mapSession parses JSONB flags array correctly', async () => {
-    const flags = [{ type: 'FACE_NOT_DETECTED', timestamp: '2026-01-01T00:00:00.000Z', detail: 'no face visible' }];
+    const flags = [
+      {
+        type: 'FACE_NOT_DETECTED',
+        timestamp: '2026-01-01T00:00:00.000Z',
+        detail: 'no face visible',
+      },
+    ];
     const row = makeRow({ flags });
     mockSelectLimit.mockResolvedValueOnce([row]);
 
@@ -271,9 +332,21 @@ describe('ProctoringService', () => {
 
   it('mapSession computes flagCount correctly', async () => {
     const flags = [
-      { type: 'TAB_SWITCH', timestamp: '2026-01-01T00:00:00.000Z', detail: null },
-      { type: 'GAZE_AWAY', timestamp: '2026-01-01T00:01:00.000Z', detail: null },
-      { type: 'MULTIPLE_FACES', timestamp: '2026-01-01T00:02:00.000Z', detail: null },
+      {
+        type: 'TAB_SWITCH',
+        timestamp: '2026-01-01T00:00:00.000Z',
+        detail: null,
+      },
+      {
+        type: 'GAZE_AWAY',
+        timestamp: '2026-01-01T00:01:00.000Z',
+        detail: null,
+      },
+      {
+        type: 'MULTIPLE_FACES',
+        timestamp: '2026-01-01T00:02:00.000Z',
+        detail: null,
+      },
     ];
     const row = makeRow({ flags });
     mockSelectLimit.mockResolvedValueOnce([row]);

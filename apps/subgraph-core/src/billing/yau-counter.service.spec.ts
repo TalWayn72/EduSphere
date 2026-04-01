@@ -17,7 +17,8 @@ const _mockFrom = vi.fn();
 const _mockOrderBy = vi.fn();
 
 function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, unknown>;
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, unknown>;
   const self = () => p;
   p.from = self;
   p.where = self;
@@ -35,7 +36,9 @@ vi.mock('@edusphere/db', () => ({
     transaction: vi.fn(),
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn(async (_db, _ctx, fn) => fn({ insert: mockInsert, select: mockSelect })),
+  withTenantContext: vi.fn(async (_db, _ctx, fn) =>
+    fn({ insert: mockInsert, select: mockSelect })
+  ),
   schema: {
     yauEvents: {
       tenantId: 'tenantId',

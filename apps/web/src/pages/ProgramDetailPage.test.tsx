@@ -39,7 +39,9 @@ vi.mock('@/components/AppSidebar', () => ({
 
 vi.mock('@/components/PageShell', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PageShell: ({ children }: any) => <div data-testid="page-shell">{children}</div>,
+  PageShell: ({ children }: any) => (
+    <div data-testid="page-shell">{children}</div>
+  ),
 }));
 
 vi.mock('@/components/PageHeader', () => ({
@@ -206,7 +208,9 @@ describe('ProgramDetailPage', () => {
 
   it('renders program title via PageHeader', () => {
     renderPage();
-    const headings = screen.getAllByRole('heading', { name: 'Data Science Nanodegree' });
+    const headings = screen.getAllByRole('heading', {
+      name: 'Data Science Nanodegree',
+    });
     expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 

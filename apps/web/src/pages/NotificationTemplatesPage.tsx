@@ -37,14 +37,19 @@ export function NotificationTemplatesPage() {
   const [mounted, setMounted] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
-  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     setMounted(true);
     return () => {
       clearTimeout(savedTimerRef.current);
       // eslint-disable-next-line no-console -- DEV-only cleanup trace
-      if (import.meta.env.DEV) console.debug('[NotificationTemplatesPage] cleanup: saved timer cleared on unmount');
+      if (import.meta.env.DEV)
+        console.debug(
+          '[NotificationTemplatesPage] cleanup: saved timer cleared on unmount'
+        );
     };
   }, []);
 
@@ -54,10 +59,11 @@ export function NotificationTemplatesPage() {
     }
   }, [role, navigate]);
 
-  const [{ data, fetching, error }] = useQuery<AdminNotificationTemplatesResult>({
-    query: ADMIN_NOTIFICATION_TEMPLATES_QUERY,
-    pause: !mounted,
-  });
+  const [{ data, fetching, error }] =
+    useQuery<AdminNotificationTemplatesResult>({
+      query: ADMIN_NOTIFICATION_TEMPLATES_QUERY,
+      pause: !mounted,
+    });
 
   const [, execUpdate] = useMutation(UPDATE_NOTIFICATION_TEMPLATE_MUTATION);
   const [, execReset] = useMutation(RESET_NOTIFICATION_TEMPLATE_MUTATION);
@@ -73,7 +79,10 @@ export function NotificationTemplatesPage() {
     await execUpdate({ id, input: { subject, bodyHtml } });
     setSavedId(id);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = setTimeout(() => setSavedId(null), TOAST_AUTO_DISMISS_MS);
+    savedTimerRef.current = setTimeout(
+      () => setSavedId(null),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
   const handleReset = async (id: string) => {
@@ -91,89 +100,96 @@ export function NotificationTemplatesPage() {
         <PageHeader
           title="Notification Templates"
           description="Customize email and push notification templates"
-          breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Notification Templates' }]}
+          breadcrumbs={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Notification Templates' },
+          ]}
         />
-      {fetching ? (
-        <p className="text-sm text-muted-foreground">Loading templates...</p>
-      ) : error ? (
-        <p className="text-sm text-destructive">
-          Error loading templates. Please try again.
-        </p>
-      ) : (
-        <div className="flex gap-4 items-start">
-          <Card className="w-72 shrink-0">
-            <CardContent className="p-2 space-y-0.5">
-              {templates.map((t) => (
-                <div
-                  key={t.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedId(t.id)}
-                  onKeyDown={(e) => e.key === 'Enter' && setSelectedId(t.id)}
-                  className={`w-full text-left rounded-md px-3 py-2.5 flex items-center gap-2 transition-colors ${
-                    t.id === (selectedId ?? templates[0]?.id)
-                      ? 'bg-primary/10 text-primary'
-                      : 'hover:bg-muted'
-                  }`}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="text-sm font-medium truncate">
-                        {t.name}
-                      </span>
-                      {!t.isActive && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] px-1 py-0"
-                        >
-                          Off
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-muted-foreground font-mono truncate">
-                      {t.key}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      Modified {formatDate(t.updatedAt)}
-                    </p>
-                  </div>
+        {fetching ? (
+          <p className="text-sm text-muted-foreground">Loading templates...</p>
+        ) : error ? (
+          <p className="text-sm text-destructive">
+            Error loading templates. Please try again.
+          </p>
+        ) : (
+          <div className="flex gap-4 items-start">
+            <Card className="w-72 shrink-0">
+              <CardContent className="p-2 space-y-0.5">
+                {templates.map((t) => (
                   <div
-                    className="flex items-center gap-1.5 shrink-0"
-                    onClick={(e) => e.stopPropagation()}
+                    key={t.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedId(t.id)}
+                    onKeyDown={(e) => e.key === 'Enter' && setSelectedId(t.id)}
+                    className={`w-full text-left rounded-md px-3 py-2.5 flex items-center gap-2 transition-colors ${
+                      t.id === (selectedId ?? templates[0]?.id)
+                        ? 'bg-primary/10 text-primary'
+                        : 'hover:bg-muted'
+                    }`}
                   >
-                    <Switch
-                      checked={t.isActive}
-                      onCheckedChange={() => void handleToggleActive(t.id, t.isActive)}
-                      className="scale-75"
-                    />
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 ${
-                        t.id === (selectedId ?? templates[0]?.id)
-                          ? 'text-primary'
-                          : 'text-muted-foreground'
-                      }`}
-                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-sm font-medium truncate">
+                          {t.name}
+                        </span>
+                        {!t.isActive && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] px-1 py-0"
+                          >
+                            Off
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground font-mono truncate">
+                        {t.key}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        Modified {formatDate(t.updatedAt)}
+                      </p>
+                    </div>
+                    <div
+                      className="flex items-center gap-1.5 shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Switch
+                        checked={t.isActive}
+                        onCheckedChange={() =>
+                          void handleToggleActive(t.id, t.isActive)
+                        }
+                        className="scale-75"
+                      />
+                      <ChevronRight
+                        className={`w-3.5 h-3.5 ${
+                          t.id === (selectedId ?? templates[0]?.id)
+                            ? 'text-primary'
+                            : 'text-muted-foreground'
+                        }`}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-              {templates.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No templates found.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-          {selected && (
-            <NotificationTemplateEditor
-              key={selected.id}
-              template={selected}
-              onSave={(id, subject, bodyHtml) => void handleSave(id, subject, bodyHtml)}
-              onReset={(id) => void handleReset(id)}
-              saved={savedId === selected.id}
-            />
-          )}
-        </div>
-      )}
+                ))}
+                {templates.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No templates found.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+            {selected && (
+              <NotificationTemplateEditor
+                key={selected.id}
+                template={selected}
+                onSave={(id, subject, bodyHtml) =>
+                  void handleSave(id, subject, bodyHtml)
+                }
+                onReset={(id) => void handleReset(id)}
+                saved={savedId === selected.id}
+              />
+            )}
+          </div>
+        )}
       </PageShell>
     </AdminLayout>
   );

@@ -112,7 +112,11 @@ export class OrgLicensingService implements OnModuleDestroy {
 
       const row = result.rows[0]!;
       this.logger.log(
-        { tenantId: ctx.tenantId, courseId: input.courseId, type: input.licenseType },
+        {
+          tenantId: ctx.tenantId,
+          courseId: input.courseId,
+          type: input.licenseType,
+        },
         '[OrgLicensingService] Course licensed'
       );
 
@@ -129,10 +133,7 @@ export class OrgLicensingService implements OnModuleDestroy {
     });
   }
 
-  async revokeLicense(
-    id: string,
-    ctx: TenantContext
-  ): Promise<boolean> {
+  async revokeLicense(id: string, ctx: TenantContext): Promise<boolean> {
     await withTenantContext(this.db, ctx, async (tx) => {
       await tx.execute(sql`
         UPDATE course_licenses

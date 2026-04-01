@@ -19,7 +19,9 @@ export function useSearchQuery() {
 
   // Mounted guard for urql
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // GraphQL semantic search (real mode)
   const [searchResult] = useQuery({
@@ -56,7 +58,10 @@ export function useSearchQuery() {
   // Log course search errors
   useEffect(() => {
     if (courseSearchResult.error) {
-      console.error('[Search] Course search failed:', courseSearchResult.error.message);
+      console.error(
+        '[Search] Course search failed:',
+        courseSearchResult.error.message
+      );
     }
   }, [courseSearchResult.error]);
 
@@ -74,7 +79,9 @@ export function useSearchQuery() {
     const isConceptType = r.entityType === 'concept';
     const type: ResultType = isConceptType ? 'concept' : 'transcript';
     const timestampParam =
-      !isConceptType && r.startTime != null ? `?t=${Math.floor(r.startTime)}` : '';
+      !isConceptType && r.startTime != null
+        ? `?t=${Math.floor(r.startTime)}`
+        : '';
     return {
       id: r.id,
       type,
@@ -82,9 +89,10 @@ export function useSearchQuery() {
         ? (r.text.split('\n')[0]?.slice(0, 80) ?? r.entityType)
         : query,
       snippet: r.text,
-      meta: !isConceptType && r.startTime != null
-        ? formatTime(r.startTime)
-        : `${Math.round(r.similarity * 100)}% match`,
+      meta:
+        !isConceptType && r.startTime != null
+          ? formatTime(r.startTime)
+          : `${Math.round(r.similarity * 100)}% match`,
       timestamp: r.startTime ?? undefined,
       href: isConceptType ? '/graph' : `/learn/${r.entityId}${timestampParam}`,
     };
@@ -123,7 +131,10 @@ export function useSearchQuery() {
 
   const results: SearchResult[] = [...courseResults, ...nonCourseResults];
 
-  const loading = (!DEV_MODE && searchResult.fetching) || courseSearchResult.fetching || isSearching;
+  const loading =
+    (!DEV_MODE && searchResult.fetching) ||
+    courseSearchResult.fetching ||
+    isSearching;
 
   return {
     inputValue,

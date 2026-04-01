@@ -39,7 +39,10 @@ vi.mock('@edusphere/db', () => ({
     })),
     { placeholder: vi.fn() }
   ),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) => cb(mockTx)),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: typeof mockTx) => unknown) =>
+      cb(mockTx)
+  ),
   closeAllPools: vi.fn(),
 }));
 
@@ -85,24 +88,44 @@ const _orgAdminAuth: AuthContext = {
 
 // ─── Annotation fixtures ──────────────────────────────────────────────
 const personalAnnotation = {
-  id: 'p-1', layer: 'PERSONAL', user_id: 'student-1',
-  asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
+  id: 'p-1',
+  layer: 'PERSONAL',
+  user_id: 'student-1',
+  asset_id: 'asset-1',
+  tenant_id: 'tenant-1',
+  deleted_at: null,
 };
 const sharedAnnotation = {
-  id: 's-1', layer: 'SHARED', user_id: 'student-1',
-  asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
+  id: 's-1',
+  layer: 'SHARED',
+  user_id: 'student-1',
+  asset_id: 'asset-1',
+  tenant_id: 'tenant-1',
+  deleted_at: null,
 };
 const instructorAnnotation = {
-  id: 'i-1', layer: 'INSTRUCTOR', user_id: 'instr-1',
-  asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
+  id: 'i-1',
+  layer: 'INSTRUCTOR',
+  user_id: 'instr-1',
+  asset_id: 'asset-1',
+  tenant_id: 'tenant-1',
+  deleted_at: null,
 };
 const aiAnnotation = {
-  id: 'ai-1', layer: 'AI_GENERATED', user_id: 'system',
-  asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
+  id: 'ai-1',
+  layer: 'AI_GENERATED',
+  user_id: 'system',
+  asset_id: 'asset-1',
+  tenant_id: 'tenant-1',
+  deleted_at: null,
 };
 const _otherPersonal = {
-  id: 'p-2', layer: 'PERSONAL', user_id: 'student-2',
-  asset_id: 'asset-1', tenant_id: 'tenant-1', deleted_at: null,
+  id: 'p-2',
+  layer: 'PERSONAL',
+  user_id: 'student-2',
+  asset_id: 'asset-1',
+  tenant_id: 'tenant-1',
+  deleted_at: null,
 };
 
 describe('Layer Filtering — annotation visibility rules', () => {

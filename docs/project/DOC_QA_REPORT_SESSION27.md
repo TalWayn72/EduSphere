@@ -21,18 +21,18 @@ The documentation set has a significant freshness problem. Several core document
 
 ## Quality Scorecard
 
-| Doc | Accuracy | Completeness | Clarity | Freshness | Overall | Priority |
-|-----|----------|--------------|---------|-----------|---------|----------|
-| A. README.md | 3 | 3 | 5 | 2 | **3.25** | HIGH |
-| B. OPEN_ISSUES.md | 5 | 5 | 4 | 5 | **4.75** | LOW |
-| C. docs/project/PROJECT_STATUS.md | 1 | 1 | 4 | 1 | **1.75** | CRITICAL |
-| D. docs/testing/TESTING_CONVENTIONS.md | 4 | 3 | 5 | 2 | **3.50** | HIGH |
-| E. docs/security/SESSION_26_SECURITY_AUDIT.md | 5 | 5 | 5 | 5 | **5.00** | LOW |
-| F. CHANGELOG.md | 1 | 1 | 3 | 1 | **1.50** | CRITICAL |
-| G. docs/architecture/ARCHITECTURE.md | 4 | 3 | 5 | 3 | **3.75** | MEDIUM |
-| H. API_CONTRACTS_GRAPHQL_FEDERATION.md | 4 | 2 | 5 | 2 | **3.25** | HIGH |
-| I. docs/testing/TEST_REGISTRY.md | 1 | 1 | 4 | 1 | **1.75** | CRITICAL |
-| J. docs/plans/phase-27-security-audit.md | N/A | N/A | N/A | N/A | **N/A** | NOTE |
+| Doc                                           | Accuracy | Completeness | Clarity | Freshness | Overall  | Priority |
+| --------------------------------------------- | -------- | ------------ | ------- | --------- | -------- | -------- |
+| A. README.md                                  | 3        | 3            | 5       | 2         | **3.25** | HIGH     |
+| B. OPEN_ISSUES.md                             | 5        | 5            | 4       | 5         | **4.75** | LOW      |
+| C. docs/project/PROJECT_STATUS.md             | 1        | 1            | 4       | 1         | **1.75** | CRITICAL |
+| D. docs/testing/TESTING_CONVENTIONS.md        | 4        | 3            | 5       | 2         | **3.50** | HIGH     |
+| E. docs/security/SESSION_26_SECURITY_AUDIT.md | 5        | 5            | 5       | 5         | **5.00** | LOW      |
+| F. CHANGELOG.md                               | 1        | 1            | 3       | 1         | **1.50** | CRITICAL |
+| G. docs/architecture/ARCHITECTURE.md          | 4        | 3            | 5       | 3         | **3.75** | MEDIUM   |
+| H. API_CONTRACTS_GRAPHQL_FEDERATION.md        | 4        | 2            | 5       | 2         | **3.25** | HIGH     |
+| I. docs/testing/TEST_REGISTRY.md              | 1        | 1            | 4       | 1         | **1.75** | CRITICAL |
+| J. docs/plans/phase-27-security-audit.md      | N/A      | N/A          | N/A     | N/A       | **N/A**  | NOTE     |
 
 **Score legend:** 5 = excellent, 4 = good, 3 = acceptable, 2 = poor, 1 = severely wrong/missing
 
@@ -41,6 +41,7 @@ The documentation set has a significant freshness problem. Several core document
 ## Doc J — Plans Directory Note
 
 `docs/plans/phase-27-security-audit.md` does **not** exist in `docs/plans/`. The file lives at:
+
 - `docs/security/PHASE_27_SECURITY_AUDIT.md` (correct permanent location — security audit archived in security folder)
 
 The `OPEN_ISSUES.md` (Phase 27 deliverables section) references the path as `docs/plans/phase-27-security-audit.md` which is a broken cross-link. The file has been correctly placed in `docs/security/` but the cross-reference in OPEN_ISSUES.md points to a path that does not exist.
@@ -57,6 +58,7 @@ The `OPEN_ISSUES.md` (Phase 27 deliverables section) references the path as `doc
 The Phase Breakdown section (line 48 onward) describes phases labeled "Phase 0: Foundation Setup", "Phase 1: Core Authentication", "Phase 2: Academic Structure", "Phase 3: Teaching & Learning Tools" — all marked **"Not Started / 0% completion"**. These are NOT the EduSphere phases (Phase 0-17 of the GraphQL Federation platform). This document appears to be a stale template from a different project or an early draft that was never updated.
 
 Specific contradictions:
+
 - Line 53: "Status: Not Started" — Reality: Phases 0-17 are all complete since February 2026
 - Line 59: "Initialize Next.js 14+ project" — Reality: EduSphere uses Vite + React 19, NOT Next.js
 - Line 94: "Phase 1: Core Authentication — Multi-role (Admin, Teacher, Student, Parent)" — Reality: roles are SUPER_ADMIN/ORG_ADMIN/INSTRUCTOR/STUDENT/RESEARCHER
@@ -73,6 +75,7 @@ Specific contradictions:
 **File:** `CHANGELOG.md`
 
 The file contains only 6 lines:
+
 ```
 # Changelog
 All notable changes to EduSphere will be documented in this file.
@@ -91,6 +94,7 @@ No entries exist for any session (1-27). There is no Session 27 entry, no Sessio
 **Status line (line 7):** "Status: Core test suites planned; i18n tests fully implemented (February 2026)."
 
 Every single table entry shows "Status: Planned" with aspirational test counts (e.g., "150+ (Planned)" for Knowledge Subgraph). The actual test counts from OPEN_ISSUES.md as of Session 27:
+
 - Web: 3,315 tests (251 files)
 - Backend subgraphs: 2,296 tests (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 509)
 - Security: 816 tests (32 spec files)
@@ -99,6 +103,7 @@ Every single table entry shows "Status: Planned" with aspirational test counts (
 - Total: >5,762 tests
 
 None of the Session 25-27 test files are listed:
+
 - `AITutorScreen.test.ts` — NOT listed
 - `skill-tree.resolver.spec.ts` — NOT listed
 - `skill-tree.service.spec.ts` — NOT listed
@@ -131,11 +136,13 @@ The plans directory does not contain `phase-27-security-audit.md`. The correct f
 **File:** `README.md`, Testing section (lines 419-476)
 
 The README states:
+
 - "Frontend Unit Tests: 146 tests / 12 suites passing"
 - "Backend Unit Tests: 37 tests / 3 suites passing (subgraph-core)"
 - Frontend E2E: "Specs ready — needs dev server" (marked as pending)
 
 Reality (from OPEN_ISSUES.md, verified Session 27):
+
 - Web: 3,315 tests (251 files) — not 146
 - Backend: 2,296 tests across all 6 subgraphs — not 37 from core only
 - E2E Playwright: tests are written and passing, not "needs dev server"
@@ -153,9 +160,11 @@ The listed test suites (Layout.test.tsx with 11 tests, ActivityFeed with 12 test
 **File:** `README.md`, lines 305-323
 
 The Development Phases table ends at Phase 17 and the status line reads:
+
 > "Current Status: ALL 17 phases complete — Backend + Frontend fully built. Next: Phase 7 Production Hardening (K8s) + Phase 8 Mobile (Expo)."
 
 This is contradictory (says "all 17 complete" but then says "Next: Phase 7 + Phase 8"). More critically, it makes no mention of:
+
 - Phase 27 (Live Sessions, Offline Web, Course Discovery, KG Context) — completed Session 26
 - Session 25 (UI/UX Revolution — Design System, AppSidebar, VideoPlayer, SkillTree, WCAG 2.2 AA)
 - Phases 18-27 do not appear in the table at all
@@ -168,6 +177,7 @@ This is contradictory (says "all 17 complete" but then says "Next: Phase 7 + Pha
 
 **File:** `README.md`, lines 60-70
 **Problem:** The README lists demo accounts with password `Demo123!` and emails like `admin@edusphere.dev`, `orgadmin@edusphere.dev`. The real credentials (from CLAUDE.md and OPEN_ISSUES.md) are:
+
 - `super.admin@edusphere.dev` / (password managed by `scripts/reset-keycloak-passwords.cjs`)
 - `org.admin@example.com` (dot, not underscore — note different domain too)
 - `instructor@example.com`
@@ -181,6 +191,7 @@ The README's email formats (`admin@edusphere.dev`, `orgadmin@edusphere.dev`) do 
 ### HP-2 — README.md pnpm version mismatch
 
 **File:** `README.md`, line 16 and line 179
+
 - Prerequisites line: "pnpm 9+"
 - Tech Stack table: "pnpm 9.x + Turbo latest"
 - CLAUDE.md states: pnpm >=10.0.0
@@ -192,6 +203,7 @@ The project requires pnpm 10+, not pnpm 9+. This will cause failed installs for 
 ### HP-3 — README.md KEYCLOAK_CLIENT_ID is wrong
 
 **File:** `README.md`, line 531
+
 ```env
 KEYCLOAK_CLIENT_ID=edusphere-app
 ```
@@ -212,6 +224,7 @@ Phases 18-27 are entirely absent. At minimum, Phase 27 (Live Sessions, Offline W
 **File:** `API_CONTRACTS_GRAPHQL_FEDERATION.md`
 
 A full search for `LiveSession`, `SkillTree`, and `createLiveSession` in the API contracts file returns zero matches. Phase 27 introduced:
+
 - `LiveSession` type (owned by Collaboration subgraph)
 - `createLiveSession`, `updateLiveSession`, `endLiveSession` mutations
 - `liveSessions` query
@@ -225,6 +238,7 @@ None of these are documented in the API contracts. The contracts are the "single
 ### HP-6 — docs/architecture/ARCHITECTURE.md status says "Phase 0"
 
 **File:** `docs/architecture/ARCHITECTURE.md`, line 6
+
 ```
 Status: Phase 0 (Foundation) — Implementation in progress
 ```
@@ -238,6 +252,7 @@ The project is at Phase 27. This header is severely stale. The body content of t
 **File:** `docs/architecture/ARCHITECTURE.md`
 
 Phase 27 introduced a full offline architecture for the web app:
+
 - ServiceWorker (Workbox-style) for offline caching
 - IndexedDB-backed `useOfflineQueue` for operation queuing
 - `OfflineBanner` component for user feedback
@@ -254,6 +269,7 @@ None of this is mentioned in the architecture document. Section 4 (Offline-First
 The document has 3,162 lines of detailed testing guidance but contains no section on mobile-specific testing patterns that have been established since Session 25:
 
 **Missing patterns (critical to document):**
+
 1. `__DEV__` global — must add `define: { __DEV__: true }` to `vitest.config.ts` for mobile tests
 2. `@testing-library/react-native` is NOT installed — mobile tests must be pure logic tests (no `render`/`screen`)
 3. Mobile test file pattern: mock Apollo + navigation + i18n, test logic directly
@@ -270,6 +286,7 @@ These patterns are documented in CLAUDE.md and MEMORY.md but not in the testing 
 The urql mocking patterns established in MEMORY.md (and hardened through BUG-039, BUG-052, BUG-029) are absent:
 
 **Missing patterns:**
+
 1. Mock by document string (NOT call-count based) — prevents false-positive/false-negative test failures
 2. `NOOP_MUTATION` pattern for unused mutations
 3. Cast as `never` (not `as ReturnType<typeof urql.useQuery>` — missing `stale`/`hasNext`)
@@ -289,6 +306,7 @@ Already covered in HP-7 above. Additionally, the Architecture doc's "Design Phil
 ### MP-2 — README.md PostgreSQL version inconsistency
 
 **File:** `README.md`
+
 - Badge (line 7): "PostgreSQL 16+"
 - Tech Stack table (line 184): "PostgreSQL 16.x"
 - Service Health Check table (line 81): "PostgreSQL 16"
@@ -330,18 +348,19 @@ OPEN_ISSUES.md (Phase 27 section, line 34) references "PenTests: PENTEST-001..02
 
 **File:** `README.md`, lines 60-70
 **Change:** Replace the demo accounts table with:
+
 ```markdown
 ### Demo User Accounts
 
 See `scripts/reset-keycloak-passwords.cjs` for current passwords (single source of truth).
 
-| Role | Email |
-|------|-------|
+| Role        | Email                     |
+| ----------- | ------------------------- |
 | Super Admin | super.admin@edusphere.dev |
-| Org Admin | org.admin@example.com |
-| Instructor | instructor@example.com |
-| Student | student@example.com |
-| Researcher | researcher@example.com |
+| Org Admin   | org.admin@example.com     |
+| Instructor  | instructor@example.com    |
+| Student     | student@example.com       |
+| Researcher  | researcher@example.com    |
 ```
 
 ---
@@ -350,6 +369,7 @@ See `scripts/reset-keycloak-passwords.cjs` for current passwords (single source 
 
 **File:** `README.md`, lines 419-476
 **Change:** Replace the entire Testing table section with current numbers:
+
 - Frontend Unit Tests: 3,315 tests / 251 suites passing
 - Backend Unit Tests: 2,296 tests (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 509)
 - Security Tests: 816 tests / 32 spec files
@@ -366,17 +386,20 @@ Remove the individual suite list (lines 431-444) — it is a stale snapshot from
 
 **File:** `README.md`, after line 320 (Phase 17 row)
 **Add:**
+
 ```markdown
 | **Phases 18-24** | Competitive Gap Closure — 39 features (Tier 1+2+3), Admin Upgrade (F-101–F-113) | 15-25 days | ✅ Complete |
-| **Phase 25**     | UI/UX Revolution — Design System, AppSidebar, VideoPlayer, SkillTree, WCAG 2.2 AA | 5-7 days   | ✅ Complete |
-| **Phase 26**     | PRD Gap Closure — G1+G2+G3+G5+G6+G8 (Context Panel, Sketch Overlay, Agent Studio) | 3-5 days   | ✅ Complete |
-| **Phase 27**     | Live Sessions, Offline Web, Course Discovery, Knowledge Graph Context              | 5-7 days   | ✅ Complete |
+| **Phase 25** | UI/UX Revolution — Design System, AppSidebar, VideoPlayer, SkillTree, WCAG 2.2 AA | 5-7 days | ✅ Complete |
+| **Phase 26** | PRD Gap Closure — G1+G2+G3+G5+G6+G8 (Context Panel, Sketch Overlay, Agent Studio) | 3-5 days | ✅ Complete |
+| **Phase 27** | Live Sessions, Offline Web, Course Discovery, Knowledge Graph Context | 5-7 days | ✅ Complete |
 ```
 
 **Change current status line (line 321) to:**
+
 ```markdown
 **Current Status:** ALL 27 phases complete — Backend + Frontend + Mobile fully built and tested.
->5,762 tests passing across 26 TypeScript packages. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+
+> 5,762 tests passing across 26 TypeScript packages. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 ```
 
 ---
@@ -387,6 +410,7 @@ Remove the individual suite list (lines 431-444) — it is a stale snapshot from
 **Action:** Complete replacement. The current Phase Breakdown section (line 47 onward) is from a different project (uses Next.js, roles like "Teacher/Parent", Cloudflare R2 — none of which are EduSphere).
 
 Replace lines 47-693 with an accurate breakdown reflecting Phases 0-27, actual completion status, actual test counts, and actual technology (Vite/React, not Next.js). The Executive Summary (lines 1-44) is largely accurate and should be preserved but updated:
+
 - Line 4: "190 tests passing" → ">5,762 tests passing"
 - Line 14: "Phases 1-17 complete" → "Phases 1-27 complete"
 - Remove blocker about LangGraph TypeScript errors (resolved in a subsequent session)
@@ -402,7 +426,9 @@ Replace lines 47-693 with an accurate breakdown reflecting Phases 0-27, actual c
 ## [Unreleased]
 
 ## [0.27.0] — 2026-03-06 (Session 27 / Phase 27)
+
 ### Added
+
 - Live Sessions (BigBlueButton integration, FE + BE + NATS)
 - Offline Web (ServiceWorker + IndexedDB + OfflineBanner + OfflineLessonCache)
 - Course Discovery improvements (/explore, /discover routing fixes)
@@ -413,16 +439,21 @@ Replace lines 47-693 with an accurate breakdown reflecting Phases 0-27, actual c
 - Phase 27 Security Audit (SI-3 fix: BBB passwords encrypted)
 
 ### Fixed
+
 - BUG-054: Storage progress bar appeared full at 0% usage
 - Raw GraphQL error message exposed in LiveSessionsPage DOM
 
 ## [0.26.0] — 2026-03-05 (Session 26)
+
 ### Added
+
 - PRD Gap features G1 (Context Panel), G2 (Video Sketch Overlay), G3 (Annotation Promote), G5 (Agent Studio), G6 (Deep Link), G8 (Auto-Flashcards)
 - FEAT-055 LessonResultsPage all pipeline outputs
 
 ## [0.25.0] — 2026-03-04 (Session 25)
+
 ### Added
+
 - UI/UX Revolution: Design System (Indigo #6366F1 tokens), ThemeProvider (3-tier)
 - AppSidebar (collapsible 240px/64px, 6 nav groups)
 - VideoPlayerWithCurriculum, KnowledgeSkillTree (BFS + SVG bezier)
@@ -437,6 +468,7 @@ Replace lines 47-693 with an accurate breakdown reflecting Phases 0-27, actual c
 
 **File:** `docs/testing/TEST_REGISTRY.md`
 **Action:**
+
 1. Replace the status line (line 7) with: "Status: ACTIVE — >5,762 tests passing as of Session 27 (March 2026)"
 2. Replace all "Planned" status rows with actual counts from OPEN_ISSUES.md
 3. Add a new section "Session 25-27 New Test Files" listing all files introduced:
@@ -445,37 +477,42 @@ Replace lines 47-693 with an accurate breakdown reflecting Phases 0-27, actual c
 ## Session 25-27 New Test Files
 
 ### Mobile (apps/mobile)
-| File | Tests | Coverage |
-|------|-------|----------|
-| `src/screens/AITutorScreen.test.ts` | new | AITutor consent, send, error |
-| `src/screens/HomeScreen.test.tsx` | new | HomeScreen indigo tokens, stats |
+
+| File                                | Tests | Coverage                        |
+| ----------------------------------- | ----- | ------------------------------- |
+| `src/screens/AITutorScreen.test.ts` | new   | AITutor consent, send, error    |
+| `src/screens/HomeScreen.test.tsx`   | new   | HomeScreen indigo tokens, stats |
 
 ### Web Pages (apps/web/src/pages)
-| File | Tests | Coverage |
-|------|-------|----------|
-| `KnowledgeGraphPage.test.tsx` | new | courseId context routing |
-| `SkillTreePage.test.tsx` | new | BFS traversal, mastery levels |
-| `LiveSessionsPage.test.tsx` | new | list, join, error states |
-| `LiveSessionDetailPage.test.tsx` | new | detail view, chat, end session |
+
+| File                             | Tests | Coverage                       |
+| -------------------------------- | ----- | ------------------------------ |
+| `KnowledgeGraphPage.test.tsx`    | new   | courseId context routing       |
+| `SkillTreePage.test.tsx`         | new   | BFS traversal, mastery levels  |
+| `LiveSessionsPage.test.tsx`      | new   | list, join, error states       |
+| `LiveSessionDetailPage.test.tsx` | new   | detail view, chat, end session |
 
 ### Web Components (apps/web/src/components)
-| File | Tests | Coverage |
-|------|-------|----------|
-| `OfflineBanner.test.tsx` | new | offline/online states, aria-live |
-| `AdminActivityFeed.test.tsx` | new | feed, interval cleanup, types |
-| `SmartRoot.test.tsx` | new | auth/unauth routing |
+
+| File                         | Tests | Coverage                         |
+| ---------------------------- | ----- | -------------------------------- |
+| `OfflineBanner.test.tsx`     | new   | offline/online states, aria-live |
+| `AdminActivityFeed.test.tsx` | new   | feed, interval cleanup, types    |
+| `SmartRoot.test.tsx`         | new   | auth/unauth routing              |
 
 ### Web Hooks (apps/web/src/hooks)
-| File | Tests | Coverage |
-|------|-------|----------|
-| `useOfflineStatus.test.ts` | new | navigator.onLine, event listeners |
-| `useOfflineQueue.test.ts` | new | enqueue, flush, LRU eviction |
+
+| File                       | Tests | Coverage                          |
+| -------------------------- | ----- | --------------------------------- |
+| `useOfflineStatus.test.ts` | new   | navigator.onLine, event listeners |
+| `useOfflineQueue.test.ts`  | new   | enqueue, flush, LRU eviction      |
 
 ### Backend (apps/subgraph-knowledge)
-| File | Tests | Coverage |
-|------|-------|----------|
-| `graph/skill-tree.resolver.spec.ts` | new | getSkillTree, updateMasteryLevel |
-| `graph/skill-tree.service.spec.ts` | new | BFS traversal, mastery update |
+
+| File                                | Tests | Coverage                         |
+| ----------------------------------- | ----- | -------------------------------- |
+| `graph/skill-tree.resolver.spec.ts` | new   | getSkillTree, updateMasteryLevel |
+| `graph/skill-tree.service.spec.ts`  | new   | BFS traversal, mastery update    |
 ```
 
 ---
@@ -496,8 +533,8 @@ type LiveSession @key(fields: "id") {
   scheduledAt: DateTime
   startedAt: DateTime
   endedAt: DateTime
-  attendeePasswordEnc: String   # Encrypted — SI-3 compliant
-  moderatorPasswordEnc: String  # Encrypted — SI-3 compliant
+  attendeePasswordEnc: String # Encrypted — SI-3 compliant
+  moderatorPasswordEnc: String # Encrypted — SI-3 compliant
   recordingUrl: URL
   createdBy: User!
   createdAt: DateTime!
@@ -511,13 +548,22 @@ enum LiveSessionStatus {
 }
 
 type Query {
-  liveSessions(tenantId: ID!, first: Int, after: Cursor): LiveSessionConnection! @authenticated
+  liveSessions(
+    tenantId: ID!
+    first: Int
+    after: Cursor
+  ): LiveSessionConnection! @authenticated
 }
 
 type Mutation {
-  createLiveSession(input: CreateLiveSessionInput!): LiveSession! @authenticated @requiresScopes(scopes: ["session:write"])
-  updateLiveSession(id: ID!, input: UpdateLiveSessionInput!): LiveSession! @authenticated
-  endLiveSession(id: ID!): LiveSession! @authenticated @requiresScopes(scopes: ["session:write"])
+  createLiveSession(input: CreateLiveSessionInput!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+  updateLiveSession(id: ID!, input: UpdateLiveSessionInput!): LiveSession!
+    @authenticated
+  endLiveSession(id: ID!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
 }
 ```
 
@@ -533,8 +579,8 @@ type Mutation {
 type SkillTreeNode {
   id: ID!
   label: String!
-  type: String!   # "CONCEPT" | "TERM" | etc.
-  masteryLevel: Float!  # 0.0 - 1.0
+  type: String! # "CONCEPT" | "TERM" | etc.
+  masteryLevel: Float! # 0.0 - 1.0
   connections: [ID!]!
 }
 
@@ -543,7 +589,8 @@ type Query {
 }
 
 type Mutation {
-  updateMasteryLevel(conceptId: ID!, level: Float!): SkillTreeNode! @authenticated
+  updateMasteryLevel(conceptId: ID!, level: Float!): SkillTreeNode!
+    @authenticated
 }
 ```
 
@@ -553,10 +600,13 @@ type Mutation {
 
 **File:** `docs/architecture/ARCHITECTURE.md`, line 6
 **Change:**
+
 ```markdown
 > **Status:** Phase 0 (Foundation) — Implementation in progress
 ```
+
 to:
+
 ```markdown
 > **Status:** Phase 27 Complete — All 27 phases implemented and in production
 ```
@@ -580,6 +630,7 @@ Phase 27 added offline capabilities to the React SPA:
 - **`OfflineLessonCache`**: Caches lesson content (video metadata, transcripts) for offline playback
 
 **Offline sync pattern:**
+
 1. User goes offline → `useOfflineStatus` detects → `OfflineBanner` appears
 2. User performs action (e.g., annotation) → `useOfflineQueue` enqueues GraphQL mutation in IndexedDB (LRU cap: 100 items)
 3. User goes online → queue flushes in insertion order → mutations replayed to gateway
@@ -593,7 +644,7 @@ Phase 27 added offline capabilities to the React SPA:
 **File:** `docs/testing/TESTING_CONVENTIONS.md`
 **Action:** Add a new section "9. Mobile Testing (Expo SDK 54)" after Section 8 (E2E Testing):
 
-```markdown
+````markdown
 ## 9. Mobile Testing (Expo SDK 54 / Vitest)
 
 ### Key Constraint: No @testing-library/react-native
@@ -603,14 +654,16 @@ Phase 27 added offline capabilities to the React SPA:
 ### Required vitest.config.ts Configuration
 
 Every `apps/mobile/vitest.config.ts` MUST include:
+
 ```typescript
 export default defineConfig({
   define: {
-    __DEV__: true,  // React Native global — required or tests throw ReferenceError
+    __DEV__: true, // React Native global — required or tests throw ReferenceError
   },
   // ...
 });
 ```
+````
 
 ### Mobile Test Pattern
 
@@ -630,6 +683,7 @@ describe('AITutorScreen', () => {
 ### Mock Dependencies
 
 Mobile tests must mock:
+
 - `@apollo/client` or `urql` for GraphQL calls
 - `@react-navigation/native` for navigation
 - `i18n-js` or `react-i18next` for translations
@@ -639,7 +693,8 @@ Mobile tests must mock:
 
 - `apps/mobile/src/screens/AITutorScreen.test.ts` — pure logic, consent gate
 - `apps/mobile/src/screens/HomeScreen.test.tsx` — stats utils, streak logic
-```
+
+````
 
 ---
 
@@ -667,7 +722,7 @@ const NOOP_MUTATION = [
   { fetching: false },
   vi.fn().mockResolvedValue({ data: undefined, error: undefined })
 ] as never;  // Cast as never — ReturnType<useQuery> is missing stale/hasNext
-```
+````
 
 #### 2. Reset State Between Tests
 
@@ -683,7 +738,9 @@ When a component appears as a sibling in React Router routes, wrap queries with 
 
 ```typescript
 const [mounted, setMounted] = useState(false);
-useEffect(() => { setMounted(true); }, []);
+useEffect(() => {
+  setMounted(true);
+}, []);
 const [result] = useQuery({ query: MY_QUERY, pause: !mounted });
 ```
 
@@ -696,7 +753,8 @@ expect(screen.getByText('Test Course')).toBeInTheDocument();
 // CORRECT: check full document text content
 expect(document.body.textContent).toContain('Test Course');
 ```
-```
+
+````
 
 ---
 
@@ -706,8 +764,10 @@ expect(document.body.textContent).toContain('Test Course');
 **Change:**
 ```markdown
 Security audit: docs/plans/phase-27-security-audit.md
-```
+````
+
 to:
+
 ```markdown
 Security audit: docs/security/PHASE_27_SECURITY_AUDIT.md
 ```
@@ -717,6 +777,7 @@ Security audit: docs/security/PHASE_27_SECURITY_AUDIT.md
 ### Edit 16 — README.md: Fix PostgreSQL version badge and references
 
 **File:** `README.md`
+
 - Line 7 badge: Update to show PostgreSQL 17+ (matching `PROJECT_STATUS.md` actual Docker state)
 - Line 184 Tech Stack table: PostgreSQL version `16.x` → `17.x`
 - Line 34 DB section header: "PostgreSQL 16" → "PostgreSQL 17"
@@ -731,6 +792,7 @@ Confirm actual DB version by checking `infrastructure/docker-compose.yml` postgr
 Current item 4 reads: "Offline-First Mobile: Expo SDK 54 with SQLite caching and optimistic UI updates"
 
 **Change to:**
+
 ```markdown
 4. **Offline-First**: Expo SDK 54 (SQLite + TanStack Query) for mobile. Web PWA via ServiceWorker + IndexedDB queue (`useOfflineQueue`) for offline mutation replay.
 ```
@@ -745,13 +807,13 @@ Current item 4 reads: "Offline-First Mobile: Expo SDK 54 with SQLite caching and
 ```markdown
 ### Phase 27 E2E Specs (Playwright)
 
-| Spec File | Scenarios | Feature |
-|-----------|-----------|---------|
-| `e2e/live-sessions.spec.ts` | ~20 | Live Session CRUD + join flow |
-| `e2e/offline-mode.spec.ts` | 5 | Offline banner + queue |
-| `e2e/knowledge-graph-course-context.spec.ts` | 11 | KG courseId context |
-| `e2e/settings-storage.spec.ts` | 7 | Progress bar + storage quota |
-| `e2e/course-discovery.spec.ts` | 11 | /explore and /discover routes |
+| Spec File                                    | Scenarios | Feature                       |
+| -------------------------------------------- | --------- | ----------------------------- |
+| `e2e/live-sessions.spec.ts`                  | ~20       | Live Session CRUD + join flow |
+| `e2e/offline-mode.spec.ts`                   | 5         | Offline banner + queue        |
+| `e2e/knowledge-graph-course-context.spec.ts` | 11        | KG courseId context           |
+| `e2e/settings-storage.spec.ts`               | 7         | Progress bar + storage quota  |
+| `e2e/course-discovery.spec.ts`               | 11        | /explore and /discover routes |
 ```
 
 ---
@@ -759,38 +821,42 @@ Current item 4 reads: "Offline-First Mobile: Expo SDK 54 with SQLite caching and
 ## Docs Not Needing Immediate Action
 
 ### SESSION_26_SECURITY_AUDIT.md — Score 5.0/5
+
 Fully current, accurate, well-structured. All 10 SI invariants documented. Router security analysis included. The hardcoded `tenantId: "tenant-1"` finding in AITutorScreen is documented and rated correctly. No changes needed.
 
 ### PHASE_27_SECURITY_AUDIT.md — Score 5.0/5
+
 Fully current for Phase 27 scope. Three findings (HIGH: plaintext passwords, MEDIUM: raw error message, LOW: console.warn) are documented with fixes applied. All OWASP checks documented. No changes needed.
 
 ### API_CONTRACTS_GRAPHQL_FEDERATION.md (existing content) — Score 4/5
+
 The existing content (Sections 1-12 as far as reviewed) is accurate and well-structured. The 6 subgraphs are correctly described, federation patterns are correct, entity ownership table is correct. The only deficiency is missing Phase 27 types (LiveSession, SkillTree) covered in Edit 9 and Edit 10.
 
 ### ARCHITECTURE.md (body content) — Score 4/5
+
 The component diagrams (Section 3), database architecture (Section 5), and security architecture (Section 9) are accurate and complete for Phases 0-17. The Mermaid diagram correctly shows all 6 subgraphs, Hive Gateway, PostgreSQL + AGE, NATS, MinIO, Keycloak. Only issues are the stale status header (Edit 11) and missing offline web section (Edit 12).
 
 ---
 
 ## Priority Order for Fixes
 
-| Priority | Edit | Effort | Impact |
-|----------|------|--------|--------|
-| P0 | Edit 6: PROJECT_STATUS.md full rewrite | High | Critical — wrong project described |
-| P0 | Edit 7: CHANGELOG.md add session entries | Medium | Critical — empty changelog |
-| P0 | Edit 8: TEST_REGISTRY.md actual counts | Medium | Critical — all counts are fictional |
-| P1 | Edit 4: README.md test counts | Low | High — misrepresents test coverage |
-| P1 | Edit 5: README.md Phase table | Low | High — missing Phases 18-27 |
-| P1 | Edit 2: README.md Keycloak client ID | Trivial | High — breaks developer setup |
-| P1 | Edit 1: README.md pnpm version | Trivial | High — blocks pnpm install |
-| P1 | Edit 3: README.md demo credentials | Low | High — login fails with listed creds |
-| P1 | Edit 15: OPEN_ISSUES.md cross-link | Trivial | Medium — broken file reference |
-| P2 | Edit 9: API contracts LiveSession | Medium | High — contracts incomplete |
-| P2 | Edit 10: API contracts SkillTree | Low | High — contracts incomplete |
-| P2 | Edit 13: TESTING_CONVENTIONS mobile | Medium | High — undocumented pattern causes test failures |
-| P2 | Edit 14: TESTING_CONVENTIONS urql | Medium | High — undocumented pattern causes flaky tests |
-| P3 | Edit 11: ARCHITECTURE.md status | Trivial | Medium — misleading status |
-| P3 | Edit 12: ARCHITECTURE.md offline web | Low | Medium — missing architecture section |
-| P3 | Edit 16: README.md PostgreSQL version | Trivial | Low — version inconsistency |
-| P3 | Edit 17: ARCHITECTURE.md offline design | Trivial | Low — minor completeness gap |
-| P3 | Edit 18: TESTING_CONVENTIONS E2E files | Low | Low — convenience reference |
+| Priority | Edit                                     | Effort  | Impact                                           |
+| -------- | ---------------------------------------- | ------- | ------------------------------------------------ |
+| P0       | Edit 6: PROJECT_STATUS.md full rewrite   | High    | Critical — wrong project described               |
+| P0       | Edit 7: CHANGELOG.md add session entries | Medium  | Critical — empty changelog                       |
+| P0       | Edit 8: TEST_REGISTRY.md actual counts   | Medium  | Critical — all counts are fictional              |
+| P1       | Edit 4: README.md test counts            | Low     | High — misrepresents test coverage               |
+| P1       | Edit 5: README.md Phase table            | Low     | High — missing Phases 18-27                      |
+| P1       | Edit 2: README.md Keycloak client ID     | Trivial | High — breaks developer setup                    |
+| P1       | Edit 1: README.md pnpm version           | Trivial | High — blocks pnpm install                       |
+| P1       | Edit 3: README.md demo credentials       | Low     | High — login fails with listed creds             |
+| P1       | Edit 15: OPEN_ISSUES.md cross-link       | Trivial | Medium — broken file reference                   |
+| P2       | Edit 9: API contracts LiveSession        | Medium  | High — contracts incomplete                      |
+| P2       | Edit 10: API contracts SkillTree         | Low     | High — contracts incomplete                      |
+| P2       | Edit 13: TESTING_CONVENTIONS mobile      | Medium  | High — undocumented pattern causes test failures |
+| P2       | Edit 14: TESTING_CONVENTIONS urql        | Medium  | High — undocumented pattern causes flaky tests   |
+| P3       | Edit 11: ARCHITECTURE.md status          | Trivial | Medium — misleading status                       |
+| P3       | Edit 12: ARCHITECTURE.md offline web     | Low     | Medium — missing architecture section            |
+| P3       | Edit 16: README.md PostgreSQL version    | Trivial | Low — version inconsistency                      |
+| P3       | Edit 17: ARCHITECTURE.md offline design  | Trivial | Low — minor completeness gap                     |
+| P3       | Edit 18: TESTING_CONVENTIONS E2E files   | Low     | Low — convenience reference                      |

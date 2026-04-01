@@ -69,7 +69,7 @@ function mockParallelQueries(
   mastery = masteryRows,
   velocity = velocityRow,
   enrolled = enrolledRows,
-  candidates = candidateRows,
+  candidates = candidateRows
 ): void {
   mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
     let callIdx = 0;
@@ -124,7 +124,7 @@ describe('RecommendedCoursesService', () => {
       [], // no mastery rows → no gaps
       velocityRow,
       enrolledRows,
-      candidateRows,
+      candidateRows
     );
 
     const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
@@ -139,7 +139,7 @@ describe('RecommendedCoursesService', () => {
       masteryRows,
       velocityRow,
       [{ course_id: 'c1' }, { course_id: 'c2' }], // enrolled in c1 + c2
-      candidateRows,
+      candidateRows
     );
 
     const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
@@ -150,10 +150,13 @@ describe('RecommendedCoursesService', () => {
   });
 
   it('uses fallback title when course_title is null', async () => {
-    const candidatesWithNull = [
-      { ...candidateRows[0]!, course_title: null },
-    ];
-    mockParallelQueries(masteryRows, velocityRow, enrolledRows, candidatesWithNull);
+    const candidatesWithNull = [{ ...candidateRows[0]!, course_title: null }];
+    mockParallelQueries(
+      masteryRows,
+      velocityRow,
+      enrolledRows,
+      candidatesWithNull
+    );
 
     const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
     expect(result[0]?.title).toBe('Untitled Course');

@@ -91,8 +91,13 @@ export function PlatformUsageDashboardPage() {
 
   if (role && role !== 'SUPER_ADMIN') {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center" data-testid="access-denied">
-        <p className="text-destructive font-semibold">Access Denied — SUPER_ADMIN only</p>
+      <div
+        className="flex min-h-[40vh] items-center justify-center"
+        data-testid="access-denied"
+      >
+        <p className="text-destructive font-semibold">
+          Access Denied — SUPER_ADMIN only
+        </p>
       </div>
     );
   }
@@ -104,72 +109,86 @@ export function PlatformUsageDashboardPage() {
           title="Platform Usage"
           description="YAU utilization across all tenants"
         />
-      <div data-testid="platform-usage-page">
-        {/* Export button */}
-        <div className="flex justify-end mb-4">
-          <Button
-            data-testid="export-csv-btn"
-            variant="outline"
-            size="sm"
-            onClick={handleExportCsv}
-            disabled={rows.length === 0}
-          >
-            Export CSV
-          </Button>
-        </div>
-
-        {fetching && (
-          <div className="space-y-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full rounded" />
-            ))}
+        <div data-testid="platform-usage-page">
+          {/* Export button */}
+          <div className="flex justify-end mb-4">
+            <Button
+              data-testid="export-csv-btn"
+              variant="outline"
+              size="sm"
+              onClick={handleExportCsv}
+              disabled={rows.length === 0}
+            >
+              Export CSV
+            </Button>
           </div>
-        )}
 
-        {error && !fetching && (
-          <Card>
-            <CardContent className="py-8 text-center text-destructive text-sm">
-              Failed to load platform data. Please try again.
-            </CardContent>
-          </Card>
-        )}
-
-        {!fetching && !error && (
-          <Table data-testid="platform-usage-table">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tenant</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead className="text-right">YAU</TableHead>
-                <TableHead className="text-right">Seat Limit</TableHead>
-                <TableHead className="text-right">Utilization %</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.tenantId}>
-                  <TableCell className="font-medium">{row.tenantName}</TableCell>
-                  <TableCell>{row.plan}</TableCell>
-                  <TableCell className="text-right">{row.yearlyActiveUsers}</TableCell>
-                  <TableCell className="text-right">{row.seatLimit}</TableCell>
-                  <TableCell className="text-right">{row.seatUtilizationPct}%</TableCell>
-                  <TableCell className="text-center" aria-label={`Status: ${statusEmoji(row.seatUtilizationPct)}`}>
-                    {statusEmoji(row.seatUtilizationPct)}
-                  </TableCell>
-                </TableRow>
+          {fetching && (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full rounded" />
               ))}
-              {rows.length === 0 && (
+            </div>
+          )}
+
+          {error && !fetching && (
+            <Card>
+              <CardContent className="py-8 text-center text-destructive text-sm">
+                Failed to load platform data. Please try again.
+              </CardContent>
+            </Card>
+          )}
+
+          {!fetching && !error && (
+            <Table data-testid="platform-usage-table">
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    No tenant data available.
-                  </TableCell>
+                  <TableHead>Tenant</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead className="text-right">YAU</TableHead>
+                  <TableHead className="text-right">Seat Limit</TableHead>
+                  <TableHead className="text-right">Utilization %</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+              </TableHeader>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow key={row.tenantId}>
+                    <TableCell className="font-medium">
+                      {row.tenantName}
+                    </TableCell>
+                    <TableCell>{row.plan}</TableCell>
+                    <TableCell className="text-right">
+                      {row.yearlyActiveUsers}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {row.seatLimit}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {row.seatUtilizationPct}%
+                    </TableCell>
+                    <TableCell
+                      className="text-center"
+                      aria-label={`Status: ${statusEmoji(row.seatUtilizationPct)}`}
+                    >
+                      {statusEmoji(row.seatUtilizationPct)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {rows.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-muted-foreground py-8"
+                    >
+                      No tenant data available.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+        </div>
       </PageShell>
     </AdminLayout>
   );

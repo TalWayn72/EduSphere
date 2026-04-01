@@ -59,7 +59,11 @@ function setupDbMock(vectorRows: unknown[] = []) {
 
 function setupIlikeMock(ilikeRows: Array<{ id: string; text: string }> = []) {
   mockWithTenantContext.mockImplementation(
-    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => {
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      fn: (tx: unknown) => Promise<unknown>
+    ) => {
       const tx = {
         select: () => {
           mockSelect();
@@ -77,7 +81,7 @@ function setupIlikeMock(ilikeRows: Array<{ id: string; text: string }> = []) {
         },
       };
       return fn(tx);
-    },
+    }
   );
 }
 
@@ -122,9 +126,7 @@ describe('searchKnowledgeGraph', () => {
     delete process.env.OPENAI_API_KEY;
 
     setupDbMock();
-    setupIlikeMock([
-      { id: 'seg-2', text: 'Fallback match from ILIKE' },
-    ]);
+    setupIlikeMock([{ id: 'seg-2', text: 'Fallback match from ILIKE' }]);
 
     const results = await searchKnowledgeGraph('query', TENANT_ID, 5);
 
@@ -197,7 +199,7 @@ describe('searchKnowledgeGraph', () => {
       'query',
       TENANT_ID,
       5,
-      ragConfig,
+      ragConfig
     );
 
     expect(results[0].similarity).toBeCloseTo(0.56, 1); // 0.8 * 0.7
@@ -264,7 +266,7 @@ describe('searchKnowledgeGraph', () => {
         headers: expect.objectContaining({
           Authorization: 'Bearer sk-test',
         }),
-      }),
+      })
     );
   });
 

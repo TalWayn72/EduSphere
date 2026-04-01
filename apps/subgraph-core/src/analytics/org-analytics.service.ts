@@ -8,11 +8,7 @@
  *   - Date range filtering
  *   - All queries scoped via withTenantContext (RLS enforced)
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -124,12 +120,12 @@ export class OrgAnalyticsService implements OnModuleDestroy {
       return {
         activeLearners: Number(row?.active_learners ?? 0),
         totalEnrollments,
-        completionRate: totalEnrollments > 0
-          ? Math.round((completedCount / totalEnrollments) * 10000) / 100
-          : 0,
-        totalLearningHours: Math.round(
-          Number(row?.total_minutes ?? 0) / 60 * 100
-        ) / 100,
+        completionRate:
+          totalEnrollments > 0
+            ? Math.round((completedCount / totalEnrollments) * 10000) / 100
+            : 0,
+        totalLearningHours:
+          Math.round((Number(row?.total_minutes ?? 0) / 60) * 100) / 100,
       };
     });
   }
@@ -170,11 +166,12 @@ export class OrgAnalyticsService implements OnModuleDestroy {
           courseId: r.course_id,
           title: r.title,
           enrollmentCount,
-          completionRate: enrollmentCount > 0
-            ? Math.round((completedCount / enrollmentCount) * 10000) / 100
-            : 0,
+          completionRate:
+            enrollmentCount > 0
+              ? Math.round((completedCount / enrollmentCount) * 10000) / 100
+              : 0,
           avgTimeToComplete: r.avg_time_seconds
-            ? Math.round(Number(r.avg_time_seconds) / 3600 * 100) / 100
+            ? Math.round((Number(r.avg_time_seconds) / 3600) * 100) / 100
             : null,
         };
       });

@@ -57,14 +57,20 @@ export function ContextPanel({ activeSegment, onSeek }: Props) {
   });
 
   const results: SemanticResult[] = result.data?.searchSemantic ?? [];
-  const concepts = results.filter((r) => r.entityType === 'concept').slice(0, 4);
-  const segments = results.filter((r) => r.entityType !== 'concept').slice(0, 4);
+  const concepts = results
+    .filter((r) => r.entityType === 'concept')
+    .slice(0, 4);
+  const segments = results
+    .filter((r) => r.entityType !== 'concept')
+    .slice(0, 4);
 
   if (!activeSegment) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 p-4 text-center text-muted-foreground">
         <Lightbulb className="h-8 w-8 opacity-20" />
-        <p className="text-xs">Play the video — related concepts will appear here automatically</p>
+        <p className="text-xs">
+          Play the video — related concepts will appear here automatically
+        </p>
       </div>
     );
   }
@@ -147,7 +153,8 @@ export function ContextPanel({ activeSegment, onSeek }: Props) {
                     className="text-[10px] text-green-700 hover:underline font-medium dark:text-green-300"
                     onClick={() => onSeek(r.startTime!)}
                   >
-                    Jump to {Math.floor(r.startTime / 60)}:{String(Math.floor(r.startTime % 60)).padStart(2, '0')}
+                    Jump to {Math.floor(r.startTime / 60)}:
+                    {String(Math.floor(r.startTime % 60)).padStart(2, '0')}
                   </button>
                 )}
               </div>

@@ -27,7 +27,10 @@ import {
 } from './discussion.schemas';
 
 // Re-export field resolvers for backward-compatible imports
-export { DiscussionMessageResolver, DiscussionParticipantResolver } from './discussion-field.resolver';
+export {
+  DiscussionMessageResolver,
+  DiscussionParticipantResolver,
+} from './discussion-field.resolver';
 
 interface GraphQLContext {
   req: IncomingMessage;
@@ -47,7 +50,7 @@ export class DiscussionResolver {
 
   constructor(
     private readonly discussionService: DiscussionService,
-    private readonly discussionInsightsService: DiscussionInsightsService,
+    private readonly discussionInsightsService: DiscussionInsightsService
   ) {
     this.pubSub = createPubSub();
   }
@@ -70,7 +73,10 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findDiscussionsByCourse(
-      courseId, limit, offset, context.authContext
+      courseId,
+      limit,
+      offset,
+      context.authContext
     );
   }
 
@@ -82,7 +88,9 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findDiscussionsByUser(
-      limit, offset, context.authContext
+      limit,
+      offset,
+      context.authContext
     );
   }
 
@@ -95,7 +103,10 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findMessagesByDiscussion(
-      discussionId, limit, offset, context.authContext
+      discussionId,
+      limit,
+      offset,
+      context.authContext
     );
   }
 
@@ -106,7 +117,10 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     const validated = createDiscussionInputSchema.parse(input);
-    return this.discussionService.createDiscussion(validated, context.authContext);
+    return this.discussionService.createDiscussion(
+      validated,
+      context.authContext
+    );
   }
 
   @Mutation('addMessage')
@@ -118,7 +132,9 @@ export class DiscussionResolver {
     if (!context.authContext) throw new Error('Unauthenticated');
     const validated = addMessageInputSchema.parse(input);
     const message = await this.discussionService.addMessage(
-      discussionId, validated, context.authContext
+      discussionId,
+      validated,
+      context.authContext
     );
     this.pubSub.publish(`messageAdded_${discussionId}`, {
       messageAdded: message,
@@ -132,7 +148,10 @@ export class DiscussionResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.joinDiscussion(discussionId, context.authContext);
+    return this.discussionService.joinDiscussion(
+      discussionId,
+      context.authContext
+    );
   }
 
   @Mutation('leaveDiscussion')
@@ -141,27 +160,37 @@ export class DiscussionResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.discussionService.leaveDiscussion(discussionId, context.authContext);
+    return this.discussionService.leaveDiscussion(
+      discussionId,
+      context.authContext
+    );
   }
 
   @Mutation('generateDiscussionSummary')
   async generateDiscussionSummary(
     @Args('discussionId') discussionId: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     const discussion = await this.discussionService.findDiscussionById(
-      discussionId, context.authContext,
+      discussionId,
+      context.authContext
     );
     const messages = await this.discussionService.findMessagesByDiscussion(
-      discussionId, 50, 0, context.authContext,
+      discussionId,
+      50,
+      0,
+      context.authContext
     );
-    const messageDtos = messages.map((m: { content: string; user_id: string }) => ({
-      content: m.content,
-      userId: m.user_id,
-    }));
+    const messageDtos = messages.map(
+      (m: { content: string; user_id: string }) => ({
+        content: m.content,
+        userId: m.user_id,
+      })
+    );
     return this.discussionInsightsService.summarizeThread(
-      messageDtos, (discussion as { title: string }).title,
+      messageDtos,
+      (discussion as { title: string }).title
     );
   }
 
@@ -189,7 +218,10 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findMessagesByDiscussion(
-      discussion.id, limit, offset, context.authContext
+      discussion.id,
+      limit,
+      offset,
+      context.authContext
     );
   }
 
@@ -200,7 +232,8 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.findParticipantsByDiscussion(
-      discussion.id, context.authContext
+      discussion.id,
+      context.authContext
     );
   }
 
@@ -211,7 +244,8 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.countParticipants(
-      discussion.id, context.authContext
+      discussion.id,
+      context.authContext
     );
   }
 
@@ -222,7 +256,8 @@ export class DiscussionResolver {
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
     return this.discussionService.countMessages(
-      discussion.id, context.authContext
+      discussion.id,
+      context.authContext
     );
   }
 }

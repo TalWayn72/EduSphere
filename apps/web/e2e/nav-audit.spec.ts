@@ -500,7 +500,9 @@ test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)
     await page.waitForLoadState('domcontentloaded');
 
     // CourseList renders a "New Course" button for instructors/admins
-    const newCourseLink = page.getByRole('button', { name: /New Course/i }).first();
+    const newCourseLink = page
+      .getByRole('button', { name: /New Course/i })
+      .first();
     const count = await newCourseLink.count();
     if (count > 0) {
       await expect(newCourseLink).toBeVisible({ timeout: 8_000 });

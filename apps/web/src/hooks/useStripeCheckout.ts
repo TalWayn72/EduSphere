@@ -55,8 +55,7 @@ export function useStripeCheckout(): UseStripeCheckoutReturn {
         // In production: window.location.href = stripeCheckoutUrl
         return mockSessionId;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Checkout failed';
+        const message = err instanceof Error ? err.message : 'Checkout failed';
         setError(message);
         setStatus('error');
         return '';

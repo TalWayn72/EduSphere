@@ -16,9 +16,7 @@ import { ExamBlueprintService } from './exam-blueprint.service';
 export class ExamBlueprintResolver {
   private readonly logger = new Logger(ExamBlueprintResolver.name);
 
-  constructor(
-    private readonly blueprintService: ExamBlueprintService,
-  ) {}
+  constructor(private readonly blueprintService: ExamBlueprintService) {}
 
   @Query('examBlueprints')
   async examBlueprints(
@@ -36,10 +34,7 @@ export class ExamBlueprintResolver {
   }
 
   @Query('examBlueprint')
-  async examBlueprint(
-    @Args('id') id: string,
-    @Context() ctx: GraphQLContext
-  ) {
+  async examBlueprint(@Args('id') id: string, @Context() ctx: GraphQLContext) {
     const { tenantId, userId, role } = this.extractAuth(ctx);
     this.logger.log({ blueprintId: id, tenantId }, 'examBlueprint query');
     return this.blueprintService.getBlueprint(id, tenantId, userId, role);

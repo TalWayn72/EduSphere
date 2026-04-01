@@ -9,7 +9,13 @@
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 
 // ── urql mock ──────────────────────────────────────────────────────────────────
 const mockCreateAnchor = vi.fn().mockResolvedValue({
@@ -26,36 +32,67 @@ const mockCreateAnchor = vi.fn().mockResolvedValue({
 });
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, mockCreateAnchor]),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    mockCreateAnchor,
+  ]),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+  ]),
   gql: vi.fn((s: TemplateStringsArray) => String(s)),
-  useClient: vi.fn(() => ({ query: vi.fn().mockResolvedValue({ data: undefined, error: undefined }) })),
+  useClient: vi.fn(() => ({
+    query: vi.fn().mockResolvedValue({ data: undefined, error: undefined }),
+  })),
 }));
 
 // ── shadcn/ui mocks ────────────────────────────────────────────────────────────
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, 'data-testid': testId }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (
-    <button onClick={onClick} data-testid={testId}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    'data-testid': testId,
+  }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (
+    <button onClick={onClick} data-testid={testId}>
+      {children}
+    </button>
   ),
 }));
 
 vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div data-testid="dialog">{children}</div> : null,
-  DialogContent: ({ children, 'data-testid': testId }: React.HTMLAttributes<HTMLDivElement>) => (
+  DialogContent: ({
+    children,
+    'data-testid': testId,
+  }: React.HTMLAttributes<HTMLDivElement>) => (
     <div data-testid={testId ?? 'dialog-content'}>{children}</div>
   ),
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogDescription: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  DialogHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2>{children}</h2>
+  ),
+  DialogDescription: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props}>{children}</p>
   ),
-  DialogFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogFooter: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // ── AssetPicker mock ───────────────────────────────────────────────────────────
 vi.mock('./AssetPicker', () => ({
-  default: ({ onSelect }: { courseId: string; selectedAssetId: string | null; onSelect: (id: string | null) => void }) => (
+  default: ({
+    onSelect,
+  }: {
+    courseId: string;
+    selectedAssetId: string | null;
+    onSelect: (id: string | null) => void;
+  }) => (
     <div data-testid="asset-picker-mock">
       <button onClick={() => onSelect('asset-1')}>Pick asset</button>
     </div>
@@ -70,7 +107,9 @@ vi.mock('./visual-anchor.graphql', () => ({
   CONFIRM_VISUAL_ASSET_UPLOAD: 'CONFIRM_VISUAL_ASSET_UPLOAD',
 }));
 
-vi.mock('@/lib/utils', () => ({ cn: (...args: string[]) => args.filter(Boolean).join(' ') }));
+vi.mock('@/lib/utils', () => ({
+  cn: (...args: string[]) => args.filter(Boolean).join(' '),
+}));
 
 import AnchorEditor from './AnchorEditor';
 
@@ -86,7 +125,7 @@ function renderEditor() {
       existingAnchorCount={0}
     >
       <p data-testid="child-content">Document content here</p>
-    </AnchorEditor>,
+    </AnchorEditor>
   );
   return { ...utils, onAnchorCreated };
 }
@@ -94,11 +133,21 @@ function renderEditor() {
 /** Simulates a text selection inside the anchor editor container. */
 function simulateSelection(container: HTMLElement, text = 'hello world') {
   // Create a fake range/selection
-  const editorEl = container.querySelector('[data-testid="anchor-editor"]') as HTMLElement;
+  const editorEl = container.querySelector(
+    '[data-testid="anchor-editor"]'
+  ) as HTMLElement;
 
   // Mock window.getSelection to return a non-collapsed selection
   const mockRange = {
-    getBoundingClientRect: () => ({ left: 100, top: 50, width: 80, height: 20, right: 180, bottom: 70 } as DOMRect),
+    getBoundingClientRect: () =>
+      ({
+        left: 100,
+        top: 50,
+        width: 80,
+        height: 20,
+        right: 180,
+        bottom: 70,
+      }) as DOMRect,
   };
   const mockSelection = {
     isCollapsed: false,
@@ -107,11 +156,21 @@ function simulateSelection(container: HTMLElement, text = 'hello world') {
     getRangeAt: () => mockRange,
     removeAllRanges: vi.fn(),
   };
-  vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as ReturnType<typeof window.getSelection>);
+  vi.spyOn(window, 'getSelection').mockReturnValue(
+    mockSelection as unknown as ReturnType<typeof window.getSelection>
+  );
 
   // Mock getBoundingClientRect on the container
   vi.spyOn(editorEl, 'getBoundingClientRect').mockReturnValue({
-    left: 0, top: 0, width: 800, height: 600, right: 800, bottom: 600, x: 0, y: 0, toJSON: () => ({})
+    left: 0,
+    top: 0,
+    width: 800,
+    height: 600,
+    right: 800,
+    bottom: 600,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
   } as DOMRect);
 
   fireEvent.mouseUp(editorEl);
@@ -123,7 +182,11 @@ describe('AnchorEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(window, 'getSelection').mockReturnValue({
-      isCollapsed: true, rangeCount: 0, toString: () => '', getRangeAt: vi.fn(), removeAllRanges: vi.fn(),
+      isCollapsed: true,
+      rangeCount: 0,
+      toString: () => '',
+      getRangeAt: vi.fn(),
+      removeAllRanges: vi.fn(),
     } as unknown as ReturnType<typeof window.getSelection>);
   });
 
@@ -181,17 +244,19 @@ describe('AnchorEditor', () => {
           courseId: 'course-1',
           anchorText: 'hello world',
         }),
-      }),
+      })
     );
 
     await waitFor(() => {
       expect(onAnchorCreated).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'anchor-1' }),
+        expect.objectContaining({ id: 'anchor-1' })
       );
     });
 
     // Modal should close
-    expect(screen.queryByTestId('anchor-creation-modal')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('anchor-creation-modal')
+    ).not.toBeInTheDocument();
   });
 
   it('closes modal without mutation when Cancel is clicked', () => {
@@ -202,7 +267,9 @@ describe('AnchorEditor', () => {
     expect(screen.getByTestId('anchor-creation-modal')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Cancel'));
 
-    expect(screen.queryByTestId('anchor-creation-modal')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('anchor-creation-modal')
+    ).not.toBeInTheDocument();
     expect(mockCreateAnchor).not.toHaveBeenCalled();
   });
 });

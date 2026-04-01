@@ -70,19 +70,23 @@ test.describe('InstructorAnalyticsDashboard — DEV_MODE guard', () => {
   });
 
   test('renders Overview tab button', async ({ page }) => {
-    await expect(
-      page.getByRole('tab', { name: /overview/i })
-    ).toBeVisible();
+    await expect(page.getByRole('tab', { name: /overview/i })).toBeVisible();
   });
 
   test('renders all four tab buttons', async ({ page }) => {
     await expect(page.getByRole('tab', { name: /overview/i })).toBeVisible();
-    await expect(page.getByRole('tab', { name: /learner engagement/i })).toBeVisible();
-    await expect(page.getByRole('tab', { name: /at-risk learners/i })).toBeVisible();
+    await expect(
+      page.getByRole('tab', { name: /learner engagement/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('tab', { name: /at-risk learners/i })
+    ).toBeVisible();
     await expect(page.getByRole('tab', { name: /ai usage/i })).toBeVisible();
   });
 
-  test('no [object Object] serialization in analytics DOM', async ({ page }) => {
+  test('no [object Object] serialization in analytics DOM', async ({
+    page,
+  }) => {
     const body = await page.textContent('body');
     expect(body).not.toContain('[object Object]');
   });
@@ -157,7 +161,11 @@ test.describe('MyProgressPage — DEV_MODE guard', () => {
                 currentStreak: 7,
                 longestStreak: 14,
                 activeChallenges: [
-                  { challengeId: 'ch-1', title: '7-Day Streak', completed: false },
+                  {
+                    challengeId: 'ch-1',
+                    title: '7-Day Streak',
+                    completed: false,
+                  },
                 ],
                 leaderboard: [
                   {
@@ -177,7 +185,9 @@ test.describe('MyProgressPage — DEV_MODE guard', () => {
       }
     });
     await login(page);
-    await page.goto(`${BASE_URL}/my-progress`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/my-progress`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
   });
 
@@ -229,7 +239,9 @@ test.describe('MyProgressPage — Live backend', () => {
   });
 
   test('my progress page loads for authenticated student', async ({ page }) => {
-    await page.goto(`${BASE_URL}/my-progress`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/my-progress`, {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForLoadState('domcontentloaded');
 
     // Either stats are displayed or the empty-state prompt is shown

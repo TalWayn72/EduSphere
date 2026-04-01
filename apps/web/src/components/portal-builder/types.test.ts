@@ -46,7 +46,10 @@ describe('portal-builder/types', () => {
       expect(block.id).toBe('block-1');
       expect(block.type).toBe('HeroBanner');
       expect(block.order).toBe(0);
-      expect(block.config).toEqual({ title: 'Welcome', subtitle: 'Learn more' });
+      expect(block.config).toEqual({
+        title: 'Welcome',
+        subtitle: 'Learn more',
+      });
     });
 
     it('config accepts any record shape', () => {

@@ -95,25 +95,19 @@ describe('SI-1: learner_skill_progress RLS uses app.current_user_id', () => {
 
 describe('skill_paths RLS tenant isolation and role gate', () => {
   it('USING clause references app.current_tenant', () => {
-    const raw = sqlToString(
-      skillPathsRLS as Parameters<typeof sqlToString>[0]
-    );
+    const raw = sqlToString(skillPathsRLS as Parameters<typeof sqlToString>[0]);
     expect(raw).toContain('app.current_tenant');
   });
 
   it('WITH CHECK restricts writes to INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN', () => {
-    const raw = sqlToString(
-      skillPathsRLS as Parameters<typeof sqlToString>[0]
-    );
+    const raw = sqlToString(skillPathsRLS as Parameters<typeof sqlToString>[0]);
     expect(raw).toContain('INSTRUCTOR');
     expect(raw).toContain('ORG_ADMIN');
     expect(raw).toContain('SUPER_ADMIN');
   });
 
   it('WITH CHECK uses app.current_user_role (not app.current_user)', () => {
-    const raw = sqlToString(
-      skillPathsRLS as Parameters<typeof sqlToString>[0]
-    );
+    const raw = sqlToString(skillPathsRLS as Parameters<typeof sqlToString>[0]);
     expect(raw).toContain('app.current_user_role');
     expect(raw).not.toMatch(/current_setting\('app\.current_user'[^_]/);
   });

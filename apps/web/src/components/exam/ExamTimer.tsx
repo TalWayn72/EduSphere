@@ -22,10 +22,12 @@ export function ExamTimer({
       variant="outline"
       className={cn(
         'gap-1.5 px-3 py-1.5 text-sm font-mono tabular-nums transition-colors',
-        !isWarning && !isCritical && 'border-green-500 bg-green-50 text-green-700',
+        !isWarning &&
+          !isCritical &&
+          'border-green-500 bg-green-50 text-green-700',
         isWarning && 'border-yellow-500 bg-yellow-50 text-yellow-700',
         isCritical && 'border-red-500 bg-red-50 text-red-700',
-        isFlashing && 'animate-pulse',
+        isFlashing && 'animate-pulse'
       )}
       aria-live="polite"
       aria-label={`Time remaining: ${formattedTime}`}

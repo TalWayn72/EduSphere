@@ -244,7 +244,9 @@ describe('Dashboard', () => {
     renderDashboard();
     // Should still render the page with mock fallback values
     expect(screen.getByText('Concepts Mastered')).toBeInTheDocument();
-    expect(screen.getByText(String(MOCK_CONCEPTS_MASTERED))).toBeInTheDocument();
+    expect(
+      screen.getByText(String(MOCK_CONCEPTS_MASTERED))
+    ).toBeInTheDocument();
   });
 
   it('shows course count from real query data', () => {

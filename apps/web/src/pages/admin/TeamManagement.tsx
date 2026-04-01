@@ -14,7 +14,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { PendingInvitesTable } from './TeamManagement.invites';
 
@@ -39,14 +43,26 @@ export function TeamManagement() {
   const csvRef = useRef<HTMLInputElement>(null);
   const [, invite] = useMutation(INVITE_MUTATION);
   const [mounted, setMounted] = useState(false);
-  React.useEffect(() => { setMounted(true); }, []);
-  const [{ data, fetching }] = useQuery({ query: INVITES_QUERY, pause: !mounted });
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+  const [{ data, fetching }] = useQuery({
+    query: INVITES_QUERY,
+    pause: !mounted,
+  });
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<InviteForm>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<InviteForm>({
     resolver: zodResolver(inviteSchema),
   });
 
-  const onInvite = async (form: InviteForm) => { await invite({ input: form }); };
+  const onInvite = async (form: InviteForm) => {
+    await invite({ input: form });
+  };
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,29 +73,64 @@ export function TeamManagement() {
     reader.readAsText(file);
   };
 
-  const invites = (data?.pendingInvites ?? []) as Array<{ id: string; email: string; role: string; status: string }>;
+  const invites = (data?.pendingInvites ?? []) as Array<{
+    id: string;
+    email: string;
+    role: string;
+    status: string;
+  }>;
 
   return (
     <AdminLayout title={t('team.title')} description={t('team.description')}>
       <div data-testid="team-management-page" className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
-            <CardHeader><CardTitle className="text-base">{t('team.inviteTitle')}</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">
+                {t('team.inviteTitle')}
+              </CardTitle>
+            </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit(onInvite)} className="space-y-4" noValidate>
+              <form
+                onSubmit={handleSubmit(onInvite)}
+                className="space-y-4"
+                noValidate
+              >
                 <div className="space-y-2">
                   <Label htmlFor="invite-email">{t('team.emailLabel')}</Label>
-                  <Input id="invite-email" type="email" {...register('email')} placeholder={t('team.emailPlaceholder')} aria-required="true" />
-                  {errors.email && <p className="text-destructive text-xs" role="alert">{errors.email.message}</p>}
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    {...register('email')}
+                    placeholder={t('team.emailPlaceholder')}
+                    aria-required="true"
+                  />
+                  {errors.email && (
+                    <p className="text-destructive text-xs" role="alert">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="invite-role">{t('team.roleLabel')}</Label>
-                  <Select onValueChange={(v) => setValue('role', v as InviteForm['role'])}>
-                    <SelectTrigger id="invite-role"><SelectValue placeholder={t('team.rolePlaceholder')} /></SelectTrigger>
+                  <Select
+                    onValueChange={(v) =>
+                      setValue('role', v as InviteForm['role'])
+                    }
+                  >
+                    <SelectTrigger id="invite-role">
+                      <SelectValue placeholder={t('team.rolePlaceholder')} />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="STUDENT">{t('team.roles.student')}</SelectItem>
-                      <SelectItem value="INSTRUCTOR">{t('team.roles.instructor')}</SelectItem>
-                      <SelectItem value="ORG_ADMIN">{t('team.roles.orgAdmin')}</SelectItem>
+                      <SelectItem value="STUDENT">
+                        {t('team.roles.student')}
+                      </SelectItem>
+                      <SelectItem value="INSTRUCTOR">
+                        {t('team.roles.instructor')}
+                      </SelectItem>
+                      <SelectItem value="ORG_ADMIN">
+                        {t('team.roles.orgAdmin')}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -89,11 +140,25 @@ export function TeamManagement() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">{t('team.csvTitle')}</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">{t('team.csvTitle')}</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">{t('team.csvDescription')}</p>
-              <Input ref={csvRef} type="file" accept=".csv" onChange={handleCsvUpload} aria-label={t('team.csvLabel')} />
-              {csvStatus && <p className="text-sm text-muted-foreground" role="status">{csvStatus}</p>}
+              <p className="text-sm text-muted-foreground">
+                {t('team.csvDescription')}
+              </p>
+              <Input
+                ref={csvRef}
+                type="file"
+                accept=".csv"
+                onChange={handleCsvUpload}
+                aria-label={t('team.csvLabel')}
+              />
+              {csvStatus && (
+                <p className="text-sm text-muted-foreground" role="status">
+                  {csvStatus}
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>

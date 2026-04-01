@@ -10,7 +10,9 @@ vi.mock('urql', () => ({
 }));
 
 vi.mock('lucide-react', () => {
-  const MockIcon = (props: Record<string, unknown>) => <span data-testid="mock-icon" {...props} />;
+  const MockIcon = (props: Record<string, unknown>) => (
+    <span data-testid="mock-icon" {...props} />
+  );
   return { Pencil: MockIcon, Trash2: MockIcon };
 });
 
@@ -32,13 +34,23 @@ const t = (k: string) => k;
 
 const sampleBadges: BadgeData[] = [
   {
-    id: 'b1', name: 'First Steps', description: 'Complete first course',
-    iconUrl: '', xpRequired: 100, autoAwardCriteria: null,
+    id: 'b1',
+    name: 'First Steps',
+    description: 'Complete first course',
+    iconUrl: '',
+    xpRequired: 100,
+    autoAwardCriteria: null,
   },
   {
-    id: 'b2', name: 'Scholar', description: 'Complete 10 courses',
-    iconUrl: 'https://img.test/badge.png', xpRequired: 1000,
-    autoAwardCriteria: { type: 'XP_THRESHOLD', amount: 1000 } as BadgeData['autoAwardCriteria'],
+    id: 'b2',
+    name: 'Scholar',
+    description: 'Complete 10 courses',
+    iconUrl: 'https://img.test/badge.png',
+    xpRequired: 1000,
+    autoAwardCriteria: {
+      type: 'XP_THRESHOLD',
+      amount: 1000,
+    } as BadgeData['autoAwardCriteria'],
   },
 ];
 
@@ -56,8 +68,12 @@ describe('GamificationBadgeForm', () => {
 
   it('renders description and XP inputs', () => {
     render(<GamificationBadgeForm t={t} />);
-    expect(screen.getByLabelText('gamification.badgeDescription')).toBeInTheDocument();
-    expect(screen.getByLabelText('gamification.xpRequired')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('gamification.badgeDescription')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('gamification.xpRequired')
+    ).toBeInTheDocument();
   });
 
   it('renders icon URL input', () => {
@@ -82,7 +98,13 @@ describe('GamificationBadgeForm', () => {
 
   it('shows cancel button in edit mode', () => {
     const onCancel = vi.fn();
-    render(<GamificationBadgeForm t={t} editingBadge={sampleBadges[0]} onCancel={onCancel} />);
+    render(
+      <GamificationBadgeForm
+        t={t}
+        editingBadge={sampleBadges[0]}
+        onCancel={onCancel}
+      />
+    );
     const cancelBtn = screen.getByText('common.cancel');
     fireEvent.click(cancelBtn);
     expect(onCancel).toHaveBeenCalled();
@@ -119,7 +141,9 @@ describe('GamificationBadgeTable', () => {
 
   it('calls onEdit when edit button clicked', () => {
     const onEdit = vi.fn();
-    render(<GamificationBadgeTable badges={sampleBadges} t={t} onEdit={onEdit} />);
+    render(
+      <GamificationBadgeTable badges={sampleBadges} t={t} onEdit={onEdit} />
+    );
     const editButtons = screen.getAllByLabelText('common.edit');
     fireEvent.click(editButtons[0]);
     expect(onEdit).toHaveBeenCalledWith(sampleBadges[0]);

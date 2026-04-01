@@ -24,7 +24,11 @@ describe('OgImageService', () => {
 
   // 1 — basic generation
   it('generates a non-empty Buffer', async () => {
-    const buf = await service.generateOgImage('Hello World', 'A description', 'default');
+    const buf = await service.generateOgImage(
+      'Hello World',
+      'A description',
+      'default'
+    );
     expect(buf).toBeInstanceOf(Buffer);
     expect(buf.length).toBeGreaterThan(0);
   });
@@ -34,7 +38,7 @@ describe('OgImageService', () => {
     const svg = service.buildSvg(
       service.safeXmlEscape('<script>alert(1)</script>'),
       '',
-      'default',
+      'default'
     );
     expect(svg).not.toContain('<script>');
     expect(svg).toContain('&lt;script&gt;');
@@ -43,7 +47,11 @@ describe('OgImageService', () => {
   // 3 — title truncated at 80 chars
   it('title is truncated at 80 chars before generating SVG', async () => {
     const longTitle = 'A'.repeat(100);
-    const svg = service.buildSvg(service.safeXmlEscape(longTitle.slice(0, 80)), '', 'default');
+    const svg = service.buildSvg(
+      service.safeXmlEscape(longTitle.slice(0, 80)),
+      '',
+      'default'
+    );
     // The SVG should contain at most 80 'A' characters in a run (not 100)
     const matchLong = svg.match(/A{81,}/);
     expect(matchLong).toBeNull();
@@ -52,7 +60,11 @@ describe('OgImageService', () => {
   // 4 — description truncated at 160 chars
   it('description is truncated at 160 chars before generating SVG', () => {
     const longDesc = 'B'.repeat(200);
-    const svg = service.buildSvg('Title', service.safeXmlEscape(longDesc.slice(0, 160)), 'default');
+    const svg = service.buildSvg(
+      'Title',
+      service.safeXmlEscape(longDesc.slice(0, 160)),
+      'default'
+    );
     // SVG description element shows first 80 chars of the (already-160-truncated) description
     const matchLong = svg.match(/B{161,}/);
     expect(matchLong).toBeNull();

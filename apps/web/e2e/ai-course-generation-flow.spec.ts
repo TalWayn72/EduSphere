@@ -31,7 +31,9 @@ test.describe('AI Course Generation Flow', () => {
     await login(page);
   });
 
-  test('BUG-089: full flow — consent ON → generate course → spinner stops', async ({ page }) => {
+  test('BUG-089: full flow — consent ON → generate course → spinner stops', async ({
+    page,
+  }) => {
     // Increase timeout — course generation involves LLM call + DB writes
     test.setTimeout(120_000);
 
@@ -118,7 +120,9 @@ test.describe('AI Course Generation Flow', () => {
     expect(modalText).not.toContain('graphQLErrors');
   });
 
-  test('BUG-089: generateCourseFromPrompt mutation returns valid response', async ({ page }) => {
+  test('BUG-089: generateCourseFromPrompt mutation returns valid response', async ({
+    page,
+  }) => {
     // This test intercepts the actual GraphQL mutation to verify
     // the backend returns a valid response (not an error)
 
@@ -195,7 +199,9 @@ test.describe('AI Course Generation Flow', () => {
     }
   });
 
-  test('BUG-089R2: spinner does not hang forever on generation failure', async ({ page }) => {
+  test('BUG-089R2: spinner does not hang forever on generation failure', async ({
+    page,
+  }) => {
     // This test simulates a backend failure by intercepting the GraphQL
     // mutation to return RUNNING status, then verifying the polling fallback
     // detects the FAILED status and stops the spinner.

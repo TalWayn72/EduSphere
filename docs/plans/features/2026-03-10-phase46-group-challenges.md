@@ -3,14 +3,18 @@
 **Status:** ✅ Complete — see OPEN_ISSUES.md
 
 ## Goal
+
 Complete the Social Learning loop started in Phase 45 by adding:
+
 1. Group Challenges — collaborative learning objectives with leaderboard
 2. KG-based Peer Matching — Apache AGE graph traversal to find ideal learning partners based on complementary skill gaps
 
 ## Sprint A — Backend (DB + Subgraph)
 
 ### DB Migration 0028
+
 Tables:
+
 - `group_challenges` — id, tenant_id, title, description, course_id, challenge_type (QUIZ/PROJECT/DISCUSSION), target_score, start_date, end_date, max_participants, status (DRAFT/ACTIVE/COMPLETED), created_by, created_at, updated_at
   - RLS: tenant isolation + created_by access
 - `challenge_participants` — id, challenge_id, user_id, score, rank, joined_at, completed_at
@@ -19,6 +23,7 @@ Tables:
   - RLS: requester or matched_user access
 
 ### Subgraph-core: GroupChallengeService
+
 - `createChallenge(input)` — INSTRUCTOR/ORG_ADMIN only
 - `joinChallenge(challengeId)` — any authenticated user, max_participants check
 - `submitChallengeScore(challengeId, score)` — participant only, NATS event: EDUSPHERE.challenge.score_submitted
@@ -27,6 +32,7 @@ Tables:
 - NATS fan-out: `EDUSPHERE.challenge.completed` → social_feed_items
 
 ### Subgraph-knowledge: PeerMatchingService
+
 - `findPeerMatches(userId, courseId)` — Apache AGE Cypher:
   - Find users in same course with COMPLEMENTARY skill gaps
   - Query: users whose strong skills fill my weak skills and vice versa
@@ -35,6 +41,7 @@ Tables:
 - `respondToPeerMatch(requestId, accept: boolean)`
 
 ### GraphQL SDL additions (subgraph-core + subgraph-knowledge)
+
 ```graphql
 type GroupChallenge {
   id: ID!
@@ -67,33 +74,51 @@ type PeerMatch {
   complementarySkills: [String!]!
 }
 
-enum ChallengeType { QUIZ PROJECT DISCUSSION }
-enum ChallengeStatus { DRAFT ACTIVE COMPLETED }
+enum ChallengeType {
+  QUIZ
+  PROJECT
+  DISCUSSION
+}
+enum ChallengeStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
 
 extend type Query {
-  activeChallenges(courseId: String, first: Int, after: String): GroupChallengeConnection!
+  activeChallenges(
+    courseId: String
+    first: Int
+    after: String
+  ): GroupChallengeConnection!
   challengeLeaderboard(challengeId: ID!): [ChallengeParticipant!]!
   peerMatches(courseId: String): [PeerMatch!]!
   myPeerMatchRequests: [PeerMatchRequest!]!
 }
 
 extend type Mutation {
-  createChallenge(input: CreateChallengeInput!): GroupChallenge! @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  createChallenge(input: CreateChallengeInput!): GroupChallenge!
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
   joinChallenge(challengeId: ID!): ChallengeParticipant! @authenticated
-  submitChallengeScore(challengeId: ID!, score: Int!): ChallengeParticipant! @authenticated
-  requestPeerMatch(matchedUserId: ID!, courseId: String!): PeerMatchRequest! @authenticated
-  respondToPeerMatch(requestId: ID!, accept: Boolean!): PeerMatchRequest! @authenticated
+  submitChallengeScore(challengeId: ID!, score: Int!): ChallengeParticipant!
+    @authenticated
+  requestPeerMatch(matchedUserId: ID!, courseId: String!): PeerMatchRequest!
+    @authenticated
+  respondToPeerMatch(requestId: ID!, accept: Boolean!): PeerMatchRequest!
+    @authenticated
 }
 ```
 
 ## Sprint B — Frontend UI
 
 ### New Pages (apps/web/src/pages/)
+
 - `GroupChallengesPage.tsx` — list of active challenges, join button, leaderboard preview
 - `ChallengeDetailPage.tsx` — full leaderboard, submit score, participants list
 - `PeerMatchingPage.tsx` — "Find a Study Partner" page, match cards with request button
 
 ### New Components (apps/web/src/components/)
+
 - `challenge/ChallengeCard.tsx` — challenge preview with countdown timer
 - `challenge/Leaderboard.tsx` — ranked table with trophy icons for top 3
 - `challenge/CountdownTimer.tsx` — live countdown to challenge end date
@@ -101,22 +126,26 @@ extend type Mutation {
 - `peer-matching/SkillOverlapBar.tsx` — visual overlap of complementary skills
 
 ### New GraphQL queries (apps/web/src/lib/graphql/)
+
 - `challenge.queries.ts`
 - `peer-matching.queries.ts`
 
 ### Router + Sidebar
+
 - Routes: `/challenges`, `/challenges/:id`, `/peer-matching`
 - AppSidebar nav: Group Challenges (Trophy), Find Study Partner (UserCheck)
 
 ## Sprint C — Security + Tests + E2E
 
 ### Security
+
 - SEC-1: `if (challenge.createdBy !== userId && role !== 'INSTRUCTOR')` guard
 - IDOR: `submitScore` validates participant membership before update
 - Rate limit: max 1 score submission per challenge per user (unique constraint)
 - SEC-9: `withTenantContext()` on all challenge + peer_match queries
 
 ### Tests
+
 - `packages/db/src/rls/group-challenges.test.ts` — RLS isolation
 - `apps/subgraph-core/src/challenges/group-challenge.service.spec.ts`
 - `apps/subgraph-knowledge/src/peer-matching/peer-matching.service.spec.ts`
@@ -126,6 +155,7 @@ extend type Mutation {
 - `tests/security/group-challenges.spec.ts`
 
 ## Acceptance Criteria
+
 - [ ] `pnpm turbo test` 100% pass
 - [ ] `pnpm turbo typecheck` 0 errors
 - [ ] `pnpm turbo lint` 0 errors

@@ -101,25 +101,30 @@ Phase 1: Document Processing    Phase 2: Embedding Generation
 // Extends existing KnowledgeSource type
 interface KnowledgeSource {
   // ... existing fields ...
-  embeddingStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETE' | 'PARTIAL' | 'FAILED';
-  embeddedChunks: number;   // chunks with embeddings
-  totalChunks: number;      // total chunks from parsing
-  embeddingError?: string;  // error message if FAILED
+  embeddingStatus:
+    | 'NOT_STARTED'
+    | 'IN_PROGRESS'
+    | 'COMPLETE'
+    | 'PARTIAL'
+    | 'FAILED';
+  embeddedChunks: number; // chunks with embeddings
+  totalChunks: number; // total chunks from parsing
+  embeddingError?: string; // error message if FAILED
 }
 ```
 
 ### Interaction States
 
-| Source Status | Embedding Status | Display | Searchable? |
-|---|---|---|---|
-| PENDING | NOT_STARTED | "Queued for processing" | No |
-| PROCESSING | NOT_STARTED | "Parsing document..." (spinner) | No |
-| READY | NOT_STARTED | "Parsed, waiting for indexing" | No |
-| READY | IN_PROGRESS | Progress bar + "Indexing 47/120 chunks" | Partial |
-| READY | COMPLETE | Green checkmark + "Fully searchable" | Yes |
-| READY | PARTIAL | Yellow warning + "62% searchable" | Partial |
-| READY | FAILED | Red error + retry button | No |
-| FAILED | NOT_STARTED | Red error on parsing + no embedding row | No |
+| Source Status | Embedding Status | Display                                 | Searchable? |
+| ------------- | ---------------- | --------------------------------------- | ----------- |
+| PENDING       | NOT_STARTED      | "Queued for processing"                 | No          |
+| PROCESSING    | NOT_STARTED      | "Parsing document..." (spinner)         | No          |
+| READY         | NOT_STARTED      | "Parsed, waiting for indexing"          | No          |
+| READY         | IN_PROGRESS      | Progress bar + "Indexing 47/120 chunks" | Partial     |
+| READY         | COMPLETE         | Green checkmark + "Fully searchable"    | Yes         |
+| READY         | PARTIAL          | Yellow warning + "62% searchable"       | Partial     |
+| READY         | FAILED           | Red error + retry button                | No          |
+| FAILED        | NOT_STARTED      | Red error on parsing + no embedding row | No          |
 
 ### Polling Strategy
 
@@ -219,21 +224,21 @@ Add an API field `searchMeta` returned alongside search results that indicates t
 
 ```typescript
 interface SearchMeta {
-  totalSources: number;       // total knowledge sources in tenant
-  indexedSources: number;     // sources with complete embeddings
+  totalSources: number; // total knowledge sources in tenant
+  indexedSources: number; // sources with complete embeddings
   indexingInProgress: boolean; // any sources currently embedding
-  indexingPercent: number;     // 0-100
+  indexingPercent: number; // 0-100
 }
 ```
 
 ### Role-Based Display Logic
 
-| Role | No Embeddings | Partial | Full + No Match |
-|---|---|---|---|
-| STUDENT | "Search coming soon" + browse CTA | "More results may appear" banner | Standard no-results |
-| INSTRUCTOR | Indexing status + "Start Indexing" CTA | Progress bar + count | Standard no-results |
-| ORG_ADMIN | Full dashboard link + indexing CTA | Progress bar + admin link | Standard no-results |
-| SUPER_ADMIN | Full dashboard link + indexing CTA | Progress bar + admin link | Standard no-results |
+| Role        | No Embeddings                          | Partial                          | Full + No Match     |
+| ----------- | -------------------------------------- | -------------------------------- | ------------------- |
+| STUDENT     | "Search coming soon" + browse CTA      | "More results may appear" banner | Standard no-results |
+| INSTRUCTOR  | Indexing status + "Start Indexing" CTA | Progress bar + count             | Standard no-results |
+| ORG_ADMIN   | Full dashboard link + indexing CTA     | Progress bar + admin link        | Standard no-results |
+| SUPER_ADMIN | Full dashboard link + indexing CTA     | Progress bar + admin link        | Standard no-results |
 
 ---
 
@@ -308,13 +313,13 @@ Located at `/admin/embeddings` within the existing admin routes.
 
 ### Admin Actions
 
-| Action | Description | Role Required |
-|---|---|---|
-| Re-index All | Trigger embedding generation for all un-indexed content | ORG_ADMIN |
-| Re-index Course | Trigger for a specific course | ORG_ADMIN, INSTRUCTOR (own course) |
-| Retry Failed | Retry embedding for a failed source | ORG_ADMIN, INSTRUCTOR (own course) |
-| View Details | Expand course row to see per-source status | ORG_ADMIN, INSTRUCTOR |
-| Export Report | Download CSV of embedding coverage | ORG_ADMIN |
+| Action          | Description                                             | Role Required                      |
+| --------------- | ------------------------------------------------------- | ---------------------------------- |
+| Re-index All    | Trigger embedding generation for all un-indexed content | ORG_ADMIN                          |
+| Re-index Course | Trigger for a specific course                           | ORG_ADMIN, INSTRUCTOR (own course) |
+| Retry Failed    | Retry embedding for a failed source                     | ORG_ADMIN, INSTRUCTOR (own course) |
+| View Details    | Expand course row to see per-source status              | ORG_ADMIN, INSTRUCTOR              |
+| Export Report   | Download CSV of embedding coverage                      | ORG_ADMIN                          |
 
 ### GraphQL Queries (Proposed)
 
@@ -352,7 +357,10 @@ query EmbeddingDashboard($tenantId: ID!) {
         }
       }
     }
-    pageInfo { hasNextPage endCursor }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
   }
 }
 
@@ -455,8 +463,8 @@ interface RagSource {
   sourceTitle: string;
   sourceType: SourceType;
   chunkIndex: number;
-  snippet: string;          // relevant text excerpt
-  relevanceScore: number;   // 0.0 - 1.0
+  snippet: string; // relevant text excerpt
+  relevanceScore: number; // 0.0 - 1.0
 }
 
 interface AiResponseMeta {
@@ -476,13 +484,13 @@ interface ChatMessage {
 
 ### Confidence Thresholds
 
-| Score Range | Display | Color |
-|---|---|---|
-| 0.80 - 1.00 | "High confidence" | Green (`text-green-600`) |
-| 0.50 - 0.79 | "Moderate confidence" | Yellow (`text-yellow-600`) |
-| 0.20 - 0.49 | "Low confidence" + warning | Orange (`text-orange-600`) |
-| 0.00 - 0.19 | "Very low — general knowledge" | Red (`text-red-500`) |
-| No sources | "No indexed sources" + CTA | Gray (`text-muted-foreground`) |
+| Score Range | Display                        | Color                          |
+| ----------- | ------------------------------ | ------------------------------ |
+| 0.80 - 1.00 | "High confidence"              | Green (`text-green-600`)       |
+| 0.50 - 0.79 | "Moderate confidence"          | Yellow (`text-yellow-600`)     |
+| 0.20 - 0.49 | "Low confidence" + warning     | Orange (`text-orange-600`)     |
+| 0.00 - 0.19 | "Very low — general knowledge" | Red (`text-red-500`)           |
+| No sources  | "No indexed sources" + CTA     | Gray (`text-muted-foreground`) |
 
 ### Source Panel Behavior
 
@@ -611,32 +619,32 @@ sequenceDiagram
 
 ### WCAG 2.1 AA Compliance
 
-| Criterion | Requirement | Implementation |
-|---|---|---|
-| **1.1.1 Non-text Content** | Progress bars must have text alternatives | `aria-label="Embedding progress: 62 percent"` on progress bar |
-| **1.3.1 Info and Relationships** | Status indicators must be programmatically determinable | Use `role="status"` with `aria-live="polite"` for embedding updates |
-| **1.4.1 Use of Color** | Status must not rely on color alone | Add text labels (Ready, Failed, Indexing) alongside colored indicators |
-| **1.4.3 Contrast** | All text meets 4.5:1 ratio | Verify all status colors pass contrast check in both light and dark themes |
-| **1.4.11 Non-text Contrast** | Progress bar track vs fill meets 3:1 | Use `bg-primary` fill on `bg-muted` track |
-| **2.1.1 Keyboard** | All interactive elements keyboard accessible | Tab order: source cards → expand/collapse → action buttons |
-| **2.4.3 Focus Order** | Logical focus sequence in source panel | Sources panel: expand trigger → source list → close → next message |
-| **2.4.7 Focus Visible** | Clear focus indicators | Use `focus-visible:ring-2 focus-visible:ring-primary` |
-| **3.3.1 Error Identification** | Embedding failures clearly identified | Error icon + text description + retry action |
-| **4.1.2 Name, Role, Value** | Custom components expose correct ARIA | `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` |
-| **4.1.3 Status Messages** | Status changes announced to AT | `aria-live="polite"` regions for embedding status transitions |
+| Criterion                        | Requirement                                             | Implementation                                                              |
+| -------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **1.1.1 Non-text Content**       | Progress bars must have text alternatives               | `aria-label="Embedding progress: 62 percent"` on progress bar               |
+| **1.3.1 Info and Relationships** | Status indicators must be programmatically determinable | Use `role="status"` with `aria-live="polite"` for embedding updates         |
+| **1.4.1 Use of Color**           | Status must not rely on color alone                     | Add text labels (Ready, Failed, Indexing) alongside colored indicators      |
+| **1.4.3 Contrast**               | All text meets 4.5:1 ratio                              | Verify all status colors pass contrast check in both light and dark themes  |
+| **1.4.11 Non-text Contrast**     | Progress bar track vs fill meets 3:1                    | Use `bg-primary` fill on `bg-muted` track                                   |
+| **2.1.1 Keyboard**               | All interactive elements keyboard accessible            | Tab order: source cards → expand/collapse → action buttons                  |
+| **2.4.3 Focus Order**            | Logical focus sequence in source panel                  | Sources panel: expand trigger → source list → close → next message          |
+| **2.4.7 Focus Visible**          | Clear focus indicators                                  | Use `focus-visible:ring-2 focus-visible:ring-primary`                       |
+| **3.3.1 Error Identification**   | Embedding failures clearly identified                   | Error icon + text description + retry action                                |
+| **4.1.2 Name, Role, Value**      | Custom components expose correct ARIA                   | `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` |
+| **4.1.3 Status Messages**        | Status changes announced to AT                          | `aria-live="polite"` regions for embedding status transitions               |
 
 ### Keyboard Navigation
 
-| Context | Key | Action |
-|---|---|---|
-| Source card | Enter / Space | Toggle embedding detail expansion |
-| Source card | Delete / Backspace | Open delete confirmation |
-| Progress bar | (non-interactive) | Read via aria-label |
-| Sources panel (AI chat) | Enter / Space | Toggle source citations |
-| Sources panel | Arrow Up/Down | Navigate between sources |
-| Source citation | Enter | Navigate to source in content viewer |
-| Admin table row | Enter | Expand course details |
-| Retry button | Enter / Space | Trigger re-indexing |
+| Context                 | Key                | Action                               |
+| ----------------------- | ------------------ | ------------------------------------ |
+| Source card             | Enter / Space      | Toggle embedding detail expansion    |
+| Source card             | Delete / Backspace | Open delete confirmation             |
+| Progress bar            | (non-interactive)  | Read via aria-label                  |
+| Sources panel (AI chat) | Enter / Space      | Toggle source citations              |
+| Sources panel           | Arrow Up/Down      | Navigate between sources             |
+| Source citation         | Enter              | Navigate to source in content viewer |
+| Admin table row         | Enter              | Expand course details                |
+| Retry button            | Enter / Space      | Trigger re-indexing                  |
 
 ### Screen Reader Announcements
 
@@ -654,12 +662,12 @@ sequenceDiagram
 
 All four features must have equivalent functionality on mobile. Key adaptations:
 
-| Feature | Web | Mobile (Expo) |
-|---|---|---|
-| **Embedding Status** | Inline in source card | Same layout — progress bar uses `react-native-reanimated` for smooth animation |
-| **Search Empty State** | Centered card with CTA buttons | Full-screen empty state with `ScrollView` + pull-to-refresh |
-| **Admin Dashboard** | Table layout with expandable rows | Card-based list with `FlatList` + bottom sheet for details |
-| **RAG Quality** | Collapsible panel below chat message | Bottom sheet (`@gorhom/bottom-sheet`) triggered by "Sources" button |
+| Feature                | Web                                  | Mobile (Expo)                                                                  |
+| ---------------------- | ------------------------------------ | ------------------------------------------------------------------------------ |
+| **Embedding Status**   | Inline in source card                | Same layout — progress bar uses `react-native-reanimated` for smooth animation |
+| **Search Empty State** | Centered card with CTA buttons       | Full-screen empty state with `ScrollView` + pull-to-refresh                    |
+| **Admin Dashboard**    | Table layout with expandable rows    | Card-based list with `FlatList` + bottom sheet for details                     |
+| **RAG Quality**        | Collapsible panel below chat message | Bottom sheet (`@gorhom/bottom-sheet`) triggered by "Sources" button            |
 
 ### Mobile-Specific Patterns
 
@@ -680,11 +688,11 @@ All four features must have equivalent functionality on mobile. Key adaptations:
 
 ### Push Notifications (Mobile Only)
 
-| Event | Notification |
-|---|---|
-| Embedding complete | "Your course materials are now searchable!" |
-| Embedding failed | "Indexing failed for [source]. Tap to retry." |
-| Large batch complete | "[N] sources indexed across [M] courses." |
+| Event                | Notification                                  |
+| -------------------- | --------------------------------------------- |
+| Embedding complete   | "Your course materials are now searchable!"   |
+| Embedding failed     | "Indexing failed for [source]. Tap to retry." |
+| Large batch complete | "[N] sources indexed across [M] courses."     |
 
 ### Offline Behavior
 
@@ -699,32 +707,32 @@ All four features must have equivalent functionality on mobile. Key adaptations:
 
 ### Error State Catalog
 
-| Component | Error | Display | Recovery Action |
-|---|---|---|---|
-| Source Manager | Parsing failed | Red card with error message | "Retry" button |
-| Source Manager | Embedding failed | Red embedding row with error | "Retry Embedding" button |
-| Source Manager | Network error on poll | Toast notification | Auto-retry in 10s |
-| Search Page | API error | "Search temporarily unavailable" | "Try Again" button |
-| Search Page | Timeout | "Search is taking longer than expected" | Auto-retry |
-| Admin Dashboard | Failed to load overview | Error card with retry | "Refresh" button |
-| Admin Dashboard | Re-index request failed | Toast error | "Try Again" in toast |
-| AI Chat | RAG pipeline error | "I couldn't access course materials" | Answer from general knowledge + warning |
-| AI Chat | No sources found | "No indexed sources" banner | "Index Course Materials" CTA |
+| Component       | Error                   | Display                                 | Recovery Action                         |
+| --------------- | ----------------------- | --------------------------------------- | --------------------------------------- |
+| Source Manager  | Parsing failed          | Red card with error message             | "Retry" button                          |
+| Source Manager  | Embedding failed        | Red embedding row with error            | "Retry Embedding" button                |
+| Source Manager  | Network error on poll   | Toast notification                      | Auto-retry in 10s                       |
+| Search Page     | API error               | "Search temporarily unavailable"        | "Try Again" button                      |
+| Search Page     | Timeout                 | "Search is taking longer than expected" | Auto-retry                              |
+| Admin Dashboard | Failed to load overview | Error card with retry                   | "Refresh" button                        |
+| Admin Dashboard | Re-index request failed | Toast error                             | "Try Again" in toast                    |
+| AI Chat         | RAG pipeline error      | "I couldn't access course materials"    | Answer from general knowledge + warning |
+| AI Chat         | No sources found        | "No indexed sources" banner             | "Index Course Materials" CTA            |
 
 ### Empty State Catalog
 
-| Component | Condition | Display |
-|---|---|---|
-| Source Manager | No sources | Books icon + "No sources yet" + "Add your first source" CTA |
-| Source Manager | All sources failed | Warning icon + "All sources failed to process" + "Retry All" CTA |
-| Search Page | No query entered | Search icon + suggested queries (existing) |
-| Search Page | No embeddings exist | Context-aware message (role-based, see Feature 2) |
-| Search Page | No results (indexed) | "No results" + spelling suggestions |
-| Admin Dashboard | No courses | "No courses created yet" + "Create Course" CTA |
-| Admin Dashboard | No sources uploaded | "No content to index" + "Upload materials" CTA |
-| Admin Dashboard | All 100% indexed | Green celebration state + "All content is searchable!" |
-| AI Chat | No chat history | Quick prompts (existing) |
-| AI Chat | No course sources | "No sources indexed" warning above input |
+| Component       | Condition            | Display                                                          |
+| --------------- | -------------------- | ---------------------------------------------------------------- |
+| Source Manager  | No sources           | Books icon + "No sources yet" + "Add your first source" CTA      |
+| Source Manager  | All sources failed   | Warning icon + "All sources failed to process" + "Retry All" CTA |
+| Search Page     | No query entered     | Search icon + suggested queries (existing)                       |
+| Search Page     | No embeddings exist  | Context-aware message (role-based, see Feature 2)                |
+| Search Page     | No results (indexed) | "No results" + spelling suggestions                              |
+| Admin Dashboard | No courses           | "No courses created yet" + "Create Course" CTA                   |
+| Admin Dashboard | No sources uploaded  | "No content to index" + "Upload materials" CTA                   |
+| Admin Dashboard | All 100% indexed     | Green celebration state + "All content is searchable!"           |
+| AI Chat         | No chat history      | Quick prompts (existing)                                         |
+| AI Chat         | No course sources    | "No sources indexed" warning above input                         |
 
 ---
 
@@ -732,27 +740,27 @@ All four features must have equivalent functionality on mobile. Key adaptations:
 
 ### Loading State Specifications
 
-| Component | Trigger | Duration | Display |
-|---|---|---|---|
-| Source card embedding | Poll response pending | 0-3s | Skeleton pulse on embedding row |
-| Search results | Query submitted | 0-5s | 3 skeleton cards (existing pattern) |
-| Admin dashboard overview | Page load | 0-2s | 3 skeleton stat cards + skeleton table |
-| Admin course expansion | Row click | 0-1s | Skeleton source rows |
-| AI chat response | Message sent | 0-30s | Typing indicator (existing dot animation) |
-| AI source panel | Response received | 0-1s | Skeleton source cards below response |
-| Re-index action | Button click | 0-2s | Button spinner + disabled state |
-| Bulk re-index | "Re-index All" click | Immediate | Modal with job queue + estimated time |
+| Component                | Trigger               | Duration  | Display                                   |
+| ------------------------ | --------------------- | --------- | ----------------------------------------- |
+| Source card embedding    | Poll response pending | 0-3s      | Skeleton pulse on embedding row           |
+| Search results           | Query submitted       | 0-5s      | 3 skeleton cards (existing pattern)       |
+| Admin dashboard overview | Page load             | 0-2s      | 3 skeleton stat cards + skeleton table    |
+| Admin course expansion   | Row click             | 0-1s      | Skeleton source rows                      |
+| AI chat response         | Message sent          | 0-30s     | Typing indicator (existing dot animation) |
+| AI source panel          | Response received     | 0-1s      | Skeleton source cards below response      |
+| Re-index action          | Button click          | 0-2s      | Button spinner + disabled state           |
+| Bulk re-index            | "Re-index All" click  | Immediate | Modal with job queue + estimated time     |
 
 ### Animation Specifications
 
-| Element | Animation | Duration | Easing |
-|---|---|---|---|
-| Progress bar fill | Width transition | 300ms | `ease-out` |
-| Source card status change | Background color fade | 200ms | `ease-in-out` |
-| Source panel expand | Height + opacity | 250ms | `ease-out` |
-| Confidence badge appear | Scale + fade | 150ms | `ease-out` |
-| Error shake | Horizontal shake | 400ms | `ease-in-out` (2 cycles) |
-| Success checkmark | Scale pop | 300ms | `cubic-bezier(0.34, 1.56, 0.64, 1)` |
+| Element                   | Animation             | Duration | Easing                              |
+| ------------------------- | --------------------- | -------- | ----------------------------------- |
+| Progress bar fill         | Width transition      | 300ms    | `ease-out`                          |
+| Source card status change | Background color fade | 200ms    | `ease-in-out`                       |
+| Source panel expand       | Height + opacity      | 250ms    | `ease-out`                          |
+| Confidence badge appear   | Scale + fade          | 150ms    | `ease-out`                          |
+| Error shake               | Horizontal shake      | 400ms    | `ease-in-out` (2 cycles)            |
+| Success checkmark         | Scale pop             | 300ms    | `cubic-bezier(0.34, 1.56, 0.64, 1)` |
 
 ### Skeleton Patterns
 
@@ -778,32 +786,33 @@ Admin Dashboard Loading:
 
 ### New Components Required
 
-| Component | Location | Description |
-|---|---|---|
-| `EmbeddingProgress` | `apps/web/src/components/source-manager/EmbeddingProgress.tsx` | Progress bar + status for embedding within source card |
-| `SearchEmptyState` | `apps/web/src/pages/search/SearchEmptyState.tsx` | Context-aware empty state (role-based) |
-| `SearchIndexingBanner` | `apps/web/src/pages/search/SearchIndexingBanner.tsx` | Partial indexing notice banner |
-| `EmbeddingDashboard` | `apps/web/src/pages/admin/EmbeddingDashboard.tsx` | Admin overview page |
-| `EmbeddingCourseTable` | `apps/web/src/pages/admin/EmbeddingCourseTable.tsx` | Course-level embedding table |
-| `EmbeddingCourseRow` | `apps/web/src/pages/admin/EmbeddingCourseRow.tsx` | Expandable row with source details |
-| `EmbeddingOverviewCards` | `apps/web/src/pages/admin/EmbeddingOverviewCards.tsx` | 3 stat cards (coverage, status, storage) |
-| `EmbeddingActivityLog` | `apps/web/src/pages/admin/EmbeddingActivityLog.tsx` | Recent embedding events feed |
-| `RagSourcePanel` | `apps/web/src/pages/content-viewer/RagSourcePanel.tsx` | Collapsible source citations |
-| `RagSourceCard` | `apps/web/src/pages/content-viewer/RagSourceCard.tsx` | Individual source citation card |
-| `RagConfidenceBadge` | `apps/web/src/pages/content-viewer/RagConfidenceBadge.tsx` | Confidence score badge |
+| Component                | Location                                                       | Description                                            |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------------------------ |
+| `EmbeddingProgress`      | `apps/web/src/components/source-manager/EmbeddingProgress.tsx` | Progress bar + status for embedding within source card |
+| `SearchEmptyState`       | `apps/web/src/pages/search/SearchEmptyState.tsx`               | Context-aware empty state (role-based)                 |
+| `SearchIndexingBanner`   | `apps/web/src/pages/search/SearchIndexingBanner.tsx`           | Partial indexing notice banner                         |
+| `EmbeddingDashboard`     | `apps/web/src/pages/admin/EmbeddingDashboard.tsx`              | Admin overview page                                    |
+| `EmbeddingCourseTable`   | `apps/web/src/pages/admin/EmbeddingCourseTable.tsx`            | Course-level embedding table                           |
+| `EmbeddingCourseRow`     | `apps/web/src/pages/admin/EmbeddingCourseRow.tsx`              | Expandable row with source details                     |
+| `EmbeddingOverviewCards` | `apps/web/src/pages/admin/EmbeddingOverviewCards.tsx`          | 3 stat cards (coverage, status, storage)               |
+| `EmbeddingActivityLog`   | `apps/web/src/pages/admin/EmbeddingActivityLog.tsx`            | Recent embedding events feed                           |
+| `RagSourcePanel`         | `apps/web/src/pages/content-viewer/RagSourcePanel.tsx`         | Collapsible source citations                           |
+| `RagSourceCard`          | `apps/web/src/pages/content-viewer/RagSourceCard.tsx`          | Individual source citation card                        |
+| `RagConfidenceBadge`     | `apps/web/src/pages/content-viewer/RagConfidenceBadge.tsx`     | Confidence score badge                                 |
 
 ### Modified Components
 
-| Component | File | Changes |
-|---|---|---|
-| `SourceManager` | `apps/web/src/components/source-manager/SourceManager.tsx` | Add `EmbeddingProgress` to source cards |
-| `SearchPage` | `apps/web/src/pages/search/SearchPage.tsx` | Replace static empty state with `SearchEmptyState` |
-| `AiChatPanel` | `apps/web/src/pages/content-viewer/AiChatPanel.tsx` | Add `RagSourcePanel` below assistant messages |
-| `ChatMessage` type | `apps/web/src/pages/content-viewer/AiChatPanel.tsx` | Extend with `ragMeta` field |
+| Component          | File                                                       | Changes                                            |
+| ------------------ | ---------------------------------------------------------- | -------------------------------------------------- |
+| `SourceManager`    | `apps/web/src/components/source-manager/SourceManager.tsx` | Add `EmbeddingProgress` to source cards            |
+| `SearchPage`       | `apps/web/src/pages/search/SearchPage.tsx`                 | Replace static empty state with `SearchEmptyState` |
+| `AiChatPanel`      | `apps/web/src/pages/content-viewer/AiChatPanel.tsx`        | Add `RagSourcePanel` below assistant messages      |
+| `ChatMessage` type | `apps/web/src/pages/content-viewer/AiChatPanel.tsx`        | Extend with `ragMeta` field                        |
 
 ### Shared UI Primitives Used
 
 All new components use existing shadcn/ui primitives:
+
 - `Card` — stat cards, source cards
 - `Badge` — status badges, confidence badges
 - `Progress` — embedding progress bars (new from shadcn)
@@ -817,16 +826,16 @@ All new components use existing shadcn/ui primitives:
 
 ## Design Tokens
 
-| Token | Light | Dark | Usage |
-|---|---|---|---|
-| `--embedding-ready` | `#16a34a` (green-600) | `#4ade80` (green-400) | Complete status |
-| `--embedding-progress` | `#2563eb` (blue-600) | `#60a5fa` (blue-400) | In-progress status |
-| `--embedding-pending` | `#eab308` (yellow-500) | `#facc15` (yellow-400) | Pending/waiting |
-| `--embedding-failed` | `#dc2626` (red-600) | `#f87171` (red-400) | Error states |
-| `--confidence-high` | `#16a34a` (green-600) | `#4ade80` (green-400) | Score >= 0.80 |
-| `--confidence-medium` | `#eab308` (yellow-500) | `#facc15` (yellow-400) | Score 0.50-0.79 |
-| `--confidence-low` | `#ea580c` (orange-600) | `#fb923c` (orange-400) | Score 0.20-0.49 |
-| `--confidence-none` | `#dc2626` (red-600) | `#f87171` (red-400) | Score < 0.20 |
+| Token                  | Light                  | Dark                   | Usage              |
+| ---------------------- | ---------------------- | ---------------------- | ------------------ |
+| `--embedding-ready`    | `#16a34a` (green-600)  | `#4ade80` (green-400)  | Complete status    |
+| `--embedding-progress` | `#2563eb` (blue-600)   | `#60a5fa` (blue-400)   | In-progress status |
+| `--embedding-pending`  | `#eab308` (yellow-500) | `#facc15` (yellow-400) | Pending/waiting    |
+| `--embedding-failed`   | `#dc2626` (red-600)    | `#f87171` (red-400)    | Error states       |
+| `--confidence-high`    | `#16a34a` (green-600)  | `#4ade80` (green-400)  | Score >= 0.80      |
+| `--confidence-medium`  | `#eab308` (yellow-500) | `#facc15` (yellow-400) | Score 0.50-0.79    |
+| `--confidence-low`     | `#ea580c` (orange-600) | `#fb923c` (orange-400) | Score 0.20-0.49    |
+| `--confidence-none`    | `#dc2626` (red-600)    | `#f87171` (red-400)    | Score < 0.20       |
 
 ---
 
@@ -878,12 +887,12 @@ All new components use existing shadcn/ui primitives:
 
 ## Implementation Priority
 
-| Priority | Feature | Effort | Impact |
-|---|---|---|---|
-| P0 | Embedding Status Indicator | Medium (extend existing Source Manager) | High — transparency for instructors |
-| P1 | Search Empty State | Small (new component + search meta API) | High — reduces user confusion |
-| P1 | RAG Quality Indicator | Medium (new components + extend chat API) | High — builds trust in AI answers |
-| P2 | Admin Embedding Dashboard | Large (new page + new GraphQL queries) | Medium — admin tooling |
+| Priority | Feature                    | Effort                                    | Impact                              |
+| -------- | -------------------------- | ----------------------------------------- | ----------------------------------- |
+| P0       | Embedding Status Indicator | Medium (extend existing Source Manager)   | High — transparency for instructors |
+| P1       | Search Empty State         | Small (new component + search meta API)   | High — reduces user confusion       |
+| P1       | RAG Quality Indicator      | Medium (new components + extend chat API) | High — builds trust in AI answers   |
+| P2       | Admin Embedding Dashboard  | Large (new page + new GraphQL queries)    | Medium — admin tooling              |
 
 ---
 

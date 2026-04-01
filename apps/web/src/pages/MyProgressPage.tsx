@@ -44,7 +44,11 @@ export function MyProgressPage() {
   if (!mounted || fetching) {
     return (
       <Layout>
-        <div className="p-6" aria-busy="true" aria-label="Loading progress data">
+        <div
+          className="p-6"
+          aria-busy="true"
+          aria-label="Loading progress data"
+        >
           {t('common:loading')}
         </div>
       </Layout>
@@ -80,25 +84,35 @@ export function MyProgressPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">{t('gamification:currentStreak')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('gamification:currentStreak')}
+              </p>
               <p className="text-3xl font-bold">
                 {stats.currentStreak}{' '}
-                <span className="text-sm font-normal">{t('gamification:days')}</span>
+                <span className="text-sm font-normal">
+                  {t('gamification:days')}
+                </span>
               </p>
               {stats.longestStreak > 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {t('gamification:longestStreak', { value: stats.longestStreak })}
+                  {t('gamification:longestStreak', {
+                    value: stats.longestStreak,
+                  })}
                 </p>
               )}
             </div>
 
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">{t('gamification:activeChallenges')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('gamification:activeChallenges')}
+              </p>
               <p className="text-3xl font-bold">{activeChallengesCount}</p>
             </div>
 
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">{t('gamification:leaderboardPosition')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('gamification:leaderboardPosition')}
+              </p>
               <p className="text-3xl font-bold">
                 {myRank != null ? `#${myRank}` : '—'}
               </p>

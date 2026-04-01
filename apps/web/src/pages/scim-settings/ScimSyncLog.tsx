@@ -21,9 +21,7 @@ export function ScimSyncLog({ entries }: ScimSyncLogProps) {
     <Card>
       <CardHeader>
         <CardTitle>Sync Log</CardTitle>
-        <CardDescription>
-          Recent SCIM provisioning operations
-        </CardDescription>
+        <CardDescription>Recent SCIM provisioning operations</CardDescription>
       </CardHeader>
       <CardContent>
         {entries.length === 0 ? (

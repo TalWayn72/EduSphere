@@ -7,12 +7,22 @@ import { MemoryRouter } from 'react-router-dom';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
-  useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
-  useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
 }));
 
 vi.mock('@/lib/auth', () => ({
@@ -41,14 +51,22 @@ vi.mock('@/contexts/ThemeContext', () => ({
     resolvedMode: 'light',
     setThemeMode: vi.fn(),
     tenantPrimitives: {},
-    userPreferences: { mode: 'system', fontSize: 'md', readingMode: false, motionPreference: 'full', contrastMode: 'normal' },
+    userPreferences: {
+      mode: 'system',
+      fontSize: 'md',
+      readingMode: false,
+      motionPreference: 'full',
+      contrastMode: 'normal',
+    },
     setTenantTheme: vi.fn(),
     setFontSize: vi.fn(),
     setReadingMode: vi.fn(),
     setMotionPreference: vi.fn(),
     previewThemeChanges: vi.fn(),
   })),
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock('@/components/PageShell', () => ({
@@ -132,13 +150,19 @@ describe('DashboardPage', () => {
   it('renders continue learning section', () => {
     renderDashboard();
     expect(screen.getByTestId('continue-learning-section')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /continue learning/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /continue learning/i })
+    ).toBeInTheDocument();
   });
 
   it('renders at least one course card with progress', () => {
     renderDashboard();
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
-    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Advanced Chavruta Techniques')
+    ).toBeInTheDocument();
   });
 
   it('renders View all link in continue learning section', () => {
@@ -149,7 +173,9 @@ describe('DashboardPage', () => {
   it('renders mastery overview section', () => {
     renderDashboard();
     expect(screen.getByTestId('mastery-overview')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /mastery overview/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /mastery overview/i })
+    ).toBeInTheDocument();
   });
 
   it('renders MasteryBadge components for each topic', () => {
@@ -164,24 +190,30 @@ describe('DashboardPage', () => {
   it('renders recent activity section', () => {
     renderDashboard();
     expect(screen.getByTestId('recent-activity')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /recent activity/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /recent activity/i })
+    ).toBeInTheDocument();
   });
 
   it('renders 5 recent activity items', () => {
     renderDashboard();
-    const activityList = screen.getByRole('list', { name: /recent learning activities/i });
+    const activityList = screen.getByRole('list', {
+      name: /recent learning activities/i,
+    });
     expect(activityList.querySelectorAll('li')).toHaveLength(5);
   });
 
   it('renders recommendations section', () => {
     renderDashboard();
     expect(screen.getByTestId('recommendations')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /recommended for you/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /recommended for you/i })
+    ).toBeInTheDocument();
   });
 
   it('renders recommended course cards', () => {
     renderDashboard();
-    expect(screen.getByText("Mishnah: Laws of Damages")).toBeInTheDocument();
+    expect(screen.getByText('Mishnah: Laws of Damages')).toBeInTheDocument();
     expect(screen.getByText('Biblical Hebrew Foundations')).toBeInTheDocument();
   });
 
@@ -267,7 +299,9 @@ describe('DashboardPage — real data integration', () => {
     // MOCK_IN_PROGRESS has 3 items — fallback "3 in progress" shown
     expect(screen.getByText(/3 in progress/i)).toBeInTheDocument();
     // Mock courses are still shown (fallback)
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
   });
 
   it('shows loading state without crashing during fetch', async () => {
@@ -337,7 +371,9 @@ describe('DashboardPage — real data integration', () => {
       {
         data: undefined,
         fetching: false,
-        error: { message: 'Cannot query field "preferences" on type "User"' } as Error,
+        error: {
+          message: 'Cannot query field "preferences" on type "User"',
+        } as Error,
         stale: false,
         hasNext: false,
       },

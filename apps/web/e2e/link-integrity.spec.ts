@@ -23,7 +23,7 @@ test.describe('Link Integrity — Landing Page', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ data: {} }),
-      }),
+      })
     );
   });
 
@@ -67,7 +67,10 @@ test.describe('Link Integrity — Landing Page', () => {
 
     for (const link of companyLinks) {
       test(`Footer "${link.label}" → ${link.href} loads`, async ({ page }) => {
-        await page.goto(link.href, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await page.goto(link.href, {
+          waitUntil: 'domcontentloaded',
+          timeout: 15000,
+        });
         await page.waitForLoadState('networkidle').catch(() => {});
         const bodyText = await page.locator('body').innerText();
         expect(bodyText.trim().length).toBeGreaterThan(10);
@@ -87,22 +90,37 @@ test.describe('Link Integrity — Landing Page', () => {
       await expect(page.locator('#pricing')).toBeAttached();
     });
 
-    test('/features/ai-course-builder redirects to /features', async ({ page }) => {
-      await page.goto('/features/ai-course-builder', { waitUntil: 'domcontentloaded', timeout: 15000 });
+    test('/features/ai-course-builder redirects to /features', async ({
+      page,
+    }) => {
+      await page.goto('/features/ai-course-builder', {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
+      });
       await page.waitForLoadState('networkidle').catch(() => {});
       expect(page.url()).toContain('/features');
       const bodyText = await page.locator('body').innerText();
       expect(bodyText.trim().length).toBeGreaterThan(10);
     });
 
-    test('/features/visual-anchoring redirects to /features', async ({ page }) => {
-      await page.goto('/features/visual-anchoring', { waitUntil: 'domcontentloaded', timeout: 15000 });
+    test('/features/visual-anchoring redirects to /features', async ({
+      page,
+    }) => {
+      await page.goto('/features/visual-anchoring', {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
+      });
       await page.waitForLoadState('networkidle').catch(() => {});
       expect(page.url()).toContain('/features');
     });
 
-    test('/features/knowledge-graph redirects to /features', async ({ page }) => {
-      await page.goto('/features/knowledge-graph', { waitUntil: 'domcontentloaded', timeout: 15000 });
+    test('/features/knowledge-graph redirects to /features', async ({
+      page,
+    }) => {
+      await page.goto('/features/knowledge-graph', {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
+      });
       await page.waitForLoadState('networkidle').catch(() => {});
       expect(page.url()).toContain('/features');
     });
@@ -113,7 +131,10 @@ test.describe('Link Integrity — Landing Page', () => {
 
     for (const slug of solutions) {
       test(`/solutions/${slug} loads solutions page`, async ({ page }) => {
-        await page.goto(`/solutions/${slug}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await page.goto(`/solutions/${slug}`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 15000,
+        });
         await page.waitForLoadState('networkidle').catch(() => {});
         const bodyText = await page.locator('body').innerText();
         expect(bodyText.trim().length).toBeGreaterThan(10);
@@ -125,10 +146,20 @@ test.describe('Link Integrity — Landing Page', () => {
   test.describe('Footer links — Compliance column anchors', () => {
     // These link to /compliance#ferpa, /compliance#wcag, etc.
     // The compliance page SHOULD have matching section IDs
-    const complianceAnchors = ['ferpa', 'wcag', 'scorm', 'gdpr', 'air-gapped', 'security'];
+    const complianceAnchors = [
+      'ferpa',
+      'wcag',
+      'scorm',
+      'gdpr',
+      'air-gapped',
+      'security',
+    ];
 
     test('Compliance page loads', async ({ page }) => {
-      await page.goto('/compliance', { waitUntil: 'domcontentloaded', timeout: 15000 });
+      await page.goto('/compliance', {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
+      });
       await page.waitForLoadState('networkidle').catch(() => {});
       const bodyText = await page.locator('body').innerText();
       expect(bodyText.trim().length).toBeGreaterThan(10);
@@ -139,7 +170,10 @@ test.describe('Link Integrity — Landing Page', () => {
     // and serve as a TODO for Round 6 (GraphQL graceful degradation fix).
     for (const anchor of complianceAnchors) {
       test.skip(`/compliance has #${anchor} section`, async ({ page }) => {
-        await page.goto('/compliance', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await page.goto('/compliance', {
+          waitUntil: 'domcontentloaded',
+          timeout: 15000,
+        });
         await page.waitForLoadState('networkidle').catch(() => {});
         const section = page.locator(`#${anchor}`);
         await expect(section).toBeAttached();

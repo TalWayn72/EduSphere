@@ -5,7 +5,10 @@ vi.mock('@/lib/lesson-pipeline.store', () => ({
   MODULE_LABELS: {
     INGESTION: { en: 'Ingestion', he: 'איסוף חומרים' },
     ASR: { en: 'Transcription (ASR)', he: 'תמלול' },
-    NER_SOURCE_LINKING: { en: 'NER + Source Linking', he: 'זיהוי ישויות ומקורות' },
+    NER_SOURCE_LINKING: {
+      en: 'NER + Source Linking',
+      he: 'זיהוי ישויות ומקורות',
+    },
     CONTENT_CLEANING: { en: 'Content Cleaning', he: 'ניקוי תוכן' },
     SUMMARIZATION: { en: 'Summarization', he: 'סיכום' },
     STRUCTURED_NOTES: { en: 'Structured Notes', he: 'תיעוד מובנה' },
@@ -26,7 +29,9 @@ describe('PipelineModulePalette', () => {
   it('renders all 10 module buttons in desktop sidebar', () => {
     render(<PipelineModulePalette onAddModule={vi.fn()} />);
     expect(screen.getByTestId('palette-module-INGESTION')).toBeInTheDocument();
-    expect(screen.getByTestId('palette-module-PUBLISH_SHARE')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('palette-module-PUBLISH_SHARE')
+    ).toBeInTheDocument();
   });
 
   it('calls onAddModule when a module is clicked', () => {
@@ -58,7 +63,9 @@ describe('PipelineModulePalette', () => {
     fireEvent.click(screen.getByTestId('mobile-palette-toggle'));
     expect(screen.getByTestId('mobile-palette-sheet')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('mobile-palette-backdrop'));
-    expect(screen.queryByTestId('mobile-palette-sheet')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mobile-palette-sheet')
+    ).not.toBeInTheDocument();
   });
 
   it('each module button has min 44px touch target', () => {

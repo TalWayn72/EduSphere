@@ -121,7 +121,8 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
     );
 
     const created = rows[0];
-    if (!created) throw new InternalServerErrorException('Failed to create SCIM group');
+    if (!created)
+      throw new InternalServerErrorException('Failed to create SCIM group');
 
     if (courseIds.length > 0 && memberIds.length > 0) {
       this.publishEvent('EDUSPHERE.scim.group.enrollment', {
@@ -234,10 +235,7 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** Publish NATS event. Public for use by ScimGroupMemberService. */
-  publishEvent(
-    subject: string,
-    payload: Record<string, unknown>
-  ): void {
+  publishEvent(subject: string, payload: Record<string, unknown>): void {
     if (!this.nats) return;
     try {
       this.nats.publish(

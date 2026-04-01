@@ -10,7 +10,7 @@
 
 ## 1. Purpose & Motivation
 
-Long operations (>2 seconds) currently show a static `Loader2` spinner with a frozen label (e.g., "מייצר..."). Users have no indication of *what* is happening internally, which increases perceived wait time and uncertainty.
+Long operations (>2 seconds) currently show a static `Loader2` spinner with a frozen label (e.g., "מייצר..."). Users have no indication of _what_ is happening internally, which increases perceived wait time and uncertainty.
 
 This feature introduces a **DynamicStatusIndicator** component that cycles through meaningful, operation-specific Hebrew status messages — similar to how Claude Code's status line narrates its own work. This transforms a passive wait into a transparent, trustworthy experience.
 
@@ -20,24 +20,24 @@ This feature introduces a **DynamicStatusIndicator** component that cycles throu
 
 ### 2.1 Deliverables
 
-| Artifact | Path |
-|---|---|
-| Core component | `apps/web/src/components/ui/DynamicStatusIndicator.tsx` |
-| Hook | `apps/web/src/hooks/useCyclingStatus.ts` |
-| Memory test | `apps/web/src/hooks/useCyclingStatus.memory.test.ts` |
-| Unit tests | `apps/web/src/components/ui/DynamicStatusIndicator.test.tsx` |
-| E2E spec | `apps/web/e2e/dynamic-status-indicator.spec.ts` |
-| Message presets | `apps/web/src/lib/status-messages.ts` |
+| Artifact        | Path                                                         |
+| --------------- | ------------------------------------------------------------ |
+| Core component  | `apps/web/src/components/ui/DynamicStatusIndicator.tsx`      |
+| Hook            | `apps/web/src/hooks/useCyclingStatus.ts`                     |
+| Memory test     | `apps/web/src/hooks/useCyclingStatus.memory.test.ts`         |
+| Unit tests      | `apps/web/src/components/ui/DynamicStatusIndicator.test.tsx` |
+| E2E spec        | `apps/web/e2e/dynamic-status-indicator.spec.ts`              |
+| Message presets | `apps/web/src/lib/status-messages.ts`                        |
 
 ### 2.2 Component Variants
 
 Three layout variants cover all contexts in EduSphere:
 
-| Variant | Layout | Primary Use Cases |
-|---|---|---|
-| `inline` | Spinner + text on same line (horizontal flex) | Buttons, table row actions, inline card loading |
-| `block` | Spinner centered above, text centered below | Full-page loading, modal generation state, wizard steps |
-| `minimal` | Text only — no spinner | Inside panels/cards that already carry a progress bar |
+| Variant   | Layout                                        | Primary Use Cases                                       |
+| --------- | --------------------------------------------- | ------------------------------------------------------- |
+| `inline`  | Spinner + text on same line (horizontal flex) | Buttons, table row actions, inline card loading         |
+| `block`   | Spinner centered above, text centered below   | Full-page loading, modal generation state, wizard steps |
+| `minimal` | Text only — no spinner                        | Inside panels/cards that already carry a progress bar   |
 
 ---
 
@@ -47,12 +47,12 @@ Three layout variants cover all contexts in EduSphere:
 
 All tokens are shadcn/ui design system tokens — no new CSS variables are introduced.
 
-| State | Text Class | Icon Class |
-|---|---|---|
-| In progress | `text-sm text-muted-foreground` | `text-muted-foreground` |
+| State                | Text Class                                   | Icon Class                           |
+| -------------------- | -------------------------------------------- | ------------------------------------ |
+| In progress          | `text-sm text-muted-foreground`              | `text-muted-foreground`              |
 | Success (1.5 s hold) | `text-sm text-green-600 dark:text-green-400` | `text-green-600 dark:text-green-400` |
-| Error (persistent) | `text-sm text-destructive` | `text-destructive` |
-| Cancelled | — (component unmounts) | — |
+| Error (persistent)   | `text-sm text-destructive`                   | `text-destructive`                   |
+| Cancelled            | — (component unmounts)                       | —                                    |
 
 ### 3.2 Spinner
 
@@ -86,6 +86,7 @@ Reduced motion (prefers-reduced-motion: reduce):
 ```
 
 Tailwind class for the animated text span:
+
 ```
 transition-opacity duration-200
 ```
@@ -120,15 +121,17 @@ An optional `shimmer` prop adds a subtle `animate-pulse` class to the text span.
 
 ```tsx
 // Before (current pattern in AiCourseCreatorModal.tsx):
-<Loader2 className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5 animate-spin" />
-{t('aiCreator.generating')}
+<Loader2 className="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5 animate-spin" />;
+{
+  t('aiCreator.generating');
+}
 
 // After:
 <DynamicStatusIndicator
   variant="inline"
   messages={STATUS_MESSAGES.aiGeneration}
   size="sm"
-/>
+/>;
 ```
 
 ### 4.2 Block Variant
@@ -192,32 +195,11 @@ export const STATUS_MESSAGES = {
     'יוצר מודולים...',
     'מסיים...',
   ],
-  fileUpload: [
-    'מכין העלאה...',
-    'מעלה קובץ...',
-    'מאשר...',
-    'הושלם!',
-  ],
-  quizGrading: [
-    'בודק תשובות...',
-    'מחשב ציון...',
-    'מכין משוב...',
-  ],
-  pageLoad: [
-    'טוען נתונים...',
-    'מעבד...',
-    'כמעט מוכן...',
-  ],
-  contentImport: [
-    'מתחבר למקור...',
-    'מייבא תוכן...',
-    'מעבד שיעורים...',
-  ],
-  aiChat: [
-    'חושב...',
-    'מנסח תשובה...',
-    'כמעט מוכן...',
-  ],
+  fileUpload: ['מכין העלאה...', 'מעלה קובץ...', 'מאשר...', 'הושלם!'],
+  quizGrading: ['בודק תשובות...', 'מחשב ציון...', 'מכין משוב...'],
+  pageLoad: ['טוען נתונים...', 'מעבד...', 'כמעט מוכן...'],
+  contentImport: ['מתחבר למקור...', 'מייבא תוכן...', 'מעבד שיעורים...'],
+  aiChat: ['חושב...', 'מנסח תשובה...', 'כמעט מוכן...'],
 } as const satisfies Record<string, readonly string[]>;
 ```
 
@@ -262,16 +244,19 @@ const { currentMessage, isFading } = useCyclingStatus({
 });
 
 // In render: skip opacity transition class when reducedMotion=true
-<span className={cn(
-  'transition-opacity duration-200',
-  !reducedMotion && (isFading ? 'opacity-0' : 'opacity-100'),
-  reducedMotion && 'opacity-100'
-)}>
+<span
+  className={cn(
+    'transition-opacity duration-200',
+    !reducedMotion && (isFading ? 'opacity-0' : 'opacity-100'),
+    reducedMotion && 'opacity-100'
+  )}
+>
   {currentMessage}
-</span>
+</span>;
 ```
 
 Under `prefers-reduced-motion: reduce`:
+
 - No fade transition
 - Dots span renders `"..."` statically without cycling
 - `animate-pulse` shimmer suppressed
@@ -318,20 +303,21 @@ The component is purely presentational — it does not receive focus and does no
 ```ts
 interface UseCyclingStatusOptions {
   messages: readonly string[];
-  intervalMs?: number;       // default: 2500
-  reducedMotion?: boolean;   // from useReducedMotion()
+  intervalMs?: number; // default: 2500
+  reducedMotion?: boolean; // from useReducedMotion()
 }
 
 interface UseCyclingStatusResult {
   currentMessage: string;
-  isFading: boolean;         // true during 200ms fade-out window
-  dots: string;              // '', '.', '..', '...' — for showDots feature
+  isFading: boolean; // true during 200ms fade-out window
+  dots: string; // '', '.', '..', '...' — for showDots feature
 }
 ```
 
 ### Memory Safety (mandatory per CLAUDE.md)
 
 The hook creates two intervals:
+
 1. Message cycling interval (`intervalMs`)
 2. Dots cycling interval (400 ms)
 
@@ -342,6 +328,7 @@ Both **must** be stored in `useRef<ReturnType<typeof setInterval>>` and cleared 
 The fade transition uses a `setTimeout` for the 200 ms opacity swap window — this must also be cleared in the cleanup return.
 
 **Required memory test** (`useCyclingStatus.memory.test.ts`):
+
 - Verify `clearInterval` is called on unmount for both intervals
 - Verify `clearTimeout` is called on unmount for the fade timeout
 
@@ -539,23 +526,23 @@ flowchart TD
 
 The component uses exclusively Tailwind semantic tokens from the shadcn/ui design system. No new CSS custom properties are introduced. Dark mode is handled automatically by Tailwind's `dark:` variant applied to the same semantic tokens.
 
-| Token | Light Mode Value | Dark Mode Value |
-|---|---|---|
-| `text-muted-foreground` | `hsl(215.4 16.3% 46.9%)` | `hsl(215 20.2% 65.1%)` |
-| `text-destructive` | `hsl(0 84.2% 60.2%)` | same |
-| `text-green-600` | `#16a34a` | `text-green-400` (#4ade80) |
+| Token                   | Light Mode Value         | Dark Mode Value            |
+| ----------------------- | ------------------------ | -------------------------- |
+| `text-muted-foreground` | `hsl(215.4 16.3% 46.9%)` | `hsl(215 20.2% 65.1%)`     |
+| `text-destructive`      | `hsl(0 84.2% 60.2%)`     | same                       |
+| `text-green-600`        | `#16a34a`                | `text-green-400` (#4ade80) |
 
 ---
 
 ## 17. Testing Requirements
 
-| Test Type | File | Coverage |
-|---|---|---|
-| Unit — hook cycling | `useCyclingStatus.test.ts` | Intervals fire, message increments, cleanup called |
-| Unit — hook memory | `useCyclingStatus.memory.test.ts` | clearInterval × 2, clearTimeout × 1 on unmount |
-| Unit — component | `DynamicStatusIndicator.test.tsx` | All 3 variants render, success/error state, role/aria attrs |
-| Unit — reduced motion | `DynamicStatusIndicator.test.tsx` | No transition class when useReducedMotion=true |
-| E2E | `dynamic-status-indicator.spec.ts` | Inline variant in AI modal, message cycling, success flash, RTL layout |
+| Test Type             | File                               | Coverage                                                               |
+| --------------------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| Unit — hook cycling   | `useCyclingStatus.test.ts`         | Intervals fire, message increments, cleanup called                     |
+| Unit — hook memory    | `useCyclingStatus.memory.test.ts`  | clearInterval × 2, clearTimeout × 1 on unmount                         |
+| Unit — component      | `DynamicStatusIndicator.test.tsx`  | All 3 variants render, success/error state, role/aria attrs            |
+| Unit — reduced motion | `DynamicStatusIndicator.test.tsx`  | No transition class when useReducedMotion=true                         |
+| E2E                   | `dynamic-status-indicator.spec.ts` | Inline variant in AI modal, message cycling, success flash, RTL layout |
 
 ### Key Assertions (E2E)
 
@@ -581,13 +568,13 @@ await expect(region).toBeAttached();
 
 The following files will be updated by Frontend Engineering in the implementation phase to replace static loading text with `DynamicStatusIndicator`:
 
-| File | Current Pattern | Target Variant |
-|---|---|---|
-| `apps/web/src/components/AiCourseCreatorModal.tsx` | `Loader2` + `{t('aiCreator.generating')}` inside Button | `inline` sm with `aiGeneration` preset |
-| `apps/web/src/components/AssessmentResultReport.tsx` | `Loader2` with no status text | `inline` md |
-| `apps/web/src/components/analytics/AtRiskLearnersPanel.tsx` | `Loader2` with no status text | `minimal` |
-| `apps/web/src/App.tsx` | `animate-spin` div + no text | `block` lg with `pageLoad` preset |
-| `apps/web/src/components/AltTextModal.tsx` | `Loader2` + static label | `inline` sm |
+| File                                                        | Current Pattern                                         | Target Variant                         |
+| ----------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------- |
+| `apps/web/src/components/AiCourseCreatorModal.tsx`          | `Loader2` + `{t('aiCreator.generating')}` inside Button | `inline` sm with `aiGeneration` preset |
+| `apps/web/src/components/AssessmentResultReport.tsx`        | `Loader2` with no status text                           | `inline` md                            |
+| `apps/web/src/components/analytics/AtRiskLearnersPanel.tsx` | `Loader2` with no status text                           | `minimal`                              |
+| `apps/web/src/App.tsx`                                      | `animate-spin` div + no text                            | `block` lg with `pageLoad` preset      |
+| `apps/web/src/components/AltTextModal.tsx`                  | `Loader2` + static label                                | `inline` sm                            |
 
 ---
 

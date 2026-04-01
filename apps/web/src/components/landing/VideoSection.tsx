@@ -22,7 +22,9 @@ export function VideoSection() {
         <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-[#0f1117]">
           {prefersReducedMotion ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-              <p className="text-slate-200 text-sm dark:text-slate-700">{t('landing.video.demoLabel')}</p>
+              <p className="text-slate-200 text-sm dark:text-slate-700">
+                {t('landing.video.demoLabel')}
+              </p>
               <p className="text-xs text-slate-300 dark:text-slate-600">
                 {t('landing.video.motionReduced')}
               </p>

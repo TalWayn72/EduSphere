@@ -167,19 +167,31 @@ describe('PushTokenService', () => {
 
     // Spy on all logger methods
     const logSpy = vi.spyOn(
-      (service as unknown as { logger: { log: unknown } }).logger as { log: (...args: unknown[]) => void },
+      (service as unknown as { logger: { log: unknown } }).logger as {
+        log: (...args: unknown[]) => void;
+      },
       'log'
     );
     const debugSpy = vi.spyOn(
-      (service as unknown as { logger: { debug: unknown } }).logger as { debug: (...args: unknown[]) => void },
+      (service as unknown as { logger: { debug: unknown } }).logger as {
+        debug: (...args: unknown[]) => void;
+      },
       'debug'
     );
     const errorSpy = vi.spyOn(
-      (service as unknown as { logger: { error: unknown } }).logger as { error: (...args: unknown[]) => void },
+      (service as unknown as { logger: { error: unknown } }).logger as {
+        error: (...args: unknown[]) => void;
+      },
       'error'
     );
 
-    await service.registerToken('user-1', 'tenant-1', 'IOS', tokenValue, undefined);
+    await service.registerToken(
+      'user-1',
+      'tenant-1',
+      'IOS',
+      tokenValue,
+      undefined
+    );
 
     const allLogCalls = [
       ...logSpy.mock.calls,

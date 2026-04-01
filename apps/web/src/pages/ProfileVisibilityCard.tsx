@@ -33,14 +33,19 @@ export function ProfileVisibilityCard({
   const [, executeMutation] = useMutation<VisibilityResult>(
     UPDATE_PROFILE_VISIBILITY_MUTATION
   );
-  const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   React.useEffect(() => {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[ProfileVisibilityCard] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[ProfileVisibilityCard] cleanup: copy timer cleared on unmount'
+          );
       }
     };
   }, []);
@@ -54,7 +59,10 @@ export function ProfileVisibilityCard({
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-      copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
+      copyTimerRef.current = setTimeout(
+        () => setCopied(false),
+        TOAST_AUTO_DISMISS_MS
+      );
     });
   }, [userId]);
 

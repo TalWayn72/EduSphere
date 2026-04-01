@@ -3,7 +3,7 @@ name: Lighthouse CI — LCP Budget
 on:
   pull_request:
     paths:
-      - 'apps/web/src/**'
+      - "apps/web/src/**"
 
 jobs:
   lighthouse:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
 

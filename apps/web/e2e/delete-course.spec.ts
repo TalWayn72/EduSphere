@@ -83,7 +83,7 @@ function setupEditPageMocks(
     deleteMutationResponse?: string | null;
     onDeleteCalled?: () => void;
     courseOverrides?: Partial<typeof MOCK_COURSE>;
-  } = {},
+  } = {}
 ) {
   const course = { ...MOCK_COURSE, ...options.courseOverrides };
 
@@ -119,7 +119,9 @@ function setupEditPageMocks(
 test.describe('delete-course — Delete Course Flow', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('instructor sees delete button on course edit page', async ({ page }) => {
+  test('instructor sees delete button on course edit page', async ({
+    page,
+  }) => {
     await setupEditPageMocks(page);
     await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
 
@@ -145,7 +147,9 @@ test.describe('delete-course — Delete Course Flow', () => {
     expect(dialogText).toBeTruthy();
   });
 
-  test('confirmation dialog requires typing course title to enable delete', async ({ page }) => {
+  test('confirmation dialog requires typing course title to enable delete', async ({
+    page,
+  }) => {
     await setupEditPageMocks(page);
     await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
 
@@ -157,7 +161,9 @@ test.describe('delete-course — Delete Course Flow', () => {
     await expect(dialog).toBeVisible({ timeout: 5_000 });
 
     // The confirm/delete button inside the dialog should be disabled initially
-    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    const confirmBtn = dialog
+      .getByRole('button', { name: /delete|confirm/i })
+      .first();
 
     // Look for the confirmation input field
     const confirmInput = dialog.locator('input').first();
@@ -178,7 +184,9 @@ test.describe('delete-course — Delete Course Flow', () => {
   test('cancel closes dialog without deleting', async ({ page }) => {
     let deleteCalled = false;
     await setupEditPageMocks(page, {
-      onDeleteCalled: () => { deleteCalled = true; },
+      onDeleteCalled: () => {
+        deleteCalled = true;
+      },
     });
     await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
 
@@ -190,7 +198,9 @@ test.describe('delete-course — Delete Course Flow', () => {
     await expect(dialog).toBeVisible({ timeout: 5_000 });
 
     // Click cancel button
-    const cancelBtn = dialog.getByRole('button', { name: /cancel|close|no/i }).first();
+    const cancelBtn = dialog
+      .getByRole('button', { name: /cancel|close|no/i })
+      .first();
     if (await cancelBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await cancelBtn.click();
     } else {
@@ -208,10 +218,14 @@ test.describe('delete-course — Delete Course Flow', () => {
     expect(page.url()).toContain(`/courses/${COURSE_ID}`);
   });
 
-  test('confirming deletion triggers DeleteCourse mutation', async ({ page }) => {
+  test('confirming deletion triggers DeleteCourse mutation', async ({
+    page,
+  }) => {
     let deleteCalled = false;
     await setupEditPageMocks(page, {
-      onDeleteCalled: () => { deleteCalled = true; },
+      onDeleteCalled: () => {
+        deleteCalled = true;
+      },
     });
     await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
 
@@ -229,7 +243,9 @@ test.describe('delete-course — Delete Course Flow', () => {
     }
 
     // Click the confirm/delete button
-    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    const confirmBtn = dialog
+      .getByRole('button', { name: /delete|confirm/i })
+      .first();
     await confirmBtn.waitFor({ timeout: 3_000 });
     if (await confirmBtn.isEnabled()) {
       await confirmBtn.click();
@@ -257,7 +273,9 @@ test.describe('delete-course — Delete Course Flow', () => {
     }
 
     // Click confirm
-    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    const confirmBtn = dialog
+      .getByRole('button', { name: /delete|confirm/i })
+      .first();
     await confirmBtn.waitFor({ timeout: 3_000 });
     if (await confirmBtn.isEnabled()) {
       await confirmBtn.click();
@@ -270,14 +288,18 @@ test.describe('delete-course — Delete Course Flow', () => {
     expect(url).toMatch(/\/courses(?:\/)?$/);
   });
 
-  test('delete mutation error shows friendly message (not raw GraphQL)', async ({ page }) => {
+  test('delete mutation error shows friendly message (not raw GraphQL)', async ({
+    page,
+  }) => {
     await setupEditPageMocks(page, {
       deleteMutationResponse: JSON.stringify({
         data: { deleteCourse: null },
-        errors: [{
-          message: 'Cannot delete course with active enrollments',
-          extensions: { code: 'FORBIDDEN' },
-        }],
+        errors: [
+          {
+            message: 'Cannot delete course with active enrollments',
+            extensions: { code: 'FORBIDDEN' },
+          },
+        ],
       }),
     });
     await loginAndNavigate(page, `/courses/${COURSE_ID}/edit`);
@@ -296,7 +318,9 @@ test.describe('delete-course — Delete Course Flow', () => {
     }
 
     // Click confirm
-    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    const confirmBtn = dialog
+      .getByRole('button', { name: /delete|confirm/i })
+      .first();
     await confirmBtn.waitFor({ timeout: 3_000 });
     if (await confirmBtn.isEnabled()) {
       await confirmBtn.click();
@@ -320,17 +344,21 @@ test.describe('delete-course — Delete Course Flow', () => {
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible({ timeout: 5_000 });
 
-    await expect(page).toHaveScreenshot('delete-course-confirmation-dialog.png', {
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page).toHaveScreenshot(
+      'delete-course-confirmation-dialog.png',
+      {
+        maxDiffPixelRatio: 0.05,
+      }
+    );
   });
 });
 
 // ─── Test Suite: BUG-101 — DialogTitle accessibility (no console errors) ────
 
 test.describe('delete-course — BUG-101: Dialog accessibility', () => {
-
-  test('DeleteCourseDialog does not produce console errors about DialogTitle', async ({ page }) => {
+  test('DeleteCourseDialog does not produce console errors about DialogTitle', async ({
+    page,
+  }) => {
     const consoleErrors: ConsoleMessage[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -353,7 +381,9 @@ test.describe('delete-course — BUG-101: Dialog accessibility', () => {
 
     // BUG-101 regression guard: no console errors about missing DialogTitle
     const dialogTitleErrors = consoleErrors.filter(
-      (e) => e.text().includes('DialogTitle') || e.text().includes('DialogDescription')
+      (e) =>
+        e.text().includes('DialogTitle') ||
+        e.text().includes('DialogDescription')
     );
     expect(dialogTitleErrors).toHaveLength(0);
   });
@@ -391,7 +421,9 @@ test.describe('delete-course — BUG-101: Dialog accessibility', () => {
     await confirmInput.fill(MOCK_COURSE.title);
 
     // Confirm button should now be enabled
-    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    const confirmBtn = dialog
+      .getByRole('button', { name: /delete|confirm/i })
+      .first();
     await expect(confirmBtn).toBeEnabled({ timeout: 3_000 });
 
     await page.screenshot({
@@ -414,7 +446,9 @@ test.describe('delete-course — BUG-101: Dialog accessibility', () => {
     const confirmInput = dialog.locator('input').first();
     await confirmInput.fill(MOCK_COURSE.title);
 
-    const confirmBtn = dialog.getByRole('button', { name: /delete|confirm/i }).first();
+    const confirmBtn = dialog
+      .getByRole('button', { name: /delete|confirm/i })
+      .first();
     await expect(confirmBtn).toBeEnabled({ timeout: 3_000 });
     await confirmBtn.click();
 
@@ -431,7 +465,9 @@ test.describe('delete-course — BUG-101: Dialog accessibility', () => {
 // ─── Test Suite: Role-Based Access — Delete Button Visibility ───────────────
 
 test.describe('delete-course — Role-based delete button visibility', () => {
-  test('student cannot see delete button on course detail page', async ({ page }) => {
+  test('student cannot see delete button on course detail page', async ({
+    page,
+  }) => {
     // Mock the course detail page (not edit page — students can't access edit)
     await routeGraphQL(page, (opName) => {
       if (opName === 'CourseDetail' || opName === 'GetCourse') {
@@ -464,7 +500,9 @@ test.describe('delete-course — Role-based delete button visibility', () => {
     await expect(deleteBtn).not.toBeVisible({ timeout: 5_000 });
   });
 
-  test('non-owner instructor is redirected from edit page (role guard)', async ({ page }) => {
+  test('non-owner instructor is redirected from edit page (role guard)', async ({
+    page,
+  }) => {
     await routeGraphQL(page, (opName) => {
       if (opName === 'CourseDetail' || opName === 'GetCourse') {
         return JSON.stringify({
@@ -497,7 +535,9 @@ test.describe('delete-course — Role-based delete button visibility', () => {
     if (url.includes('/edit')) {
       // User has admin access — delete button should still be present for admins
       const deleteBtn = page.getByRole('button', { name: /delete/i }).first();
-      const isVisible = await deleteBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+      const isVisible = await deleteBtn
+        .isVisible({ timeout: 5_000 })
+        .catch(() => false);
       // Admin users can delete any course
       expect(typeof isVisible).toBe('boolean');
     }

@@ -37,6 +37,7 @@ flowchart LR
 ## Problem
 
 Previously, Security and QA divisions only engaged at Wave 2 (implementation). This caused:
+
 - Missing `data-testid` attributes discovered post-implementation
 - Threat models written after code was committed
 - Security gaps found too late to fix cheaply
@@ -51,11 +52,11 @@ Each Wave 1 planning phase MUST produce:
 
 For every new feature or mutation:
 
-| Threat | STRIDE Category | Mitigation | Owner |
-|--------|----------------|-----------|-------|
-| Unauthorized access to [resource] | Spoofing | JWT + @requiresRole | Backend |
-| Data leak across tenants | Information Disclosure | RLS + withTenantContext | Database |
-| Injection via user input | Tampering | Zod validation | Backend |
+| Threat                            | STRIDE Category        | Mitigation              | Owner    |
+| --------------------------------- | ---------------------- | ----------------------- | -------- |
+| Unauthorized access to [resource] | Spoofing               | JWT + @requiresRole     | Backend  |
+| Data leak across tenants          | Information Disclosure | RLS + withTenantContext | Database |
+| Injection via user input          | Tampering              | Zod validation          | Backend  |
 
 #### 2. Testability Contract (QA Division)
 
@@ -63,15 +64,18 @@ For every new UI component or API endpoint:
 
 ```markdown
 ## Required data-testid Attributes
+
 - data-testid="feature-main-container"
 - data-testid="feature-submit-button"
 - data-testid="feature-error-message"
 
 ## Required Error Codes
+
 - FEATURE_NOT_FOUND
 - FEATURE_PERMISSION_DENIED
 
 ## Mock Seams
+
 - GraphQL query: mockable via page.route()
 - External service: mockable via dependency injection
 ```
@@ -99,4 +103,4 @@ For every new UI component or API endpoint:
 
 ---
 
-*Effective: March 2026 — Enterprise Audit Wave 5*
+_Effective: March 2026 — Enterprise Audit Wave 5_

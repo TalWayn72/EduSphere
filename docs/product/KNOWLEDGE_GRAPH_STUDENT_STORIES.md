@@ -58,6 +58,7 @@ graph TD
 **so that** I can review them before struggling with advanced material.
 
 **Acceptance Criteria:**
+
 - Before opening a module, show a card: "This module builds on: [Concept A], [Concept B]"
 - Concepts I've mastered show ✅, unmastered show ⚠️ with a link to review material
 - Data source: Apache AGE `PREREQUISITE_OF` edges between concepts
@@ -70,6 +71,7 @@ graph TD
 **so that** I can explore connections and deepen my understanding.
 
 **Acceptance Criteria:**
+
 - Right sidebar panel (collapsible) shows 3-5 related concepts
 - Each concept card shows: name, brief definition, confidence score
 - Clicking a concept navigates to its detail page with connected concepts
@@ -82,6 +84,7 @@ graph TD
 **so that** I'm challenged appropriately — not bored or overwhelmed.
 
 **Acceptance Criteria:**
+
 - Quiz engine reads student's concept mastery scores from knowledge graph
 - Low mastery → easier questions (recall level)
 - High mastery → harder questions (application/synthesis level)
@@ -95,6 +98,7 @@ graph TD
 **so that** I can continue learning in a structured way.
 
 **Acceptance Criteria:**
+
 - "What to learn next" card on course completion page
 - Shows 2-3 courses that build on concepts from the completed course
 - Ranked by: prerequisite overlap (highest = best next step)
@@ -107,6 +111,7 @@ graph TD
 **so that** I know where to focus my study time.
 
 **Acceptance Criteria:**
+
 - Dashboard widget showing concept clusters (TopicCluster nodes)
 - Each cluster shows: mastery percentage, number of concepts, status (strong/weak/new)
 - Clicking a cluster drills into individual concepts
@@ -119,6 +124,7 @@ graph TD
 **so that** I understand its importance and cross-disciplinary connections.
 
 **Acceptance Criteria:**
+
 - "Appears in" section on concept detail page
 - Lists all courses/modules that reference this concept
 - Shows how many students have mastered it (anonymized)
@@ -136,15 +142,15 @@ graph TD
 
 ## Dependencies
 
-| Story | Depends On |
-|-------|-----------|
-| US-1 | `PREREQUISITE_OF` edges populated in knowledge graph |
-| US-2 | pgvector similarity search + AGE graph traversal |
-| US-3 | Quiz engine in subgraph-content + mastery scores |
-| US-4 | Course → concept mapping via `TAUGHT_IN` edges |
-| US-5 | TopicCluster ontology populated |
-| US-6 | `TAUGHT_IN` edges + cross-course concept indexing |
+| Story | Depends On                                           |
+| ----- | ---------------------------------------------------- |
+| US-1  | `PREREQUISITE_OF` edges populated in knowledge graph |
+| US-2  | pgvector similarity search + AGE graph traversal     |
+| US-3  | Quiz engine in subgraph-content + mastery scores     |
+| US-4  | Course → concept mapping via `TAUGHT_IN` edges       |
+| US-5  | TopicCluster ontology populated                      |
+| US-6  | `TAUGHT_IN` edges + cross-course concept indexing    |
 
 ---
 
-*Created: March 2026 — Enterprise Audit Wave 8*
+_Created: March 2026 — Enterprise Audit Wave 8_

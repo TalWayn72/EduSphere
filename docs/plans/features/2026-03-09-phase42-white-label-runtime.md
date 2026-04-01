@@ -7,16 +7,16 @@
 
 ## Context — What's Already Built
 
-| Component | Location | Status |
-|-----------|----------|--------|
-| `tenant_branding` DB table | `packages/db/src/schema/tenantBranding.ts` | ✅ Full schema (logoUrl, colors, font, customCss, hideEduSphereBranding) |
-| `TenantBrandingService` | `apps/subgraph-core/src/tenant/tenant-branding.service.ts` | ✅ get/update |
-| GraphQL: `myTenantBranding` query | `apps/subgraph-core/src/tenant/tenant.graphql` + supergraph | ✅ authenticated query |
-| GraphQL: `updateTenantBranding` | same | ✅ ORG_ADMIN only |
-| `branding.ts` | `apps/web/src/lib/branding.ts` | ✅ `applyTenantBranding()` + `hexToHsl()` + `detectTenantSlug()` |
-| `branding.queries.ts` | `apps/web/src/lib/graphql/branding.queries.ts` | ✅ `TENANT_BRANDING_QUERY` + `UPDATE_TENANT_BRANDING_MUTATION` |
-| `BrandingSettingsPage` | `apps/web/src/pages/BrandingSettingsPage.tsx` | ✅ Admin branding form |
-| AppSidebar hardcoded "EduSphere" | `apps/web/src/components/AppSidebar.tsx:101` | ❌ Not connected to branding |
+| Component                         | Location                                                    | Status                                                                   |
+| --------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `tenant_branding` DB table        | `packages/db/src/schema/tenantBranding.ts`                  | ✅ Full schema (logoUrl, colors, font, customCss, hideEduSphereBranding) |
+| `TenantBrandingService`           | `apps/subgraph-core/src/tenant/tenant-branding.service.ts`  | ✅ get/update                                                            |
+| GraphQL: `myTenantBranding` query | `apps/subgraph-core/src/tenant/tenant.graphql` + supergraph | ✅ authenticated query                                                   |
+| GraphQL: `updateTenantBranding`   | same                                                        | ✅ ORG_ADMIN only                                                        |
+| `branding.ts`                     | `apps/web/src/lib/branding.ts`                              | ✅ `applyTenantBranding()` + `hexToHsl()` + `detectTenantSlug()`         |
+| `branding.queries.ts`             | `apps/web/src/lib/graphql/branding.queries.ts`              | ✅ `TENANT_BRANDING_QUERY` + `UPDATE_TENANT_BRANDING_MUTATION`           |
+| `BrandingSettingsPage`            | `apps/web/src/pages/BrandingSettingsPage.tsx`               | ✅ Admin branding form                                                   |
+| AppSidebar hardcoded "EduSphere"  | `apps/web/src/components/AppSidebar.tsx:101`                | ❌ Not connected to branding                                             |
 
 ## What's MISSING (Phase 42 gaps)
 
@@ -59,7 +59,11 @@ Public pages (login, portal) → REST GET /api/branding?slug={tenant} →
 import { useEffect } from 'react';
 import { useQuery } from 'urql';
 import { TENANT_BRANDING_QUERY } from '@/lib/graphql/branding.queries';
-import { applyTenantBranding, DEFAULT_BRANDING, type TenantBrandingData } from '@/lib/branding';
+import {
+  applyTenantBranding,
+  DEFAULT_BRANDING,
+  type TenantBrandingData,
+} from '@/lib/branding';
 
 function injectCustomCss(css: string | null | undefined): void {
   const id = 'tenant-custom-css';
@@ -103,6 +107,7 @@ export function useTenantBranding() {
 **Modify: `apps/web/src/lib/graphql/branding.queries.ts`**
 
 Add `customCss` to `TENANT_BRANDING_QUERY`:
+
 ```graphql
 myTenantBranding {
   # ... existing fields ...
@@ -152,14 +157,13 @@ Read the file, then add `BrandingProvider` INSIDE the urql client provider (so i
 
 ```tsx
 // Add inside the providers stack, after the urql client:
-<BrandingProvider>
-  {/* existing content */}
-</BrandingProvider>
+<BrandingProvider>{/* existing content */}</BrandingProvider>
 ```
 
 **Test: `apps/web/src/hooks/useTenantBranding.test.ts`** (NEW, 5 tests)
 
 Mock urql `useQuery` and `applyTenantBranding`. Test:
+
 1. calls `applyTenantBranding` when data arrives
 2. does NOT call `applyTenantBranding` while fetching
 3. `injectCustomCss` adds `<style id="tenant-custom-css">` to head
@@ -167,6 +171,7 @@ Mock urql `useQuery` and `applyTenantBranding`. Test:
 5. returns `DEFAULT_BRANDING` when no data
 
 **Test: `apps/web/src/contexts/BrandingContext.test.tsx`** (NEW, 3 tests)
+
 1. `useBranding()` returns default branding without provider
 2. returns branding from hook when data loads
 3. `fetching: true` propagated correctly
@@ -190,16 +195,23 @@ Read the full file first. Then:
 **Test: `apps/web/src/components/AppSidebar.test.tsx`** (MODIFY — add 4 new tests)
 
 Read existing tests first. Add:
+
 1. renders `organizationName` from branding (not hardcoded "EduSphere")
 2. renders custom logo `<img>` when `logoUrl` is not default
 3. shows "EduSphere" icon when `logoUrl` is default
 4. hides `hideEduSphereBranding` text when flag is true
 
 Mock `useBranding` in the test file:
+
 ```typescript
 vi.mock('@/contexts/BrandingContext', () => ({
   useBranding: vi.fn(() => ({
-    branding: { ...DEFAULT_BRANDING, organizationName: 'AcmeCorp', logoUrl: '/defaults/logo.svg', hideEduSphereBranding: false },
+    branding: {
+      ...DEFAULT_BRANDING,
+      organizationName: 'AcmeCorp',
+      logoUrl: '/defaults/logo.svg',
+      hideEduSphereBranding: false,
+    },
     fetching: false,
   })),
 }));
@@ -216,6 +228,7 @@ vi.mock('@/contexts/BrandingContext', () => ({
 **Modify: `apps/subgraph-core/src/tenant/tenant.graphql`**
 
 Add public branding query (no `@authenticated`):
+
 ```graphql
 extend type Query {
   publicBranding(slug: String!): PublicTenantBranding
@@ -234,6 +247,7 @@ type PublicTenantBranding {
 **Modify: `apps/subgraph-core/src/tenant/tenant-branding.service.ts`**
 
 Add:
+
 ```typescript
 async getPublicBranding(slug: string): Promise<PublicBrandingResult | null> {
   // Look up tenant by slug (requires join with tenants table)
@@ -268,7 +282,11 @@ Add `publicBranding(slug: String!): PublicTenantBranding` to Query.
 import { useEffect } from 'react';
 import { useQuery } from 'urql';
 import { gql } from 'urql';
-import { applyTenantBranding, detectTenantSlug, DEFAULT_BRANDING } from '@/lib/branding';
+import {
+  applyTenantBranding,
+  detectTenantSlug,
+  DEFAULT_BRANDING,
+} from '@/lib/branding';
 
 const PUBLIC_BRANDING_QUERY = gql`
   query PublicBranding($slug: String!) {
@@ -313,6 +331,7 @@ export function usePublicBranding() {
 Read the current login page. Add `usePublicBranding()` call at the top. Use the returned branding to show tenant logo on the login card.
 
 **Test: `apps/web/src/hooks/usePublicBranding.test.ts`** (3 tests)
+
 1. pauses when no slug detected
 2. applies branding on data load
 3. returns null on main domain
@@ -331,7 +350,10 @@ import { test, expect } from '@playwright/test';
 function mockBrandingGraphQL(page, branding = {}) {
   return page.route('**/graphql', async (route) => {
     const body = route.request().postDataJSON();
-    if (body?.query?.includes('myTenantBranding') || body?.query?.includes('TenantBranding')) {
+    if (
+      body?.query?.includes('myTenantBranding') ||
+      body?.query?.includes('TenantBranding')
+    ) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -341,7 +363,7 @@ function mockBrandingGraphQL(page, branding = {}) {
               logoUrl: '/defaults/logo.svg',
               logoMarkUrl: null,
               faviconUrl: '/defaults/favicon.ico',
-              primaryColor: '#7c3aed',  // purple — visible diff from default blue
+              primaryColor: '#7c3aed', // purple — visible diff from default blue
               secondaryColor: '#64748b',
               accentColor: '#f59e0b',
               backgroundColor: '#ffffff',
@@ -368,13 +390,19 @@ test.describe('White-label branding', () => {
   test('sidebar shows tenant organizationName', async ({ page }) => {
     await mockBrandingGraphQL(page, { organizationName: 'AcmeCorp' });
     await page.goto('/dashboard');
-    await expect(page.getByTestId('sidebar-brand-name')).toContainText('AcmeCorp');
+    await expect(page.getByTestId('sidebar-brand-name')).toContainText(
+      'AcmeCorp'
+    );
   });
 
   test('customCss is injected into document head', async ({ page }) => {
-    await mockBrandingGraphQL(page, { customCss: '.custom-brand { color: red; }' });
+    await mockBrandingGraphQL(page, {
+      customCss: '.custom-brand { color: red; }',
+    });
     await page.goto('/dashboard');
-    const customStyle = await page.evaluate(() => document.getElementById('tenant-custom-css')?.textContent);
+    const customStyle = await page.evaluate(
+      () => document.getElementById('tenant-custom-css')?.textContent
+    );
     expect(customStyle).toContain('.custom-brand');
   });
 
@@ -382,7 +410,9 @@ test.describe('White-label branding', () => {
     await mockBrandingGraphQL(page, { primaryColor: '#7c3aed' });
     await page.goto('/dashboard');
     const cssVar = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--primary')
+        .trim()
     );
     expect(cssVar).toBeTruthy();
     expect(cssVar).not.toBe('');
@@ -394,33 +424,51 @@ test.describe('White-label branding', () => {
     await expect(page.locator('body')).not.toContainText('TypeError');
   });
 
-  test('visual regression — dashboard with custom branding', async ({ page }) => {
-    await mockBrandingGraphQL(page, { organizationName: 'AcmeCorp', primaryColor: '#7c3aed' });
+  test('visual regression — dashboard with custom branding', async ({
+    page,
+  }) => {
+    await mockBrandingGraphQL(page, {
+      organizationName: 'AcmeCorp',
+      primaryColor: '#7c3aed',
+    });
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
-    await expect(page).toHaveScreenshot('white-label-dashboard.png', { maxDiffPixels: 800 });
+    await expect(page).toHaveScreenshot('white-label-dashboard.png', {
+      maxDiffPixels: 800,
+    });
   });
 });
 ```
 
 **Security tests to add to `tests/security/api-security.spec.ts`:**
+
 ```typescript
 describe('Phase 42: White-Label Security', () => {
   it('publicBranding query excludes customCss and hideEduSphereBranding', () => {
-    const sdl = readFileSync(join(__dirname, '../../apps/subgraph-core/src/tenant/tenant.graphql'), 'utf8');
-    const publicBrandingType = sdl.match(/type PublicTenantBranding\s*\{([^}]+)\}/s)?.[1] ?? '';
+    const sdl = readFileSync(
+      join(__dirname, '../../apps/subgraph-core/src/tenant/tenant.graphql'),
+      'utf8'
+    );
+    const publicBrandingType =
+      sdl.match(/type PublicTenantBranding\s*\{([^}]+)\}/s)?.[1] ?? '';
     expect(publicBrandingType).not.toContain('customCss');
     expect(publicBrandingType).not.toContain('hideEduSphereBranding');
   });
 
   it('customCss injection uses textContent not innerHTML (XSS safe)', () => {
-    const hookSrc = readFileSync(join(__dirname, '../../apps/web/src/hooks/useTenantBranding.ts'), 'utf8');
+    const hookSrc = readFileSync(
+      join(__dirname, '../../apps/web/src/hooks/useTenantBranding.ts'),
+      'utf8'
+    );
     expect(hookSrc).toContain('textContent');
     expect(hookSrc).not.toContain('innerHTML');
   });
 
   it('useTenantBranding uses cache-and-network — fresh branding on each load', () => {
-    const hookSrc = readFileSync(join(__dirname, '../../apps/web/src/hooks/useTenantBranding.ts'), 'utf8');
+    const hookSrc = readFileSync(
+      join(__dirname, '../../apps/web/src/hooks/useTenantBranding.ts'),
+      'utf8'
+    );
     expect(hookSrc).toContain('cache-and-network');
   });
 });
@@ -454,43 +502,43 @@ Sprint C (after A+B):
 
 ## Critical File Paths
 
-| File | Status |
-|------|--------|
-| `apps/web/src/hooks/useTenantBranding.ts` | NEW |
-| `apps/web/src/contexts/BrandingContext.tsx` | NEW |
-| `apps/web/src/hooks/usePublicBranding.ts` | NEW |
-| `apps/web/src/hooks/useTenantBranding.test.ts` | NEW |
-| `apps/web/src/contexts/BrandingContext.test.tsx` | NEW |
-| `apps/web/src/hooks/usePublicBranding.test.ts` | NEW |
-| `apps/web/src/App.tsx` | MODIFY — add BrandingProvider |
-| `apps/web/src/components/AppSidebar.tsx` | MODIFY — dynamic org name + logo |
-| `apps/web/src/components/AppSidebar.test.tsx` | MODIFY — +4 branding tests |
-| `apps/web/src/lib/graphql/branding.queries.ts` | MODIFY — add customCss field |
-| `apps/subgraph-core/src/tenant/tenant.graphql` | MODIFY — add publicBranding + PublicTenantBranding type |
-| `apps/subgraph-core/src/tenant/tenant-branding.service.ts` | MODIFY — add getPublicBranding() |
-| `apps/subgraph-core/src/tenant/tenant.resolver.ts` | MODIFY — add publicBranding resolver |
-| `apps/gateway/supergraph.graphql` | MODIFY — add publicBranding + PublicTenantBranding |
-| `apps/web/e2e/white-label.spec.ts` | NEW |
-| `tests/security/api-security.spec.ts` | MODIFY — +3 white-label security tests |
+| File                                                       | Status                                                  |
+| ---------------------------------------------------------- | ------------------------------------------------------- |
+| `apps/web/src/hooks/useTenantBranding.ts`                  | NEW                                                     |
+| `apps/web/src/contexts/BrandingContext.tsx`                | NEW                                                     |
+| `apps/web/src/hooks/usePublicBranding.ts`                  | NEW                                                     |
+| `apps/web/src/hooks/useTenantBranding.test.ts`             | NEW                                                     |
+| `apps/web/src/contexts/BrandingContext.test.tsx`           | NEW                                                     |
+| `apps/web/src/hooks/usePublicBranding.test.ts`             | NEW                                                     |
+| `apps/web/src/App.tsx`                                     | MODIFY — add BrandingProvider                           |
+| `apps/web/src/components/AppSidebar.tsx`                   | MODIFY — dynamic org name + logo                        |
+| `apps/web/src/components/AppSidebar.test.tsx`              | MODIFY — +4 branding tests                              |
+| `apps/web/src/lib/graphql/branding.queries.ts`             | MODIFY — add customCss field                            |
+| `apps/subgraph-core/src/tenant/tenant.graphql`             | MODIFY — add publicBranding + PublicTenantBranding type |
+| `apps/subgraph-core/src/tenant/tenant-branding.service.ts` | MODIFY — add getPublicBranding()                        |
+| `apps/subgraph-core/src/tenant/tenant.resolver.ts`         | MODIFY — add publicBranding resolver                    |
+| `apps/gateway/supergraph.graphql`                          | MODIFY — add publicBranding + PublicTenantBranding      |
+| `apps/web/e2e/white-label.spec.ts`                         | NEW                                                     |
+| `tests/security/api-security.spec.ts`                      | MODIFY — +3 white-label security tests                  |
 
 ---
 
 ## Security Invariants
 
-| Check | Rule |
-|-------|------|
-| `customCss` injection | Use `el.textContent = css` NOT `el.innerHTML` (XSS) |
+| Check                     | Rule                                                                      |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `customCss` injection     | Use `el.textContent = css` NOT `el.innerHTML` (XSS)                       |
 | `publicBranding` response | NEVER return `customCss`, `hideEduSphereBranding`, or internal tenant IDs |
-| `publicBranding` resolver | No `@authenticated` — but limited to safe public fields only |
-| Branding colors | `hexToHsl()` validation — reject invalid hex to prevent CSS injection |
+| `publicBranding` resolver | No `@authenticated` — but limited to safe public fields only              |
+| Branding colors           | `hexToHsl()` validation — reject invalid hex to prevent CSS injection     |
 
 ---
 
 ## Expected Test Delta
 
-| Package | Before | After | Delta |
-|---------|--------|-------|-------|
-| Web unit | 3,933 | ~3,955+ | +22 (hook, context, sidebar, public) |
-| subgraph-core | existing | +3 | (publicBranding) |
-| Security | 26 api-security | +3 | (white-label) |
-| E2E | ~109 | ~114 | +5 (white-label) |
+| Package       | Before          | After   | Delta                                |
+| ------------- | --------------- | ------- | ------------------------------------ |
+| Web unit      | 3,933           | ~3,955+ | +22 (hook, context, sidebar, public) |
+| subgraph-core | existing        | +3      | (publicBranding)                     |
+| Security      | 26 api-security | +3      | (white-label)                        |
+| E2E           | ~109            | ~114    | +5 (white-label)                     |

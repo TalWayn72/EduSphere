@@ -5,7 +5,11 @@ import React from 'react';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useParams: () => ({ sessionId: 's-1' }), useNavigate: () => vi.fn() };
+  return {
+    ...actual,
+    useParams: () => ({ sessionId: 's-1' }),
+    useNavigate: () => vi.fn(),
+  };
 });
 
 vi.mock('lucide-react', () => ({
@@ -41,7 +45,11 @@ import { ExamTakingPage } from './ExamTakingPage';
 
 describe('ExamTakingPage', () => {
   it('renders without crash', () => {
-    const { container } = render(<MemoryRouter><ExamTakingPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <ExamTakingPage />
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 });

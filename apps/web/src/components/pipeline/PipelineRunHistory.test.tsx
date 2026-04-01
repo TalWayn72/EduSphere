@@ -27,23 +27,60 @@ vi.mock('@/lib/graphql/lesson.queries', () => ({
 let lastOnValueChange: ((value: string) => void) | undefined;
 
 vi.mock('@/components/ui/select', () => ({
-  Select: ({ children, value, onValueChange }: { children: React.ReactNode; value: string; onValueChange: (v: string) => void }) => {
+  Select: ({
+    children,
+    value,
+    onValueChange,
+  }: {
+    children: React.ReactNode;
+    value: string;
+    onValueChange: (v: string) => void;
+  }) => {
     lastOnValueChange = onValueChange;
-    return <div data-testid="select" data-value={value}>{children}</div>;
+    return (
+      <div data-testid="select" data-value={value}>
+        {children}
+      </div>
+    );
   },
-  SelectTrigger: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <button {...props}>{children}</button>
+  SelectTrigger: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [k: string]: unknown;
+  }) => <button {...props}>{children}</button>,
+  SelectValue: ({ placeholder }: { placeholder: string }) => (
+    <span>{placeholder}</span>
   ),
-  SelectValue: ({ placeholder }: { placeholder: string }) => <span>{placeholder}</span>,
-  SelectContent: ({ children }: { children: React.ReactNode }) => <div data-testid="select-content">{children}</div>,
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-testid={`select-item-${value}`} data-value={value}>{children}</div>
+  SelectContent: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="select-content">{children}</div>
+  ),
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => (
+    <div data-testid={`select-item-${value}`} data-value={value}>
+      {children}
+    </div>
   ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }) => (
-    <button onClick={onClick} {...props}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    size?: string;
+  }) => (
+    <button onClick={onClick} {...props}>
+      {children}
+    </button>
   ),
 }));
 

@@ -49,7 +49,9 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
           status: 'FAILED',
           error_message: 'Processing was interrupted (service restarted)',
         })
-        .where(inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING']))
+        .where(
+          inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING'])
+        )
         .returning();
 
       if (stale.length > 0) {
@@ -60,7 +62,7 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
     } catch (err) {
       this.logger.warn(
         { err: (err as Error).message },
-        'Startup cleanup skipped — knowledge_sources table may not exist yet (run migrations)',
+        'Startup cleanup skipped — knowledge_sources table may not exist yet (run migrations)'
       );
     }
   }
@@ -132,7 +134,11 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
   async reindexCourseEmbeddings(
     tenantId: string,
     courseId: string
-  ): Promise<{ sourcesProcessed: number; embeddingsGenerated: number; errors: string[] }> {
+  ): Promise<{
+    sourcesProcessed: number;
+    embeddingsGenerated: number;
+    errors: string[];
+  }> {
     return this.processingService.reindexCourseEmbeddings(tenantId, courseId);
   }
 }

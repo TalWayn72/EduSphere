@@ -48,7 +48,10 @@ export class BiometricService {
 
       return result.success;
     } catch (error) {
-      console.error('[BiometricService] Biometric authentication error:', error);
+      console.error(
+        '[BiometricService] Biometric authentication error:',
+        error
+      );
       return false;
     }
   }

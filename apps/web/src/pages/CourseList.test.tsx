@@ -222,9 +222,7 @@ describe('CourseList', () => {
     ] as unknown as ReturnType<typeof useQuery>);
     renderCourseList();
     expect(screen.getByTestId('offline-banner-retry')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /retry/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
   it('retry button calls reexecute with network-only policy', () => {
@@ -588,7 +586,11 @@ describe('CourseList', () => {
   it('refetches courses when navigated to with deleted state', () => {
     const mockReexecute = vi.fn();
     vi.mocked(useQuery).mockReturnValue([
-      { data: { courses: MOCK_COURSES }, fetching: false, error: undefined } as ReturnType<typeof useQuery>[0],
+      {
+        data: { courses: MOCK_COURSES },
+        fetching: false,
+        error: undefined,
+      } as ReturnType<typeof useQuery>[0],
       mockReexecute,
     ]);
     vi.mocked(useMutation).mockReturnValue([
@@ -600,7 +602,10 @@ describe('CourseList', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          { pathname: '/courses', state: { deleted: true, message: 'Course deleted' } },
+          {
+            pathname: '/courses',
+            state: { deleted: true, message: 'Course deleted' },
+          },
         ]}
       >
         <Routes>

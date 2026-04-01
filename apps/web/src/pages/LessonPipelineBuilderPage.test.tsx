@@ -61,7 +61,9 @@ import * as urql from 'urql';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 const NOOP_MUTATION = [{ fetching: false }, NOOP_EXECUTE] as never;
 
 const EMPTY_PLANS_QUERY = [
@@ -194,9 +196,11 @@ describe('LessonPipelineBuilderPage', () => {
     );
     fireEvent.click(screen.getByTestId('add-step-VIDEO'));
     await waitFor(() => expect(mockCreate).toHaveBeenCalled());
-    await waitFor(() => expect(mockAdd).toHaveBeenCalledWith({
-      input: { planId: 'new-plan-1', stepType: 'VIDEO', config: {} },
-    }));
+    await waitFor(() =>
+      expect(mockAdd).toHaveBeenCalledWith({
+        input: { planId: 'new-plan-1', stepType: 'VIDEO', config: {} },
+      })
+    );
   });
 
   it('shows VIDEO step in list after adding', async () => {

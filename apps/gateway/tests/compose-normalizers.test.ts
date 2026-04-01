@@ -25,13 +25,13 @@ function normalizeKnowledgeSdl(sdl: string): string {
   // Remove SocialFeedItem type block (may have directives like @authenticated before {)
   let out = sdl.replace(
     /"""[^"]*"""\s*type SocialFeedItem[^{]*\{[^}]*\}/gs,
-    '',
+    ''
   );
   out = out.replace(/type SocialFeedItem[^{]*\{[^}]*\}/gs, '');
   // Remove SocialRecommendation type block
   out = out.replace(
     /"""[^"]*"""\s*type SocialRecommendation[^{]*\{[^}]*\}/gs,
-    '',
+    ''
   );
   out = out.replace(/type SocialRecommendation[^{]*\{[^}]*\}/gs, '');
   // Remove SocialVerb enum block
@@ -48,16 +48,10 @@ function normalizeKnowledgeSdl(sdl: string): string {
   out = out.replace(/\s*"""[^"]*"""\s*skillGapReport[^\n]*/gs, '');
   out = out.replace(/\s*skillGapReport[^\n]*/g, '');
   // Remove SkillGapReport type block
-  out = out.replace(
-    /"""[^"]*"""\s*type SkillGapReport\s*\{[^}]*\}/gs,
-    '',
-  );
+  out = out.replace(/"""[^"]*"""\s*type SkillGapReport\s*\{[^}]*\}/gs, '');
   out = out.replace(/type SkillGapReport\s*\{[^}]*\}/gs, '');
   // Remove SkillGapItem type block
-  out = out.replace(
-    /"""[^"]*"""\s*type SkillGapItem\s*\{[^}]*\}/gs,
-    '',
-  );
+  out = out.replace(/"""[^"]*"""\s*type SkillGapItem\s*\{[^}]*\}/gs, '');
   out = out.replace(/type SkillGapItem\s*\{[^}]*\}/gs, '');
   // Remove empty extend type Query {} blocks left behind
   out = out.replace(/extend\s+type\s+Query\s*\{\s*\}/g, '');
@@ -65,7 +59,10 @@ function normalizeKnowledgeSdl(sdl: string): string {
 }
 
 function normalizeAgentSdl(sdl: string): string {
-  return sdl.replace(/(?<!Agent)LessonPipelineResult/g, 'AgentLessonPipelineResult');
+  return sdl.replace(
+    /(?<!Agent)LessonPipelineResult/g,
+    'AgentLessonPipelineResult'
+  );
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -226,7 +223,9 @@ extend type Query {
     const result = normalizeAgentSdl(input);
     expect(result).not.toContain('type LessonPipelineResult');
     expect(result).toContain('type AgentLessonPipelineResult');
-    expect(result).toContain('agentPipelineResult(id: ID!): AgentLessonPipelineResult');
+    expect(result).toContain(
+      'agentPipelineResult(id: ID!): AgentLessonPipelineResult'
+    );
   });
 
   it('renames all occurrences including in field return types', () => {

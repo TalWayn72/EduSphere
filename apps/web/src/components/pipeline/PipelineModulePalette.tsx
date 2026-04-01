@@ -5,13 +5,23 @@
  * Mobile (<1024px): collapsible bottom panel triggered by a floating button.
  */
 import { useState } from 'react';
-import { MODULE_LABELS, type PipelineModuleType } from '@/lib/lesson-pipeline.store';
+import {
+  MODULE_LABELS,
+  type PipelineModuleType,
+} from '@/lib/lesson-pipeline.store';
 import { Button } from '@/components/ui/button';
 
 const ALL_MODULES: PipelineModuleType[] = [
-  'INGESTION', 'ASR', 'NER_SOURCE_LINKING', 'CONTENT_CLEANING',
-  'SUMMARIZATION', 'STRUCTURED_NOTES', 'DIAGRAM_GENERATOR',
-  'CITATION_VERIFIER', 'QA_GATE', 'PUBLISH_SHARE',
+  'INGESTION',
+  'ASR',
+  'NER_SOURCE_LINKING',
+  'CONTENT_CLEANING',
+  'SUMMARIZATION',
+  'STRUCTURED_NOTES',
+  'DIAGRAM_GENERATOR',
+  'CITATION_VERIFIER',
+  'QA_GATE',
+  'PUBLISH_SHARE',
 ];
 
 interface Props {
@@ -77,7 +87,9 @@ export function PipelineModulePalette({ onAddModule }: Props) {
 function PaletteList({ onAdd }: { onAdd: (m: PipelineModuleType) => void }) {
   return (
     <>
-      <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">מודולים</p>
+      <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">
+        מודולים
+      </p>
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
         {ALL_MODULES.map((m) => (
           <button

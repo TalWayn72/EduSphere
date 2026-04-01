@@ -1,12 +1,5 @@
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-} from '@nestjs/common';
-import {
-  withTenantContext,
-  sql,
-} from '@edusphere/db';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { withTenantContext, sql } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import { createHmac, randomBytes } from 'crypto';
 import {
@@ -64,10 +57,7 @@ export class WebhookDeliveryService {
 
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(
-        () => controller.abort(),
-        WEBHOOK_TIMEOUT_MS
-      );
+      const timeout = setTimeout(() => controller.abort(), WEBHOOK_TIMEOUT_MS);
 
       const res = await fetch(webhook.url, {
         method: 'POST',
@@ -86,8 +76,14 @@ export class WebhookDeliveryService {
 
       const status = res.ok ? 'DELIVERED' : 'FAILED';
       return this.recordDelivery(
-        db, webhook.id, ctx, eventType, payload,
-        res.status, attempt, status
+        db,
+        webhook.id,
+        ctx,
+        eventType,
+        payload,
+        res.status,
+        attempt,
+        status
       );
     } catch (err) {
       this.logger.warn(
@@ -98,16 +94,30 @@ export class WebhookDeliveryService {
       if (attempt < MAX_RETRIES) {
         const delay = [0, 60_000, 300_000][attempt] ?? 300_000;
         setTimeout(() => {
-          this.dispatchToWebhook(db, webhook, eventType, payload, ctx, attempt + 1)
-            .catch((e) =>
-              this.logger.error({ err: e }, '[WebhookDeliveryService] Retry failed')
-            );
+          this.dispatchToWebhook(
+            db,
+            webhook,
+            eventType,
+            payload,
+            ctx,
+            attempt + 1
+          ).catch((e) =>
+            this.logger.error(
+              { err: e },
+              '[WebhookDeliveryService] Retry failed'
+            )
+          );
         }, delay);
       }
 
       return this.recordDelivery(
-        db, webhook.id, ctx, eventType, payload,
-        null, attempt,
+        db,
+        webhook.id,
+        ctx,
+        eventType,
+        payload,
+        null,
+        attempt,
         attempt >= MAX_RETRIES ? 'FAILED' : 'RETRYING'
       );
     }

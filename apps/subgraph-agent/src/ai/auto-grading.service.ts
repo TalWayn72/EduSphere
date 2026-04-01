@@ -54,7 +54,10 @@ function parseGradingResponse(
   const lowerResponse = responseText.toLowerCase();
   const scoreKeywordIdx = lowerResponse.indexOf('score');
   if (scoreKeywordIdx !== -1) {
-    const afterScore = responseText.slice(scoreKeywordIdx + 5).trimStart().replace(/^[:\s]+/, '');
+    const afterScore = responseText
+      .slice(scoreKeywordIdx + 5)
+      .trimStart()
+      .replace(/^[:\s]+/, '');
     const numStr = afterScore.split(/[^\d.]/)[0] ?? '';
     const parsed = parseFloat(numStr);
     if (!isNaN(parsed)) {
@@ -63,13 +66,18 @@ function parseGradingResponse(
   }
 
   // Extract suggestions after "Suggestion(s):" marker by splitting on that keyword
-  const suggestionIdx = responseText
-    .toLowerCase()
-    .indexOf('suggestion');
+  const suggestionIdx = responseText.toLowerCase().indexOf('suggestion');
   if (suggestionIdx !== -1) {
-    const afterKeyword = responseText.slice(suggestionIdx).replace(/^suggestions?[:\s]*/i, '');
+    const afterKeyword = responseText
+      .slice(suggestionIdx)
+      .replace(/^suggestions?[:\s]*/i, '');
     const firstParagraph = afterKeyword.split('\n\n')[0] ?? afterKeyword;
-    suggestions.push(...firstParagraph.split(/\n/).map((s) => s.replace(/^[-•*]\s*/, '').trim()).filter(Boolean));
+    suggestions.push(
+      ...firstParagraph
+        .split(/\n/)
+        .map((s) => s.replace(/^[-•*]\s*/, '').trim())
+        .filter(Boolean)
+    );
   }
 
   return { score, explanation, suggestions };
@@ -142,7 +150,8 @@ export class AutoGradingService {
       studentAnswer: sanitizedAnswer,
       score,
       maxScore: rubric.maxScore,
-      percentageScore: rubric.maxScore > 0 ? (score / rubric.maxScore) * 100 : 0,
+      percentageScore:
+        rubric.maxScore > 0 ? (score / rubric.maxScore) * 100 : 0,
       explanation,
       suggestions,
       gradedAt: new Date(),

@@ -49,7 +49,11 @@ vi.mock('@edusphere/db', () => ({
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 't-1', userId: 'u-1', userRole: 'INSTRUCTOR' as const };
+const TENANT_CTX = {
+  tenantId: 't-1',
+  userId: 'u-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 const MOCK_PLAN_ROW = {
   id: 'plan-1',
@@ -87,7 +91,11 @@ describe('LessonPlanService', () => {
       mockValues.mockReturnValue({ returning: mockReturning });
       mockInsert.mockReturnValue({ values: mockValues });
 
-      const result = await service.createPlan('course-1', TENANT_CTX, 'Test Plan');
+      const result = await service.createPlan(
+        'course-1',
+        TENANT_CTX,
+        'Test Plan'
+      );
 
       expect(mockInsert).toHaveBeenCalled();
       expect(result.id).toBe('plan-1');
@@ -100,12 +108,20 @@ describe('LessonPlanService', () => {
     it('appends a step and returns updated plan', async () => {
       // existing steps query (count)
       const mockExistingLimit = vi.fn().mockResolvedValue([]);
-      const mockExistingOrderBy = vi.fn().mockReturnValue({ limit: mockExistingLimit });
-      const mockExistingWhere = vi.fn().mockReturnValue({ orderBy: mockExistingOrderBy });
-      const mockExistingFrom = vi.fn().mockReturnValue({ where: mockExistingWhere });
+      const mockExistingOrderBy = vi
+        .fn()
+        .mockReturnValue({ limit: mockExistingLimit });
+      const mockExistingWhere = vi
+        .fn()
+        .mockReturnValue({ orderBy: mockExistingOrderBy });
+      const mockExistingFrom = vi
+        .fn()
+        .mockReturnValue({ where: mockExistingWhere });
 
       // insert step
-      mockValues.mockReturnValue({ returning: vi.fn().mockResolvedValue([MOCK_STEP_ROW]) });
+      mockValues.mockReturnValue({
+        returning: vi.fn().mockResolvedValue([MOCK_STEP_ROW]),
+      });
       mockInsert.mockReturnValue({ values: mockValues });
 
       // select plan
@@ -115,15 +131,17 @@ describe('LessonPlanService', () => {
 
       // select steps after insert
       const mockStepsOrderBy = vi.fn().mockResolvedValue([MOCK_STEP_ROW]);
-      const mockStepsWhere = vi.fn().mockReturnValue({ orderBy: mockStepsOrderBy });
+      const mockStepsWhere = vi
+        .fn()
+        .mockReturnValue({ orderBy: mockStepsOrderBy });
       const mockStepsFrom = vi.fn().mockReturnValue({ where: mockStepsWhere });
 
       let callCount = 0;
       mockSelect.mockImplementation(() => {
         callCount++;
         if (callCount === 1) return { from: mockExistingFrom }; // existing steps
-        if (callCount === 2) return { from: mockPlanFrom };     // plan select
-        return { from: mockStepsFrom };                          // steps after insert
+        if (callCount === 2) return { from: mockPlanFrom }; // plan select
+        return { from: mockStepsFrom }; // steps after insert
       });
 
       const result = await service.addStep('plan-1', TENANT_CTX, 'VIDEO', {});
@@ -143,7 +161,9 @@ describe('LessonPlanService', () => {
 
       // steps query after update
       const mockOrderBySteps = vi.fn().mockResolvedValue([]);
-      const mockWhereSteps = vi.fn().mockReturnValue({ orderBy: mockOrderBySteps });
+      const mockWhereSteps = vi
+        .fn()
+        .mockReturnValue({ orderBy: mockOrderBySteps });
       const mockFromSteps = vi.fn().mockReturnValue({ where: mockWhereSteps });
       mockSelect.mockReturnValue({ from: mockFromSteps });
 

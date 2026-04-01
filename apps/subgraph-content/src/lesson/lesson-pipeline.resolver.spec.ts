@@ -17,10 +17,12 @@ import {
 const MOCK_RUN = { id: 'run-1', status: 'RUNNING', pipelineId: 'pipe-1' };
 const MOCK_RESULTS = [{ id: 'res-1', moduleName: 'INGESTION' }];
 
-function makePipelineService(overrides: Partial<{
-  findCurrentRunByPipeline: () => Promise<unknown>;
-  findResultsByRunId: () => Promise<unknown[]>;
-}> = {}) {
+function makePipelineService(
+  overrides: Partial<{
+    findCurrentRunByPipeline: () => Promise<unknown>;
+    findResultsByRunId: () => Promise<unknown[]>;
+  }> = {}
+) {
   return {
     findCurrentRunByPipeline: vi.fn().mockResolvedValue(MOCK_RUN),
     findResultsByRunId: vi.fn().mockResolvedValue(MOCK_RESULTS),

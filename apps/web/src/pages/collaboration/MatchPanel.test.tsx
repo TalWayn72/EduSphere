@@ -6,10 +6,17 @@ import type { MatchState } from './collaboration.types';
 // ── shadcn mocks ──────────────────────────────────────────────────────────────
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="card" {...props}>{children}</div>
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
   ),
-  CardContent: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="card-content" {...props}>{children}</div>
+  CardContent: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div data-testid="card-content" {...props}>
+      {children}
+    </div>
   ),
 }));
 

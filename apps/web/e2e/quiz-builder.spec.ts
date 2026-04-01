@@ -173,11 +173,19 @@ test.describe('QuizBuilder — question types and interactions', () => {
       '[data-testid="question-type-select"], select:near(:text("Type")), [aria-label*="question type"]'
     );
     if ((await typeSelector.count()) > 0) {
-      await typeSelector.first().click().catch(() => {});
+      await typeSelector
+        .first()
+        .click()
+        .catch(() => {});
       // Look for matching option
-      const matchingOption = page.locator('option:has-text("Matching"), [role="option"]:has-text("Matching")');
+      const matchingOption = page.locator(
+        'option:has-text("Matching"), [role="option"]:has-text("Matching")'
+      );
       if ((await matchingOption.count()) > 0) {
-        await matchingOption.first().click().catch(() => {});
+        await matchingOption
+          .first()
+          .click()
+          .catch(() => {});
       }
     }
 
@@ -196,12 +204,18 @@ test.describe('QuizBuilder — question types and interactions', () => {
       '[data-testid="question-type-select"], select:near(:text("Type"))'
     );
     if ((await typeSelector.count()) > 0) {
-      await typeSelector.first().click().catch(() => {});
+      await typeSelector
+        .first()
+        .click()
+        .catch(() => {});
       const fillBlankOption = page.locator(
         'option:has-text("Fill"), [role="option"]:has-text("Fill")'
       );
       if ((await fillBlankOption.count()) > 0) {
-        await fillBlankOption.first().click().catch(() => {});
+        await fillBlankOption
+          .first()
+          .click()
+          .catch(() => {});
       }
     }
 
@@ -218,12 +232,18 @@ test.describe('QuizBuilder — question types and interactions', () => {
       '[data-testid="question-type-select"], select:near(:text("Type"))'
     );
     if ((await typeSelector.count()) > 0) {
-      await typeSelector.first().click().catch(() => {});
+      await typeSelector
+        .first()
+        .click()
+        .catch(() => {});
       const hotspotOption = page.locator(
         'option:has-text("Hotspot"), [role="option"]:has-text("Hotspot")'
       );
       if ((await hotspotOption.count()) > 0) {
-        await hotspotOption.first().click().catch(() => {});
+        await hotspotOption
+          .first()
+          .click()
+          .catch(() => {});
       }
     }
 
@@ -249,7 +269,10 @@ test.describe('QuizBuilder — question types and interactions', () => {
         '[data-testid="save-quiz-btn"], button:has-text("Save"), button[type="submit"]'
       );
       if ((await saveBtn.count()) > 0) {
-        await saveBtn.first().click().catch(() => {});
+        await saveBtn
+          .first()
+          .click()
+          .catch(() => {});
       }
     }
 
@@ -269,7 +292,10 @@ test.describe('QuizBuilder — question types and interactions', () => {
       '[data-testid="preview-quiz-btn"], button:has-text("Preview"), button[aria-label*="preview" i]'
     );
     if ((await previewBtn.count()) > 0) {
-      await previewBtn.first().click().catch(() => {});
+      await previewBtn
+        .first()
+        .click()
+        .catch(() => {});
       await page.waitForLoadState('domcontentloaded');
     }
 
@@ -328,7 +354,10 @@ test.describe('QuizBuilder — question types and interactions', () => {
       '[data-testid="shuffle-toggle"], input[name="shuffleQuestions"], [role="switch"]:near(:text("Shuffle"))'
     );
     if ((await shuffleToggle.count()) > 0) {
-      await shuffleToggle.first().click().catch(() => {});
+      await shuffleToggle
+        .first()
+        .click()
+        .catch(() => {});
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
@@ -381,7 +410,9 @@ test.describe('QuizBuilder — question types and interactions', () => {
     await routeGraphQL(page, () => {
       return JSON.stringify({
         data: null,
-        errors: [{ message: 'DatabaseError: connection refused at pool.acquire' }],
+        errors: [
+          { message: 'DatabaseError: connection refused at pool.acquire' },
+        ],
       });
     });
 
@@ -462,7 +493,10 @@ test.describe('QuizBuilder — question types and interactions', () => {
       '[data-testid="delete-question-btn"], button[aria-label*="delete" i], button[aria-label*="remove" i]'
     );
     if ((await deleteBtn.count()) > 0) {
-      await deleteBtn.first().click().catch(() => {});
+      await deleteBtn
+        .first()
+        .click()
+        .catch(() => {});
     }
 
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({

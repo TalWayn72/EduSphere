@@ -23,7 +23,10 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { PipelineNode, PipelineModuleType } from '@/lib/lesson-pipeline.store';
+import type {
+  PipelineNode,
+  PipelineModuleType,
+} from '@/lib/lesson-pipeline.store';
 import { MODULE_LABELS } from '@/lib/lesson-pipeline.store';
 import { SortablePipelineNode } from './SortablePipelineNode';
 
@@ -43,14 +46,22 @@ function getNodeLabel(moduleType: string): string {
 }
 
 export function PipelineSortableCanvas({
-  nodes, selectedNodeId, customMode, onSelect, onRemove, onReorder, onDropModule,
+  nodes,
+  selectedNodeId,
+  customMode,
+  onSelect,
+  onRemove,
+  onReorder,
+  onDropModule,
 }: Props) {
   const instructionsId = useId();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   const announcements: Announcements = {
@@ -75,17 +86,22 @@ export function PipelineSortableCanvas({
     onDragCancel: () => 'הגרירה בוטלה',
   };
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIdx = nodes.findIndex((n) => n.id === active.id);
-    const newIdx = nodes.findIndex((n) => n.id === over.id);
-    if (oldIdx !== -1 && newIdx !== -1) onReorder(oldIdx, newIdx);
-  }, [nodes, onReorder]);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const oldIdx = nodes.findIndex((n) => n.id === active.id);
+      const newIdx = nodes.findIndex((n) => n.id === over.id);
+      if (oldIdx !== -1 && newIdx !== -1) onReorder(oldIdx, newIdx);
+    },
+    [nodes, onReorder]
+  );
 
   const handleNativeDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const moduleType = e.dataTransfer.getData('moduleType') as PipelineModuleType;
+    const moduleType = e.dataTransfer.getData(
+      'moduleType'
+    ) as PipelineModuleType;
     if (moduleType) onDropModule(moduleType);
   };
 
@@ -100,14 +116,18 @@ export function PipelineSortableCanvas({
         {customMode ? (
           <>
             <p className="text-4xl mb-3">&#x1F527;</p>
-            <p className="text-lg font-medium text-blue-600 dark:text-blue-400">מצב בנייה חופשית</p>
+            <p className="text-lg font-medium text-blue-600 dark:text-blue-400">
+              מצב בנייה חופשית
+            </p>
             <p className="text-sm mt-1">גרור מודולים מהחלונית השמאלית לכאן</p>
           </>
         ) : (
           <>
             <p className="text-4xl mb-3">&#x1F517;</p>
             <p className="text-lg font-medium">גרור מודולים לכאן</p>
-            <p className="text-sm">בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל</p>
+            <p className="text-sm">
+              בנה את ה-Pipeline שלך, או בחר תבנית מהסרגל
+            </p>
           </>
         )}
       </div>
@@ -121,7 +141,8 @@ export function PipelineSortableCanvas({
       className="min-h-[200px]"
     >
       <p id={instructionsId} className="sr-only">
-        השתמש במקש Tab כדי לנווט בין מודולים. לחץ רווח כדי להרים, חצים כדי להזיז, רווח כדי להניח, Escape לביטול.
+        השתמש במקש Tab כדי לנווט בין מודולים. לחץ רווח כדי להרים, חצים כדי
+        להזיז, רווח כדי להניח, Escape לביטול.
       </p>
       <DndContext
         sensors={sensors}
@@ -129,8 +150,15 @@ export function PipelineSortableCanvas({
         onDragEnd={handleDragEnd}
         accessibility={{ announcements }}
       >
-        <SortableContext items={nodes.map((n) => n.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2 max-w-lg mx-auto" role="list" aria-describedby={instructionsId}>
+        <SortableContext
+          items={nodes.map((n) => n.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div
+            className="space-y-2 max-w-lg mx-auto"
+            role="list"
+            aria-describedby={instructionsId}
+          >
             {nodes.map((node, idx) => (
               <SortablePipelineNode
                 key={node.id}
@@ -138,7 +166,9 @@ export function PipelineSortableCanvas({
                 idx={idx}
                 total={nodes.length}
                 isSelected={selectedNodeId === node.id}
-                onSelect={() => onSelect(selectedNodeId === node.id ? null : node.id)}
+                onSelect={() =>
+                  onSelect(selectedNodeId === node.id ? null : node.id)
+                }
                 onRemove={() => onRemove(node.id)}
               />
             ))}

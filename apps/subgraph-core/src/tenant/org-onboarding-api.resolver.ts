@@ -22,16 +22,23 @@ export class OrgOnboardingApiResolver {
 
   @Mutation('createApiKey')
   async createApiKey(
-    @Args('input') input: {
-      name: string; scopes: string[];
-      rateLimitPerMinute?: number; expiresAt?: string;
+    @Args('input')
+    input: {
+      name: string;
+      scopes: string[];
+      rateLimitPerMinute?: number;
+      expiresAt?: string;
     },
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    return this.apiKeyService.createKey({
-      ...input, expiresAt: input.expiresAt ? new Date(input.expiresAt) : undefined,
-    }, tenantCtx);
+    return this.apiKeyService.createKey(
+      {
+        ...input,
+        expiresAt: input.expiresAt ? new Date(input.expiresAt) : undefined,
+      },
+      tenantCtx
+    );
   }
 
   @Mutation('revokeApiKey')
@@ -60,7 +67,8 @@ export class OrgOnboardingApiResolver {
   @Mutation('updateWebhook')
   async updateWebhook(
     @Args('id') id: string,
-    @Args('input') input: { url?: string; events?: string[]; isActive?: boolean },
+    @Args('input')
+    input: { url?: string; events?: string[]; isActive?: boolean },
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
@@ -104,30 +112,48 @@ export class OrgOnboardingApiResolver {
   }
 
   @Mutation('requestDomainVerification')
-  async requestDomainVerification(@Args('domain') domain: string, @Context() ctx: GqlContext) {
+  async requestDomainVerification(
+    @Args('domain') domain: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
-    return this.domainProvisioningService.requestCustomDomain(domain, tenantCtx);
+    return this.domainProvisioningService.requestCustomDomain(
+      domain,
+      tenantCtx
+    );
   }
 
   @Mutation('checkDomainVerification')
-  async checkDomainVerification(@Args('domain') domain: string, @Context() ctx: GqlContext) {
+  async checkDomainVerification(
+    @Args('domain') domain: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.domainProvisioningService.checkCustomDomain(domain, tenantCtx);
   }
 
   @Mutation('removeCustomDomain')
-  async removeCustomDomain(@Args('domainId') domainId: string, @Context() ctx: GqlContext) {
+  async removeCustomDomain(
+    @Args('domainId') domainId: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
-    return this.domainProvisioningService.removeCustomDomain(domainId, tenantCtx);
+    return this.domainProvisioningService.removeCustomDomain(
+      domainId,
+      tenantCtx
+    );
   }
 
   // ─── Licensing ────────────────────────────────────────────
 
   @Mutation('licenseCourse')
   async licenseCourse(
-    @Args('input') input: {
-      courseId: string; licenseType: string;
-      maxSeats?: number; durationMonths?: number;
+    @Args('input')
+    input: {
+      courseId: string;
+      licenseType: string;
+      maxSeats?: number;
+      durationMonths?: number;
     },
     @Context() ctx: GqlContext
   ) {
@@ -136,7 +162,10 @@ export class OrgOnboardingApiResolver {
   }
 
   @Mutation('revokeCourseLicense')
-  async revokeCourseLicense(@Args('id') id: string, @Context() ctx: GqlContext) {
+  async revokeCourseLicense(
+    @Args('id') id: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.licensingService.revokeLicense(id, tenantCtx);
   }

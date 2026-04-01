@@ -14,7 +14,11 @@ const AUTO_DISMISS_MS = 8_000;
  * "Return to last place" banner shown when the user has a saved scroll position.
  * Auto-dismisses after 8 seconds. Memory-safe: setTimeout cleared on unmount.
  */
-export function ResumeBanner({ activeAnchor, onResume, onDismiss }: ResumeBannerProps) {
+export function ResumeBanner({
+  activeAnchor,
+  onResume,
+  onDismiss,
+}: ResumeBannerProps) {
   useEffect(() => {
     const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
@@ -29,7 +33,10 @@ export function ResumeBanner({ activeAnchor, onResume, onDismiss }: ResumeBanner
       <span className="text-sm">המשך מהמקום שעצרת</span>
       {activeAnchor?.visualAsset && (
         <img
-          src={activeAnchor.visualAsset.webpUrl ?? activeAnchor.visualAsset.storageUrl}
+          src={
+            activeAnchor.visualAsset.webpUrl ??
+            activeAnchor.visualAsset.storageUrl
+          }
           alt=""
           className="h-10 w-10 object-cover rounded"
           aria-hidden="true"

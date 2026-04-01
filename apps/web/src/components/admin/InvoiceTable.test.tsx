@@ -14,8 +14,24 @@ import { InvoiceTable } from './InvoiceTable';
 import type { Invoice } from '@/pages/admin/StripeInvoicePage';
 
 const invoices: Invoice[] = [
-  { id: 'inv-1', tenant: 'Acme Corp', plan: 'PROFESSIONAL', year: 2026, amount: 48000, status: 'paid', pdfUrl: 'https://example.com/inv.pdf' },
-  { id: 'inv-2', tenant: 'Beta Inc', plan: 'STARTER', year: 2026, amount: 12000, status: 'draft', pdfUrl: '#' },
+  {
+    id: 'inv-1',
+    tenant: 'Acme Corp',
+    plan: 'PROFESSIONAL',
+    year: 2026,
+    amount: 48000,
+    status: 'paid',
+    pdfUrl: 'https://example.com/inv.pdf',
+  },
+  {
+    id: 'inv-2',
+    tenant: 'Beta Inc',
+    plan: 'STARTER',
+    year: 2026,
+    amount: 12000,
+    status: 'draft',
+    pdfUrl: '#',
+  },
 ];
 
 describe('InvoiceTable', () => {
@@ -38,7 +54,10 @@ describe('InvoiceTable', () => {
 
   it('shows Download link for invoices with PDF URL', () => {
     render(<InvoiceTable invoices={invoices} />);
-    expect(screen.getByTestId('download-pdf-inv-1')).toHaveAttribute('href', 'https://example.com/inv.pdf');
+    expect(screen.getByTestId('download-pdf-inv-1')).toHaveAttribute(
+      'href',
+      'https://example.com/inv.pdf'
+    );
   });
 
   it('shows Pending for invoices without valid PDF', () => {
@@ -48,6 +67,8 @@ describe('InvoiceTable', () => {
 
   it('has accessible table label', () => {
     render(<InvoiceTable invoices={invoices} />);
-    expect(screen.getByRole('table', { name: 'Invoice history' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: 'Invoice history' })
+    ).toBeInTheDocument();
   });
 });

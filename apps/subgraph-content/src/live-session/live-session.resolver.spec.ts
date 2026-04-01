@@ -24,28 +24,31 @@ const mockLiveSessionService = {
 // Context helpers — uses the NEW authContext pattern
 // ---------------------------------------------------------------------------
 
-function makeCtx(opts: {
-  tenantId?: string;
-  userId?: string;
-  headerTenantId?: string;
-} = {}): GraphQLContext {
+function makeCtx(
+  opts: {
+    tenantId?: string;
+    userId?: string;
+    headerTenantId?: string;
+  } = {}
+): GraphQLContext {
   return {
     req: {
       headers: {
         ...(opts.headerTenantId ? { 'x-tenant-id': opts.headerTenantId } : {}),
       },
     },
-    authContext: opts.tenantId || opts.userId
-      ? {
-          tenantId: opts.tenantId,
-          userId: opts.userId ?? '',
-          email: 'test@example.com',
-          username: 'testuser',
-          roles: [],
-          scopes: [],
-          isSuperAdmin: false,
-        }
-      : undefined,
+    authContext:
+      opts.tenantId || opts.userId
+        ? {
+            tenantId: opts.tenantId,
+            userId: opts.userId ?? '',
+            email: 'test@example.com',
+            username: 'testuser',
+            roles: [],
+            scopes: [],
+            isSuperAdmin: false,
+          }
+        : undefined,
   } as unknown as GraphQLContext;
 }
 
@@ -175,7 +178,9 @@ describe('LiveSessionResolver', () => {
   // ── getLiveSession ────────────────────────────────────────────────────────
 
   it('getLiveSession — passes contentItemId and tenantId to service', async () => {
-    mockLiveSessionService.getByContentItem.mockResolvedValue({ id: 'session-1' });
+    mockLiveSessionService.getByContentItem.mockResolvedValue({
+      id: 'session-1',
+    });
 
     const result = await resolver.getLiveSession(
       'content-1',
@@ -204,7 +209,10 @@ describe('LiveSessionResolver', () => {
 
     const [contentItemId, tenantId, scheduledAt, meetingName] =
       mockLiveSessionService.createLiveSession.mock.calls[0] as [
-        string, string, Date, string,
+        string,
+        string,
+        Date,
+        string,
       ];
 
     expect(contentItemId).toBe('content-1');

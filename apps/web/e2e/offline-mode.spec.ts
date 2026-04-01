@@ -142,9 +142,9 @@ test.describe('Offline mode', () => {
     await expect(banner).toBeVisible({ timeout: 5000 });
 
     // Look for a dismiss/close button within the banner
-    const dismissBtn = banner.locator(
-      'button[aria-label*="dismiss" i], button[aria-label*="close" i]'
-    ).first();
+    const dismissBtn = banner
+      .locator('button[aria-label*="dismiss" i], button[aria-label*="close" i]')
+      .first();
     const hasDismiss = await dismissBtn.isVisible().catch(() => false);
 
     if (hasDismiss) {
@@ -188,9 +188,11 @@ test.describe('Offline mode', () => {
     });
 
     // Look for a sync indicator element
-    const syncIndicator = page.locator(
-      '[data-testid*="sync"], [data-testid*="connection-status"], [aria-label*="sync" i]'
-    ).first();
+    const syncIndicator = page
+      .locator(
+        '[data-testid*="sync"], [data-testid*="connection-status"], [aria-label*="sync" i]'
+      )
+      .first();
     const syncExists = await syncIndicator.isVisible().catch(() => false);
 
     if (syncExists) {
@@ -215,14 +217,19 @@ test.describe('Offline mode', () => {
     });
 
     // Click sidebar nav links — they should not crash the page
-    const navLinks = page.locator('nav a').or(page.locator('[data-testid="app-sidebar"] a'));
+    const navLinks = page
+      .locator('nav a')
+      .or(page.locator('[data-testid="app-sidebar"] a'));
     const count = await navLinks.count();
 
     if (count > 0) {
       // Click the first available nav link
-      await navLinks.first().click().catch(() => {
-        // Link click may fail if element not interactive while offline
-      });
+      await navLinks
+        .first()
+        .click()
+        .catch(() => {
+          // Link click may fail if element not interactive while offline
+        });
       await page.waitForLoadState('domcontentloaded');
 
       // Page should not show crash overlay
@@ -301,15 +308,22 @@ test.describe('Offline mode', () => {
     expect(bannerText).not.toContain('undefined');
   });
 
-  test('visual regression — online restored state', async ({ page, context }) => {
+  test('visual regression — online restored state', async ({
+    page,
+    context,
+  }) => {
     // Go offline then back online
     await context.setOffline(true);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
-    await expect(page.getByTestId('offline-banner')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('offline-banner')).toBeVisible({
+      timeout: 5000,
+    });
 
     await context.setOffline(false);
     await page.evaluate(() => window.dispatchEvent(new Event('online')));
-    await expect(page.getByTestId('offline-banner')).not.toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('offline-banner')).not.toBeVisible({
+      timeout: 5000,
+    });
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForLoadState('domcontentloaded');

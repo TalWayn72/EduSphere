@@ -37,20 +37,27 @@ export function XapiSettingsPage() {
   const navigate = useNavigate();
   const role = useAuthRole();
   const [copied, setCopied] = useState(false);
-  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
         // eslint-disable-next-line no-console -- DEV-only cleanup trace
-        if (import.meta.env.DEV) console.debug('[XapiSettingsPage] cleanup: copy timer cleared on unmount');
+        if (import.meta.env.DEV)
+          console.debug(
+            '[XapiSettingsPage] cleanup: copy timer cleared on unmount'
+          );
       }
     };
   }, []);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [tokensResult, refetchTokens] = useQuery<{ xapiTokens: XapiToken[] }>({
     query: XAPI_TOKENS_QUERY,
     pause: !mounted,
@@ -73,10 +80,16 @@ export function XapiSettingsPage() {
     await navigator.clipboard.writeText(lrsBaseUrl);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), TOAST_AUTO_DISMISS_MS);
+    copyTimerRef.current = setTimeout(
+      () => setCopied(false),
+      TOAST_AUTO_DISMISS_MS
+    );
   };
 
-  const handleGenerate = async (description: string, lrsEndpoint: string): Promise<string | null> => {
+  const handleGenerate = async (
+    description: string,
+    lrsEndpoint: string
+  ): Promise<string | null> => {
     const result = await generateToken({
       description,
       lrsEndpoint: lrsEndpoint || undefined,
@@ -96,32 +109,43 @@ export function XapiSettingsPage() {
   return (
     <Layout>
       <PageShell size="md">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'xAPI' }]} />
+        <Breadcrumbs
+          items={[{ label: 'Admin', href: '/admin' }, { label: 'xAPI' }]}
+        />
         <div className="flex items-center gap-3">
           <Database className="h-6 w-6 text-primary" />
           <div>
             <h1 className="text-2xl font-bold">xAPI / LRS Integration</h1>
             <p className="text-muted-foreground text-sm">
               Self-hosted LRS &nbsp;
-              <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">xAPI 1.0.3</span>
+              <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
+                xAPI 1.0.3
+              </span>
             </p>
           </div>
         </div>
         <Card>
           <CardHeader>
             <CardTitle>LRS Endpoint</CardTitle>
-            <CardDescription>Submit xAPI statements to this URL</CardDescription>
+            <CardDescription>
+              Submit xAPI statements to this URL
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 p-3 bg-muted rounded-md font-mono text-sm">
               <span className="flex-1 truncate">{lrsBaseUrl}</span>
-              <Button variant="ghost" size="sm" onClick={() => void handleCopy()}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleCopy()}
+              >
                 <Copy className="h-4 w-4" />
                 <span className="ml-1">{copied ? 'Copied!' : 'Copy'}</span>
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              POST /xapi/statements &nbsp;|&nbsp; GET /xapi/statements &nbsp;|&nbsp; GET /xapi/about
+              POST /xapi/statements &nbsp;|&nbsp; GET /xapi/statements
+              &nbsp;|&nbsp; GET /xapi/about
             </p>
           </CardContent>
         </Card>
@@ -129,9 +153,13 @@ export function XapiSettingsPage() {
           tokens={tokensResult.data?.xapiTokens ?? []}
           fetching={tokensResult.fetching}
           onGenerate={handleGenerate}
-          onRevoke={(id) => { void handleRevoke(id); }}
+          onRevoke={(id) => {
+            void handleRevoke(id);
+          }}
         />
-        <XapiStatementViewer statements={statementsResult.data?.xapiStatements ?? []} />
+        <XapiStatementViewer
+          statements={statementsResult.data?.xapiStatements ?? []}
+        />
       </PageShell>
     </Layout>
   );

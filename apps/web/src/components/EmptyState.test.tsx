@@ -32,11 +32,7 @@ describe('EmptyState', () => {
   });
 
   it('renders an icon when provided', () => {
-    render(
-      <EmptyState
-        icon={<span data-testid="custom-icon">icon</span>}
-      />
-    );
+    render(<EmptyState icon={<span data-testid="custom-icon">icon</span>} />);
     expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
 

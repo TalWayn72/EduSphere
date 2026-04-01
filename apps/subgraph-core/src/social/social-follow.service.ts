@@ -2,11 +2,7 @@
  * SocialFollowService — Follow/unfollow, follower queries, mutual connections.
  * Extracted from SocialService for file-size compliance (<300 lines).
  */
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,

@@ -195,8 +195,11 @@ describe('auth — DEV_MODE', () => {
     window.sessionStorage.setItem('edusphere_dev_logged_in', 'true');
     window.sessionStorage.setItem('edusphere_locale_synced', 'true');
 
-    const { initKeycloak, logout, LOCALE_SYNCED_KEY: key } =
-      await import('@/lib/auth');
+    const {
+      initKeycloak,
+      logout,
+      LOCALE_SYNCED_KEY: key,
+    } = await import('@/lib/auth');
     await initKeycloak();
     logout();
 

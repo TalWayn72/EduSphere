@@ -34,7 +34,13 @@ function DebateSkeleton() {
 }
 
 // ── Consent gate ──────────────────────────────────────────────────────────────
-function ConsentPrompt({ onGrant, labels }: { onGrant: () => void; labels: { title: string; description: string; button: string } }) {
+function ConsentPrompt({
+  onGrant,
+  labels,
+}: {
+  onGrant: () => void;
+  labels: { title: string; description: string; button: string };
+}) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4 px-6 text-center">
       <Bot className="h-10 w-10 text-primary opacity-70" />
@@ -117,7 +123,14 @@ export function ChavrutaPage() {
           {error && <ErrorBanner message={error} />}
 
           {needsConsent ? (
-            <ConsentPrompt onGrant={grantConsent} labels={{ title: t('consentTitle'), description: t('consentDescription'), button: t('consentButton') }} />
+            <ConsentPrompt
+              onGrant={grantConsent}
+              labels={{
+                title: t('consentTitle'),
+                description: t('consentDescription'),
+                button: t('consentButton'),
+              }}
+            />
           ) : messages.length === 0 && isLoading ? (
             <DebateSkeleton />
           ) : (

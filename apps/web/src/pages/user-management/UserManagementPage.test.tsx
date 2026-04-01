@@ -42,7 +42,9 @@ vi.mock('urql', () => {
       },
       vi.fn(),
     ]),
-    useMutation: vi.fn().mockReturnValue([{}, vi.fn().mockResolvedValue({ data: {} })]),
+    useMutation: vi
+      .fn()
+      .mockReturnValue([{}, vi.fn().mockResolvedValue({ data: {} })]),
   };
 });
 
@@ -96,9 +98,13 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <option value={value}>{children}</option>
-  ),
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: { children: React.ReactNode }) => (
     <button data-testid="role-trigger">{children}</button>
   ),
@@ -112,7 +118,10 @@ vi.mock('@/components/ui/table', () => ({
   TableBody: ({ children }: { children: React.ReactNode }) => (
     <tbody>{children}</tbody>
   ),
-  TableCell: ({ children, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+  TableCell: ({
+    children,
+    ...props
+  }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
     <td {...props}>{children}</td>
   ),
   TableHead: ({ children }: { children: React.ReactNode }) => (
@@ -170,7 +179,9 @@ describe('UserManagementPage — layout', () => {
 
   it('renders search input', () => {
     render(<UserManagementPage />);
-    expect(screen.getByPlaceholderText('Search by name or email...')).toBeTruthy();
+    expect(
+      screen.getByPlaceholderText('Search by name or email...')
+    ).toBeTruthy();
   });
 
   it('renders Apply button', () => {

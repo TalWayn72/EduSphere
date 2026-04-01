@@ -18,7 +18,9 @@ export class TesseractOcrService implements OnModuleDestroy {
     this.logger.log('TesseractOcrService initialized with 2 workers');
   }
 
-  async extractText(imageBuffer: Buffer): Promise<{ text: string; confidence: number }> {
+  async extractText(
+    imageBuffer: Buffer
+  ): Promise<{ text: string; confidence: number }> {
     if (!this.initialized) await this.initialize();
     const { data } = await this.scheduler.addJob('recognize', imageBuffer);
     return { text: data.text.trim(), confidence: data.confidence / 100 };

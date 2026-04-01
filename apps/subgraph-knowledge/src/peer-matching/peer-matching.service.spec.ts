@@ -27,8 +27,9 @@ const mockTx = vi.hoisted(() => ({
 }));
 
 const mockWithTenantContext = vi.hoisted(() =>
-  vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
-    fn(mockTx)
+  vi.fn(
+    async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
+      fn(mockTx)
   )
 );
 
@@ -97,9 +98,9 @@ describe('PeerMatchingService', () => {
   });
 
   it('requestPeerMatch — throws if requester === matchedUserId', async () => {
-    await expect(service.requestPeerMatch(TENANT, REQUESTER, REQUESTER)).rejects.toThrow(
-      BadRequestException
-    );
+    await expect(
+      service.requestPeerMatch(TENANT, REQUESTER, REQUESTER)
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('requestPeerMatch — creates record with correct tenant and requester', async () => {
@@ -113,7 +114,11 @@ describe('PeerMatchingService', () => {
     mockReturning.mockResolvedValueOnce([newRequest]);
 
     const result = await service.requestPeerMatch(TENANT, REQUESTER, MATCHED);
-    expect(result).toMatchObject({ tenantId: TENANT, requesterId: REQUESTER, status: 'PENDING' });
+    expect(result).toMatchObject({
+      tenantId: TENANT,
+      requesterId: REQUESTER,
+      status: 'PENDING',
+    });
   });
 
   it('respondToPeerMatch — throws NotFoundException when request not found', async () => {
@@ -130,7 +135,11 @@ describe('PeerMatchingService', () => {
   });
 
   it('respondToPeerMatch — IDOR: rejects if not the matchedUserId', async () => {
-    const request = { id: REQUEST_ID, requesterId: REQUESTER, matchedUserId: MATCHED };
+    const request = {
+      id: REQUEST_ID,
+      requesterId: REQUESTER,
+      matchedUserId: MATCHED,
+    };
     mockTx.select.mockReturnValueOnce({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
@@ -140,13 +149,17 @@ describe('PeerMatchingService', () => {
     });
 
     // REQUESTER tries to respond, but matchedUserId is MATCHED — should be rejected
-    await expect(service.respondToPeerMatch(TENANT, REQUESTER, REQUEST_ID, true)).rejects.toThrow(
-      BadRequestException
-    );
+    await expect(
+      service.respondToPeerMatch(TENANT, REQUESTER, REQUEST_ID, true)
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('respondToPeerMatch — updates status to ACCEPTED when matchedUserId responds', async () => {
-    const request = { id: REQUEST_ID, requesterId: REQUESTER, matchedUserId: MATCHED };
+    const request = {
+      id: REQUEST_ID,
+      requesterId: REQUESTER,
+      matchedUserId: MATCHED,
+    };
     const updated = { ...request, status: 'ACCEPTED' };
     mockTx.select.mockReturnValueOnce({
       from: vi.fn(() => ({
@@ -157,7 +170,12 @@ describe('PeerMatchingService', () => {
     });
     mockReturning.mockResolvedValueOnce([updated]);
 
-    const result = await service.respondToPeerMatch(TENANT, MATCHED, REQUEST_ID, true);
+    const result = await service.respondToPeerMatch(
+      TENANT,
+      MATCHED,
+      REQUEST_ID,
+      true
+    );
     expect(result.status).toBe('ACCEPTED');
   });
 });

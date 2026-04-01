@@ -25,9 +25,7 @@ function requireAuth(ctx: GqlContext): TenantContext {
 
 @Resolver('MarketplaceListing')
 export class MarketplaceOrgResolver {
-  constructor(
-    private readonly marketplaceOrgService: MarketplaceOrgService
-  ) {}
+  constructor(private readonly marketplaceOrgService: MarketplaceOrgService) {}
 
   @Query('marketplaceListings')
   async getMarketplaceListings(
@@ -53,7 +51,8 @@ export class MarketplaceOrgResolver {
 
   @Mutation('publishToMarketplace')
   async publishToMarketplace(
-    @Args('input') input: {
+    @Args('input')
+    input: {
       courseId: string;
       title: string;
       description?: string;

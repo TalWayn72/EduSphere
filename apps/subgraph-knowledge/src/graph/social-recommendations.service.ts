@@ -30,7 +30,6 @@ export interface SocialFeedItem {
   timestamp: Date;
 }
 
-
 @Injectable()
 export class SocialRecommendationsService implements OnModuleDestroy {
   private readonly logger = new Logger(SocialRecommendationsService.name);
@@ -68,11 +67,7 @@ export class SocialRecommendationsService implements OnModuleDestroy {
       ctx
     );
 
-    const aggregated = aggregateActivity(
-      activityRows,
-      completedIds,
-      mutualSet
-    );
+    const aggregated = aggregateActivity(activityRows, completedIds, mutualSet);
 
     const ranked = aggregated
       .sort((a, b) => b.weight - a.weight)
@@ -125,5 +120,4 @@ export class SocialRecommendationsService implements OnModuleDestroy {
       this.logger.error({ err }, 'closeAllPools error on destroy')
     );
   }
-
 }

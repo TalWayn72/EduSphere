@@ -35,7 +35,11 @@ describe('GenerateInvoiceDialog', () => {
       target: { value: 'tenant-123' },
     });
     fireEvent.click(screen.getByTestId('submit-invoice-btn'));
-    expect(onGenerate).toHaveBeenCalledWith('tenant-123', expect.any(Number), 'STARTER');
+    expect(onGenerate).toHaveBeenCalledWith(
+      'tenant-123',
+      expect.any(Number),
+      'STARTER'
+    );
   });
 
   it('fires onClose when Cancel is clicked', () => {

@@ -6,7 +6,9 @@ import { render, screen, within } from '@testing-library/react';
 import { EmbeddingCoverageChart } from './EmbeddingCoverageChart';
 import type { CourseBreakdown } from './EmbeddingDashboardPage.stats';
 
-function makeCourse(overrides: Partial<CourseBreakdown> & { courseId: string }): CourseBreakdown {
+function makeCourse(
+  overrides: Partial<CourseBreakdown> & { courseId: string }
+): CourseBreakdown {
   return {
     courseTitle: `Course ${overrides.courseId}`,
     sourceCount: 10,
@@ -19,7 +21,9 @@ function makeCourse(overrides: Partial<CourseBreakdown> & { courseId: string }):
 describe('EmbeddingCoverageChart', () => {
   it('renders empty state when no courses', () => {
     render(<EmbeddingCoverageChart courses={[]} />);
-    expect(screen.getByText(/No courses with embedding data/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No courses with embedding data/)
+    ).toBeInTheDocument();
   });
 
   it('renders a bar for each course', () => {
@@ -33,7 +37,9 @@ describe('EmbeddingCoverageChart', () => {
   });
 
   it('shows green bar for >80% coverage', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 9 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 9 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const bar = screen.getByTestId('coverage-bar-c1');
     expect(within(bar).getByText('90%')).toBeInTheDocument();
@@ -42,45 +48,64 @@ describe('EmbeddingCoverageChart', () => {
   });
 
   it('shows yellow bar for 40-80% coverage', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 5 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 5 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const bar = screen.getByTestId('coverage-bar-c1');
     expect(within(bar).getByText('50%')).toBeInTheDocument();
   });
 
   it('shows red bar for <40% coverage', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 2 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 2 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const bar = screen.getByTestId('coverage-bar-c1');
     expect(within(bar).getByText('20%')).toBeInTheDocument();
   });
 
   it('handles 0 sourceCount gracefully (0%)', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 0, indexedCount: 0 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 0, indexedCount: 0 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const bar = screen.getByTestId('coverage-bar-c1');
     expect(within(bar).getByText('0%')).toBeInTheDocument();
-    expect(within(bar).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+    expect(within(bar).getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '0'
+    );
   });
 
   it('has accessible progressbar roles', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 8 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 8 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const progressbar = screen.getByRole('progressbar');
     expect(progressbar).toHaveAttribute('aria-valuemin', '0');
     expect(progressbar).toHaveAttribute('aria-valuemax', '100');
     expect(progressbar).toHaveAttribute('aria-valuenow', '80');
-    expect(progressbar).toHaveAttribute('aria-label', expect.stringContaining('80%'));
+    expect(progressbar).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('80%')
+    );
   });
 
   it('renders a role=list container with proper label', () => {
     const courses = [makeCourse({ courseId: 'c1' })];
     render(<EmbeddingCoverageChart courses={courses} />);
-    expect(screen.getByRole('list')).toHaveAttribute('aria-label', expect.stringContaining('coverage'));
+    expect(screen.getByRole('list')).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('coverage')
+    );
   });
 
   it('shows indexed/total count per course', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 7 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 7 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     expect(screen.getByText(/7\/10/)).toBeInTheDocument();
     expect(screen.getByText(/sources indexed/)).toBeInTheDocument();
@@ -95,7 +120,9 @@ describe('EmbeddingCoverageChart', () => {
 
 describe('EmbeddingCoverageChart — Accessibility', () => {
   it('progressbar has aria-valuemin, aria-valuemax, and aria-valuenow', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 7 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 7 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const bar = screen.getByRole('progressbar');
     expect(bar).toHaveAttribute('aria-valuemin', '0');
@@ -104,7 +131,9 @@ describe('EmbeddingCoverageChart — Accessibility', () => {
   });
 
   it('progressbar has descriptive aria-label with percentage', () => {
-    const courses = [makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 8 })];
+    const courses = [
+      makeCourse({ courseId: 'c1', sourceCount: 10, indexedCount: 8 }),
+    ];
     render(<EmbeddingCoverageChart courses={courses} />);
     const bar = screen.getByRole('progressbar');
     expect(bar).toHaveAttribute('aria-label', expect.stringContaining('80%'));
@@ -114,6 +143,9 @@ describe('EmbeddingCoverageChart — Accessibility', () => {
     const courses = [makeCourse({ courseId: 'c1' })];
     render(<EmbeddingCoverageChart courses={courses} />);
     const list = screen.getByRole('list');
-    expect(list).toHaveAttribute('aria-label', expect.stringContaining('coverage'));
+    expect(list).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('coverage')
+    );
   });
 });

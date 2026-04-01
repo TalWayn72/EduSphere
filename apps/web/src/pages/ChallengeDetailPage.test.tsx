@@ -5,17 +5,25 @@ import * as urql from 'urql';
 import { ChallengeDetailPage } from './ChallengeDetailPage';
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('urql', async () => ({
-  ...await vi.importActual('urql'),
+  ...(await vi.importActual('urql')),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
 
-const NOOP_QUERY = [{ data: undefined, fetching: false, error: undefined }, vi.fn()] as never;
-const NOOP_MUTATION = [{ fetching: false }, vi.fn().mockResolvedValue({ data: undefined, error: undefined })] as never;
+const NOOP_QUERY = [
+  { data: undefined, fetching: false, error: undefined },
+  vi.fn(),
+] as never;
+const NOOP_MUTATION = [
+  { fetching: false },
+  vi.fn().mockResolvedValue({ data: undefined, error: undefined }),
+] as never;
 
 function renderWithRoute() {
   return render(
@@ -35,12 +43,16 @@ describe('ChallengeDetailPage', () => {
 
   it('renders leaderboard heading', () => {
     renderWithRoute();
-    expect(screen.getByRole('heading', { name: /[Ll]eaderboard|[Cc]hallenge/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /[Ll]eaderboard|[Cc]hallenge/i })
+    ).toBeInTheDocument();
   });
 
   it('renders submit score button', () => {
     renderWithRoute();
-    expect(screen.getByRole('button', { name: /[Ss]ubmit|[Ss]core/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /[Ss]ubmit|[Ss]core/i })
+    ).toBeInTheDocument();
   });
 
   it('shows empty leaderboard state', () => {

@@ -6,12 +6,12 @@ Before Wave 2 specialists are spawned, certain Lead pairs must exchange **contra
 
 ## Sync Windows
 
-| # | Sync | Leads | Duration | Validation |
-|---|------|-------|----------|------------|
-| 1 | Schema-SDL Alignment | API-Lead + DBLead | 2 min | Schema fields match SDL types |
-| 2 | GraphQL-FE Contract | API-Lead + FELead | 2 min | GraphQL fields exist before component coding |
-| 3 | UX-Security Surface | UXLead + SecurityLead | 1 min | RTL/i18n XSS surface mapped |
-| 4 | Design-FE Alignment | FELead + UXLead | 1 min | Design tokens + responsive breakpoints aligned |
+| #   | Sync                 | Leads                 | Duration | Validation                                     |
+| --- | -------------------- | --------------------- | -------- | ---------------------------------------------- |
+| 1   | Schema-SDL Alignment | API-Lead + DBLead     | 2 min    | Schema fields match SDL types                  |
+| 2   | GraphQL-FE Contract  | API-Lead + FELead     | 2 min    | GraphQL fields exist before component coding   |
+| 3   | UX-Security Surface  | UXLead + SecurityLead | 1 min    | RTL/i18n XSS surface mapped                    |
+| 4   | Design-FE Alignment  | FELead + UXLead       | 1 min    | Design tokens + responsive breakpoints aligned |
 
 **Total sync overhead:** 6 minutes (syncs 1+3 and 2+4 can run in parallel = ~4 min effective).
 
@@ -30,11 +30,13 @@ Each Lead pair exchanges a **contract summary** — a concise 3-5 bullet point l
 #### Sync 1: API-Lead + DBLead (2 min)
 
 **API-Lead provides:**
+
 - List of new/modified SDL types with field names and types
 - Entity ownership changes (`@key` fields)
 - New federation stubs needed from other subgraphs
 
 **DBLead provides:**
+
 - List of new/modified Drizzle schema tables with column names and types
 - RLS policy changes affecting entity access
 - Migration sequence and rollback plan
@@ -44,11 +46,13 @@ Each Lead pair exchanges a **contract summary** — a concise 3-5 bullet point l
 #### Sync 2: API-Lead + FELead (2 min)
 
 **API-Lead provides:**
+
 - List of available queries/mutations with input/output types
 - Pagination pattern (Relay cursor connection fields)
 - Authorization requirements per operation
 
 **FELead provides:**
+
 - List of GraphQL operations the UI will call
 - Expected response shapes for components
 - Real-time subscription needs
@@ -58,11 +62,13 @@ Each Lead pair exchanges a **contract summary** — a concise 3-5 bullet point l
 #### Sync 3: UXLead + SecurityLead (1 min)
 
 **UXLead provides:**
+
 - User input fields and their expected formats
 - RTL/i18n text rendering approach
 - File upload and rich text editor usage
 
 **SecurityLead provides:**
+
 - XSS-sensitive surfaces (user-generated content, rich text, file names)
 - Input sanitization requirements
 - CSRF protection points
@@ -72,11 +78,13 @@ Each Lead pair exchanges a **contract summary** — a concise 3-5 bullet point l
 #### Sync 4: FELead + UXLead (1 min)
 
 **FELead provides:**
+
 - Component library used (shadcn/ui + Radix primitives)
 - Responsive breakpoints in use (Tailwind defaults)
 - Current design token values (colors, spacing, typography)
 
 **UXLead provides:**
+
 - Design token requirements for the feature
 - Responsive behavior expectations (mobile-first, tablet, desktop)
 - Animation/transition specs
@@ -86,6 +94,7 @@ Each Lead pair exchanges a **contract summary** — a concise 3-5 bullet point l
 ### Phase 3: Disagreement Resolution
 
 If any Lead pair cannot align within their time window:
+
 1. Both Leads submit their position (1 bullet point each) to the Orchestrator
 2. Orchestrator resolves within 1 minute using Architecture Lead output from Wave 1
 3. Resolution is final — both Leads proceed with the Orchestrator's decision
@@ -169,6 +178,7 @@ sequenceDiagram
 ## When to Skip Syncs
 
 Syncs may be skipped ONLY when:
+
 - The task affects a single subgraph with no schema changes (skip Sync 1)
 - The task is backend-only with no UI impact (skip Syncs 2, 3, 4)
 - The task is a pure bug fix with no interface changes (skip all syncs)

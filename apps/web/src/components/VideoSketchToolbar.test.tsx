@@ -14,8 +14,18 @@ vi.mock('lucide-react', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }) => (
-    <button onClick={onClick} disabled={disabled} {...props}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    disabled,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    size?: string;
+  }) => (
+    <button onClick={onClick} disabled={disabled} {...props}>
+      {children}
+    </button>
   ),
 }));
 
@@ -58,8 +68,14 @@ describe('VideoSketchToolbar', () => {
 
   it('active tool has aria-pressed=true', () => {
     render(<VideoSketchToolbar {...defaultProps} tool="eraser" />);
-    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('sketch-tool-eraser')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(screen.getByTestId('sketch-tool-freehand')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   });
 
   it('calls onToolChange when tool clicked', () => {
@@ -75,12 +91,16 @@ describe('VideoSketchToolbar', () => {
 
   it('color swatch shows current color', () => {
     render(<VideoSketchToolbar {...defaultProps} color="#00ff00" />);
-    expect(screen.getByTestId('sketch-color-swatch')).toHaveStyle({ backgroundColor: '#00ff00' });
+    expect(screen.getByTestId('sketch-color-swatch')).toHaveStyle({
+      backgroundColor: '#00ff00',
+    });
   });
 
   it('calls onColorChange when color changed', () => {
     render(<VideoSketchToolbar {...defaultProps} />);
-    fireEvent.change(screen.getByTestId('sketch-color-picker'), { target: { value: '#0000ff' } });
+    fireEvent.change(screen.getByTestId('sketch-color-picker'), {
+      target: { value: '#0000ff' },
+    });
     expect(defaultProps.onColorChange).toHaveBeenCalledWith('#0000ff');
   });
 

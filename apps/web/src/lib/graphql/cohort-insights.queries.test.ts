@@ -7,5 +7,4 @@ describe('cohort-insights.queries', () => {
     expect(typeof COHORT_INSIGHTS_QUERY).toBe('string');
     expect(COHORT_INSIGHTS_QUERY).toContain('query CohortInsights');
   });
-
 });

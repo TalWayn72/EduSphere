@@ -3,12 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  BookOpen,
-  ChevronRight,
-  Loader2,
-  Network,
-} from 'lucide-react';
+import { BookOpen, ChevronRight, Loader2, Network } from 'lucide-react';
 import { DEV_MODE } from '@/lib/auth';
 import type { GraphNode, GraphEdge } from '@/lib/mock-graph-data';
 import type { ApiConceptNode } from './types';
@@ -66,11 +61,14 @@ export const GraphSidebar = React.memo(function GraphSidebar({
   const navigate = useNavigate();
 
   const selectedNodeBadgeStyle = useMemo(
-    () => selectedNode ? {
-      backgroundColor: `${NODE_COLOR[selectedNode.type]}20`,
-      color: NODE_COLOR[selectedNode.type],
-    } : undefined,
-    [selectedNode],
+    () =>
+      selectedNode
+        ? {
+            backgroundColor: `${NODE_COLOR[selectedNode.type]}20`,
+            color: NODE_COLOR[selectedNode.type],
+          }
+        : undefined,
+    [selectedNode]
   );
 
   return (
@@ -80,13 +78,9 @@ export const GraphSidebar = React.memo(function GraphSidebar({
         <Card>
           <CardContent className="p-4 space-y-3">
             <div className="flex items-start gap-2">
-              <span className="text-2xl">
-                {TYPE_LABEL[selectedNode.type]}
-              </span>
+              <span className="text-2xl">{TYPE_LABEL[selectedNode.type]}</span>
               <div>
-                <p className="font-semibold text-sm">
-                  {selectedNode.label}
-                </p>
+                <p className="font-semibold text-sm">{selectedNode.label}</p>
                 <span
                   className="text-xs px-1.5 py-0.5 rounded"
                   style={selectedNodeBadgeStyle}
@@ -104,11 +98,12 @@ export const GraphSidebar = React.memo(function GraphSidebar({
               size="sm"
               variant="ghost"
               className="w-full text-xs h-7 justify-start"
-              onClick={() => navigate('/learn/b0000000-0000-0000-0000-000000000001')}
+              onClick={() =>
+                navigate('/learn/b0000000-0000-0000-0000-000000000001')
+              }
             >
               <BookOpen className="h-3 w-3 mr-1" />
-              {t('seeInContent')}{' '}
-              <ChevronRight className="h-3 w-3 ml-auto" />
+              {t('seeInContent')} <ChevronRight className="h-3 w-3 ml-auto" />
             </Button>
           </CardContent>
         </Card>
@@ -137,8 +132,7 @@ export const GraphSidebar = React.memo(function GraphSidebar({
                   <span
                     className="h-2 w-2 rounded-full flex-shrink-0"
                     style={{
-                      backgroundColor:
-                        NODE_COLOR[other?.type ?? 'CONCEPT'],
+                      backgroundColor: NODE_COLOR[other?.type ?? 'CONCEPT'],
                     }}
                   />
                   <div className="min-w-0 flex-1">
@@ -217,15 +211,11 @@ export const GraphSidebar = React.memo(function GraphSidebar({
           </p>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="text-center p-2 bg-muted/40 rounded">
-              <p className="text-lg font-bold">
-                {graphData.nodes.length}
-              </p>
+              <p className="text-lg font-bold">{graphData.nodes.length}</p>
               <p className="text-muted-foreground">{t('nodes')}</p>
             </div>
             <div className="text-center p-2 bg-muted/40 rounded">
-              <p className="text-lg font-bold">
-                {graphData.edges.length}
-              </p>
+              <p className="text-lg font-bold">{graphData.edges.length}</p>
               <p className="text-muted-foreground">{t('edges')}</p>
             </div>
           </div>

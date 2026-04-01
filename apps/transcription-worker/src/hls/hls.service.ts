@@ -89,7 +89,10 @@ export class HlsService {
       await writeFile(masterPath, masterManifest, 'utf-8');
 
       // Step 4 -- Upload everything to MinIO
-      const segmentKeys = await this.manifest.uploadDirectory(outputDir, outputPrefix);
+      const segmentKeys = await this.manifest.uploadDirectory(
+        outputDir,
+        outputPrefix
+      );
       const manifestKey = `${outputPrefix}/master.m3u8`;
 
       this.logger.log(
@@ -98,9 +101,11 @@ export class HlsService {
 
       return { manifestKey, segmentKeys, duration };
     } finally {
-      await this.manifest.cleanupDir(workDir).catch((e) =>
-        this.logger.warn(`HLS: failed to clean up workDir=${workDir}`, e)
-      );
+      await this.manifest
+        .cleanupDir(workDir)
+        .catch((e) =>
+          this.logger.warn(`HLS: failed to clean up workDir=${workDir}`, e)
+        );
     }
   }
 

@@ -20,7 +20,12 @@ export default meta;
 type Story = StoryObj<typeof Table>;
 
 const courses = [
-  { id: 'C-001', name: 'Machine Learning 101', students: 245, status: 'Active' },
+  {
+    id: 'C-001',
+    name: 'Machine Learning 101',
+    students: 245,
+    status: 'Active',
+  },
   { id: 'C-002', name: 'Data Structures', students: 189, status: 'Active' },
   { id: 'C-003', name: 'Intro to AI Ethics', students: 72, status: 'Draft' },
 ];

@@ -53,13 +53,17 @@ interface VisualAnchorsResult {
 }
 
 export function UnifiedLearningPage() {
-  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{ contentId: string }>();
+  const { contentId = 'b0000000-0000-0000-0000-000000000001' } = useParams<{
+    contentId: string;
+  }>();
   const [searchParams] = useSearchParams();
 
   // Mounted guard: prevent urql cache dispatch during sibling route render
   // (/learn/:contentId and /document/:contentId both render this component).
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ── Content item query (contentType + document content) ──
   const [itemResult] = useQuery<ContentItemResult>({
@@ -108,14 +112,18 @@ export function UnifiedLearningPage() {
   const chat = useAgentChat(contentId);
 
   // ── Document scroll memory ──
-  const { saveScrollPosition, isReturning, savedScrollY } = useDocumentScrollMemory(contentId);
+  const { saveScrollPosition, isReturning, savedScrollY } =
+    useDocumentScrollMemory(contentId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // ── Resume banner (G-10) ──
   const [showResumeBanner, setShowResumeBanner] = useState(isReturning);
 
   const scrollToSaved = useCallback(() => {
-    scrollContainerRef.current?.scrollTo({ top: savedScrollY, behavior: 'smooth' });
+    scrollContainerRef.current?.scrollTo({
+      top: savedScrollY,
+      behavior: 'smooth',
+    });
   }, [savedScrollY]);
 
   // ── Visual anchors ──
@@ -124,12 +132,16 @@ export function UnifiedLearningPage() {
     variables: { mediaAssetId: contentId },
     pause: !mounted || !contentId,
   });
-  const visualAnchors: VisualAnchor[] = anchorsResult.data?.getVisualAnchors ?? [];
+  const visualAnchors: VisualAnchor[] =
+    anchorsResult.data?.getVisualAnchors ?? [];
   const anchorPositions = visualAnchors.map((a) => ({
     id: a.id,
     documentOrder: a.documentOrder,
   }));
-  const { activeAnchorId } = useAnchorDetection(anchorPositions, scrollContainerRef);
+  const { activeAnchorId } = useAnchorDetection(
+    anchorPositions,
+    scrollContainerRef
+  );
   const activeAnchor = visualAnchors.find((a) => a.id === activeAnchorId);
 
   // ── Document zoom ──
@@ -179,7 +191,10 @@ export function UnifiedLearningPage() {
       {showResumeBanner && activeAnchorId && (
         <ResumeBanner
           activeAnchor={activeAnchor}
-          onResume={() => { scrollToSaved(); setShowResumeBanner(false); }}
+          onResume={() => {
+            scrollToSaved();
+            setShowResumeBanner(false);
+          }}
           onDismiss={() => setShowResumeBanner(false)}
         />
       )}
@@ -202,59 +217,59 @@ export function UnifiedLearningPage() {
             anchors={visualAnchors}
             activeAnchorId={activeAnchorId}
           />
-        <ResizablePanelGroup
-          orientation="horizontal"
-          className="flex-1 overflow-hidden border rounded-lg"
-        >
-          {/* LEFT — Document */}
-          <ResizablePanel defaultSize={55} minSize={25} id="document">
-            <DocumentPanel
-              content={documentContent}
-              hasDocument={isDocumentContent || !!documentContent}
-              textAnnotations={textAnnotations}
-              focusedAnnotationId={focusedAnnotationId}
-              onAnnotationClick={setFocusedAnnotationId}
-              onAddTextAnnotation={(args) => {
-                void addTextAnnotation(args);
-              }}
-              scrollContainerRef={scrollContainerRef}
-              onScroll={handleScroll}
-              documentZoom={documentZoom}
-              defaultAnnotationLayer={defaultAnnotationLayer}
-            />
-          </ResizablePanel>
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="flex-1 overflow-hidden border rounded-lg"
+          >
+            {/* LEFT — Document */}
+            <ResizablePanel defaultSize={55} minSize={25} id="document">
+              <DocumentPanel
+                content={documentContent}
+                hasDocument={isDocumentContent || !!documentContent}
+                textAnnotations={textAnnotations}
+                focusedAnnotationId={focusedAnnotationId}
+                onAnnotationClick={setFocusedAnnotationId}
+                onAddTextAnnotation={(args) => {
+                  void addTextAnnotation(args);
+                }}
+                scrollContainerRef={scrollContainerRef}
+                onScroll={handleScroll}
+                documentZoom={documentZoom}
+                defaultAnnotationLayer={defaultAnnotationLayer}
+              />
+            </ResizablePanel>
 
-          <ResizableHandle withHandle />
+            <ResizableHandle withHandle />
 
-          {/* RIGHT — Video + Transcript + Tabs */}
-          <ResizablePanel defaultSize={45} minSize={25} id="tools">
-            <ToolsPanel
-              videoUrl={videoUrl}
-              hlsManifestUrl={hlsManifestUrl}
-              transcript={transcript}
-              annotations={annotations}
-              annotationsFetching={annotFetching}
-              currentTime={currentTime}
-              duration={duration}
-              seekTarget={seekTarget}
-              onTimeUpdate={setCurrentTime}
-              onDurationChange={setDuration}
-              onSeek={seekTo}
-              onAddAnnotation={(text, layer, time) => {
-                void addAnnotation(text, layer, time);
-              }}
-              onReply={(pid, content, layer) => {
-                void addReply(pid, content, layer, currentTime);
-              }}
-              onOverlayAnnotation={(content, layer, ts) => {
-                void addAnnotation(content, layer, ts);
-              }}
-              bookmarks={bookmarks}
-              chat={chat}
-              subtitleTracks={subtitleTracks}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            {/* RIGHT — Video + Transcript + Tabs */}
+            <ResizablePanel defaultSize={45} minSize={25} id="tools">
+              <ToolsPanel
+                videoUrl={videoUrl}
+                hlsManifestUrl={hlsManifestUrl}
+                transcript={transcript}
+                annotations={annotations}
+                annotationsFetching={annotFetching}
+                currentTime={currentTime}
+                duration={duration}
+                seekTarget={seekTarget}
+                onTimeUpdate={setCurrentTime}
+                onDurationChange={setDuration}
+                onSeek={seekTo}
+                onAddAnnotation={(text, layer, time) => {
+                  void addAnnotation(text, layer, time);
+                }}
+                onReply={(pid, content, layer) => {
+                  void addReply(pid, content, layer, currentTime);
+                }}
+                onOverlayAnnotation={(content, layer, ts) => {
+                  void addAnnotation(content, layer, ts);
+                }}
+                bookmarks={bookmarks}
+                chat={chat}
+                subtitleTracks={subtitleTracks}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
       </div>
     </Layout>

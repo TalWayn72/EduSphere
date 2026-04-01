@@ -3,10 +3,7 @@
  * and DiscussionMessageService. Preserves the original public API
  * so that all existing imports continue to work unchanged.
  */
-import {
-  Injectable,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
 import type {
   CreateDiscussionInput,
@@ -19,7 +16,7 @@ import { DiscussionMessageService } from './discussion-message.service';
 export class DiscussionService implements OnModuleDestroy {
   constructor(
     private readonly threads: DiscussionThreadService,
-    private readonly messages: DiscussionMessageService,
+    private readonly messages: DiscussionMessageService
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -37,14 +34,26 @@ export class DiscussionService implements OnModuleDestroy {
     offset: number,
     authContext: AuthContext
   ) {
-    return this.threads.findDiscussionsByCourse(courseId, limit, offset, authContext);
+    return this.threads.findDiscussionsByCourse(
+      courseId,
+      limit,
+      offset,
+      authContext
+    );
   }
 
-  async createDiscussion(input: CreateDiscussionInput, authContext: AuthContext) {
+  async createDiscussion(
+    input: CreateDiscussionInput,
+    authContext: AuthContext
+  ) {
     return this.threads.createDiscussion(input, authContext);
   }
 
-  async findDiscussionsByUser(limit: number, offset: number, authContext: AuthContext) {
+  async findDiscussionsByUser(
+    limit: number,
+    offset: number,
+    authContext: AuthContext
+  ) {
     return this.threads.findDiscussionsByUser(limit, offset, authContext);
   }
 
@@ -55,7 +64,12 @@ export class DiscussionService implements OnModuleDestroy {
     offset: number,
     authContext: AuthContext
   ) {
-    return this.messages.findMessagesByDiscussion(discussionId, limit, offset, authContext);
+    return this.messages.findMessagesByDiscussion(
+      discussionId,
+      limit,
+      offset,
+      authContext
+    );
   }
 
   async findMessageById(id: string, authContext: AuthContext) {
@@ -68,7 +82,12 @@ export class DiscussionService implements OnModuleDestroy {
     offset: number,
     authContext: AuthContext
   ) {
-    return this.messages.findRepliesByParent(parentId, limit, offset, authContext);
+    return this.messages.findRepliesByParent(
+      parentId,
+      limit,
+      offset,
+      authContext
+    );
   }
 
   async countReplies(parentId: string, authContext: AuthContext) {
@@ -88,7 +107,10 @@ export class DiscussionService implements OnModuleDestroy {
   }
 
   // Participant operations
-  async findParticipantsByDiscussion(discussionId: string, authContext: AuthContext) {
+  async findParticipantsByDiscussion(
+    discussionId: string,
+    authContext: AuthContext
+  ) {
     return this.threads.findParticipantsByDiscussion(discussionId, authContext);
   }
 

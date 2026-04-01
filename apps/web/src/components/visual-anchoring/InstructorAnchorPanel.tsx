@@ -30,7 +30,8 @@ interface AnchorRowProps {
 }
 
 function AnchorRow({ anchor, onDelete }: AnchorRowProps) {
-  const thumb = anchor.visualAsset?.webpUrl ?? anchor.visualAsset?.storageUrl ?? null;
+  const thumb =
+    anchor.visualAsset?.webpUrl ?? anchor.visualAsset?.storageUrl ?? null;
 
   return (
     <li
@@ -45,7 +46,10 @@ function AnchorRow({ anchor, onDelete }: AnchorRowProps) {
           loading="lazy"
         />
       ) : (
-        <div className="h-10 w-10 shrink-0 rounded border bg-muted" aria-hidden="true" />
+        <div
+          className="h-10 w-10 shrink-0 rounded border bg-muted"
+          aria-hidden="true"
+        />
       )}
 
       <div className="flex-1 min-w-0 space-y-0.5">
@@ -53,7 +57,9 @@ function AnchorRow({ anchor, onDelete }: AnchorRowProps) {
           {truncate(anchor.anchorText)}
         </p>
         <div className="flex items-center gap-1">
-          <span className="text-xs text-muted-foreground">#{anchor.documentOrder + 1}</span>
+          <span className="text-xs text-muted-foreground">
+            #{anchor.documentOrder + 1}
+          </span>
           {anchor.isBroken && (
             <Badge
               variant="outline"
@@ -100,7 +106,7 @@ export default function InstructorAnchorPanel({
         setDeleteAnnouncement('שגיאה במחיקת עוגן. אנא נסה שוב.');
       }
     },
-    [deleteAnchor, onAnchorDeleted],
+    [deleteAnchor, onAnchorDeleted]
   );
 
   const sorted = [...anchors].sort((a, b) => a.documentOrder - b.documentOrder);
@@ -122,7 +128,9 @@ export default function InstructorAnchorPanel({
         {deleteAnnouncement}
       </div>
       <div className="flex items-center justify-between border-b px-3 py-2">
-        <h2 className="text-sm font-semibold">Visual Anchors ({anchors.length})</h2>
+        <h2 className="text-sm font-semibold">
+          Visual Anchors ({anchors.length})
+        </h2>
         <Button
           variant="outline"
           size="sm"
@@ -141,17 +149,23 @@ export default function InstructorAnchorPanel({
           <div
             className={cn(
               'flex flex-col items-center gap-2 rounded-lg border border-dashed',
-              'py-10 text-center text-sm text-muted-foreground',
+              'py-10 text-center text-sm text-muted-foreground'
             )}
             data-testid="anchor-empty-state"
           >
             <p>No anchors yet.</p>
-            <p className="text-xs">Select text in the document to create one.</p>
+            <p className="text-xs">
+              Select text in the document to create one.
+            </p>
           </div>
         ) : (
           <ul className="space-y-2" aria-label="Anchor list">
             {sorted.map((anchor) => (
-              <AnchorRow key={anchor.id} anchor={anchor} onDelete={handleDelete} />
+              <AnchorRow
+                key={anchor.id}
+                anchor={anchor}
+                onDelete={handleDelete}
+              />
             ))}
           </ul>
         )}

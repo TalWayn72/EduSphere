@@ -49,7 +49,10 @@ export function scoreConceptsByText(
     .map((c) => ({
       id: c.id,
       text: c.definition ?? c.name,
-      similarity: computeTextSimilarity(`${c.name} ${c.definition ?? ''}`, query),
+      similarity: computeTextSimilarity(
+        `${c.name} ${c.definition ?? ''}`,
+        query
+      ),
       entityType: 'concept',
       entityId: c.id,
       startTime: null,
