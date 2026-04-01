@@ -229,6 +229,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared packages (needed for @edusphere/db imports)
+        run: pnpm turbo build --filter='./packages/*'
+
       - name: Security tests (static analysis -- no DB required)
         run: pnpm test:security
 

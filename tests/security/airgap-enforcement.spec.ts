@@ -81,7 +81,7 @@ describe('Air-Gap: Helm chart values disable external providers', () => {
 
   it('values.yaml sets AIRGAP_MODE to "true"', () => {
     const content = read(valuesPath);
-    expect(content).toContain('AIRGAP_MODE: "true"');
+    expect(content).toMatch(/AIRGAP_MODE:\s*['"]true['"]/);
   });
 
   it('values.yaml disables OpenAI external service', () => {
