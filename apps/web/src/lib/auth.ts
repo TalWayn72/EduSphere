@@ -60,9 +60,8 @@ const KEYCLOAK_INIT_TIMEOUT_MS = 10_000;
 
 export function initKeycloak(): Promise<boolean> {
   if (DEV_MODE) {
-    // eslint-disable-next-line no-console -- DEV-only auth mode indicator
     if (import.meta.env.DEV)
-      console.debug('[Auth] DEV MODE: Running without Keycloak authentication');
+      console.warn('[Auth] DEV MODE: Running without Keycloak authentication');
     devAuthenticated =
       window.sessionStorage.getItem(DEV_LOGGED_IN_KEY) === 'true';
     return Promise.resolve(devAuthenticated);
@@ -121,8 +120,7 @@ export function initKeycloak(): Promise<boolean> {
   kcInitPromise
     .then((authenticated) => {
       if (didTimeout && authenticated) {
-        // eslint-disable-next-line no-console -- late-auth recovery logging
-        console.info(
+        console.warn(
           '[Auth] Keycloak authenticated after timeout — recovering session.'
         );
         setupTokenRefresh();

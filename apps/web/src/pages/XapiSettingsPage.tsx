@@ -45,9 +45,9 @@ export function XapiSettingsPage() {
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
-        // eslint-disable-next-line no-console -- DEV-only cleanup trace
+
         if (import.meta.env.DEV)
-          console.debug(
+          console.warn(
             '[XapiSettingsPage] cleanup: copy timer cleared on unmount'
           );
       }

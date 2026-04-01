@@ -132,9 +132,9 @@ export function useFileUpload(
           reportProgress(10);
 
           const { uploadUrl, fileKey } = await presign(file);
-          // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
+
           if (import.meta.env.DEV)
-            console.debug(`${LOG_PREFIX} presign OK — fileKey=${fileKey}`);
+            console.warn(`${LOG_PREFIX} presign OK — fileKey=${fileKey}`);
 
           if (!mountedRef.current) return null;
 
@@ -157,11 +157,8 @@ export function useFileUpload(
             );
           }
 
-          // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
           if (import.meta.env.DEV)
-            console.debug(
-              `${LOG_PREFIX} PUT OK — status=${putResponse.status}`
-            );
+            console.warn(`${LOG_PREFIX} PUT OK — status=${putResponse.status}`);
           if (!mountedRef.current) return null;
 
           // ── Step 3: Confirm ────────────────────────────────────────
@@ -169,9 +166,9 @@ export function useFileUpload(
           reportProgress(80);
 
           const result = await confirm(fileKey, file);
-          // eslint-disable-next-line no-console -- DEV-only upload lifecycle trace
+
           if (import.meta.env.DEV)
-            console.debug(`${LOG_PREFIX} confirm OK — id=${result.id}`);
+            console.warn(`${LOG_PREFIX} confirm OK — id=${result.id}`);
 
           if (!mountedRef.current) return null;
 
@@ -181,8 +178,7 @@ export function useFileUpload(
         } catch (err: unknown) {
           // Abort errors are not retryable
           if (err instanceof DOMException && err.name === 'AbortError') {
-            // eslint-disable-next-line no-console -- DEV-only abort trace
-            if (import.meta.env.DEV) console.debug(`${LOG_PREFIX} aborted`);
+            if (import.meta.env.DEV) console.warn(`${LOG_PREFIX} aborted`);
             return null;
           }
 
@@ -203,8 +199,7 @@ export function useFileUpload(
 
           const backoffMs = BASE_DELAY_MS * Math.pow(2, attempt - 1);
           if (import.meta.env.DEV) {
-            // eslint-disable-next-line no-console -- DEV-only retry trace
-            console.debug(
+            console.warn(
               `${LOG_PREFIX} attempt ${attempt}/${maxRetries} failed (${message}) — retrying in ${backoffMs}ms`
             );
           }
@@ -226,9 +221,8 @@ export function useFileUpload(
   const retry = useCallback(async (): Promise<ConfirmResult | null> => {
     const file = lastFileRef.current;
     if (!file) {
-      // eslint-disable-next-line no-console -- DEV-only retry trace
       if (import.meta.env.DEV)
-        console.debug(`${LOG_PREFIX} retry called with no previous file`);
+        console.warn(`${LOG_PREFIX} retry called with no previous file`);
       return null;
     }
     return executeUpload(file);

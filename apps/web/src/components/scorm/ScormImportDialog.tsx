@@ -62,9 +62,9 @@ export function ScormImportDialog({
     return () => {
       if (redirectTimerRef.current) {
         clearTimeout(redirectTimerRef.current);
-        // eslint-disable-next-line no-console -- DEV-only cleanup trace
+
         if (import.meta.env.DEV)
-          console.debug(
+          console.warn(
             '[ScormImportDialog] cleanup: redirect timer cleared on unmount'
           );
       }

@@ -121,11 +121,10 @@ function resolveWithPlurals(
 function makeTFunction(ns: string | string[]) {
   const namespaces = Array.isArray(ns) ? ns : [ns];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (
     key: string,
     optionsOrDefault?: string | Record<string, unknown>
-  ): any => {
+  ): string => {
     const defaultString =
       typeof optionsOrDefault === 'string' ? optionsOrDefault : undefined;
     const options =

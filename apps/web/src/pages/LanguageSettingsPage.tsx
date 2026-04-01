@@ -77,9 +77,9 @@ export function LanguageSettingsPage() {
     return () => {
       if (savedTimerRef.current) {
         clearTimeout(savedTimerRef.current);
-        // eslint-disable-next-line no-console -- DEV-only cleanup trace
+
         if (import.meta.env.DEV)
-          console.debug(
+          console.warn(
             '[LanguageSettingsPage] cleanup: saved timer cleared on unmount'
           );
       }

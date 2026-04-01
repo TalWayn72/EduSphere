@@ -45,9 +45,9 @@ export function NotificationTemplatesPage() {
     setMounted(true);
     return () => {
       clearTimeout(savedTimerRef.current);
-      // eslint-disable-next-line no-console -- DEV-only cleanup trace
+
       if (import.meta.env.DEV)
-        console.debug(
+        console.warn(
           '[NotificationTemplatesPage] cleanup: saved timer cleared on unmount'
         );
     };

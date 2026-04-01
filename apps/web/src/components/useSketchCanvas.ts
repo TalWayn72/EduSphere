@@ -1,3 +1,4 @@
+/* global TouchEvent */
 /**
  * useSketchCanvas — drawing hook for VideoSketchOverlay.
  * Supports freehand, eraser, rect, arrow, ellipse, and text tools.
@@ -129,7 +130,6 @@ export function useSketchCanvas({
   const shapeEndRef = useRef<{ x: number; y: number } | null>(null);
   const currentFreehandRef = useRef<{ x: number; y: number }[]>([]);
 
-  // eslint-disable-next-line no-undef
   const getPos = (e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
     const rect = canvas.getBoundingClientRect();
     const client = 'touches' in e ? e.touches[0]! : e;
@@ -152,7 +152,6 @@ export function useSketchCanvas({
     []
   );
 
-  // eslint-disable-next-line no-undef
   const startDraw = useCallback(
     (e: MouseEvent | TouchEvent) => {
       const canvas = canvasRef.current;
@@ -170,7 +169,6 @@ export function useSketchCanvas({
     [canvasRef, tool]
   );
 
-  // eslint-disable-next-line no-undef
   const continueDraw = useCallback(
     (e: MouseEvent | TouchEvent) => {
       if (!drawingRef.current) return;
