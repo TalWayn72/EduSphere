@@ -18,15 +18,15 @@ jobs:
 
     steps:
       - name: Checkout audit-logs branch
+        id: checkout-audit
         uses: actions/checkout@v4
         with:
           ref: audit-logs
-          token: ${{ secrets.AUDIT_EXPORT_TOKEN || github.token }}
           fetch-depth: 1
         continue-on-error: true  # Branch may not exist yet
 
       - name: Checkout main branch (fallback)
-        if: failure()
+        if: steps.checkout-audit.outcome == 'failure'
         uses: actions/checkout@v4
 
       - name: Create audit-logs directory
@@ -34,7 +34,7 @@ jobs:
 
       - name: Export GitHub Audit Logs
         env:
-          GH_TOKEN: ${{ secrets.AUDIT_EXPORT_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUDIT_EXPORT_TOKEN || secrets.GITHUB_TOKEN }}
           ORG: ${{ github.repository_owner }}
         run: |
           DATE=$(date -u +%Y-%m-%d)
