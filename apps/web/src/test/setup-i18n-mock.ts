@@ -124,7 +124,8 @@ function makeTFunction(ns: string | string[]) {
   return (
     key: string,
     optionsOrDefault?: string | Record<string, unknown>
-  ): string => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): any => {
     const defaultString =
       typeof optionsOrDefault === 'string' ? optionsOrDefault : undefined;
     const options =

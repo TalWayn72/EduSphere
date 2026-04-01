@@ -23,15 +23,46 @@ import {
   SEND_AGENT_MESSAGE_MUTATION,
   MESSAGE_STREAM_SUBSCRIPTION,
 } from '@/lib/graphql/agent.queries';
-import type {
-  StartAgentSessionMutation,
-  StartAgentSessionMutationVariables,
-  SendAgentMessageMutation,
-  SendAgentMessageMutationVariables,
-  MessageStreamSubscription,
-  MessageStreamSubscriptionVariables,
-} from '@edusphere/graphql-types';
 import { MessageRole } from '@edusphere/graphql-types';
+import type { TemplateType } from '@edusphere/graphql-types';
+
+// Types defined locally because agent.queries.ts is excluded from codegen
+// (supergraph lacks some agent-specific input types like CreateAgentWorkflowInput).
+interface StartAgentSessionMutation {
+  startAgentSession: {
+    id: string;
+    templateType: TemplateType;
+    status: string;
+    createdAt: string;
+  } | null;
+}
+interface StartAgentSessionMutationVariables {
+  templateType: TemplateType;
+  context: Record<string, unknown>;
+}
+interface SendAgentMessageMutation {
+  sendMessage: {
+    id: string;
+    role: MessageRole;
+    content: string;
+    createdAt: string;
+  } | null;
+}
+interface SendAgentMessageMutationVariables {
+  sessionId: string;
+  content: string;
+}
+interface MessageStreamSubscription {
+  messageStream: {
+    id: string;
+    role: MessageRole;
+    content: string;
+    createdAt: string;
+  } | null;
+}
+interface MessageStreamSubscriptionVariables {
+  sessionId: string;
+}
 import type { ChatMessage } from './useAgentChat.helpers';
 import {
   INITIAL_MESSAGE,
@@ -178,7 +209,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       if (!sid) {
         const res = await startSession({
           templateType:
-            'CHAVRUTA_DEBATE' as import('@edusphere/graphql-types').TemplateType,
+            'CHAVRUTA_DEBATE' as TemplateType,
           context: { contentId },
         });
         if (res.error) {
