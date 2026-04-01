@@ -134,7 +134,7 @@ jobs:
       # exit-code "0" keeps CD unblocked while base-image CVEs are tracked.
       - name: Trivy scan — ${{ matrix.service }} (HIGH/CRITICAL → report)
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}@${{ steps.build-push.outputs.digest }}
           format: sarif

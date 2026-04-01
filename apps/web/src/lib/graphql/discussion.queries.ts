@@ -1,7 +1,7 @@
 import { gql } from '@urql/core';
 
 export const MY_DISCUSSIONS_QUERY = gql`
-  query MyDiscussions($limit: Int) {
+  query MyDiscussionsList($limit: Int) {
     myDiscussions(limit: $limit) {
       id
       title
@@ -14,7 +14,7 @@ export const MY_DISCUSSIONS_QUERY = gql`
 `;
 
 export const DISCUSSION_QUERY = gql`
-  query Discussion($id: ID!) {
+  query DiscussionDetail($id: ID!) {
     discussion(id: $id) {
       id
       title
@@ -42,7 +42,7 @@ export const DISCUSSION_MESSAGES_QUERY = gql`
 `;
 
 export const ADD_MESSAGE_MUTATION = gql`
-  mutation AddMessage($discussionId: ID!, $input: AddMessageInput!) {
+  mutation AddDiscussionMessage($discussionId: ID!, $input: AddMessageInput!) {
     addMessage(discussionId: $discussionId, input: $input) {
       id
       content
@@ -58,7 +58,7 @@ export const LIKE_MESSAGE_MUTATION = gql`
 `;
 
 export const MESSAGE_ADDED_SUBSCRIPTION = gql`
-  subscription MessageAdded($discussionId: ID!) {
+  subscription DiscussionMessageAdded($discussionId: ID!) {
     messageAdded(discussionId: $discussionId) {
       id
       userId

@@ -23,7 +23,7 @@ fi
 # Step 2: Check if container is running, start if needed
 if ! docker ps --format '{{.Names}}' | grep -q "edusphere-all-in-one"; then
   echo "Container not running — starting docker-compose..."
-  cd "$SCRIPT_DIR/.." && docker-compose up -d 2>&1 | tail -3
+  cd "$SCRIPT_DIR/.." && docker compose up -d 2>&1 | tail -3
   echo "Waiting 30s for container startup..."
   sleep 30
 fi

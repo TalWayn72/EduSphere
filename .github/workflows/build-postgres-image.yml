@@ -48,7 +48,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/postgres-age
+          images: ghcr.io/talwayn72/postgres-age
           tags: |
             type=raw,value=pg18
             type=raw,value=pg18-${{ github.sha }}
@@ -71,7 +71,7 @@ jobs:
             -e POSTGRES_USER=test \
             -e POSTGRES_PASSWORD=test \
             -e POSTGRES_DB=test \
-            ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
+            ghcr.io/talwayn72/postgres-age:pg18
           sleep 10
           docker exec pg-test psql -U test -d test -c "CREATE EXTENSION IF NOT EXISTS age; CREATE EXTENSION IF NOT EXISTS vector; LOAD 'age'; SELECT extname, extversion FROM pg_extension;"
           docker stop pg-test

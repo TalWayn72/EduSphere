@@ -29,7 +29,7 @@ jobs:
     services:
       # PostgreSQL 18 with Apache AGE + pgvector (custom CI image)
       postgres:
-        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
+        image: ghcr.io/talwayn72/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -146,7 +146,7 @@ jobs:
 
     services:
       postgres:
-        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
+        image: ghcr.io/talwayn72/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -211,7 +211,7 @@ jobs:
 
     services:
       postgres:
-        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
+        image: ghcr.io/talwayn72/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password

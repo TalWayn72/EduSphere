@@ -6,6 +6,20 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.67.0] — 2026-04-01 — CI Pipeline Fixes
+
+### Fixed
+- **Docker image case-sensitivity** — service container refs now use lowercase `ghcr.io/talwayn72/postgres-age:pg18` (all 7 workflow files)
+- **Trivy action version** — corrected `@0.28.0` to `@v0.28.0` in docker-build.yml, ci.yml, cd.yml
+- **GraphQL codegen duplicate ops** — renamed MyDiscussions/Discussion/AddMessage/MessageAdded in discussion.queries.ts to unique names
+- **Semgrep YAML syntax** — quoted `pattern: origin: '*'` to fix nested mapping parse error
+- **Pre-E2E gate** — replaced `docker-compose` with `docker compose` (V2 CLI) for CI runners
+- **Lighthouse CI** — added `--chrome-flags="--no-sandbox"` and fallback for CI without backend
+- **Docs freshness** — CHANGELOG.md and PROJECT_STATUS.md brought up to date
+- **npm audit** — added pnpm overrides for critical @apollo/gateway and handlebars vulnerabilities
+
+---
+
 ## [0.66.0] — 2026-03-17 — Phase 65: Lesson Pipeline Production Hardening
 
 ### Added

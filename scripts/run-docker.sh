@@ -4,7 +4,7 @@
 set -e
 
 echo "🚀 Starting EduSphere..."
-docker-compose up -d
+docker compose up -d
 
 echo "⏳ Waiting for services..."
 sleep 10

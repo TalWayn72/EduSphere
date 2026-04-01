@@ -78,7 +78,7 @@ rules:
       confidence: LOW
 
   - id: edusphere-cors-wildcard
-    pattern: origin: '*'
+    pattern: "origin: '*'"
     message: |
       CORS wildcard origin in production. Use specific origins:
         origin: process.env.CORS_ORIGIN?.split(',') ?? []

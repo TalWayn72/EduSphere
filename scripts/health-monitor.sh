@@ -37,7 +37,7 @@ fi
 # ── 3. Container check ───────────────────────────────────────────────────────
 if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "edusphere-all-in-one"; then
   log "WARN: edusphere-all-in-one container is down — running docker-compose up -d"
-  cd "$PROJECT_DIR" && docker-compose up -d >> "$LOG_FILE" 2>&1
+  cd "$PROJECT_DIR" && docker compose up -d >> "$LOG_FILE" 2>&1
   RESTART_HAPPENED=1
   sleep 30  # wait for supervisord to start all services
 fi

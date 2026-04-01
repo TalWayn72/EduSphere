@@ -108,7 +108,7 @@ echo -e "\n${YELLOW}Services down. Auto-restoring...${NC}"
 # 3a. If container is missing, bring it up
 if ! docker ps --format '{{.Names}}' | grep -q edusphere-all-in-one; then
   echo "Container not running. Starting docker-compose..."
-  docker-compose up -d 2>&1 | tail -5
+  docker compose up -d 2>&1 | tail -5
   echo "Waiting 30s for full container startup..."
   sleep 30
 else
