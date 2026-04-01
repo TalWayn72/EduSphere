@@ -242,7 +242,9 @@ describe('Keycloak Client-ID standardized to edusphere-web', () => {
     // KEYCLOAK_AUDIENCE defined in gateway-config.ts (extracted from index.ts)
     const content = readSource('apps/gateway/src/gateway-config.ts');
     expect(content).toMatch(/KEYCLOAK_AUDIENCE[\s\S]*?['"]edusphere-web['"]/);
-    expect(content).not.toMatch(/KEYCLOAK_AUDIENCE[\s\S]*?['"]edusphere-app['"]/);
+    expect(content).not.toMatch(
+      /KEYCLOAK_AUDIENCE[\s\S]*?['"]edusphere-app['"]/
+    );
   });
 
   it('gateway gateway-plugins.ts uses KEYCLOAK_AUDIENCE', () => {
