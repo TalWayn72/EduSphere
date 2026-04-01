@@ -1,0 +1,12 @@
+# Gitleaks configuration — allowlisted false positives
+# These are test fixtures, UI text, and documentation strings, not real secrets.
+
+[allowlist]
+
+# Test files containing mock/fixture API keys (not real credentials)
+paths = [
+  '''apps/subgraph-core/src/org/api-key\.service\.spec\.ts$''',
+  '''apps/web/src/components/partners/ApiKeySection\.test\.tsx$''',
+  '''apps/web/src/components/landing/VsCompetitorsSection\.tsx$''',
+  '''docs/operations/ENTERPRISE_EXECUTION_PROTOCOL\.md$''',
+]

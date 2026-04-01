@@ -208,8 +208,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       let sid = sessionId;
       if (!sid) {
         const res = await startSession({
-          templateType:
-            'CHAVRUTA_DEBATE' as TemplateType,
+          templateType: 'CHAVRUTA_DEBATE' as TemplateType,
           context: { contentId },
         });
         if (res.error) {

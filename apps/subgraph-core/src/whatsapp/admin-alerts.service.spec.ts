@@ -43,7 +43,7 @@ vi.mock('../notifications/channels/whatsapp-channel.service', () => ({
 }));
 
 import { AdminAlertsService } from './admin-alerts.service.js';
-import { WhatsAppChannelService } from '../notifications/channels/whatsapp-channel.service.js';
+import { WhatsAppChannelService } from '../notifications/channels/whatsapp-channel.service';
 import { closeAllPools, withTenantContext } from '@edusphere/db';
 
 const mockWithTenantContext = vi.mocked(withTenantContext);
