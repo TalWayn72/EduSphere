@@ -29,7 +29,7 @@ jobs:
     services:
       # PostgreSQL 18 with Apache AGE + pgvector (custom CI image)
       postgres:
-        image: postgres:16
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -81,14 +81,15 @@ jobs:
           done
           echo "NATS JetStream started"
 
-      # AGE and pgvector extensions are not available in vanilla postgres:16.
-      # CI tests run without these extensions; integration tests that need them
-      # should use the custom postgres-age image built by build-postgres-image.yml.
+      # pgvector extension is available in pgvector/pgvector:pg16 image.
+      # AGE extension is not available; CI tests run without AGE.
+      # Integration tests that need AGE should use the custom postgres-age image.
       - name: Enable PostgreSQL extensions (best-effort)
         continue-on-error: true
         run: |
           PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
             -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" \
+            -c "CREATE EXTENSION IF NOT EXISTS \"vector\";" \
             -c "SELECT extname, extversion FROM pg_extension;"
 
       - name: Install dependencies
@@ -147,7 +148,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -180,6 +181,7 @@ jobs:
         run: |
           PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
             -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" \
+            -c "CREATE EXTENSION IF NOT EXISTS \"vector\";" \
             -c "SELECT extname, extversion FROM pg_extension;"
 
       - name: Install dependencies
@@ -212,7 +214,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -279,6 +281,7 @@ jobs:
         run: |
           PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
             -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" \
+            -c "CREATE EXTENSION IF NOT EXISTS \"vector\";" \
             -c "SELECT extname, extversion FROM pg_extension;"
 
       - name: Install dependencies
