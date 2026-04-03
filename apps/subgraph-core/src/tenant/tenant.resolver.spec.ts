@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test mocks use any for partial service stubs */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TenantResolver } from './tenant.resolver';
 
@@ -53,7 +54,6 @@ describe('TenantResolver', () => {
     tenantPlanService = {
       updatePlan: vi.fn(),
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver = new TenantResolver(
       tenantService as any,
       {} as any, // tenantLanguageService

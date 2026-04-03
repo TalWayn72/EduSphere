@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test mocks use any for partial service stubs */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { mockDb, mockNatsConn } = vi.hoisted(() => {

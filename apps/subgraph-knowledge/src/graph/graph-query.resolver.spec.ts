@@ -44,15 +44,17 @@ vi.mock('./graph.service', () => ({
 }));
 
 import { GraphQueryResolver } from './graph-query.resolver';
+import type { GraphQLContext } from './graph-resolver.helpers';
+import type { GraphService } from './graph.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const AUTH = { tenantId: 't1', userId: 'u1', role: 'STUDENT' };
 const CTX = {
   authContext: { tenantId: 't1', userId: 'u1', roles: ['STUDENT'], scopes: [] },
-};
+} as GraphQLContext;
 
 function makeResolver(): GraphQueryResolver {
-  return new GraphQueryResolver(mockGraphService as any);
+  return new GraphQueryResolver(mockGraphService as unknown as GraphService);
 }
 
 describe('GraphQueryResolver', () => {
@@ -64,7 +66,7 @@ describe('GraphQueryResolver', () => {
   it('concept() delegates to graphService.findConceptById', async () => {
     mockGraphService.findConceptById.mockResolvedValue({ id: 'c1' });
     const r = makeResolver();
-    const result = await r.concept('c1', CTX as any);
+    const result = await r.concept('c1', CTX);
     expect(mockGraphService.findConceptById).toHaveBeenCalledWith(
       'c1',
       't1',
@@ -77,7 +79,7 @@ describe('GraphQueryResolver', () => {
   it('conceptByName() delegates correctly', async () => {
     mockGraphService.findConceptByName.mockResolvedValue({ name: 'Math' });
     const r = makeResolver();
-    await r.conceptByName('Math', CTX as any);
+    await r.conceptByName('Math', CTX);
     expect(mockGraphService.findConceptByName).toHaveBeenCalledWith(
       'Math',
       't1',
@@ -89,7 +91,7 @@ describe('GraphQueryResolver', () => {
   it('concepts() passes default limit', async () => {
     mockGraphService.findAllConcepts.mockResolvedValue([]);
     const r = makeResolver();
-    await r.concepts(20, CTX as any);
+    await r.concepts(20, CTX);
     expect(mockGraphService.findAllConcepts).toHaveBeenCalledWith(
       't1',
       'u1',
@@ -101,7 +103,7 @@ describe('GraphQueryResolver', () => {
   it('relatedConcepts() passes depth and limit', async () => {
     mockGraphService.findRelatedConcepts.mockResolvedValue([]);
     const r = makeResolver();
-    await r.relatedConcepts('c1', 3, 5, CTX as any);
+    await r.relatedConcepts('c1', 3, 5, CTX);
     expect(mockGraphService.findRelatedConcepts).toHaveBeenCalledWith(
       'c1',
       3,
@@ -115,7 +117,7 @@ describe('GraphQueryResolver', () => {
   it('person() delegates to findPersonById', async () => {
     mockGraphService.findPersonById.mockResolvedValue({ id: 'p1' });
     const r = makeResolver();
-    await r.person('p1', CTX as any);
+    await r.person('p1', CTX);
     expect(mockGraphService.findPersonById).toHaveBeenCalledWith(
       'p1',
       't1',
@@ -127,7 +129,7 @@ describe('GraphQueryResolver', () => {
   it('personByName() delegates correctly', async () => {
     mockGraphService.findPersonByName.mockResolvedValue({ name: 'Ada' });
     const r = makeResolver();
-    await r.personByName('Ada', CTX as any);
+    await r.personByName('Ada', CTX);
     expect(mockGraphService.findPersonByName).toHaveBeenCalledWith(
       'Ada',
       't1',
@@ -139,7 +141,7 @@ describe('GraphQueryResolver', () => {
   it('term() delegates to findTermById', async () => {
     mockGraphService.findTermById.mockResolvedValue({ id: 't1' });
     const r = makeResolver();
-    await r.term('t1', CTX as any);
+    await r.term('t1', CTX);
     expect(mockGraphService.findTermById).toHaveBeenCalledWith(
       't1',
       't1',
@@ -151,7 +153,7 @@ describe('GraphQueryResolver', () => {
   it('source() delegates to findSourceById', async () => {
     mockGraphService.findSourceById.mockResolvedValue({ id: 's1' });
     const r = makeResolver();
-    await r.source('s1', CTX as any);
+    await r.source('s1', CTX);
     expect(mockGraphService.findSourceById).toHaveBeenCalledWith(
       's1',
       't1',
@@ -163,7 +165,7 @@ describe('GraphQueryResolver', () => {
   it('searchSemantic() returns results from graphService', async () => {
     mockGraphService.semanticSearch.mockResolvedValue([{ id: 'r1' }]);
     const r = makeResolver();
-    const result = await r.searchSemantic('algebra', 5, CTX as any);
+    const result = await r.searchSemantic('algebra', 5, CTX);
     expect(mockGraphService.semanticSearch).toHaveBeenCalledWith(
       'algebra',
       5,
@@ -179,7 +181,7 @@ describe('GraphQueryResolver', () => {
       new Error('search failed')
     );
     const r = makeResolver();
-    await expect(r.searchSemantic('q', 10, CTX as any)).rejects.toThrow(
+    await expect(r.searchSemantic('q', 10, CTX)).rejects.toThrow(
       'search failed'
     );
   });
@@ -187,7 +189,7 @@ describe('GraphQueryResolver', () => {
   it('learningPath() delegates with from/to', async () => {
     mockGraphService.getLearningPath.mockResolvedValue([]);
     const r = makeResolver();
-    await r.learningPath('a', 'b', CTX as any);
+    await r.learningPath('a', 'b', CTX);
     expect(mockGraphService.getLearningPath).toHaveBeenCalledWith(
       'a',
       'b',
@@ -200,7 +202,7 @@ describe('GraphQueryResolver', () => {
   it('prerequisiteChain() delegates correctly', async () => {
     mockGraphService.getPrerequisiteChain.mockResolvedValue([]);
     const r = makeResolver();
-    await r.prerequisiteChain('Calculus', CTX as any);
+    await r.prerequisiteChain('Calculus', CTX);
     expect(mockGraphService.getPrerequisiteChain).toHaveBeenCalledWith(
       'Calculus',
       't1',
@@ -214,7 +216,7 @@ describe('GraphQueryResolver', () => {
       throw new Error('Authentication required');
     });
     const r = makeResolver();
-    await expect(() => r.concept('c1', {} as any)).rejects.toThrow(
+    await expect(() => r.concept('c1', {} as GraphQLContext)).rejects.toThrow(
       'Authentication required'
     );
   });
@@ -222,7 +224,7 @@ describe('GraphQueryResolver', () => {
   it('topicClustersByCourse() delegates correctly', async () => {
     mockGraphService.findTopicClustersByCourse.mockResolvedValue([]);
     const r = makeResolver();
-    await r.topicClustersByCourse('course-1', CTX as any);
+    await r.topicClustersByCourse('course-1', CTX);
     expect(mockGraphService.findTopicClustersByCourse).toHaveBeenCalledWith(
       'course-1',
       't1',
@@ -234,7 +236,7 @@ describe('GraphQueryResolver', () => {
   it('relatedConceptsByName() passes conceptName and depth', async () => {
     mockGraphService.getRelatedConceptsByName.mockResolvedValue([]);
     const r = makeResolver();
-    await r.relatedConceptsByName('Algebra', 4, CTX as any);
+    await r.relatedConceptsByName('Algebra', 4, CTX);
     expect(mockGraphService.getRelatedConceptsByName).toHaveBeenCalledWith(
       'Algebra',
       4,

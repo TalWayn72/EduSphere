@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test mocks use any for partial service stubs */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { InternalServerErrorException } from '@nestjs/common';
 import { KeycloakAdminHttpService } from './keycloak-admin-http.service';

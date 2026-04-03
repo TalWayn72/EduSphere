@@ -8,10 +8,13 @@ vi.mock('@edusphere/db', () => ({
 import {
   getGraphAuthContext,
   assertRelationshipType,
+  type GraphQLContext,
 } from './graph-resolver.helpers';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function makeContext(overrides: Record<string, unknown> = {}) {
+function makeContext(
+  overrides: Record<string, unknown> = {}
+): GraphQLContext {
   return {
     authContext: {
       tenantId: 'tenant-1',
@@ -20,13 +23,13 @@ function makeContext(overrides: Record<string, unknown> = {}) {
       scopes: [],
       ...overrides,
     },
-  };
+  } as GraphQLContext;
 }
 
 describe('getGraphAuthContext', () => {
   it('extracts tenantId, userId, and first role', () => {
     const ctx = makeContext();
-    const result = getGraphAuthContext(ctx as any);
+    const result = getGraphAuthContext(ctx);
     expect(result).toEqual({
       tenantId: 'tenant-1',
       userId: 'user-1',
@@ -36,37 +39,39 @@ describe('getGraphAuthContext', () => {
 
   it('defaults role to STUDENT when roles array is empty', () => {
     const ctx = makeContext({ roles: [] });
-    const result = getGraphAuthContext(ctx as any);
+    const result = getGraphAuthContext(ctx);
     expect(result.role).toBe('STUDENT');
   });
 
   it('throws UnauthorizedException when authContext is missing', () => {
-    expect(() => getGraphAuthContext({} as any)).toThrow(UnauthorizedException);
+    expect(() =>
+      getGraphAuthContext({} as GraphQLContext)
+    ).toThrow(UnauthorizedException);
   });
 
   it('throws UnauthorizedException when userId is missing', () => {
-    const ctx = { authContext: { tenantId: 't', userId: '', roles: [] } };
-    expect(() => getGraphAuthContext(ctx as any)).toThrow(
-      UnauthorizedException
-    );
+    const ctx = {
+      authContext: { tenantId: 't', userId: '', roles: [] },
+    } as GraphQLContext;
+    expect(() => getGraphAuthContext(ctx)).toThrow(UnauthorizedException);
   });
 
   it('throws UnauthorizedException when tenantId is missing', () => {
-    const ctx = { authContext: { tenantId: '', userId: 'u', roles: [] } };
-    expect(() => getGraphAuthContext(ctx as any)).toThrow(
-      UnauthorizedException
-    );
+    const ctx = {
+      authContext: { tenantId: '', userId: 'u', roles: [] },
+    } as GraphQLContext;
+    expect(() => getGraphAuthContext(ctx)).toThrow(UnauthorizedException);
   });
 
   it('throws UnauthorizedException when authContext is null', () => {
-    expect(() => getGraphAuthContext({ authContext: null } as any)).toThrow(
-      UnauthorizedException
-    );
+    expect(() =>
+      getGraphAuthContext({ authContext: null } as unknown as GraphQLContext)
+    ).toThrow(UnauthorizedException);
   });
 
   it('uses first role from multiple roles', () => {
     const ctx = makeContext({ roles: ['ORG_ADMIN', 'STUDENT'] });
-    const result = getGraphAuthContext(ctx as any);
+    const result = getGraphAuthContext(ctx);
     expect(result.role).toBe('ORG_ADMIN');
   });
 });
