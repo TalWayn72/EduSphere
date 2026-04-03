@@ -3,7 +3,7 @@
 # NOTE: Existing data volumes require pg_upgrade before switching from PG16.
 #       Fresh development environments can switch immediately.
 # Pinned 2026-03-17 — was postgres:18-alpine
-FROM postgres:16-alpine
+FROM postgres:18-alpine
 
 LABEL maintainer="EduSphere Team"
 LABEL description="PostgreSQL 18 with Apache AGE 1.7.0 graph database (with RLS) and pgvector 0.8.1 for embeddings"
