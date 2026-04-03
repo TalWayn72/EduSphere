@@ -60,6 +60,14 @@ vi.mock('./risk-scorer.js', () => ({
 // ── Import after mocks (vi.mock is hoisted, so this is safe) ──────────────────
 
 import { AtRiskService } from './at-risk.service.js';
+import { AtRiskDetectionService } from './at-risk-detection.service.js';
+import { AtRiskFlagService } from './at-risk-flag.service.js';
+
+function buildService() {
+  const flagService = new AtRiskFlagService();
+  const detectionService = new AtRiskDetectionService(flagService);
+  return new AtRiskService(detectionService, flagService);
+}
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -79,39 +87,33 @@ describe('AtRiskService — memory safety', () => {
 
   // Test 1
   it('constructs without errors', () => {
-    const service = new AtRiskService();
+    const service = buildService();
     expect(service).toBeInstanceOf(AtRiskService);
   });
 
   // Test 2
   it('should call closeAllPools on onModuleDestroy', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     await service.onModuleDestroy();
     expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
-  // Test 3
-  it('should close NATS connection if open on onModuleDestroy', async () => {
-    const service = new AtRiskService();
-    // Manually inject a NATS connection to simulate it being open
-    (service as { nc: { close: () => Promise<void> } | null }).nc = {
-      close: mockClose,
-    };
-    await service.onModuleDestroy();
-    expect(mockClose).toHaveBeenCalled();
+  // Test 3 — delegates to flags sub-service
+  it('should not throw on onModuleDestroy', async () => {
+    const service = buildService();
+    await expect(service.onModuleDestroy()).resolves.not.toThrow();
   });
 
   // Test 4
-  it('should not throw if NATS was never opened on onModuleDestroy', async () => {
-    const service = new AtRiskService();
-    expect((service as { nc: unknown }).nc).toBeNull();
-    await expect(service.onModuleDestroy()).resolves.not.toThrow();
+  it('onModuleDestroy calls closeAllPools via flags', async () => {
+    const service = buildService();
+    await service.onModuleDestroy();
     expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
   // Test 5
   it('onModuleDestroy is idempotent — calling twice does not throw', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     await expect(service.onModuleDestroy()).resolves.not.toThrow();
     await expect(service.onModuleDestroy()).resolves.not.toThrow();
     expect(mockCloseAllPools).toHaveBeenCalledTimes(2);
@@ -119,7 +121,7 @@ describe('AtRiskService — memory safety', () => {
 
   // Test 6
   it('onModuleDestroy skips NATS close when nc is null', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     (service as { nc: null }).nc = null;
     await service.onModuleDestroy();
     expect(mockClose).not.toHaveBeenCalled();
@@ -128,7 +130,7 @@ describe('AtRiskService — memory safety', () => {
 
   // Test 7
   it('getAtRiskLearners calls withTenantContext with the correct context', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([]);
     await service.getAtRiskLearners('course-1', CTX);
     expect(mockWithTenantContext).toHaveBeenCalledWith(
@@ -140,7 +142,7 @@ describe('AtRiskService — memory safety', () => {
 
   // Test 8
   it('getAtRiskLearners returns empty array when no active flags', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([]);
     const result = await service.getAtRiskLearners('course-1', CTX);
     expect(result).toEqual([]);
@@ -159,7 +161,7 @@ describe('AtRiskService — memory safety', () => {
       status: 'active',
       resolvedAt: null,
     };
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([flagRow]);
     const result = await service.getAtRiskLearners('course-1', CTX);
     expect(result).toHaveLength(1);
@@ -172,7 +174,7 @@ describe('AtRiskService — memory safety', () => {
 
   // Test 10
   it('dismissFlag calls withTenantContext and returns true', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([]);
     const result = await service.dismissFlag('flag-42', CTX);
     expect(mockWithTenantContext).toHaveBeenCalledWith(

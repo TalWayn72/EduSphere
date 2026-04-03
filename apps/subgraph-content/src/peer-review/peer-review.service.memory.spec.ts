@@ -32,6 +32,8 @@ vi.mock('nats', () => ({
 }));
 
 import { PeerReviewService } from './peer-review.service.js';
+import { PeerReviewCoreService } from './peer-review-core.service.js';
+import { PeerReviewAssignmentService } from './peer-review-assignment.service.js';
 import { closeAllPools } from '@edusphere/db';
 import { connect } from 'nats';
 
@@ -40,7 +42,8 @@ describe('PeerReviewService — memory safety', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    svc = new PeerReviewService();
+    const core = new PeerReviewCoreService();
+    svc = new PeerReviewService(core, new PeerReviewAssignmentService(core));
     await svc.onModuleInit();
   });
 
@@ -76,7 +79,11 @@ describe('PeerReviewService — memory safety', () => {
 
   it('does not throw if NATS connection was never established', async () => {
     vi.mocked(connect).mockRejectedValueOnce(new Error('NATS unavailable'));
-    const svc2 = new PeerReviewService();
+    const core2 = new PeerReviewCoreService();
+    const svc2 = new PeerReviewService(
+      core2,
+      new PeerReviewAssignmentService(core2)
+    );
     await svc2.onModuleInit().catch(() => undefined);
     await expect(svc2.onModuleDestroy()).resolves.not.toThrow();
   });

@@ -5,6 +5,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { OpenBadgeService } from './open-badge.service.js';
+import { OpenBadgeQueryService } from './open-badge-query.service.js';
+import { GraphGroundedCredentialService } from '../certificate/graph-credential.service.js';
 import {
   loadKeyPair,
   signCredential,
@@ -86,7 +88,11 @@ describe('OpenBadgeService', () => {
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      providers: [OpenBadgeService],
+      providers: [
+        OpenBadgeService,
+        GraphGroundedCredentialService,
+        OpenBadgeQueryService,
+      ],
     }).compile();
     service = module.get(OpenBadgeService);
     (

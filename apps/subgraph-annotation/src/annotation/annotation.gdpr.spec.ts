@@ -19,8 +19,14 @@ const mockTx = {
   update: mockUpdate,
 };
 
+const mockDbInstance = {
+  transaction: vi.fn(async (cb: (tx: typeof mockTx) => Promise<unknown>) =>
+    cb(mockTx)
+  ),
+};
+
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: vi.fn(() => ({})),
+  createDatabaseConnection: vi.fn(() => mockDbInstance),
   schema: {
     annotations: {
       id: 'id',
@@ -82,7 +88,9 @@ describe('AnnotationService — GDPR compliance', () => {
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
     mockUpdate.mockReturnValue({ set: mockSet });
-    service = new AnnotationService(createMockQueriesService({}, []));
+    service = new AnnotationService(
+      createMockQueriesService(mockDbInstance, [])
+    );
   });
 
   describe('Soft delete — never hard delete', () => {

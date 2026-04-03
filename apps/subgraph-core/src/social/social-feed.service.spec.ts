@@ -37,9 +37,11 @@ vi.mock('@edusphere/db', () => ({
   inArray: vi.fn((a: unknown, b: unknown) => ({ inArray: [a, b] })),
   ilike: vi.fn((a: unknown, b: unknown) => ({ ilike: [a, b] })),
   sql: Object.assign(
-    vi.fn((_a: unknown) => ({
-      sql: _a,
-      as: vi.fn().mockReturnThis(),
+    vi.fn((...args: unknown[]) => ({
+      sql: args,
+      as: vi.fn(function (this: unknown) {
+        return this;
+      }),
     })),
     { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }
   ),
@@ -69,13 +71,15 @@ describe('SocialFeedService', () => {
       vi.spyOn(followService, 'getFollowing').mockResolvedValue(['u2', 'u3']);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            orderBy: vi.fn().mockReturnValue({
-              limit: vi
-                .fn()
-                .mockResolvedValue([
-                  { id: 'feed-1', actorId: 'u2', verb: 'COMPLETED' },
-                ]),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi
+                  .fn()
+                  .mockResolvedValue([
+                    { id: 'feed-1', actorId: 'u2', verb: 'COMPLETED' },
+                  ]),
+              }),
             }),
           }),
         }),
@@ -94,9 +98,11 @@ describe('SocialFeedService', () => {
       const limitFn = vi.fn().mockResolvedValue([]);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            orderBy: vi.fn().mockReturnValue({
-              limit: limitFn,
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: limitFn,
+              }),
             }),
           }),
         }),

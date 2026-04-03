@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PipelineNatsService } from './pipeline-nats.service';
 
-const mockPublish = vi.fn();
-const mockDrain = vi.fn().mockResolvedValue(undefined);
-const mockNc = { publish: mockPublish, drain: mockDrain };
+const { mockPublish, mockDrain, mockNc } = vi.hoisted(() => {
+  const mockPublish = vi.fn();
+  const mockDrain = vi.fn().mockResolvedValue(undefined);
+  const mockNc = { publish: mockPublish, drain: mockDrain };
+  return { mockPublish, mockDrain, mockNc };
+});
 
 vi.mock('nats', () => ({
   connect: vi.fn().mockResolvedValue(mockNc),
-  StringCodec: vi.fn(() => ({ encode: vi.fn((s) => s) })),
+  StringCodec: vi.fn(() => ({ encode: vi.fn((s: string) => s) })),
 }));
+
+import { PipelineNatsService } from './pipeline-nats.service';
 
 vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn(() => ({ servers: 'nats://test:4222' })),

@@ -74,7 +74,10 @@ describe('SocialService memory safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     drainMock.mockResolvedValue(undefined);
-    service = new SocialService(new SocialFollowService(), new SocialFeedService(new SocialFollowService()));
+    service = new SocialService(
+      new SocialFollowService(),
+      new SocialFeedService(new SocialFollowService())
+    );
   });
 
   // Test 1: onModuleDestroy calls closeAllPools

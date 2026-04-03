@@ -72,13 +72,14 @@ vi.mock('./bbb.client', () => ({
 }));
 
 import { LiveSessionService } from './live-session.service';
+import { LiveSessionRecordingService } from './live-session-recording.service';
 import { createBbbClient } from './bbb.client';
 
 describe('LiveSessionService', () => {
   let service: LiveSessionService;
 
   beforeEach(async () => {
-    service = new LiveSessionService();
+    service = new LiveSessionService(new LiveSessionRecordingService());
     // Allow NATS subscription to settle
     await new Promise((r) => setTimeout(r, 10));
   });

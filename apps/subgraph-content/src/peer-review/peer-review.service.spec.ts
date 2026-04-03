@@ -6,6 +6,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { PeerReviewService } from './peer-review.service.js';
+import { PeerReviewCoreService } from './peer-review-core.service.js';
+import { PeerReviewAssignmentService } from './peer-review-assignment.service.js';
 
 // ---------------------------------------------------------------------------
 // Hoist mock factories
@@ -101,7 +103,8 @@ describe('PeerReviewService', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    svc = new PeerReviewService();
+    const core = new PeerReviewCoreService();
+    svc = new PeerReviewService(core, new PeerReviewAssignmentService(core));
     // Skip real NATS connect in unit tests
     await svc.onModuleInit().catch(() => undefined);
   });

@@ -80,7 +80,10 @@ describe('SocialService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new SocialService(new SocialFollowService(), new SocialFeedService(new SocialFollowService()));
+    service = new SocialService(
+      new SocialFollowService(),
+      new SocialFeedService(new SocialFollowService())
+    );
   });
 
   // Test 1: followUser inserts record and returns true

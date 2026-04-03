@@ -100,7 +100,10 @@ describe('BadgeService', () => {
     mockInsert.mockReturnValue({
       values: vi.fn().mockResolvedValue(undefined),
     });
-    service = new BadgeService(new BadgeEventHandlersService(), new BadgeQueriesService());
+    service = new BadgeService(
+      new BadgeEventHandlersService(),
+      new BadgeQueriesService()
+    );
   });
   it('connects to NATS on init', async () => {
     await service.onModuleInit();

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LessonPipelineService } from './lesson-pipeline.service';
+import { LessonPipelineQueryService } from './lesson-pipeline-query.service';
 
 vi.mock('./lesson-pipeline-orchestrator.service', () => ({
   LessonPipelineOrchestratorService: vi.fn().mockImplementation(() => ({
@@ -103,7 +104,10 @@ describe('LessonPipelineService', () => {
     vi.clearAllMocks();
     mockOrchestrator.executeRun = vi.fn().mockResolvedValue(undefined);
     mockOrchestrator.cancelRun = vi.fn();
-    service = new LessonPipelineService(mockOrchestrator as never);
+    service = new LessonPipelineService(
+      mockOrchestrator as never,
+      new LessonPipelineQueryService()
+    );
   });
 
   describe('findByLesson()', () => {

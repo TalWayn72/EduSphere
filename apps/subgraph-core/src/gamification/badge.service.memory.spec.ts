@@ -80,7 +80,10 @@ describe('BadgeService memory safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockExecute.mockResolvedValue({ rows: [] });
-    service = new BadgeService(new BadgeEventHandlersService(), new BadgeQueriesService());
+    service = new BadgeService(
+      new BadgeEventHandlersService(),
+      new BadgeQueriesService()
+    );
   });
 
   it('unsubscribes all NATS subscriptions on destroy', async () => {

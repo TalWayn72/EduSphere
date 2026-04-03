@@ -76,6 +76,14 @@ vi.mock('./risk-scorer.js', () => ({
 }));
 
 import { AtRiskService } from './at-risk.service.js';
+import { AtRiskDetectionService } from './at-risk-detection.service.js';
+import { AtRiskFlagService } from './at-risk-flag.service.js';
+
+function buildService() {
+  const flagService = new AtRiskFlagService();
+  const detectionService = new AtRiskDetectionService(flagService);
+  return new AtRiskService(detectionService, flagService);
+}
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -103,34 +111,27 @@ describe('AtRiskService', () => {
 
   // Test 1: onModuleDestroy calls closeAllPools
   it('onModuleDestroy calls closeAllPools', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     await service.onModuleDestroy();
     expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
-  // Test 2: onModuleDestroy closes NATS connection if open
-  it('onModuleDestroy closes NATS connection if open', async () => {
-    const service = new AtRiskService();
-    // Inject an open NATS connection
-    (service as unknown as { nc: { close: () => Promise<void> } }).nc = {
-      close: mockNatsClose,
-    };
-    await service.onModuleDestroy();
-    expect(mockNatsClose).toHaveBeenCalled();
+  // Test 2: onModuleDestroy delegates to flags sub-service
+  it('onModuleDestroy does not throw', async () => {
+    const service = buildService();
+    await expect(service.onModuleDestroy()).resolves.not.toThrow();
   });
 
-  // Test 3: onModuleDestroy handles null nc gracefully
-  it('onModuleDestroy handles null nc gracefully', async () => {
-    const service = new AtRiskService();
-    expect((service as unknown as { nc: unknown }).nc).toBeNull();
-    await expect(service.onModuleDestroy()).resolves.not.toThrow();
-    expect(mockNatsClose).not.toHaveBeenCalled();
+  // Test 3: onModuleDestroy calls closeAllPools via flags
+  it('onModuleDestroy calls closeAllPools', async () => {
+    const service = buildService();
+    await service.onModuleDestroy();
     expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
   // Test 4: getAtRiskLearners returns data from withTenantContext
   it('getAtRiskLearners returns data from withTenantContext', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([FLAG_ROW]);
 
     const result = await service.getAtRiskLearners('course-1', CTX);
@@ -143,7 +144,7 @@ describe('AtRiskService', () => {
 
   // Test 5: getAtRiskLearners with empty course returns empty array
   it('getAtRiskLearners with empty course returns empty array', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([]);
 
     const result = await service.getAtRiskLearners('empty-course', CTX);
@@ -158,7 +159,7 @@ describe('AtRiskService', () => {
 
   // Test 6: dismissFlag calls withTenantContext
   it('dismissFlag calls withTenantContext with correct context', async () => {
-    const service = new AtRiskService();
+    const service = buildService();
     mockWithTenantContext.mockResolvedValueOnce([]);
 
     const result = await service.dismissFlag('flag-1', CTX);
@@ -171,14 +172,14 @@ describe('AtRiskService', () => {
     );
   });
 
-  // Test 7: nc is null initially
-  it('nc is null initially before any NATS connection is made', () => {
-    const service = new AtRiskService();
-    expect((service as unknown as { nc: unknown }).nc).toBeNull();
+  // Test 7: service constructs successfully
+  it('service constructs without errors', () => {
+    const service = buildService();
+    expect(service).toBeDefined();
   });
 
   // Test 8: service instantiates without error
   it('service instantiates without error', () => {
-    expect(() => new AtRiskService()).not.toThrow();
+    expect(() => buildService()).not.toThrow();
   });
 });

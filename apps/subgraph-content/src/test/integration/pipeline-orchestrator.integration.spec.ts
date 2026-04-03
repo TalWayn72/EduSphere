@@ -146,7 +146,9 @@ vi.mock('../../lesson/lesson-publish.service', () => ({
 }));
 
 import { LessonPipelineOrchestratorService } from '../../lesson/lesson-pipeline-orchestrator.service';
-import type { LessonPublishService } from '../../lesson/lesson-publish.service';
+import { PipelineModuleExecutorService } from '../../lesson/pipeline-module-executor.service';
+import { PipelineNatsService } from '../../lesson/pipeline-nats.service';
+import { LessonPublishService } from '../../lesson/lesson-publish.service';
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -314,7 +316,12 @@ describe('Pipeline Orchestrator Integration', () => {
     const publishService = {
       publishLesson: mockPublishLesson,
     } as unknown as LessonPublishService;
-    service = new LessonPipelineOrchestratorService(publishService);
+    const moduleExecutor = new PipelineModuleExecutorService(publishService);
+    const natsService = new PipelineNatsService();
+    service = new LessonPipelineOrchestratorService(
+      moduleExecutor,
+      natsService
+    );
   });
 
   // ── Full pipeline run ────────────────────────────────────────────────────

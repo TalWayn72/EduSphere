@@ -2,6 +2,7 @@ import { vi, describe, it, expect } from 'vitest';
 import { Logger } from '@nestjs/common';
 import { AeoController } from './aeo.controller';
 import { AeoService } from './aeo.service';
+import { AeoContentService } from './aeo-content.service';
 
 // Mock @edusphere/db so AeoService can be instantiated without a real DB
 vi.mock('@edusphere/db', () => ({
@@ -34,8 +35,8 @@ const MOCK_INSTRUCTORS = Array.from({ length: 4 }, (_, i) => ({
 }));
 
 function buildController() {
-  const svc = new AeoService();
-  const ctrl = new AeoController(svc);
+  const svc = new AeoService(new AeoContentService());
+  const ctrl = new AeoController(svc, {} as never);
   return { ctrl, svc };
 }
 
@@ -63,7 +64,7 @@ describe('AeoController', () => {
 
   describe('getCourses', () => {
     it('returns courses from service', async () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'getPublicCourses').mockResolvedValue([
         {
           id: 'abc-123',
@@ -72,16 +73,16 @@ describe('AeoController', () => {
           slug: 'intro-to-ai',
         },
       ]);
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const courses = await ctrl.getCourses();
       expect(courses).toHaveLength(1);
       expect(courses[0].id).toBe('abc-123');
     });
 
     it('returns empty array when no published courses', async () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'getPublicCourses').mockResolvedValue([]);
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const courses = await ctrl.getCourses();
       expect(courses).toEqual([]);
     });
@@ -89,11 +90,11 @@ describe('AeoController', () => {
 
   describe('getSitemap', () => {
     it('calls generateSitemapXml and sends XML via res.send', async () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'generateSitemapXml').mockResolvedValue(
         '<?xml version="1.0"?><urlset/>'
       );
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const mockRes = {
         send: vi.fn(),
       } as unknown as import('express').Response;
@@ -107,18 +108,18 @@ describe('AeoController', () => {
 
   describe('getCatalog', () => {
     it('returns 200 with array of 6 catalog items', () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'getCatalog').mockReturnValue(MOCK_CATALOG);
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const result = ctrl.getCatalog();
       expect(result).toHaveLength(6);
       expect(svc.getCatalog).toHaveBeenCalledOnce();
     });
 
     it('each catalog item has required fields: id, name, description, level, duration, category, slug', () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'getCatalog').mockReturnValue(MOCK_CATALOG);
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const result = ctrl.getCatalog();
       for (const item of result) {
         expect(item).toHaveProperty('id');
@@ -149,18 +150,18 @@ describe('AeoController', () => {
 
   describe('getInstructors', () => {
     it('returns 200 with array of 4 instructor profiles', () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'getInstructors').mockReturnValue(MOCK_INSTRUCTORS);
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const result = ctrl.getInstructors();
       expect(result).toHaveLength(4);
       expect(svc.getInstructors).toHaveBeenCalledOnce();
     });
 
     it('each instructor has required fields: id, name, jobTitle, university, description, specialization', () => {
-      const svc = new AeoService();
+      const svc = new AeoService(new AeoContentService());
       vi.spyOn(svc, 'getInstructors').mockReturnValue(MOCK_INSTRUCTORS);
-      const ctrl = new AeoController(svc);
+      const ctrl = new AeoController(svc, {} as never);
       const result = ctrl.getInstructors();
       for (const inst of result) {
         expect(inst).toHaveProperty('id');

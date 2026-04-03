@@ -75,6 +75,7 @@ vi.mock('./bbb.client', () => ({
 }));
 
 import { LiveSessionService } from './live-session.service';
+import { LiveSessionRecordingService } from './live-session-recording.service';
 import { closeAllPools } from '@edusphere/db';
 import { connect } from 'nats';
 
@@ -83,7 +84,7 @@ describe('LiveSessionService — memory safety', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    service = new LiveSessionService();
+    service = new LiveSessionService(new LiveSessionRecordingService());
     // Allow async NATS subscription to settle
     await new Promise((r) => setTimeout(r, 20));
   });

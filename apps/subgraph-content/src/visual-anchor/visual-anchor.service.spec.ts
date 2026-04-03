@@ -144,7 +144,8 @@ describe('VisualAnchorService', () => {
     );
     service = new VisualAnchorService(
       mockClamav as never,
-      mockImageOptimizer as never
+      mockImageOptimizer as never,
+      {} as never
     );
   });
 

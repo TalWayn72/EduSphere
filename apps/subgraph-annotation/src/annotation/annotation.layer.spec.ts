@@ -10,8 +10,14 @@ const mockWhere = vi.fn();
 const mockFrom = vi.fn();
 const mockTx = { select: () => ({ from: mockFrom }) };
 
+const mockDbInstance = {
+  transaction: vi.fn(async (cb: (tx: typeof mockTx) => Promise<unknown>) =>
+    cb(mockTx)
+  ),
+};
+
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: vi.fn(() => ({})),
+  createDatabaseConnection: vi.fn(() => mockDbInstance),
   schema: {
     annotations: {
       id: 'id',
@@ -93,7 +99,9 @@ describe('AnnotationService — layer visibility rules', () => {
     mockOrderBy.mockReturnValue({ limit: mockLimit });
     mockWhere.mockReturnValue({ orderBy: mockOrderBy, limit: mockLimit });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
-    service = new AnnotationService(createMockQueriesService({}, []));
+    service = new AnnotationService(
+      createMockQueriesService(mockDbInstance, [])
+    );
   });
 
   describe('STUDENT visibility', () => {

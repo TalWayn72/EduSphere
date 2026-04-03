@@ -1,12 +1,25 @@
 /**
  * Shared test helpers for AnnotationService spec files.
  * Creates a mock AnnotationQueriesService that mimics auth checks
- * and calls withTenantContext (which is mocked by @edusphere/db mock).
+ * and invokes the mocked withTenantContext from the caller's vi.mock.
+ *
+ * Uses dynamic import() instead of require() so vitest's module
+ * mock hoisting is respected across file boundaries.
  */
 import { vi } from 'vitest';
 import { UnauthorizedException } from '@nestjs/common';
 import type { AnnotationQueriesService } from './annotation-queries.service';
 import type { AuthContext } from '@edusphere/auth';
+
+/**
+ * Resolve withTenantContext from the caller's vi.mock scope.
+ * Dynamic import() is intercepted by vitest's module mock system,
+ * unlike synchronous require() which may bypass it.
+ */
+async function getMockedWithTenantContext() {
+  const mod = await import('@edusphere/db');
+  return mod.withTenantContext;
+}
 
 export function createMockQueriesService(
   mockDb: unknown,
@@ -27,15 +40,11 @@ export function createMockQueriesService(
     findAll: vi
       .fn()
       .mockImplementation(
-        async (
-          _filters: Record<string, unknown>,
-          auth?: AuthContext
-        ) => {
+        async (_filters: Record<string, unknown>, auth?: AuthContext) => {
           authGuard(auth);
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { withTenantContext } = require('@edusphere/db');
+          const withTenantContext = await getMockedWithTenantContext();
           return withTenantContext(
-            mockDb,
+            mockDb as never,
             toCtx(auth as AuthContext),
             async () => defaultResult
           );
@@ -50,10 +59,9 @@ export function createMockQueriesService(
           auth?: AuthContext
         ) => {
           authGuard(auth);
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { withTenantContext } = require('@edusphere/db');
+          const withTenantContext = await getMockedWithTenantContext();
           return withTenantContext(
-            mockDb,
+            mockDb as never,
             toCtx(auth as AuthContext),
             async () => defaultResult
           );
@@ -69,10 +77,9 @@ export function createMockQueriesService(
           auth?: AuthContext
         ) => {
           authGuard(auth);
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { withTenantContext } = require('@edusphere/db');
+          const withTenantContext = await getMockedWithTenantContext();
           return withTenantContext(
-            mockDb,
+            mockDb as never,
             toCtx(auth as AuthContext),
             async () => defaultResult
           );

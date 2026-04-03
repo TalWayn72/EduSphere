@@ -31,7 +31,9 @@ vi.mock('@edusphere/db', () => ({
 function makeChain(rows: unknown[]) {
   const limit = vi.fn().mockResolvedValue(rows);
   const orderBy = vi.fn().mockReturnValue({ limit });
-  const where = vi.fn().mockReturnValue({ orderBy, limit });
+  // Make where() return a thenable + chainable object (some queries await where() directly)
+  const whereResult = Object.assign(Promise.resolve(rows), { orderBy, limit });
+  const where = vi.fn().mockReturnValue(whereResult);
   const from = vi.fn().mockReturnValue({ where });
   return { from, where, orderBy, limit };
 }

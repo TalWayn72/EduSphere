@@ -96,7 +96,10 @@ describe('LessonPipelineOrchestratorService — memory safety', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new LessonPipelineOrchestratorService(new PipelineModuleExecutorService(new LessonPublishService()), new PipelineNatsService());
+    service = new LessonPipelineOrchestratorService(
+      new PipelineModuleExecutorService(new LessonPublishService()),
+      new PipelineNatsService()
+    );
   });
 
   it('onModuleDestroy aborts all active AbortControllers', async () => {

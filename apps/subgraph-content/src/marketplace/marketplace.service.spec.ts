@@ -105,7 +105,10 @@ const getService = async () => {
   const { MarketplaceService } = await import('./marketplace.service.js');
   const svc = new MarketplaceService(
     mockStripeClient as never,
-    mockEarningsService as never
+    mockEarningsService as never,
+    {} as never, // listingService
+    {} as never, // purchaseService
+    {} as never // searchService
   );
   return svc;
 };
