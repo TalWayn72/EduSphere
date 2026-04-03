@@ -108,11 +108,11 @@ jobs:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
-  # Unit tests with Vitest — sharded into 4 parallel jobs
-  unit-tests:
-    name: Unit Tests (Vitest ${{ matrix.shard }})
+  # Web unit tests with Vitest — sharded into 4 parallel jobs (no coverage — too slow for CI)
+  unit-tests-web:
+    name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -138,41 +138,43 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run frontend unit tests with coverage (shard ${{ matrix.shard }})
+      - name: Run frontend unit tests (shard ${{ matrix.shard }})
         # Only run frontend tests here; backend subgraph tests require a live DB
         # and run in the Full Test Suite workflow (test.yml) with proper services.
-        # vitest.config.ts defines thresholds: lines/statements 79%, functions 70%, branches 65%
-        run: pnpm --filter @edusphere/web test -- --run --coverage --reporter=verbose --shard=${{ matrix.shard }}
+        # Coverage removed from sharded CI — run separately in nightly/on-demand job.
+        run: pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
         continue-on-error: false
 
+  # Shared package unit tests — single job, no sharding needed (packages are fast individually)
+  unit-tests-packages:
+    name: Unit Tests — Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Run shared-package unit tests (no DB required)
-        run: pnpm turbo test --filter='./packages/*' -- --run --reporter=verbose --shard=${{ matrix.shard }}
-        continue-on-error: false
+        run: pnpm turbo test --filter='./packages/*' -- --run --reporter=verbose
         env:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-reports-shard-${{ strategy.job-index }}
-          path: |
-            apps/*/coverage
-            packages/*/coverage
-          retention-days: 7
-
-      - name: Upload coverage to Codecov (optional)
-        uses: codecov/codecov-action@v4
-        if: always()
-        continue-on-error: true
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: |
-            apps/*/coverage/coverage-final.json
-            packages/*/coverage/coverage-final.json
-          flags: unittests
-          name: codecov-shard-${{ strategy.job-index }}
 
   # Security audit - npm audit for vulnerabilities
   security-scan:
@@ -513,7 +515,8 @@ jobs:
         root-cleanliness,
         lint,
         typecheck,
-        unit-tests,
+        unit-tests-web,
+        unit-tests-packages,
         security-scan,
         security-policy-tests,
         security-scanning,
@@ -533,7 +536,8 @@ jobs:
           if [[ "${{ needs.root-cleanliness.result }}" != "success" || \
                 "${{ needs.lint.result }}" != "success" || \
                 "${{ needs.typecheck.result }}" != "success" || \
-                "${{ needs.unit-tests.result }}" != "success" || \
+                "${{ needs.unit-tests-web.result }}" != "success" || \
+                "${{ needs.unit-tests-packages.result }}" != "success" || \
                 "${{ needs.security-scan.result }}" != "success" || \
                 "${{ needs.security-policy-tests.result }}" != "success" || \
                 "${{ needs.build.result }}" != "success" || \
