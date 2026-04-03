@@ -78,18 +78,19 @@ type CohortMetrics {
 }
 
 extend type Query {
-  tenantAnalytics(period: AnalyticsPeriod!): TenantAnalytics!
-    @authenticated
+  tenantAnalytics(period: AnalyticsPeriod!): TenantAnalytics! @authenticated
 
-  learnerVelocity(period: AnalyticsPeriod!, limit: Int = 20): [LearnerVelocityRow!]!
-    @authenticated
+  learnerVelocity(
+    period: AnalyticsPeriod!
+    limit: Int = 20
+  ): [LearnerVelocityRow!]! @authenticated
 
-  cohortRetention(weeksBack: Int = 12): [CohortMetrics!]!
-    @authenticated
+  cohortRetention(weeksBack: Int = 12): [CohortMetrics!]! @authenticated
 
-  exportTenantAnalytics(period: AnalyticsPeriod!, format: ExportFormat!): String!
-    @authenticated
-    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  exportTenantAnalytics(
+    period: AnalyticsPeriod!
+    format: ExportFormat!
+  ): String! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 # ─── Phase 36: At-Risk Learner Query ──────────────────────────────────────────

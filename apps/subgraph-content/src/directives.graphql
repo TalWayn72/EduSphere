@@ -1,4 +1,6 @@
-"""Custom application-level directives (non-federation)."""
+"""
+Custom application-level directives (non-federation).
+"""
 enum UserRole {
   ORG_ADMIN
   SUPER_ADMIN

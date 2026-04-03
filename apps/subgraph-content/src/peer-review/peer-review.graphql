@@ -5,9 +5,17 @@ extend type Query {
 }
 
 extend type Mutation {
-  createPeerReviewRubric(input: CreateRubricInput!): PeerReviewRubric! @authenticated
-  submitForPeerReview(contentItemId: ID!, submissionText: String!): [PeerReviewAssignment!]! @authenticated
-  submitPeerReview(assignmentId: ID!, criteriaScores: String!, feedback: String): Boolean! @authenticated
+  createPeerReviewRubric(input: CreateRubricInput!): PeerReviewRubric!
+    @authenticated
+  submitForPeerReview(
+    contentItemId: ID!
+    submissionText: String!
+  ): [PeerReviewAssignment!]! @authenticated
+  submitPeerReview(
+    assignmentId: ID!
+    criteriaScores: String!
+    feedback: String
+  ): Boolean! @authenticated
 }
 
 type PeerReviewAssignment {

@@ -20,7 +20,8 @@ enum TranslationStatus {
 }
 
 extend type Query {
-  contentTranslation(contentItemId: ID!, locale: String!): ContentTranslation @authenticated
+  contentTranslation(contentItemId: ID!, locale: String!): ContentTranslation
+    @authenticated
 }
 
 extend type Mutation {

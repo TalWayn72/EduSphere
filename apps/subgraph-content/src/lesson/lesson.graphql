@@ -163,9 +163,11 @@ input SaveLessonPipelineInput {
 
 extend type Query {
   lesson(id: ID!): Lesson @authenticated
-  lessonsByCourse(courseId: ID!, limit: Int = 20, offset: Int = 0): [Lesson!]! @authenticated
+  lessonsByCourse(courseId: ID!, limit: Int = 20, offset: Int = 0): [Lesson!]!
+    @authenticated
   lessonPipelineRun(runId: ID!): LessonPipelineRun @authenticated
-  lessonPipelineRuns(lessonId: ID!, limit: Int): [LessonPipelineRun!]! @authenticated
+  lessonPipelineRuns(lessonId: ID!, limit: Int): [LessonPipelineRun!]!
+    @authenticated
 }
 
 extend type Mutation {
@@ -181,16 +183,20 @@ extend type Mutation {
   addLessonAsset(lessonId: ID!, input: AddLessonAssetInput!): LessonAsset!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
-  saveLessonPipeline(lessonId: ID!, input: SaveLessonPipelineInput!): LessonPipeline!
-    @authenticated
-    @requiresScopes(scopes: [["course:write"]])
+  saveLessonPipeline(
+    lessonId: ID!
+    input: SaveLessonPipelineInput!
+  ): LessonPipeline! @authenticated @requiresScopes(scopes: [["course:write"]])
   startLessonPipelineRun(pipelineId: ID!): LessonPipelineRun!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
   cancelLessonPipelineRun(runId: ID!): LessonPipelineRun!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
-  retryPipelineModule(runId: ID!, moduleType: PipelineModuleType!): LessonPipelineRun!
+  retryPipelineModule(
+    runId: ID!
+    moduleType: PipelineModuleType!
+  ): LessonPipelineRun!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
   restoreRun(runId: ID!): LessonPipelineRun!
@@ -239,10 +245,15 @@ extend type Query {
 }
 
 extend type Mutation {
-  createPipelineTemplate(input: CreatePipelineTemplateInput!): LessonPipelineTemplate!
+  createPipelineTemplate(
+    input: CreatePipelineTemplateInput!
+  ): LessonPipelineTemplate!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
-  updatePipelineTemplate(id: ID!, input: UpdatePipelineTemplateInput!): LessonPipelineTemplate!
+  updatePipelineTemplate(
+    id: ID!
+    input: UpdatePipelineTemplateInput!
+  ): LessonPipelineTemplate!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
   deletePipelineTemplate(id: ID!): Boolean!

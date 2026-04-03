@@ -17,11 +17,17 @@ type MediaAssetUpload {
 3D model metadata — populated only when assetType is MODEL_3D.
 """
 type Model3DInfo {
-  """ Format identifier: gltf | glb | obj | fbx """
+  """
+  Format identifier: gltf | glb | obj | fbx
+  """
   format: String!
-  """ Triangle count used for LOD hints. Null until poly_count is set. """
+  """
+  Triangle count used for LOD hints. Null until poly_count is set.
+  """
   polyCount: Int
-  """ Animation clips embedded in the 3D file. """
+  """
+  Animation clips embedded in the 3D file.
+  """
   animations: [ModelAnimation!]!
 }
 
@@ -37,11 +43,17 @@ type ModelAnimation {
 An available subtitle track for a media asset.
 """
 type SubtitleTrack {
-  """ BCP-47 language code, e.g. "he", "fr", "de". """
+  """
+  BCP-47 language code, e.g. "he", "fr", "de".
+  """
   language: String!
-  """ Human-readable label for display in the player UI. """
+  """
+  Human-readable label for display in the player UI.
+  """
   label: String!
-  """ Presigned URL of the WebVTT subtitle file (valid for 15 minutes). """
+  """
+  Presigned URL of the WebVTT subtitle file (valid for 15 minutes).
+  """
   src: String!
 }
 

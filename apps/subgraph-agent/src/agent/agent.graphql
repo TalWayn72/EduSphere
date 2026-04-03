@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@external", "@shareable", "@authenticated"]
+  )
 
 directive @requiresRole(roles: [String!]!) on FIELD_DEFINITION
 
@@ -43,7 +46,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  startAgentExecution(input: StartAgentExecutionInput!): AgentExecution! @authenticated
+  startAgentExecution(input: StartAgentExecutionInput!): AgentExecution!
+    @authenticated
   cancelAgentExecution(id: ID!): AgentExecution! @authenticated
 }
 

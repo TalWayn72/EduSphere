@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@authenticated", "@requiresScopes"]
+  )
 
 """
 KnowledgeSource — an information source attached to a course.
@@ -11,17 +14,25 @@ type KnowledgeSource {
   tenantId: ID!
   title: String!
   sourceType: SourceType!
-  """ Original file name, URL, or YouTube link """
+  """
+  Original file name, URL, or YouTube link
+  """
   origin: String
-  """ Full extracted plaintext (may be large — use with care) """
+  """
+  Full extracted plaintext (may be large — use with care)
+  """
   rawContent: String
-  """ Preview of first 500 chars """
+  """
+  Preview of first 500 chars
+  """
   preview: String
   status: SourceStatus!
   chunkCount: Int!
   errorMessage: String
   metadata: JSON
-  """ Presigned MinIO URL for viewing the original file (PDF, DOCX, TXT). Null for URL/YouTube/Text sources. """
+  """
+  Presigned MinIO URL for viewing the original file (PDF, DOCX, TXT). Null for URL/YouTube/Text sources.
+  """
   fileUrl: String
   createdAt: String!
 }
@@ -57,18 +68,26 @@ input AddTextSourceInput {
 input AddYoutubeSourceInput {
   courseId: ID!
   title: String!
-  """ Full YouTube video URL (youtube.com/watch?v=... or youtu.be/...) """
+  """
+  Full YouTube video URL (youtube.com/watch?v=... or youtu.be/...)
+  """
   url: String!
 }
 
 input AddFileSourceInput {
   courseId: ID!
   title: String!
-  """ Original filename — used to determine SourceType (pdf/docx/txt) """
+  """
+  Original filename — used to determine SourceType (pdf/docx/txt)
+  """
   fileName: String!
-  """ Base64-encoded file content """
+  """
+  Base64-encoded file content
+  """
   contentBase64: String!
-  """ MIME type hint (e.g. application/pdf) """
+  """
+  MIME type hint (e.g. application/pdf)
+  """
   mimeType: String!
 }
 
@@ -83,20 +102,23 @@ extend type Mutation {
   The system fetches the page, extracts text, chunks it and embeds it.
   """
   addUrlSource(input: AddUrlSourceInput!): KnowledgeSource!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   """
   Add raw text as a knowledge source.
   """
   addTextSource(input: AddTextSourceInput!): KnowledgeSource!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   """
   Add a YouTube video as a knowledge source.
   The system fetches the auto-generated transcript and indexes it.
   """
   addYoutubeSource(input: AddYoutubeSourceInput!): KnowledgeSource!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   """
   Upload a local file (DOCX / PDF / TXT) as a knowledge source.
@@ -104,20 +126,23 @@ extend type Mutation {
   the GraphQL gateway without a multipart transport layer.
   """
   addFileSource(input: AddFileSourceInput!): KnowledgeSource!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   """
   Remove a knowledge source (and its embeddings).
   """
   deleteKnowledgeSource(id: ID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   """
   Re-generate embeddings for all READY knowledge sources in a course.
   Useful after embedding model changes or corruption recovery.
   """
   reindexCourseEmbeddings(courseId: ID!): ReindexResult!
-    @authenticated @requiresScopes(scopes: [["course:manage"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:manage"]])
 }
 
 type ReindexResult {

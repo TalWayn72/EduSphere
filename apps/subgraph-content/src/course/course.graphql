@@ -1,5 +1,14 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: [
+      "@key"
+      "@shareable"
+      "@external"
+      "@authenticated"
+      "@requiresScopes"
+    ]
+  )
 
 type Course @key(fields: "id") {
   id: ID!
@@ -86,8 +95,12 @@ extend type Query {
 extend type Mutation {
   createCourse(input: CreateCourseInput!): Course! @authenticated
   updateCourse(id: ID!, input: UpdateCourseInput!): Course! @authenticated
-  deleteCourse(id: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
-  publishCourse(id: ID!): Course! @authenticated @requiresScopes(scopes: [["course:publish"]])
+  deleteCourse(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  publishCourse(id: ID!): Course!
+    @authenticated
+    @requiresScopes(scopes: [["course:publish"]])
   unpublishCourse(id: ID!): Course! @authenticated
   enrollCourse(courseId: ID!): UserCourse! @authenticated
   unenrollCourse(courseId: ID!): Boolean! @authenticated

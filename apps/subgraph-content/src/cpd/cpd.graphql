@@ -33,8 +33,16 @@ extend type Query {
 
 extend type Mutation {
   exportCpdReport(format: CpdExportFormat!): String! @authenticated
-  createCpdCreditType(name: String!, regulatoryBody: String!, creditHoursPerHour: Float!): CpdCreditType! @authenticated @requiresRole(roles: [ORG_ADMIN])
-  assignCpdCreditsToCourse(courseId: ID!, creditTypeId: ID!, creditHours: Float!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+  createCpdCreditType(
+    name: String!
+    regulatoryBody: String!
+    creditHoursPerHour: Float!
+  ): CpdCreditType! @authenticated @requiresRole(roles: [ORG_ADMIN])
+  assignCpdCreditsToCourse(
+    courseId: ID!
+    creditTypeId: ID!
+    creditHours: Float!
+  ): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
 }
 
 enum CpdExportFormat {

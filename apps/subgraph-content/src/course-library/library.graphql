@@ -21,21 +21,27 @@ type LibraryCourse {
   licenseType: LibraryLicense!
   priceCents: Int!
   durationMinutes: Int!
-  """True if the current tenant has already activated this course"""
+  """
+  True if the current tenant has already activated this course
+  """
   isActivated: Boolean!
 }
 
 type LibraryActivation {
   id: ID!
   libraryCourseId: ID!
-  """The course ID created in the tenant's catalog, populated after activation"""
+  """
+  The course ID created in the tenant's catalog, populated after activation
+  """
   courseId: ID
   activatedAt: String!
 }
 
 extend type Query {
   libraryCourses(topic: LibraryTopic): [LibraryCourse!]! @authenticated
-  myLibraryActivations: [LibraryActivation!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+  myLibraryActivations: [LibraryActivation!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
 }
 
 extend type Mutation {

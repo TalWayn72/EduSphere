@@ -102,9 +102,13 @@ extend type Query {
   ): CourseListingConnection! @authenticated
   myPurchases: [MarketplacePurchase!]! @authenticated
   purchases(limit: Int = 20, offset: Int = 0): [PurchaseDetail!]! @authenticated
-  instructorEarnings: EarningsSummary! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  instructorEarnings: EarningsSummary!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
   myPayouts: [InstructorPayout!]! @authenticated
-  allPayouts(month: String): [InstructorPayout!]! @authenticated @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  allPayouts(month: String): [InstructorPayout!]!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
 }
 
 extend type Mutation {
@@ -115,7 +119,9 @@ extend type Mutation {
     revenueSplitPercent: Int
   ): CourseListing! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
 
-  publishListing(courseId: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  publishListing(courseId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
 
   purchaseCourse(courseId: ID!): PaymentIntentResult! @authenticated
 
@@ -123,5 +129,7 @@ extend type Mutation {
 
   requestRefund(purchaseId: ID!): PurchaseDetail! @authenticated
 
-  requestPayout: Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  requestPayout: Boolean!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
 }

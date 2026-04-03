@@ -39,14 +39,18 @@ extend type Mutation {
     requiredCourseIds: [ID!]!
     badgeEmoji: String
     totalHours: Int
-  ): CredentialProgram! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+  ): CredentialProgram!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
 
   updateProgram(
     id: ID!
     title: String
     description: String
     published: Boolean
-  ): CredentialProgram! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+  ): CredentialProgram!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
 
   enrollInProgram(programId: ID!): ProgramEnrollment! @authenticated
 }

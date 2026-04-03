@@ -17,10 +17,8 @@ type QuizResult {
 }
 
 extend type Mutation {
-  gradeQuizSubmission(
-    contentItemId: ID!
-    answers: JSON!
-  ): QuizResult! @authenticated
+  gradeQuizSubmission(contentItemId: ID!, answers: JSON!): QuizResult!
+    @authenticated
 }
 
 extend type Query {

@@ -1,11 +1,17 @@
 type Subscription {
-  """User created event"""
+  """
+  User created event
+  """
   userCreated(tenantId: ID!): User!
 
-  """User updated event"""
+  """
+  User updated event
+  """
   userUpdated(userId: ID!, tenantId: ID!): User!
 
-  """Real-time user status updates"""
+  """
+  Real-time user status updates
+  """
   userStatusChanged(userId: ID!): UserStatus!
 }
 

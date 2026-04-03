@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 type SecuritySettings {
   mfaRequired: Boolean!
@@ -32,7 +35,9 @@ extend type Query {
 }
 
 extend type Mutation {
-  updateSecuritySettings(input: UpdateSecuritySettingsInput!): SecuritySettings!
+  updateSecuritySettings(
+    input: UpdateSecuritySettingsInput!
+  ): SecuritySettings!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }

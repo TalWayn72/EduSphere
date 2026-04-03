@@ -47,7 +47,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession! @authenticated
+  startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession!
+    @authenticated
   sendMessage(sessionId: ID!, content: String!): AgentMessage! @authenticated
   endSession(sessionId: ID!): Boolean! @authenticated
 }

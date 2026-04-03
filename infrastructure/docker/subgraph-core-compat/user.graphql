@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 # Custom directives — declared locally, not imported from Federation spec
 directive @requiresRole(roles: [UserRole!]!) on FIELD_DEFINITION | OBJECT
@@ -50,7 +53,8 @@ extend type Query {
 extend type Mutation {
   createUser(input: CreateUserInput!): User! @authenticated
   updateUser(id: ID!, input: UpdateUserInput!): User! @authenticated
-  updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!): User!
+    @authenticated
 }
 
 input CreateUserInput {

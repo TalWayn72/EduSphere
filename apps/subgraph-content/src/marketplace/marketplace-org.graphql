@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 # ─── Marketplace Listing (Org-to-Org) ───────────────────────
 
@@ -52,6 +55,5 @@ extend type Mutation {
   publishToMarketplace(input: PublishToMarketplaceInput!): MarketplaceListing!
     @authenticated
 
-  unpublishFromMarketplace(listingId: ID!): Boolean!
-    @authenticated
+  unpublishFromMarketplace(listingId: ID!): Boolean! @authenticated
 }

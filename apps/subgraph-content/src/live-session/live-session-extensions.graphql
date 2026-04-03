@@ -40,13 +40,18 @@ extend type Query {
 }
 
 extend type Mutation {
-  createBreakoutRooms(sessionId: ID!, rooms: [CreateBreakoutRoomInput!]!): [BreakoutRoom!]!
+  createBreakoutRooms(
+    sessionId: ID!
+    rooms: [CreateBreakoutRoomInput!]!
+  ): [BreakoutRoom!]!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
 
-  createPoll(sessionId: ID!, question: String!, options: [String!]!): SessionPoll!
-    @authenticated
-    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+  createPoll(
+    sessionId: ID!
+    question: String!
+    options: [String!]!
+  ): SessionPoll! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
 
   activatePoll(pollId: ID!): SessionPoll!
     @authenticated

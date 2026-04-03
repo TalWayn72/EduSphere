@@ -21,5 +21,7 @@ type CourseGenerationResult {
 }
 
 extend type Mutation {
-  generateCourseFromPrompt(input: GenerateCourseInput!): CourseGenerationResult! @authenticated
+  generateCourseFromPrompt(
+    input: GenerateCourseInput!
+  ): CourseGenerationResult! @authenticated
 }

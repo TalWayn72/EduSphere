@@ -13,5 +13,6 @@ type CertExamGenResult {
 }
 
 extend type Mutation {
-  generateCertExamItems(input: GenerateCertExamItemsInput!): CertExamGenResult! @authenticated
+  generateCertExamItems(input: GenerateCertExamItemsInput!): CertExamGenResult!
+    @authenticated
 }

@@ -47,7 +47,8 @@ extend type Query {
   Returns the ordered list of choices the authenticated user has made
   for the given scenario tree (identified by its root content item ID).
   """
-  myScenarioProgress(scenarioRootId: ID!): [ScenarioProgressEntry!]! @authenticated
+  myScenarioProgress(scenarioRootId: ID!): [ScenarioProgressEntry!]!
+    @authenticated
 }
 
 extend type Mutation {

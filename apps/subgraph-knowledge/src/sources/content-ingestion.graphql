@@ -5,7 +5,6 @@ Accepts a file upload (base64 via Upload scalar) and runs the full OCR pipeline:
   Tier 2: PaddleOCR (port 8001) when Tesseract confidence < 70%
   Tier 3: TrOCR (port 8002) when Moondream detects handwriting
 """
-
 scalar Upload
 
 extend type Mutation {

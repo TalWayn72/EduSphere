@@ -89,12 +89,14 @@ export function canonicalJson(value: unknown): string {
   }
   const obj = value as Record<string, unknown>;
   const sortedKeys = Object.keys(obj).sort();
+  /* eslint-disable security/detect-object-injection -- keys from Object.keys are safe */
   const pairs = sortedKeys
     .filter(
       (k) =>
         Object.prototype.hasOwnProperty.call(obj, k) && obj[k] !== undefined
-    ) // eslint-disable-line security/detect-object-injection
-    .map((k) => `${JSON.stringify(k)}:${canonicalJson(obj[k])}`); // eslint-disable-line security/detect-object-injection
+    )
+    .map((k) => `${JSON.stringify(k)}:${canonicalJson(obj[k])}`);
+  /* eslint-enable security/detect-object-injection */
   return '{' + pairs.join(',') + '}';
 }
 

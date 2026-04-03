@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 type Tenant @key(fields: "id") {
   id: ID!
@@ -116,7 +119,9 @@ type Query {
 }
 
 type Mutation {
-  updateTenantLanguageSettings(input: UpdateTenantLanguageSettingsInput!): TenantLanguageSettings!
+  updateTenantLanguageSettings(
+    input: UpdateTenantLanguageSettingsInput!
+  ): TenantLanguageSettings!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   updateTenantBranding(input: UpdateTenantBrandingInput!): TenantBranding!

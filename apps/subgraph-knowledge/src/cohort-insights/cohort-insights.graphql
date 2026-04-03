@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@authenticated"]
+  )
 
 type CohortInsight {
   annotationId: ID!
@@ -18,6 +21,9 @@ type CohortInsightsResult {
 }
 
 extend type Query {
-  cohortInsights(conceptId: ID!, courseId: ID!, limit: Int): CohortInsightsResult!
-    @authenticated
+  cohortInsights(
+    conceptId: ID!
+    courseId: ID!
+    limit: Int
+  ): CohortInsightsResult! @authenticated
 }

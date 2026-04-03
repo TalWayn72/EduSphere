@@ -33,9 +33,7 @@ input UpdateRoleInput {
 }
 
 extend type Query {
-  roles: [Role!]!
-    @authenticated
-    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  roles: [Role!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
   role(id: ID!): Role
     @authenticated

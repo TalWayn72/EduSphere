@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 type Skill {
   id: ID!
@@ -55,7 +58,10 @@ type Query {
 
 type Mutation {
   createSkillPath(input: CreateSkillPathInput!): SkillPath! @authenticated
-  updateMySkillProgress(skillId: ID!, masteryLevel: MasteryLevel!): LearnerSkillProgress! @authenticated
+  updateMySkillProgress(
+    skillId: ID!
+    masteryLevel: MasteryLevel!
+  ): LearnerSkillProgress! @authenticated
 }
 
 input CreateSkillPathInput {

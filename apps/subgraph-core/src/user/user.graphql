@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated", "@requiresScopes"]
+  )
 
 # Custom authorization directive (not a federation spec directive — defined locally)
 directive @requiresRole(roles: [String!]!) on FIELD_DEFINITION
@@ -113,8 +116,11 @@ type Query {
   _health: String! @shareable
   user(id: ID!): User
   users(
-    limit: Int = 10,
-    offset: Int = 0 @deprecated(reason: "Use cursor-based pagination with 'after' argument instead. Will be removed 2026-09-01.")
+    limit: Int = 10
+    offset: Int = 0
+      @deprecated(
+        reason: "Use cursor-based pagination with 'after' argument instead. Will be removed 2026-09-01."
+      )
   ): [User!]!
   me: User
   myStats: UserStats! @authenticated
@@ -125,7 +131,9 @@ type Query {
     offset: Int = 0
     search: String
     role: UserRole
-  ): AdminUsersResult! @authenticated @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  ): AdminUsersResult!
+    @authenticated
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
 
   # Phase 2: cursor-based user list (Relay spec)
   listUsers(input: ListUsersInput): UserConnection!
@@ -145,7 +153,8 @@ type Mutation {
     @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
   # Self-service: any authenticated user may update their own preferences
-  updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!): User!
+    @authenticated
   # Toggle public profile visibility (self-service)
   updateProfileVisibility(isPublic: Boolean!): UserPreferences! @authenticated
   # Soft-deactivate a user (admin only)

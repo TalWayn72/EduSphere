@@ -1,11 +1,19 @@
 extend type Query {
-  scimTokens: [ScimToken!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  scimSyncLog(limit: Int): [ScimSyncEntry!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  scimTokens: [ScimToken!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  scimSyncLog(limit: Int): [ScimSyncEntry!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 extend type Mutation {
-  generateScimToken(input: GenerateScimTokenInput!): GenerateScimTokenResult! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-  revokeScimToken(id: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  generateScimToken(input: GenerateScimTokenInput!): GenerateScimTokenResult!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  revokeScimToken(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 type ScimToken {

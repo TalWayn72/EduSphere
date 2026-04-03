@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@authenticated"]
+  )
 
 type ChavrutaPartnerMatch {
   partnerId: ID!
@@ -32,10 +35,14 @@ input CreateChavrutaPartnerSessionInput {
 }
 
 extend type Query {
-  chavrutaPartnerMatches(input: FindChavrutaPartnerInput!): [ChavrutaPartnerMatch!]! @authenticated
+  chavrutaPartnerMatches(
+    input: FindChavrutaPartnerInput!
+  ): [ChavrutaPartnerMatch!]! @authenticated
   myChavrutaPartnerSessions: [ChavrutaPartnerSession!]! @authenticated
 }
 
 extend type Mutation {
-  createChavrutaPartnerSession(input: CreateChavrutaPartnerSessionInput!): ChavrutaPartnerSession! @authenticated
+  createChavrutaPartnerSession(
+    input: CreateChavrutaPartnerSessionInput!
+  ): ChavrutaPartnerSession! @authenticated
 }

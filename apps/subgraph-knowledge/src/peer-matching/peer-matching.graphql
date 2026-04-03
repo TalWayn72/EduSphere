@@ -1,4 +1,15 @@
-extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@requires", "@provides", "@authenticated", "@requiresScopes"])
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: [
+      "@key"
+      "@external"
+      "@requires"
+      "@provides"
+      "@authenticated"
+      "@requiresScopes"
+    ]
+  )
 
 type PeerMatch {
   userId: ID!
@@ -30,6 +41,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  requestPeerMatch(matchedUserId: ID!, courseId: String): PeerMatchRequest! @authenticated
-  respondToPeerMatch(requestId: ID!, accept: Boolean!): PeerMatchRequest! @authenticated
+  requestPeerMatch(matchedUserId: ID!, courseId: String): PeerMatchRequest!
+    @authenticated
+  respondToPeerMatch(requestId: ID!, accept: Boolean!): PeerMatchRequest!
+    @authenticated
 }

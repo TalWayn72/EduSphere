@@ -1,6 +1,10 @@
 extend type Mutation {
-  generateBIApiKey(description: String!): String! @authenticated @requiresRole(roles: [ORG_ADMIN])
-  revokeBIApiKey(tokenId: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+  generateBIApiKey(description: String!): String!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
+  revokeBIApiKey(tokenId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
 }
 
 extend type Query {

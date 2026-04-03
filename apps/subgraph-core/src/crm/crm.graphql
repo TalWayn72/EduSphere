@@ -17,7 +17,9 @@ type CrmSyncLogEntry {
 
 extend type Query {
   crmConnection: CrmConnection @authenticated @requiresRole(roles: [ORG_ADMIN])
-  crmSyncLog(limit: Int): [CrmSyncLogEntry!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+  crmSyncLog(limit: Int): [CrmSyncLogEntry!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
 }
 
 extend type Mutation {

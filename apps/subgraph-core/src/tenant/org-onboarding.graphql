@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@authenticated"]
+  )
 
 # ─── Provisioning ──────────────────────────────────────────────
 
@@ -347,10 +350,8 @@ input LicenseCourseInput {
 
 extend type Query {
   myOrganization: Organization! @authenticated
-  orgMembers(limit: Int = 20, offset: Int = 0): [OrgMember!]!
-    @authenticated
-  orgInvitations(status: InvitationStatus): [OrgInvitation!]!
-    @authenticated
+  orgMembers(limit: Int = 20, offset: Int = 0): [OrgMember!]! @authenticated
+  orgInvitations(status: InvitationStatus): [OrgInvitation!]! @authenticated
   trialStatus: TrialStatus! @authenticated
   apiKeys: [ApiKey!]! @authenticated
   webhooks: [Webhook!]! @authenticated
@@ -371,49 +372,35 @@ extend type Query {
 extend type Mutation {
   createOrganization(input: CreateOrganizationInput!): Organization!
 
-  inviteUser(input: InviteUserInput!): OrgInvitation!
-    @authenticated
+  inviteUser(input: InviteUserInput!): OrgInvitation! @authenticated
   acceptInvitation(token: String!): OrgMember!
-  revokeInvitation(id: ID!): Boolean!
-    @authenticated
-  updateMemberRole(userId: ID!, role: String!): OrgMember!
-    @authenticated
-  removeMember(userId: ID!): Boolean!
-    @authenticated
+  revokeInvitation(id: ID!): Boolean! @authenticated
+  updateMemberRole(userId: ID!, role: String!): OrgMember! @authenticated
+  removeMember(userId: ID!): Boolean! @authenticated
 
-  createApiKey(input: CreateApiKeyInput!): ApiKeyCreated!
-    @authenticated
-  revokeApiKey(id: ID!): Boolean!
-    @authenticated
+  createApiKey(input: CreateApiKeyInput!): ApiKeyCreated! @authenticated
+  revokeApiKey(id: ID!): Boolean! @authenticated
 
-  createWebhook(input: CreateWebhookInput!): Webhook!
-    @authenticated
-  updateWebhook(id: ID!, input: UpdateWebhookInput!): Webhook!
-    @authenticated
-  deleteWebhook(id: ID!): Boolean!
-    @authenticated
-  testWebhook(id: ID!): WebhookDelivery!
-    @authenticated
+  createWebhook(input: CreateWebhookInput!): Webhook! @authenticated
+  updateWebhook(id: ID!, input: UpdateWebhookInput!): Webhook! @authenticated
+  deleteWebhook(id: ID!): Boolean! @authenticated
+  testWebhook(id: ID!): WebhookDelivery! @authenticated
 
   requestDomainVerification(domain: String!): DomainVerificationInfo!
     @authenticated
-  checkDomainVerification(domain: String!): CustomDomain!
-    @authenticated
-  removeCustomDomain(domainId: ID!): Boolean!
-    @authenticated
+  checkDomainVerification(domain: String!): CustomDomain! @authenticated
+  removeCustomDomain(domainId: ID!): Boolean! @authenticated
 
-  licenseCourse(input: LicenseCourseInput!): CourseLicense!
-    @authenticated
-  revokeCourseLicense(id: ID!): Boolean!
-    @authenticated
+  licenseCourse(input: LicenseCourseInput!): CourseLicense! @authenticated
+  revokeCourseLicense(id: ID!): Boolean! @authenticated
 
-  updateGamificationConfig(input: UpdateGamificationConfigInput!): GamificationConfig!
-    @authenticated
+  updateGamificationConfig(
+    input: UpdateGamificationConfigInput!
+  ): GamificationConfig! @authenticated
 
   createOrgBadge(input: CreateOrgBadgeInput!): OrgBadge! @authenticated
   updateOrgBadge(id: ID!, input: UpdateOrgBadgeInput!): OrgBadge! @authenticated
   deleteOrgBadge(id: ID!): Boolean! @authenticated
 
-  exportAnalytics(input: ExportAnalyticsInput!): ExportResult!
-    @authenticated
+  exportAnalytics(input: ExportAnalyticsInput!): ExportResult! @authenticated
 }

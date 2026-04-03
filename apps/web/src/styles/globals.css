@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Enable class-based dark mode for Tailwind v4 (required for .dark class toggle) */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -64,21 +64,21 @@
 @layer base {
   :root {
     /* Primary — Indigo (distinct from all competitors) */
-    --primary: 239 84% 58%;              /* #4F46E5 indigo-600 — WCAG AA 6.4:1 with white */
+    --primary: 239 84% 58%; /* #4F46E5 indigo-600 — WCAG AA 6.4:1 with white */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 238 84% 60%;        /* #4F46E5 indigo-600 */
-    --primary-subtle: 239 84% 95%;       /* indigo-50 */
+    --primary-hover: 238 84% 60%; /* #4F46E5 indigo-600 */
+    --primary-subtle: 239 84% 95%; /* indigo-50 */
 
     /* Accent — Purple */
-    --accent: 262 83% 65%;               /* #8B5CF6 violet-500 */
+    --accent: 262 83% 65%; /* #8B5CF6 violet-500 */
     --accent-foreground: 0 0% 100%;
 
     /* Surfaces */
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;           /* slate-900 */
+    --foreground: 222 47% 11%; /* slate-900 */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --card-hover: 239 84% 98%;           /* indigo-50/60 on hover */
+    --card-hover: 239 84% 98%; /* indigo-50/60 on hover */
 
     /* Neutrals */
     --muted: 210 40% 96%;
@@ -96,15 +96,15 @@
     --destructive-foreground: 0 0% 100%;
 
     /* Mastery states (Khan Academy 5-state system) */
-    --mastery-none: 220 13% 91%;         /* gray — Not Started */
-    --mastery-attempted: 38 92% 60%;     /* amber — Attempted */
-    --mastery-familiar: 199 89% 55%;     /* sky — Familiar */
-    --mastery-proficient: 142 72% 45%;   /* green — Proficient */
-    --mastery-mastered: 239 84% 58%;     /* indigo — Mastered */
+    --mastery-none: 220 13% 91%; /* gray — Not Started */
+    --mastery-attempted: 38 92% 60%; /* amber — Attempted */
+    --mastery-familiar: 199 89% 55%; /* sky — Familiar */
+    --mastery-proficient: 142 72% 45%; /* green — Proficient */
+    --mastery-mastered: 239 84% 58%; /* indigo — Mastered */
 
     /* Streak / Gamification */
-    --streak-fire: 24 95% 55%;           /* orange */
-    --streak-cold: 215 16% 65%;          /* slate */
+    --streak-fire: 24 95% 55%; /* orange */
+    --streak-cold: 215 16% 65%; /* slate */
 
     /* Success / Warning / Info */
     --success: 142 72% 45%;
@@ -119,12 +119,15 @@
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
     /* Radius */
-    --radius: 0.75rem;                   /* more modern, rounded */
+    --radius: 0.75rem; /* more modern, rounded */
 
     /* Shadows */
-    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
-    --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-card:
+      0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+    --shadow-elevated:
+      0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-modal:
+      0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
     /* Animation */
     --duration-fast: 150ms;
@@ -138,7 +141,7 @@
   }
 
   .dark {
-    --primary: 239 84% 63%;              /* indigo-500 adjusted for dark — WCAG AA ~5.5:1 with white */
+    --primary: 239 84% 63%; /* indigo-500 adjusted for dark — WCAG AA ~5.5:1 with white */
     --primary-foreground: 0 0% 100%;
     --primary-hover: 239 84% 80%;
     --primary-subtle: 239 30% 15%;
@@ -146,7 +149,7 @@
     --accent: 262 83% 72%;
     --accent-foreground: 0 0% 100%;
 
-    --background: 222 47% 6%;            /* very dark slate, NOT pure black */
+    --background: 222 47% 6%; /* very dark slate, NOT pure black */
     --foreground: 210 40% 96%;
     --card: 222 47% 9%;
     --card-foreground: 210 40% 96%;
@@ -194,7 +197,11 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      sans-serif;
   }
 
   /* WCAG 2.2 SC 2.4.12 — Focus Not Obscured (Minimum)
@@ -215,7 +222,7 @@
      never fully obscures a keyboard-focused element when it is scrolled
      into view (SC 2.4.11 + SC 2.4.12 reinforcement).                      */
   *:focus-visible {
-    outline: 3px solid #4F46E5 !important;
+    outline: 3px solid #4f46e5 !important;
     outline-offset: 2px !important;
     border-radius: 2px;
     scroll-margin-top: var(--header-height, 60px);
@@ -231,10 +238,10 @@
      All interactive controls must have an activation area >= 24x24 CSS px.
      Inline anchors inside body text are exempt (Exception 2).              */
   button,
-  [role="button"],
+  [role='button'],
   a,
-  input[type="checkbox"],
-  input[type="radio"],
+  input[type='checkbox'],
+  input[type='radio'],
   select {
     min-height: 24px;
     min-width: 24px;
@@ -253,11 +260,26 @@
 
 @layer utilities {
   /* Mastery badge utilities */
-  .mastery-none      { background-color: hsl(var(--mastery-none)); color: hsl(var(--foreground)); }
-  .mastery-attempted { background-color: hsl(var(--mastery-attempted)); color: white; }
-  .mastery-familiar  { background-color: hsl(var(--mastery-familiar)); color: white; }
-  .mastery-proficient{ background-color: hsl(var(--mastery-proficient)); color: white; }
-  .mastery-mastered  { background-color: hsl(var(--mastery-mastered)); color: white; }
+  .mastery-none {
+    background-color: hsl(var(--mastery-none));
+    color: hsl(var(--foreground));
+  }
+  .mastery-attempted {
+    background-color: hsl(var(--mastery-attempted));
+    color: white;
+  }
+  .mastery-familiar {
+    background-color: hsl(var(--mastery-familiar));
+    color: white;
+  }
+  .mastery-proficient {
+    background-color: hsl(var(--mastery-proficient));
+    color: white;
+  }
+  .mastery-mastered {
+    background-color: hsl(var(--mastery-mastered));
+    color: white;
+  }
 
   /* WCAG 2.4.1 — prefers-reduced-motion utility class
      Applied to <html> when motionPreference !== 'full' (see applyUserPreferences). */
@@ -269,9 +291,10 @@
 
   /* Smooth transitions */
   .transition-theme {
-    transition: background-color var(--duration-base) var(--ease-out),
-                color var(--duration-base) var(--ease-out),
-                border-color var(--duration-base) var(--ease-out);
+    transition:
+      background-color var(--duration-base) var(--ease-out),
+      color var(--duration-base) var(--ease-out),
+      border-color var(--duration-base) var(--ease-out);
   }
 
   /* Card hover effect */
@@ -285,8 +308,9 @@
        Dark:  muted = hsl(217 33% 14%) / 0.6 ≈ #1a2030 — muted-foreground (215 20% 65%) ≈ 5.1:1 ✓ */
   .card-interactive {
     box-shadow: var(--shadow-card);
-    transition: box-shadow var(--duration-fast) var(--ease-out),
-                transform var(--duration-fast) var(--ease-out);
+    transition:
+      box-shadow var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
   }
   .card-interactive:hover {
     box-shadow: var(--shadow-elevated);
@@ -294,46 +318,72 @@
   }
 
   /* Streak badge */
-  .streak-active { color: hsl(var(--streak-fire)); }
-  .streak-cold   { color: hsl(var(--streak-cold)); }
+  .streak-active {
+    color: hsl(var(--streak-fire));
+  }
+  .streak-cold {
+    color: hsl(var(--streak-cold));
+  }
 }
 
 /* ── RTL Support — applied when dir="rtl" is set on <html> ──────────────── */
 
 /* Flip space-x-* margin direction for RTL layouts */
-[dir="rtl"] [class*="space-x-"] > :not([hidden]) ~ :not([hidden]) {
+[dir='rtl'] [class*='space-x-'] > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
 
 /* Flip ml-auto / mr-auto for RTL */
-[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
-[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+[dir='rtl'] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+[dir='rtl'] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
 
 /* Ensure text inputs and textareas flow RTL */
-[dir="rtl"] input,
-[dir="rtl"] textarea {
+[dir='rtl'] input,
+[dir='rtl'] textarea {
   text-align: right;
 }
 
 /* Flip text-left / text-right for RTL */
-[dir="rtl"] .text-left { text-align: right; }
-[dir="rtl"] .text-right { text-align: left; }
+[dir='rtl'] .text-left {
+  text-align: right;
+}
+[dir='rtl'] .text-right {
+  text-align: left;
+}
 
 /* Flip rounded corners for RTL */
-[dir="rtl"] .rounded-l-lg { border-radius: 0 0.5rem 0.5rem 0; }
-[dir="rtl"] .rounded-r-lg { border-radius: 0.5rem 0 0 0.5rem; }
+[dir='rtl'] .rounded-l-lg {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+[dir='rtl'] .rounded-r-lg {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
 
 /* Ensure tables respect RTL */
-[dir="rtl"] table th,
-[dir="rtl"] table td { text-align: right; }
+[dir='rtl'] table th,
+[dir='rtl'] table td {
+  text-align: right;
+}
 
 /* Flip directional icons in RTL */
-[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+[dir='rtl'] .rtl-flip {
+  transform: scaleX(-1);
+}
 
 /* ── LandingPage — CTA shimmer effect ──────────────────────────────────── */
 @keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 }
 
 .cta-shimmer {
@@ -355,15 +405,22 @@
 
 /* ── Settings — highlight pulse for scroll-to-setting navigation ────────── */
 @keyframes settings-highlight {
-  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
-  50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+  }
 }
 .animate-settings-highlight {
   animation: settings-highlight 1s ease-in-out 3;
   border-radius: var(--radius);
 }
 @media (prefers-reduced-motion: reduce) {
-  .animate-settings-highlight { animation: none; }
+  .animate-settings-highlight {
+    animation: none;
+  }
 }
 
 /* ── CollaborativeEditor — mention chip ─────────────────────────────────── */

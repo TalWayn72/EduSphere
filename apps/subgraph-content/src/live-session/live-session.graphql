@@ -14,7 +14,8 @@ type LiveSession @key(fields: "id") {
 extend type Query {
   liveSession(contentItemId: ID!): LiveSession @authenticated
 
-  liveSessions(status: String, limit: Int, offset: Int): [LiveSession!]! @authenticated
+  liveSessions(status: String, limit: Int, offset: Int): [LiveSession!]!
+    @authenticated
 
   liveSessionById(sessionId: ID!): LiveSession @authenticated
 }
@@ -25,5 +26,4 @@ extend type Mutation {
     scheduledAt: String!
     meetingName: String!
   ): LiveSession! @authenticated
-
 }

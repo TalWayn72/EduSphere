@@ -34,7 +34,9 @@ extend type Mutation {
   updateScormSession(sessionId: ID!, data: String!): Boolean! @authenticated
   finishScormSession(sessionId: ID!, data: String!): Boolean! @authenticated
   importScormPackage(fileKey: String!): ScormImportResult! @authenticated
-  exportCourseAsScorm(courseId: ID!): String! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+  exportCourseAsScorm(courseId: ID!): String!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
   exportCourseAsScorm2004(courseId: ID!): ScormExportResult!
     @authenticated
     @requiresScopes(scopes: ["course:write"])

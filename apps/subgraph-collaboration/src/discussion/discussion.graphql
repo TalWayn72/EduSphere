@@ -1,14 +1,21 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@shareable", "@external", "@authenticated"]
+  )
 
-"""Discussion types"""
+"""
+Discussion types
+"""
 enum DiscussionType {
   FORUM
   CHAVRUTA
   DEBATE
 }
 
-"""Message types"""
+"""
+Message types
+"""
 enum MessageType {
   TEXT
   IMAGE
@@ -16,7 +23,9 @@ enum MessageType {
   AUDIO
 }
 
-"""Discussion in a course"""
+"""
+Discussion in a course
+"""
 type Discussion @key(fields: "id") {
   id: ID!
   courseId: ID!
@@ -34,7 +43,9 @@ type Discussion @key(fields: "id") {
   updatedAt: DateTime!
 }
 
-"""Message in a discussion"""
+"""
+Message in a discussion
+"""
 type DiscussionMessage @key(fields: "id") {
   id: ID!
   discussionId: ID!
@@ -53,7 +64,9 @@ type DiscussionMessage @key(fields: "id") {
   updatedAt: DateTime!
 }
 
-"""Participant in a discussion"""
+"""
+Participant in a discussion
+"""
 type DiscussionParticipant {
   id: ID!
   discussionId: ID!
@@ -63,7 +76,9 @@ type DiscussionParticipant {
   joinedAt: DateTime!
 }
 
-"""External entity stubs"""
+"""
+External entity stubs
+"""
 type User @key(fields: "id") {
   id: ID!
 }
@@ -73,38 +88,64 @@ type Course @key(fields: "id") {
 }
 
 extend type Query {
-  """Get a single discussion by ID"""
+  """
+  Get a single discussion by ID
+  """
   discussion(id: ID!): Discussion @authenticated
 
-  """Get all discussions for a course"""
-  discussions(courseId: ID!, limit: Int = 20, offset: Int = 0): [Discussion!]! @authenticated
+  """
+  Get all discussions for a course
+  """
+  discussions(courseId: ID!, limit: Int = 20, offset: Int = 0): [Discussion!]!
+    @authenticated
 
-  """Get all discussions the current user has participated in"""
+  """
+  Get all discussions the current user has participated in
+  """
   myDiscussions(limit: Int = 20, offset: Int = 0): [Discussion!]! @authenticated
 
-  """Get all messages in a discussion"""
-  discussionMessages(discussionId: ID!, limit: Int = 50, offset: Int = 0): [DiscussionMessage!]! @authenticated
+  """
+  Get all messages in a discussion
+  """
+  discussionMessages(
+    discussionId: ID!
+    limit: Int = 50
+    offset: Int = 0
+  ): [DiscussionMessage!]! @authenticated
 }
 
 extend type Mutation {
-  """Create a new discussion"""
+  """
+  Create a new discussion
+  """
   createDiscussion(input: CreateDiscussionInput!): Discussion! @authenticated
 
-  """Add a message to a discussion"""
-  addMessage(discussionId: ID!, input: AddMessageInput!): DiscussionMessage! @authenticated
+  """
+  Add a message to a discussion
+  """
+  addMessage(discussionId: ID!, input: AddMessageInput!): DiscussionMessage!
+    @authenticated
 
-  """Join a discussion as a participant"""
+  """
+  Join a discussion as a participant
+  """
   joinDiscussion(discussionId: ID!): Boolean! @authenticated
 
-  """Leave a discussion"""
+  """
+  Leave a discussion
+  """
   leaveDiscussion(discussionId: ID!): Boolean! @authenticated
 
-  """Like or unlike a message"""
+  """
+  Like or unlike a message
+  """
   likeMessage(messageId: ID!): Boolean! @authenticated
 }
 
 type Subscription {
-  """Subscribe to new messages in a discussion"""
+  """
+  Subscribe to new messages in a discussion
+  """
   messageAdded(discussionId: ID!): DiscussionMessage!
 }
 
@@ -123,7 +164,9 @@ input AddMessageInput {
 
 scalar DateTime
 
-"""AI-generated summary of a discussion thread"""
+"""
+AI-generated summary of a discussion thread
+"""
 type DiscussionSummary {
   summary: String!
   keyTopics: [String!]!
@@ -132,14 +175,21 @@ type DiscussionSummary {
 }
 
 extend type Mutation {
-  """Generate an AI-powered summary for a discussion thread"""
-  generateDiscussionSummary(discussionId: ID!): DiscussionSummary! @authenticated
+  """
+  Generate an AI-powered summary for a discussion thread
+  """
+  generateDiscussionSummary(discussionId: ID!): DiscussionSummary!
+    @authenticated
 
-  """Compact a collaborative document's CRDT state (remove tombstones, merge operations)"""
+  """
+  Compact a collaborative document's CRDT state (remove tombstones, merge operations)
+  """
   compactCollabDocument(documentId: ID!): CollabDocument! @authenticated
 }
 
-"""A collaborative document with CRDT state"""
+"""
+A collaborative document with CRDT state
+"""
 type CollabDocument {
   id: ID!
   title: String!

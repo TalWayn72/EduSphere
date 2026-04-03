@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@authenticated"]
+  )
 
 type Embedding @key(fields: "id") {
   id: ID!
@@ -26,8 +29,16 @@ scalar JSON
 extend type Query {
   embedding(id: ID!): Embedding
   embeddingsByContentItem(contentItemId: ID!): [Embedding!]!
-  semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7): [SimilarityResult!]!
-  semanticSearchByContentItem(contentItemId: ID!, query: [Float!]!, limit: Int = 5): [SimilarityResult!]!
+  semanticSearch(
+    query: [Float!]!
+    limit: Int = 10
+    minSimilarity: Float = 0.7
+  ): [SimilarityResult!]!
+  semanticSearchByContentItem(
+    contentItemId: ID!
+    query: [Float!]!
+    limit: Int = 5
+  ): [SimilarityResult!]!
 }
 
 extend type Mutation {

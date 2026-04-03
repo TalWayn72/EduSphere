@@ -87,7 +87,10 @@ type VisualAssetSearchResult {
 extend type Query {
   getVisualAssets(courseId: ID!): [VisualAsset!]! @authenticated
   getVisualAnchors(mediaAssetId: ID!): [VisualAnchor!]! @authenticated
-  searchVisualAssets(courseId: ID!, query: String!): [VisualAssetSearchResult!]!
+  searchVisualAssets(
+    courseId: ID!
+    query: String!
+  ): [VisualAssetSearchResult!]!
     @authenticated
     @requiresScopes(scopes: ["content:read"])
 }
@@ -102,19 +105,25 @@ extend type Mutation {
   ): VisualAsset! @authenticated @requiresScopes(scopes: ["content:write"])
 
   createVisualAnchor(input: CreateVisualAnchorInput!): VisualAnchor!
-    @authenticated @requiresScopes(scopes: ["content:write"])
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
 
   updateVisualAnchor(id: ID!, input: UpdateVisualAnchorInput!): VisualAnchor!
-    @authenticated @requiresScopes(scopes: ["content:write"])
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
 
   deleteVisualAnchor(id: ID!): Boolean!
-    @authenticated @requiresScopes(scopes: ["content:write"])
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
 
   assignAssetToAnchor(anchorId: ID!, visualAssetId: ID!): VisualAnchor!
-    @authenticated @requiresScopes(scopes: ["content:write"])
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
 
   syncAnchors(mediaAssetId: ID!): SyncResult!
-    @authenticated @requiresScopes(scopes: ["content:write"]) @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 
 extend type Subscription {

@@ -1,5 +1,14 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: [
+      "@key"
+      "@shareable"
+      "@external"
+      "@authenticated"
+      "@requiresScopes"
+    ]
+  )
 
 enum AnnotationType {
   TEXT
@@ -18,7 +27,9 @@ enum AnnotationLayer {
   AI_GENERATED
 }
 
-"""Character range within a text document — used for INLINE_COMMENT and SUGGESTION types"""
+"""
+Character range within a text document — used for INLINE_COMMENT and SUGGESTION types
+"""
 type TextRange {
   start: Int!
   end: Int!
@@ -35,7 +46,9 @@ type Annotation @key(fields: "id") {
   layer: AnnotationLayer!
   content: JSON!
   spatialData: JSON
-  """Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)"""
+  """
+  Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)
+  """
   textRange: TextRange
   parentId: ID
   parent: Annotation
@@ -60,10 +73,17 @@ type Query {
     userId: ID
     layer: AnnotationLayer
     limit: Int = 20
-    offset: Int = 0 @deprecated(reason: "Use cursor-based pagination with 'after' argument instead. Will be removed 2026-09-01.")
+    offset: Int = 0
+      @deprecated(
+        reason: "Use cursor-based pagination with 'after' argument instead. Will be removed 2026-09-01."
+      )
   ): [Annotation!]!
   annotationsByAsset(assetId: ID!, layer: AnnotationLayer): [Annotation!]!
-  annotationsByUser(userId: ID!, limit: Int = 20, offset: Int = 0): [Annotation!]!
+  annotationsByUser(
+    userId: ID!
+    limit: Int = 20
+    offset: Int = 0
+  ): [Annotation!]!
 }
 
 type Mutation {
@@ -92,11 +112,15 @@ type Mutation {
 }
 
 type Subscription {
-  """Subscribe to new annotations on a specific asset in real-time"""
+  """
+  Subscribe to new annotations on a specific asset in real-time
+  """
   annotationAdded(assetId: ID!): Annotation!
 }
 
-"""Input for text range — required for INLINE_COMMENT and SUGGESTION annotation types"""
+"""
+Input for text range — required for INLINE_COMMENT and SUGGESTION annotation types
+"""
 input TextRangeInput {
   start: Int!
   end: Int!
@@ -109,7 +133,9 @@ input CreateAnnotationInput {
   layer: AnnotationLayer = PERSONAL
   content: JSON!
   spatialData: JSON
-  """Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)"""
+  """
+  Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)
+  """
   textRange: TextRangeInput
   parentId: ID
 }

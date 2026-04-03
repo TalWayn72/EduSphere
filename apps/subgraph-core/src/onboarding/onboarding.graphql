@@ -18,7 +18,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @authenticated
+  updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState!
+    @authenticated
   completeOnboarding: OnboardingState! @authenticated
   skipOnboarding: OnboardingState! @authenticated
 }
