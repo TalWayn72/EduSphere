@@ -17,26 +17,30 @@ describe('ClamAV Upload Security (SI-Upload)', () => {
     expect(EICAR_TEST_STRING).toContain('EICAR');
   });
 
-  it('file size > 100MB is rejected before ClamAV scan', { timeout: 30_000 }, async () => {
-    // Dynamically import to avoid module resolution in CI without ClamAV
-    const { ClamavService } =
-      await import('../../apps/subgraph-content/src/clamav/clamav.service').catch(
-        () => ({ ClamavService: null })
-      );
+  it(
+    'file size > 100MB is rejected before ClamAV scan',
+    { timeout: 30_000 },
+    async () => {
+      // Dynamically import to avoid module resolution in CI without ClamAV
+      const { ClamavService } =
+        await import('../../apps/subgraph-content/src/clamav/clamav.service').catch(
+          () => ({ ClamavService: null })
+        );
 
-    if (!ClamavService) {
-      // Skip if module not available in test environment
-      expect(true).toBe(true);
-      return;
+      if (!ClamavService) {
+        // Skip if module not available in test environment
+        expect(true).toBe(true);
+        return;
+      }
+
+      const service = new ClamavService();
+      const oversizedBuffer = Buffer.alloc(101 * 1024 * 1024); // 101 MB
+
+      await expect(
+        service.scanBuffer(oversizedBuffer, 'large.bin')
+      ).rejects.toThrow('File too large for scanning');
     }
-
-    const service = new ClamavService();
-    const oversizedBuffer = Buffer.alloc(101 * 1024 * 1024); // 101 MB
-
-    await expect(
-      service.scanBuffer(oversizedBuffer, 'large.bin')
-    ).rejects.toThrow('File too large for scanning');
-  });
+  );
 
   it('ClamAV service returns hasError=true when scanner unavailable (graceful degradation)', async () => {
     const { ClamavService } =

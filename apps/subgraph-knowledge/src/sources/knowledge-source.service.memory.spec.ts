@@ -43,7 +43,9 @@ const { mockCloseAllPools, mockDb } = vi.hoisted(() => {
   const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
 
   const mockDb = {
-    insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ returning: mockReturning }) }),
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({ returning: mockReturning }),
+    }),
     select: vi.fn().mockReturnValue({ from: mockFrom }),
     update: vi.fn().mockReturnValue({ set: mockSet }),
     delete: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),

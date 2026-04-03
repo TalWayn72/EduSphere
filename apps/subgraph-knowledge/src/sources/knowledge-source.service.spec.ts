@@ -142,9 +142,7 @@ describe('KnowledgeSourceService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new KnowledgeSourceService(
-      mockProcessingService as never
-    );
+    service = new KnowledgeSourceService(mockProcessingService as never);
   });
 
   // ── listByCourseSources ────────────────────────────────────────────────────
@@ -202,7 +200,9 @@ describe('KnowledgeSourceService', () => {
 
       const result = await service.createAndProcess(input);
 
-      expect(mockProcessingService.createAndProcess).toHaveBeenCalledWith(input);
+      expect(mockProcessingService.createAndProcess).toHaveBeenCalledWith(
+        input
+      );
       expect(result).toEqual(PENDING_SOURCE);
     });
 
