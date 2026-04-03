@@ -9,12 +9,12 @@ on:
 jobs:
   visual-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 45
     continue-on-error: true # Visual regression is non-blocking; timeouts should not fail CI
     strategy:
       fail-fast: false
       matrix:
-        shard: [1/4, 2/4, 3/4, 4/4]
+        shard: [1/8, 2/8, 3/8, 4/8, 5/8, 6/8, 7/8, 8/8]
 
     services:
       postgres:
