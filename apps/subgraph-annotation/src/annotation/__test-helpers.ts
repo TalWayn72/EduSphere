@@ -10,6 +10,7 @@ import { vi } from 'vitest';
 import { UnauthorizedException } from '@nestjs/common';
 import type { AnnotationQueriesService } from './annotation-queries.service';
 import type { AuthContext } from '@edusphere/auth';
+import type { SQLWrapper } from 'drizzle-orm';
 
 /**
  * Resolve mocked DB helpers from the caller's vi.mock scope.
@@ -47,7 +48,7 @@ async function executeQueryChain(
   return tx
     .select()
     .from(schema.annotations)
-    .where(and(...conditions))
+    .where(and(...(conditions as SQLWrapper[])))
     .orderBy(desc(schema.annotations.created_at))
     .limit(limit)
     .offset(offset);
@@ -89,12 +90,12 @@ export function createMockQueriesService(
               ];
               if (filters.assetId) {
                 conditions.push(
-                  eq(schema.annotations.asset_id, filters.assetId)
+                  eq(schema.annotations.asset_id, filters.assetId as string)
                 );
               }
               if (filters.userId) {
                 conditions.push(
-                  eq(schema.annotations.user_id, filters.userId)
+                  eq(schema.annotations.user_id, filters.userId as string)
                 );
               }
               if (filters.layer) {
@@ -149,7 +150,7 @@ export function createMockQueriesService(
               return tx
                 .select()
                 .from(schema.annotations)
-                .where(and(...conditions))
+                .where(and(...(conditions as SQLWrapper[])))
                 .orderBy(desc(schema.annotations.created_at));
             }
           );
