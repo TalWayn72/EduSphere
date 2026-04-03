@@ -100,13 +100,16 @@ vi.mock('@edusphere/langgraph-workflows', () => ({
 }));
 
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service.js';
+import { PipelineModuleExecutorService } from './pipeline-module-executor.service.js';
+import { PipelineNatsService } from './pipeline-nats.service.js';
+import { LessonPublishService } from './lesson-publish.service.js';
 
 describe('LessonPipelineOrchestratorService', () => {
   let service: LessonPipelineOrchestratorService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new LessonPipelineOrchestratorService();
+    service = new LessonPipelineOrchestratorService(new PipelineModuleExecutorService(new LessonPublishService()), new PipelineNatsService());
   });
 
   // ── cancelRun ─────────────────────────────────────────────────────────────

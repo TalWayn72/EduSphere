@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserService } from './user.service';
+import { UserAdminService } from './user-admin.service';
 import type { AuthContext } from '@edusphere/auth';
 
 // Mock the entire @edusphere/db package
@@ -125,6 +126,8 @@ describe('UserService', () => {
     mockSelect.mockReturnValue({ from: mockFrom });
 
     service = new UserService();
+    const adminService = new UserAdminService(service);
+    adminService.onModuleInit();
   });
 
   // ─── findById ───────────────────────────────────────────────────────────────

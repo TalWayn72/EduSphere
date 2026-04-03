@@ -32,25 +32,44 @@ jobs:
       - name: Setup k6
         uses: grafana/setup-k6-action@v1
 
+      - name: Verify target is reachable
+        id: health-gate
+        run: |
+          TARGET="${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}"
+          echo "Testing connectivity to $TARGET..."
+          if curl -sf --max-time 10 "$TARGET/health" > /dev/null 2>&1 || \
+             curl -sf --max-time 10 "$TARGET" > /dev/null 2>&1; then
+            echo "reachable=true" >> "$GITHUB_OUTPUT"
+            echo "Target $TARGET is reachable"
+          else
+            echo "reachable=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Target $TARGET is not reachable. Skipping performance tests."
+            echo "Set PERF_TEST_BASE_URL repository variable to point to a running instance."
+          fi
+
       - name: Run health check scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/01-health-check.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}
           K6_PROFILE: ${{ github.event.inputs.profile || 'load' }}
 
       - name: Run course list scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/02-course-list.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
           K6_PROFILE: ${{ github.event.inputs.profile || 'load' }}
 
       - name: Run semantic search scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/04-semantic-search.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
           K6_PROFILE: ${{ github.event.inputs.profile || 'load' }}
 
       - name: Run agent session scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/05-agent-session.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
@@ -60,12 +79,14 @@ jobs:
           TEST_CONTENT_ID: ${{ vars.PERF_TEST_CONTENT_ID }}
 
       - name: Run knowledge graph scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/06-knowledge-graph.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
           K6_PROFILE: ${{ github.event.inputs.profile || 'load' }}
 
       - name: Run concurrent agent scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/09-agent-concurrent.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
@@ -74,12 +95,20 @@ jobs:
           TEST_TEMPLATE_ID: ${{ vars.PERF_TEST_TEMPLATE_ID }}
 
       - name: Run lesson pipeline load scenario
+        if: steps.health-gate.outputs.reachable == 'true'
         run: k6 run --no-color tests/performance/scenarios/10-lesson-pipeline-load.k6.js
         env:
           GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
           K6_PROFILE: ${{ github.event.inputs.profile || 'load' }}
           TEST_JWT: ${{ secrets.PERF_TEST_JWT }}
           TEST_LESSON_IDS: ${{ vars.PERF_TEST_LESSON_IDS }}
+
+      - name: Skip notice (no target available)
+        if: steps.health-gate.outputs.reachable != 'true'
+        run: |
+          echo "## Performance Tests Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "No reachable target at \`${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}\`." >> $GITHUB_STEP_SUMMARY
+          echo "Set the **PERF_TEST_BASE_URL** repository variable to run nightly perf tests." >> $GITHUB_STEP_SUMMARY
 
       - name: Upload k6 results
         uses: actions/upload-artifact@v4

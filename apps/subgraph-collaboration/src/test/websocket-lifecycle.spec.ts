@@ -63,6 +63,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from '../discussion/discussion.service';
+import { createDiscussionService } from '../discussion/__test-helpers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -139,7 +140,7 @@ describe('WebSocket Lifecycle — participant join/leave/reconnect', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('joining a session creates a participant record', async () => {

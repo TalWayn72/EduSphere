@@ -47,6 +47,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { AnnotationService } from '../annotation/annotation.service';
+import { createMockQueriesService } from '../annotation/__test-helpers';
 
 const userAuth: AuthContext = {
   userId: 'user-gdpr',
@@ -102,7 +103,7 @@ describe('GDPR Erasure — annotation data lifecycle', () => {
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
     mockUpdate.mockReturnValue({ set: mockSet });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   it('soft-delete cascades user erasure — each annotation is individually soft-deleted', async () => {

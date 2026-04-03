@@ -70,6 +70,8 @@ vi.mock('./badge-definitions.js', () => ({
 }));
 
 import { BadgeService } from './badge.service.js';
+import { BadgeEventHandlersService } from './badge-event-handlers.service.js';
+import { BadgeQueriesService } from './badge-queries.service.js';
 import { closeAllPools } from '@edusphere/db';
 
 describe('BadgeService memory safety', () => {
@@ -78,7 +80,7 @@ describe('BadgeService memory safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockExecute.mockResolvedValue({ rows: [] });
-    service = new BadgeService();
+    service = new BadgeService(new BadgeEventHandlersService(), new BadgeQueriesService());
   });
 
   it('unsubscribes all NATS subscriptions on destroy', async () => {

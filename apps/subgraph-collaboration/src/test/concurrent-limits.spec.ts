@@ -60,6 +60,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from '../discussion/discussion.service';
+import { createDiscussionService } from '../discussion/__test-helpers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -113,7 +114,7 @@ describe('Concurrent Limits — participant count tracking', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('countParticipants returns correct count for a session', async () => {

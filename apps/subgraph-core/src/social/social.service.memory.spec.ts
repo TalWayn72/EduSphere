@@ -64,6 +64,8 @@ vi.mock('@edusphere/nats-client', () => ({
 }));
 
 import { SocialService } from './social.service';
+import { SocialFollowService } from './social-follow.service';
+import { SocialFeedService } from './social-feed.service';
 import { closeAllPools } from '@edusphere/db';
 
 describe('SocialService memory safety', () => {
@@ -72,7 +74,7 @@ describe('SocialService memory safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     drainMock.mockResolvedValue(undefined);
-    service = new SocialService();
+    service = new SocialService(new SocialFollowService(), new SocialFeedService(new SocialFollowService()));
   });
 
   // Test 1: onModuleDestroy calls closeAllPools

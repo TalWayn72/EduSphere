@@ -49,6 +49,15 @@ const TENANT_CTX = {
   role: 'SUPER_ADMIN',
 };
 
+const MOCK_DB_ROW = {
+  id: 'tenant-1',
+  name: 'Acme Corp',
+  slug: 'acme',
+  plan: 'ENTERPRISE',
+  created_at: new Date('2026-01-01'),
+  updated_at: new Date('2026-03-30'),
+};
+
 const MOCK_TENANT = {
   id: 'tenant-1',
   name: 'Acme Corp',
@@ -76,7 +85,7 @@ describe('TenantPlanService', () => {
   });
 
   it('updatePlan returns the updated tenant', async () => {
-    mockReturning.mockResolvedValueOnce([MOCK_TENANT]);
+    mockReturning.mockResolvedValueOnce([MOCK_DB_ROW]);
 
     const result = await service.updatePlan(
       'tenant-1',
@@ -106,7 +115,7 @@ describe('TenantPlanService', () => {
   });
 
   it('updatePlan accepts effectiveDate parameter', async () => {
-    mockReturning.mockResolvedValueOnce([MOCK_TENANT]);
+    mockReturning.mockResolvedValueOnce([MOCK_DB_ROW]);
 
     const result = await service.updatePlan(
       'tenant-1',

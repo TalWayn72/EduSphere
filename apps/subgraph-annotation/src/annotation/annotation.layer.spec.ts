@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
+import { createMockQueriesService } from './__test-helpers';
 
 const mockOrderBy = vi.fn();
 const mockLimit = vi.fn();
@@ -92,7 +93,7 @@ describe('AnnotationService — layer visibility rules', () => {
     mockOrderBy.mockReturnValue({ limit: mockLimit });
     mockWhere.mockReturnValue({ orderBy: mockOrderBy, limit: mockLimit });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   describe('STUDENT visibility', () => {

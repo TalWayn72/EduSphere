@@ -1,6 +1,7 @@
 ﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
+import { createMockQueriesService } from './__test-helpers';
 
 // ─── Mock DB chain helpers ────────────────────────────────────────────
 const mockReturning = vi.fn();
@@ -104,7 +105,9 @@ describe('AnnotationService', () => {
     mockInsert.mockReturnValue({ values: mockValues });
     mockSet.mockReturnValue({ where: mockWhere });
     mockUpdate.mockReturnValue({ set: mockSet });
-    service = new AnnotationService();
+    service = new AnnotationService(
+      createMockQueriesService(mockDb, [MOCK_ANNOTATION])
+    );
   });
 
   // ─── findById ─────────────────────────────────────────────────────────

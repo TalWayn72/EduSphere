@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CourseService } from './course.service';
+import { CoursePublishService } from './course-publish.service';
 import { withReadReplica } from '@edusphere/db';
 
 const mockSelect = vi.fn();
@@ -75,7 +76,7 @@ describe('CourseService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new CourseService();
+    service = new CourseService(new CoursePublishService());
   });
 
   describe('findById()', () => {

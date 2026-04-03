@@ -86,6 +86,9 @@ vi.mock('@edusphere/langgraph-workflows', () => ({
 }));
 
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service';
+import { PipelineModuleExecutorService } from './pipeline-module-executor.service';
+import { PipelineNatsService } from './pipeline-nats.service';
+import { LessonPublishService } from './lesson-publish.service';
 import { closeAllPools } from '@edusphere/db';
 
 describe('LessonPipelineOrchestratorService — memory safety', () => {
@@ -93,7 +96,7 @@ describe('LessonPipelineOrchestratorService — memory safety', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new LessonPipelineOrchestratorService();
+    service = new LessonPipelineOrchestratorService(new PipelineModuleExecutorService(new LessonPublishService()), new PipelineNatsService());
   });
 
   it('onModuleDestroy aborts all active AbortControllers', async () => {

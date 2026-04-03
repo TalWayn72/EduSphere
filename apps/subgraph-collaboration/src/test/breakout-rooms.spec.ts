@@ -62,6 +62,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from '../discussion/discussion.service';
+import { createDiscussionService } from '../discussion/__test-helpers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -147,7 +148,7 @@ describe('Breakout Rooms — sub-sessions from main discussion', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('creates a breakout room as a new discussion under same course', async () => {

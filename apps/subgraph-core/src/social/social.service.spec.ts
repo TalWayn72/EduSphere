@@ -62,6 +62,8 @@ vi.mock('@edusphere/nats-client', () => ({
 }));
 
 import { SocialService } from './social.service';
+import { SocialFollowService } from './social-follow.service';
+import { SocialFeedService } from './social-feed.service';
 
 describe('SocialService', () => {
   let service: SocialService;
@@ -78,7 +80,7 @@ describe('SocialService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new SocialService();
+    service = new SocialService(new SocialFollowService(), new SocialFeedService(new SocialFollowService()));
   });
 
   // Test 1: followUser inserts record and returns true

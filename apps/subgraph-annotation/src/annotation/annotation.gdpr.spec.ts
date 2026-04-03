@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
+import { createMockQueriesService } from './__test-helpers';
 
 const mockReturning = vi.fn();
 const mockLimit = vi.fn();
@@ -81,7 +82,7 @@ describe('AnnotationService — GDPR compliance', () => {
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
     mockUpdate.mockReturnValue({ set: mockSet });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   describe('Soft delete — never hard delete', () => {

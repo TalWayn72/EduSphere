@@ -51,11 +51,22 @@ vi.mock('nats', () => ({
 // ── Import service after mocks ───────────────────────────────────────────────
 
 import { LiveSessionsService } from './live-sessions.service';
+import { LiveSessionsEventsService } from './live-sessions-events.service';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+function createMockEventsService(): LiveSessionsEventsService {
+  return {
+    publishSessionStarted: vi.fn().mockResolvedValue(undefined),
+    publishSessionCreated: vi.fn().mockResolvedValue(undefined),
+    publishSessionEnded: vi.fn().mockResolvedValue(undefined),
+    publishParticipantJoined: vi.fn().mockResolvedValue(undefined),
+    onModuleDestroy: vi.fn().mockResolvedValue(undefined),
+  } as unknown as LiveSessionsEventsService;
+}
+
 function buildService(): LiveSessionsService {
-  return new LiveSessionsService();
+  return new LiveSessionsService(createMockEventsService());
 }
 
 function setUpdateResult(rows: object[]): void {

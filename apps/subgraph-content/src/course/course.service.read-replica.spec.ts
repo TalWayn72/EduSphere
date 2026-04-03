@@ -55,6 +55,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { CourseService } from './course.service';
+import { CoursePublishService } from './course-publish.service';
 
 const MOCK_COURSE = {
   id: 'course-1',
@@ -83,7 +84,7 @@ describe('CourseService — read-replica routing', () => {
     mocks.mockReturning.mockResolvedValue([MOCK_COURSE]);
     mocks.mockWhere.mockReturnValue({ returning: mocks.mockReturning });
 
-    service = new CourseService();
+    service = new CourseService(new CoursePublishService());
   });
 
   // ─── READ METHODS — must use withReadReplica ────────────────────────────

@@ -65,6 +65,7 @@ vi.mock('nats', () => ({
 }));
 
 import { PilotService } from './pilot.service.js';
+import { PilotApprovalService } from './pilot-approval.service.js';
 
 const SUPER_CTX = {
   tenantId: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
@@ -93,7 +94,8 @@ describe('PilotService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new PilotService(makeSubSvc());
+    const approvalSvc = new PilotApprovalService(makeSubSvc());
+    service = new PilotService(approvalSvc);
   });
 
   it('constructs without throwing', () => {
