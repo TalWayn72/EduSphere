@@ -9,7 +9,7 @@ on:
 jobs:
   visual-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     continue-on-error: true # Visual regression is non-blocking; timeouts should not fail CI
     strategy:
       fail-fast: false
