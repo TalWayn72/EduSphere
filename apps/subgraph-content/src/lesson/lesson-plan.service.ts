@@ -173,7 +173,7 @@ export class LessonPlanService implements OnModuleDestroy {
   ) {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       for (let i = 0; i < stepIds.length; i++) {
-        const stepId = stepIds[i];
+        const stepId = stepIds.at(i);
         if (!stepId) continue;
         await tx
           .update(schema.course_lesson_steps)

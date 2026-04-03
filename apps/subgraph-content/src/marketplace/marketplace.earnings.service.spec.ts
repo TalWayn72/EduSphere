@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * MarketplaceEarningsService unit tests — F-031 Instructor Marketplace
  * 14 tests covering earnings calculation, payout logic, and DB interactions.

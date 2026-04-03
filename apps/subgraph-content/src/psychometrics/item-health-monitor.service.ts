@@ -125,7 +125,7 @@ export class ItemHealthMonitorService implements OnModuleDestroy {
   private countConsecutiveFlags(flags: string[]): number {
     let count = 0;
     for (let i = flags.length - 1; i >= 0; i--) {
-      if (flags[i] === 'HEALTH_CHECK_FAIL') count++;
+      if (flags.at(i) === 'HEALTH_CHECK_FAIL') count++;
       else break;
     }
     return count;

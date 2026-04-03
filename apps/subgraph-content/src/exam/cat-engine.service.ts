@@ -155,7 +155,7 @@ export class CatEngineService implements OnModuleDestroy {
     responses: boolean[]
   ): { theta: number; se: number } {
     const paired = items.map((item, i) => ({
-      isCorrect: responses[i]!,
+      isCorrect: responses.at(i) ?? false,
       a: item.irtA,
       b: item.irtB,
       c: item.irtC,

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * MarketplaceOrgService unit tests — org marketplace listing management.
  * 14 tests covering publish, unpublish, getListings, and getListing.

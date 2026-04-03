@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AtRiskDetectionService } from './at-risk-detection.service';
 
 const mockFlagService = {
-  getDb: vi.fn(() => mockDb),
+  getDb: vi.fn(() => ({})),
   findActiveFlag: vi.fn(),
   createFlag: vi.fn(),
   publishFlagEvent: vi.fn(),
   resolveFlag: vi.fn(),
 };
 
-const mockTx = { select: vi.fn() };
-const mockDb = {} as any;
+const { mockWithTenantCtx, mockWithBypassRLS } = vi.hoisted(() => ({
+  mockWithTenantCtx: vi.fn(),
+  mockWithBypassRLS: vi.fn(),
+}));
 
 vi.mock('@edusphere/db', () => ({
   schema: {
@@ -41,10 +44,10 @@ vi.mock('@edusphere/db', () => ({
     },
     atRiskFlags: { id: 'id' },
   },
-  eq: vi.fn((col, val) => ({ col, val })),
-  and: vi.fn((...c) => ({ and: c })),
-  withTenantContext: vi.fn((_db, _ctx, fn) => fn(mockTx)),
-  withBypassRLS: vi.fn((_db, fn) => fn(mockTx)),
+  eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
+  and: vi.fn((...c: unknown[]) => ({ and: c })),
+  withTenantContext: mockWithTenantCtx,
+  withBypassRLS: mockWithBypassRLS,
 }));
 
 vi.mock('@edusphere/config', () => ({
@@ -55,30 +58,12 @@ vi.mock('@edusphere/config', () => ({
 }));
 
 vi.mock('./risk-scorer.js', () => ({
-  computeRiskScore: vi.fn((metrics) => ({
+  computeRiskScore: vi.fn((metrics: { daysSinceLastActivity: number }) => ({
     score: metrics.daysSinceLastActivity > 7 ? 85 : 20,
     factors: { inactiveForDays: metrics.daysSinceLastActivity > 7 },
     isAtRisk: metrics.daysSinceLastActivity > 7,
   })),
 }));
-
-function makeSelectChain(rows: unknown[]) {
-  const limit = vi.fn().mockResolvedValue(rows);
-  const where = vi.fn().mockReturnValue({ limit, then: undefined });
-  const from = vi.fn().mockReturnValue({ where });
-  const innerJoin = vi
-    .fn()
-    .mockReturnValue({ where, innerJoin: vi.fn().mockReturnValue({ where }) });
-  return { from, where, limit, innerJoin };
-}
-
-function makeSelectChainJoin(rows: unknown[]) {
-  const where = vi.fn().mockResolvedValue(rows);
-  const innerJoin2 = vi.fn().mockReturnValue({ where });
-  const innerJoin1 = vi.fn().mockReturnValue({ innerJoin: innerJoin2 });
-  const from = vi.fn().mockReturnValue({ innerJoin: innerJoin1 });
-  return { from, where };
-}
 
 describe('AtRiskDetectionService', () => {
   let service: AtRiskDetectionService;
@@ -86,24 +71,23 @@ describe('AtRiskDetectionService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     service = new AtRiskDetectionService(mockFlagService as any);
+    // Default: withBypassRLS resolves to empty tenants
+    mockWithBypassRLS.mockResolvedValue([]);
+    // Default: withTenantContext resolves to empty array
+    mockWithTenantCtx.mockResolvedValue([]);
   });
 
   describe('runNightlyDetection()', () => {
     it('calls detectAcrossAllTenants without throwing', async () => {
-      // bypassRLS returns tenants
-      const tenantChain = makeSelectChain([{ id: 'tenant-1' }]);
-      // userCourses join — empty enrollments for simplicity
-      const enrollChain = makeSelectChainJoin([]);
-      mockTx.select
-        .mockReturnValueOnce({ from: tenantChain.from })
-        .mockReturnValueOnce({ from: enrollChain.from });
+      mockWithBypassRLS.mockResolvedValueOnce([{ id: 'tenant-1' }]);
+      // enrollments query returns empty
+      mockWithTenantCtx.mockResolvedValueOnce([]);
 
       await expect(service.runNightlyDetection()).resolves.toBeUndefined();
     });
 
     it('does not throw when detection fails internally', async () => {
-      const { withBypassRLS } = await import('@edusphere/db');
-      (withBypassRLS as any).mockRejectedValueOnce(new Error('DB down'));
+      mockWithBypassRLS.mockRejectedValueOnce(new Error('DB down'));
 
       await expect(service.runNightlyDetection()).resolves.toBeUndefined();
     });
@@ -111,10 +95,10 @@ describe('AtRiskDetectionService', () => {
 
   describe('processEnrollment (via runNightlyDetection)', () => {
     it('flags at-risk learner when no existing flag', async () => {
-      // Tenants
-      const tenantChain = makeSelectChain([{ id: 't1' }]);
-      // Enrollments (one active enrollment)
-      const enrollChain = makeSelectChainJoin([
+      // withBypassRLS: return tenants
+      mockWithBypassRLS.mockResolvedValueOnce([{ id: 't1' }]);
+      // withTenantContext call 1: enrollments
+      mockWithTenantCtx.mockResolvedValueOnce([
         {
           userId: 'u1',
           courseId: 'c1',
@@ -122,15 +106,10 @@ describe('AtRiskDetectionService', () => {
           estimatedHours: 10,
         },
       ]);
-      // progress rows — empty (no activity = high risk)
-      const progressChain = makeSelectChainJoin([]);
-      const quizChain = makeSelectChainJoin([]);
-
-      mockTx.select
-        .mockReturnValueOnce({ from: tenantChain.from }) // tenants
-        .mockReturnValueOnce({ from: enrollChain.from }) // enrollments
-        .mockReturnValueOnce({ from: progressChain.from }) // progress
-        .mockReturnValueOnce({ from: quizChain.from }); // quizzes
+      // withTenantContext calls 2 & 3: progress + quizzes (Promise.all)
+      mockWithTenantCtx
+        .mockResolvedValueOnce([]) // progress — empty = high risk
+        .mockResolvedValueOnce([]); // quizzes — empty
 
       mockFlagService.findActiveFlag.mockResolvedValue(null);
       mockFlagService.createFlag.mockResolvedValue(undefined);
@@ -149,8 +128,9 @@ describe('AtRiskDetectionService', () => {
     });
 
     it('resolves flag when learner is no longer at-risk', async () => {
-      const tenantChain = makeSelectChain([{ id: 't1' }]);
-      const enrollChain = makeSelectChainJoin([
+      mockWithBypassRLS.mockResolvedValueOnce([{ id: 't1' }]);
+      // enrollments
+      mockWithTenantCtx.mockResolvedValueOnce([
         {
           userId: 'u1',
           courseId: 'c1',
@@ -160,16 +140,9 @@ describe('AtRiskDetectionService', () => {
       ]);
       // Recent activity -> not at risk (daysSince = 0)
       const now = new Date();
-      const progressChain = makeSelectChainJoin([
-        { lastAccessedAt: now, isCompleted: true },
-      ]);
-      const quizChain = makeSelectChainJoin([{ passed: true }]);
-
-      mockTx.select
-        .mockReturnValueOnce({ from: tenantChain.from })
-        .mockReturnValueOnce({ from: enrollChain.from })
-        .mockReturnValueOnce({ from: progressChain.from })
-        .mockReturnValueOnce({ from: quizChain.from });
+      mockWithTenantCtx
+        .mockResolvedValueOnce([{ lastAccessedAt: now, isCompleted: true }])
+        .mockResolvedValueOnce([{ passed: true }]);
 
       mockFlagService.findActiveFlag.mockResolvedValue({ id: 'flag-1' });
       mockFlagService.resolveFlag.mockResolvedValue(undefined);
@@ -183,8 +156,8 @@ describe('AtRiskDetectionService', () => {
     });
 
     it('does nothing when risk status is unchanged', async () => {
-      const tenantChain = makeSelectChain([{ id: 't1' }]);
-      const enrollChain = makeSelectChainJoin([
+      mockWithBypassRLS.mockResolvedValueOnce([{ id: 't1' }]);
+      mockWithTenantCtx.mockResolvedValueOnce([
         {
           userId: 'u1',
           courseId: 'c1',
@@ -192,14 +165,9 @@ describe('AtRiskDetectionService', () => {
           estimatedHours: 10,
         },
       ]);
-      const progressChain = makeSelectChainJoin([]);
-      const quizChain = makeSelectChainJoin([]);
-
-      mockTx.select
-        .mockReturnValueOnce({ from: tenantChain.from })
-        .mockReturnValueOnce({ from: enrollChain.from })
-        .mockReturnValueOnce({ from: progressChain.from })
-        .mockReturnValueOnce({ from: quizChain.from });
+      mockWithTenantCtx
+        .mockResolvedValueOnce([]) // progress
+        .mockResolvedValueOnce([]); // quizzes
 
       // Already flagged and still at risk
       mockFlagService.findActiveFlag.mockResolvedValue({ id: 'flag-1' });

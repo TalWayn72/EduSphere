@@ -51,7 +51,7 @@ vi.mock('@edusphere/db', () => ({
   inArray: vi.fn((a: unknown, b: unknown) => ({ inArray: [a, b] })),
   ilike: vi.fn((a: unknown, b: unknown) => ({ ilike: [a, b] })),
   sql: Object.assign(
-    vi.fn((a: unknown) => ({ sql: a })),
+    vi.fn((_a: unknown) => ({ sql: _a, as: vi.fn((_alias: string) => ({ sql: _a, alias: _alias })) })),
     { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }
   ),
 }));
@@ -80,9 +80,10 @@ describe('SocialService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    const sharedFollowService = new SocialFollowService();
     service = new SocialService(
-      new SocialFollowService(),
-      new SocialFeedService(new SocialFollowService())
+      sharedFollowService,
+      new SocialFeedService(sharedFollowService)
     );
   });
 

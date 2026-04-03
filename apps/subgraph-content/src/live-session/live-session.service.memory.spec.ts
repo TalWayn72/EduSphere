@@ -81,10 +81,12 @@ import { connect } from 'nats';
 
 describe('LiveSessionService — memory safety', () => {
   let service: LiveSessionService;
+  let recordingService: LiveSessionRecordingService;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    service = new LiveSessionService(new LiveSessionRecordingService());
+    recordingService = new LiveSessionRecordingService();
+    service = new LiveSessionService(recordingService);
     // Allow async NATS subscription to settle
     await new Promise((r) => setTimeout(r, 20));
   });
@@ -98,6 +100,8 @@ describe('LiveSessionService — memory safety', () => {
     const unsubscribeSpy =
       natsConn?.subscribe?.mock?.results?.[0]?.value?.unsubscribe;
 
+    // NATS cleanup is in the recording service
+    await recordingService.onModuleDestroy();
     await service.onModuleDestroy();
 
     if (unsubscribeSpy) {
@@ -112,6 +116,8 @@ describe('LiveSessionService — memory safety', () => {
     const connectResult = vi.mocked(connect).mock.results[0];
     const resolvedConn = connectResult ? await connectResult.value : null;
 
+    // NATS cleanup is in the recording service
+    await recordingService.onModuleDestroy();
     await service.onModuleDestroy();
 
     if (resolvedConn) {

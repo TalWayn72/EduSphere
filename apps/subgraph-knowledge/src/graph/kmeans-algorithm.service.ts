@@ -115,8 +115,8 @@ export class KMeansAlgorithmService {
       if (!changed && iter > 0) break;
 
       for (let ci = 0; ci < clampedK; ci++) {
-        // eslint-disable-next-line security/detect-object-injection -- safe numeric index into assignments array
         const clusterPoints = concepts
+          // eslint-disable-next-line security/detect-object-injection -- safe numeric index
           .filter((_, i) => assignments[i] === ci)
           .map((c) => c.embedding);
         if (clusterPoints.length > 0) {

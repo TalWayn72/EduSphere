@@ -31,7 +31,8 @@ export class DocumentParserService {
       mammothModule) as typeof mammothModule;
     const buffer =
       typeof source === 'string'
-        ? readFileSync(source) // source is always an absolute path when string
+        ? // eslint-disable-next-line security/detect-non-literal-fs-filename -- source is validated absolute path
+          readFileSync(source)
         : source;
     const result = await mammoth.extractRawText({ buffer });
 

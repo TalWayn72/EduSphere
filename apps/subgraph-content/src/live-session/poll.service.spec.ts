@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Shared mock db builder ────────────────────────────────────────────────────

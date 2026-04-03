@@ -100,15 +100,31 @@ const mockEarningsService = {
   requestPayout: vi.fn(),
 };
 
+// ── Sub-service mocks ────────────────────────────────────────────────────────
+const mockListingService = {
+  createListing: vi.fn(),
+  publishListing: vi.fn(),
+};
+
+const mockPurchaseService = {
+  purchaseCourse: vi.fn(),
+  processWebhook: vi.fn(),
+  getUserPurchases: vi.fn(),
+};
+
+const mockSearchService = {
+  getListings: vi.fn(),
+};
+
 // ── Lazy import after mocks ───────────────────────────────────────────────────
 const getService = async () => {
   const { MarketplaceService } = await import('./marketplace.service.js');
   const svc = new MarketplaceService(
     mockStripeClient as never,
     mockEarningsService as never,
-    {} as never, // listingService
-    {} as never, // purchaseService
-    {} as never // searchService
+    mockListingService as never,
+    mockPurchaseService as never,
+    mockSearchService as never
   );
   return svc;
 };
@@ -146,24 +162,9 @@ beforeEach(() => {
 
 describe('MarketplaceService', () => {
   it('1. purchaseCourse creates Stripe PaymentIntent with correct amount', async () => {
-    mockWithTenantContext
-      .mockResolvedValueOnce([]) // no existing complete purchase
-      .mockResolvedValueOnce([
-        {
-          priceCents: 2999,
-          currency: 'USD',
-          isPublished: true,
-          revenueSplitPercent: 70,
-        },
-      ]) // listing
-      .mockResolvedValueOnce([]) // no existing stripe customer
-      .mockResolvedValueOnce({ id: 'cus_123' }) // create customer returns (not from tx)
-      .mockResolvedValueOnce([]); // insert purchase
-
-    mockStripeClient.createCustomer.mockResolvedValue({ id: 'cus_123' });
-    mockStripeClient.createPaymentIntent.mockResolvedValue({
-      id: INTENT_ID,
-      client_secret: 'secret_test',
+    mockPurchaseService.purchaseCourse.mockResolvedValue({
+      clientSecret: 'secret_test',
+      paymentIntentId: INTENT_ID,
     });
 
     const svc = await getService();
@@ -175,43 +176,32 @@ describe('MarketplaceService', () => {
       'Test User'
     );
 
-    expect(mockStripeClient.createPaymentIntent).toHaveBeenCalledWith(
-      2999,
-      'USD',
-      expect.any(String)
+    expect(mockPurchaseService.purchaseCourse).toHaveBeenCalledWith(
+      expect.anything(), // db
+      COURSE_ID,
+      USER_ID,
+      TENANT_ID,
+      'user@test.com',
+      'Test User'
     );
     expect(result.paymentIntentId).toBe(INTENT_ID);
   });
 
   it('2. purchaseCourse creates pending purchase record in DB', async () => {
-    mockWithTenantContext
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([
-        {
-          priceCents: 4999,
-          currency: 'USD',
-          isPublished: true,
-          revenueSplitPercent: 70,
-        },
-      ])
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([]);
-
-    mockStripeClient.createCustomer.mockResolvedValue({ id: 'cus_456' });
-    mockStripeClient.createPaymentIntent.mockResolvedValue({
-      id: INTENT_ID,
-      client_secret: 'cs_test',
+    mockPurchaseService.purchaseCourse.mockResolvedValue({
+      clientSecret: 'cs_test',
+      paymentIntentId: INTENT_ID,
     });
 
     const svc = await getService();
     await svc.purchaseCourse(COURSE_ID, USER_ID, TENANT_ID, 'u@t.com', 'Test');
-    expect(mockWithTenantContext).toHaveBeenCalled();
+    expect(mockPurchaseService.purchaseCourse).toHaveBeenCalled();
   });
 
   it('3. purchaseCourse prevents duplicate purchase (idempotency check)', async () => {
-    mockWithTenantContext.mockResolvedValueOnce([
-      { id: 'existing-purchase', status: 'COMPLETE' },
-    ]);
+    mockPurchaseService.purchaseCourse.mockRejectedValue(
+      new BadRequestException('Course already purchased')
+    );
 
     const svc = await getService();
     await expect(
@@ -220,20 +210,7 @@ describe('MarketplaceService', () => {
   });
 
   it('4. processWebhook marks purchase COMPLETE on payment_intent.succeeded', async () => {
-    let capturedStatus: string | undefined;
-    mockWithTenantContext
-      .mockImplementationOnce(
-        (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-          fn({
-            update: () => ({
-              set: (v: { status: string }) => {
-                capturedStatus = v.status;
-                return { where: () => [] };
-              },
-            }),
-          })
-      )
-      .mockResolvedValueOnce([]); // for publishEnrollmentEvent
+    mockPurchaseService.processWebhook.mockResolvedValue(undefined);
 
     const event = {
       type: 'payment_intent.succeeded',
@@ -242,22 +219,16 @@ describe('MarketplaceService', () => {
 
     const svc = await getService();
     await svc.processWebhook(event as never, TENANT_ID);
-    expect(capturedStatus).toBe('COMPLETE');
+    expect(mockPurchaseService.processWebhook).toHaveBeenCalledWith(
+      expect.anything(), // db
+      event,
+      TENANT_ID,
+      expect.any(Function) // getNatsConnection
+    );
   });
 
   it('5. processWebhook marks purchase FAILED on payment_intent.payment_failed', async () => {
-    let capturedStatus: string | undefined;
-    mockWithTenantContext.mockImplementationOnce(
-      (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({
-          update: () => ({
-            set: (v: { status: string }) => {
-              capturedStatus = v.status;
-              return { where: () => [] };
-            },
-          }),
-        })
-    );
+    mockPurchaseService.processWebhook.mockResolvedValue(undefined);
 
     const event = {
       type: 'payment_intent.payment_failed',
@@ -266,21 +237,16 @@ describe('MarketplaceService', () => {
 
     const svc = await getService();
     await svc.processWebhook(event as never, TENANT_ID);
-    expect(capturedStatus).toBe('FAILED');
+    expect(mockPurchaseService.processWebhook).toHaveBeenCalledWith(
+      expect.anything(),
+      event,
+      TENANT_ID,
+      expect.any(Function)
+    );
   });
 
   it('6. processWebhook publishes NATS enrollment event on success', async () => {
-    mockWithTenantContext
-      .mockResolvedValueOnce([]) // update purchase
-      .mockResolvedValueOnce([
-        {
-          // fetch purchase for event
-          id: 'p-1',
-          courseId: COURSE_ID,
-          userId: USER_ID,
-          tenantId: TENANT_ID,
-        },
-      ]);
+    mockPurchaseService.processWebhook.mockResolvedValue(undefined);
 
     const event = {
       type: 'payment_intent.succeeded',
@@ -288,8 +254,7 @@ describe('MarketplaceService', () => {
     };
     const svc = await getService();
     await svc.processWebhook(event as never, TENANT_ID);
-    // NATS connect is called lazily; expect publish was attempted
-    expect(mockWithTenantContext).toHaveBeenCalled();
+    expect(mockPurchaseService.processWebhook).toHaveBeenCalled();
   });
 
   it('7. getInstructorEarnings delegates to earnings service', async () => {
@@ -310,41 +275,39 @@ describe('MarketplaceService', () => {
   });
 
   it('8. createListing stores with correct revenueSplitPercent', async () => {
-    let capturedValues: Record<string, unknown> = {};
-    mockWithTenantContext.mockImplementationOnce(
-      (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({
-          insert: () => ({
-            values: (v: Record<string, unknown>) => {
-              capturedValues = v;
-              return { returning: () => [{ ...v, id: 'new-listing' }] };
-            },
-          }),
-        })
-    );
+    mockListingService.createListing.mockResolvedValue({
+      id: 'new-listing',
+      courseId: COURSE_ID,
+      tenantId: TENANT_ID,
+      priceCents: 4999,
+      currency: 'USD',
+      isPublished: false,
+      revenueSplitPercent: 80,
+    });
 
     const svc = await getService();
-    await svc.createListing(COURSE_ID, 4999, 'USD', 80, TENANT_ID);
-    expect(capturedValues['revenueSplitPercent']).toBe(80);
+    const result = await svc.createListing(COURSE_ID, 4999, 'USD', 80, TENANT_ID);
+    expect(mockListingService.createListing).toHaveBeenCalledWith(
+      expect.anything(), // db
+      COURSE_ID,
+      4999,
+      'USD',
+      80,
+      TENANT_ID
+    );
+    expect(result.revenueSplitPercent).toBe(80);
   });
 
   it('9. publishListing sets isPublished=true in DB', async () => {
-    let capturedSet: Record<string, unknown> = {};
-    mockWithTenantContext.mockImplementationOnce(
-      (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({
-          update: () => ({
-            set: (v: Record<string, unknown>) => {
-              capturedSet = v;
-              return { where: () => [] };
-            },
-          }),
-        })
-    );
+    mockListingService.publishListing.mockResolvedValue(undefined);
 
     const svc = await getService();
     await svc.publishListing(COURSE_ID, TENANT_ID);
-    expect(capturedSet['isPublished']).toBe(true);
+    expect(mockListingService.publishListing).toHaveBeenCalledWith(
+      expect.anything(), // db
+      COURSE_ID,
+      TENANT_ID
+    );
   });
 
   it('10. getUserPurchases returns only for correct user+tenant', async () => {
@@ -359,7 +322,7 @@ describe('MarketplaceService', () => {
         purchasedAt: new Date(),
       },
     ];
-    mockWithTenantContext.mockResolvedValueOnce(fakePurchases);
+    mockPurchaseService.getUserPurchases.mockResolvedValue(fakePurchases);
 
     const svc = await getService();
     const result = await svc.getUserPurchases(USER_ID, TENANT_ID);
@@ -369,7 +332,7 @@ describe('MarketplaceService', () => {
   });
 
   it('11. getListings returns listing with title field populated from courses JOIN', async () => {
-    const fakeRow = {
+    const fakeResult = {
       id: 'listing-1',
       courseId: COURSE_ID,
       priceCents: 1999,
@@ -381,8 +344,12 @@ describe('MarketplaceService', () => {
       thumbnailUrl: 'https://example.com/thumb.jpg',
       instructorName: 'Jane Doe',
       enrollmentCount: 5,
+      price: 19.99,
+      tags: [],
+      rating: null,
+      totalLessons: 0,
     };
-    mockWithTenantContext.mockResolvedValueOnce([fakeRow]);
+    mockSearchService.getListings.mockResolvedValue([fakeResult]);
 
     const svc = await getService();
     const result = await svc.getListings(TENANT_ID, USER_ID, 'STUDENT');
@@ -392,7 +359,7 @@ describe('MarketplaceService', () => {
   });
 
   it('12. getListings returns listing with instructorName from users JOIN', async () => {
-    const fakeRow = {
+    const fakeResult = {
       id: 'listing-2',
       courseId: COURSE_ID,
       priceCents: 4999,
@@ -404,21 +371,23 @@ describe('MarketplaceService', () => {
       thumbnailUrl: null,
       instructorName: 'Alice Smith',
       enrollmentCount: 12,
+      price: 49.99,
+      tags: [],
+      rating: null,
+      totalLessons: 0,
     };
-    mockWithTenantContext.mockResolvedValueOnce([fakeRow]);
+    mockSearchService.getListings.mockResolvedValue([fakeResult]);
 
     const svc = await getService();
     const result = await svc.getListings(TENANT_ID, USER_ID, 'STUDENT');
     expect(result[0]?.instructorName).toBe('Alice Smith');
-    // tags/rating/totalLessons are placeholder values until tables exist
     expect(result[0]?.tags).toEqual([]);
     expect(result[0]?.rating).toBeNull();
     expect(result[0]?.totalLessons).toBe(0);
   });
 
-  it('13. getListings with filters.search passes ilike filter (mock returns filtered result)', async () => {
-    const { ilike: mockIlike } = await import('@edusphere/db');
-    const fakeRow = {
+  it('13. getListings with filters.search delegates to searchService', async () => {
+    const fakeResult = {
       id: 'listing-3',
       courseId: COURSE_ID,
       priceCents: 999,
@@ -430,30 +399,47 @@ describe('MarketplaceService', () => {
       thumbnailUrl: null,
       instructorName: 'Bob Jones',
       enrollmentCount: 3,
+      price: 9.99,
+      tags: [],
+      rating: null,
+      totalLessons: 0,
     };
-    mockWithTenantContext.mockResolvedValueOnce([fakeRow]);
+    mockSearchService.getListings.mockResolvedValue([fakeResult]);
 
     const svc = await getService();
     const result = await svc.getListings(TENANT_ID, USER_ID, 'STUDENT', 20, 0, {
       search: 'TypeScript',
     });
 
-    // ilike was called with search term wrapped in wildcards
-    expect(mockIlike).toHaveBeenCalledWith(expect.anything(), '%TypeScript%');
+    expect(mockSearchService.getListings).toHaveBeenCalledWith(
+      expect.anything(),
+      TENANT_ID,
+      USER_ID,
+      'STUDENT',
+      20,
+      0,
+      { search: 'TypeScript' }
+    );
     expect(result).toHaveLength(1);
     expect(result[0]?.title).toBe('TypeScript Basics');
   });
 
-  it('14. getListings with filters.priceMax applies lte filter in cents', async () => {
-    const { lte: mockLte } = await import('@edusphere/db');
-    mockWithTenantContext.mockResolvedValueOnce([]);
+  it('14. getListings with filters.priceMax delegates to searchService', async () => {
+    mockSearchService.getListings.mockResolvedValue([]);
 
     const svc = await getService();
     await svc.getListings(TENANT_ID, USER_ID, 'STUDENT', 20, 0, {
       priceMax: 9.99,
     });
 
-    // priceMax=9.99 → priceCents lte 999
-    expect(mockLte).toHaveBeenCalledWith(expect.anything(), 999);
+    expect(mockSearchService.getListings).toHaveBeenCalledWith(
+      expect.anything(),
+      TENANT_ID,
+      USER_ID,
+      'STUDENT',
+      20,
+      0,
+      { priceMax: 9.99 }
+    );
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── In-memory mock for @edusphere/db ─────────────────────────────────────────

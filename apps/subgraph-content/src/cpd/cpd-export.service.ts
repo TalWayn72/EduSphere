@@ -196,11 +196,12 @@ export class CpdExportService {
         .fillColor('#000000');
     }
     cells.forEach((cell, i) => {
+      const colWidth = widths.at(i) ?? 60;
       doc.text(cell.slice(0, 28), x + 2, y + 2, {
-        width: (widths[i] ?? 60) - 4,
+        width: colWidth - 4,
         lineBreak: false,
       });
-      x += widths[i] ?? 60;
+      x += colWidth;
     });
     doc.moveDown();
     if (doc.y > doc.page.height - 80) doc.addPage();

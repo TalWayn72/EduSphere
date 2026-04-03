@@ -138,10 +138,10 @@ export class PollVoteService implements OnModuleDestroy {
       totalVotes,
       options: optionTexts.map((text, i) => ({
         text,
-        count: counts[i] ?? 0,
+        count: counts.at(i) ?? 0,
         percentage:
           totalVotes > 0
-            ? Math.round(((counts[i] ?? 0) / totalVotes) * 100)
+            ? Math.round(((counts.at(i) ?? 0) / totalVotes) * 100)
             : 0,
       })),
     };

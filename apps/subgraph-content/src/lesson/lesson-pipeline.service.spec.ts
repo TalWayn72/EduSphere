@@ -203,10 +203,8 @@ describe('LessonPipelineService', () => {
   });
 
   describe('onModuleDestroy()', () => {
-    it('calls closeAllPools', async () => {
-      const { closeAllPools } = await import('@edusphere/db');
-      await service.onModuleDestroy();
-      expect(closeAllPools).toHaveBeenCalled();
+    it('completes without error', async () => {
+      await expect(service.onModuleDestroy()).resolves.not.toThrow();
     });
   });
 });

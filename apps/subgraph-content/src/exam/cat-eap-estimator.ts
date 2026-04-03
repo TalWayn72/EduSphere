@@ -59,9 +59,9 @@ export function estimateAbilityEAP(
   let sumThetaPost = 0;
 
   for (let k = 0; k < quadPoints; k++) {
-    const w = posterior[k]! * step;
+    const w = (posterior.at(k) ?? 0) * step;
     sumPost += w;
-    sumThetaPost += points[k]! * w;
+    sumThetaPost += (points.at(k) ?? 0) * w;
   }
 
   const thetaEAP = sumPost > 0 ? sumThetaPost / sumPost : 0;
@@ -69,8 +69,8 @@ export function estimateAbilityEAP(
   // Compute SE
   let sumVarPost = 0;
   for (let k = 0; k < quadPoints; k++) {
-    const diff = points[k]! - thetaEAP;
-    sumVarPost += diff * diff * posterior[k]! * step;
+    const diff = (points.at(k) ?? 0) - thetaEAP;
+    sumVarPost += diff * diff * (posterior.at(k) ?? 0) * step;
   }
 
   const variance = sumPost > 0 ? sumVarPost / sumPost : 1;

@@ -51,6 +51,7 @@ const LOCAL_DIRECTIVES = new Set(['@link']);
 
 function collectGraphqlFiles(dir: string): string[] {
   const files: string[] = [];
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- dir is built from resolve(__dirname)
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (
@@ -73,10 +74,12 @@ function extractDirectivesUsed(
   const lines = sdl.split('\n');
   for (let i = 0; i < lines.length; i++) {
     // Match @directiveName (skip @link imports and string content)
+    // eslint-disable-next-line security/detect-object-injection -- i is a numeric loop index
     const matches = lines[i].matchAll(/@(\w+)/g);
     for (const m of matches) {
       const directive = `@${m[1]}`;
       // Skip directives inside triple-quoted strings
+      // eslint-disable-next-line security/detect-object-injection -- i is a numeric loop index
       const beforeMatch = sdl.substring(0, sdl.indexOf(lines[i]) + m.index!);
       const tripleQuoteCount = (beforeMatch.match(/"""/g) || []).length;
       if (tripleQuoteCount % 2 === 0) {
@@ -106,6 +109,7 @@ function extractImportedDirectives(sdl: string): Set<string> {
 
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
+/* eslint-disable security/detect-non-literal-fs-filename -- all paths built from resolve(__dirname), safe */
 describe('Knowledge subgraph — startup health (regression)', () => {
   describe('Critical dependencies are importable', () => {
     const pkgJson = JSON.parse(readFileSync(PKG_JSON_PATH, 'utf-8'));
@@ -122,6 +126,7 @@ describe('Knowledge subgraph — startup health (regression)', () => {
       '%s is listed in package.json dependencies',
       (dep) => {
         expect(
+          // eslint-disable-next-line security/detect-object-injection -- dep is from a hardcoded criticalDeps array
           pkgJson.dependencies[dep] || pkgJson.devDependencies?.[dep],
           `${dep} must be in package.json — subgraph crashes on startup without it`
         ).toBeTruthy();

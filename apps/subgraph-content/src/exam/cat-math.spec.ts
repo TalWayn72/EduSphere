@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { describe, it, expect } from 'vitest';
 import {
   fisherInformation3PL,

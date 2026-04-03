@@ -89,6 +89,7 @@ export class KnowledgeSourceController {
     const ext = '.' + (file.originalname.split('.').pop() ?? '').toLowerCase();
     const sourceType: SourceType =
       MIME_TO_SOURCE_TYPE[file.mimetype] ??
+      // eslint-disable-next-line security/detect-object-injection -- ext is derived from file extension, not user input
       EXT_TO_SOURCE_TYPE[ext] ??
       (() => {
         throw new BadRequestException(

@@ -40,8 +40,9 @@ export function natsToXapiStatement(
   subject: string,
   payload: Record<string, unknown>
 ): object {
-  const verbKey: VerbKey =
-    (SUBJECT_TO_VERB[subject] as VerbKey | undefined) ?? 'launched';
+  const verbKey: VerbKey = Object.prototype.hasOwnProperty.call(SUBJECT_TO_VERB, subject)
+    ? SUBJECT_TO_VERB[subject]! // eslint-disable-line security/detect-object-injection
+    : 'launched';
   const activityId = (payload['courseId'] ??
     payload['sessionId'] ??
     payload['id'] ??
@@ -57,7 +58,7 @@ export function natsToXapiStatement(
         name: payload['userId'] as string,
       },
     },
-    verb: XAPI_VERBS[verbKey],
+    verb: XAPI_VERBS[verbKey], // eslint-disable-line security/detect-object-injection
     object: {
       objectType: 'Activity',
       id: `https://edusphere.io/activities/${activityId}`,
