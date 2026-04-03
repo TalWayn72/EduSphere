@@ -31,7 +31,7 @@ export function createMockQueriesService(
     }
   };
   const toCtx = (auth: AuthContext) => ({
-    tenantId: auth.tenantId,
+    tenantId: auth.tenantId as string,
     userId: auth.userId,
     userRole: auth.roles[0] || 'STUDENT',
   });
