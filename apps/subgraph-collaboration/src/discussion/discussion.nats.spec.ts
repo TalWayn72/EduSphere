@@ -89,7 +89,7 @@ vi.mock('graphql-yoga', () => ({
   })),
 }));
 
-import { DiscussionService } from './discussion.service';
+import { createDiscussionService } from './__test-helpers';
 import { DiscussionResolver } from './discussion.resolver';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ describe('Discussion — NATS event publishing', () => {
     mockInsert.mockReturnValue({ values: mockValues });
     mockValues.mockReturnValue({ returning: mockReturning });
 
-    const service = new DiscussionService();
+    const service = createDiscussionService();
     resolver = new DiscussionResolver(service);
   });
 

@@ -80,6 +80,8 @@ vi.mock('./badge-definitions.js', () => ({
 }));
 
 import { BadgeService } from './badge.service.js';
+import { BadgeEventHandlersService } from './badge-event-handlers.service.js';
+import { BadgeQueriesService } from './badge-queries.service.js';
 
 describe('BadgeService', () => {
   let service: BadgeService;
@@ -98,7 +100,10 @@ describe('BadgeService', () => {
     mockInsert.mockReturnValue({
       values: vi.fn().mockResolvedValue(undefined),
     });
-    service = new BadgeService();
+    service = new BadgeService(
+      new BadgeEventHandlersService(),
+      new BadgeQueriesService()
+    );
   });
   it('connects to NATS on init', async () => {
     await service.onModuleInit();

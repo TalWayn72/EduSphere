@@ -36,11 +36,13 @@ vi.mock('@edusphere/db', () => ({
   and: vi.fn((...args: unknown[]) => args),
 }));
 
-vi.mock('../notifications/channels/whatsapp-channel.service', () => ({
-  WhatsAppChannelService: vi.fn().mockImplementation(() => ({
-    sendTemplate: mockSendTemplate,
-  })),
-}));
+vi.mock('../notifications/channels/whatsapp-channel.service', () => {
+  return {
+    WhatsAppChannelService: class MockWhatsAppChannelService {
+      sendTemplate = mockSendTemplate;
+    },
+  };
+});
 
 import { AdminAlertsService } from './admin-alerts.service.js';
 import { WhatsAppChannelService } from '../notifications/channels/whatsapp-channel.service';

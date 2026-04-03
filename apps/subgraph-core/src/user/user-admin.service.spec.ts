@@ -4,22 +4,35 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockUpdate = vi.fn();
-const mockExecute = vi.fn();
+const { mockUpdate, mockExecute, makeChain, sqlMock } = vi.hoisted(() => {
+  const mockUpdate = vi.fn();
+  const mockExecute = vi.fn();
 
-function makeChain(rows: unknown[] = []) {
-  const p = Promise.resolve(rows) as Promise<unknown[]> &
-    Record<string, unknown>;
-  const self = () => p;
-  p.from = self;
-  p.where = self;
-  p.limit = self;
-  p.offset = self;
-  p.orderBy = self;
-  p.set = self;
-  p.returning = self;
-  return p;
-}
+  function makeChain(rows: unknown[] = []) {
+    const p = Promise.resolve(rows) as Promise<unknown[]> &
+      Record<string, unknown>;
+    const self = () => p;
+    p.from = self;
+    p.where = self;
+    p.limit = self;
+    p.offset = self;
+    p.orderBy = self;
+    p.set = self;
+    p.returning = self;
+    return p;
+  }
+
+  // Tagged-template-compatible sql mock: sql`...` returns { as: fn }
+  const sqlTaggedTemplate = (...args: unknown[]) => ({
+    sql: args,
+    as: vi.fn().mockReturnThis(),
+  });
+  const sqlMock = Object.assign(vi.fn(sqlTaggedTemplate), {
+    raw: vi.fn((a: unknown) => ({ sqlRaw: a })),
+  });
+
+  return { mockUpdate, mockExecute, makeChain, sqlMock };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
@@ -48,7 +61,7 @@ vi.mock('@edusphere/db', () => ({
     },
   },
   eq: vi.fn((a, b) => ({ eq: [a, b] })),
-  sql: Object.assign(vi.fn(), { raw: vi.fn() }),
+  sql: sqlMock,
 }));
 
 vi.mock('@edusphere/config', () => ({

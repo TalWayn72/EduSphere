@@ -92,7 +92,9 @@ export class WebhookDeliveryService {
       );
 
       if (attempt < MAX_RETRIES) {
-        const delay = [0, 60_000, 300_000][attempt] ?? 300_000;
+        const RETRY_DELAYS = [0, 60_000, 300_000] as const;
+        const delayIndex = Math.min(attempt, RETRY_DELAYS.length - 1);
+        const delay = RETRY_DELAYS[delayIndex as 0 | 1 | 2];
         setTimeout(() => {
           this.dispatchToWebhook(
             db,

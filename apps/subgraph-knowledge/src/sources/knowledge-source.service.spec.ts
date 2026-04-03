@@ -111,7 +111,7 @@ function buildSelect(rows: unknown[]) {
   return vi.fn().mockReturnValue({ from });
 }
 
-function buildInsert(row: unknown) {
+function _buildInsert(row: unknown) {
   const returning = vi.fn().mockResolvedValue([row]);
   const values = vi.fn().mockReturnValue({ returning });
   return vi.fn().mockReturnValue({ values });
@@ -131,26 +131,8 @@ function buildDelete() {
 
 // ─── Mock dependencies ────────────────────────────────────────────────────────
 
-const mockParser = {
-  parseText: vi
-    .fn()
-    .mockReturnValue({ text: 'parsed text', wordCount: 2, metadata: {} }),
-  parseUrl: vi
-    .fn()
-    .mockResolvedValue({ text: 'url text', wordCount: 2, metadata: {} }),
-  parseDocx: vi
-    .fn()
-    .mockResolvedValue({ text: 'docx text', wordCount: 2, metadata: {} }),
-  chunkText: vi.fn().mockReturnValue([{ index: 0, text: 'chunk 1' }]),
-};
-
-const mockEmbeddings = {
-  generateEmbedding: vi.fn().mockResolvedValue({ id: 'emb-1' }),
-};
-
-const mockMinioUrl = {
-  uploadFile: vi.fn().mockResolvedValue(undefined),
-  getPresignedUrl: vi.fn().mockResolvedValue('https://minio.local/presigned'),
+const mockProcessingService = {
+  createAndProcess: vi.fn().mockResolvedValue(PENDING_SOURCE),
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -161,9 +143,7 @@ describe('KnowledgeSourceService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     service = new KnowledgeSourceService(
-      mockParser as never,
-      mockEmbeddings as never,
-      mockMinioUrl as never
+      mockProcessingService as never
     );
   });
 
@@ -207,246 +187,40 @@ describe('KnowledgeSourceService', () => {
     });
   });
 
-  // ── createAndProcess — TEXT type ───────────────────────────────────────────
+  // ── createAndProcess (delegates to processingService) ─────────────────────
 
-  describe('createAndProcess() — TEXT source', () => {
-    it('inserts source as PENDING, then sets to READY', async () => {
-      const readySource = {
-        ...PENDING_SOURCE,
-        status: 'READY' as const,
-        chunk_count: 1,
-      };
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(buildUpdate(readySource));
-
-      const result = await service.createAndProcess({
+  describe('createAndProcess()', () => {
+    it('delegates to processingService.createAndProcess', async () => {
+      const input = {
         tenantId: TENANT,
         courseId: COURSE,
         title: 'Manual Text',
-        sourceType: 'TEXT',
+        sourceType: 'TEXT' as const,
         origin: 'manual',
         rawText: 'Hello from test',
-      });
-
-      // createAndProcess now returns PENDING immediately; background task does the rest
-      expect(result.status).toBe('PENDING');
-
-      // Flush all pending microtasks so the background processSource completes
-      await new Promise<void>((resolve) => setImmediate(resolve));
-
-      expect(mockParser.parseText).toHaveBeenCalledWith('Hello from test');
-      expect(mockParser.chunkText).toHaveBeenCalled();
-      expect(mockEmbeddings.generateEmbedding).toHaveBeenCalledWith(
-        'chunk 1',
-        expect.stringContaining('ks:')
-      );
-      expect(mockUpdate).toHaveBeenCalled();
-    });
-
-    it('marks source as FAILED when parser throws', async () => {
-      const failedSource = {
-        ...PENDING_SOURCE,
-        status: 'FAILED' as const,
-        error_message: 'parse error',
       };
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
 
-      // First update (PROCESSING) succeeds; second (FAILED) returns failed source
-      let updateCall = 0;
-      mockUpdate.mockImplementation(() => {
-        updateCall++;
-        const row = updateCall === 1 ? PENDING_SOURCE : failedSource;
-        const returning = vi.fn().mockResolvedValue([row]);
-        const where = vi.fn().mockReturnValue({ returning });
-        const set = vi.fn().mockReturnValue({ where });
-        return { set };
-      });
+      const result = await service.createAndProcess(input);
 
-      mockParser.parseText.mockImplementationOnce(() => {
-        throw new Error('parse error');
-      });
-
-      const result = await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'Bad source',
-        sourceType: 'TEXT',
-        origin: 'manual',
-        rawText: 'fail',
-      });
-
-      // Returns PENDING immediately; background task transitions to FAILED
-      expect(result.status).toBe('PENDING');
-
-      // Flush background processing
-      await new Promise<void>((resolve) => setImmediate(resolve));
-
-      // Background task should have called update twice: PROCESSING + FAILED
-      expect(updateCall).toBe(2);
+      expect(mockProcessingService.createAndProcess).toHaveBeenCalledWith(input);
+      expect(result).toEqual(PENDING_SOURCE);
     });
-  });
 
-  // ── createAndProcess — URL type ────────────────────────────────────────────
-
-  describe('createAndProcess() — URL source', () => {
-    it('calls parseUrl with the origin URL', async () => {
-      const readySource = { ...PENDING_SOURCE, status: 'READY' as const };
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(buildUpdate(readySource));
-
-      await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'Example',
-        sourceType: 'URL',
-        origin: 'https://example.com/article',
-      });
-
-      // Flush background processing
-      await new Promise<void>((resolve) => setImmediate(resolve));
-
-      expect(mockParser.parseUrl).toHaveBeenCalledWith(
-        'https://example.com/article'
-      );
-    });
-  });
-
-  // ── createAndProcess — DOCX type ───────────────────────────────────────────
-
-  describe('createAndProcess() — FILE_DOCX source', () => {
-    it('calls parseDocx with the file path', async () => {
-      const readySource = { ...PENDING_SOURCE, status: 'READY' as const };
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(buildUpdate(readySource));
-
-      await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'DOCX file',
-        sourceType: 'FILE_DOCX',
-        origin: '/path/to/file.docx',
-      });
-
-      // Flush background processing
-      await new Promise<void>((resolve) => setImmediate(resolve));
-
-      expect(mockParser.parseDocx).toHaveBeenCalledWith('/path/to/file.docx');
-    });
-  });
-
-  // ── createAndProcess — FILE_PDF with MinIO upload ──────────────────────────
-
-  describe('createAndProcess() — FILE_PDF with MinIO upload', () => {
-    const pdfBuffer = Buffer.from('fake-pdf-content');
-
-    it('uploads file to MinIO and stores file_key in DB', async () => {
-      const sourceWithKey = {
-        ...PENDING_SOURCE,
-        source_type: 'FILE_PDF' as const,
-        file_key: 'tenant-abc/course-123/uuid/report.pdf',
-      };
-      mockInsert.mockImplementation(buildInsert(sourceWithKey));
-      mockUpdate.mockImplementation(
-        buildUpdate({ ...sourceWithKey, status: 'READY' as const })
+    it('propagates errors from processingService', async () => {
+      mockProcessingService.createAndProcess.mockRejectedValueOnce(
+        new Error('processing failed')
       );
 
-      const result = await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'PDF Report',
-        sourceType: 'FILE_PDF',
-        origin: 'report.pdf',
-        fileBuffer: pdfBuffer,
-      });
-
-      expect(result.status).toBe('PENDING');
-      expect(mockMinioUrl.uploadFile).toHaveBeenCalledWith(
-        expect.stringContaining(`${TENANT}/${COURSE}/`),
-        pdfBuffer,
-        'application/pdf'
-      );
-    });
-
-    it('marks source FAILED when MinIO upload throws', async () => {
-      const failedSource = {
-        ...PENDING_SOURCE,
-        status: 'FAILED' as const,
-        error_message: 'MinIO upload failed: Error: S3 down',
-      };
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(buildUpdate(failedSource));
-      mockMinioUrl.uploadFile.mockRejectedValueOnce(new Error('S3 down'));
-
-      const result = await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'Bad PDF',
-        sourceType: 'FILE_PDF',
-        origin: 'bad.pdf',
-        fileBuffer: pdfBuffer,
-      });
-
-      // Should return FAILED since upload failed
-      expect(result.status).toBe('FAILED');
-      expect(mockUpdate).toHaveBeenCalled();
-    });
-
-    it('does not upload to MinIO when no fileBuffer is provided', async () => {
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(
-        buildUpdate({ ...PENDING_SOURCE, status: 'READY' as const })
-      );
-
-      await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'Text only',
-        sourceType: 'TEXT',
-        origin: 'manual',
-        rawText: 'no file here',
-      });
-
-      expect(mockMinioUrl.uploadFile).not.toHaveBeenCalled();
-    });
-  });
-
-  // ── createAndProcess — embedding failure is non-fatal ─────────────────────
-
-  describe('createAndProcess() — partial embedding failure', () => {
-    it('continues processing when some embeddings fail', async () => {
-      mockParser.chunkText.mockReturnValueOnce([
-        { index: 0, text: 'chunk 0' },
-        { index: 1, text: 'chunk 1' },
-      ]);
-      mockEmbeddings.generateEmbedding
-        .mockResolvedValueOnce({ id: 'emb-0' })
-        .mockRejectedValueOnce(new Error('provider down'));
-
-      const readySource = {
-        ...PENDING_SOURCE,
-        status: 'READY' as const,
-        chunk_count: 1,
-      };
-      mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
-      mockUpdate.mockImplementation(buildUpdate(readySource));
-
-      const result = await service.createAndProcess({
-        tenantId: TENANT,
-        courseId: COURSE,
-        title: 'Partial',
-        sourceType: 'TEXT',
-        origin: 'manual',
-        rawText: 'two chunks text',
-      });
-
-      // Returns PENDING immediately; background marks READY after partial embedding
-      expect(result.status).toBe('PENDING');
-
-      // Flush background processing
-      await new Promise<void>((resolve) => setImmediate(resolve));
-
-      // Background task completed: update was called (PROCESSING + READY)
-      expect(mockUpdate).toHaveBeenCalled();
+      await expect(
+        service.createAndProcess({
+          tenantId: TENANT,
+          courseId: COURSE,
+          title: 'Bad source',
+          sourceType: 'TEXT' as const,
+          origin: 'manual',
+          rawText: 'fail',
+        })
+      ).rejects.toThrow('processing failed');
     });
   });
 

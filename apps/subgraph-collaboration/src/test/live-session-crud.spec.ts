@@ -67,6 +67,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from '../discussion/discussion.service';
+import { createDiscussionService } from '../discussion/__test-helpers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -139,7 +140,7 @@ describe('Live Session CRUD — discussion-based sessions', () => {
     vi.clearAllMocks();
     setupSelectChain([MOCK_DISCUSSION]);
     setupInsertChain([MOCK_DISCUSSION]);
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('creates a live session (discussion) with title, type, and course', async () => {

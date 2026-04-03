@@ -32,30 +32,18 @@ vi.mock('mime-types', () => ({
 }));
 
 // ── Mock child_process.spawn ─────────────────────────────────────────────────
-const mockStderrOn = vi.fn();
-const mockFfmpegOn = vi.fn();
-const mockSpawnReturn = {
-  stderr: { on: mockStderrOn },
-  on: mockFfmpegOn,
-  stdio: [],
-};
 vi.mock('child_process', () => ({
-  spawn: vi.fn().mockReturnValue(mockSpawnReturn),
+  spawn: vi.fn(),
 }));
 
 // ── Mock fs/promises ─────────────────────────────────────────────────────────
 const mockMkdir = vi.fn().mockResolvedValue(undefined);
-const mockReaddir = vi
-  .fn()
-  .mockResolvedValue(['master.m3u8', '720p.m3u8', '720p_0000.ts']);
-const mockUnlink = vi.fn().mockResolvedValue(undefined);
-const mockRmdir = vi.fn().mockResolvedValue(undefined);
 const mockWriteFile = vi.fn().mockResolvedValue(undefined);
 vi.mock('fs/promises', () => ({
   mkdir: mockMkdir,
-  readdir: mockReaddir,
-  unlink: mockUnlink,
-  rmdir: mockRmdir,
+  readdir: vi.fn().mockResolvedValue([]),
+  unlink: vi.fn().mockResolvedValue(undefined),
+  rmdir: vi.fn().mockResolvedValue(undefined),
   writeFile: mockWriteFile,
 }));
 
@@ -79,49 +67,43 @@ vi.mock('stream', () => ({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Helper: simulates FFmpeg process emitting 'data' on stderr then 'close'.
- * Called inside a single tick via Promise.resolve().then() so the service's
- * spawn-based promise resolves correctly.
- */
-function simulateFfmpegSuccess(
-  durationLine = 'Duration: 00:10:30.00, start: 0'
-) {
-  // FFmpeg stderr data callback
-  const stderrCallback = mockStderrOn.mock.calls.find(
-    ([event]: [string]) => event === 'data'
-  )?.[1] as ((data: Buffer) => void) | undefined;
-  if (stderrCallback) stderrCallback(Buffer.from(durationLine));
-
-  // FFmpeg close callback with code 0
-  const closeCallback = mockFfmpegOn.mock.calls.find(
-    ([event]: [string]) => event === 'close'
-  )?.[1] as ((code: number) => void) | undefined;
-  if (closeCallback) closeCallback(0);
+/** Creates a mock HlsManifestService with all methods stubbed. */
+function createMockManifest() {
+  return {
+    inferContentType: vi.fn().mockImplementation((name: string) => {
+      if (name.endsWith('.mp4')) return 'video/mp4';
+      if (name.endsWith('.m3u8')) return 'application/x-mpegurl';
+      if (name.endsWith('.ts')) return 'video/mp2t';
+      if (name.endsWith('.mp3')) return 'audio/mpeg';
+      if (name.endsWith('.pdf')) return 'application/pdf';
+      return 'application/octet-stream';
+    }),
+    runFFmpeg: vi.fn(),
+    buildMasterManifest: vi.fn().mockReturnValue('#EXTM3U\n'),
+    uploadDirectory: vi
+      .fn()
+      .mockResolvedValue([
+        'tenant/course/id/hls/master.m3u8',
+        'tenant/course/id/hls/720p.m3u8',
+        'tenant/course/id/hls/720p_0000.ts',
+      ]),
+    cleanupDir: vi.fn().mockResolvedValue(undefined),
+  };
 }
-
-function simulateFfmpegFailure(code = 1) {
-  const closeCallback = mockFfmpegOn.mock.calls.find(
-    ([event]: [string]) => event === 'close'
-  )?.[1] as ((code: number) => void) | undefined;
-  if (closeCallback) closeCallback(code);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('HlsService', () => {
   let HlsService: typeof import('./hls.service').HlsService;
+  let mockManifest: ReturnType<typeof createMockManifest>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    // Reset spawn mock to return fresh event-emitter-like object each test
-    mockStderrOn.mockClear();
-    mockFfmpegOn.mockClear();
-
     // Default S3 send: download returns readable stream
     const { Readable } = await import('stream');
     mockS3Send.mockResolvedValue({ Body: new Readable() });
+
+    // Fresh mock manifest for each test
+    mockManifest = createMockManifest();
 
     // Re-import module fresh (vi.mock is hoisted so it stays mocked)
     HlsService = (await import('./hls.service')).HlsService;
@@ -135,14 +117,14 @@ describe('HlsService', () => {
 
   describe('constructor', () => {
     it('initialises with default env vars', () => {
-      const service = new HlsService();
+      const service = new HlsService(mockManifest as never);
       expect(service).toBeDefined();
     });
 
     it('uses MINIO_ENDPOINT env var when provided', async () => {
       process.env.MINIO_ENDPOINT = 'http://custom-minio:9001';
       const { S3Client } = await import('@aws-sdk/client-s3');
-      new HlsService();
+      new HlsService(mockManifest as never);
       expect(S3Client).toHaveBeenCalledWith(
         expect.objectContaining({ endpoint: 'http://custom-minio:9001' })
       );
@@ -154,81 +136,49 @@ describe('HlsService', () => {
 
   describe('transcodeToHls', () => {
     it('returns null for audio files without running FFmpeg', async () => {
-      const { spawn } = await import('child_process');
-      const service = new HlsService();
+      const service = new HlsService(mockManifest as never);
       const result = await service.transcodeToHls(
         'tenant/course/id/file.mp3',
         'tenant/course/id/hls'
       );
 
       expect(result).toBeNull();
-      expect(spawn).not.toHaveBeenCalled();
+      expect(mockManifest.runFFmpeg).not.toHaveBeenCalled();
     });
 
     it('returns null for PDF files without running FFmpeg', async () => {
-      const { spawn } = await import('child_process');
-      const service = new HlsService();
+      const service = new HlsService(mockManifest as never);
       const result = await service.transcodeToHls(
         'tenant/course/id/slide.pdf',
         'tenant/course/id/hls'
       );
 
       expect(result).toBeNull();
-      expect(spawn).not.toHaveBeenCalled();
+      expect(mockManifest.runFFmpeg).not.toHaveBeenCalled();
     });
 
     it('downloads source from MinIO for video files', async () => {
-      const service = new HlsService();
+      mockManifest.runFFmpeg.mockResolvedValue(630);
+      const service = new HlsService(mockManifest as never);
 
-      // Run transcodeToHls and simultaneously simulate FFmpeg success
-      const transcodePromise = service.transcodeToHls(
+      await service.transcodeToHls(
         'tenant/course/id/video.mp4',
         'tenant/course/id/hls'
       );
-      // Wait for spawn to be called (more async steps than 2 ticks)
-      const { spawn } = await import('child_process');
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if ((spawn as ReturnType<typeof vi.fn>).mock.calls.length > 0) {
-            resolve();
-          } else {
-            setImmediate(check);
-          }
-        };
-        setImmediate(check);
-      });
-      simulateFfmpegSuccess();
 
-      await transcodePromise;
-
-      await import('@aws-sdk/client-s3');
       expect(mockS3Send).toHaveBeenCalledWith(
         expect.objectContaining({ Key: 'tenant/course/id/video.mp4' })
       );
     });
 
     it('returns manifest key and segment keys on success', async () => {
-      const service = new HlsService();
+      mockManifest.runFFmpeg.mockResolvedValue(630);
+      const service = new HlsService(mockManifest as never);
 
-      const transcodePromise = service.transcodeToHls(
+      const result = await service.transcodeToHls(
         'tenant/course/id/video.mp4',
         'tenant/course/id/hls'
       );
-      // Wait for spawn to be called before simulating FFmpeg
-      const { spawn: _spawn } = await import('child_process');
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if ((_spawn as ReturnType<typeof vi.fn>).mock.calls.length > 0) {
-            resolve();
-          } else {
-            setImmediate(check);
-          }
-        };
-        setImmediate(check);
-      });
-      simulateFfmpegSuccess('Duration: 00:10:30.00');
-
-      const result = await transcodePromise;
 
       expect(result).not.toBeNull();
       expect(result?.manifestKey).toBe('tenant/course/id/hls/master.m3u8');
@@ -237,110 +187,55 @@ describe('HlsService', () => {
     });
 
     it('uploads every file in the output directory to MinIO', async () => {
-      const service = new HlsService();
+      mockManifest.runFFmpeg.mockResolvedValue(630);
+      const service = new HlsService(mockManifest as never);
 
-      const transcodePromise = service.transcodeToHls(
+      await service.transcodeToHls(
         'tenant/course/id/video.mp4',
         'tenant/course/id/hls'
       );
-      // Wait for spawn to be called before simulating FFmpeg
-      const { spawn: _spawn } = await import('child_process');
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if ((_spawn as ReturnType<typeof vi.fn>).mock.calls.length > 0) {
-            resolve();
-          } else {
-            setImmediate(check);
-          }
-        };
-        setImmediate(check);
-      });
-      simulateFfmpegSuccess();
 
-      await transcodePromise;
-
-      // readdir mock returns 3 files; each triggers a PutObjectCommand
-      const { PutObjectCommand } = await import('@aws-sdk/client-s3');
-      expect(PutObjectCommand).toHaveBeenCalledTimes(3);
+      // uploadDirectory is called once by the manifest mock
+      expect(mockManifest.uploadDirectory).toHaveBeenCalledTimes(1);
     });
 
     it('cleans up temp directory even when FFmpeg fails', async () => {
-      const service = new HlsService();
-
-      const transcodePromise = service.transcodeToHls(
-        'tenant/course/id/video.mp4',
-        'tenant/course/id/hls'
+      mockManifest.runFFmpeg.mockRejectedValue(
+        new Error('FFmpeg exited with code 1')
       );
-      // Wait for spawn to be called before simulating FFmpeg
-      const { spawn: _spawn } = await import('child_process');
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if ((_spawn as ReturnType<typeof vi.fn>).mock.calls.length > 0) {
-            resolve();
-          } else {
-            setImmediate(check);
-          }
-        };
-        setImmediate(check);
-      });
-      simulateFfmpegFailure(1);
+      const service = new HlsService(mockManifest as never);
 
-      await expect(transcodePromise).rejects.toThrow(
-        /FFmpeg exited with code 1/
-      );
+      await expect(
+        service.transcodeToHls(
+          'tenant/course/id/video.mp4',
+          'tenant/course/id/hls'
+        )
+      ).rejects.toThrow(/FFmpeg exited with code 1/);
 
       // cleanup must still have been called
-      expect(mockRmdir).toHaveBeenCalled();
+      expect(mockManifest.cleanupDir).toHaveBeenCalled();
     });
 
     it('cleans up temp directory on successful transcode', async () => {
-      const service = new HlsService();
+      mockManifest.runFFmpeg.mockResolvedValue(630);
+      const service = new HlsService(mockManifest as never);
 
-      const transcodePromise = service.transcodeToHls(
+      await service.transcodeToHls(
         'tenant/course/id/video.mp4',
         'tenant/course/id/hls'
       );
-      // Wait for spawn to be called before simulating FFmpeg
-      const { spawn: _spawn } = await import('child_process');
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if ((_spawn as ReturnType<typeof vi.fn>).mock.calls.length > 0) {
-            resolve();
-          } else {
-            setImmediate(check);
-          }
-        };
-        setImmediate(check);
-      });
-      simulateFfmpegSuccess();
 
-      await transcodePromise;
-
-      expect(mockRmdir).toHaveBeenCalled();
+      expect(mockManifest.cleanupDir).toHaveBeenCalled();
     });
 
-    it('returns duration = 0 when FFmpeg stderr has no Duration line', async () => {
-      const service = new HlsService();
+    it('returns duration = 0 when FFmpeg returns 0 duration', async () => {
+      mockManifest.runFFmpeg.mockResolvedValue(0);
+      const service = new HlsService(mockManifest as never);
 
-      const transcodePromise = service.transcodeToHls(
+      const result = await service.transcodeToHls(
         'tenant/course/id/video.mp4',
         'tenant/course/id/hls'
       );
-      // Wait for spawn to be called before simulating FFmpeg
-      const { spawn: _spawn } = await import('child_process');
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          if ((_spawn as ReturnType<typeof vi.fn>).mock.calls.length > 0) {
-            resolve();
-          } else {
-            setImmediate(check);
-          }
-        };
-        setImmediate(check);
-      });
-      simulateFfmpegSuccess('No duration info here');
-
-      const result = await transcodePromise;
       expect(result?.duration).toBe(0);
     });
   });
@@ -350,7 +245,7 @@ describe('HlsService', () => {
   describe('getManifestPresignedUrl', () => {
     it('returns a presigned URL for a given manifest key', async () => {
       const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
-      const service = new HlsService();
+      const service = new HlsService(mockManifest as never);
       const url = await service.getManifestPresignedUrl(
         'tenant/course/id/hls/master.m3u8'
       );
@@ -399,29 +294,33 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
       downloadToTemp: vi.fn().mockResolvedValue('/tmp/video.mp4'),
     };
     const mockNats = { publish: vi.fn().mockResolvedValue(undefined) };
-    const mockConceptExtractor = { extract: vi.fn().mockResolvedValue([]) };
-    const mockGraphBuilder = {
-      publishConcepts: vi.fn().mockResolvedValue(undefined),
-    };
     const mockHls = {
       transcodeToHls: vi
         .fn()
         .mockRejectedValue(new Error('FFmpeg not installed')),
       getManifestPresignedUrl: vi.fn(),
     };
-
     const mockTranslation = {
       translateTranscript: vi.fn().mockResolvedValue(undefined),
+    };
+    const mockHelpers = {
+      updateAssetStatus: vi.fn().mockResolvedValue(undefined),
+      persistTranscript: vi.fn().mockResolvedValue({
+        transcriptId: 'transcript-uuid',
+        segmentIds: ['seg-1'],
+      }),
+      uploadVtt: vi.fn().mockResolvedValue(undefined),
+      updateAssetHlsManifest: vi.fn().mockResolvedValue(undefined),
+      extractAndPublishConcepts: vi.fn().mockResolvedValue(undefined),
     };
     /* eslint-disable @typescript-eslint/no-explicit-any -- partial mocks in test */
     const service = new TranscriptionService(
       mockWhisper as any,
       mockMinio as any,
       mockNats as any,
-      mockConceptExtractor as any,
-      mockGraphBuilder as any,
       mockHls as any,
-      mockTranslation as any
+      mockTranslation as any,
+      mockHelpers as any
     );
     /* eslint-enable @typescript-eslint/no-explicit-any */
 

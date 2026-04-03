@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- test file reads use safe joined paths */
 /**
  * Memory safety tests for NotificationDispatcher and related services.
  * Validates that all @Injectable services with resources implement OnModuleDestroy

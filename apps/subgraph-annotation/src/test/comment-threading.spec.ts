@@ -49,6 +49,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { AnnotationService } from '../annotation/annotation.service';
+import { createMockQueriesService } from '../annotation/__test-helpers';
 
 const ownerAuth: AuthContext = {
   userId: 'user-1',
@@ -116,7 +117,7 @@ describe('Comment Threading — nested annotation replies', () => {
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
     mockUpdate.mockReturnValue({ set: mockSet });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   it('creates a top-level comment (parentId is null)', async () => {

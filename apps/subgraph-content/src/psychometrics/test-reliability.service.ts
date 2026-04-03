@@ -150,6 +150,7 @@ export class TestReliabilityService implements OnModuleDestroy {
       const row = new Array<number>(itemIds.length).fill(0);
       for (const r of responses) {
         const idx = itemIndex.get(r.itemId);
+        // eslint-disable-next-line security/detect-object-injection -- idx is from Map<string, number> bounded by itemIds.length
         if (idx !== undefined) row[idx] = r.isCorrect ? 1 : 0;
       }
       matrix.push(row);

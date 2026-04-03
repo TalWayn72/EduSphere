@@ -47,7 +47,7 @@ function gradeMultipleChoice(qd: ExamQuestionData, answer: unknown): boolean {
 function gradeDragOrder(qd: ExamQuestionData, answer: unknown): boolean {
   if (!Array.isArray(answer)) return false;
   const correct = qd.correctOrder ?? [];
-  return correct.every((id, i) => answer[i] === id);
+  return correct.every((id, i) => answer.at(i) === id);
 }
 
 function gradeHotspot(qd: ExamQuestionData, answer: unknown): boolean {

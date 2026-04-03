@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { DiscussionService } from './discussion.service';
+import { createDiscussionService } from './__test-helpers';
 import type { AuthContext } from '@edusphere/auth';
 
 // ── DB mock setup ────────────────────────────────────────────────────────────
@@ -202,7 +203,7 @@ describe('DiscussionService', () => {
     vi.clearAllMocks();
     setupSelectChain([MOCK_DISCUSSION]);
     setupInsertChain([MOCK_DISCUSSION]);
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   // ─── toTenantContext ──────────────────────────────────────────────────────

@@ -232,7 +232,14 @@ export class AnalyticsExportController implements OnModuleDestroy {
     if (data.length === 0) return '';
     const headers = Object.keys(data[0] as Record<string, unknown>);
     const rows = data.map((row) =>
-      headers.map((h) => String(row[h] ?? '')).join(',')
+      headers
+        .map((h) => {
+          const value = Object.prototype.hasOwnProperty.call(row, h)
+            ? row[h as keyof typeof row]
+            : '';
+          return String(value ?? '');
+        })
+        .join(',')
     );
     return [headers.join(','), ...rows].join('\n');
   }

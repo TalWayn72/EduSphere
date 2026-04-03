@@ -303,6 +303,7 @@ describe('NatsConsumer — transcript bridge behavior', () => {
         [Symbol.asyncIterator]: () => ({
           next: async () => {
             if (idx < msgs.length) {
+              // eslint-disable-next-line security/detect-object-injection -- safe: idx is a numeric counter
               const msg = msgs[idx];
               idx++;
               return { value: msg, done: false };

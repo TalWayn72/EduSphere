@@ -144,8 +144,8 @@ export class NotificationRetryWorker implements OnModuleInit, OnModuleDestroy {
           `[NotificationRetryWorker] Delivery bounced after ${MAX_RETRIES.toString()} retries — id=${row.id}`
         );
       } else {
-        const nextDelay =
-          BACKOFF_MS[newRetryCount] ?? BACKOFF_MS[BACKOFF_MS.length - 1];
+        const backoffIndex = Math.min(newRetryCount, BACKOFF_MS.length - 1);
+        const nextDelay = BACKOFF_MS[backoffIndex as 0 | 1 | 2];
         const nextRetryAt = new Date(Date.now() + nextDelay);
         await withTenantContext(this.db, ctx, async (tx) => {
           await tx

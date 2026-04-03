@@ -18,6 +18,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { MediaService } from './media.service';
+import { MediaQueriesService } from './media-queries.service';
 
 const mockS3Send = vi.fn();
 let capturedS3Config: Record<string, unknown> = {};
@@ -129,7 +130,7 @@ describe('MediaService', () => {
     process.env['MINIO_PORT'] = '9000';
     process.env['MINIO_BUCKET'] = 'edusphere-media';
     process.env['NATS_URL'] = 'nats://localhost:4222';
-    service = new MediaService();
+    service = new MediaService(new MediaQueriesService());
   });
 
   it('should initialise S3Client with full http:// URL and forcePathStyle=true', () => {

@@ -302,6 +302,7 @@ export class ContentIngestionPipelineService
       docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     };
+    // eslint-disable-next-line security/detect-object-injection -- ext is validated string from file extension
     return ext ? (map[ext] ?? null) : null;
   }
 

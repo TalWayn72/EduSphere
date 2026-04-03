@@ -51,15 +51,19 @@ test('SA-01 Content Viewer (Default landing)', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-01-content-viewer.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
   const navItems = await page.locator('nav a, nav button').allInnerTexts();
-  console.log('Navigation items:', navItems);
   const h1 = await page
     .locator('h1, h2')
     .first()
     .innerText()
     .catch(() => 'no heading');
-  console.log('Main heading:', h1);
+  test
+    .info()
+    .annotations.push(
+      { type: 'url', description: page.url() },
+      { type: 'nav-items', description: navItems.join(', ') },
+      { type: 'heading', description: h1 }
+    );
 });
 
 test('SA-02 Dashboard', async ({ page }) => {
@@ -71,9 +75,7 @@ test('SA-02 Dashboard', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-02-dashboard.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Dashboard content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-03 Courses List', async ({ page }) => {
@@ -85,9 +87,7 @@ test('SA-03 Courses List', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-03-courses.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Courses content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-04 Course Create (Admin feature)', async ({ page }) => {
@@ -99,9 +99,7 @@ test('SA-04 Course Create (Admin feature)', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-04-course-create.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Course Create content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-05 Knowledge Graph', async ({ page }) => {
@@ -113,9 +111,7 @@ test('SA-05 Knowledge Graph', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-05-knowledge-graph.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Graph content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-06 Annotations', async ({ page }) => {
@@ -127,9 +123,7 @@ test('SA-06 Annotations', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-06-annotations.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Annotations content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-07 Agents', async ({ page }) => {
@@ -141,9 +135,7 @@ test('SA-07 Agents', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-07-agents.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Agents content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-08 Collaboration', async ({ page }) => {
@@ -155,9 +147,7 @@ test('SA-08 Collaboration', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-08-collaboration.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Collaboration content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-09 Search', async ({ page }) => {
@@ -169,9 +159,7 @@ test('SA-09 Search', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-09-search.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Search content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-10 Profile', async ({ page }) => {
@@ -183,9 +171,7 @@ test('SA-10 Profile', async ({ page }) => {
     path: `${SCREENSHOTS}/sa-10-profile.png`,
     fullPage: true,
   });
-  console.log('URL:', page.url());
-  const body = await page.locator('body').innerText();
-  console.log('Profile content:', body.substring(0, 1200));
+  test.info().annotations.push({ type: 'url', description: page.url() });
 });
 
 test('SA-11 User Menu - Check admin options', async ({ page }) => {
@@ -201,7 +187,6 @@ test('SA-11 User Menu - Check admin options', async ({ page }) => {
     )
     .first();
   const menuVisible = await userMenu.isVisible().catch(() => false);
-  console.log('User menu visible:', menuVisible);
 
   if (menuVisible) {
     await userMenu.click();
@@ -210,15 +195,18 @@ test('SA-11 User Menu - Check admin options', async ({ page }) => {
       path: `${SCREENSHOTS}/sa-11-user-menu.png`,
       fullPage: false,
     });
-    const menuText = await page.locator('body').innerText();
-    console.log('After menu click:', menuText.substring(0, 500));
+    test.info().annotations.push({ type: 'user-menu', description: 'opened' });
   } else {
     await page.screenshot({
       path: `${SCREENSHOTS}/sa-11-dashboard-no-menu.png`,
       fullPage: false,
     });
-    console.log('User menu button not found, checking all clickable elements');
     const btns = await page.locator('button').allInnerTexts();
-    console.log('Buttons:', btns.join(' | '));
+    test
+      .info()
+      .annotations.push(
+        { type: 'user-menu', description: 'not found' },
+        { type: 'buttons', description: btns.join(' | ') }
+      );
   }
 });

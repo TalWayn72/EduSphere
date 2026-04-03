@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Shared mock db builder ────────────────────────────────────────────────────
@@ -63,6 +64,7 @@ vi.mock('nats', () => ({
 // ── Import after mocks ────────────────────────────────────────────────────────
 
 import { PollService } from './poll.service';
+import { PollVoteService } from './poll-vote.service';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -95,7 +97,7 @@ describe('PollService', () => {
     _mockDb = makeMockDb();
     _mockDb['returning'] = vi.fn().mockResolvedValue([makePoll()]);
     _mockDb['limit'] = vi.fn().mockResolvedValue([makePoll()]);
-    service = new PollService();
+    service = new PollService(new PollVoteService());
   });
 
   afterEach(async () => {
@@ -147,7 +149,7 @@ describe('PollService', () => {
     freshDb['set'] = vi.fn().mockReturnValue(freshDb);
     _mockDb = freshDb;
     await service.onModuleDestroy();
-    service = new PollService();
+    service = new PollService(new PollVoteService());
 
     const result = await service.closePoll(POLL_ID, TENANT, USER);
     expect(result.pollId).toBe(POLL_ID);
@@ -167,7 +169,7 @@ describe('PollService', () => {
     _mockDb = innerDb;
     // Recreate service with fresh db
     await service.onModuleDestroy();
-    service = new PollService();
+    service = new PollService(new PollVoteService());
 
     await service.vote(POLL_ID, USER, 1, TENANT);
     expect(innerDb['insert']).toHaveBeenCalled();
@@ -191,7 +193,7 @@ describe('PollService', () => {
     innerDb['returning'] = vi.fn().mockResolvedValue([]);
     _mockDb = innerDb;
     await service.onModuleDestroy();
-    service = new PollService();
+    service = new PollService(new PollVoteService());
 
     await service.vote(POLL_ID, USER, 2, TENANT);
     expect(innerDb['update']).toHaveBeenCalled();
@@ -252,7 +254,7 @@ describe('PollService', () => {
     innerDb['returning'] = vi.fn().mockResolvedValue([]);
     _mockDb = innerDb;
     await service.onModuleDestroy();
-    service = new PollService();
+    service = new PollService(new PollVoteService());
 
     await service.vote(POLL_ID, USER, 0, TENANT);
     await new Promise((r) => setTimeout(r, 50));

@@ -1,10 +1,10 @@
 /**
  * OpenBadgeService unit tests — 10 tests covering issuance, verification, revocation (F-025)
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { OpenBadgeService } from './open-badge.service.js';
+import { OpenBadgeQueryService } from './open-badge-query.service.js';
 import {
   loadKeyPair,
   signCredential,
@@ -81,21 +81,22 @@ vi.mock('@edusphere/nats-client', () => ({
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('OpenBadgeService', () => {
-  let module: TestingModule;
   let service: OpenBadgeService;
+  let queryService: OpenBadgeQueryService;
 
-  beforeEach(async () => {
-    module = await Test.createTestingModule({
-      providers: [OpenBadgeService],
-    }).compile();
-    service = module.get(OpenBadgeService);
+  beforeEach(() => {
+    const mockGraphCredentialService = {
+      verifyKnowledgePathCoverage: vi.fn(),
+      recordGraphCredential: vi.fn(),
+    };
+    queryService = new OpenBadgeQueryService();
+    service = new OpenBadgeService(
+      mockGraphCredentialService as never,
+      queryService
+    );
     (
       service as unknown as { keyPair: ReturnType<typeof loadKeyPair> }
     ).keyPair = loadKeyPair();
-  });
-
-  afterEach(async () => {
-    await module.close();
   });
 
   // Test 1: issueCredential creates assertion with Ed25519 proof field
@@ -165,12 +166,10 @@ describe('OpenBadgeService', () => {
 
   // Test 4: verifyCredential returns valid:false for revoked assertion
   it('should return valid:false when assertion is revoked (DB-level check)', async () => {
-    const { withTenantContext: _wt, ...rest } = await import('@edusphere/db');
-    void rest;
     // Simulate via service logic: revoked flag check happens before crypto
     const revokedAssertion = { ...mockAssertion, revoked: true };
-    // getAssertionById returns revoked — verifyCredential should short-circuit
-    vi.spyOn(service, 'getAssertionById').mockResolvedValueOnce(
+    // Spy on queryService.getAssertionById (verifyCredential calls queryService directly)
+    vi.spyOn(queryService, 'getAssertionById').mockResolvedValueOnce(
       revokedAssertion as Parameters<(typeof service)['mapAssertion']>[0]
     );
     const result = await service.verifyCredential('assertion-uuid-1');
@@ -184,7 +183,7 @@ describe('OpenBadgeService', () => {
       ...mockAssertion,
       expiresAt: new Date('2020-01-01T00:00:00Z'), // past date
     };
-    vi.spyOn(service, 'getAssertionById').mockResolvedValueOnce(
+    vi.spyOn(queryService, 'getAssertionById').mockResolvedValueOnce(
       expiredAssertion as Parameters<(typeof service)['mapAssertion']>[0]
     );
     const result = await service.verifyCredential('assertion-uuid-1');

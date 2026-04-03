@@ -57,6 +57,7 @@ vi.mock('@edusphere/db', () => ({
 
 import { withTenantContext } from '@edusphere/db';
 import { AnnotationService } from '../annotation/annotation.service';
+import { createMockQueriesService } from '../annotation/__test-helpers';
 
 // ─── Auth contexts for two tenants ────────────────────────────────────
 const tenantAAuth: AuthContext = {
@@ -110,7 +111,7 @@ describe('Tenant Isolation — cross-tenant annotation security', () => {
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   it('tenant A cannot see tenant B annotations — withTenantContext enforces isolation', async () => {

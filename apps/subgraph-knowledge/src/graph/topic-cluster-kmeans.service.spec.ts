@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
+import { KMeansAlgorithmService } from './kmeans-algorithm.service';
 import type { NatsConnection } from 'nats';
 
 // ── Module-level mocks ───────────────────────────────────────────────────────
@@ -55,7 +56,10 @@ type ServicePrivate = {
 };
 
 function makeService(): TopicClusterKMeansService {
-  return new TopicClusterKMeansService(mockTopicClusterService as never);
+  return new TopicClusterKMeansService(
+    mockTopicClusterService as never,
+    new KMeansAlgorithmService()
+  );
 }
 
 // ── Test suite ───────────────────────────────────────────────────────────────

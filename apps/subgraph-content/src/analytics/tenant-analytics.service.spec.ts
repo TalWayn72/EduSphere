@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ vi.mock('@edusphere/db', () => ({
 
 import * as db from '@edusphere/db';
 import { TenantAnalyticsService } from './tenant-analytics.service.js';
+import { TenantAnalyticsAggregationService } from './tenant-analytics-aggregation.service.js';
 
 const TENANT_ID = 'aaaaaaaa-0000-0000-0000-000000000001';
 const USER_ID = 'bbbbbbbb-0000-0000-0000-000000000001';
@@ -81,7 +83,9 @@ describe('TenantAnalyticsService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new TenantAnalyticsService();
+    service = new TenantAnalyticsService(
+      new TenantAnalyticsAggregationService()
+    );
   });
 
   // ── Memory safety ──────────────────────────────────────────────────────────

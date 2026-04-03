@@ -47,6 +47,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { AnnotationService } from '../annotation/annotation.service';
+import { createMockQueriesService } from '../annotation/__test-helpers';
 
 // ─── Auth contexts ────────────────────────────────────────────────────
 const studentAuth: AuthContext = {
@@ -139,7 +140,7 @@ describe('Layer Filtering — annotation visibility rules', () => {
     mockOrderBy.mockReturnValue({ limit: mockLimit });
     mockWhere.mockReturnValue({ orderBy: mockOrderBy, limit: mockLimit });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   it('personal annotations are visible only to owner (student sees own)', async () => {

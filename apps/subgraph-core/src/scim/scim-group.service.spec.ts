@@ -35,6 +35,7 @@ vi.mock('@edusphere/nats-client', () => ({
 }));
 
 import { ScimGroupService } from './scim-group.service.js';
+import { ScimGroupMemberService } from './scim-group-member.service.js';
 import { withTenantContext, closeAllPools } from '@edusphere/db';
 import { connect } from 'nats';
 
@@ -59,6 +60,7 @@ const makeDbGroup = (overrides: Record<string, unknown> = {}) => ({
 
 describe('ScimGroupService', () => {
   let service: ScimGroupService;
+  let memberService: ScimGroupMemberService;
   let mockNats: {
     drain: ReturnType<typeof vi.fn>;
     publish: ReturnType<typeof vi.fn>;
@@ -78,6 +80,7 @@ describe('ScimGroupService', () => {
     );
 
     service = new ScimGroupService();
+    memberService = new ScimGroupMemberService(service);
     await service.onModuleInit();
     Object.assign(service, { db: {}, nats: mockNats });
   });
@@ -263,7 +266,7 @@ describe('ScimGroupService', () => {
         } as never);
       });
 
-      const result = await service.patchGroup(TENANT_ID, GROUP_ID, [
+      const result = await memberService.patchGroup(TENANT_ID, GROUP_ID, [
         { op: 'add', path: 'members', value: [{ value: 'user-new' }] },
       ]);
 
@@ -293,7 +296,7 @@ describe('ScimGroupService', () => {
         } as never);
       });
 
-      const result = await service.patchGroup(TENANT_ID, GROUP_ID, [
+      const result = await memberService.patchGroup(TENANT_ID, GROUP_ID, [
         { op: 'remove', path: 'members', value: [{ value: 'user-1' }] },
       ]);
 
@@ -324,7 +327,7 @@ describe('ScimGroupService', () => {
         } as never);
       });
 
-      const result = await service.patchGroup(TENANT_ID, GROUP_ID, [
+      const result = await memberService.patchGroup(TENANT_ID, GROUP_ID, [
         { op: 'replace', path: 'displayName', value: 'New Name' },
       ]);
 

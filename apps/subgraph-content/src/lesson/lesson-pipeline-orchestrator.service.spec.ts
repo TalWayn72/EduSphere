@@ -100,13 +100,19 @@ vi.mock('@edusphere/langgraph-workflows', () => ({
 }));
 
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service.js';
+import { PipelineModuleExecutorService } from './pipeline-module-executor.service.js';
+import { PipelineNatsService } from './pipeline-nats.service.js';
+import { LessonPublishService } from './lesson-publish.service.js';
 
 describe('LessonPipelineOrchestratorService', () => {
   let service: LessonPipelineOrchestratorService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new LessonPipelineOrchestratorService();
+    service = new LessonPipelineOrchestratorService(
+      new PipelineModuleExecutorService(new LessonPublishService()),
+      new PipelineNatsService()
+    );
   });
 
   // ── cancelRun ─────────────────────────────────────────────────────────────
@@ -146,15 +152,13 @@ describe('LessonPipelineOrchestratorService', () => {
     expect(abort2).toHaveBeenCalled();
   });
 
-  it('drains NATS connection on destroy if connected', async () => {
-    const mockNc = {
-      drain: vi.fn().mockResolvedValue(undefined),
-      publish: vi.fn(),
-    };
+  it('onModuleDestroy clears active controllers', async () => {
+    const ctrl = new AbortController();
     // @ts-expect-error — accessing private field for testing
-    service['nc'] = mockNc;
+    service['activeControllers'].add(ctrl);
     await service.onModuleDestroy();
-    expect(mockNc.drain).toHaveBeenCalled();
+    // @ts-expect-error — accessing private field for testing
+    expect(service['activeControllers'].size).toBe(0);
   });
 
   it('calls closeAllPools on destroy', async () => {

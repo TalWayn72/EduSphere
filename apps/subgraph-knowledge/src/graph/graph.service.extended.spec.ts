@@ -1,244 +1,139 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * GraphService extended spec — additional delegation tests.
+ * Covers Term, Source, TopicCluster, and edge-case delegation paths.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GraphService } from './graph.service';
-import { GraphConceptService } from './graph-concept.service';
-import { GraphConceptLinkService } from './graph-concept-link.service';
-import { GraphSearchService } from './graph-search.service';
-import { GraphPersonTermService } from './graph-person-term.service';
-import { GraphSourceClusterService } from './graph-source-cluster.service';
 
-vi.mock('@edusphere/db', () => ({
-  db: {},
-  withTenantContext: vi.fn(
-    async (_db: unknown, _ctx: unknown, cb: () => unknown) => cb()
-  ),
-}));
-
-var mc = {
-  // Concept CRUD
+const mockQueries = {
   findConceptById: vi.fn(),
   findConceptByName: vi.fn(),
-  findConceptByNameCaseInsensitive: vi.fn(),
   findAllConcepts: vi.fn(),
+  findRelatedConcepts: vi.fn(),
+  semanticSearch: vi.fn(),
+  findPersonById: vi.fn(),
+  findPersonByName: vi.fn(),
+  findTermById: vi.fn(),
+  findTermByName: vi.fn(),
+  findSourceById: vi.fn(),
+  findTopicClusterById: vi.fn(),
+  findTopicClustersByCourse: vi.fn(),
+  getLearningPath: vi.fn(),
+  getRelatedConceptsByName: vi.fn(),
+  getPrerequisiteChain: vi.fn(),
+};
+
+const mockMutations = {
   createConcept: vi.fn(),
   updateConcept: vi.fn(),
   deleteConcept: vi.fn(),
-  // Concept relations (CypherConceptRelationService)
-  findRelatedConcepts: vi.fn(),
   linkConcepts: vi.fn(),
-  linkConceptsAndFetch: vi.fn().mockResolvedValue({ from: null, to: null }),
-  // Embedding
-  callEmbeddingProvider: vi.fn(),
-  generateEmbedding: vi.fn(),
-  // Person
-  findPersonById: vi.fn(),
-  findPersonByName: vi.fn(),
   createPerson: vi.fn(),
-  // Term
-  findTermById: vi.fn(),
-  findTermByName: vi.fn(),
   createTerm: vi.fn(),
-  // Source
-  findSourceById: vi.fn(),
   createSource: vi.fn(),
-  // TopicCluster
-  findTopicClusterById: vi.fn(),
-  findTopicClustersByCourse: vi.fn(),
   createTopicCluster: vi.fn(),
-  // Learning Path
-  findShortestLearningPath: vi.fn(),
-  collectRelatedConcepts: vi.fn(),
-  findPrerequisiteChain: vi.fn(),
+  generateEmbedding: vi.fn(),
 };
 
-var RAW = {
-  id: 'c-1',
-  tenant_id: 't-1',
-  name: 'X',
-  definition: 'D',
-  source_ids: '[]',
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z',
-};
+const T = 'tenant-1';
+const U = 'user-1';
+const R = 'STUDENT';
 
 describe('GraphService extended', () => {
-  var svc: GraphService;
+  let svc: GraphService;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mc.linkConceptsAndFetch.mockResolvedValue({ from: null, to: null });
-    svc = new GraphService(
-      new GraphConceptService(mc as any, mc as any),
-      new GraphConceptLinkService(mc as any),
-      new GraphSearchService(mc as any, mc as any),
-      new GraphPersonTermService(mc as any, mc as any),
-      new GraphSourceClusterService(mc as any, mc as any, mc as any)
+    svc = new GraphService(mockQueries as any, mockMutations as any);
+  });
+
+  it('findRelatedConcepts delegates with all args', async () => {
+    mockQueries.findRelatedConcepts.mockResolvedValue([]);
+    await svc.findRelatedConcepts('c-1', 2, 10, T, U, R);
+    expect(mockQueries.findRelatedConcepts).toHaveBeenCalledWith('c-1', 2, 10, T, U, R);
+  });
+
+  it('linkConcepts delegates to mutations', async () => {
+    const link = { from: 'c-1', to: 'c-2', type: 'RELATES_TO' };
+    mockMutations.linkConcepts.mockResolvedValue(link);
+    const result = await svc.linkConcepts('c-1', 'c-2', 'RELATES_TO' as any, 0.8, null, T, U, R);
+    expect(result).toEqual(link);
+  });
+
+  it('findPersonById delegates to queries', async () => {
+    mockQueries.findPersonById.mockResolvedValue({ id: 'p-1' });
+    await svc.findPersonById('p-1', T, U, R);
+    expect(mockQueries.findPersonById).toHaveBeenCalledWith('p-1', T, U, R);
+  });
+
+  it('findPersonByName delegates to queries', async () => {
+    mockQueries.findPersonByName.mockResolvedValue({ id: 'p-1' });
+    await svc.findPersonByName('Maimonides', T, U, R);
+    expect(mockQueries.findPersonByName).toHaveBeenCalledWith('Maimonides', T, U, R);
+  });
+
+  it('createPerson delegates to mutations', async () => {
+    mockMutations.createPerson.mockResolvedValue({ id: 'p-1' });
+    await svc.createPerson('Maimonides', 'Bio', T, U, R);
+    expect(mockMutations.createPerson).toHaveBeenCalledWith('Maimonides', 'Bio', T, U, R);
+  });
+
+  it('findTermById delegates to queries', async () => {
+    mockQueries.findTermById.mockResolvedValue({ id: 't-1' });
+    await svc.findTermById('t-1', T, U, R);
+    expect(mockQueries.findTermById).toHaveBeenCalledWith('t-1', T, U, R);
+  });
+
+  it('findTermByName delegates to queries', async () => {
+    mockQueries.findTermByName.mockResolvedValue({ id: 't-1' });
+    await svc.findTermByName('Ontology', T, U, R);
+    expect(mockQueries.findTermByName).toHaveBeenCalledWith('Ontology', T, U, R);
+  });
+
+  it('createTerm delegates to mutations', async () => {
+    mockMutations.createTerm.mockResolvedValue({ id: 't-1' });
+    await svc.createTerm('Ontology', 'Definition', T, U, R);
+    expect(mockMutations.createTerm).toHaveBeenCalledWith('Ontology', 'Definition', T, U, R);
+  });
+
+  it('findSourceById delegates to queries', async () => {
+    mockQueries.findSourceById.mockResolvedValue({ id: 's-1' });
+    await svc.findSourceById('s-1', T, U, R);
+    expect(mockQueries.findSourceById).toHaveBeenCalledWith('s-1', T, U, R);
+  });
+
+  it('createSource delegates to mutations', async () => {
+    mockMutations.createSource.mockResolvedValue({ id: 's-1' });
+    await svc.createSource('Paper', 'ARTICLE', 'https://example.com', T, U, R);
+    expect(mockMutations.createSource).toHaveBeenCalledWith(
+      'Paper', 'ARTICLE', 'https://example.com', T, U, R
     );
   });
 
-  it('findRelatedConcepts maps strength', async () => {
-    mc.findRelatedConcepts.mockResolvedValue([{ ...RAW, strength: 0.9 }]);
-    var r = await svc.findRelatedConcepts(
-      'c-1',
-      2,
-      10,
-      't-1',
-      'u-1',
-      'STUDENT'
+  it('findTopicClusterById delegates to queries', async () => {
+    mockQueries.findTopicClusterById.mockResolvedValue({ id: 'tc-1' });
+    await svc.findTopicClusterById('tc-1', T, U, R);
+    expect(mockQueries.findTopicClusterById).toHaveBeenCalledWith('tc-1', T, U, R);
+  });
+
+  it('findTopicClustersByCourse delegates to queries', async () => {
+    mockQueries.findTopicClustersByCourse.mockResolvedValue([]);
+    await svc.findTopicClustersByCourse('course-1', T, U, R);
+    expect(mockQueries.findTopicClustersByCourse).toHaveBeenCalledWith('course-1', T, U, R);
+  });
+
+  it('createTopicCluster delegates to mutations', async () => {
+    mockMutations.createTopicCluster.mockResolvedValue({ id: 'tc-1' });
+    await svc.createTopicCluster('ML Basics', 'Machine learning cluster', T, U, R);
+    expect(mockMutations.createTopicCluster).toHaveBeenCalledWith(
+      'ML Basics', 'Machine learning cluster', T, U, R
     );
-    expect(r[0].strength).toBe(0.9);
   });
 
-  it('findRelatedConcepts defaults strength to 1.0', async () => {
-    mc.findRelatedConcepts.mockResolvedValue([RAW]);
-    var r = await svc.findRelatedConcepts(
-      'c-1',
-      2,
-      10,
-      't-1',
-      'u-1',
-      'STUDENT'
-    );
-    expect(r[0].strength).toBe(1.0);
-  });
-
-  it('linkConcepts returns relationship info', async () => {
-    mc.linkConceptsAndFetch.mockResolvedValue({ from: null, to: null });
-    var r = await svc.linkConcepts(
-      'c-1',
-      'c-2',
-      'RELATES_TO',
-      0.8,
-      'desc',
-      't-1',
-      'u-1',
-      'INSTRUCTOR'
-    );
-    expect(r.relationshipType).toBe('RELATES_TO');
-    expect(r.strength).toBe(0.8);
-    expect(r.inferred).toBe(false);
-  });
-
-  it('findPersonById delegates to cypherService', async () => {
-    mc.findPersonById.mockResolvedValue({ id: 'p-1' });
-    expect(await svc.findPersonById('p-1', 't-1', 'u-1', 'STUDENT')).toEqual({
-      id: 'p-1',
-    });
-  });
-
-  it('findPersonByName delegates to cypherService', async () => {
-    mc.findPersonByName.mockResolvedValue({ id: 'p-1' });
-    expect(
-      await svc.findPersonByName('Maimonides', 't-1', 'u-1', 'STUDENT')
-    ).toEqual({ id: 'p-1' });
-  });
-
-  it('createPerson delegates to cypherService', async () => {
-    mc.createPerson.mockResolvedValue({ id: 'p-1' });
-    var r = await svc.createPerson(
-      'Maimonides',
-      'Bio',
-      't-1',
-      'u-1',
-      'INSTRUCTOR'
-    );
-    expect(mc.createPerson).toHaveBeenCalledWith('Maimonides', 'Bio', 't-1');
-    expect(r).toEqual({ id: 'p-1' });
-  });
-
-  it('findTermById delegates to cypherService', async () => {
-    mc.findTermById.mockResolvedValue({ id: 't-1' });
-    expect(await svc.findTermById('t-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({
-      id: 't-1',
-    });
-  });
-
-  it('findTermByName delegates to cypherService', async () => {
-    mc.findTermByName.mockResolvedValue({ id: 't-1' });
-    expect(
-      await svc.findTermByName('Torah', 'ten-1', 'u-1', 'STUDENT')
-    ).toEqual({ id: 't-1' });
-  });
-
-  it('createTerm delegates to cypherService', async () => {
-    mc.createTerm.mockResolvedValue({ id: 't-1' });
-    var r = await svc.createTerm(
-      'Torah',
-      'Scriptures',
-      'ten-1',
-      'u-1',
-      'INSTRUCTOR'
-    );
-    expect(mc.createTerm).toHaveBeenCalledWith('Torah', 'Scriptures', 'ten-1');
-    expect(r).toEqual({ id: 't-1' });
-  });
-
-  it('findSourceById delegates to cypherService', async () => {
-    mc.findSourceById.mockResolvedValue({ id: 's-1' });
-    expect(await svc.findSourceById('s-1', 'ten-1', 'u-1', 'STUDENT')).toEqual({
-      id: 's-1',
-    });
-  });
-
-  it('createSource delegates to cypherService', async () => {
-    mc.createSource.mockResolvedValue({ id: 's-1' });
-    var r = await svc.createSource(
-      'Guide',
-      'BOOK',
-      null,
-      'ten-1',
-      'u-1',
-      'INSTRUCTOR'
-    );
-    expect(mc.createSource).toHaveBeenCalledWith(
-      'Guide',
-      'BOOK',
-      null,
-      'ten-1'
-    );
-    expect(r).toEqual({ id: 's-1' });
-  });
-
-  it('findTopicClusterById delegates to cypherService', async () => {
-    mc.findTopicClusterById.mockResolvedValue({ id: 'cl-1' });
-    expect(
-      await svc.findTopicClusterById('cl-1', 'ten-1', 'u-1', 'STUDENT')
-    ).toEqual({ id: 'cl-1' });
-  });
-
-  it('findTopicClustersByCourse delegates to cypherService', async () => {
-    mc.findTopicClustersByCourse.mockResolvedValue([{ id: 'cl-1' }]);
-    expect(
-      await svc.findTopicClustersByCourse('course-1', 'ten-1', 'u-1', 'STUDENT')
-    ).toHaveLength(1);
-  });
-
-  it('createTopicCluster delegates to cypherService', async () => {
-    mc.createTopicCluster.mockResolvedValue({ id: 'cl-1' });
-    var r = await svc.createTopicCluster(
-      'Cluster',
-      null,
-      'ten-1',
-      'u-1',
-      'INSTRUCTOR'
-    );
-    expect(mc.createTopicCluster).toHaveBeenCalledWith(
-      'Cluster',
-      null,
-      'ten-1'
-    );
-    expect(r).toEqual({ id: 'cl-1' });
-  });
-
-  it('generateEmbedding returns false', async () => {
-    expect(
-      await svc.generateEmbedding(
-        'text',
-        'Concept',
-        'c-1',
-        't-1',
-        'u-1',
-        'INSTRUCTOR'
-      )
-    ).toBe(false);
+  it('generateEmbedding delegates to mutations', async () => {
+    mockMutations.generateEmbedding.mockResolvedValue(false);
+    const result = await svc.generateEmbedding('text', 'concept', 'c-1', T, U, R);
+    expect(result).toBe(false);
   });
 });

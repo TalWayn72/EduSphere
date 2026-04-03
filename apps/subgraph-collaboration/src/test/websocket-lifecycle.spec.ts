@@ -63,6 +63,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from '../discussion/discussion.service';
+import { createDiscussionService } from '../discussion/__test-helpers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -110,7 +111,8 @@ const MOCK_PARTICIPANT = {
 function setupSelectChainMulti(results: unknown[][]) {
   let callCount = 0;
   mockFrom.mockImplementation(() => {
-    const result = results[callCount] ?? results[results.length - 1];
+    const safeIndex = Math.min(callCount, results.length - 1);
+    const result = results.at(safeIndex) ?? results.at(-1);
     callCount++;
     const limitFn = vi.fn(() => {
       const p = Promise.resolve(result) as Promise<unknown[]> & {
@@ -139,7 +141,7 @@ describe('WebSocket Lifecycle — participant join/leave/reconnect', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('joining a session creates a participant record', async () => {

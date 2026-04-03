@@ -60,6 +60,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from '../discussion/discussion.service';
+import { createDiscussionService } from '../discussion/__test-helpers';
 import { BadRequestException } from '@nestjs/common';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -127,7 +128,7 @@ describe('Conflict Resolution — concurrent message edits', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('concurrent messages from different users are both persisted (last-write-wins at DB level)', async () => {

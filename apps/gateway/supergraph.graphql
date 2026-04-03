@@ -929,7 +929,7 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Moves all edges from the source concept to the target, then deletes the source.
   Returns the merged target concept.
   """
-  mergeConceptGraphNodes(input: MergeConceptsInput!) : Concept! @join__field(graph: KNOWLEDGE)  @authenticated
+  mergeConceptGraphNodes(input: MergeConceptsInput!) : Concept! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["org:manage"]])
   """
   Run k-means++ clustering on all concepts for a given course (default k=5).
   Returns the resulting TopicCluster nodes. Requires INSTRUCTOR or higher role.

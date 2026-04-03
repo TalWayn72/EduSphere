@@ -59,6 +59,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from './discussion.service';
+import { createDiscussionService } from './__test-helpers';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -101,7 +102,7 @@ describe('Discussion — Relay cursor pagination', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('hasNextPage is true when more items exist beyond the current page', () => {

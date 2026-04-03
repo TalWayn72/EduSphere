@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TenantAnalyticsAggregationService } from './tenant-analytics-aggregation.service';
 
@@ -38,7 +39,9 @@ const CUTOFF = new Date('2026-01-01');
 
 function makeSelectChain(rows: unknown[]) {
   const groupBy = vi.fn().mockResolvedValue(rows);
-  const where = vi.fn().mockReturnValue({ groupBy });
+  // Make where() return a thenable+chainable object: some queries use .groupBy(), others await directly
+  const whereResult = Object.assign(Promise.resolve(rows), { groupBy });
+  const where = vi.fn().mockReturnValue(whereResult);
   const from = vi.fn().mockReturnValue({ where });
   return { from, where, groupBy };
 }

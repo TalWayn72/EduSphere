@@ -88,6 +88,7 @@ function makeCypherTopicClusterService() {
 }
 
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service.js';
+import { KMeansAlgorithmService } from './kmeans-algorithm.service.js';
 import type { CypherTopicClusterService } from './cypher-topic-cluster.service.js';
 
 function makeService(
@@ -95,7 +96,8 @@ function makeService(
 ): TopicClusterKMeansService {
   return new TopicClusterKMeansService(
     (cypher ??
-      makeCypherTopicClusterService()) as unknown as CypherTopicClusterService
+      makeCypherTopicClusterService()) as unknown as CypherTopicClusterService,
+    new KMeansAlgorithmService()
   );
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * BiExportService unit tests — F-029 BI Tool Export
  * Verifies OData v4 format, pagination parameters, and tenant isolation.

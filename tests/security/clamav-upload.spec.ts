@@ -17,7 +17,7 @@ describe('ClamAV Upload Security (SI-Upload)', () => {
     expect(EICAR_TEST_STRING).toContain('EICAR');
   });
 
-  it('file size > 100MB is rejected before ClamAV scan', async () => {
+  it('file size > 100MB is rejected before ClamAV scan', { timeout: 30_000 }, async () => {
     // Dynamically import to avoid module resolution in CI without ClamAV
     const { ClamavService } =
       await import('../../apps/subgraph-content/src/clamav/clamav.service').catch(

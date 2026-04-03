@@ -261,9 +261,12 @@ describe('NATS Notification Bridge — Phase 45 Social Types (source assertions)
         resolve(root, 'packages/nats-client/src/social-events.ts'),
         'utf8'
       );
-      expect(socialEvents).toContain(
-        "'COMPLETED' | 'ENROLLED' | 'ACHIEVED_BADGE' | 'DISCUSSED' | 'STARTED_LEARNING'"
-      );
+      // Verb union may be split across lines — check each variant individually
+      expect(socialEvents).toContain("'COMPLETED'");
+      expect(socialEvents).toContain("'ENROLLED'");
+      expect(socialEvents).toContain("'ACHIEVED_BADGE'");
+      expect(socialEvents).toContain("'DISCUSSED'");
+      expect(socialEvents).toContain("'STARTED_LEARNING'");
     });
   });
 

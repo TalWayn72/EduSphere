@@ -113,8 +113,8 @@ async function buildService(opts: {
   embeddingError?: boolean;
   parseError?: boolean;
 }) {
-  const { KnowledgeSourceService } =
-    await import('./knowledge-source.service.js');
+  const { KnowledgeSourceProcessingService: KnowledgeSourceService } =
+    await import('./knowledge-source-processing.service.js');
 
   const insertRow = makeFakeSource({ status: 'PENDING' });
   const processingRow = makeFakeSource({ status: 'PROCESSING' });

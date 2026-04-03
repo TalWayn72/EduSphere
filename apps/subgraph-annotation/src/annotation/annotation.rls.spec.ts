@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
+import { createMockQueriesService } from './__test-helpers';
 
 // ─── Capture withTenantContext call arguments ─────────────────────────────
 const capturedContexts: Array<{
@@ -100,7 +101,7 @@ describe('AnnotationService — RLS tenant isolation', () => {
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
-    service = new AnnotationService();
+    service = new AnnotationService(createMockQueriesService({}, []));
   });
 
   describe('listAnnotations — tenant isolation', () => {

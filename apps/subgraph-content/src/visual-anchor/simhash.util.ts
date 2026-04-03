@@ -16,6 +16,7 @@ export function computeSimhash(text: string): string {
     for (let i = 0; i < 64; i++) {
       // Use bits from both halves of the 32-bit hash via modulo rotation
       const bit = (h >>> (i % 32)) & 1;
+      // eslint-disable-next-line security/detect-object-injection -- i is bounded [0, 64)
       v[i] = (v[i] ?? 0) + (bit ? 1 : -1);
     }
   }
@@ -23,10 +24,10 @@ export function computeSimhash(text: string): string {
   let hash = '';
   for (let i = 0; i < 64; i += 4) {
     const nibble =
-      (v[i]! > 0 ? 8 : 0) |
-      (v[i + 1]! > 0 ? 4 : 0) |
-      (v[i + 2]! > 0 ? 2 : 0) |
-      (v[i + 3]! > 0 ? 1 : 0);
+      ((v.at(i) ?? 0) > 0 ? 8 : 0) |
+      ((v.at(i + 1) ?? 0) > 0 ? 4 : 0) |
+      ((v.at(i + 2) ?? 0) > 0 ? 2 : 0) |
+      ((v.at(i + 3) ?? 0) > 0 ? 1 : 0);
     hash += nibble.toString(16);
   }
   return hash; // 16 hex chars = 64 bits
@@ -40,7 +41,7 @@ export function simhashDistance(a: string, b: string): number {
   if (a.length !== b.length) return 64;
   let dist = 0;
   for (let i = 0; i < a.length; i++) {
-    const xor = parseInt(a[i]!, 16) ^ parseInt(b[i]!, 16);
+    const xor = parseInt(a.at(i) ?? '0', 16) ^ parseInt(b.at(i) ?? '0', 16);
     dist += xor
       .toString(2)
       .split('')

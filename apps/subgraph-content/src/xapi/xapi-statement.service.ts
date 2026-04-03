@@ -118,6 +118,9 @@ export class XapiStatementService implements OnModuleInit, OnModuleDestroy {
   }
 
   mapNatsToXapi(subject: string, payload: unknown): XapiStatement | null {
+    if (!Object.prototype.hasOwnProperty.call(SUBJECT_TO_VERB, subject))
+      return null;
+    // eslint-disable-next-line security/detect-object-injection -- guarded by hasOwnProperty above
     const verbId = SUBJECT_TO_VERB[subject];
     if (!verbId) return null;
 

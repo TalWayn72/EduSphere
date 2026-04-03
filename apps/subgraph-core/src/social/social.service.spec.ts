@@ -51,7 +51,10 @@ vi.mock('@edusphere/db', () => ({
   inArray: vi.fn((a: unknown, b: unknown) => ({ inArray: [a, b] })),
   ilike: vi.fn((a: unknown, b: unknown) => ({ ilike: [a, b] })),
   sql: Object.assign(
-    vi.fn((a: unknown) => ({ sql: a })),
+    vi.fn((_a: unknown) => ({
+      sql: _a,
+      as: vi.fn((_alias: string) => ({ sql: _a, alias: _alias })),
+    })),
     { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }
   ),
 }));
@@ -62,6 +65,8 @@ vi.mock('@edusphere/nats-client', () => ({
 }));
 
 import { SocialService } from './social.service';
+import { SocialFollowService } from './social-follow.service';
+import { SocialFeedService } from './social-feed.service';
 
 describe('SocialService', () => {
   let service: SocialService;
@@ -78,7 +83,11 @@ describe('SocialService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new SocialService();
+    const sharedFollowService = new SocialFollowService();
+    service = new SocialService(
+      sharedFollowService,
+      new SocialFeedService(sharedFollowService)
+    );
   });
 
   // Test 1: followUser inserts record and returns true
@@ -208,24 +217,35 @@ describe('SocialService', () => {
 
   describe('getSocialFeed', () => {
     it('returns empty array when user follows nobody', async () => {
-      vi.spyOn(service, 'getFollowing').mockResolvedValue([]);
+      const followService = (
+        service as unknown as { followService: SocialFollowService }
+      ).followService;
+      vi.spyOn(followService, 'getFollowing').mockResolvedValue([]);
       const result = await service.getSocialFeed('user-1', 'tenant-1', 20);
       expect(result).toEqual([]);
     });
 
     it('returns feed items from followed users ordered by createdAt desc', async () => {
-      vi.spyOn(service, 'getFollowing').mockResolvedValue(['user-2', 'user-3']);
+      const followService = (
+        service as unknown as { followService: SocialFollowService }
+      ).followService;
+      vi.spyOn(followService, 'getFollowing').mockResolvedValue([
+        'user-2',
+        'user-3',
+      ]);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            orderBy: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([]),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
             }),
           }),
         }),
       });
       await service.getSocialFeed('user-1', 'tenant-1', 20);
-      expect(service.getFollowing).toHaveBeenCalledWith(
+      expect(followService.getFollowing).toHaveBeenCalledWith(
         'user-1',
         'tenant-1',
         100
@@ -233,18 +253,24 @@ describe('SocialService', () => {
     });
 
     it('respects the limit parameter', async () => {
-      vi.spyOn(service, 'getFollowing').mockResolvedValue(['user-2']);
+      // Must spy on the internal followService used by feedService
+      const followService = (
+        service as unknown as { followService: SocialFollowService }
+      ).followService;
+      vi.spyOn(followService, 'getFollowing').mockResolvedValue(['user-2']);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            orderBy: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([]),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
             }),
           }),
         }),
       });
       await service.getSocialFeed('user-1', 'tenant-1', 5);
-      expect(service.getFollowing).toHaveBeenCalledWith(
+      expect(followService.getFollowing).toHaveBeenCalledWith(
         'user-1',
         'tenant-1',
         100

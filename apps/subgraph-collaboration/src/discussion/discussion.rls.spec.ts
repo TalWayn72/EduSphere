@@ -60,6 +60,7 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 import { DiscussionService } from './discussion.service';
+import { createDiscussionService } from './__test-helpers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -99,7 +100,7 @@ describe('DiscussionService — RLS tenant isolation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new DiscussionService();
+    service = createDiscussionService();
   });
 
   it('calls withTenantContext with tenantId derived from JWT, not GraphQL input', async () => {

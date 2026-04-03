@@ -103,6 +103,7 @@ export class ExamAssemblyService implements OnModuleDestroy {
     const questionOrder = shuffled.map((item) => item.id);
     const optionShuffleSeeds: Record<string, number> = {};
     for (const id of questionOrder) {
+      // eslint-disable-next-line security/detect-object-injection -- id is a trusted DB UUID
       optionShuffleSeeds[id] = randomInt(1, 2147483647);
     }
 
@@ -217,8 +218,10 @@ export class ExamAssemblyService implements OnModuleDestroy {
       );
       const shuffled = this.fisherYatesShuffle([...bloomItems]);
       for (let j = 0; j < bloomNeeded && j < shuffled.length; j++) {
-        picked.push(shuffled[j]!);
-        used.add(shuffled[j]!.id);
+        const item = shuffled.at(j);
+        if (!item) continue;
+        picked.push(item);
+        used.add(item.id);
       }
     }
 
@@ -238,6 +241,7 @@ export class ExamAssemblyService implements OnModuleDestroy {
   private fisherYatesShuffle<T>(arr: T[]): T[] {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = randomInt(0, i + 1);
+      // eslint-disable-next-line security/detect-object-injection -- bounded loop indices
       [arr[i], arr[j]] = [arr[j]!, arr[i]!];
     }
     return arr;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PeerReviewAssignmentService } from './peer-review-assignment.service';

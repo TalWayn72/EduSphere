@@ -4,6 +4,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    server: {
+      deps: {
+        inline: ['@edusphere/dns-provider'],
+      },
+    },
     include: ['src/**/*.spec.ts'],
     exclude: [
       // Orphaned specs — source modules not yet implemented

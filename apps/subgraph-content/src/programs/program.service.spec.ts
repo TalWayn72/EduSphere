@@ -54,6 +54,7 @@ vi.mock('@edusphere/db', () => {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 import { ProgramService } from './program.service';
+import { ProgramEnrollmentService } from './program-enrollment.service';
 import { withTenantContext } from '@edusphere/db';
 
 function buildPublishedProgram(
@@ -94,7 +95,7 @@ describe('ProgramService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new ProgramService();
+    service = new ProgramService(new ProgramEnrollmentService());
   });
 
   // ─── 1. listPrograms ───────────────────────────────────────────────────────
