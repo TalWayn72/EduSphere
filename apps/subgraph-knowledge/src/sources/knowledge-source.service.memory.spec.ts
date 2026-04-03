@@ -1,4 +1,4 @@
-/* Memory-safety tests for KnowledgeSourceService — no-explicit-any removed */
+/* Memory-safety tests for KnowledgeSourceService */
 /**
  * knowledge-source.service.memory.spec.ts
  *
@@ -6,9 +6,8 @@
  * Verifies:
  *   1. onModuleDestroy() calls closeAllPools() to release DB connections.
  *   2. onModuleDestroy() is idempotent (safe to call multiple times).
- *   3. Embedding failures do not leave dangling promises or grow the error queue.
- *   4. processSource() wraps all DB operations so a mid-process error still
- *      reaches the FAILED update path (no orphaned PROCESSING rows).
+ *   3. createAndProcess() delegates without leaking (processing tests elsewhere).
+ *   4. onModuleInit() marks stale sources as FAILED.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -41,11 +40,10 @@ const { mockCloseAllPools, mockDb } = vi.hoisted(() => {
     orderBy: vi.fn().mockResolvedValue([]),
   });
   const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
-  const mockValues = vi.fn().mockReturnValue({ returning: mockReturning });
   const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
 
   const mockDb = {
-    insert: vi.fn().mockReturnValue({ values: mockValues }),
+    insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ returning: mockReturning }) }),
     select: vi.fn().mockReturnValue({ from: mockFrom }),
     update: vi.fn().mockReturnValue({ set: mockSet }),
     delete: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
@@ -70,32 +68,22 @@ vi.mock('@edusphere/db', () => ({
       created_at: 'created_at',
     },
   },
-  eq: vi.fn((a, b) => ({ eq: [a, b] })),
-  and: vi.fn((...args) => ({ and: args })),
+  eq: vi.fn((a: unknown, b: unknown) => ({ eq: [a, b] })),
+  and: vi.fn((...args: unknown[]) => ({ and: args })),
+  inArray: vi.fn((col: unknown, vals: unknown[]) => ({ inArray: [col, vals] })),
 }));
 
 import { KnowledgeSourceService } from './knowledge-source.service.js';
 
-const mockParser = {
-  parseText: vi
-    .fn()
-    .mockReturnValue({ text: 'hello', wordCount: 1, metadata: {} }),
-  parseUrl: vi
-    .fn()
-    .mockResolvedValue({ text: 'url text', wordCount: 2, metadata: {} }),
-  parseDocx: vi
-    .fn()
-    .mockResolvedValue({ text: 'docx', wordCount: 1, metadata: {} }),
-  chunkText: vi.fn().mockReturnValue([{ index: 0, text: 'chunk' }]),
+const PENDING_SOURCE = {
+  id: 'ks-mem-1',
+  tenant_id: 't-1',
+  course_id: 'c-1',
+  status: 'PENDING',
 };
 
-const mockEmbeddings = {
-  generateEmbedding: vi.fn().mockResolvedValue({ id: 'emb-1' }),
-};
-
-const mockMinioUrl = {
-  uploadFile: vi.fn().mockResolvedValue(undefined),
-  getPresignedUrl: vi.fn().mockResolvedValue('https://minio.test/presigned'),
+const mockProcessingService = {
+  createAndProcess: vi.fn().mockResolvedValue(PENDING_SOURCE),
 };
 
 describe('KnowledgeSourceService — memory safety', () => {
@@ -103,20 +91,7 @@ describe('KnowledgeSourceService — memory safety', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Restore default mock implementations
-    mockParser.parseText.mockReturnValue({
-      text: 'hello',
-      wordCount: 1,
-      metadata: {},
-    });
-    mockParser.chunkText.mockReturnValue([{ index: 0, text: 'chunk' }]);
-    mockEmbeddings.generateEmbedding.mockResolvedValue({ id: 'emb-1' });
-
-    service = new KnowledgeSourceService(
-      mockParser as never,
-      mockEmbeddings as never,
-      mockMinioUrl as never
-    );
+    service = new KnowledgeSourceService(mockProcessingService as never);
   });
 
   // ── Test 1: onModuleDestroy releases DB pool ───────────────────────────────
@@ -132,125 +107,23 @@ describe('KnowledgeSourceService — memory safety', () => {
     expect(mockCloseAllPools).toHaveBeenCalledTimes(2);
   });
 
-  // ── Test 3: embedding failures do not throw (no dangling rejections) ───────
-  it('createAndProcess() does not throw when all embeddings fail', async () => {
-    mockEmbeddings.generateEmbedding.mockRejectedValue(
-      new Error('provider unavailable')
-    );
-
-    // Ensure update resolves even for FAILED path
-    const failedRow = {
-      id: 'ks-mem-1',
-      status: 'FAILED',
-      tenant_id: 't-1',
-      course_id: 'c-1',
-      title: 'Test',
-      source_type: 'TEXT',
-      origin: 'manual',
-      chunk_count: 0,
-      error_message: null,
-      metadata: {},
-      raw_content: '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    // insert returns PENDING row
-    const pendingRow = { ...failedRow, status: 'PENDING' };
-    mockDb.insert.mockReturnValue({
-      values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([pendingRow]),
-      }),
-    });
-
-    // update always returns the ready/failed row
-    const readyRow = { ...failedRow, status: 'READY', chunk_count: 0 };
-    mockDb.update.mockReturnValue({
-      set: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([readyRow]),
-        }),
-      }),
-    });
-
-    // Should not throw — embedding errors are logged and counted, not re-thrown
-    await expect(
-      service.createAndProcess({
-        tenantId: 't-1',
-        courseId: 'c-1',
-        title: 'Embed fail test',
-        sourceType: 'TEXT',
-        origin: 'manual',
-        rawText: 'embed fail',
-      })
-    ).resolves.toBeDefined();
-  });
-
-  // ── Test 4: PROCESSING state is always resolved (no orphaned rows) ─────────
-  it('createAndProcess() always reaches READY or FAILED even when parser throws', async () => {
-    mockParser.parseText.mockImplementationOnce(() => {
-      throw new Error('parser crash');
-    });
-
-    const pendingRow = {
-      id: 'ks-orphan',
-      status: 'PENDING',
-      tenant_id: 't-1',
-      course_id: 'c-1',
-      title: 'Orphan test',
-      source_type: 'TEXT',
-      origin: 'manual',
-      chunk_count: 0,
-      error_message: null,
-      metadata: {},
-      raw_content: '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    const failedRow = {
-      ...pendingRow,
-      status: 'FAILED',
-      error_message: 'parser crash',
-    };
-
-    mockDb.insert.mockReturnValue({
-      values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([pendingRow]),
-      }),
-    });
-
-    let updateCount = 0;
-    mockDb.update.mockImplementation(() => {
-      updateCount++;
-      // First update → PROCESSING (no returning needed)
-      // Second update → FAILED (returns failedRow)
-      const row = updateCount >= 2 ? failedRow : pendingRow;
-      return {
-        set: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            returning: vi.fn().mockResolvedValue([row]),
-          }),
-        }),
-      };
-    });
-
+  // ── Test 3: createAndProcess delegates without throwing ─────────────────────
+  it('createAndProcess() delegates to processingService', async () => {
     const result = await service.createAndProcess({
       tenantId: 't-1',
       courseId: 'c-1',
-      title: 'Orphan test',
+      title: 'Test',
       sourceType: 'TEXT',
       origin: 'manual',
-      rawText: 'will fail',
+      rawText: 'hello',
     });
+    expect(mockProcessingService.createAndProcess).toHaveBeenCalled();
+    expect(result).toEqual(PENDING_SOURCE);
+  });
 
-    // createAndProcess returns PENDING immediately; background task handles the rest
-    expect(result.status).toBe('PENDING');
-
-    // Flush background processing so processSource completes
-    await new Promise<void>((resolve) => setImmediate(resolve));
-
-    // Must have reached terminal state — two updates: PROCESSING + FAILED
-    expect(updateCount).toBeGreaterThanOrEqual(2);
+  // ── Test 4: onModuleInit marks stale sources ────────────────────────────────
+  it('onModuleInit() marks stale sources as FAILED', async () => {
+    await service.onModuleInit();
+    expect(mockDb.update).toHaveBeenCalled();
   });
 });

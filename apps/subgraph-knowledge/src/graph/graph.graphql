@@ -1,7 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
-
-directive @requiresRole(roles: [String!]!) on FIELD_DEFINITION
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated", "@requiresScopes"])
 
 type Concept @key(fields: "id") {
   id: ID!
@@ -132,7 +130,7 @@ extend type Mutation {
   """
   mergeConceptGraphNodes(input: MergeConceptsInput!): Concept!
     @authenticated
-    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+    @requiresScopes(scopes: [["org:manage"]])
 
   """
   Run k-means++ clustering on all concepts for a given course (default k=5).

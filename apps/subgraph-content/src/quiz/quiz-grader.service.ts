@@ -95,7 +95,9 @@ export class QuizGraderService {
     if (!Array.isArray(answer)) {
       return { itemIndex: idx, correct: false, partialScore: 0 };
     }
-    const correct = item.correctOrder.every((id, i) => (answer as unknown[]).at(i) === id);
+    const correct = item.correctOrder.every(
+      (id, i) => (answer as unknown[]).at(i) === id
+    );
     return { itemIndex: idx, correct, partialScore: correct ? 1 : 0 };
   }
 

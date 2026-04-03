@@ -38,7 +38,7 @@ describe('Expo SDK 55 migration checks', () => {
   it('package.json includes expo-video', () => {
     const pkg = readPkg();
     expect(pkg.dependencies?.['expo-video']).toBeDefined();
-    expect(pkg.dependencies?.['expo-video']).toMatch(/~2\./);
+    expect(pkg.dependencies?.['expo-video']).toMatch(/~55\./);
   });
 
   it('package.json uses react-native 0.83', () => {
@@ -54,7 +54,7 @@ describe('Expo SDK 55 migration checks', () => {
 
   it('no source files import from expo-av', () => {
     const result = execSync(
-      'grep -rl "expo-av" src/ --include="*.ts" --include="*.tsx" 2>/dev/null || true',
+      'grep -rl "expo-av" src/ --include="*.ts" --include="*.tsx" --exclude-dir="__tests__" 2>/dev/null || true',
       { cwd: MOBILE_ROOT, encoding: 'utf8' }
     ) as string;
     expect(result.trim()).toBe('');

@@ -25,7 +25,8 @@ export function computeKR20FromMatrix(matrix: number[][]): number {
 
   let sumPQ = 0;
   for (let j = 0; j < k; j++) {
-    const p = matrix.reduce((s, row) => s + (row.at(j) ?? 0), 0) / matrix.length;
+    const p =
+      matrix.reduce((s, row) => s + (row.at(j) ?? 0), 0) / matrix.length;
     sumPQ += p * (1 - p);
   }
   return (k / (k - 1)) * (1 - sumPQ / sigmaTotal);

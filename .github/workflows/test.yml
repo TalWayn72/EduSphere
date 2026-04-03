@@ -97,12 +97,7 @@ jobs:
 
       - name: Build shared packages
         run: |
-          pnpm --filter @edusphere/db build
-          pnpm --filter @edusphere/config build
-          pnpm --filter @edusphere/nats-client build
-          pnpm --filter @edusphere/auth build
-          pnpm --filter @edusphere/metrics build
-          pnpm --filter @edusphere/langgraph-workflows build
+          pnpm turbo build --filter='./packages/*'
 
       - name: Generate database schema
         run: pnpm --filter @edusphere/db generate
@@ -289,12 +284,7 @@ jobs:
 
       - name: Build shared packages
         run: |
-          pnpm --filter @edusphere/db build
-          pnpm --filter @edusphere/config build
-          pnpm --filter @edusphere/nats-client build
-          pnpm --filter @edusphere/auth build
-          pnpm --filter @edusphere/metrics build
-          pnpm --filter @edusphere/langgraph-workflows build
+          pnpm turbo build --filter='./packages/*'
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate

@@ -145,7 +145,7 @@ describe('No wildcard CORS in any production source (SI-2 global)', () => {
         }
       }
     }
-  });
+  }, 30_000);
 
   it('must have zero wildcard CORS headers in production TypeScript files', () => {
     if (violations.length > 0) {

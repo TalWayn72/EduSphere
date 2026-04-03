@@ -57,11 +57,13 @@ test('SA-01 Content Viewer (Default landing)', async ({ page }) => {
     .first()
     .innerText()
     .catch(() => 'no heading');
-  test.info().annotations.push(
-    { type: 'url', description: page.url() },
-    { type: 'nav-items', description: navItems.join(', ') },
-    { type: 'heading', description: h1 }
-  );
+  test
+    .info()
+    .annotations.push(
+      { type: 'url', description: page.url() },
+      { type: 'nav-items', description: navItems.join(', ') },
+      { type: 'heading', description: h1 }
+    );
 });
 
 test('SA-02 Dashboard', async ({ page }) => {
@@ -200,9 +202,11 @@ test('SA-11 User Menu - Check admin options', async ({ page }) => {
       fullPage: false,
     });
     const btns = await page.locator('button').allInnerTexts();
-    test.info().annotations.push(
-      { type: 'user-menu', description: 'not found' },
-      { type: 'buttons', description: btns.join(' | ') }
-    );
+    test
+      .info()
+      .annotations.push(
+        { type: 'user-menu', description: 'not found' },
+        { type: 'buttons', description: btns.join(' | ') }
+      );
   }
 });

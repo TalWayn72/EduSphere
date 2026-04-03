@@ -73,10 +73,7 @@ export function createMockQueriesService(
     findAll: vi
       .fn()
       .mockImplementation(
-        async (
-          filters: Record<string, unknown>,
-          auth?: AuthContext
-        ) => {
+        async (filters: Record<string, unknown>, auth?: AuthContext) => {
           authGuard(auth);
           const helpers = await getMockedDbHelpers();
           return helpers.withTenantContext(
@@ -101,10 +98,7 @@ export function createMockQueriesService(
               if (filters.layer) {
                 if (filters.layer === 'PERSONAL') {
                   conditions.push(
-                    eq(
-                      schema.annotations.user_id,
-                      (auth as AuthContext).userId
-                    )
+                    eq(schema.annotations.user_id, (auth as AuthContext).userId)
                   );
                 }
                 conditions.push(
@@ -143,9 +137,7 @@ export function createMockQueriesService(
                 sql`${schema.annotations.deleted_at} IS NULL`,
               ];
               if (layer) {
-                conditions.push(
-                  sql`${schema.annotations.layer} = ${layer}`
-                );
+                conditions.push(sql`${schema.annotations.layer} = ${layer}`);
               }
               return tx
                 .select()
@@ -177,13 +169,7 @@ export function createMockQueriesService(
                 eq(schema.annotations.user_id, userId),
                 sql`${schema.annotations.deleted_at} IS NULL`,
               ];
-              return executeQueryChain(
-                tx,
-                mockDb,
-                conditions,
-                limit,
-                offset
-              );
+              return executeQueryChain(tx, mockDb, conditions, limit, offset);
             }
           );
         }

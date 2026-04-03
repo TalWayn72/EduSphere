@@ -40,7 +40,10 @@ export function natsToXapiStatement(
   subject: string,
   payload: Record<string, unknown>
 ): object {
-  const verbKey: VerbKey = Object.prototype.hasOwnProperty.call(SUBJECT_TO_VERB, subject)
+  const verbKey: VerbKey = Object.prototype.hasOwnProperty.call(
+    SUBJECT_TO_VERB,
+    subject
+  )
     ? SUBJECT_TO_VERB[subject]! // eslint-disable-line security/detect-object-injection
     : 'launched';
   const activityId = (payload['courseId'] ??

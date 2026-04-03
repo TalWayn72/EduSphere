@@ -12,9 +12,7 @@ import {
 } from './graph-resolver.helpers';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function makeContext(
-  overrides: Record<string, unknown> = {}
-): GraphQLContext {
+function makeContext(overrides: Record<string, unknown> = {}): GraphQLContext {
   return {
     authContext: {
       tenantId: 'tenant-1',
@@ -44,9 +42,9 @@ describe('getGraphAuthContext', () => {
   });
 
   it('throws UnauthorizedException when authContext is missing', () => {
-    expect(() =>
-      getGraphAuthContext({} as GraphQLContext)
-    ).toThrow(UnauthorizedException);
+    expect(() => getGraphAuthContext({} as GraphQLContext)).toThrow(
+      UnauthorizedException
+    );
   });
 
   it('throws UnauthorizedException when userId is missing', () => {

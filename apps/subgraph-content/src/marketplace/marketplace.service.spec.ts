@@ -286,7 +286,13 @@ describe('MarketplaceService', () => {
     });
 
     const svc = await getService();
-    const result = await svc.createListing(COURSE_ID, 4999, 'USD', 80, TENANT_ID);
+    const result = await svc.createListing(
+      COURSE_ID,
+      4999,
+      'USD',
+      80,
+      TENANT_ID
+    );
     expect(mockListingService.createListing).toHaveBeenCalledWith(
       expect.anything(), // db
       COURSE_ID,
