@@ -108,11 +108,15 @@ jobs:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
-  # Unit tests with Vitest
+  # Unit tests with Vitest — sharded into 4 parallel jobs
   unit-tests:
-    name: Unit Tests (Vitest)
+    name: Unit Tests (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/4, 2/4, 3/4, 4/4]
 
     steps:
       - name: Checkout repository
@@ -134,15 +138,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run frontend unit tests with coverage (thresholds enforced)
+      - name: Run frontend unit tests with coverage (shard ${{ matrix.shard }})
         # Only run frontend tests here; backend subgraph tests require a live DB
         # and run in the Full Test Suite workflow (test.yml) with proper services.
         # vitest.config.ts defines thresholds: lines/statements 79%, functions 70%, branches 65%
-        run: pnpm --filter @edusphere/web test -- --run --coverage --reporter=verbose
+        run: pnpm --filter @edusphere/web test -- --run --coverage --reporter=verbose --shard=${{ matrix.shard }}
         continue-on-error: false
 
       - name: Run shared-package unit tests (no DB required)
-        run: pnpm turbo test --filter='./packages/*' -- --run --reporter=verbose
+        run: pnpm turbo test --filter='./packages/*' -- --run --reporter=verbose --shard=${{ matrix.shard }}
         continue-on-error: false
         env:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -152,7 +156,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-reports
+          name: coverage-reports-shard-${{ strategy.job-index }}
           path: |
             apps/*/coverage
             packages/*/coverage
@@ -168,7 +172,7 @@ jobs:
             apps/*/coverage/coverage-final.json
             packages/*/coverage/coverage-final.json
           flags: unittests
-          name: codecov-umbrella
+          name: codecov-shard-${{ strategy.job-index }}
 
   # Security audit - npm audit for vulnerabilities
   security-scan:
@@ -282,12 +286,16 @@ jobs:
             packages/*/dist
           retention-days: 3
 
-  # E2E tests — Playwright, frontend-only (no backend required)
+  # E2E tests — Playwright, frontend-only (no backend required) — sharded into 3 parallel jobs
   e2e-tests:
-    name: E2E Tests (Playwright — frontend only)
+    name: E2E Tests (Playwright ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
     continue-on-error: true # E2E tests may fail without backend services; non-blocking in CI
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/3, 2/3, 3/3]
 
     steps:
       - name: Checkout repository
@@ -310,8 +318,8 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter @edusphere/web exec playwright install --with-deps chromium
 
-      - name: Run Playwright E2E tests
-        run: pnpm --filter @edusphere/web test:e2e
+      - name: Run Playwright E2E tests (shard ${{ matrix.shard }})
+        run: pnpm --filter @edusphere/web exec playwright test --shard=${{ matrix.shard }}
         env:
           # CI mode: no real backend, Playwright starts Vite dev server automatically
           # ignoreSnapshots is set in playwright.config.ts when CI=true
@@ -321,7 +329,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-shard-${{ strategy.job-index }}
           path: apps/web/playwright-report/
           retention-days: 7
 
