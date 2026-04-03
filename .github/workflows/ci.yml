@@ -491,15 +491,10 @@ jobs:
       - name: Run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.13.x
-          lhci autorun \
-            --config=.lighthouserc.json \
-            --collect.startServerCommand="pnpm --filter @edusphere/web preview" \
-            --collect.startServerReadyPattern="Local" \
-            --collect.chromePath="" \
-            --collect.settings.chromeFlags="--no-sandbox --disable-gpu --ignore-certificate-errors"
+          lhci autorun --config=.lighthouserc.json
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHROME_FLAGS: "--no-sandbox --disable-gpu"
+          CHROME_FLAGS: "--no-sandbox --disable-gpu --ignore-certificate-errors"
 
   # Summary job - all checks must pass
   ci-complete:
