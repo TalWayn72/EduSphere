@@ -25,7 +25,8 @@ function getSubgraphsForType(typeName: string): string[] {
   const lines = supergraphSDL.split(nl);
   const prefix = 'type ' + typeName;
   const startIdx = lines.findIndex(
-    (l) => l === prefix || l.startsWith(prefix + ' ') || l.startsWith(prefix + '\r')
+    (l) =>
+      l === prefix || l.startsWith(prefix + ' ') || l.startsWith(prefix + '\r')
   );
   if (startIdx === -1) return [];
 

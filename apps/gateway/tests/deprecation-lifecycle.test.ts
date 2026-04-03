@@ -40,8 +40,10 @@ function extractDeprecations(
   sdl: string
 ): Array<{ reason: string; context: string }> {
   const results: Array<{ reason: string; context: string }> = [];
-  // Match @deprecated(reason: "...") patterns
-  const regex = /@deprecated\(reason:\s*"([^"]+)"\)/g;
+  // Match @deprecated(reason: "...") patterns — handles both single-line
+  // @deprecated(reason: "...") and multi-line @deprecated(\n  reason: "...")
+  // produced by composition/formatting tools.
+  const regex = /@deprecated\(\s*reason:\s*"([^"]+)"\s*\)/gs;
   let match;
   while ((match = regex.exec(sdl)) !== null) {
     results.push({

@@ -73,12 +73,12 @@ export type AdaptivePathItem = {
 };
 
 export type AddFileSourceInput = {
-  /** Base64-encoded file content  */
+  /** Base64-encoded file content */
   contentBase64: Scalars['String']['input'];
   courseId: Scalars['ID']['input'];
-  /** Original filename — used to determine SourceType (pdf/docx/txt)  */
+  /** Original filename — used to determine SourceType (pdf/docx/txt) */
   fileName: Scalars['String']['input'];
-  /** MIME type hint (e.g. application/pdf)  */
+  /** MIME type hint (e.g. application/pdf) */
   mimeType: Scalars['String']['input'];
   title: Scalars['String']['input'];
 };
@@ -118,7 +118,7 @@ export type AddUrlSourceInput = {
 export type AddYoutubeSourceInput = {
   courseId: Scalars['ID']['input'];
   title: Scalars['String']['input'];
-  /** Full YouTube video URL (youtube.com/watch?v=... or youtu.be/...)  */
+  /** Full YouTube video URL (youtube.com/watch?v=... or youtu.be/...) */
   url: Scalars['String']['input'];
 };
 
@@ -1866,15 +1866,15 @@ export type KnowledgeSource = {
   courseId: Scalars['ID']['output'];
   createdAt: Scalars['String']['output'];
   errorMessage?: Maybe<Scalars['String']['output']>;
-  /** Presigned MinIO URL for viewing the original file (PDF, DOCX, TXT). Null for URL/YouTube/Text sources.  */
+  /** Presigned MinIO URL for viewing the original file (PDF, DOCX, TXT). Null for URL/YouTube/Text sources. */
   fileUrl?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   metadata?: Maybe<Scalars['JSON']['output']>;
-  /** Original file name, URL, or YouTube link  */
+  /** Original file name, URL, or YouTube link */
   origin?: Maybe<Scalars['String']['output']>;
-  /** Preview of first 500 chars  */
+  /** Preview of first 500 chars */
   preview?: Maybe<Scalars['String']['output']>;
-  /** Full extracted plaintext (may be large — use with care)  */
+  /** Full extracted plaintext (may be large — use with care) */
   rawContent?: Maybe<Scalars['String']['output']>;
   sourceType: SourceType;
   status: SourceStatus;
@@ -2306,11 +2306,11 @@ export type MicrolessonQuizQuestion = {
 /** 3D model metadata — populated only when assetType is MODEL_3D. */
 export type Model3DInfo = {
   __typename?: 'Model3DInfo';
-  /** Animation clips embedded in the 3D file.  */
+  /** Animation clips embedded in the 3D file. */
   animations: Array<ModelAnimation>;
-  /** Format identifier: gltf | glb | obj | fbx  */
+  /** Format identifier: gltf | glb | obj | fbx */
   format: Scalars['String']['output'];
-  /** Triangle count used for LOD hints. Null until poly_count is set.  */
+  /** Triangle count used for LOD hints. Null until poly_count is set. */
   polyCount?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -6543,11 +6543,11 @@ export enum SubscriptionStatus {
 /** An available subtitle track for a media asset. */
 export type SubtitleTrack = {
   __typename?: 'SubtitleTrack';
-  /** Human-readable label for display in the player UI.  */
+  /** Human-readable label for display in the player UI. */
   label: Scalars['String']['output'];
-  /** BCP-47 language code, e.g. "he", "fr", "de".  */
+  /** BCP-47 language code, e.g. "he", "fr", "de". */
   language: Scalars['String']['output'];
-  /** Presigned URL of the WebVTT subtitle file (valid for 15 minutes).  */
+  /** Presigned URL of the WebVTT subtitle file (valid for 15 minutes). */
   src: Scalars['String']['output'];
 };
 
