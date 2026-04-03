@@ -12,18 +12,50 @@ import type { AnnotationQueriesService } from './annotation-queries.service';
 import type { AuthContext } from '@edusphere/auth';
 
 /**
- * Resolve withTenantContext from the caller's vi.mock scope.
+ * Resolve mocked DB helpers from the caller's vi.mock scope.
  * Dynamic import() is intercepted by vitest's module mock system,
  * unlike synchronous require() which may bypass it.
  */
-async function getMockedWithTenantContext() {
+async function getMockedDbHelpers() {
   const mod = await import('@edusphere/db');
-  return mod.withTenantContext;
+  return {
+    withTenantContext: mod.withTenantContext,
+    schema: mod.schema,
+    eq: mod.eq,
+    and: mod.and,
+    desc: mod.desc,
+    sql: mod.sql,
+  };
+}
+
+/**
+ * Build the full Drizzle-style query chain on the mock tx,
+ * mirroring what the real AnnotationQueriesService does.
+ * This ensures tests that set up mockOffset/mockLimit/etc.
+ * get their expected data returned through the chain.
+ */
+async function executeQueryChain(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tx: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  conditions: unknown[],
+  limit: number,
+  offset: number
+) {
+  const { schema, and, desc } = await getMockedDbHelpers();
+  return tx
+    .select()
+    .from(schema.annotations)
+    .where(and(...conditions))
+    .orderBy(desc(schema.annotations.created_at))
+    .limit(limit)
+    .offset(offset);
 }
 
 export function createMockQueriesService(
   mockDb: unknown,
-  defaultResult: unknown[] = []
+  _defaultResult: unknown[] = []
 ): AnnotationQueriesService {
   const authGuard = (auth?: AuthContext) => {
     if (!auth || !auth.tenantId) {
@@ -40,13 +72,52 @@ export function createMockQueriesService(
     findAll: vi
       .fn()
       .mockImplementation(
-        async (_filters: Record<string, unknown>, auth?: AuthContext) => {
+        async (
+          filters: Record<string, unknown>,
+          auth?: AuthContext
+        ) => {
           authGuard(auth);
-          const withTenantContext = await getMockedWithTenantContext();
-          return withTenantContext(
+          const helpers = await getMockedDbHelpers();
+          return helpers.withTenantContext(
             mockDb as never,
             toCtx(auth as AuthContext),
-            async () => defaultResult
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            async (tx: any) => {
+              const { schema, eq, sql } = helpers;
+              const conditions: unknown[] = [
+                sql`${schema.annotations.deleted_at} IS NULL`,
+              ];
+              if (filters.assetId) {
+                conditions.push(
+                  eq(schema.annotations.asset_id, filters.assetId)
+                );
+              }
+              if (filters.userId) {
+                conditions.push(
+                  eq(schema.annotations.user_id, filters.userId)
+                );
+              }
+              if (filters.layer) {
+                if (filters.layer === 'PERSONAL') {
+                  conditions.push(
+                    eq(
+                      schema.annotations.user_id,
+                      (auth as AuthContext).userId
+                    )
+                  );
+                }
+                conditions.push(
+                  sql`${schema.annotations.layer} = ${filters.layer}`
+                );
+              }
+              return executeQueryChain(
+                tx,
+                mockDb,
+                conditions,
+                (filters.limit as number) || 10,
+                (filters.offset as number) || 0
+              );
+            }
           );
         }
       ),
@@ -54,16 +125,33 @@ export function createMockQueriesService(
       .fn()
       .mockImplementation(
         async (
-          _assetId: string,
-          _layer: string | undefined,
+          assetId: string,
+          layer: string | undefined,
           auth?: AuthContext
         ) => {
           authGuard(auth);
-          const withTenantContext = await getMockedWithTenantContext();
-          return withTenantContext(
+          const helpers = await getMockedDbHelpers();
+          return helpers.withTenantContext(
             mockDb as never,
             toCtx(auth as AuthContext),
-            async () => defaultResult
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            async (tx: any) => {
+              const { schema, eq, and, desc, sql } = helpers;
+              const conditions: unknown[] = [
+                eq(schema.annotations.asset_id, assetId),
+                sql`${schema.annotations.deleted_at} IS NULL`,
+              ];
+              if (layer) {
+                conditions.push(
+                  sql`${schema.annotations.layer} = ${layer}`
+                );
+              }
+              return tx
+                .select()
+                .from(schema.annotations)
+                .where(and(...conditions))
+                .orderBy(desc(schema.annotations.created_at));
+            }
           );
         }
       ),
@@ -71,17 +159,31 @@ export function createMockQueriesService(
       .fn()
       .mockImplementation(
         async (
-          _userId: string,
-          _limit: number,
-          _offset: number,
+          userId: string,
+          limit: number,
+          offset: number,
           auth?: AuthContext
         ) => {
           authGuard(auth);
-          const withTenantContext = await getMockedWithTenantContext();
-          return withTenantContext(
+          const helpers = await getMockedDbHelpers();
+          return helpers.withTenantContext(
             mockDb as never,
             toCtx(auth as AuthContext),
-            async () => defaultResult
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            async (tx: any) => {
+              const { schema, eq, sql } = helpers;
+              const conditions = [
+                eq(schema.annotations.user_id, userId),
+                sql`${schema.annotations.deleted_at} IS NULL`,
+              ];
+              return executeQueryChain(
+                tx,
+                mockDb,
+                conditions,
+                limit,
+                offset
+              );
+            }
           );
         }
       ),

@@ -213,24 +213,35 @@ describe('SocialService', () => {
 
   describe('getSocialFeed', () => {
     it('returns empty array when user follows nobody', async () => {
-      vi.spyOn(service, 'getFollowing').mockResolvedValue([]);
+      const followService = (
+        service as unknown as { followService: SocialFollowService }
+      ).followService;
+      vi.spyOn(followService, 'getFollowing').mockResolvedValue([]);
       const result = await service.getSocialFeed('user-1', 'tenant-1', 20);
       expect(result).toEqual([]);
     });
 
     it('returns feed items from followed users ordered by createdAt desc', async () => {
-      vi.spyOn(service, 'getFollowing').mockResolvedValue(['user-2', 'user-3']);
+      const followService = (
+        service as unknown as { followService: SocialFollowService }
+      ).followService;
+      vi.spyOn(followService, 'getFollowing').mockResolvedValue([
+        'user-2',
+        'user-3',
+      ]);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            orderBy: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([]),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
             }),
           }),
         }),
       });
       await service.getSocialFeed('user-1', 'tenant-1', 20);
-      expect(service.getFollowing).toHaveBeenCalledWith(
+      expect(followService.getFollowing).toHaveBeenCalledWith(
         'user-1',
         'tenant-1',
         100
@@ -238,18 +249,24 @@ describe('SocialService', () => {
     });
 
     it('respects the limit parameter', async () => {
-      vi.spyOn(service, 'getFollowing').mockResolvedValue(['user-2']);
+      // Must spy on the internal followService used by feedService
+      const followService = (
+        service as unknown as { followService: SocialFollowService }
+      ).followService;
+      vi.spyOn(followService, 'getFollowing').mockResolvedValue(['user-2']);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            orderBy: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([]),
+          leftJoin: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
             }),
           }),
         }),
       });
       await service.getSocialFeed('user-1', 'tenant-1', 5);
-      expect(service.getFollowing).toHaveBeenCalledWith(
+      expect(followService.getFollowing).toHaveBeenCalledWith(
         'user-1',
         'tenant-1',
         100

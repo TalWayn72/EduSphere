@@ -391,14 +391,20 @@ describe('UserService', () => {
   // ─── listUsers (Phase 2) ────────────────────────────────────────────────
 
   describe('listUsers()', () => {
+    /**
+     * Helper: spy on the internal UserAdminService.adminUsers
+     * (service.adminUsers delegates to adminService.adminUsers,
+     * but listUsers calls adminService.listUsers which calls
+     * adminService.adminUsers — so we must spy on the actual instance).
+     */
+    function spyAdminUsers(retVal: { users: never[]; total: number }) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const adminSvc = (service as any).adminService as UserAdminService;
+      return vi.spyOn(adminSvc, 'adminUsers').mockResolvedValue(retVal);
+    }
+
     it('returns a UserConnection shape', async () => {
-      // adminUsers returns { users: [MOCK_USER], total: 1 }
-      // listUsers delegates to adminUsers — spy directly
-      // Simplified: just spy on adminUsers and mock it
-      const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
-        users: [MOCK_USER as never],
-        total: 1,
-      });
+      const spy = spyAdminUsers({ users: [MOCK_USER as never], total: 1 });
 
       const result = await service.listUsers({}, ADMIN_AUTH);
       expect(result).toHaveProperty('edges');
@@ -406,7 +412,7 @@ describe('UserService', () => {
       expect(result).toHaveProperty('pageInfo');
       expect(result).toHaveProperty('totalCount');
       expect(result.totalCount).toBe(1);
-      adminUsersSpy.mockRestore();
+      spy.mockRestore();
     });
 
     it('sets hasNextPage true when more results exist', async () => {
@@ -414,26 +420,20 @@ describe('UserService', () => {
         ...MOCK_USER,
         id: `u-${String(i)}`,
       }));
-      const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
-        users: manyUsers as never[],
-        total: 21,
-      });
+      const spy = spyAdminUsers({ users: manyUsers as never[], total: 21 });
 
       const result = await service.listUsers({ limit: 20 }, ADMIN_AUTH);
       expect(result.pageInfo.hasNextPage).toBe(true);
       expect(result.nodes.length).toBe(20);
-      adminUsersSpy.mockRestore();
+      spy.mockRestore();
     });
 
     it('pageInfo.hasPreviousPage true when page > 0', async () => {
-      const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
-        users: [MOCK_USER as never],
-        total: 10,
-      });
+      const spy = spyAdminUsers({ users: [MOCK_USER as never], total: 10 });
 
       const result = await service.listUsers({ page: 1, limit: 5 }, ADMIN_AUTH);
       expect(result.pageInfo.hasPreviousPage).toBe(true);
-      adminUsersSpy.mockRestore();
+      spy.mockRestore();
     });
   });
 });
