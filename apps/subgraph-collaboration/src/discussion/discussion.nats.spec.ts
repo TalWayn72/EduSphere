@@ -89,7 +89,6 @@ vi.mock('graphql-yoga', () => ({
   })),
 }));
 
-import { DiscussionService } from './discussion.service';
 import { createDiscussionService } from './__test-helpers';
 import { DiscussionResolver } from './discussion.resolver';
 
