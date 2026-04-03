@@ -17,24 +17,36 @@ const supergraphSDL = readFileSync(
 
 /**
  * Returns distinct subgraph names that appear in @join__type(graph: X) on the
- * type definition line for typeName in the supergraph SDL.
+ * type definition header (from `type TypeName` through the opening `{`) in the
+ * supergraph SDL.  The directives may span multiple continuation lines.
  */
 function getSubgraphsForType(typeName: string): string[] {
   const nl = String.fromCharCode(10);
   const lines = supergraphSDL.split(nl);
-  const typeLine = lines.find((l) => l.startsWith('type ' + typeName + ' '));
-  if (!typeLine) return [];
-  // Extract all graph: VALUE substrings from the type line
+  const prefix = 'type ' + typeName;
+  const startIdx = lines.findIndex(
+    (l) => l === prefix || l.startsWith(prefix + ' ') || l.startsWith(prefix + '\r')
+  );
+  if (startIdx === -1) return [];
+
+  // Collect lines from the type declaration through the opening brace
+  let header = '';
+  for (let i = startIdx; i < lines.length; i++) {
+    header += ' ' + lines[i];
+    if (lines[i].includes('{')) break;
+  }
+
+  // Extract all graph: VALUE substrings from the header block
   const results: string[] = [];
   const marker = '@join__type(graph: ';
   let pos = 0;
   while (true) {
-    const idx = typeLine.indexOf(marker, pos);
+    const idx = header.indexOf(marker, pos);
     if (idx === -1) break;
     const start = idx + marker.length;
-    const end = typeLine.indexOf(')', start);
+    const end = header.indexOf(')', start);
     if (end === -1) break;
-    const graphName = typeLine.slice(start, end).split(',')[0]?.trim();
+    const graphName = header.slice(start, end).split(',')[0]?.trim();
     if (graphName && !results.includes(graphName)) results.push(graphName);
     pos = end + 1;
   }
