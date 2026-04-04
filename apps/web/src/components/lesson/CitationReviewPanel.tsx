@@ -96,7 +96,7 @@ export function CitationReviewPanel({
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-7 text-xs text-emerald-600"
+                  className="h-7 text-xs text-emerald-600 dark:text-emerald-400"
                   onClick={() => onApprove(citation.id)}
                   disabled={citation.matchStatus === 'VERIFIED'}
                 >
