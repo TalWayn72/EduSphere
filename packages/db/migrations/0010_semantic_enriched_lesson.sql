@@ -8,8 +8,6 @@ ALTER TABLE "media_assets" ADD COLUMN IF NOT EXISTS "youtube_video_id" text;--> 
 ALTER TABLE "lesson_citations" ADD COLUMN IF NOT EXISTS "knowledge_source_id" uuid;--> statement-breakpoint
 ALTER TABLE "lesson_citations" ADD COLUMN IF NOT EXISTS "resolved_text" text;--> statement-breakpoint
 ALTER TABLE "lesson_citations" ADD COLUMN IF NOT EXISTS "graph_source_id" text;--> statement-breakpoint
-ALTER TABLE "visual_anchors" ADD COLUMN IF NOT EXISTS "start_time" numeric(10, 3);--> statement-breakpoint
-ALTER TABLE "visual_anchors" ADD COLUMN IF NOT EXISTS "end_time" numeric(10, 3);--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "enriched_transcript_blocks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tenant_id" uuid NOT NULL,
