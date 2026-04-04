@@ -14,37 +14,39 @@ import {
   useState,
 } from 'react';
 
-declare namespace YT {
-  class Player {
-    constructor(
-      container: HTMLElement,
-      options: {
-        videoId?: string;
-        width?: string | number;
-        height?: string | number;
-        playerVars?: Record<string, number>;
-        events?: {
-          onReady?: () => void;
-          onStateChange?: (e: OnStateChangeEvent) => void;
-        };
-      }
-    );
-    playVideo(): void;
-    pauseVideo(): void;
-    seekTo(seconds: number, allowSeekAhead?: boolean): void;
-    getCurrentTime(): number;
-    getDuration(): number;
-    getPlayerState(): number;
-    destroy(): void;
-  }
-  interface OnStateChangeEvent {
-    data: number;
-  }
+interface YTOnStateChangeEvent {
+  data: number;
+}
+
+interface YTPlayer {
+  playVideo(): void;
+  pauseVideo(): void;
+  seekTo(seconds: number, allowSeekAhead?: boolean): void;
+  getCurrentTime(): number;
+  getDuration(): number;
+  getPlayerState(): number;
+  destroy(): void;
+}
+
+interface YTPlayerConstructor {
+  new (
+    container: HTMLElement,
+    options: {
+      videoId?: string;
+      width?: string | number;
+      height?: string | number;
+      playerVars?: Record<string, number>;
+      events?: {
+        onReady?: () => void;
+        onStateChange?: (e: YTOnStateChangeEvent) => void;
+      };
+    }
+  ): YTPlayer;
 }
 
 declare global {
   interface Window {
-    YT: typeof YT & { Player: typeof YT.Player };
+    YT: { Player: YTPlayerConstructor };
     onYouTubeIframeAPIReady: (() => void) | undefined;
   }
 }
@@ -94,7 +96,7 @@ export const YouTubeEmbedPlayer = forwardRef<
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<YT.Player | null>(null);
+  const playerRef = useRef<YTPlayer | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastPollRef = useRef(0);
   const [ready, setReady] = useState(false);
@@ -143,7 +145,7 @@ export const YouTubeEmbedPlayer = forwardRef<
             onReadyRef.current?.();
             startPolling();
           },
-          onStateChange: (e: YT.OnStateChangeEvent) => {
+          onStateChange: (e: YTOnStateChangeEvent) => {
             if (!destroyed) onStateChangeRef.current?.(e.data);
           },
         },

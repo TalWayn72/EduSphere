@@ -7,7 +7,7 @@
  * EXCEPTION NOTE (150-line rule): Page-level orchestrator wiring multiple
  * hooks and sub-components; all rendering delegated.
  */
-import { useState, useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -41,7 +41,10 @@ export function LessonEnrichmentEditor() {
   const { data, fetching, refetch } = useEnrichedLesson(lessonId);
   const { approve, reject } = useCitationReview();
   const player = useYouTubePlayer();
-  const [_editCitationId, setEditCitationId] = useState<string | null>(null);
+  const editCitationRef = useRef<string | null>(null);
+  const setEditCitationId = useCallback((id: string | null) => {
+    editCitationRef.current = id;
+  }, []);
 
   const [, ingest] = useMutation(INGEST_YOUTUBE_LESSON_MUTATION);
   const [, setTimestamp] = useMutation(SET_BLOCK_ANCHOR_TIMESTAMP_MUTATION);

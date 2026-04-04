@@ -10,8 +10,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // ── Mock YouTube IFrame API ─────────────────────────────────────────────────
 
 const mockSeekTo = vi.fn();
-const _mockGetCurrentTime = vi.fn().mockReturnValue(42);
-const _mockDestroy = vi.fn();
 
 vi.mock('@/components/youtube/YouTubeEmbedPlayer', () => ({
   YouTubeEmbedPlayer: vi.fn(
