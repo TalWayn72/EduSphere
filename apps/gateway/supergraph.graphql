@@ -877,6 +877,9 @@ type Query
   knowledgeSource(id: ID!): KnowledgeSource
     @join__field(graph: KNOWLEDGE)
     @authenticated
+  enrichedLesson(lessonId: ID!): EnrichedLesson
+    @join__field(graph: CONTENT)
+    @authenticated
 }
 
 type Mutation
@@ -1228,6 +1231,22 @@ type Mutation
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
   publishLesson(id: ID!): Lesson!
+    @join__field(graph: CONTENT)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  ingestYoutubeLesson(input: IngestYoutubeLessonInput!): EnrichedLesson!
+    @join__field(graph: CONTENT)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  updateLessonCitation(citationId: ID!, input: UpdateCitationInput!): LessonCitation!
+    @join__field(graph: CONTENT)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  setBlockAnchorTimestamp(input: SetBlockAnchorTimestampInput!): EnrichedTranscriptBlock!
+    @join__field(graph: CONTENT)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  publishEnrichedLesson(lessonId: ID!): EnrichedLesson!
     @join__field(graph: CONTENT)
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
@@ -5818,4 +5837,64 @@ input AddFileSourceInput @join__type(graph: KNOWLEDGE) {
   MIME type hint (e.g. application/pdf)
   """
   mimeType: String!
+}
+
+enum EnrichedBlockType @join__type(graph: CONTENT) {
+  TEXT @join__enumValue(graph: CONTENT)
+  CITATION @join__enumValue(graph: CONTENT)
+  VISUAL_ANCHOR @join__enumValue(graph: CONTENT)
+  HEADING @join__enumValue(graph: CONTENT)
+}
+
+enum EnrichmentStatus @join__type(graph: CONTENT) {
+  PENDING @join__enumValue(graph: CONTENT)
+  EXTRACTING_TRANSCRIPT @join__enumValue(graph: CONTENT)
+  RUNNING_NER @join__enumValue(graph: CONTENT)
+  RESOLVING_CITATIONS @join__enumValue(graph: CONTENT)
+  READY @join__enumValue(graph: CONTENT)
+  PUBLISHED @join__enumValue(graph: CONTENT)
+}
+
+type EnrichedTranscriptBlock @join__type(graph: CONTENT) {
+  id: ID!
+  lessonId: ID!
+  segmentId: ID
+  blockType: EnrichedBlockType!
+  blockOrder: Int!
+  content: JSON!
+  citation: LessonCitation @join__field(graph: CONTENT)
+  anchor: VisualAnchor @join__field(graph: CONTENT)
+  startTime: Float
+  endTime: Float
+}
+
+type EnrichedLesson @join__type(graph: CONTENT) {
+  id: ID!
+  lesson: Lesson! @join__field(graph: CONTENT)
+  blocks: [EnrichedTranscriptBlock!]!
+  citations: [LessonCitation!]!
+  youtubeVideoId: String
+  transcriptReady: Boolean!
+  enrichmentStatus: EnrichmentStatus!
+}
+
+input IngestYoutubeLessonInput @join__type(graph: CONTENT) {
+  lessonId: ID!
+  youtubeUrl: String!
+}
+
+input UpdateCitationInput @join__type(graph: CONTENT) {
+  matchStatus: CitationMatchStatus
+  sourceText: String
+  bookName: String
+  part: String
+  page: String
+  column: String
+  paragraph: String
+}
+
+input SetBlockAnchorTimestampInput @join__type(graph: CONTENT) {
+  blockId: ID!
+  startTime: Float!
+  endTime: Float
 }
