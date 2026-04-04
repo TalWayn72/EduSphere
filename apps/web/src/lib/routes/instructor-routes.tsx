@@ -28,6 +28,11 @@ const InvestorDeckPage = lazy(() =>
     default: m.InvestorDeckPage,
   }))
 );
+const LessonEnrichmentEditor = lazy(() =>
+  import('@/pages/LessonEnrichmentEditor').then((m) => ({
+    default: m.LessonEnrichmentEditor,
+  }))
+);
 
 const INSTRUCTOR_ROLES = {
   requiredRoles: ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'],
@@ -55,6 +60,11 @@ export const instructorRoutes: RouteObject[] = [
   {
     path: '/partner/dashboard',
     element: guarded(<PartnerDashboardPage />, INSTRUCTOR_ROLES),
+  },
+  // Lesson Enrichment Editor — instructor authoring for YouTube lessons
+  {
+    path: '/lesson/:lessonId/edit',
+    element: guarded(<LessonEnrichmentEditor />, INSTRUCTOR_ROLES),
   },
   // Internal investor deck — SUPER_ADMIN only
   {

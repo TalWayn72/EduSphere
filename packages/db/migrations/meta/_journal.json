@@ -71,6 +71,13 @@
       "when": 1772693084086,
       "tag": "0009_overconfident_rogue",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1743724800000,
+      "tag": "0010_semantic_enriched_lesson",
+      "breakpoints": true
     }
   ]
 }

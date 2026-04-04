@@ -44,15 +44,16 @@
     "expo-status-bar": "~2.2.0",
     "expo-task-manager": "~12.0.2",
     "expo-video": "~55.0.11",
-    "react-native-reanimated": "^4.0.0",
     "graphql": "^16.9.0",
     "graphql-ws": "^5.16.0",
     "i18next": "^23.16.0",
     "react": "18.3.1",
     "react-i18next": "^15.0.0",
     "react-native": "0.83.0",
+    "react-native-reanimated": "^4.0.0",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.10.0"
+    "react-native-screens": "~4.10.0",
+    "react-native-youtube-iframe": "^2.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

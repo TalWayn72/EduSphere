@@ -108,6 +108,8 @@ export const media_assets = pgTable(
     model_animations: jsonb('model_animations').default([]),
     /** Triangle count for LOD hints (3D models only). */
     poly_count: integer('poly_count'),
+    /** YouTube video ID for embedded playback (FEAT: Semantic-Enriched Lesson Creation). */
+    youtube_video_id: text('youtube_video_id'),
     ...timestamps,
     ...softDelete,
   },

@@ -13,6 +13,7 @@ import { users } from './core';
 import { courses } from './content';
 import { modules } from './content';
 import { media_assets } from './content';
+import { knowledgeSources } from './knowledge-sources';
 
 // ─── Lessons ──────────────────────────────────────────────────────────────────
 
@@ -139,6 +140,15 @@ export const lesson_citations = pgTable('lesson_citations', {
     .notNull()
     .default('UNVERIFIED'),
   confidence: numeric('confidence', { precision: 5, scale: 4 }),
+  /** FK to knowledge_sources — resolved source document (FEAT: Semantic-Enriched Lesson). */
+  knowledge_source_id: uuid('knowledge_source_id').references(
+    () => knowledgeSources.id,
+    { onDelete: 'set null' }
+  ),
+  /** Actual resolved source text fetched from knowledge graph. */
+  resolved_text: text('resolved_text'),
+  /** Apache AGE graph node ID for the Source vertex. */
+  graph_source_id: text('graph_source_id'),
   ...timestamps,
 });
 

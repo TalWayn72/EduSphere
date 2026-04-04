@@ -1,0 +1,89 @@
+# ─── Enriched Lesson SDL (Semantic-Enriched Lesson Creation) ─────────────────
+# Defines types for enriched transcripts with inline citations and visual anchors.
+
+enum EnrichedBlockType {
+  TEXT
+  CITATION
+  VISUAL_ANCHOR
+  HEADING
+}
+
+enum EnrichmentStatus {
+  PENDING
+  EXTRACTING_TRANSCRIPT
+  RUNNING_NER
+  RESOLVING_CITATIONS
+  READY
+  PUBLISHED
+}
+
+type EnrichedTranscriptBlock {
+  id: ID!
+  lessonId: ID!
+  segmentId: ID
+  blockType: EnrichedBlockType!
+  blockOrder: Int!
+  content: JSON!
+  citation: LessonCitation
+  anchor: VisualAnchor
+  startTime: Float
+  endTime: Float
+}
+
+type EnrichedLesson {
+  id: ID!
+  lesson: Lesson!
+  blocks: [EnrichedTranscriptBlock!]!
+  citations: [LessonCitation!]!
+  youtubeVideoId: String
+  transcriptReady: Boolean!
+  enrichmentStatus: EnrichmentStatus!
+}
+
+input IngestYoutubeLessonInput {
+  lessonId: ID!
+  youtubeUrl: String!
+}
+
+input UpdateCitationInput {
+  matchStatus: CitationMatchStatus
+  sourceText: String
+  bookName: String
+  part: String
+  page: String
+  column: String
+  paragraph: String
+}
+
+input SetBlockAnchorTimestampInput {
+  blockId: ID!
+  startTime: Float!
+  endTime: Float
+}
+
+extend type Query {
+  enrichedLesson(lessonId: ID!): EnrichedLesson @authenticated
+}
+
+extend type Mutation {
+  ingestYoutubeLesson(input: IngestYoutubeLessonInput!): EnrichedLesson!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  updateLessonCitation(
+    citationId: ID!
+    input: UpdateCitationInput!
+  ): LessonCitation!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  setBlockAnchorTimestamp(
+    input: SetBlockAnchorTimestampInput!
+  ): EnrichedTranscriptBlock!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  publishEnrichedLesson(lessonId: ID!): EnrichedLesson!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}

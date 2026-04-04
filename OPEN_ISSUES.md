@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 31 March 2026 (QA gate — all E2E tests verified live)
+**Last Updated:** 5 April 2026 (Semantic-Enriched Lesson Creation — Phases 1-5 complete, integration testing)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -18,10 +18,11 @@
 
 ### 🟡 In Progress
 
-| ID                 | Issue                                                                                                        | Started     |
-| ------------------ | ------------------------------------------------------------------------------------------------------------ | ----------- |
-| FEAT-API-MUTATIONS | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
-| FEAT-AGENT-SANDBOX | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026 |
+| ID                            | Issue                                                                                                        | Started      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------ |
+| FEAT-SEMANTIC-LESSON-CREATION | Semantic-Enriched Lesson Creation — Phases 1-5 complete, integration testing phase                          | 5 Apr 2026   |
+| FEAT-API-MUTATIONS            | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026  |
+| FEAT-AGENT-SANDBOX            | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026  |
 
 ### ✅ Fixed (31 Mar 2026 Session)
 
@@ -192,6 +193,40 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 3. Content Moderation (flagged content queue, review workflow)
 4. System Health Dashboard (real-time metrics, alerts, service status)
 5. Audit Log Viewer (security events, user actions, compliance trail)
+
+---
+
+## 🟡 FEAT-SEMANTIC-LESSON-CREATION — Semantic-Enriched Lesson Creation
+
+- **Status:** 🟡 In Progress — Integration Testing Phase
+- **Started:** 5 Apr 2026
+- **Severity:** 🟡 Medium (new feature)
+- **Plan:** `docs/plans/features/FEAT-semantic-enriched-lesson-creation.md`
+
+**Description:** YouTube video transcript extraction, Hebrew sacred text NER, citation resolution via Knowledge Graph, enriched transcript with inline citations, visual anchor timestamp sync, instructor authoring UI, and student synchronized viewing experience.
+
+**Phases Completed (1–5):**
+
+- **Phase 1:** DB migration — new `enriched_transcript_blocks` table (Drizzle schema + RLS)
+- **Phase 2:** NestJS enrichment pipeline — YouTube caption fetch, enhanced NER, citation resolver, NATS events
+- **Phase 3:** GraphQL SDL + resolvers — `EnrichedLesson`, `EnrichedTranscriptBlock`, `EnrichmentStatus` types; `ingestYoutubeLesson`, `updateLessonCitation`, `setBlockAnchorTimestamp`, `publishEnrichedLesson` mutations
+- **Phase 4:** Instructor authoring UI — `/lesson/:lessonId/edit` route, enrichment editor, citation review panel, anchor sync
+- **Phase 5:** Student synchronized viewing — YouTube IFrame embed + auto-scroll enriched transcript + citation cards
+
+**Scope:**
+
+| Category           | Count |
+| ------------------ | ----- |
+| New files          | ~45   |
+| Modified files     | ~15   |
+| New tests          | 139 (14 test files) |
+| New DB tables      | 1 (`enriched_transcript_blocks`) |
+| New GraphQL types  | 3 (`EnrichedLesson`, `EnrichedTranscriptBlock`, `EnrichmentStatus`) |
+| New mutations      | 4 (`ingestYoutubeLesson`, `updateLessonCitation`, `setBlockAnchorTimestamp`, `publishEnrichedLesson`) |
+| NATS subjects      | 4 (`lesson.youtube.ingest`, `lesson.transcript.ready`, `citation.candidates.extracted`, `lesson.enrichment.completed`) |
+| Mobile components  | 4 new Expo components with offline support |
+
+**Next Step:** Integration testing — E2E flow from YouTube URL ingest through to student view.
 
 ---
 

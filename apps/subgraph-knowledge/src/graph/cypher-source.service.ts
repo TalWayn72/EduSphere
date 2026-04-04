@@ -21,6 +21,39 @@ export class CypherSourceService {
     return result[0] || null;
   }
 
+  /**
+   * Fuzzy-matches a Source node by title using case-insensitive CONTAINS.
+   * Returns the first matching Source or null.
+   */
+  async findSourceByTitleFuzzy(
+    title: string,
+    tenantId: string
+  ): Promise<unknown> {
+    // Normalize: trim, lowercase for fuzzy matching
+    const normalizedTitle = title.trim();
+    const result = await executeCypher(
+      db,
+      GRAPH_NAME,
+      `MATCH (s:Source {tenant_id: $tenantId})
+       WHERE s.title =~ $pattern
+       RETURN s
+       LIMIT 1`,
+      {
+        tenantId,
+        pattern: `(?i).*${this.escapeRegex(normalizedTitle)}.*`,
+      },
+      tenantId
+    );
+    return result[0] || null;
+  }
+
+  /**
+   * Escapes special regex characters in the title for Cypher =~ operator.
+   */
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   async createSource(
     title: string,
     type: string,

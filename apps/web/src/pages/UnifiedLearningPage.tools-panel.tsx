@@ -19,6 +19,10 @@ import { ContextPanel } from '@/components/ContextPanel';
 import type { TranscriptSegment } from '@/lib/mock-content-data';
 import type { Annotation, AnnotationLayer } from '@/types/annotations';
 import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
+import type { EnrichedTranscriptBlock } from '@/components/enriched-transcript/enriched-transcript.types';
+import { YouTubeEmbedPlayer } from '@/components/youtube/YouTubeEmbedPlayer';
+import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
+import { SyncTranscriptScroller } from '@/components/enriched-transcript/SyncTranscriptScroller';
 import { AnnotationsTab } from '@/pages/UnifiedLearningPage.annotations-tab';
 import { AiTab } from '@/pages/UnifiedLearningPage.ai-tab';
 import {
@@ -53,6 +57,10 @@ interface Props {
   onSketchSave?: (paths: SketchPath[], timestamp: number) => Promise<void>;
   existingSketches?: ExistingSketch[];
   subtitleTracks?: SubtitleTrack[];
+  /** YouTube video ID — when set, uses YouTubeEmbedPlayer instead of VideoPlayerCore. */
+  youtubeVideoId?: string | null;
+  /** Enriched transcript blocks for YouTube content. */
+  enrichedBlocks?: EnrichedTranscriptBlock[];
 }
 
 export function ToolsPanel({
@@ -75,9 +83,15 @@ export function ToolsPanel({
   onSketchSave,
   existingSketches = [],
   subtitleTracks = [],
+  youtubeVideoId,
+  enrichedBlocks = [],
 }: Props) {
   const { t } = useTranslation('content');
   const [activeTab, setActiveTab] = useState<Tab>('annotations');
+  const isYouTube = !!youtubeVideoId;
+
+  // YouTube player hook (only active when YouTube content)
+  const ytPlayer = useYouTubePlayer();
 
   // Find the transcript segment active at currentTime for the Context panel.
   const activeSegment = useMemo((): TranscriptSegment | null => {
@@ -113,49 +127,76 @@ export function ToolsPanel({
       {/* TOP — Video player + Transcript */}
       <ResizablePanel defaultSize={45} minSize={20} id="video">
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Video */}
+          {/* Video — YouTube embed or standard player */}
           <div className="flex-shrink-0 relative">
-            <VideoPlayerCore
-              src={videoUrl}
-              hlsSrc={hlsManifestUrl}
-              bookmarks={bookmarks}
-              seekTo={seekTarget}
-              onTimeUpdate={onTimeUpdate}
-              onDurationChange={onDurationChange}
-              subtitleTracks={subtitleTracks}
-            />
-            <div className="absolute bottom-10 left-0 right-0 pointer-events-none">
-              <VideoProgressMarkers
-                annotations={annotations}
-                duration={duration}
-                onSeek={onSeek}
+            {isYouTube ? (
+              <YouTubeEmbedPlayer
+                ref={ytPlayer.playerRef}
+                videoId={youtubeVideoId}
+                onReady={() => {
+                  ytPlayer.handleReady();
+                  onDurationChange(ytPlayer.playerRef.current?.getDuration() ?? 0);
+                }}
+                onTimeUpdate={(t) => {
+                  ytPlayer.handleTimeUpdate(t);
+                  onTimeUpdate(t);
+                }}
+                onStateChange={ytPlayer.handleStateChange}
+                className="w-full aspect-video"
               />
-            </div>
-            <AddAnnotationOverlay
-              currentTime={currentTime}
-              onSave={onOverlayAnnotation}
-            />
-            {onSketchSave && (
-              <VideoSketchOverlay
-                currentTime={currentTime}
-                onSave={onSketchSave}
-                existingSketches={existingSketches}
-              />
+            ) : (
+              <>
+                <VideoPlayerCore
+                  src={videoUrl}
+                  hlsSrc={hlsManifestUrl}
+                  bookmarks={bookmarks}
+                  seekTo={seekTarget}
+                  onTimeUpdate={onTimeUpdate}
+                  onDurationChange={onDurationChange}
+                  subtitleTracks={subtitleTracks}
+                />
+                <div className="absolute bottom-10 left-0 right-0 pointer-events-none">
+                  <VideoProgressMarkers
+                    annotations={annotations}
+                    duration={duration}
+                    onSeek={onSeek}
+                  />
+                </div>
+                <AddAnnotationOverlay
+                  currentTime={currentTime}
+                  onSave={onOverlayAnnotation}
+                />
+                {onSketchSave && (
+                  <VideoSketchOverlay
+                    currentTime={currentTime}
+                    onSave={onSketchSave}
+                    existingSketches={existingSketches}
+                  />
+                )}
+              </>
             )}
           </div>
 
-          {/* Transcript */}
+          {/* Transcript — enriched scroller for YouTube, standard panel otherwise */}
           <div className="flex-1 overflow-hidden flex flex-col border-t">
             <div className="px-3 py-1.5 border-b flex items-center gap-1.5 text-xs font-semibold flex-shrink-0">
               <BookOpen className="h-3.5 w-3.5" />
               {t('transcript', 'תמלול')}
             </div>
             <div className="flex-1 overflow-hidden">
-              <TranscriptPanel
-                segments={transcript}
-                currentTime={currentTime}
-                onSeek={onSeek}
-              />
+              {isYouTube && enrichedBlocks.length > 0 ? (
+                <SyncTranscriptScroller
+                  blocks={enrichedBlocks}
+                  currentTime={currentTime}
+                  onSeek={onSeek}
+                />
+              ) : (
+                <TranscriptPanel
+                  segments={transcript}
+                  currentTime={currentTime}
+                  onSeek={onSeek}
+                />
+              )}
             </div>
           </div>
         </div>

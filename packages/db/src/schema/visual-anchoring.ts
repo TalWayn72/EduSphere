@@ -97,6 +97,10 @@ export const visualAnchors = pgTable(
     }),
     // DOM document order (0-based) — used for tie-breaking centermost detection
     document_order: integer('document_order').notNull().default(0),
+    // Video timestamp (seconds) where this anchor becomes active (FEAT: Semantic-Enriched Lesson)
+    start_time: numeric('start_time', { precision: 10, scale: 3 }),
+    // Video timestamp (seconds) where this anchor deactivates
+    end_time: numeric('end_time', { precision: 10, scale: 3 }),
     // Set to true by sync tool when anchor_text no longer matches document content
     is_broken: boolean('is_broken').notNull().default(false),
     ...timestamps,

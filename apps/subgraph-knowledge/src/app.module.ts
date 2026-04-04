@@ -11,6 +11,7 @@ import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 import { CohortInsightsModule } from './cohort-insights/cohort-insights.module';
 import { PeerMatchingModule } from './peer-matching/peer-matching.module';
+import { CitationResolutionModule } from './citation/citation-resolution.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PeerMatchingModule } from './peer-matching/peer-matching.module';
     NatsConsumerModule,
     CohortInsightsModule,
     PeerMatchingModule,
+    CitationResolutionModule,
   ],
 })
 export class AppModule {}

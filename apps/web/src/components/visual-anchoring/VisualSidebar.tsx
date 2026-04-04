@@ -7,6 +7,8 @@ interface VisualSidebarProps {
   activeAnchorId: string | null;
   isRTL?: boolean;
   className?: string;
+  /** When provided, shows timestamp info for the active anchor (video mode). */
+  currentTime?: number;
 }
 
 /**
@@ -20,6 +22,7 @@ export default function VisualSidebar({
   activeAnchorId,
   isRTL = false,
   className = '',
+  currentTime,
 }: VisualSidebarProps) {
   const activeAnchor = activeAnchorId
     ? (anchors.find((a) => a.id === activeAnchorId) ?? null)
@@ -106,12 +109,17 @@ export default function VisualSidebar({
         )}
       </div>
 
-      {/* Anchor text preview */}
+      {/* Anchor text preview + optional timestamp */}
       {activeAnchor && (
         <div className="px-3 py-2 border-t border-border bg-muted/30">
           <p className="text-xs text-muted-foreground line-clamp-2 italic">
             &ldquo;{activeAnchor.anchorText}&rdquo;
           </p>
+          {currentTime !== undefined && (
+            <p className="text-[10px] text-muted-foreground/60 mt-1">
+              {Math.floor(currentTime / 60)}:{String(Math.floor(currentTime % 60)).padStart(2, '0')}
+            </p>
+          )}
         </div>
       )}
     </aside>

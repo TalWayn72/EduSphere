@@ -33,6 +33,8 @@ import { DocumentPanel } from '@/pages/UnifiedLearningPage.document-panel';
 import { ToolsPanel } from '@/pages/UnifiedLearningPage.tools-panel';
 import VisualSidebar from '@/components/visual-anchoring/VisualSidebar';
 import { useAnchorDetection } from '@/hooks/useAnchorDetection';
+import { useTimestampAnchorDetection } from '@/hooks/useTimestampAnchorDetection';
+import { useEnrichedLesson } from '@/hooks/useEnrichedLesson';
 import { GET_VISUAL_ANCHORS } from '@/components/visual-anchoring/visual-anchor.graphql';
 import type { VisualAnchor } from '@/components/visual-anchoring/visual-anchor.types';
 import { ResumeBanner } from '@/pages/ResumeBanner';
@@ -80,8 +82,13 @@ export function UnifiedLearningPage() {
     item?.content ?? (itemResult.error ? mockDocumentContent : '');
 
   // ── Video / transcript hook (has mock fallback) ──
-  const { videoUrl, hlsManifestUrl, videoTitle, transcript } =
+  const { videoUrl, hlsManifestUrl, videoTitle, transcript, youtubeVideoId, isYouTubeContent } =
     useContentData(contentId);
+
+  // ── Enriched lesson data (for YouTube content) ──
+  const enrichedLesson = useEnrichedLesson(
+    isYouTubeContent ? contentId : '',
+  );
 
   // ── Subtitle tracks (empty array when query not available) ──
   const subtitleTracks = useSubtitleTracks(contentId);
@@ -126,6 +133,11 @@ export function UnifiedLearningPage() {
     });
   }, [savedScrollY]);
 
+  // ── Video state (declared here so currentTime is available for anchor detection below) ──
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [seekTarget, setSeekTarget] = useState<number | undefined>();
+
   // ── Visual anchors ──
   const [anchorsResult] = useQuery<VisualAnchorsResult>({
     query: GET_VISUAL_ANCHORS,
@@ -138,19 +150,31 @@ export function UnifiedLearningPage() {
     id: a.id,
     documentOrder: a.documentOrder,
   }));
-  const { activeAnchorId } = useAnchorDetection(
+  const scrollAnchor = useAnchorDetection(
     anchorPositions,
     scrollContainerRef
   );
+  // Timestamp-based anchor detection for enriched YouTube lessons
+  const timestampAnchors = (enrichedLesson.data?.blocks ?? [])
+    .filter((b) => b.blockType === 'VISUAL_ANCHOR' && b.anchor)
+    .map((b) => ({
+      id: b.anchor!.id,
+      startTime: b.anchor!.startTime ?? null,
+      endTime: b.anchor!.endTime ?? null,
+      documentOrder: b.blockOrder,
+    }));
+  const tsAnchor = useTimestampAnchorDetection({
+    anchors: timestampAnchors,
+    currentTime,
+  });
+  // Use timestamp-based detection for YouTube content, scroll-based otherwise
+  const activeAnchorId = isYouTubeContent
+    ? tsAnchor.activeAnchorId
+    : scrollAnchor.activeAnchorId;
   const activeAnchor = visualAnchors.find((a) => a.id === activeAnchorId);
 
   // ── Document zoom ──
   const { documentZoom, defaultAnnotationLayer } = useDocumentUIStore();
-
-  // ── Video state ──
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [seekTarget, setSeekTarget] = useState<number | undefined>();
 
   const seekTo = useCallback((time: number) => {
     setSeekTarget(time);
@@ -216,6 +240,7 @@ export function UnifiedLearningPage() {
           <VisualSidebar
             anchors={visualAnchors}
             activeAnchorId={activeAnchorId}
+            currentTime={isYouTubeContent ? currentTime : undefined}
           />
           <ResizablePanelGroup
             orientation="horizontal"
@@ -267,6 +292,8 @@ export function UnifiedLearningPage() {
                 bookmarks={bookmarks}
                 chat={chat}
                 subtitleTracks={subtitleTracks}
+                youtubeVideoId={youtubeVideoId}
+                enrichedBlocks={enrichedLesson.data?.blocks ?? []}
               />
             </ResizablePanel>
           </ResizablePanelGroup>

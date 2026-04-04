@@ -228,3 +228,6 @@ export * from './custom-domains';
 
 // GDPR Erasure Log — cryptographic proof of Art.17 erasure
 export * from './gdpr-erasure-log';
+
+// Enriched Transcript Blocks (FEAT: Semantic-Enriched Lesson Creation)
+export * from './enriched-transcript';

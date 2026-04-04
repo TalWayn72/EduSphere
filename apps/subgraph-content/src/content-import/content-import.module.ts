@@ -19,6 +19,6 @@ import { ClamavModule } from '../clamav/clamav.module';
     ContentImportResolver,
     ScormExportService,
   ],
-  exports: [ContentImportService, ScormExportService],
+  exports: [ContentImportService, ScormExportService, YouTubeClient],
 })
 export class ContentImportModule {}

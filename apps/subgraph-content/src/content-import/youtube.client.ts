@@ -19,9 +19,60 @@ interface YTResponse {
   nextPageToken?: string;
 }
 
+/** Regex matching a raw 11-character YouTube video ID. */
+const RAW_VIDEO_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
+
+/**
+ * Patterns that capture a video ID from common YouTube URL formats:
+ * watch, youtu.be, embed, v/, shorts, live.
+ */
+const VIDEO_ID_PATTERNS: RegExp[] = [
+  /[?&]v=([a-zA-Z0-9_-]{11})/,
+  /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+  /\/embed\/([a-zA-Z0-9_-]{11})/,
+  /\/v\/([a-zA-Z0-9_-]{11})/,
+  /\/shorts\/([a-zA-Z0-9_-]{11})/,
+  /\/live\/([a-zA-Z0-9_-]{11})/,
+];
+
 @Injectable()
 export class YouTubeClient {
   private readonly logger = new Logger(YouTubeClient.name);
+
+  /**
+   * Extract a YouTube video ID from any common URL format or a raw 11-char ID.
+   *
+   * Supported formats:
+   * - https://www.youtube.com/watch?v=ID
+   * - https://youtu.be/ID
+   * - https://www.youtube.com/embed/ID
+   * - https://www.youtube.com/v/ID
+   * - https://www.youtube.com/shorts/ID
+   * - https://www.youtube.com/live/ID
+   * - https://m.youtube.com/watch?v=ID
+   * - Raw 11-character video ID string
+   */
+  static extractVideoId(url: string): string {
+    const trimmed = url.trim();
+    if (!trimmed) {
+      throw new BadRequestException('Invalid YouTube URL or video ID');
+    }
+
+    // Check for raw video ID (exactly 11 valid chars)
+    if (RAW_VIDEO_ID_RE.test(trimmed)) {
+      return trimmed;
+    }
+
+    // Try each URL pattern
+    for (const pattern of VIDEO_ID_PATTERNS) {
+      const match = pattern.exec(trimmed);
+      if (match?.[1]) {
+        return match[1];
+      }
+    }
+
+    throw new BadRequestException('Invalid YouTube URL or video ID');
+  }
 
   async getPlaylistItems(
     playlistId: string,

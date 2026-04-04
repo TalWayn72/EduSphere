@@ -19,6 +19,7 @@ interface MediaAsset {
   duration?: number | null;
   thumbnailUrl?: string | null;
   hlsManifestUrl?: string | null;
+  youtubeVideoId?: string | null;
 }
 
 interface TranscriptSegmentRaw {
@@ -53,6 +54,10 @@ export interface ContentData {
   transcript: TranscriptSegment[];
   fetching: boolean;
   error: string | null;
+  /** YouTube video ID when the content is a YouTube embed (enriched lesson). */
+  youtubeVideoId: string | null;
+  /** True when the content source is a YouTube embed rather than a hosted video. */
+  isYouTubeContent: boolean;
 }
 
 export function useContentData(contentId: string): ContentData {
@@ -64,6 +69,9 @@ export function useContentData(contentId: string): ContentData {
 
   const item = result.data?.contentItem;
   const hasError = !!result.error && !item;
+
+  const youtubeVideoId = item?.mediaAsset?.youtubeVideoId ?? null;
+  const isYouTubeContent = !!youtubeVideoId;
 
   const videoUrl = item?.mediaAsset?.url ?? mockVideo.url;
   const hlsManifestUrl = item?.mediaAsset?.hlsManifestUrl ?? null;
@@ -88,5 +96,7 @@ export function useContentData(contentId: string): ContentData {
     error: hasError
       ? (result.error?.message ?? 'Failed to load content')
       : null,
+    youtubeVideoId,
+    isYouTubeContent,
   };
 }

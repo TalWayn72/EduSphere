@@ -35,6 +35,7 @@ import { PeerReviewModule } from './peer-review/peer-review.module';
 import { AeoModule } from './aeo/aeo.module';
 import { ExamModule } from './exam/exam.module';
 import { PsychometricsModule } from './psychometrics/psychometrics.module';
+import { EnrichedLessonModule } from './enriched-lesson/enriched-lesson.module';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { PsychometricsModule } from './psychometrics/psychometrics.module';
     AeoModule,
     ExamModule,
     PsychometricsModule,
+    EnrichedLessonModule,
   ],
 })
 export class AppModule {}

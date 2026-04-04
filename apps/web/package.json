@@ -134,6 +134,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
+    "@types/youtube": "^0.1.2",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.20",

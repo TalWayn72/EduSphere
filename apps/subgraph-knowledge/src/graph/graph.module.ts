@@ -81,6 +81,6 @@ import { MergeConceptsService } from './merge-concepts.service';
     SkillTreeResolver,
     MergeConceptsService,
   ],
-  exports: [GraphService, CypherService],
+  exports: [GraphService, CypherService, CypherSourceService],
 })
 export class GraphModule {}
