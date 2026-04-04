@@ -14,9 +14,37 @@ import {
   useState,
 } from 'react';
 
+declare namespace YT {
+  class Player {
+    constructor(
+      container: HTMLElement,
+      options: {
+        videoId?: string;
+        width?: string | number;
+        height?: string | number;
+        playerVars?: Record<string, number>;
+        events?: {
+          onReady?: () => void;
+          onStateChange?: (e: OnStateChangeEvent) => void;
+        };
+      }
+    );
+    playVideo(): void;
+    pauseVideo(): void;
+    seekTo(seconds: number, allowSeekAhead?: boolean): void;
+    getCurrentTime(): number;
+    getDuration(): number;
+    getPlayerState(): number;
+    destroy(): void;
+  }
+  interface OnStateChangeEvent {
+    data: number;
+  }
+}
+
 declare global {
   interface Window {
-    YT: typeof YT;
+    YT: typeof YT & { Player: typeof YT.Player };
     onYouTubeIframeAPIReady: (() => void) | undefined;
   }
 }

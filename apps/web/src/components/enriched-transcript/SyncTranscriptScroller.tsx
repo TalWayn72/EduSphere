@@ -83,7 +83,6 @@ export function SyncTranscriptScroller({
   );
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div onWheel={handleWheel} className={className}>
       <EnrichedTranscriptPanel
         blocks={blocks}

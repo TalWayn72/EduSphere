@@ -41,7 +41,7 @@ export function LessonEnrichmentEditor() {
   const { data, fetching, refetch } = useEnrichedLesson(lessonId);
   const { approve, reject } = useCitationReview();
   const player = useYouTubePlayer();
-  const [editCitationId, setEditCitationId] = useState<string | null>(null);
+  const [_editCitationId, setEditCitationId] = useState<string | null>(null);
 
   const [, ingest] = useMutation(INGEST_YOUTUBE_LESSON_MUTATION);
   const [, setTimestamp] = useMutation(SET_BLOCK_ANCHOR_TIMESTAMP_MUTATION);

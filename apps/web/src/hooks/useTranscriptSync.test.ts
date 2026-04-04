@@ -4,7 +4,7 @@
  * Tests: bidirectional sync between player time and transcript scroll,
  * active segment detection, click-to-seek, debounce behavior.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
