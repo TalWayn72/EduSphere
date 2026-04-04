@@ -31,7 +31,8 @@ export function usePlayerKeyboardShortcuts({
     const handler = (e: KeyboardEvent) => {
       const tag = document.activeElement?.tagName ?? '';
       if (INTERACTIVE_TAGS.has(tag)) return;
-      const isEditable = (document.activeElement as HTMLElement)?.isContentEditable;
+      const isEditable = (document.activeElement as HTMLElement)
+        ?.isContentEditable;
       if (isEditable) return;
 
       switch (e.key) {

@@ -60,8 +60,7 @@ export class CitationNerConsumer implements OnModuleInit, OnModuleDestroy {
   private async ensureStream(): Promise<void> {
     if (!this.connection) return;
     try {
-      const jsm: JetStreamManager =
-        await this.connection.jetstreamManager();
+      const jsm: JetStreamManager = await this.connection.jetstreamManager();
       try {
         await jsm.streams.info(STREAM_NAME);
       } catch {
@@ -89,9 +88,7 @@ export class CitationNerConsumer implements OnModuleInit, OnModuleDestroy {
       for await (const msg of sub) {
         try {
           const raw = this.sc.decode(msg.data);
-          const payload = TranscriptReadyPayloadSchema.parse(
-            JSON.parse(raw)
-          );
+          const payload = TranscriptReadyPayloadSchema.parse(JSON.parse(raw));
           await this.handleTranscriptReady(payload);
         } catch (err) {
           this.logger.error(
@@ -182,10 +179,7 @@ export class CitationNerConsumer implements OnModuleInit, OnModuleDestroy {
         'Published citation.candidates.extracted'
       );
     } catch (err) {
-      this.logger.error(
-        { err },
-        `Failed to publish to ${PUBLISH_SUBJECT}`
-      );
+      this.logger.error({ err }, `Failed to publish to ${PUBLISH_SUBJECT}`);
     }
   }
 }

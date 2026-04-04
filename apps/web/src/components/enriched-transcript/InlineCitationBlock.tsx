@@ -47,10 +47,7 @@ export function InlineCitationBlock({
           {transcriptText}
         </span>
         <span className="shrink-0 flex items-center gap-1 mt-0.5">
-          <Badge
-            variant="outline"
-            className="text-xs gap-1 cursor-pointer"
-          >
+          <Badge variant="outline" className="text-xs gap-1 cursor-pointer">
             <BookOpen className="h-3 w-3" />
             {citation.bookName}
           </Badge>

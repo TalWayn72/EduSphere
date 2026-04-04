@@ -82,7 +82,8 @@ export class EnrichedLessonResolver {
 
   @Mutation('setBlockAnchorTimestamp')
   async setBlockAnchorTimestamp(
-    @Args('input') input: { blockId: string; startTime: number; endTime?: number },
+    @Args('input')
+    input: { blockId: string; startTime: number; endTime?: number },
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);

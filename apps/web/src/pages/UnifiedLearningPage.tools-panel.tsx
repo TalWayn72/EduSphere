@@ -135,7 +135,9 @@ export function ToolsPanel({
                 videoId={youtubeVideoId}
                 onReady={() => {
                   ytPlayer.handleReady();
-                  onDurationChange(ytPlayer.playerRef.current?.getDuration() ?? 0);
+                  onDurationChange(
+                    ytPlayer.playerRef.current?.getDuration() ?? 0
+                  );
                 }}
                 onTimeUpdate={(t) => {
                   ytPlayer.handleTimeUpdate(t);

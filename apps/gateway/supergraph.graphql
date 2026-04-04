@@ -1238,11 +1238,16 @@ type Mutation
     @join__field(graph: CONTENT)
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
-  updateLessonCitation(citationId: ID!, input: UpdateCitationInput!): LessonCitation!
+  updateLessonCitation(
+    citationId: ID!
+    input: UpdateCitationInput!
+  ): LessonCitation!
     @join__field(graph: CONTENT)
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
-  setBlockAnchorTimestamp(input: SetBlockAnchorTimestampInput!): EnrichedTranscriptBlock!
+  setBlockAnchorTimestamp(
+    input: SetBlockAnchorTimestampInput!
+  ): EnrichedTranscriptBlock!
     @join__field(graph: CONTENT)
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
@@ -3377,6 +3382,8 @@ type VisualAnchor @join__type(graph: CONTENT) {
   isBroken: Boolean!
   createdAt: String!
   updatedAt: String!
+  startTime: Float @join__field(graph: CONTENT)
+  endTime: Float @join__field(graph: CONTENT)
 }
 
 type SyncResult @join__type(graph: CONTENT) {

@@ -102,7 +102,7 @@ export default function EnrichedTranscriptSheet({
           {item.blockType === 'VISUAL_ANCHOR' && (
             <View style={styles.anchor} testID="block-anchor">
               <Text style={styles.anchorText}>
-                {item.content.text as string ?? 'Visual anchor'}
+                {(item.content.text as string) ?? 'Visual anchor'}
               </Text>
             </View>
           )}

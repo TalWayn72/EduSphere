@@ -2,9 +2,17 @@
  * Shared types for enriched transcript components.
  */
 
-export type EnrichedBlockType = 'TEXT' | 'CITATION' | 'VISUAL_ANCHOR' | 'HEADING';
+export type EnrichedBlockType =
+  | 'TEXT'
+  | 'CITATION'
+  | 'VISUAL_ANCHOR'
+  | 'HEADING';
 
-export type CitationMatchStatus = 'VERIFIED' | 'UNVERIFIED' | 'REJECTED' | 'EDITED';
+export type CitationMatchStatus =
+  | 'VERIFIED'
+  | 'UNVERIFIED'
+  | 'REJECTED'
+  | 'EDITED';
 
 export type EnrichmentStatus =
   | 'PENDING'

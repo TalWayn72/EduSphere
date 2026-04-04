@@ -83,7 +83,10 @@ export const INGEST_YOUTUBE_LESSON_MUTATION = gql`
 `;
 
 export const UPDATE_CITATION_MUTATION = gql`
-  mutation UpdateLessonCitation($citationId: ID!, $input: UpdateCitationInput!) {
+  mutation UpdateLessonCitation(
+    $citationId: ID!
+    $input: UpdateCitationInput!
+  ) {
     updateLessonCitation(citationId: $citationId, input: $input) {
       ...CitationFields
     }

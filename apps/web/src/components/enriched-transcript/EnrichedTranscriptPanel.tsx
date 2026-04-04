@@ -22,7 +22,7 @@ interface EnrichedTranscriptPanelProps {
 
 function isActiveBlock(
   block: EnrichedTranscriptBlock,
-  currentTime: number | undefined,
+  currentTime: number | undefined
 ): boolean {
   if (currentTime === undefined) return false;
   if (block.startTime == null) return false;
@@ -47,7 +47,10 @@ export function EnrichedTranscriptPanel({
   const sorted = [...blocks].sort((a, b) => a.blockOrder - b.blockOrder);
 
   return (
-    <ScrollArea className={`h-full ${className}`} data-testid="enriched-transcript-panel">
+    <ScrollArea
+      className={`h-full ${className}`}
+      data-testid="enriched-transcript-panel"
+    >
       <div ref={containerRef} className="p-3 space-y-2">
         {sorted.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-8">

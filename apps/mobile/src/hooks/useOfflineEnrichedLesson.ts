@@ -119,7 +119,10 @@ export function useOfflineEnrichedLesson(
         end_time: number | null;
         citation_id: string | null;
         synced_at: string | null;
-      }>(`SELECT * FROM ${BLOCKS_TABLE} WHERE lesson_id = ? ORDER BY block_order`, [lessonId]);
+      }>(
+        `SELECT * FROM ${BLOCKS_TABLE} WHERE lesson_id = ? ORDER BY block_order`,
+        [lessonId]
+      );
 
       const cachedCitations = await db.getAllAsync<{
         id: string;
@@ -188,10 +191,9 @@ export function useOfflineEnrichedLesson(
 
       try {
         // Clear existing cache for this lesson
-        await db.runAsync(
-          `DELETE FROM ${BLOCKS_TABLE} WHERE lesson_id = ?`,
-          [lessonId]
-        );
+        await db.runAsync(`DELETE FROM ${BLOCKS_TABLE} WHERE lesson_id = ?`, [
+          lessonId,
+        ]);
         await db.runAsync(
           `DELETE FROM ${CITATIONS_TABLE} WHERE lesson_id = ?`,
           [lessonId]
@@ -251,14 +253,12 @@ export function useOfflineEnrichedLesson(
     const db = dbRef.current;
     if (!db) return;
 
-    await db.runAsync(
-      `DELETE FROM ${BLOCKS_TABLE} WHERE lesson_id = ?`,
-      [lessonId]
-    );
-    await db.runAsync(
-      `DELETE FROM ${CITATIONS_TABLE} WHERE lesson_id = ?`,
-      [lessonId]
-    );
+    await db.runAsync(`DELETE FROM ${BLOCKS_TABLE} WHERE lesson_id = ?`, [
+      lessonId,
+    ]);
+    await db.runAsync(`DELETE FROM ${CITATIONS_TABLE} WHERE lesson_id = ?`, [
+      lessonId,
+    ]);
 
     setBlocks([]);
     setCitations([]);

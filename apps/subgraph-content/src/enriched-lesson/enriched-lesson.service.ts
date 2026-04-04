@@ -49,9 +49,14 @@ export class EnrichedLessonService implements OnModuleDestroy {
     return this.nc;
   }
 
-  private publishEvent(subject: string, payload: Record<string, unknown>): void {
+  private publishEvent(
+    subject: string,
+    payload: Record<string, unknown>
+  ): void {
     this.getNats()
-      .then((nc) => nc.publish(subject, this.sc.encode(JSON.stringify(payload))))
+      .then((nc) =>
+        nc.publish(subject, this.sc.encode(JSON.stringify(payload)))
+      )
       .catch((err: unknown) => {
         this.logger.warn(`Failed to publish ${subject}: ${String(err)}`);
       });
@@ -141,13 +146,17 @@ export class EnrichedLessonService implements OnModuleDestroy {
   ) {
     return withTenantContext(this.db, tenantCtx, async (db) => {
       const updateData: Record<string, unknown> = {};
-      if (input.matchStatus !== undefined) updateData['match_status'] = input.matchStatus;
-      if (input.sourceText !== undefined) updateData['source_text'] = input.sourceText;
-      if (input.bookName !== undefined) updateData['book_name'] = input.bookName;
+      if (input.matchStatus !== undefined)
+        updateData['match_status'] = input.matchStatus;
+      if (input.sourceText !== undefined)
+        updateData['source_text'] = input.sourceText;
+      if (input.bookName !== undefined)
+        updateData['book_name'] = input.bookName;
       if (input.part !== undefined) updateData['part'] = input.part;
       if (input.page !== undefined) updateData['page'] = input.page;
       if (input.column !== undefined) updateData['column'] = input.column;
-      if (input.paragraph !== undefined) updateData['paragraph'] = input.paragraph;
+      if (input.paragraph !== undefined)
+        updateData['paragraph'] = input.paragraph;
 
       const [row] = await db
         .update(schema.lesson_citations)

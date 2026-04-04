@@ -93,7 +93,7 @@ export const YouTubeEmbedPlayer = forwardRef<
   YouTubeEmbedPlayerProps
 >(function YouTubeEmbedPlayer(
   { videoId, onReady, onTimeUpdate, onStateChange, className, width, height },
-  ref,
+  ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);

@@ -33,28 +33,31 @@ function makeRawSegment(text: string, offsetMs: number, durationMs: number) {
 
 describe('extractVideoId', () => {
   it('extracts ID from standard watch URL', () => {
-    expect(extractVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
-      .toBe('dQw4w9WgXcQ');
+    expect(extractVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toBe(
+      'dQw4w9WgXcQ'
+    );
   });
 
   it('extracts ID from short youtu.be URL', () => {
-    expect(extractVideoId('https://youtu.be/dQw4w9WgXcQ'))
-      .toBe('dQw4w9WgXcQ');
+    expect(extractVideoId('https://youtu.be/dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
   });
 
   it('extracts ID from embed URL', () => {
-    expect(extractVideoId('https://www.youtube.com/embed/dQw4w9WgXcQ'))
-      .toBe('dQw4w9WgXcQ');
+    expect(extractVideoId('https://www.youtube.com/embed/dQw4w9WgXcQ')).toBe(
+      'dQw4w9WgXcQ'
+    );
   });
 
   it('extracts ID from /v/ URL format', () => {
-    expect(extractVideoId('https://www.youtube.com/v/dQw4w9WgXcQ'))
-      .toBe('dQw4w9WgXcQ');
+    expect(extractVideoId('https://www.youtube.com/v/dQw4w9WgXcQ')).toBe(
+      'dQw4w9WgXcQ'
+    );
   });
 
   it('extracts ID from shorts URL', () => {
-    expect(extractVideoId('https://youtube.com/shorts/dQw4w9WgXcQ'))
-      .toBe('dQw4w9WgXcQ');
+    expect(extractVideoId('https://youtube.com/shorts/dQw4w9WgXcQ')).toBe(
+      'dQw4w9WgXcQ'
+    );
   });
 
   it('extracts ID from URL with additional query params', () => {
@@ -129,9 +132,9 @@ describe('YouTubeTranscriptService', () => {
 
   describe('extractVideoId (instance method)', () => {
     it('returns video ID from valid URL', () => {
-      expect(
-        service.extractVideoId('https://youtu.be/dQw4w9WgXcQ')
-      ).toBe('dQw4w9WgXcQ');
+      expect(service.extractVideoId('https://youtu.be/dQw4w9WgXcQ')).toBe(
+        'dQw4w9WgXcQ'
+      );
     });
 
     it('throws for invalid URL', () => {
@@ -157,9 +160,7 @@ describe('YouTubeTranscriptService', () => {
     });
 
     it('converts offset from milliseconds to seconds', async () => {
-      mockFetch.mockResolvedValueOnce([
-        makeRawSegment('Hello', 5000, 2000),
-      ]);
+      mockFetch.mockResolvedValueOnce([makeRawSegment('Hello', 5000, 2000)]);
 
       const result = await service.fetchTranscript('vid1');
 

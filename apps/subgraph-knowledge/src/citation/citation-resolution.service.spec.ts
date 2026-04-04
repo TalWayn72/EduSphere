@@ -125,9 +125,7 @@ describe('CitationResolutionService', () => {
     });
 
     it('finds Source node for partial title match', () => {
-      mockFindSourceByTitleFuzzy.mockResolvedValueOnce(
-        MOCK_GRAPH_SOURCE_ZOHAR
-      );
+      mockFindSourceByTitleFuzzy.mockResolvedValueOnce(MOCK_GRAPH_SOURCE_ZOHAR);
 
       const result = mockCypherSourceService.findSourceByTitleFuzzy('זוהר');
       expect(result).resolves.toBeDefined();
@@ -174,9 +172,10 @@ describe('CitationResolutionService', () => {
 
       for (let i = 0; i < SAMPLE_CANDIDATES.length; i++) {
         const candidate = SAMPLE_CANDIDATES[i];
-        const graphSource = await mockCypherSourceService.findSourceByTitleFuzzy(
-          candidate.bookName
-        );
+        const graphSource =
+          await mockCypherSourceService.findSourceByTitleFuzzy(
+            candidate.bookName
+          );
 
         if (graphSource) {
           const ks = await mockKnowledgeSourceRepo.findById(graphSource.id);

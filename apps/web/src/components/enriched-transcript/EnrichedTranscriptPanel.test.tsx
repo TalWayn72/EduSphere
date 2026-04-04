@@ -33,7 +33,11 @@ vi.mock('@/components/enriched-transcript/EnrichedTranscriptPanel', () => ({
     onBlockClick?: (block: EnrichedBlock) => void;
     currentTime?: number;
   }) => (
-    <div data-testid="enriched-transcript-panel" role="region" aria-label="Enriched Transcript">
+    <div
+      data-testid="enriched-transcript-panel"
+      role="region"
+      aria-label="Enriched Transcript"
+    >
       {blocks.length === 0 && (
         <p data-testid="empty-state">No transcript blocks available</p>
       )}
@@ -150,9 +154,7 @@ describe('EnrichedTranscriptPanel', () => {
   });
 
   it('highlights active block based on currentTime', () => {
-    render(
-      <EnrichedTranscriptPanel blocks={SAMPLE_BLOCKS} currentTime={12} />
-    );
+    render(<EnrichedTranscriptPanel blocks={SAMPLE_BLOCKS} currentTime={12} />);
 
     const citationBlock = screen.getByTestId('block-citation');
     expect(citationBlock.dataset.active).toBe('true');
@@ -167,9 +169,7 @@ describe('EnrichedTranscriptPanel', () => {
     );
 
     await user.click(screen.getAllByTestId('block-text')[0]);
-    expect(onClick).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'b2' })
-    );
+    expect(onClick).toHaveBeenCalledWith(expect.objectContaining({ id: 'b2' }));
   });
 
   it('shows empty state when no blocks provided', () => {

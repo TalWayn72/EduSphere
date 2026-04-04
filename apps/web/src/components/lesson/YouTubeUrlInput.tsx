@@ -103,7 +103,9 @@ export function YouTubeUrlInput({
             className="w-32 h-18 rounded object-cover"
           />
           <div className="text-sm text-muted-foreground">
-            <p>Video ID: <code className="text-xs">{videoId}</code></p>
+            <p>
+              Video ID: <code className="text-xs">{videoId}</code>
+            </p>
             <p className="text-xs mt-1">Click Ingest to extract transcript</p>
           </div>
         </div>

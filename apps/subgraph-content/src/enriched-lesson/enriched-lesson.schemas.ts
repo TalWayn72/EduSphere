@@ -11,9 +11,7 @@ export const IngestYoutubeLessonSchema = z.object({
 
 /** Zod schema for the updateLessonCitation mutation input. */
 export const UpdateCitationSchema = z.object({
-  matchStatus: z
-    .enum(['VERIFIED', 'UNVERIFIED', 'FAILED'])
-    .optional(),
+  matchStatus: z.enum(['VERIFIED', 'UNVERIFIED', 'FAILED']).optional(),
   sourceText: z.string().max(10_000).optional(),
   bookName: z.string().max(500).optional(),
   part: z.string().max(200).optional(),
@@ -29,6 +27,10 @@ export const SetBlockAnchorTimestampSchema = z.object({
   endTime: z.number().min(0, 'endTime must be non-negative').optional(),
 });
 
-export type IngestYoutubeLessonInput = z.infer<typeof IngestYoutubeLessonSchema>;
+export type IngestYoutubeLessonInput = z.infer<
+  typeof IngestYoutubeLessonSchema
+>;
 export type UpdateCitationInput = z.infer<typeof UpdateCitationSchema>;
-export type SetBlockAnchorTimestampInput = z.infer<typeof SetBlockAnchorTimestampSchema>;
+export type SetBlockAnchorTimestampInput = z.infer<
+  typeof SetBlockAnchorTimestampSchema
+>;

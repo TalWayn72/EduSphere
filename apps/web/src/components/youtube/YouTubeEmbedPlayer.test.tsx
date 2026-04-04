@@ -23,22 +23,13 @@ vi.mock('@/components/youtube/YouTubeEmbedPlayer', () => ({
       onReady?: () => void;
     }) => (
       <div data-testid="youtube-player" data-video-id={videoId}>
-        <button
-          data-testid="seek-button"
-          onClick={() => mockSeekTo(10)}
-        >
+        <button data-testid="seek-button" onClick={() => mockSeekTo(10)}>
           Seek
         </button>
-        <button
-          data-testid="time-button"
-          onClick={() => onTimeUpdate?.(42)}
-        >
+        <button data-testid="time-button" onClick={() => onTimeUpdate?.(42)}>
           Update Time
         </button>
-        <button
-          data-testid="ready-button"
-          onClick={() => onReady?.()}
-        >
+        <button data-testid="ready-button" onClick={() => onReady?.()}>
           Ready
         </button>
       </div>

@@ -32,9 +32,7 @@ export class YouTubeIngestConsumer implements OnModuleInit, OnModuleDestroy {
   private connection: NatsConnection | null = null;
   private readonly sc = StringCodec();
 
-  constructor(
-    private readonly transcriptService: YouTubeTranscriptService
-  ) {}
+  constructor(private readonly transcriptService: YouTubeTranscriptService) {}
 
   async onModuleInit(): Promise<void> {
     try {
@@ -61,8 +59,7 @@ export class YouTubeIngestConsumer implements OnModuleInit, OnModuleDestroy {
   private async ensureStream(): Promise<void> {
     if (!this.connection) return;
     try {
-      const jsm: JetStreamManager =
-        await this.connection.jetstreamManager();
+      const jsm: JetStreamManager = await this.connection.jetstreamManager();
       try {
         await jsm.streams.info(STREAM_NAME);
       } catch {
@@ -186,10 +183,7 @@ export class YouTubeIngestConsumer implements OnModuleInit, OnModuleDestroy {
         'Published lesson.transcript.ready'
       );
     } catch (err) {
-      this.logger.error(
-        { err },
-        `Failed to publish to ${READY_SUBJECT}`
-      );
+      this.logger.error({ err }, `Failed to publish to ${READY_SUBJECT}`);
     }
   }
 }

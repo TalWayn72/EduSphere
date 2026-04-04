@@ -79,14 +79,11 @@ test.describe('EnrichedLessonViewer — transcript panel', () => {
     await page.waitForLoadState('load');
 
     // Look for transcript-related elements
-    const transcriptArea =
-      page.locator('[data-testid="enriched-transcript-panel"]').or(
-        page.locator('[data-testid="transcript-panel"]')
-      ).or(
-        page.locator('[role="region"][aria-label*="transcript" i]')
-      ).or(
-        page.locator('.transcript-panel')
-      );
+    const transcriptArea = page
+      .locator('[data-testid="enriched-transcript-panel"]')
+      .or(page.locator('[data-testid="transcript-panel"]'))
+      .or(page.locator('[role="region"][aria-label*="transcript" i]'))
+      .or(page.locator('.transcript-panel'));
 
     // In DEV_MODE without mock data, this may not render —
     // verify page itself is stable
@@ -163,9 +160,7 @@ test.describe('EnrichedLessonViewer — keyboard shortcuts', () => {
 // ── Suite 6: No console errors ──────────────────���───────────────────────────
 
 test.describe('EnrichedLessonViewer — stability', () => {
-  test('page does not produce uncaught JavaScript errors', async ({
-    page,
-  }) => {
+  test('page does not produce uncaught JavaScript errors', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
 

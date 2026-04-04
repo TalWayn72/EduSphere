@@ -50,10 +50,7 @@ export class EnrichedBlockBuilderService {
         await this.deleteExistingBlocks(lessonId, tenantId);
 
         // Fetch all transcript segments for this lesson's transcript
-        const segments = await this.fetchLessonSegments(
-          lessonId,
-          tenantId
-        );
+        const segments = await this.fetchLessonSegments(lessonId, tenantId);
 
         if (segments.length === 0) {
           this.logger.warn(

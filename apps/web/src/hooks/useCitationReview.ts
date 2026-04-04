@@ -33,7 +33,7 @@ export interface UseCitationReviewReturn {
   reject: (citationId: string) => Promise<void>;
   updateCitation: (
     citationId: string,
-    fields: UpdateCitationVariables['input'],
+    fields: UpdateCitationVariables['input']
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -52,7 +52,7 @@ export function useCitationReview(): UseCitationReviewReturn {
         input: { matchStatus: 'VERIFIED' },
       });
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   const reject = useCallback(
@@ -62,17 +62,14 @@ export function useCitationReview(): UseCitationReviewReturn {
         input: { matchStatus: 'REJECTED' },
       });
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   const updateCitation = useCallback(
-    async (
-      citationId: string,
-      fields: UpdateCitationVariables['input'],
-    ) => {
+    async (citationId: string, fields: UpdateCitationVariables['input']) => {
       await executeMutation({ citationId, input: fields });
     },
-    [executeMutation],
+    [executeMutation]
   );
 
   return {

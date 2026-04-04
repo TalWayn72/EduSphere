@@ -32,7 +32,7 @@ export function useTimestampAnchorDetection({
       [...anchors]
         .filter((a) => a.startTime != null)
         .sort((a, b) => (a.startTime ?? 0) - (b.startTime ?? 0)),
-    [anchors],
+    [anchors]
   );
 
   const { activeAnchorId, activeAnchorIndex } = useMemo(() => {

@@ -7,7 +7,9 @@
  */
 import React, { useCallback, useRef, useState } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
-import YoutubePlayer, { type YoutubeIframeRef } from 'react-native-youtube-iframe';
+import YoutubePlayer, {
+  type YoutubeIframeRef,
+} from 'react-native-youtube-iframe';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -29,14 +31,7 @@ export interface YouTubePlayerRef {
 
 const YouTubePlayer = React.forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
   function YouTubePlayer(
-    {
-      videoId,
-      onTimeUpdate,
-      onReady,
-      onError,
-      height = 220,
-      initialTime = 0,
-    },
+    { videoId, onTimeUpdate, onReady, onError, height = 220, initialTime = 0 },
     ref
   ) {
     const playerRef = useRef<YoutubeIframeRef>(null);
@@ -109,10 +104,11 @@ const YouTubePlayer = React.forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
 
     if (error) {
       return (
-        <View style={[styles.container, { height }]} testID="youtube-player-error">
-          <Text style={styles.errorText}>
-            Failed to load video: {error}
-          </Text>
+        <View
+          style={[styles.container, { height }]}
+          testID="youtube-player-error"
+        >
+          <Text style={styles.errorText}>Failed to load video: {error}</Text>
         </View>
       );
     }

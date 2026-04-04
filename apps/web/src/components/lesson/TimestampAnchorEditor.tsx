@@ -27,7 +27,12 @@ function formatTime(seconds: number): string {
 function parseTime(str: string): number | null {
   const parts = str.split(':').map(Number);
   const [minutes, seconds] = parts;
-  if (parts.length === 2 && parts.every((n) => !isNaN(n)) && minutes !== undefined && seconds !== undefined) {
+  if (
+    parts.length === 2 &&
+    parts.every((n) => !isNaN(n)) &&
+    minutes !== undefined &&
+    seconds !== undefined
+  ) {
     return minutes * 60 + seconds;
   }
   const num = parseFloat(str);
@@ -42,10 +47,10 @@ interface BlockEditorRowProps {
 
 function BlockEditorRow({ block, currentTime, onSave }: BlockEditorRowProps) {
   const [start, setStart] = useState(
-    block.startTime != null ? formatTime(block.startTime) : '',
+    block.startTime != null ? formatTime(block.startTime) : ''
   );
   const [end, setEnd] = useState(
-    block.endTime != null ? formatTime(block.endTime) : '',
+    block.endTime != null ? formatTime(block.endTime) : ''
   );
 
   const handleSave = useCallback(() => {
@@ -133,7 +138,10 @@ export function TimestampAnchorEditor({
   const anchorBlocks = blocks.filter((b) => b.blockType === 'VISUAL_ANCHOR');
 
   return (
-    <div className={`flex flex-col h-full ${className}`} data-testid="timestamp-anchor-editor">
+    <div
+      className={`flex flex-col h-full ${className}`}
+      data-testid="timestamp-anchor-editor"
+    >
       <div className="px-3 py-2 border-b flex items-center gap-2">
         <Clock className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-medium">Timestamp Anchors</span>

@@ -70,8 +70,7 @@ export class CitationNatsConsumer implements OnModuleInit, OnModuleDestroy {
   private async ensureStream(): Promise<void> {
     if (!this.connection) return;
     try {
-      const jsm: JetStreamManager =
-        await this.connection.jetstreamManager();
+      const jsm: JetStreamManager = await this.connection.jetstreamManager();
       try {
         await jsm.streams.info(STREAM_NAME);
       } catch {
@@ -117,9 +116,7 @@ export class CitationNatsConsumer implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  private async handleCandidates(
-    payload: CandidatesPayload
-  ): Promise<void> {
+  private async handleCandidates(payload: CandidatesPayload): Promise<void> {
     const { lessonId, tenantId, candidates } = payload;
     this.logger.log(
       { lessonId, candidateCount: candidates.length },
@@ -188,10 +185,7 @@ export class CitationNatsConsumer implements OnModuleInit, OnModuleDestroy {
         'Published lesson.enrichment.completed'
       );
     } catch (err) {
-      this.logger.error(
-        { err },
-        `Failed to publish to ${COMPLETED_SUBJECT}`
-      );
+      this.logger.error({ err }, `Failed to publish to ${COMPLETED_SUBJECT}`);
     }
   }
 }

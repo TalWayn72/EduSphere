@@ -82,13 +82,17 @@ export function UnifiedLearningPage() {
     item?.content ?? (itemResult.error ? mockDocumentContent : '');
 
   // ── Video / transcript hook (has mock fallback) ──
-  const { videoUrl, hlsManifestUrl, videoTitle, transcript, youtubeVideoId, isYouTubeContent } =
-    useContentData(contentId);
+  const {
+    videoUrl,
+    hlsManifestUrl,
+    videoTitle,
+    transcript,
+    youtubeVideoId,
+    isYouTubeContent,
+  } = useContentData(contentId);
 
   // ── Enriched lesson data (for YouTube content) ──
-  const enrichedLesson = useEnrichedLesson(
-    isYouTubeContent ? contentId : '',
-  );
+  const enrichedLesson = useEnrichedLesson(isYouTubeContent ? contentId : '');
 
   // ── Subtitle tracks (empty array when query not available) ──
   const subtitleTracks = useSubtitleTracks(contentId);
@@ -150,10 +154,7 @@ export function UnifiedLearningPage() {
     id: a.id,
     documentOrder: a.documentOrder,
   }));
-  const scrollAnchor = useAnchorDetection(
-    anchorPositions,
-    scrollContainerRef
-  );
+  const scrollAnchor = useAnchorDetection(anchorPositions, scrollContainerRef);
   // Timestamp-based anchor detection for enriched YouTube lessons
   const timestampAnchors = (enrichedLesson.data?.blocks ?? [])
     .filter((b) => b.blockType === 'VISUAL_ANCHOR' && b.anchor)

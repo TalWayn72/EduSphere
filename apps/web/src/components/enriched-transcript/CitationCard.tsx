@@ -5,7 +5,13 @@
  * expands to reveal resolved source text and full reference details.
  */
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  BookOpen,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import type { LessonCitation } from './enriched-transcript.types';
@@ -57,7 +63,10 @@ export function CitationCard({
         <span className="flex-1 text-sm font-medium truncate">
           {citation.bookName}
         </span>
-        <Badge variant={isVerified ? 'default' : 'secondary'} className="text-xs">
+        <Badge
+          variant={isVerified ? 'default' : 'secondary'}
+          className="text-xs"
+        >
           {isVerified ? (
             <CheckCircle className="h-3 w-3 me-1" />
           ) : (

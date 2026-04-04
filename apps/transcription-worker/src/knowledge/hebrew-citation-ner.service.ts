@@ -90,10 +90,7 @@ export class HebrewCitationNerService {
         prompt: `Lesson ID: ${lessonId}\n\nTranscript:\n${truncatedText}`,
       });
 
-      const citations = this.enrichWithSegmentInfo(
-        object.citations,
-        segments
-      );
+      const citations = this.enrichWithSegmentInfo(object.citations, segments);
 
       this.logger.log(
         { lessonId, tenantId, count: citations.length },
@@ -115,8 +112,7 @@ export class HebrewCitationNerService {
   private buildPromptText(segments: NerSegmentInput[]): string {
     return segments
       .map(
-        (s) =>
-          `[${s.startTime.toFixed(1)}s-${s.endTime.toFixed(1)}s] ${s.text}`
+        (s) => `[${s.startTime.toFixed(1)}s-${s.endTime.toFixed(1)}s] ${s.text}`
       )
       .join('\n');
   }

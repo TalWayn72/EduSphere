@@ -117,7 +117,8 @@ export default function VisualSidebar({
           </p>
           {currentTime !== undefined && (
             <p className="text-[10px] text-muted-foreground/60 mt-1">
-              {Math.floor(currentTime / 60)}:{String(Math.floor(currentTime % 60)).padStart(2, '0')}
+              {Math.floor(currentTime / 60)}:
+              {String(Math.floor(currentTime % 60)).padStart(2, '0')}
             </p>
           )}
         </div>

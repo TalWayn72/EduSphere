@@ -59,7 +59,7 @@ export function useTranscriptSync({
       const block = blockMapRef.current.get(blockId);
       if (block?.startTime != null) onSeek(block.startTime);
     },
-    [onSeek],
+    [onSeek]
   );
 
   const getBlockAtTime = useCallback(
@@ -71,7 +71,7 @@ export function useTranscriptSync({
       }
       return best;
     },
-    [sorted],
+    [sorted]
   );
 
   return { activeBlockId, activeBlockIndex, seekToBlock, getBlockAtTime };

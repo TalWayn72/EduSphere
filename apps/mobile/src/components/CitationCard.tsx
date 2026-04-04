@@ -133,9 +133,7 @@ export default function CitationCard({
       )}
 
       {/* Expand indicator */}
-      <Text style={styles.chevron}>
-        {expanded ? '▲' : '▼'}
-      </Text>
+      <Text style={styles.chevron}>{expanded ? '▲' : '▼'}</Text>
     </Pressable>
   );
 }

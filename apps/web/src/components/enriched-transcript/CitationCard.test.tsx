@@ -55,10 +55,7 @@ vi.mock('@/components/enriched-transcript/CitationCard', () => ({
           {page && <span data-testid="page">{page}</span>}
           {column && <span data-testid="column">{column}</span>}
         </button>
-        <span
-          data-testid="match-status"
-          data-status={matchStatus}
-        >
+        <span data-testid="match-status" data-status={matchStatus}>
           {matchStatus}
         </span>
         <span data-testid="confidence">{Math.round(confidence * 100)}%</span>
@@ -132,11 +129,7 @@ describe('CitationCard', () => {
 
   it('renders without optional metadata fields', () => {
     render(
-      <CitationCard
-        bookName="זוהר"
-        matchStatus="UNVERIFIED"
-        confidence={0.6}
-      />
+      <CitationCard bookName="זוהר" matchStatus="UNVERIFIED" confidence={0.6} />
     );
     expect(screen.getByTestId('book-name')).toHaveTextContent('זוהר');
     expect(screen.queryByTestId('part')).not.toBeInTheDocument();

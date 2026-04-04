@@ -63,7 +63,7 @@ export function LessonEnrichmentEditor() {
       await ingest({ input: { lessonId, youtubeUrl: url } });
       refetch();
     },
-    [ingest, lessonId, refetch],
+    [ingest, lessonId, refetch]
   );
 
   const handleTimestampSave = useCallback(
@@ -71,7 +71,7 @@ export function LessonEnrichmentEditor() {
       await setTimestamp({ input: { blockId, startTime, endTime } });
       refetch();
     },
-    [setTimestamp, refetch],
+    [setTimestamp, refetch]
   );
 
   const handlePublish = useCallback(async () => {
@@ -116,7 +116,10 @@ export function LessonEnrichmentEditor() {
 
         {/* Main editor layout */}
         {videoId && (
-          <ResizablePanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="flex-1 overflow-hidden"
+          >
             {/* LEFT — Player + Transcript */}
             <ResizablePanel defaultSize={50} minSize={30} id="editor-left">
               <div className="flex flex-col h-full overflow-hidden">
@@ -150,7 +153,10 @@ export function LessonEnrichmentEditor() {
                   <TabsTrigger value="anchors">Anchors</TabsTrigger>
                   <TabsTrigger value="preview">Preview</TabsTrigger>
                 </TabsList>
-                <TabsContent value="citations" className="flex-1 overflow-hidden">
+                <TabsContent
+                  value="citations"
+                  className="flex-1 overflow-hidden"
+                >
                   <CitationReviewPanel
                     citations={data?.citations ?? []}
                     onApprove={approve}

@@ -29,10 +29,9 @@ export interface YouTubeTranscriptResult {
 export const YoutubeUrlSchema = z
   .string()
   .min(1)
-  .refine(
-    (url) => extractVideoId(url) !== null,
-    { message: 'Invalid YouTube URL' }
-  );
+  .refine((url) => extractVideoId(url) !== null, {
+    message: 'Invalid YouTube URL',
+  });
 
 export const IngestPayloadSchema = z.object({
   lessonId: z.string().uuid(),

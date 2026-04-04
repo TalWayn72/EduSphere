@@ -19,7 +19,7 @@ interface SyncTranscriptScrollerProps {
 
 function findActiveBlockId(
   blocks: EnrichedTranscriptBlock[],
-  time: number,
+  time: number
 ): string | null {
   let best: EnrichedTranscriptBlock | null = null;
   for (const b of blocks) {
@@ -79,7 +79,7 @@ export function SyncTranscriptScroller({
         onSeek(block.startTime);
       }
     },
-    [onSeek],
+    [onSeek]
   );
 
   return (

@@ -42,9 +42,7 @@ export interface ResolvedCitation {
 export class CitationResolutionService {
   private readonly logger = new Logger(CitationResolutionService.name);
 
-  constructor(
-    private readonly cypherSourceService: CypherSourceService
-  ) {}
+  constructor(private readonly cypherSourceService: CypherSourceService) {}
 
   /**
    * Resolves an array of citation candidates against the knowledge graph
@@ -59,10 +57,7 @@ export class CitationResolutionService {
 
     for (const candidate of candidates) {
       try {
-        const resolved = await this.resolveOne(
-          candidate,
-          tenantId
-        );
+        const resolved = await this.resolveOne(candidate, tenantId);
         results.push(resolved);
       } catch (err) {
         this.logger.error(
@@ -76,9 +71,7 @@ export class CitationResolutionService {
       }
     }
 
-    const verified = results.filter(
-      (r) => r.matchStatus === 'VERIFIED'
-    ).length;
+    const verified = results.filter((r) => r.matchStatus === 'VERIFIED').length;
     this.logger.log(
       {
         lessonId,
@@ -100,11 +93,10 @@ export class CitationResolutionService {
     tenantId: string
   ): Promise<ResolvedCitation> {
     // Step 1: Find matching Source node in Apache AGE graph
-    const graphSource =
-      await this.cypherSourceService.findSourceByTitleFuzzy(
-        candidate.bookName,
-        tenantId
-      );
+    const graphSource = await this.cypherSourceService.findSourceByTitleFuzzy(
+      candidate.bookName,
+      tenantId
+    );
 
     if (!graphSource) {
       this.logger.debug(
@@ -144,10 +136,7 @@ export class CitationResolutionService {
     }
 
     // Step 3: Extract relevant passage
-    const passage = this.extractPassage(
-      ks.raw_content,
-      candidate
-    );
+    const passage = this.extractPassage(ks.raw_content, candidate);
 
     return {
       candidate,

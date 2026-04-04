@@ -18,11 +18,11 @@
 
 ### 🟡 In Progress
 
-| ID                            | Issue                                                                                                        | Started      |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------ |
-| FEAT-SEMANTIC-LESSON-CREATION | Semantic-Enriched Lesson Creation — Phases 1-5 complete, integration testing phase                          | 5 Apr 2026   |
-| FEAT-API-MUTATIONS            | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026  |
-| FEAT-AGENT-SANDBOX            | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026  |
+| ID                            | Issue                                                                                                        | Started     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------- |
+| FEAT-SEMANTIC-LESSON-CREATION | Semantic-Enriched Lesson Creation — Phases 1-5 complete, integration testing phase                           | 5 Apr 2026  |
+| FEAT-API-MUTATIONS            | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
+| FEAT-AGENT-SANDBOX            | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026 |
 
 ### ✅ Fixed (31 Mar 2026 Session)
 
@@ -215,16 +215,16 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 
 **Scope:**
 
-| Category           | Count |
-| ------------------ | ----- |
-| New files          | ~45   |
-| Modified files     | ~15   |
-| New tests          | 139 (14 test files) |
-| New DB tables      | 1 (`enriched_transcript_blocks`) |
-| New GraphQL types  | 3 (`EnrichedLesson`, `EnrichedTranscriptBlock`, `EnrichmentStatus`) |
-| New mutations      | 4 (`ingestYoutubeLesson`, `updateLessonCitation`, `setBlockAnchorTimestamp`, `publishEnrichedLesson`) |
-| NATS subjects      | 4 (`lesson.youtube.ingest`, `lesson.transcript.ready`, `citation.candidates.extracted`, `lesson.enrichment.completed`) |
-| Mobile components  | 4 new Expo components with offline support |
+| Category          | Count                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| New files         | ~45                                                                                                                    |
+| Modified files    | ~15                                                                                                                    |
+| New tests         | 139 (14 test files)                                                                                                    |
+| New DB tables     | 1 (`enriched_transcript_blocks`)                                                                                       |
+| New GraphQL types | 3 (`EnrichedLesson`, `EnrichedTranscriptBlock`, `EnrichmentStatus`)                                                    |
+| New mutations     | 4 (`ingestYoutubeLesson`, `updateLessonCitation`, `setBlockAnchorTimestamp`, `publishEnrichedLesson`)                  |
+| NATS subjects     | 4 (`lesson.youtube.ingest`, `lesson.transcript.ready`, `citation.candidates.extracted`, `lesson.enrichment.completed`) |
+| Mobile components | 4 new Expo components with offline support                                                                             |
 
 **Next Step:** Integration testing — E2E flow from YouTube URL ingest through to student view.
 

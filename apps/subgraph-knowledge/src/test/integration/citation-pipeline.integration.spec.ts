@@ -21,9 +21,31 @@ import { generateObject } from 'ai';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-interface TranscriptSegment { id: string; text: string; startTime: number; endTime: number; }
-interface CitationCandidate { bookName: string; part?: string; page?: string; column?: string; originalText: string; confidence: number; segmentIndex: number; }
-interface EnrichedBlock { lessonId: string; segmentId: string; blockType: 'TEXT' | 'CITATION' | 'VISUAL_ANCHOR' | 'HEADING'; blockOrder: number; content: Record<string, unknown>; citationId?: string; startTime: number; endTime: number; }
+interface TranscriptSegment {
+  id: string;
+  text: string;
+  startTime: number;
+  endTime: number;
+}
+interface CitationCandidate {
+  bookName: string;
+  part?: string;
+  page?: string;
+  column?: string;
+  originalText: string;
+  confidence: number;
+  segmentIndex: number;
+}
+interface EnrichedBlock {
+  lessonId: string;
+  segmentId: string;
+  blockType: 'TEXT' | 'CITATION' | 'VISUAL_ANCHOR' | 'HEADING';
+  blockOrder: number;
+  content: Record<string, unknown>;
+  citationId?: string;
+  startTime: number;
+  endTime: number;
+}
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -31,7 +53,12 @@ const TENANT_ID = '550e8400-e29b-41d4-a716-446655440001';
 const LESSON_ID = '550e8400-e29b-41d4-a716-446655440010';
 
 const TRANSCRIPT_SEGMENTS: TranscriptSegment[] = [
-  { id: 'seg-1', text: 'שלום, היום נלמד על עץ חיים שער ממז"א', startTime: 0, endTime: 5 },
+  {
+    id: 'seg-1',
+    text: 'שלום, היום נלמד על עץ חיים שער ממז"א',
+    startTime: 0,
+    endTime: 5,
+  },
   { id: 'seg-2', text: 'נפתח בזוהר חלק א דף לב', startTime: 5, endTime: 10 },
   { id: 'seg-3', text: 'זהו נושא מעניין מאוד', startTime: 10, endTime: 15 },
 ];
@@ -58,7 +85,7 @@ const NER_RESPONSE = {
 
 const GRAPH_SOURCES = {
   'עץ חיים': { id: 'gs-etz', title: 'עץ חיים', type: 'SACRED_TEXT' },
-  'זוהר': { id: 'gs-zohar', title: 'זוהר', type: 'SACRED_TEXT' },
+  זוהר: { id: 'gs-zohar', title: 'זוהר', type: 'SACRED_TEXT' },
 };
 
 const KNOWLEDGE_SOURCES = {
@@ -81,19 +108,17 @@ describe('Citation Pipeline — Full Integration', () => {
     vi.clearAllMocks();
 
     // Setup graph source lookups
-    mockFindSourceByTitleFuzzy.mockImplementation(
-      (title: string) =>
-        Promise.resolve(
-          GRAPH_SOURCES[title as keyof typeof GRAPH_SOURCES] ?? null
-        )
+    mockFindSourceByTitleFuzzy.mockImplementation((title: string) =>
+      Promise.resolve(
+        GRAPH_SOURCES[title as keyof typeof GRAPH_SOURCES] ?? null
+      )
     );
 
     // Setup knowledge source lookups
-    mockFetchKnowledgeSource.mockImplementation(
-      (gsId: string) =>
-        Promise.resolve(
-          KNOWLEDGE_SOURCES[gsId as keyof typeof KNOWLEDGE_SOURCES] ?? null
-        )
+    mockFetchKnowledgeSource.mockImplementation((gsId: string) =>
+      Promise.resolve(
+        KNOWLEDGE_SOURCES[gsId as keyof typeof KNOWLEDGE_SOURCES] ?? null
+      )
     );
 
     mockInsertCitation.mockResolvedValue({ id: 'citation-uuid' });
@@ -217,9 +242,7 @@ describe('Citation Pipeline — Full Integration', () => {
       expect.stringContaining(LESSON_ID)
     );
 
-    const published = JSON.parse(
-      mockNatsPublish.mock.calls[0][1] as string
-    );
+    const published = JSON.parse(mockNatsPublish.mock.calls[0][1] as string);
     expect(published.blockCount).toBe(5);
     expect(published.citationCount).toBe(2);
     expect(published.tenantId).toBe(TENANT_ID);

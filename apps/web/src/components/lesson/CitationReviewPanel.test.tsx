@@ -34,16 +34,29 @@ vi.mock('@/components/lesson/CitationReviewPanel', () => ({
     onReject: (id: string) => void;
     onEdit: (id: string) => void;
   }) => (
-    <div data-testid="citation-review-panel" role="region" aria-label="Citation Review">
+    <div
+      data-testid="citation-review-panel"
+      role="region"
+      aria-label="Citation Review"
+    >
       {citations.length === 0 && (
         <p data-testid="no-citations">No citations to review</p>
       )}
       {citations.map((c) => (
-        <div key={c.id} data-testid={`citation-${c.id}`} data-status={c.matchStatus}>
+        <div
+          key={c.id}
+          data-testid={`citation-${c.id}`}
+          data-status={c.matchStatus}
+        >
           <span data-testid={`book-${c.id}`}>{c.bookName}</span>
           <span data-testid={`status-${c.id}`}>{c.matchStatus}</span>
-          <span data-testid={`confidence-${c.id}`}>{Math.round(c.confidence * 100)}%</span>
-          <button data-testid={`approve-${c.id}`} onClick={() => onApprove(c.id)}>
+          <span data-testid={`confidence-${c.id}`}>
+            {Math.round(c.confidence * 100)}%
+          </span>
+          <button
+            data-testid={`approve-${c.id}`}
+            onClick={() => onApprove(c.id)}
+          >
             Approve
           </button>
           <button data-testid={`reject-${c.id}`} onClick={() => onReject(c.id)}>
@@ -95,34 +108,26 @@ describe('CitationReviewPanel', () => {
   });
 
   it('renders all citations in the list', () => {
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
     expect(screen.getByTestId('citation-cit-1')).toBeInTheDocument();
     expect(screen.getByTestId('citation-cit-2')).toBeInTheDocument();
   });
 
   it('displays book name for each citation', () => {
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
     expect(screen.getByTestId('book-cit-1')).toHaveTextContent('עץ חיים');
     expect(screen.getByTestId('book-cit-2')).toHaveTextContent('זוהר');
   });
 
   it('displays match status for each citation', () => {
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
     expect(screen.getByTestId('status-cit-1')).toHaveTextContent('VERIFIED');
     expect(screen.getByTestId('status-cit-2')).toHaveTextContent('UNVERIFIED');
   });
 
   it('calls onApprove with citation ID when Approve clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
 
     await user.click(screen.getByTestId('approve-cit-2'));
     expect(handlers.onApprove).toHaveBeenCalledWith('cit-2');
@@ -130,9 +135,7 @@ describe('CitationReviewPanel', () => {
 
   it('calls onReject with citation ID when Reject clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
 
     await user.click(screen.getByTestId('reject-cit-1'));
     expect(handlers.onReject).toHaveBeenCalledWith('cit-1');
@@ -140,9 +143,7 @@ describe('CitationReviewPanel', () => {
 
   it('calls onEdit with citation ID when Edit clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
 
     await user.click(screen.getByTestId('edit-cit-1'));
     expect(handlers.onEdit).toHaveBeenCalledWith('cit-1');
@@ -154,18 +155,14 @@ describe('CitationReviewPanel', () => {
   });
 
   it('has accessible region role and label', () => {
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
     expect(
       screen.getByRole('region', { name: 'Citation Review' })
     ).toBeInTheDocument();
   });
 
   it('displays confidence percentage for each citation', () => {
-    render(
-      <CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />
-    );
+    render(<CitationReviewPanel citations={MOCK_CITATIONS} {...handlers} />);
     expect(screen.getByTestId('confidence-cit-1')).toHaveTextContent('92%');
     expect(screen.getByTestId('confidence-cit-2')).toHaveTextContent('65%');
   });

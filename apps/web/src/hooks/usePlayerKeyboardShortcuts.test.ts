@@ -70,18 +70,12 @@ describe('usePlayerKeyboardShortcuts', () => {
   });
 
   it('ArrowRight seeks forward 5 seconds', () => {
-    handleKeyDown(
-      { key: 'ArrowRight', target: { tagName: 'DIV' } },
-      controls
-    );
+    handleKeyDown({ key: 'ArrowRight', target: { tagName: 'DIV' } }, controls);
     expect(controls.seekForward).toHaveBeenCalledWith(5);
   });
 
   it('ArrowLeft seeks backward 5 seconds', () => {
-    handleKeyDown(
-      { key: 'ArrowLeft', target: { tagName: 'DIV' } },
-      controls
-    );
+    handleKeyDown({ key: 'ArrowLeft', target: { tagName: 'DIV' } }, controls);
     expect(controls.seekBackward).toHaveBeenCalledWith(5);
   });
 
