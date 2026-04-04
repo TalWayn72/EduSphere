@@ -59,7 +59,7 @@ export function useOfflineEnrichedLesson(
   const dbRef = useRef<SQLite.SQLiteDatabase | null>(null);
   const [blocks, setBlocks] = useState<EnrichedBlock[]>([]);
   const [citations, setCitations] = useState<EnrichedLessonCitation[]>([]);
-  const [isOffline, setIsOffline] = useState(false);
+  const [isOffline, _setIsOffline] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
 
