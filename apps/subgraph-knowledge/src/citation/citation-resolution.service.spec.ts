@@ -45,7 +45,7 @@ const mockKnowledgeSourceRepo = {
   findById: mockFetchKnowledgeSource,
 };
 
-const mockCitationRepo = {
+const _mockCitationRepo = {
   update: mockUpdateCitation,
 };
 

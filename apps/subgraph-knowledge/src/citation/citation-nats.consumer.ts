@@ -14,7 +14,6 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import { NatsConnection, StringCodec, JetStreamManager } from 'nats';
-import { eq, and } from 'drizzle-orm';
 import { db, schema, withTenantContext } from '@edusphere/db';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import {

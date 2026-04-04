@@ -7,7 +7,6 @@
  * Pipeline is idempotent — re-running deletes existing blocks first.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
 import { db, withTenantContext } from '@edusphere/db';
 
 // NOTE: enriched_transcript_blocks table expected from migration 0044
