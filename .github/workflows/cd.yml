@@ -1,12 +1,10 @@
 name: CD — Deploy to Kubernetes
 
-# Triggers on push to main/master (staging auto-deploy).
+# Triggers on manual dispatch or release tags only.
+# Regular pushes to main/master do NOT trigger CD — this avoids
+# "skipped" check runs for deployment jobs that require secrets/K8s.
 # Production requires manual approval via GitHub Environment protection rules.
 on:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
     inputs:
       environment:
@@ -183,7 +181,7 @@ jobs:
           echo "Canonical image tag: ${IMAGE_TAG}"
 
   # ─────────────────────────────────────────────────────────────────────────
-  # JOB 1 — Deploy to Staging (automatic on every push to main/master)
+  # JOB 1 — Deploy to Staging (manual dispatch targeting staging)
   # ─────────────────────────────────────────────────────────────────────────
   deploy-staging:
     name: Deploy to Staging
@@ -193,11 +191,10 @@ jobs:
       name: staging
       url: https://staging-api.edusphere.dev/graphql
     needs: [check-prerequisites]
-    # Auto-deploy on push; allow manual re-deploy targeting staging.
+    # Deploy when manually dispatched targeting staging.
     if: |
       needs.check-prerequisites.outputs.can_deploy == 'true' &&
-      (github.event_name == 'push' ||
-       github.event.inputs.environment == 'staging')
+      github.event.inputs.environment == 'staging'
 
     outputs:
       image_tag: ${{ steps.image-tag.outputs.IMAGE_TAG }}
@@ -349,9 +346,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: deploy-staging
-    if: |
-      needs.deploy-staging.result == 'success' &&
-      (github.event_name == 'push' || github.event.inputs.environment == 'staging')
+    if: needs.deploy-staging.result == 'success'
 
     steps:
       - name: Checkout repository
@@ -396,10 +391,7 @@ jobs:
       (
         (
           needs.smoke-test-staging.result == 'success' &&
-          (
-            github.event.inputs.environment == 'production' ||
-            (github.event_name == 'push' && needs.deploy-staging.result == 'success')
-          )
+          github.event.inputs.environment == 'production'
         ) ||
         (
           github.event.inputs.force_production == 'true' &&
