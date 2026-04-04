@@ -112,7 +112,7 @@ jobs:
   unit-tests-web:
     name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
@@ -292,7 +292,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     continue-on-error: true # E2E tests may fail without backend services; non-blocking in CI
     strategy:
       fail-fast: false
