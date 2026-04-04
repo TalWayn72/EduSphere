@@ -2800,6 +2800,9 @@ type LessonCitation @join__type(graph: CONTENT) {
   paragraph: String
   matchStatus: CitationMatchStatus!
   confidence: Float
+  resolvedText: String @join__field(graph: CONTENT)
+  knowledgeSourceId: ID @join__field(graph: CONTENT)
+  graphSourceId: String @join__field(graph: CONTENT)
 }
 
 type LessonPipelineTemplate @join__type(graph: CONTENT) {

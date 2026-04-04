@@ -6,7 +6,9 @@ import {
   integer,
   numeric,
   index,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { transcript_segments } from './content';
@@ -49,8 +51,12 @@ export const enriched_transcript_blocks = pgTable(
     index('idx_enriched_blocks_lesson').on(t.lesson_id),
     index('idx_enriched_blocks_lesson_order').on(t.lesson_id, t.block_order),
     index('idx_enriched_blocks_segment').on(t.segment_id),
+    pgPolicy('enriched_transcript_blocks_tenant_isolation', {
+      using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+      withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+    }),
   ]
-);
+).enableRLS();
 
 export type EnrichedTranscriptBlock =
   typeof enriched_transcript_blocks.$inferSelect;
