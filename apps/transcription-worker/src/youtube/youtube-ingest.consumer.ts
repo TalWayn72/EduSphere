@@ -13,7 +13,6 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import { NatsConnection, StringCodec, JetStreamManager } from 'nats';
-import { eq } from 'drizzle-orm';
 import { db, schema, withBypassRLS } from '@edusphere/db';
 import { randomUUID } from 'crypto';
 import { buildNatsOptions } from '@edusphere/nats-client';

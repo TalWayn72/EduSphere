@@ -19,13 +19,6 @@ vi.mock('youtube-transcript', () => ({
 const mockDbInsertTranscript = vi.fn().mockResolvedValue({
   id: 'transcript-uuid-1',
 });
-const mockDbInsertSegments = vi.fn().mockResolvedValue([
-  { id: 'seg-1' },
-  { id: 'seg-2' },
-  { id: 'seg-3' },
-]);
-const mockDbUpdateMediaAsset = vi.fn().mockResolvedValue(undefined);
-const mockNatsPublish = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('@edusphere/db', () => ({
   db: {
