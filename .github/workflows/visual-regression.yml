@@ -167,6 +167,9 @@ jobs:
           retention-days: 30
 
   lost-pixel-tests:
+    # Skipped: no baseline images configured yet and lost-pixel/lost-pixel@v3 is not a valid action tag.
+    # Re-enable once baselines are generated and a valid action version is pinned.
+    if: false
     needs: [merge-visual-reports]
     runs-on: ubuntu-latest
     timeout-minutes: 20
