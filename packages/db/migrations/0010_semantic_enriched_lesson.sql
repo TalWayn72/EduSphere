@@ -29,7 +29,6 @@ ALTER TABLE "enriched_transcript_blocks" ADD CONSTRAINT "enriched_transcript_blo
 ALTER TABLE "enriched_transcript_blocks" ADD CONSTRAINT "enriched_transcript_blocks_lesson_id_lessons_id_fk" FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enriched_transcript_blocks" ADD CONSTRAINT "enriched_transcript_blocks_segment_id_transcript_segments_id_fk" FOREIGN KEY ("segment_id") REFERENCES "public"."transcript_segments"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enriched_transcript_blocks" ADD CONSTRAINT "enriched_transcript_blocks_citation_id_lesson_citations_id_fk" FOREIGN KEY ("citation_id") REFERENCES "public"."lesson_citations"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "enriched_transcript_blocks" ADD CONSTRAINT "enriched_transcript_blocks_anchor_id_visual_anchors_id_fk" FOREIGN KEY ("anchor_id") REFERENCES "public"."visual_anchors"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_enriched_blocks_tenant" ON "enriched_transcript_blocks" USING btree ("tenant_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_enriched_blocks_lesson" ON "enriched_transcript_blocks" USING btree ("lesson_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_enriched_blocks_lesson_order" ON "enriched_transcript_blocks" USING btree ("lesson_id","block_order");--> statement-breakpoint
