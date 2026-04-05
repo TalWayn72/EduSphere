@@ -34,8 +34,17 @@ import { WebSiteSchema, OrganizationSchema } from '@/components/seo';
 // with authenticated=true, explicitly navigate the router to /dashboard so it
 // picks up the clean URL and renders the authenticated route tree.
 function hasKeycloakRedirectParams(): boolean {
-  const params = new URLSearchParams(window.location.search);
-  return params.has('code') && params.has('state');
+  // Keycloak-js uses response_mode=fragment by default for public clients with
+  // PKCE.  In fragment mode the auth params arrive in window.location.hash
+  // (e.g. /#state=...&code=...), NOT in window.location.search.  Check both.
+  const queryParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(
+    window.location.hash.replace(/^#/, '')
+  );
+  return (
+    (queryParams.has('code') && queryParams.has('state')) ||
+    (hashParams.has('code') && hashParams.has('state'))
+  );
 }
 
 // Snapshot the flag once at module load — keycloak.init() will clear the params.
@@ -49,9 +58,26 @@ function cleanKeycloakUrlParams(): void {
   const url = new URL(window.location.href);
   const kcParams = ['code', 'state', 'session_state', 'iss'];
   let changed = false;
+  // Clean from query string
   for (const p of kcParams) {
     if (url.searchParams.has(p)) {
       url.searchParams.delete(p);
+      changed = true;
+    }
+  }
+  // Clean from hash fragment (fragment response_mode)
+  if (url.hash) {
+    const hashParams = new URLSearchParams(url.hash.replace(/^#/, ''));
+    let hashChanged = false;
+    for (const p of kcParams) {
+      if (hashParams.has(p)) {
+        hashParams.delete(p);
+        hashChanged = true;
+      }
+    }
+    if (hashChanged) {
+      const remaining = hashParams.toString();
+      url.hash = remaining ? `#${remaining}` : '';
       changed = true;
     }
   }
@@ -109,28 +135,38 @@ function App() {
       // Apply RTL direction immediately from cached locale (before DB fetch)
       if (cachedLocale) applyDocumentDirection(cachedLocale);
 
-      // BUG-068: After a Keycloak login redirect, the router was created at
-      // module-load time with the stale ?code=...&state=... URL.  keycloak-js
-      // cleaned the URL via history.replaceState(), but the router's internal
-      // history doesn't listen for replaceState — only popstate.  This leaves
-      // the router stuck on the old URL and lazy route chunks may never resolve
-      // because the router's location doesn't match any configured route path
-      // cleanly (the query params confuse client-side matching in some edge
-      // cases with nested Suspense boundaries).
+      // BUG-068 + BUG-107: After a Keycloak login redirect, ensure clean URL and
+      // navigate to the correct destination before unmounting the spinner.
       //
-      // Fix: after successful auth from a redirect, ensure the URL is clean
-      // and explicitly tell the router to navigate to /dashboard so it picks
-      // up the clean URL and renders the authenticated route tree.
-      if (_wasKeycloakRedirect) {
-        // Safety net: strip leftover auth params if keycloak-js didn't
-        cleanKeycloakUrlParams();
+      // The original BUG-068 fix only guarded with `_wasKeycloakRedirect` but
+      // that flag relied on detecting Keycloak params in the URL before keycloak-js
+      // cleared them.  In fragment response_mode, params arrive in the hash which
+      // keycloak-js clears synchronously — making the detection unreliable.
+      //
+      // BUG-107 fix: always check for a saved post_login_redirect destination when
+      // authentication succeeds, regardless of how we got here.  This is safe
+      // because:
+      //   - The key is only set by ProtectedRoute (protected pages) when the user
+      //     is not authenticated.
+      //   - It is removed immediately after being read here.
+      //   - If no key exists, fall through to normal routing (no navigation).
+      //
+      // Also always clean any stale Keycloak URL params (safety net).
+      cleanKeycloakUrlParams();
 
-        if (isAuthenticated()) {
-          const dest =
-            window.sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY) ?? '/dashboard';
+      if (isAuthenticated()) {
+        const dest = window.sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
+        if (dest) {
           window.sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
-          router.navigate(dest, { replace: true });
+          // Await so router state is updated before RouterProvider mounts.
+          // Without await, setKeycloakReady() fires while navigation is pending
+          // and RouterProvider picks up the stale location (/).
+          await router.navigate(dest, { replace: true });
         }
+      } else if (_wasKeycloakRedirect) {
+        // Was a Keycloak redirect but auth failed — navigate to dashboard root
+        // so the router doesn't stay stuck on a stale URL with auth params.
+        await router.navigate('/dashboard', { replace: true });
       }
 
       setKeycloakReady(true);

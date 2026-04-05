@@ -155,8 +155,12 @@ export function login(): void {
 
   // BUG-091: Clear locale-sync flag before Keycloak redirect
   window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
+  // BUG-107: Return to origin (not /login) so App.tsx bootstrap() can read
+  // sessionStorage and navigate to the saved destination before RouterProvider
+  // mounts.  The Login component's useEffect would otherwise race and win.
+  // Trailing slash required for Keycloak's "http://localhost:5173/*" pattern.
   keycloak!.login({
-    redirectUri: window.location.href,
+    redirectUri: window.location.origin + '/',
   });
 }
 

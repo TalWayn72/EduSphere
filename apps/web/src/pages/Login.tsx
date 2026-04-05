@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { login, isAuthenticated, DEV_MODE } from '@/lib/auth';
+import { POST_LOGIN_REDIRECT_KEY } from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,7 +23,16 @@ export function Login() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate('/dashboard');
+      // BUG-107: Read the saved destination first so that if Keycloak ever
+      // returns to /login, the user is sent to the originally-requested page
+      // rather than always being dropped at /dashboard.
+      const saved = window.sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
+      if (saved) {
+        window.sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+        navigate(saved, { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [navigate]);
 
