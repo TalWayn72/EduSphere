@@ -1490,6 +1490,47 @@ export type Embedding = {
   metadata?: Maybe<Scalars['JSON']['output']>;
 };
 
+export enum EnrichedBlockType {
+  Citation = 'CITATION',
+  Heading = 'HEADING',
+  Text = 'TEXT',
+  VisualAnchor = 'VISUAL_ANCHOR'
+}
+
+export type EnrichedLesson = {
+  __typename?: 'EnrichedLesson';
+  blocks: Array<EnrichedTranscriptBlock>;
+  citations: Array<LessonCitation>;
+  enrichmentStatus: EnrichmentStatus;
+  id: Scalars['ID']['output'];
+  lesson: Lesson;
+  transcriptReady: Scalars['Boolean']['output'];
+  youtubeVideoId?: Maybe<Scalars['String']['output']>;
+};
+
+export type EnrichedTranscriptBlock = {
+  __typename?: 'EnrichedTranscriptBlock';
+  anchor?: Maybe<VisualAnchor>;
+  blockOrder: Scalars['Int']['output'];
+  blockType: EnrichedBlockType;
+  citation?: Maybe<LessonCitation>;
+  content: Scalars['JSON']['output'];
+  endTime?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  segmentId?: Maybe<Scalars['ID']['output']>;
+  startTime?: Maybe<Scalars['Float']['output']>;
+};
+
+export enum EnrichmentStatus {
+  ExtractingTranscript = 'EXTRACTING_TRANSCRIPT',
+  Pending = 'PENDING',
+  Published = 'PUBLISHED',
+  Ready = 'READY',
+  ResolvingCitations = 'RESOLVING_CITATIONS',
+  RunningNer = 'RUNNING_NER'
+}
+
 export type ErasureVerification = {
   __typename?: 'ErasureVerification';
   completedAt?: Maybe<Scalars['String']['output']>;
@@ -1815,6 +1856,11 @@ export type InProgressCourse = {
   title: Scalars['String']['output'];
 };
 
+export type IngestYoutubeLessonInput = {
+  lessonId: Scalars['ID']['input'];
+  youtubeUrl: Scalars['String']['input'];
+};
+
 export type InstructorPayout = {
   __typename?: 'InstructorPayout';
   grossRevenue: Scalars['Int']['output'];
@@ -1977,12 +2023,15 @@ export type LessonCitation = {
   bookName: Scalars['String']['output'];
   column?: Maybe<Scalars['String']['output']>;
   confidence?: Maybe<Scalars['Float']['output']>;
+  graphSourceId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  knowledgeSourceId?: Maybe<Scalars['ID']['output']>;
   lessonId: Scalars['ID']['output'];
   matchStatus: CitationMatchStatus;
   page?: Maybe<Scalars['String']['output']>;
   paragraph?: Maybe<Scalars['String']['output']>;
   part?: Maybe<Scalars['String']['output']>;
+  resolvedText?: Maybe<Scalars['String']['output']>;
   sourceText: Scalars['String']['output'];
 };
 
@@ -2501,6 +2550,7 @@ export type Mutation = {
   importFromYoutube: ImportJob;
   importScormPackage: ScormImportResult;
   ingestContent: ContentIngestionResult;
+  ingestYoutubeLesson: EnrichedLesson;
   initScormSession: ScormSession;
   inviteUser: OrgInvitation;
   /** Manually issue a badge to a user (admin or instructor action) */
@@ -2536,6 +2586,7 @@ export type Mutation = {
   promoteAnnotation: Annotation;
   publishAnnouncement: Announcement;
   publishCourse: Course;
+  publishEnrichedLesson: EnrichedLesson;
   publishLesson: Lesson;
   publishLessonPlan: CourseLessonPlan;
   publishListing: Scalars['Boolean']['output'];
@@ -2611,6 +2662,7 @@ export type Mutation = {
   scheduleReview: SrsCard;
   sendMessage: AgentMessage;
   sendRoleplayMessage: Scalars['Boolean']['output'];
+  setBlockAnchorTimestamp: EnrichedTranscriptBlock;
   skipOnboarding: OnboardingState;
   startAgentExecution: AgentExecution;
   startAgentSession: AgentSession;
@@ -2655,6 +2707,7 @@ export type Mutation = {
   updateExamItem: ExamItem;
   updateGamificationConfig: GamificationConfig;
   updateLesson: Lesson;
+  updateLessonCitation: LessonCitation;
   /**
    * Update the mastery level for a skill tree node (concept) for the current user.
    * Stored in the user_skill_mastery table (created by migration 0011).
@@ -3413,6 +3466,11 @@ export type MutationIngestContentArgs = {
 };
 
 
+export type MutationIngestYoutubeLessonArgs = {
+  input: IngestYoutubeLessonInput;
+};
+
+
 export type MutationInitScormSessionArgs = {
   contentItemId: Scalars['ID']['input'];
 };
@@ -3503,6 +3561,11 @@ export type MutationPublishAnnouncementArgs = {
 
 export type MutationPublishCourseArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationPublishEnrichedLessonArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -3772,6 +3835,11 @@ export type MutationSendRoleplayMessageArgs = {
 };
 
 
+export type MutationSetBlockAnchorTimestampArgs = {
+  input: SetBlockAnchorTimestampInput;
+};
+
+
 export type MutationStartAgentExecutionArgs = {
   input: StartAgentExecutionInput;
 };
@@ -3980,6 +4048,12 @@ export type MutationUpdateGamificationConfigArgs = {
 export type MutationUpdateLessonArgs = {
   id: Scalars['ID']['input'];
   input: UpdateLessonInput;
+};
+
+
+export type MutationUpdateLessonCitationArgs = {
+  citationId: Scalars['ID']['input'];
+  input: UpdateCitationInput;
 };
 
 
@@ -4829,6 +4903,7 @@ export type Query = {
   dueReviews: Array<SrsCard>;
   embedding?: Maybe<Embedding>;
   embeddingsByContentItem: Array<Embedding>;
+  enrichedLesson?: Maybe<EnrichedLesson>;
   examBlueprint?: Maybe<ExamBlueprint>;
   examBlueprintAnalytics: BlueprintAnalytics;
   examBlueprints: Array<ExamBlueprint>;
@@ -5325,6 +5400,11 @@ export type QueryEmbeddingArgs = {
 
 export type QueryEmbeddingsByContentItemArgs = {
   contentItemId: Scalars['ID']['input'];
+};
+
+
+export type QueryEnrichedLessonArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -6276,6 +6356,12 @@ export type SessionPoll = {
   sessionId: Scalars['ID']['output'];
 };
 
+export type SetBlockAnchorTimestampInput = {
+  blockId: Scalars['ID']['input'];
+  endTime?: InputMaybe<Scalars['Float']['input']>;
+  startTime: Scalars['Float']['input'];
+};
+
 export type SimilarSubmission = {
   __typename?: 'SimilarSubmission';
   similarity: Scalars['Float']['output'];
@@ -6793,6 +6879,16 @@ export type UpdateBadgeInput = {
   pointsReward?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdateCitationInput = {
+  bookName?: InputMaybe<Scalars['String']['input']>;
+  column?: InputMaybe<Scalars['String']['input']>;
+  matchStatus?: InputMaybe<CitationMatchStatus>;
+  page?: InputMaybe<Scalars['String']['input']>;
+  paragraph?: InputMaybe<Scalars['String']['input']>;
+  part?: InputMaybe<Scalars['String']['input']>;
+  sourceText?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateConceptInput = {
   definition?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -7103,6 +7199,7 @@ export type VisualAnchor = {
   anchorText: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
   documentOrder: Scalars['Int']['output'];
+  endTime?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
   isBroken: Scalars['Boolean']['output'];
   mediaAssetId: Scalars['ID']['output'];
@@ -7114,6 +7211,7 @@ export type VisualAnchor = {
   posXEnd?: Maybe<Scalars['Float']['output']>;
   posY?: Maybe<Scalars['Float']['output']>;
   posYEnd?: Maybe<Scalars['Float']['output']>;
+  startTime?: Maybe<Scalars['Float']['output']>;
   updatedAt: Scalars['String']['output'];
   visualAsset?: Maybe<VisualAsset>;
   visualAssetId?: Maybe<Scalars['ID']['output']>;
@@ -7673,6 +7771,46 @@ export type DiscussionMessageAddedSubscriptionVariables = Exact<{
 
 
 export type DiscussionMessageAddedSubscription = { __typename?: 'Subscription', messageAdded: { __typename?: 'DiscussionMessage', id: string, userId: string, content: string, messageType: MessageType, parentMessageId?: string | null, likesCount: number, isLikedByMe: boolean, createdAt: string } };
+
+export type CitationFieldsFragment = { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null };
+
+export type EnrichedBlockFieldsFragment = { __typename?: 'EnrichedTranscriptBlock', id: string, lessonId: string, segmentId?: string | null, blockType: EnrichedBlockType, blockOrder: number, content: unknown, startTime?: number | null, endTime?: number | null, citation?: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null } | null, anchor?: { __typename?: 'VisualAnchor', id: string, anchorText: string, startTime?: number | null, endTime?: number | null, visualAssetId?: string | null } | null };
+
+export type EnrichedLessonQueryVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+}>;
+
+
+export type EnrichedLessonQuery = { __typename?: 'Query', enrichedLesson?: { __typename?: 'EnrichedLesson', id: string, youtubeVideoId?: string | null, transcriptReady: boolean, enrichmentStatus: EnrichmentStatus, lesson: { __typename?: 'Lesson', id: string, title: string }, blocks: Array<{ __typename?: 'EnrichedTranscriptBlock', id: string, lessonId: string, segmentId?: string | null, blockType: EnrichedBlockType, blockOrder: number, content: unknown, startTime?: number | null, endTime?: number | null, citation?: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null } | null, anchor?: { __typename?: 'VisualAnchor', id: string, anchorText: string, startTime?: number | null, endTime?: number | null, visualAssetId?: string | null } | null }>, citations: Array<{ __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null }> } | null };
+
+export type IngestYoutubeLessonMutationVariables = Exact<{
+  input: IngestYoutubeLessonInput;
+}>;
+
+
+export type IngestYoutubeLessonMutation = { __typename?: 'Mutation', ingestYoutubeLesson: { __typename?: 'EnrichedLesson', id: string, youtubeVideoId?: string | null, enrichmentStatus: EnrichmentStatus } };
+
+export type UpdateLessonCitationMutationVariables = Exact<{
+  citationId: Scalars['ID']['input'];
+  input: UpdateCitationInput;
+}>;
+
+
+export type UpdateLessonCitationMutation = { __typename?: 'Mutation', updateLessonCitation: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null } };
+
+export type SetBlockAnchorTimestampMutationVariables = Exact<{
+  input: SetBlockAnchorTimestampInput;
+}>;
+
+
+export type SetBlockAnchorTimestampMutation = { __typename?: 'Mutation', setBlockAnchorTimestamp: { __typename?: 'EnrichedTranscriptBlock', id: string, startTime?: number | null, endTime?: number | null } };
+
+export type PublishEnrichedLessonMutationVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+}>;
+
+
+export type PublishEnrichedLessonMutation = { __typename?: 'Mutation', publishEnrichedLesson: { __typename?: 'EnrichedLesson', id: string, enrichmentStatus: EnrichmentStatus } };
 
 export type ConceptQueryVariables = Exact<{
   id: Scalars['ID']['input'];
