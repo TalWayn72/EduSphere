@@ -6,6 +6,7 @@ import {
   PRESIGNED_UPLOAD_QUERY,
   CONFIRM_MEDIA_UPLOAD_MUTATION,
 } from '@/lib/graphql/content.queries';
+import { INGEST_YOUTUBE_LESSON_MUTATION } from '@/lib/graphql/enriched-lesson.queries';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 
 export type UploadState =
@@ -40,6 +41,8 @@ export function useMediaUpload(
   const [richDocTitle, setRichDocTitle] = useState('');
   const [richDocContent, setRichDocContent] = useState('');
   const [richDocSaved, setRichDocSaved] = useState(false);
+  const [youtubeLoading, setYoutubeLoading] = useState(false);
+  const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const richDocSavedTimerRef = useRef<
     ReturnType<typeof setTimeout> | undefined
   >(undefined);
@@ -158,6 +161,38 @@ export function useMediaUpload(
     setEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const ingestYouTube = async (url: string, videoId: string) => {
+    setYoutubeLoading(true);
+    setYoutubeError(null);
+    const result = await urqlClient
+      .mutation(INGEST_YOUTUBE_LESSON_MUTATION, {
+        input: { youtubeUrl: url, courseId },
+      })
+      .toPromise();
+    setYoutubeLoading(false);
+    if (result.error || !result.data?.ingestYoutubeLesson) {
+      const reason = result.error?.message ?? t('wizard.youtubeIngestFailed');
+      setYoutubeError(reason);
+      return;
+    }
+    const { id, youtubeVideoId } = result.data.ingestYoutubeLesson as {
+      id: string;
+      youtubeVideoId: string;
+      enrichmentStatus: string;
+    };
+    const ytEntry: UploadedMedia = {
+      id,
+      courseId,
+      fileKey: youtubeVideoId,
+      title: `YouTube: ${videoId}`,
+      contentType: 'YOUTUBE',
+      status: 'PROCESSING',
+      downloadUrl: `https://www.youtube.com/watch?v=${youtubeVideoId}`,
+      altText: null,
+    };
+    onChange({ mediaList: [...mediaList, ytEntry] });
+  };
+
   const handleSaveRichDoc = () => {
     if (!richDocTitle.trim()) return;
     const richEntry = {
@@ -197,6 +232,9 @@ export function useMediaUpload(
     removeEntry,
     updateEntry,
     handleSaveRichDoc,
+    ingestYouTube,
+    youtubeLoading,
+    youtubeError,
     t,
     onChange,
     mediaList,

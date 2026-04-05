@@ -46,6 +46,7 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   PRESIGNED_UPLOAD_QUERY: 'PRESIGNED_UPLOAD_QUERY',
   CONFIRM_MEDIA_UPLOAD_MUTATION: 'CONFIRM_MEDIA_UPLOAD_MUTATION',
 }));
+vi.mock('@/lib/graphql/enriched-lesson.queries', () => ({ INGEST_YOUTUBE_LESSON_MUTATION: 'INGEST_YOUTUBE_LESSON_MUTATION' }));
 
 vi.mock('@/components/AltTextModal', () => ({
   AltTextModal: ({ open }: { open: boolean }) =>

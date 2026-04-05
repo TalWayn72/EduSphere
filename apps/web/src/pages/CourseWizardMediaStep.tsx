@@ -1,7 +1,8 @@
-import { Upload, CheckCircle2, PenLine } from 'lucide-react';
+import { Upload, CheckCircle2, PenLine, Youtube } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { AltTextModal } from '@/components/AltTextModal';
 import { RichEditor } from '@/components/editor/RichEditor';
+import { YouTubeUrlInput } from '@/components/lesson/YouTubeUrlInput';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 import { useMediaUpload } from './useMediaUpload';
 import { MediaUploadEntries } from './MediaUploadEntries';
@@ -56,6 +57,9 @@ export function CourseWizardMediaStep({
     removeEntry,
     updateEntry,
     handleSaveRichDoc,
+    ingestYouTube,
+    youtubeLoading,
+    youtubeError,
     t,
   } = useMediaUpload(courseId, mediaList, onChange);
 
@@ -107,6 +111,20 @@ export function CourseWizardMediaStep({
           onChange={handleFileSelect}
           aria-label={t('wizard.selectFilesAriaLabel')}
         />
+      </div>
+
+      {/* YouTube ingest section */}
+      <div className="mt-6 border-t pt-4 space-y-3">
+        <p className="text-sm font-medium flex items-center gap-2">
+          <Youtube className="h-4 w-4" /> {t('wizard.addYoutubeVideo')}
+        </p>
+        <YouTubeUrlInput
+          onSubmit={ingestYouTube}
+          loading={youtubeLoading}
+        />
+        {youtubeError && (
+          <p className="text-sm text-destructive">{youtubeError}</p>
+        )}
       </div>
 
       {/* Rich Document section */}
