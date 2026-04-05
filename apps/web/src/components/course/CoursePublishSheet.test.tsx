@@ -1,9 +1,4 @@
-/**
- * CoursePublishSheet unit tests — Phase 65.
- *
- * Tests: readiness checklist rendering, pass/fail icons, publish button
- * enable/disable logic, confirmation dialog, urql mock patterns.
- */
+/** CoursePublishSheet unit tests — readiness checklist, publish flow, urql patterns. */
 import React from 'react';
 import {
   render,
@@ -14,7 +9,11 @@ import {
 } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-// ── Mocks ─────────────────────────────────────────────────────────────────────
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
+}));
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
@@ -74,32 +73,15 @@ vi.mock('@/components/ui/badge', () => ({
 }));
 
 vi.mock('lucide-react', () => ({
-  CheckCircle2: ({ className }: { className: string }) => (
-    <span data-testid="icon-check" className={className}>
-      check
-    </span>
-  ),
-  XCircle: ({ className }: { className: string }) => (
-    <span data-testid="icon-x" className={className}>
-      x
-    </span>
-  ),
-  Loader2: ({ className }: { className: string }) => (
-    <span data-testid="icon-loader" className={className}>
-      loading
-    </span>
-  ),
-  Send: ({ className }: { className: string }) => (
-    <span data-testid="icon-send" className={className}>
-      send
-    </span>
-  ),
+  CheckCircle2: ({ className }: { className?: string }) => <span data-testid="icon-check" className={className}>check</span>,
+  XCircle: ({ className }: { className?: string }) => <span data-testid="icon-x" className={className}>x</span>,
+  Loader2: ({ className }: { className?: string }) => <span data-testid="icon-loader" className={className}>loading</span>,
+  Send: ({ className }: { className?: string }) => <span data-testid="icon-send" className={className}>send</span>,
+  ArrowRight: ({ className }: { className?: string }) => <span data-testid="icon-arrow-right" className={className}>→</span>,
 }));
 
 import { CoursePublishSheet } from './CoursePublishSheet';
 import * as urql from 'urql';
-
-// ── Fixtures ──────────────────────────────────────────────────────────────────
 
 const ALL_PASS_CHECKS = [
   { name: 'has_title', passed: true, message: null },
@@ -146,8 +128,6 @@ const defaultProps = {
   onOpenChange: vi.fn(),
   onPublished: vi.fn(),
 };
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('CoursePublishSheet', () => {
   beforeEach(() => {
