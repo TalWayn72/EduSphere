@@ -18,7 +18,7 @@ import { login } from './auth.helpers';
 // ── Constants ──────────────────────��────────────────────────���───────────────
 
 const MOCK_LESSON_ID = 'mock-lesson-enriched-1';
-const ENRICHED_LESSON_URL = `/lesson/${MOCK_LESSON_ID}`;
+const ENRICHED_LESSON_URL = `/learn/${MOCK_LESSON_ID}`;
 
 // ── Auth ─────────────────────���──────────────────────────────────────────────
 
