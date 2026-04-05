@@ -191,7 +191,9 @@
     "richDocAdded": "נוסף",
     "addRichDocument": "הוסף מסמך עשיר",
     "removeAriaLabel": "הסר",
-    "selectFilesAriaLabel": "בחר קבצים להעלאה"
+    "selectFilesAriaLabel": "בחר קבצים להעלאה",
+    "addYoutubeVideo": "הוסף סרטון YouTube",
+    "youtubeIngestFailed": "נכשל בטעינת סרטון YouTube. אנא בדוק את הכתובת ונסה שוב."
   },
   "checkout": {
     "payNow": "שלם עכשיו",
