@@ -255,11 +255,13 @@ services:
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
       - KEYCLOAK_REALM=edusphere
-      - KEYCLOAK_CLIENT_ID=edusphere-app
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-content
       - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=512
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4002:4002"
     restart: unless-stopped
@@ -456,6 +458,10 @@ services:
     container_name: edusphere-gateway
     working_dir: /app/apps/gateway
     command: npx tsx src/index.ts
+    volumes:
+      # Mount supergraph.graphql so Docker service DNS names are used for routing.
+      # The baked-in image has localhost: URLs which fail inside Docker networking.
+      - ./apps/gateway/supergraph.graphql:/app/apps/gateway/supergraph.graphql:ro
     environment:
       - NODE_ENV=development
       - PORT=4000
@@ -469,9 +475,12 @@ services:
       - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/edusphere/protocol/openid-connect/certs
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=gateway
       - NODE_OPTIONS=--max-old-space-size=512
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4000:4000"
     restart: unless-stopped

@@ -143,15 +143,21 @@ export function useCourseCreate() {
     });
 
     if (error) {
-      // Advance anyway — YouTube ingest will surface the error inline.
-      // The "draft" fallback courseId will be used until a real id is available.
-      setStep(2);
+      // Surface the error — do NOT advance with a null draftCourseId because
+      // ingestYoutubeLesson will reject courseId:"draft" (not a UUID).
+      const reason =
+        error.graphQLErrors?.[0]?.message ??
+        error.networkError?.message ??
+        'Failed to create draft course. Please try again.';
+      toast.error(reason);
       return;
     }
 
     if (data?.createCourse) {
       setDraftCourseId(data.createCourse.id);
       setStep(2);
+    } else {
+      toast.error('Unexpected response from server. Please try again.');
     }
   };
 

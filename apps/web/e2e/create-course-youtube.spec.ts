@@ -30,8 +30,10 @@ const KEYCLOAK_URL = process.env.E2E_KEYCLOAK_URL ?? 'http://localhost:8080';
 const KEYCLOAK_REALM = process.env.E2E_KEYCLOAK_REALM ?? 'edusphere';
 
 const INSTRUCTOR = {
-  username: 'instructor.rachel',
-  password: 'EduSphere2024!',
+  // Use the seeded instructor account from scripts/reset-keycloak-passwords.cjs
+  // instructor.rachel does not exist in the Keycloak realm — use instructor@example.com
+  username: process.env.E2E_INSTRUCTOR_USERNAME ?? 'instructor@example.com',
+  password: process.env.E2E_INSTRUCTOR_PASSWORD ?? 'Instructor123!',
 };
 
 const COURSE_TITLE = 'כוונות הרש"ש';
@@ -121,6 +123,22 @@ async function loginViaKeycloak(page: Page): Promise<void> {
     timeout: 30_000,
   });
 
+  // Wait for Keycloak code exchange to complete — spinner disappears
+  await page
+    .waitForFunction(
+      () => {
+        const spinner = document.querySelector('.animate-spin');
+        const text = document.body.textContent ?? '';
+        return (
+          !spinner &&
+          !text.includes('Initializing authentication') &&
+          !!document.querySelector('nav, [data-testid="sidebar"], header')
+        );
+      },
+      { timeout: 30_000 }
+    )
+    .catch(() => {});
+
   // Wait for authenticated route
   await page
     .waitForURL(/\/(learn|courses|dashboard|agents|search|profile)/, {
@@ -145,12 +163,47 @@ test.describe('Create Course with YouTube Video — instructor.rachel', () => {
     await screenshot(page, 'create-course-yt-01-after-login');
 
     // ── Step 1: Navigate to /courses/new ──────────────────────────────────────
-    // Wait a moment for the app to finish initializing after Keycloak redirect
+    // After Keycloak login, the SPA is mounted and keycloak.authenticated is true
+    // in memory. We click the React Router <Link to="/courses/new"> on the
+    // Dashboard to avoid a full page reload (which would re-run Keycloak init and
+    // hit the 10-second timeout, falling back to unauthenticated).
     await page.waitForLoadState('networkidle').catch(() => {});
-    await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
-    // Wait for React lazy-loaded components to finish rendering
+    await page.waitForTimeout(1500);
+
+    // The Dashboard has a React Router Link with href="/courses/new".
+    // Clicking it does client-side navigation (no reload).
+    const createCourseLink = page.locator('a[href="/courses/new"]').first();
+    const hasCreateLink = await createCourseLink
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+
+    if (hasCreateLink) {
+      await createCourseLink.click();
+    } else {
+      // Fallback: look for any Create/New Course button/link by text
+      const createBtn = page.getByRole('link', { name: /create.*(course|new)|new.*course/i }).first();
+      const hasBtnByText = await createBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      if (hasBtnByText) {
+        await createBtn.click();
+      } else {
+        // Last resort: navigate sidebar to Courses, then find create button
+        await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+        // Wait for Keycloak SSO check to complete
+        await page.waitForTimeout(12_000);
+      }
+    }
+
+    // Wait for the Create Course page heading
+    await page
+      .waitForFunction(
+        () => document.body.textContent?.includes('Create New Course') ||
+              document.body.textContent?.includes('Create Course') ||
+              !!document.querySelector('input[name="title"]'),
+        { timeout: 15_000 }
+      )
+      .catch(() => {});
+
     await page.waitForLoadState('networkidle').catch(() => {});
-    await page.waitForTimeout(1000);
     await screenshot(page, 'create-course-yt-02-courses-new');
 
     // Verify the page loaded — look for heading or step 1 content
