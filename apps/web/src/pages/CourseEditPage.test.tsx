@@ -11,6 +11,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
     ...actual,
     useParams: vi.fn(() => ({ courseId: 'course-1' })),
     useNavigate: vi.fn(() => mockNavigate),
+    useSearchParams: vi.fn(() => [new URLSearchParams(), vi.fn()]),
   };
 });
 
@@ -44,6 +45,10 @@ vi.mock('@/components/SourceManager', () => ({
   SourceManager: vi.fn(() => (
     <div data-testid="source-manager-stub">SourceManager</div>
   )),
+}));
+
+vi.mock('@/components/course/DeleteCourseButton', () => ({
+  DeleteCourseButton: vi.fn(() => null),
 }));
 
 vi.mock('@/components/PageShell', () => ({

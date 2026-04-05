@@ -1,10 +1,12 @@
 /**
  * CoursePublishSheet — slide-in panel showing course readiness checks
- * with publish confirmation dialog.
+ * with publish confirmation dialog. Failed checks are clickable and navigate
+ * the user to the relevant edit section.
  */
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Loader2, Send } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, Send, ArrowRight } from 'lucide-react';
 import {
   COURSE_READINESS_QUERY,
   PUBLISH_COURSE_MUTATION,
@@ -47,6 +49,15 @@ const CHECK_LABELS: Record<string, string> = {
   has_pipeline_results: 'תוצאות Pipeline',
 };
 
+/** Maps a failed check name to its ?tab=... query param value. */
+const CHECK_NAV_TARGET: Record<string, string> = {
+  has_title: 'info&focus=title',
+  has_description: 'info&focus=description',
+  has_lessons: 'modules',
+  lessons_ready: 'modules',
+  has_pipeline_results: 'modules',
+};
+
 interface Props {
   courseId: string;
   open: boolean;
@@ -61,6 +72,7 @@ export const CoursePublishSheet: React.FC<Props> = ({
   onPublished,
 }) => {
   const { t } = useTranslation('errors');
+  const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [readinessResult] = useQuery<CourseReadinessData>({
@@ -81,6 +93,19 @@ export const CoursePublishSheet: React.FC<Props> = ({
       onOpenChange(false);
     }
   }, [courseId, publishCourse, onPublished, onOpenChange]);
+
+  const handleCheckClick = useCallback(
+    (checkName: string) => {
+      const target = CHECK_NAV_TARGET[checkName];
+      if (!target) return;
+      onOpenChange(false);
+      // Defer navigation so the sheet close animation can begin first.
+      setTimeout(() => {
+        navigate(`/courses/${courseId}/edit?tab=${target}`);
+      }, 50);
+    },
+    [courseId, navigate, onOpenChange]
+  );
 
   const readiness = readinessResult.data?.courseReadiness;
   const isLoading = readinessResult.fetching;
@@ -110,33 +135,48 @@ export const CoursePublishSheet: React.FC<Props> = ({
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             )}
-            {readiness?.checks.map((check) => (
-              <div
-                key={check.name}
-                role="listitem"
-                className="flex items-center gap-3 rounded-md border p-3"
-                data-testid={`check-${check.name}`}
-              >
-                {check.passed ? (
+            {readiness?.checks.map((check) =>
+              check.passed ? (
+                <div
+                  key={check.name}
+                  role="listitem"
+                  className="flex items-center gap-3 rounded-md border p-3"
+                  data-testid={`check-${check.name}`}
+                >
                   <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 dark:text-green-400" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-destructive shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium">
-                    {CHECK_LABELS[check.name] ?? check.name}
-                  </span>
-                  {!check.passed && check.message && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {check.message}
-                    </p>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium">
+                      {CHECK_LABELS[check.name] ?? check.name}
+                    </span>
+                  </div>
+                  <Badge variant="default">עבר</Badge>
                 </div>
-                <Badge variant={check.passed ? 'default' : 'destructive'}>
-                  {check.passed ? 'עבר' : 'נכשל'}
-                </Badge>
-              </div>
-            ))}
+              ) : (
+                <button
+                  key={check.name}
+                  role="listitem"
+                  type="button"
+                  className="flex items-center gap-3 rounded-md border border-destructive/40 p-3 w-full text-left cursor-pointer hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  data-testid={`check-${check.name}`}
+                  aria-label={`תקן: ${CHECK_LABELS[check.name] ?? check.name}`}
+                  onClick={() => handleCheckClick(check.name)}
+                >
+                  <XCircle className="h-5 w-5 text-destructive shrink-0" />
+                  <div className="flex-1 min-w-0 text-right">
+                    <span className="text-sm font-medium">
+                      {CHECK_LABELS[check.name] ?? check.name}
+                    </span>
+                    {check.message && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {check.message}
+                      </p>
+                    )}
+                  </div>
+                  <Badge variant="destructive">נכשל</Badge>
+                  <ArrowRight className="h-3 w-3 text-muted-foreground shrink-0 ml-1" />
+                </button>
+              )
+            )}
           </div>
 
           {publishResult.error && (

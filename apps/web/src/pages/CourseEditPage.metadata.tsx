@@ -2,6 +2,8 @@
  * CourseEditMetadata — Basic Info tab for CourseEditPage.
  * Allows editing title, description, thumbnail (emoji/URL), and estimated hours.
  */
+import { useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,9 +53,25 @@ export function CourseEditMetadata({
   onSaved,
 }: Props) {
   const { t } = useTranslation('courses');
+  const [searchParams] = useSearchParams();
+  const titleRef = useRef<HTMLInputElement | null>(null);
+  const descRef = useRef<HTMLTextAreaElement | null>(null);
+
   const [{ fetching }, executeUpdate] = useMutation<UpdateCourseResult>(
     UPDATE_COURSE_MUTATION
   );
+
+  // Auto-focus the field indicated by the ?focus= query param (set by click-to-fix navigation).
+  useEffect(() => {
+    const focus = searchParams.get('focus');
+    if (focus === 'title') {
+      titleRef.current?.focus();
+    } else if (focus === 'description') {
+      descRef.current?.focus();
+    }
+  // Run once on mount; searchParams is stable for the lifetime of this render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     register,
@@ -97,6 +115,10 @@ export function CourseEditMetadata({
             <Input
               id="edit-title"
               {...register('title')}
+              ref={(el) => {
+                register('title').ref(el);
+                titleRef.current = el;
+              }}
               placeholder={t('enterCourseTitle')}
             />
             {errors.title && (
@@ -110,6 +132,10 @@ export function CourseEditMetadata({
             <Textarea
               id="edit-description"
               {...register('description')}
+              ref={(el) => {
+                register('description').ref(el);
+                descRef.current = el;
+              }}
               placeholder={t('describeWhatStudentsLearn')}
               rows={4}
             />

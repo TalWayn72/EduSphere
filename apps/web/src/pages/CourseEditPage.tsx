@@ -6,7 +6,7 @@
  * Renders two tabs: "Basic Info" (metadata form) and "Modules & Content".
  */
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from 'urql';
 import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
@@ -59,7 +59,13 @@ export function CourseEditPage() {
   const { t } = useTranslation('courses');
   const { courseId = '' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const user = getCurrentUser();
+
+  // Read ?tab= query param set by CoursePublishSheet click-to-fix navigation.
+  const initialTab = searchParams.get('tab') ?? 'info';
+  const activeTab =
+    initialTab === 'modules' || initialTab === 'sources' ? initialTab : 'info';
 
   const [toast, setToast] = useState<string | null>(null);
   const [published, setPublished] = useState<boolean | null>(null);
@@ -249,7 +255,7 @@ export function CourseEditPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="info">
+        <Tabs defaultValue={activeTab}>
           <TabsList>
             <TabsTrigger value="info">{t('basicInfo')}</TabsTrigger>
             <TabsTrigger value="modules">{t('modulesAndContent')}</TabsTrigger>
