@@ -43,7 +43,7 @@ import { EnrichedLessonModule } from './enriched-lesson/enriched-lesson.module';
     MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
-      typePaths: ['./dist/**/*.graphql'],
+      typePaths: ['./**/*.graphql'],
       context: async ({ req }: { req: IncomingMessage }) => {
         const ctx = { req };
         await authMiddleware.validateRequest(ctx);

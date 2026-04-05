@@ -19,6 +19,7 @@ interface YouTubeUrlInputProps {
 const YT_URL_PATTERNS = [
   /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
   /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+  /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
 ];
 
 function extractVideoId(url: string): string | null {

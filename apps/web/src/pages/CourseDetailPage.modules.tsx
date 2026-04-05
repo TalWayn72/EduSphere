@@ -170,7 +170,7 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
 export function CourseModuleList({ modules, courseId }: Props) {
   const { t } = useTranslation('courses');
 
-  if (modules.length === 0) {
+  if ((modules ?? []).length === 0) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-sm text-muted-foreground">
@@ -180,7 +180,7 @@ export function CourseModuleList({ modules, courseId }: Props) {
     );
   }
 
-  const sorted = [...modules].sort((a, b) => a.orderIndex - b.orderIndex);
+  const sorted = [...(modules ?? [])].sort((a, b) => a.orderIndex - b.orderIndex);
 
   return (
     <div className="space-y-3">

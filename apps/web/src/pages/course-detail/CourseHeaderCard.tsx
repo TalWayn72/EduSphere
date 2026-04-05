@@ -78,7 +78,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
     () => (progress ? { width: `${progress.percentComplete}%` } : undefined),
     [progress]
   );
-  const totalItems = course.modules.reduce(
+  const totalItems = (course.modules ?? []).reduce(
     (n, m) => n + m.contentItems.length,
     0
   );
@@ -140,7 +140,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                   <BookOpen className="h-4 w-4" />
                   {t('itemsInModules', {
                     items: totalItems,
-                    modules: course.modules.length,
+                    modules: (course.modules ?? []).length,
                   })}
                 </span>
                 {isEnrolled && progress && (

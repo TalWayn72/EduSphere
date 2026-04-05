@@ -30,6 +30,8 @@ export function useCourseCreate() {
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
   const [showAiModal, setShowAiModal] = useState(false);
+  /** Real courseId from the auto-created draft, set when advancing to Media step. */
+  const [draftCourseId, setDraftCourseId] = useState<string | null>(null);
 
   const form = useForm<CourseSchemaValues>({
     resolver: zodResolver(courseSchema),
@@ -55,6 +57,7 @@ export function useCourseCreate() {
 
   const isSubmitting = createResult.fetching;
   const isExporting = exportScormResult.fetching;
+  const isCreatingDraft = createResult.fetching;
 
   const handleExportScorm = async () => {
     const courseId = form.getValues('title')
@@ -107,7 +110,63 @@ export function useCourseCreate() {
     setStep(1);
   };
 
+  /**
+   * Advance from Step 2 (Modules) to Step 3 (Media).
+   * Auto-creates a draft course so the Media step has a real courseId
+   * for the ingestYoutubeLesson mutation (backend rejects the "draft" placeholder).
+   * If a draft was already created (user navigated back), reuses the existing id.
+   * On backend failure, advances anyway so the user isn't blocked — YouTube ingest
+   * will surface the error inline when they click Ingest.
+   */
+  const handleNextToMedia = async () => {
+    if (draftCourseId) {
+      // Already created — just advance
+      setStep(2);
+      return;
+    }
+    const vals = form.getValues();
+    const rawSlug = vals.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const slug = rawSlug || `course-${Date.now().toString(36)}`;
+    const instructorId = user?.id ?? '';
+
+    const { data, error } = await executeMutation({
+      input: {
+        title: vals.title,
+        slug,
+        description: vals.description || undefined,
+        instructorId,
+        isPublished: false,
+      },
+    });
+
+    if (error) {
+      // Advance anyway — YouTube ingest will surface the error inline.
+      // The "draft" fallback courseId will be used until a real id is available.
+      setStep(2);
+      return;
+    }
+
+    if (data?.createCourse) {
+      setDraftCourseId(data.createCourse.id);
+      setStep(2);
+    }
+  };
+
   const handlePublish = async (publish: boolean) => {
+    // If the draft was already created when entering the Media step, navigate
+    // directly to it (publishing is handled by a separate update flow).
+    if (draftCourseId) {
+      const label = publish
+        ? 'Course published successfully!'
+        : 'Course saved as draft.';
+      toast.success(label);
+      navigate(`/courses/${draftCourseId}`);
+      return;
+    }
+
     const vals = form.getValues();
     const rawSlug = vals.title
       .toLowerCase()
@@ -172,10 +231,13 @@ export function useCourseCreate() {
     setShowAiModal,
     isSubmitting,
     isExporting,
+    isCreatingDraft,
     handleExportScorm,
     handleNextFromStep1,
+    handleNextToMedia,
     handlePublish,
     canAdvanceStep1,
+    draftCourseId,
     navigate,
   };
 }

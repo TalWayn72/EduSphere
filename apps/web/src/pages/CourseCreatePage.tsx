@@ -49,10 +49,13 @@ export function CourseCreatePage() {
     setShowAiModal,
     isSubmitting,
     isExporting,
+    isCreatingDraft,
     handleExportScorm,
     handleNextFromStep1,
+    handleNextToMedia,
     handlePublish,
     canAdvanceStep1,
+    draftCourseId,
     navigate,
   } = useCourseCreate();
 
@@ -128,7 +131,7 @@ export function CourseCreatePage() {
               )}
               {step === 2 && (
                 <CourseWizardMediaStep
-                  courseId={DRAFT_COURSE_ID}
+                  courseId={draftCourseId ?? DRAFT_COURSE_ID}
                   mediaList={wizardData.mediaList}
                   onChange={updateWizard}
                 />
@@ -159,9 +162,16 @@ export function CourseCreatePage() {
             <Button
               type="button"
               onClick={
-                step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)
+                step === 0
+                  ? handleNextFromStep1
+                  : step === 1
+                    ? handleNextToMedia
+                    : () => setStep((s) => s + 1)
               }
-              disabled={step === 0 && !canAdvanceStep1}
+              disabled={
+                (step === 0 && !canAdvanceStep1) ||
+                (step === 1 && isCreatingDraft)
+              }
             >
               {t('wizard.next')}
               <ArrowRight className="h-4 w-4 ml-2" />

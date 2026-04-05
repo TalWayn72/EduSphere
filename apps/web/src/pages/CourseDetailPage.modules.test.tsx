@@ -147,6 +147,18 @@ describe('CourseModuleList', () => {
     expect(screen.getByText('2m 0s')).toBeInTheDocument();
   });
 
+  it('renders without crash when modules is null (GraphQL null response)', () => {
+    render(
+      <MemoryRouter>
+        <CourseModuleList
+          modules={null as unknown as never[]}
+          courseId={COURSE_ID}
+        />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('No modules added')).toBeInTheDocument();
+  });
+
   it('navigates to /quiz/:id for QUIZ content type', () => {
     const modulesWithQuiz = [
       {

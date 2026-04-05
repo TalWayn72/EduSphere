@@ -7,6 +7,8 @@ import {
   CONFIRM_MEDIA_UPLOAD_MUTATION,
 } from '@/lib/graphql/content.queries';
 import { INGEST_YOUTUBE_LESSON_MUTATION } from '@/lib/graphql/enriched-lesson.queries';
+import { CREATE_LESSON_MUTATION } from '@/lib/graphql/lesson.queries';
+import { getCurrentUser } from '@/lib/auth';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 
 export type UploadState =
@@ -164,17 +166,45 @@ export function useMediaUpload(
   const ingestYouTube = async (url: string, videoId: string) => {
     setYoutubeLoading(true);
     setYoutubeError(null);
-    const result = await urqlClient
-      .mutation(INGEST_YOUTUBE_LESSON_MUTATION, {
-        input: { youtubeUrl: url, courseId },
+
+    // Step 1: auto-create a draft lesson under the course so we have a lessonId.
+    // ingestYoutubeLesson requires lessonId: ID! — no lesson exists yet in wizard flow.
+    const instructorId = getCurrentUser()?.id ?? '';
+    const lessonResult = await urqlClient
+      .mutation(CREATE_LESSON_MUTATION, {
+        input: {
+          courseId,
+          title: 'YouTube Lesson',
+          type: 'THEMATIC',
+          instructorId,
+        },
       })
       .toPromise();
+
+    if (lessonResult.error || !lessonResult.data?.createLesson) {
+      const reason =
+        lessonResult.error?.message ?? t('wizard.youtubeIngestFailed');
+      setYoutubeError(reason);
+      setYoutubeLoading(false);
+      return;
+    }
+
+    const lessonId = (lessonResult.data.createLesson as { id: string }).id;
+
+    // Step 2: ingest the YouTube video against the newly-created lesson.
+    const result = await urqlClient
+      .mutation(INGEST_YOUTUBE_LESSON_MUTATION, {
+        input: { lessonId, youtubeUrl: url },
+      })
+      .toPromise();
+
     setYoutubeLoading(false);
     if (result.error || !result.data?.ingestYoutubeLesson) {
       const reason = result.error?.message ?? t('wizard.youtubeIngestFailed');
       setYoutubeError(reason);
       return;
     }
+
     const { id, youtubeVideoId } = result.data.ingestYoutubeLesson as {
       id: string;
       youtubeVideoId: string;

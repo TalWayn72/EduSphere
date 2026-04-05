@@ -130,4 +130,18 @@ describe('CourseHeaderCard', () => {
     );
     expect(container).toBeTruthy();
   });
+
+  it('renders without crash when modules is null (GraphQL null response)', () => {
+    const props = {
+      ...baseProps,
+      course: { ...baseProps.course, modules: null as unknown as never[] },
+    };
+    const { container } = render(
+      <MemoryRouter>
+        <CourseHeaderCard {...props} />
+      </MemoryRouter>
+    );
+    expect(container).toBeTruthy();
+    expect(screen.getByText('Test Course')).toBeInTheDocument();
+  });
 });
