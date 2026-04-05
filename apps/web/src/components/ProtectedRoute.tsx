@@ -7,11 +7,17 @@ interface ProtectedRouteProps {
   requiredRoles?: string[];
 }
 
+export const POST_LOGIN_REDIRECT_KEY = 'post_login_redirect';
+
 export function ProtectedRoute({
   children,
   requiredRoles,
 }: ProtectedRouteProps) {
   if (!isAuthenticated()) {
+    const destination = window.location.pathname + window.location.search;
+    if (destination && destination !== '/login') {
+      window.sessionStorage.setItem(POST_LOGIN_REDIRECT_KEY, destination);
+    }
     return <Navigate to="/login" replace />;
   }
 

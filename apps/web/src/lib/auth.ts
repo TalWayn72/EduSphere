@@ -146,14 +146,17 @@ export function login(): void {
     // would be trusted even though the DB has a different user preference.
     window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
     devAuthenticated = true;
-    window.location.href = '/';
+    const devRedirect =
+      window.sessionStorage.getItem('post_login_redirect') ?? '/';
+    window.sessionStorage.removeItem('post_login_redirect');
+    window.location.href = devRedirect;
     return;
   }
 
   // BUG-091: Clear locale-sync flag before Keycloak redirect
   window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
   keycloak!.login({
-    redirectUri: window.location.origin,
+    redirectUri: window.location.href,
   });
 }
 

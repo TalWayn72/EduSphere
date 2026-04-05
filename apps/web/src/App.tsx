@@ -5,6 +5,7 @@ import { Provider as UrqlProvider } from 'urql';
 import { urqlClient } from '@/lib/urql-client';
 import { queryClient } from '@/lib/persisted-query-client';
 import { initKeycloak, isAuthenticated } from '@/lib/auth';
+import { POST_LOGIN_REDIRECT_KEY } from '@/components/ProtectedRoute';
 import { initI18n, applyDocumentDirection } from '@/lib/i18n';
 import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
@@ -79,11 +80,14 @@ function App() {
   useEffect(() => {
     function handleLateAuth() {
       setLateAuthTick((t) => t + 1);
-      // If this was originally a Keycloak redirect, navigate to dashboard
-      // now that auth has recovered.
+      // If this was originally a Keycloak redirect, navigate to saved destination
+      // (or /dashboard as fallback) now that auth has recovered.
       if (_wasKeycloakRedirect && isAuthenticated()) {
         cleanKeycloakUrlParams();
-        router.navigate('/dashboard', { replace: true });
+        const dest =
+          window.sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY) ?? '/dashboard';
+        window.sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+        router.navigate(dest, { replace: true });
       }
     }
     window.addEventListener('keycloak-late-auth', handleLateAuth);
@@ -122,7 +126,10 @@ function App() {
         cleanKeycloakUrlParams();
 
         if (isAuthenticated()) {
-          router.navigate('/dashboard', { replace: true });
+          const dest =
+            window.sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY) ?? '/dashboard';
+          window.sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+          router.navigate(dest, { replace: true });
         }
       }
 
