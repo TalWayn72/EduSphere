@@ -4,6 +4,10 @@ import Keycloak from 'keycloak-js';
 // Only set after user calls login(); cleared on tab/window close.
 export const DEV_LOGGED_IN_KEY = 'edusphere_dev_logged_in';
 
+// Imported from urql-client to clear on logout. Avoid circular import by
+// using the same string constant here directly.
+const AUTH_LOGIN_TIMESTAMP_KEY_INTERNAL = 'edusphere_auth_login_ts';
+
 /** @deprecated Use DEV_LOGGED_IN_KEY. Kept for backward-compat cleanup in logout(). */
 const _DEV_LOGOUT_KEY_LEGACY = 'edusphere_dev_logged_out';
 
@@ -175,6 +179,8 @@ export function logout(): void {
     window.sessionStorage.removeItem(_DEV_LOGOUT_KEY_LEGACY);
     // BUG-091: Clear locale-sync flag so next login triggers DB re-sync
     window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
+    // BUG-redirect-loop: Clear login grace period timestamp on logout
+    window.sessionStorage.removeItem(AUTH_LOGIN_TIMESTAMP_KEY_INTERNAL);
     window.location.href = '/login';
     return;
   }
@@ -182,6 +188,8 @@ export function logout(): void {
   clearTokenRefresh();
   // BUG-091: Clear locale-sync flag before Keycloak logout redirect
   window.sessionStorage.removeItem(LOCALE_SYNCED_KEY);
+  // BUG-redirect-loop: Clear login grace period timestamp on logout
+  window.sessionStorage.removeItem(AUTH_LOGIN_TIMESTAMP_KEY_INTERNAL);
   keycloak!.logout({
     redirectUri: window.location.origin,
   });

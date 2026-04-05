@@ -5,6 +5,7 @@ import { Provider as UrqlProvider } from 'urql';
 import { urqlClient } from '@/lib/urql-client';
 import { queryClient } from '@/lib/persisted-query-client';
 import { initKeycloak, isAuthenticated } from '@/lib/auth';
+import { AUTH_LOGIN_TIMESTAMP_KEY } from '@/lib/urql-client';
 import { POST_LOGIN_REDIRECT_KEY } from '@/components/ProtectedRoute';
 import { initI18n, applyDocumentDirection } from '@/lib/i18n';
 import { router } from '@/lib/router';
@@ -106,6 +107,10 @@ function App() {
   useEffect(() => {
     function handleLateAuth() {
       setLateAuthTick((t) => t + 1);
+      // BUG-redirect-loop: Record login timestamp on late auth recovery too.
+      if (isAuthenticated()) {
+        window.sessionStorage.setItem(AUTH_LOGIN_TIMESTAMP_KEY, String(Date.now()));
+      }
       // If this was originally a Keycloak redirect, navigate to saved destination
       // (or /dashboard as fallback) now that auth has recovered.
       if (_wasKeycloakRedirect && isAuthenticated()) {
@@ -155,6 +160,11 @@ function App() {
       cleanKeycloakUrlParams();
 
       if (isAuthenticated()) {
+        // BUG-redirect-loop: Record login timestamp so urql-client suppresses
+        // premature logout if the first GraphQL requests return 401 (subgraph
+        // JWKS cache not yet refreshed after the Keycloak login redirect).
+        window.sessionStorage.setItem(AUTH_LOGIN_TIMESTAMP_KEY, String(Date.now()));
+
         const dest = window.sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
         if (dest) {
           window.sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);

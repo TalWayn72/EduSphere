@@ -211,12 +211,15 @@ services:
       - PORT=4001
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
-      - KEYCLOAK_CLIENT_ID=edusphere-app
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-core
       - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=512
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4001:4001"
     restart: unless-stopped
@@ -254,6 +257,7 @@ services:
       - PORT=4002
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
       - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
@@ -299,12 +303,15 @@ services:
       - PORT=4003
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
-      - KEYCLOAK_CLIENT_ID=edusphere-app
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-annotation
       - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=512
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4003:4003"
     restart: unless-stopped
@@ -340,12 +347,15 @@ services:
       - PORT=4004
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
-      - KEYCLOAK_CLIENT_ID=edusphere-app
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-collaboration
       - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=512
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4004:4004"
     restart: unless-stopped
@@ -381,12 +391,15 @@ services:
       - PORT=4005
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
-      - KEYCLOAK_CLIENT_ID=edusphere-app
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-agent
       - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=768
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4005:4005"
     restart: unless-stopped
@@ -422,12 +435,15 @@ services:
       - PORT=4006
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080
       - KEYCLOAK_REALM=edusphere
-      - KEYCLOAK_CLIENT_ID=edusphere-app
+      - KEYCLOAK_CLIENT_ID=edusphere-web
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-knowledge
       - NATS_URL=nats://nats:4222
       - NODE_OPTIONS=--max-old-space-size=768
+      - ALLOW_DEV_TOKEN=true
+      - DEV_TOKEN_ROLE=SUPER_ADMIN
     ports:
       - "4006:4006"
     restart: unless-stopped

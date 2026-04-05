@@ -30,10 +30,16 @@ export class AuthMiddleware {
     // SEC-3: Subgraphs now validate JWT audience. The Keycloak Client-ID
     // default was fixed from 'edusphere-app' to 'edusphere-web' (packages/config).
     // BUG-073 root cause was the mismatch, not audience validation itself.
+    //
+    // BUG-redirect-loop: Pass issuerUrl separately so Docker containers can
+    // use http://keycloak:8080 for internal JWKS fetching while validating the
+    // iss claim against http://localhost:8080 (the public Keycloak address
+    // embedded in tokens issued to browser clients).
     this.jwtValidator = new JWTValidator(
       keycloakConfig.url,
       keycloakConfig.realm,
-      keycloakConfig.clientId
+      keycloakConfig.clientId,
+      keycloakConfig.issuerUrl
     );
     this.logger.log(`JWT Validator initialized: ${keycloakConfig.issuer}`);
   }

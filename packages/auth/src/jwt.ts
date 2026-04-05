@@ -58,10 +58,20 @@ export class JWTValidator {
   // clientId is optional: when omitted the audience claim is not validated.
   // Subgraphs behind the gateway can skip audience checks since the gateway
   // already validates the token before forwarding the Authorization header.
-  constructor(keycloakUrl: string, realm: string, clientId?: string) {
+  //
+  // issuerUrl is optional: when set, it overrides keycloakUrl for the issuer
+  // check only. Use this when the internal JWKS fetch URL differs from the
+  // public issuer URL in tokens (e.g. Docker: keycloakUrl=http://keycloak:8080
+  // but tokens have iss=http://localhost:8080).
+  constructor(
+    keycloakUrl: string,
+    realm: string,
+    clientId?: string,
+    issuerUrl?: string
+  ) {
     const jwksUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/certs`;
     this.jwks = createRemoteJWKSet(new URL(jwksUrl));
-    this.issuer = `${keycloakUrl}/realms/${realm}`;
+    this.issuer = `${issuerUrl ?? keycloakUrl}/realms/${realm}`;
     this.audience = clientId;
   }
 

@@ -26,6 +26,21 @@ const AUTH_ERROR_CODES = new Set([
   'FORBIDDEN',
 ]);
 
+// BUG-redirect-loop: Track the last time the user successfully logged in.
+// After a Keycloak redirect the JWT token arrives fresh but subgraph containers
+// may have a stale JWKS cache or the token is not yet propagated. We suppress
+// auth-error-triggered logout for 30 seconds after login to prevent the race
+// condition where the app logs the user out immediately after they log in.
+// The timestamp is set by App.tsx bootstrap() when isAuthenticated() is true.
+export const AUTH_LOGIN_TIMESTAMP_KEY = 'edusphere_auth_login_ts';
+const AUTH_GRACE_PERIOD_MS = 30_000; // 30 seconds grace after login
+
+function isInLoginGracePeriod(): boolean {
+  const ts = window.sessionStorage.getItem(AUTH_LOGIN_TIMESTAMP_KEY);
+  if (!ts) return false;
+  return Date.now() - parseInt(ts, 10) < AUTH_GRACE_PERIOD_MS;
+}
+
 function hasAuthError(error: CombinedError): boolean {
   return (
     error.graphQLErrors?.some(
@@ -90,6 +105,20 @@ const authErrorExchange = errorExchange({
       typeof window !== 'undefined' &&
       !window.location.pathname.startsWith('/login')
     ) {
+      // BUG-redirect-loop: Do NOT logout immediately after login.
+      // The first GraphQL requests after a Keycloak redirect may fail with
+      // Unauthenticated if subgraph JWKS caches haven't refreshed yet.
+      // Suppress logout for 30 seconds after login to avoid the redirect loop.
+      if (isInLoginGracePeriod()) {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console -- DEV-only grace period trace
+          console.debug(
+            '[Auth] GraphQL Unauthorized within login grace period — suppressing logout.',
+            error.message
+          );
+        }
+        return;
+      }
       console.error(
         '[Auth] GraphQL Unauthorized — session expired, redirecting to login.',
         error.message
