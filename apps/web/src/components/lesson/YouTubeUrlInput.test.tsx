@@ -112,9 +112,6 @@ describe('YouTubeUrlInput', () => {
 describe('extractVideoId (real implementation)', () => {
   // Helper: call the module-private extractVideoId by testing through the
   // actual YT_URL_PATTERNS logic re-implemented inline for full coverage.
-  // We use vi.importActual to load the un-mocked module.
-  type RealModule = { extractVideoIdForTest?: (url: string) => string | null };
-
   // Since extractVideoId is not exported, we validate the patterns directly.
   const YT_URL_PATTERNS_UNDER_TEST = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
