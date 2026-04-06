@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "Veuillez taper le titre exact du cours pour confirmer.",
   "deleteCourseFailed": "Échec de la suppression du cours. Veuillez réessayer.",
   "deleteCoursePermissionDenied": "Vous n'avez pas la permission de supprimer ce cours.",
+  "deleteCourseNoPermission": "Vous n'avez pas la permission de supprimer ce cours.",
   "deleteCourseNotFound": "Cours introuvable. Il a peut-être déjà été supprimé.",
   "deleteCourseConfirm": "Supprimer le cours",
   "deletingCourse": "Suppression...",

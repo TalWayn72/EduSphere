@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "Please type the exact course title to confirm.",
   "deleteCourseFailed": "Failed to delete course. Please try again.",
   "deleteCoursePermissionDenied": "You don't have permission to delete this course.",
+  "deleteCourseNoPermission": "You don't have permission to delete this course.",
   "deleteCourseNotFound": "Course not found. It may have already been deleted.",
   "deleteCourseConfirm": "Delete Course",
   "deletingCourse": "Deleting...",

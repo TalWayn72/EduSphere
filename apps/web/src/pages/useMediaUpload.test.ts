@@ -15,6 +15,8 @@
  * 11. handleSaveRichDoc ignores empty title
  * 12. Timer cleanup on unmount (memory safety)
  * 13. updateEntry patches specific entry by index
+ * 14. uploadFile shows error toast when courseId is "draft"
+ * 15. ingestYouTube shows error toast when courseId is "draft"
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
@@ -38,6 +40,26 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   CONFIRM_MEDIA_UPLOAD_MUTATION: 'CONFIRM_UPLOAD',
 }));
 
+vi.mock('./CourseCreatePage.types', () => ({
+  DRAFT_COURSE_ID: 'draft',
+}));
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn(), success: vi.fn() },
+}));
+
+vi.mock('@/lib/auth', () => ({
+  getCurrentUser: () => ({ id: 'user-123', name: 'Test User' }),
+}));
+
+vi.mock('@/lib/graphql/enriched-lesson.queries', () => ({
+  INGEST_YOUTUBE_LESSON_MUTATION: 'INGEST_YOUTUBE',
+}));
+
+vi.mock('@/lib/graphql/lesson.queries', () => ({
+  CREATE_LESSON_MUTATION: 'CREATE_LESSON',
+}));
+
 vi.mock('@/lib/constants', () => ({
   SAVED_CONFIRMATION_MS: 3000,
 }));
@@ -50,6 +72,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { useMediaUpload } from './useMediaUpload';
+import { toast } from 'sonner';
 import type { UploadedMedia } from './course-create.types';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -278,5 +301,43 @@ describe('useMediaUpload', () => {
     act(() => result.current.updateEntry(1, { progress: 50 }));
     expect(result.current.entries[0].progress).toBe(0);
     expect(result.current.entries[1].progress).toBe(50);
+  });
+
+  it('uploadFile shows error toast and does not presign when courseId is "draft"', async () => {
+    const { result } = renderHook(() => useMediaUpload('draft', [], onChange));
+
+    act(() => {
+      result.current.handleFileSelect({
+        target: { files: [createMockFile('file.png')], value: '' },
+      } as unknown as React.ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.uploadFile(0);
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Please complete course details first before uploading files.'
+    );
+    expect(mockQuery).not.toHaveBeenCalled();
+    // Entry should remain 'idle' — not moved to 'presigning'
+    expect(result.current.entries[0].state).toBe('idle');
+  });
+
+  it('ingestYouTube shows error toast and does not call backend when courseId is "draft"', async () => {
+    const { result } = renderHook(() => useMediaUpload('draft', [], onChange));
+
+    await act(async () => {
+      await result.current.ingestYouTube(
+        'https://www.youtube.com/watch?v=abc123',
+        'abc123'
+      );
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Please complete course details first before adding videos.'
+    );
+    expect(mockMutation).not.toHaveBeenCalled();
+    expect(result.current.youtubeLoading).toBe(false);
   });
 });

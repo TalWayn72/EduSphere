@@ -182,6 +182,14 @@ export function CourseEditPage() {
   const isCurrentlyPublished = published ?? course.isPublished;
   const isToggling = publishing || unpublishing;
 
+  // Permission: SUPER_ADMIN and ORG_ADMIN can delete any course.
+  // INSTRUCTOR may only delete their own course.
+  const canDelete =
+    user != null &&
+    (user.role === 'SUPER_ADMIN' ||
+      user.role === 'ORG_ADMIN' ||
+      (user.role === 'INSTRUCTOR' && course.instructorId === user.id));
+
   return (
     <Layout>
       {toast && (
@@ -225,6 +233,7 @@ export function CourseEditPage() {
               courseId={courseId}
               courseTitle={course.title}
               isPublished={isCurrentlyPublished}
+              canDelete={canDelete}
               onDeleted={() =>
                 navigate('/courses', {
                   replace: true,

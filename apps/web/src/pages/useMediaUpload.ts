@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { SAVED_CONFIRMATION_MS } from '@/lib/constants';
 import { urqlClient } from '@/lib/urql-client';
 import {
@@ -9,6 +10,7 @@ import {
 import { INGEST_YOUTUBE_LESSON_MUTATION } from '@/lib/graphql/enriched-lesson.queries';
 import { CREATE_LESSON_MUTATION } from '@/lib/graphql/lesson.queries';
 import { getCurrentUser } from '@/lib/auth';
+import { DRAFT_COURSE_ID } from './CourseCreatePage.types';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 
 export type UploadState =
@@ -84,6 +86,12 @@ export function useMediaUpload(
   const uploadFile = async (index: number) => {
     const entry = entries[index];
     if (!entry || entry.state !== 'idle') return;
+
+    // Guard: courseId must be a real UUID — backend rejects the "draft" placeholder
+    if (!courseId || courseId === DRAFT_COURSE_ID) {
+      toast.error('Please complete course details first before uploading files.');
+      return;
+    }
 
     updateEntry(index, { state: 'presigning', progress: 0 });
     const contentType = entry.file.type || 'application/octet-stream';
@@ -164,6 +172,12 @@ export function useMediaUpload(
   };
 
   const ingestYouTube = async (url: string, videoId: string) => {
+    // Guard: courseId must be a real UUID — backend rejects the "draft" placeholder
+    if (!courseId || courseId === DRAFT_COURSE_ID) {
+      toast.error('Please complete course details first before adding videos.');
+      return;
+    }
+
     setYoutubeLoading(true);
     setYoutubeError(null);
 

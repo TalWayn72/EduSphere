@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "אנא הקלד את שם הקורס המדויק לאישור.",
   "deleteCourseFailed": "מחיקת הקורס נכשלה. אנא נסה שוב.",
   "deleteCoursePermissionDenied": "אין לך הרשאה למחוק קורס זה.",
+  "deleteCourseNoPermission": "אין לך הרשאה למחוק קורס זה.",
   "deleteCourseNotFound": "הקורס לא נמצא. ייתכן שכבר נמחק.",
   "deleteCourseConfirm": "מחק קורס",
   "deletingCourse": "מוחק...",

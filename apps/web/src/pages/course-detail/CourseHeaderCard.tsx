@@ -20,6 +20,7 @@ import { EDITOR_ROLES } from './types';
 import { CoursePublishSheet } from '@/components/course/CoursePublishSheet';
 import { DeleteCourseButton } from '@/components/course/DeleteCourseButton';
 import { useAuthRole } from '@/hooks/useAuthRole';
+import { getCurrentUser } from '@/lib/auth';
 
 interface Props {
   course: CourseDetailData;
@@ -70,6 +71,18 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
   const [publishOpen, setPublishOpen] = useState(false);
   const canPublish =
     canEdit && !course.isPublished && EDITOR_ROLES.has(role ?? '');
+
+  // Permission: SUPER_ADMIN and ORG_ADMIN can delete any course.
+  // INSTRUCTOR may only delete courses they own (instructor_id === userId).
+  const canDelete = useMemo(() => {
+    if (!role) return false;
+    if (role === 'SUPER_ADMIN' || role === 'ORG_ADMIN') return true;
+    if (role === 'INSTRUCTOR') {
+      const user = getCurrentUser();
+      return user != null && course.instructorId === user.id;
+    }
+    return false;
+  }, [role, course.instructorId]);
   const handlePublished = useCallback(() => {
     // Force parent to re-fetch course data after publish
     window.location.reload();
@@ -226,6 +239,7 @@ export const CourseHeaderCard = React.memo(function CourseHeaderCard({
                   courseId={courseId}
                   courseTitle={course.title}
                   isPublished={course.isPublished}
+                  canDelete={canDelete}
                   onDeleted={() =>
                     navigate('/courses', {
                       replace: true,

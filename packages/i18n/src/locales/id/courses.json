@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "Silakan ketik judul kursus yang tepat untuk mengonfirmasi.",
   "deleteCourseFailed": "Gagal menghapus kursus. Silakan coba lagi.",
   "deleteCoursePermissionDenied": "Anda tidak memiliki izin untuk menghapus kursus ini.",
+  "deleteCourseNoPermission": "Anda tidak memiliki izin untuk menghapus kursus ini.",
   "deleteCourseNotFound": "Kursus tidak ditemukan. Mungkin sudah dihapus.",
   "deleteCourseConfirm": "Hapus Kursus",
   "deletingCourse": "Menghapus...",

@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "Пожалуйста, введите точное название курса для подтверждения.",
   "deleteCourseFailed": "Не удалось удалить курс. Пожалуйста, попробуйте снова.",
   "deleteCoursePermissionDenied": "У вас нет разрешения на удаление этого курса.",
+  "deleteCourseNoPermission": "У вас нет разрешения на удаление этого курса.",
   "deleteCourseNotFound": "Курс не найден. Возможно, он уже был удалён.",
   "deleteCourseConfirm": "Удалить курс",
   "deletingCourse": "Удаление...",

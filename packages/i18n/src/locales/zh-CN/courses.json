@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "请输入准确的课程标题以确认。",
   "deleteCourseFailed": "删除课程失败。请重试。",
   "deleteCoursePermissionDenied": "您没有删除此课程的权限。",
+  "deleteCourseNoPermission": "您没有删除此课程的权限。",
   "deleteCourseNotFound": "课程未找到。可能已被删除。",
   "deleteCourseConfirm": "删除课程",
   "deletingCourse": "删除中...",

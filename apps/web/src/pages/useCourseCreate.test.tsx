@@ -12,8 +12,11 @@
  *  8. SCORM export success toast
  *  9. canAdvanceStep1 requires >= 3 char title
  * 10. updateWizard merges partial data
+ * 11. sessionStorage persists step on change
+ * 12. sessionStorage restores step on remount
+ * 13. sessionStorage is cleared on successful publish
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -114,9 +117,29 @@ function setupUrqlMocks() {
   });
 }
 
+// sessionStorage mock (jsdom provides it but we spy to assert calls)
+const sessionStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => { store[key] = value; },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { store = {}; },
+  };
+})();
+
 beforeEach(() => {
   vi.clearAllMocks();
   setupUrqlMocks();
+  sessionStorageMock.clear();
+  Object.defineProperty(globalThis, 'sessionStorage', {
+    value: sessionStorageMock,
+    writable: true,
+  });
+});
+
+afterEach(() => {
+  sessionStorageMock.clear();
 });
 
 // ── Tests ────────────────────────────────────────────────────────────────────
@@ -221,5 +244,44 @@ describe('useCourseCreate', () => {
     const { result } = renderHook(() => useCourseCreate());
     act(() => result.current.setStep(2));
     expect(result.current.step).toBe(2);
+  });
+
+  it('persists step to sessionStorage when step changes', async () => {
+    const { result } = renderHook(() => useCourseCreate());
+    await act(async () => {
+      await result.current.handleNextFromStep1();
+    });
+    const stored = JSON.parse(
+      sessionStorageMock.getItem('edusphere-wizard-state') ?? '{}'
+    );
+    expect(stored.step).toBe(1);
+  });
+
+  it('restores step from sessionStorage on remount', () => {
+    // Pre-seed sessionStorage as if a previous session was at step 1
+    sessionStorageMock.setItem(
+      'edusphere-wizard-state',
+      JSON.stringify({ step: 1, draftCourseId: 'course-restored-id' })
+    );
+    const { result } = renderHook(() => useCourseCreate());
+    expect(result.current.step).toBe(1);
+    expect(result.current.draftCourseId).toBe('course-restored-id');
+  });
+
+  it('clears sessionStorage on successful publish', async () => {
+    sessionStorageMock.setItem(
+      'edusphere-wizard-state',
+      JSON.stringify({ step: 2, draftCourseId: null })
+    );
+    mockExecuteMutation.mockResolvedValue({
+      data: {
+        createCourse: { id: 'c-2', title: 'Published Course', slug: 'pub' },
+      },
+    });
+    const { result } = renderHook(() => useCourseCreate());
+    await act(async () => {
+      await result.current.handlePublish(true);
+    });
+    expect(sessionStorageMock.getItem('edusphere-wizard-state')).toBeNull();
   });
 });

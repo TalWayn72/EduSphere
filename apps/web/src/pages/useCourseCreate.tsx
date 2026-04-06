@@ -1,5 +1,5 @@
 /* eslint-disable edusphere-design-system/require-page-header -- custom hook, not a page component */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { useForm } from 'react-hook-form';
@@ -23,15 +23,56 @@ import {
   EXPORT_SCORM_MUTATION,
 } from './CourseCreatePage.types';
 
+const WIZARD_STORAGE_KEY = 'edusphere-wizard-state';
+
+interface WizardPersistedState {
+  step: number;
+  draftCourseId: string | null;
+}
+
+function loadWizardState(): WizardPersistedState {
+  try {
+    const raw = sessionStorage.getItem(WIZARD_STORAGE_KEY);
+    if (!raw) return { step: 0, draftCourseId: null };
+    return JSON.parse(raw) as WizardPersistedState;
+  } catch {
+    return { step: 0, draftCourseId: null };
+  }
+}
+
+function saveWizardState(state: WizardPersistedState): void {
+  try {
+    sessionStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // sessionStorage may be unavailable in some environments; fail silently
+  }
+}
+
+function clearWizardState(): void {
+  try {
+    sessionStorage.removeItem(WIZARD_STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export function useCourseCreate() {
   const navigate = useNavigate();
   const user = getCurrentUser();
 
-  const [step, setStep] = useState(0);
+  const persisted = loadWizardState();
+  const [step, setStep] = useState(persisted.step);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
   const [showAiModal, setShowAiModal] = useState(false);
   /** Real courseId from the auto-created draft, set when advancing to Media step. */
-  const [draftCourseId, setDraftCourseId] = useState<string | null>(null);
+  const [draftCourseId, setDraftCourseId] = useState<string | null>(
+    persisted.draftCourseId
+  );
+
+  // Persist wizard state to sessionStorage on every change so JWT-redirect doesn't lose progress
+  useEffect(() => {
+    saveWizardState({ step, draftCourseId });
+  }, [step, draftCourseId]);
 
   const form = useForm<CourseSchemaValues>({
     resolver: zodResolver(courseSchema),
@@ -169,6 +210,7 @@ export function useCourseCreate() {
         ? 'Course published successfully!'
         : 'Course saved as draft.';
       toast.success(label);
+      clearWizardState();
       navigate(`/courses/${draftCourseId}`);
       return;
     }
@@ -201,6 +243,7 @@ export function useCourseCreate() {
         ? `"${data.createCourse.title}" has been published!`
         : `"${data.createCourse.title}" saved as draft.`;
       toast.success(label);
+      clearWizardState();
       navigate(`/courses/${data.createCourse.id}`);
     }
   };

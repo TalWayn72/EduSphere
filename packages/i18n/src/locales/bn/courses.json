@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "নিশ্চিত করতে অনুগ্রহ করে সঠিক কোর্সের শিরোনাম টাইপ করুন।",
   "deleteCourseFailed": "কোর্স মুছে ফেলা ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।",
   "deleteCoursePermissionDenied": "এই কোর্স মুছে ফেলার অনুমতি আপনার নেই।",
+  "deleteCourseNoPermission": "এই কোর্স মুছে ফেলার অনুমতি আপনার নেই।",
   "deleteCourseNotFound": "কোর্স পাওয়া যায়নি। এটি হয়তো ইতিমধ্যে মুছে ফেলা হয়েছে।",
   "deleteCourseConfirm": "কোর্স মুছুন",
   "deletingCourse": "মুছে ফেলা হচ্ছে...",

@@ -14,6 +14,7 @@
   "deleteCourseConfirmHint": "कृपया पुष्टि के लिए सटीक कोर्स शीर्षक टाइप करें।",
   "deleteCourseFailed": "कोर्स हटाना विफल। कृपया पुनः प्रयास करें।",
   "deleteCoursePermissionDenied": "आपको इस कोर्स को हटाने की अनुमति नहीं है।",
+  "deleteCourseNoPermission": "आपको इस कोर्स को हटाने की अनुमति नहीं है।",
   "deleteCourseNotFound": "कोर्स नहीं मिला। शायद यह पहले ही हटाया जा चुका है।",
   "deleteCourseConfirm": "कोर्स हटाएं",
   "deletingCourse": "हटाया जा रहा है...",
