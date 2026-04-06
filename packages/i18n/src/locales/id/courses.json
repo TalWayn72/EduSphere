@@ -124,7 +124,9 @@
     "richDocAdded": "Added",
     "addRichDocument": "Add Rich Document",
     "removeAriaLabel": "Remove",
-    "selectFilesAriaLabel": "Select files to upload"
+    "selectFilesAriaLabel": "Select files to upload",
+    "addYoutubeVideo": "Add YouTube Video",
+    "youtubeIngestFailed": "Failed to ingest YouTube video. Please check the URL and try again."
   },
   "checkout": {
     "payNow": "Pay Now",
