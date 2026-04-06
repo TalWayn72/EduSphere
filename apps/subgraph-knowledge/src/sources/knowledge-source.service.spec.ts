@@ -246,6 +246,40 @@ describe('KnowledgeSourceService', () => {
     });
   });
 
+  // ── updateSource ─────────────────────────────────────────────────────────
+
+  describe('updateSource()', () => {
+    it('updates title and returns updated source', async () => {
+      const updated = { ...MOCK_SOURCE, title: 'New Title' };
+      mockSelect.mockImplementation(buildSelect([MOCK_SOURCE]));
+      mockUpdate.mockImplementation(buildUpdate(updated));
+
+      const result = await service.updateSource('ks-1', TENANT, {
+        title: 'New Title',
+      });
+      expect(result.title).toBe('New Title');
+      expect(mockUpdate).toHaveBeenCalled();
+    });
+
+    it('throws NotFoundException if source does not exist', async () => {
+      mockSelect.mockImplementation(buildSelect([]));
+      await expect(
+        service.updateSource('ghost', TENANT, { title: 'X' })
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('updates metadata when provided', async () => {
+      const updated = { ...MOCK_SOURCE, metadata: { lang: 'he' } };
+      mockSelect.mockImplementation(buildSelect([MOCK_SOURCE]));
+      mockUpdate.mockImplementation(buildUpdate(updated));
+
+      const result = await service.updateSource('ks-1', TENANT, {
+        metadata: { lang: 'he' },
+      });
+      expect(result.metadata).toEqual({ lang: 'he' });
+    });
+  });
+
   // ── onModuleInit ──────────────────────────────────────────────────────────
 
   describe('onModuleInit()', () => {

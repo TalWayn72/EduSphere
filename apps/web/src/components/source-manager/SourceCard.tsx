@@ -10,9 +10,10 @@ interface SourceCardProps {
   source: KnowledgeSource;
   onSelect: (id: string) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
+  onEdit?: (e: React.MouseEvent, id: string) => void;
 }
 
-export function SourceCard({ source, onSelect, onDelete }: SourceCardProps) {
+export function SourceCard({ source, onSelect, onDelete, onEdit }: SourceCardProps) {
   const { t } = useTranslation('content');
 
   return (
@@ -87,17 +88,33 @@ export function SourceCard({ source, onSelect, onDelete }: SourceCardProps) {
           )}
         </div>
       </div>
-      <button
-        onClick={(e) => onDelete(e, source.id)}
-        className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all text-lg leading-none mt-0.5 shrink-0 dark:text-gray-600"
-        aria-label={t('sources.deleteSourceLabel', {
-          title: source.title,
-          defaultValue: `Delete source: ${source.title}`,
-        })}
-        title={t('sources.deleteTitle')}
-      >
-        <span aria-hidden="true">&#x2715;</span>
-      </button>
+      <div className="flex flex-col gap-1 shrink-0">
+        {onEdit && (
+          <button
+            onClick={(e) => onEdit(e, source.id)}
+            className="text-gray-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all text-base leading-none dark:text-gray-600"
+            aria-label={t('sources.editSourceLabel', {
+              title: source.title,
+              defaultValue: `Edit source: ${source.title}`,
+            })}
+            title={t('sources.editTitle', 'Edit')}
+            data-testid={`edit-source-${source.id}`}
+          >
+            <span aria-hidden="true">&#x270E;</span>
+          </button>
+        )}
+        <button
+          onClick={(e) => onDelete(e, source.id)}
+          className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all text-lg leading-none dark:text-gray-600"
+          aria-label={t('sources.deleteSourceLabel', {
+            title: source.title,
+            defaultValue: `Delete source: ${source.title}`,
+          })}
+          title={t('sources.deleteTitle')}
+        >
+          <span aria-hidden="true">&#x2715;</span>
+        </button>
+      </div>
     </div>
   );
 }

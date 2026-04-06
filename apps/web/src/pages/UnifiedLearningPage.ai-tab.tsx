@@ -1,13 +1,15 @@
 /**
- * AiTab — AI Chavruta chat panel for UnifiedLearningPage.
+ * AiTab — AI chat panel with selectable modes (CHAVRUTA / QUIZ / EXPLAIN).
  * Extracted from ContentViewer right-side panel.
  */
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Bot, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RequirementLink } from '@/components/RequirementLink';
 import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
+import type { ChatMode } from '@/hooks/useAgentChat';
 import { ProgressStatus } from '@/components/ProgressStatus';
 import { AI_CHAT_MESSAGES } from '@/lib/progress-messages';
 
@@ -15,16 +17,37 @@ interface Props {
   chat: UseAgentChatReturn;
 }
 
-const QUICK_PROMPTS = [
-  'Debate free will',
-  'Quiz me',
-  'Summarize',
-  'Explain Rambam',
-];
+const MODES: ChatMode[] = ['CHAVRUTA', 'QUIZ', 'EXPLAIN'];
+
+const QUICK_PROMPTS_BY_MODE: Record<ChatMode, string[]> = {
+  CHAVRUTA: [
+    'Debate free will',
+    'Challenge this idea',
+    'Present a counter-argument',
+    'Prove from sources',
+  ],
+  QUIZ: ['Start quiz', 'Next question', 'Give me a hint', 'Explain the answer'],
+  EXPLAIN: [
+    'Explain simply',
+    'Give an example',
+    'Why is this important?',
+    'Connect to real life',
+  ],
+};
+
+const PLACEHOLDER_BY_MODE: Record<ChatMode, string> = {
+  CHAVRUTA: 'שאל, הצע, חלוק...',
+  QUIZ: 'ענה על השאלה...',
+  EXPLAIN: 'מה תרצה להבין?',
+};
 
 export function AiTab({ chat }: Props) {
   const { t } = useTranslation('content');
   const location = useLocation();
+  const [activeMode, setActiveMode] = useState<ChatMode>(
+    chat.mode ?? 'CHAVRUTA'
+  );
+
   const {
     messages,
     chatInput,
@@ -33,11 +56,22 @@ export function AiTab({ chat }: Props) {
     chatEndRef,
     isStreaming,
     isSending,
+    setMode,
   } = chat;
+
+  const handleModeClick = (m: ChatMode) => {
+    setActiveMode(m);
+    setMode(m);
+  };
 
   const handleSend = () => {
     void sendMessage();
   };
+
+  const quickPrompts = QUICK_PROMPTS_BY_MODE[activeMode];
+  const placeholder = isStreaming
+    ? t('agentResponding')
+    : PLACEHOLDER_BY_MODE[activeMode];
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -51,13 +85,19 @@ export function AiTab({ chat }: Props) {
           </p>
         </div>
         <div className="ml-auto flex gap-1 shrink-0">
-          {['CHAVRUTA', 'QUIZ', 'EXPLAIN'].map((mode) => (
-            <span
-              key={mode}
-              className="text-xs px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
+          {MODES.map((m) => (
+            <button
+              key={m}
+              onClick={() => handleModeClick(m)}
+              className={`text-xs px-1.5 py-0.5 rounded transition-colors ${
+                activeMode === m
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted/60 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+              }`}
+              data-mode={m}
             >
-              {mode}
-            </span>
+              {m}
+            </button>
           ))}
         </div>
       </div>
@@ -112,7 +152,7 @@ export function AiTab({ chat }: Props) {
 
       {/* Quick prompts */}
       <div className="px-3 py-1.5 border-t border-b flex gap-1.5 overflow-x-auto flex-shrink-0">
-        {QUICK_PROMPTS.map((prompt) => (
+        {quickPrompts.map((prompt) => (
           <button
             key={prompt}
             onClick={() => setChatInput(prompt)}
@@ -131,7 +171,7 @@ export function AiTab({ chat }: Props) {
           onKeyDown={(e) =>
             e.key === 'Enter' && !e.shiftKey && !isStreaming && handleSend()
           }
-          placeholder={isStreaming ? t('agentResponding') : t('askOrDebate')}
+          placeholder={placeholder}
           disabled={isStreaming}
           className="flex-1 text-xs px-2.5 py-1.5 border rounded bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
         />

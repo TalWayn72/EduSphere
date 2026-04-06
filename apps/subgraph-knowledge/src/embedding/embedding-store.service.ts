@@ -250,4 +250,5 @@ export class EmbeddingStoreService implements OnModuleDestroy {
       .returning({ id: schema.concept_embeddings.id });
     return !!conc;
   }
+
 }

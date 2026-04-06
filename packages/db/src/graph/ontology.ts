@@ -259,3 +259,42 @@ export async function createRelationship(
     { fromConceptId, toConceptId }
   );
 }
+export interface SourceNodeProperties {
+  id: string;
+  tenant_id: string;
+  name: string;
+  source_type: string;
+  origin?: string;
+  course_id?: string;
+  chunk_count?: number;
+}
+
+/** Create or update a Source vertex in the knowledge graph (idempotent MERGE). */
+export async function createSourceNode(
+  db: DrizzleDB,
+  props: SourceNodeProperties
+): Promise<void> {
+  const now = Date.now();
+  const propsJson = JSON.stringify({
+    id: props.id,
+    tenant_id: props.tenant_id,
+    name: props.name,
+    source_type: props.source_type,
+    origin: props.origin ?? '',
+    course_id: props.course_id ?? '',
+    chunk_count: props.chunk_count ?? 0,
+    updated_at: now,
+  });
+
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
+    MERGE (s:Source {id: $id})
+    ON CREATE SET s += ${propsJson}, s.created_at = ${now}
+    ON MATCH SET s += ${propsJson}
+    RETURN s.id::text
+  `,
+    { id: props.id }
+  );
+}

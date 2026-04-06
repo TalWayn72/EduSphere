@@ -1,5 +1,5 @@
 /**
- * useAgentChat — manages AI Chavruta chat state.
+ * useAgentChat — manages AI chat state with selectable modes (CHAVRUTA/QUIZ/EXPLAIN).
  *
  * Uses START_AGENT_SESSION_MUTATION + SEND_AGENT_MESSAGE_MUTATION in production.
  * Subscribes to MESSAGE_STREAM_SUBSCRIPTION for real-time streaming agent responses.
@@ -27,7 +27,6 @@ import { MessageRole } from '@edusphere/graphql-types';
 import type { TemplateType } from '@edusphere/graphql-types';
 
 // Types defined locally because agent.queries.ts is excluded from codegen
-// (supergraph lacks some agent-specific input types like CreateAgentWorkflowInput).
 interface StartAgentSessionMutation {
   startAgentSession: {
     id: string;
@@ -63,15 +62,21 @@ interface MessageStreamSubscription {
 interface MessageStreamSubscriptionVariables {
   sessionId: string;
 }
-import type { ChatMessage } from './useAgentChat.helpers';
+import type { ChatMessage, ChatMode } from './useAgentChat.helpers';
 import {
-  INITIAL_MESSAGE,
-  MOCK_RESPONSES,
+  INITIAL_MESSAGES,
+  MOCK_RESPONSES_BY_MODE,
   optimisticReducer,
   withStreamingCursor,
 } from './useAgentChat.helpers';
 
-export type { ChatMessage } from './useAgentChat.helpers';
+export type { ChatMessage, ChatMode } from './useAgentChat.helpers';
+
+const MODE_TO_TEMPLATE: Record<ChatMode, string> = {
+  CHAVRUTA: 'CHAVRUTA_DEBATE',
+  QUIZ: 'QUIZ_GENERATOR',
+  EXPLAIN: 'EXPLANATION_GENERATOR',
+};
 
 export interface UseAgentChatReturn {
   messages: ChatMessage[];
@@ -82,11 +87,17 @@ export interface UseAgentChatReturn {
   chatEndRef: RefObject<HTMLDivElement | null>;
   isStreaming: boolean;
   isSending: boolean;
+  mode: ChatMode;
+  setMode: (mode: ChatMode) => void;
 }
 
-export function useAgentChat(contentId: string): UseAgentChatReturn {
+export function useAgentChat(
+  contentId: string,
+  initialMode: ChatMode = 'CHAVRUTA'
+): UseAgentChatReturn {
+  const [mode, setModeState] = useState<ChatMode>(initialMode);
   const [confirmedMessages, setConfirmedMessages] = useState<ChatMessage[]>([
-    INITIAL_MESSAGE,
+    INITIAL_MESSAGES[initialMode],
   ]);
   const [chatInput, setChatInput] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -105,6 +116,13 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       if (streamingTimeoutRef.current)
         clearTimeout(streamingTimeoutRef.current);
     };
+  }, []);
+
+  const setMode = useCallback((newMode: ChatMode) => {
+    setModeState(newMode);
+    setSessionId(null);
+    setIsStreaming(false);
+    setConfirmedMessages([INITIAL_MESSAGES[newMode]]);
   }, []);
 
   const [, startSession] = useMutation<
@@ -164,18 +182,22 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const appendMockResponse = useCallback(() => {
-    setIsStreaming(true);
-    mockTimeoutRef.current = setTimeout(() => {
-      const reply =
-        MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)] ?? '';
-      setConfirmedMessages((prev) => [
-        ...prev,
-        { id: Date.now().toString(), role: 'agent', content: reply },
-      ]);
-      setIsStreaming(false);
-    }, 800);
-  }, []);
+  const appendMockResponse = useCallback(
+    (currentMode: ChatMode) => {
+      setIsStreaming(true);
+      const responses = MOCK_RESPONSES_BY_MODE[currentMode];
+      mockTimeoutRef.current = setTimeout(() => {
+        const reply =
+          responses[Math.floor(Math.random() * responses.length)] ?? '';
+        setConfirmedMessages((prev) => [
+          ...prev,
+          { id: Date.now().toString(), role: 'agent', content: reply },
+        ]);
+        setIsStreaming(false);
+      }, 800);
+    },
+    []
+  );
 
   const sendMessage = useCallback(() => {
     const trimmed = chatInput.trim();
@@ -204,12 +226,14 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     setIsStreaming(true);
     setConfirmedMessages((prev) => [...prev, userMsg]);
 
+    const currentMode = mode;
     startTransition(async () => {
       let sid = sessionId;
       if (!sid) {
+        const templateType = MODE_TO_TEMPLATE[currentMode] as TemplateType;
         const res = await startSession({
-          templateType: 'CHAVRUTA_DEBATE' as TemplateType,
-          context: { contentId },
+          templateType,
+          context: { contentId, mode: currentMode },
         });
         if (res.error) {
           const consentErr = res.error.graphQLErrors?.find(
@@ -274,11 +298,12 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
         return;
       }
 
-      appendMockResponse();
+      appendMockResponse(currentMode);
     });
   }, [
     chatInput,
     contentId,
+    mode,
     sessionId,
     startSession,
     sendAgentMessage,
@@ -303,5 +328,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     chatEndRef,
     isStreaming,
     isSending,
+    mode,
+    setMode,
   };
 }

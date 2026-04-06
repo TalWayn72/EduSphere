@@ -7,6 +7,12 @@
 import { useState } from 'react';
 import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { LessonCitation } from './enriched-transcript.types';
 
 interface InlineCitationBlockProps {
@@ -47,10 +53,21 @@ export function InlineCitationBlock({
           {transcriptText}
         </span>
         <span className="shrink-0 flex items-center gap-1 mt-0.5">
-          <Badge variant="outline" className="text-xs gap-1 cursor-pointer">
-            <BookOpen className="h-3 w-3" />
-            {citation.bookName}
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="text-xs gap-1 cursor-pointer">
+                  <BookOpen className="h-3 w-3" />
+                  {citation.bookName}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <p className="font-medium text-xs">{citation.bookName}</p>
+                {citation.part && <p className="text-xs text-muted-foreground">{citation.part}</p>}
+                {citation.page && <p className="text-xs text-muted-foreground">p. {citation.page}</p>}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {expanded ? (
             <ChevronUp className="h-3 w-3 text-muted-foreground" />
           ) : (

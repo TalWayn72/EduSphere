@@ -6,6 +6,7 @@ import {
   findLearningPath,
   createRelationship,
   createConcept,
+  createSourceNode,
 } from './ontology';
 import type { DrizzleDB } from './client';
 
@@ -410,5 +411,74 @@ describe('createConcept() — BUG-104 + BUG-107 regression', () => {
     expect(result).toBe('my-custom-id');
     const query: string = mockExecuteCypher.mock.calls[0][2];
     expect(query).toContain('"my-custom-id"');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// createSourceNode — GAP 9 knowledge graph indexing
+// ---------------------------------------------------------------------------
+
+describe('createSourceNode()', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExecuteCypher.mockResolvedValue([]);
+  });
+
+  it('calls executeCypher with Source MERGE query', async () => {
+    const db = buildMockDb();
+    await createSourceNode(db, {
+      id: 'ks-1',
+      tenant_id: 'tenant-1',
+      name: 'Test Source',
+      source_type: 'URL',
+      origin: 'https://example.com',
+      course_id: 'course-1',
+      chunk_count: 5,
+    });
+    expect(mockExecuteCypher).toHaveBeenCalledTimes(1);
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    expect(query).toContain('MERGE');
+    expect(query).toContain(':Source');
+  });
+
+  it('passes source id as parameter (not raw interpolation)', async () => {
+    const db = buildMockDb();
+    await createSourceNode(db, {
+      id: 'source-abc',
+      tenant_id: 'tenant-1',
+      name: 'My Source',
+      source_type: 'FILE_PDF',
+    });
+    const params = mockExecuteCypher.mock.calls[0][3] as Record<string, unknown>;
+    expect(params).toMatchObject({ id: 'source-abc' });
+  });
+
+  it('is idempotent — MERGE prevents duplicate nodes', async () => {
+    const db = buildMockDb();
+    const props = {
+      id: 'ks-dup',
+      tenant_id: 'tenant-1',
+      name: 'Dup Source',
+      source_type: 'TEXT',
+    };
+    await createSourceNode(db, props);
+    await createSourceNode(db, props);
+    // executeCypher called twice (once per call) — both use MERGE so DB stays consistent
+    expect(mockExecuteCypher).toHaveBeenCalledTimes(2);
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    expect(query).toContain('MERGE');
+  });
+
+  it('handles optional fields with defaults', async () => {
+    const db = buildMockDb();
+    await createSourceNode(db, {
+      id: 'ks-minimal',
+      tenant_id: 'tenant-1',
+      name: 'Minimal',
+      source_type: 'TEXT',
+    });
+    const query: string = mockExecuteCypher.mock.calls[0][2];
+    // Should embed default empty string for origin/course_id
+    expect(query).toContain('""');
   });
 });

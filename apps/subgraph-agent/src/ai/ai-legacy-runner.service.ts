@@ -22,6 +22,11 @@ import { injectLocale } from './locale-prompt.js';
 import { createOllama } from 'ollama-ai-provider';
 import type { AIResult } from './ai.service.js';
 import { gpuConfig } from '@edusphere/config';
+import {
+  CHAVRUTA_SYSTEM_PROMPT,
+  QUIZ_SYSTEM_PROMPT,
+  EXPLAIN_SYSTEM_PROMPT,
+} from './chat-mode-prompts.js';
 
 const MAX_TOOL_STEPS = 5;
 
@@ -48,8 +53,11 @@ export interface ExecutionInput {
 }
 
 const DEFAULT_SYSTEM_PROMPTS: Record<string, string> = {
-  EXPLAIN:
-    'You are a clear and patient explainer. Break down complex concepts into simple terms, use analogies, and check for understanding.',
+  CHAVRUTA_DEBATE: CHAVRUTA_SYSTEM_PROMPT,
+  QUIZ_GENERATOR: QUIZ_SYSTEM_PROMPT,
+  QUIZ_ASSESS: QUIZ_SYSTEM_PROMPT,
+  EXPLANATION_GENERATOR: EXPLAIN_SYSTEM_PROMPT,
+  EXPLAIN: EXPLAIN_SYSTEM_PROMPT,
   RESEARCH_SCOUT:
     'You are a research assistant. Help learners explore topics, suggest resources, identify knowledge gaps, and guide inquiry-based learning.',
   CUSTOM: 'You are a helpful AI learning assistant.',

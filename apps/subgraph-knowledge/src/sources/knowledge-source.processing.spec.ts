@@ -150,9 +150,23 @@ async function buildService(opts: {
   };
 
   const embeddings = {
-    generateEmbedding: opts.embeddingError
+    callEmbeddingProvider: opts.embeddingError
       ? vi.fn().mockRejectedValue(new Error('No embedding provider'))
-      : vi.fn().mockResolvedValue({ id: 'emb-1', segmentId: 'ks:src-1:0' }),
+      : vi.fn().mockResolvedValue([0.1, 0.2, 0.3]),
+  };
+
+  const ksChunkStore = {
+    upsert: opts.embeddingError
+      ? vi.fn().mockRejectedValue(new Error('No embedding provider'))
+      : vi.fn().mockResolvedValue(undefined),
+  };
+
+  const reindex = {
+    reindexCourseEmbeddings: vi.fn().mockResolvedValue({
+      sourcesProcessed: 0,
+      embeddingsGenerated: 0,
+      errors: [],
+    }),
   };
 
   const minioUrl = {
@@ -163,12 +177,14 @@ async function buildService(opts: {
   const svc = new KnowledgeSourceService(
     parser as never,
     embeddings as never,
+    ksChunkStore as never,
+    reindex as never,
     minioUrl as never
   );
   // Override db after construction (constructor receives mock from vi.mock above)
   Object.defineProperty(svc, 'db', { value: db, writable: true });
 
-  return { svc, db, parser, embeddings, minioUrl };
+  return { svc, db, parser, embeddings, ksChunkStore, minioUrl };
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────────

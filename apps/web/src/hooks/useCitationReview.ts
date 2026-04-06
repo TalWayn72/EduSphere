@@ -25,6 +25,8 @@ interface UpdateCitationVariables {
     page?: string;
     column?: string;
     paragraph?: string;
+    resolvedText?: string;
+    confidence?: number;
   };
 }
 

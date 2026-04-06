@@ -1,8 +1,9 @@
-import { pgTable, uuid, timestamp, vector } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, timestamp, integer, vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk } from './_shared';
 import { transcript_segments } from './content';
 import { annotations } from './annotation';
+import { knowledgeSources } from './knowledge-sources';
 
 // Drizzle ORM v0.45 native pgvector support — replaces customType pattern
 // Dimensions: 768 (nomic-embed-text dev / text-embedding-3-small prod)
@@ -69,3 +70,34 @@ export type AnnotationEmbedding = typeof annotation_embeddings.$inferSelect;
 export type NewAnnotationEmbedding = typeof annotation_embeddings.$inferInsert;
 export type ConceptEmbedding = typeof concept_embeddings.$inferSelect;
 export type NewConceptEmbedding = typeof concept_embeddings.$inferInsert;
+
+/**
+ * Knowledge Source Chunk Embeddings — one row per text chunk from a knowledge
+ * source. Uses a (source_id, chunk_index) unique constraint instead of a UUID
+ * segment_id FK so knowledge source chunks are decoupled from transcript_segments.
+ *
+ * RLS: row access governed by the parent knowledge_sources.tenant_id.
+ */
+export const knowledge_source_chunk_embeddings = pgTable(
+  'knowledge_source_chunk_embeddings',
+  {
+    id: pk(),
+    source_id: uuid('source_id')
+      .notNull()
+      .references(() => knowledgeSources.id, { onDelete: 'cascade' }),
+    chunk_index: integer('chunk_index').notNull(),
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  }
+);
+
+export const ksChunkEmbeddingsHnswIdx = sql`
+CREATE INDEX IF NOT EXISTS idx_ks_chunk_embeddings_hnsw
+  ON knowledge_source_chunk_embeddings USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 32, ef_construction = 128);
+`;
+
+export type KsChunkEmbedding = typeof knowledge_source_chunk_embeddings.$inferSelect;
+export type NewKsChunkEmbedding = typeof knowledge_source_chunk_embeddings.$inferInsert;

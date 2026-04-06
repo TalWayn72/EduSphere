@@ -272,4 +272,47 @@ describe('useAgentChat', () => {
     const { result } = renderHook(() => useAgentChat('content-1'));
     expect(result.current.isStreaming).toBe(false);
   });
+
+  it('defaults to CHAVRUTA mode', () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() => useAgentChat('content-1'));
+    expect(result.current.mode).toBe('CHAVRUTA');
+  });
+
+  it('setMode changes active mode to QUIZ', () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() => useAgentChat('content-1'));
+
+    act(() => {
+      result.current.setMode('QUIZ');
+    });
+
+    expect(result.current.mode).toBe('QUIZ');
+  });
+
+  it('setMode resets messages to the new mode initial message', () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() => useAgentChat('content-1'));
+
+    act(() => {
+      result.current.setMode('EXPLAIN');
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messages[0]?.role).toBe('agent');
+    // EXPLAIN initial message contains Hebrew greeting
+    expect(result.current.messages[0]?.content).toContain('שלום');
+  });
+
+  it('accepts QUIZ as initialMode parameter', () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() => useAgentChat('content-1', 'QUIZ'));
+    expect(result.current.mode).toBe('QUIZ');
+  });
+
+  it('exposes setMode as a function', () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() => useAgentChat('content-1'));
+    expect(typeof result.current.setMode).toBe('function');
+  });
 });

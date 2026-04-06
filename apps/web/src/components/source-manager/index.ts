@@ -4,6 +4,7 @@
  */
 
 export { SourceManager } from './SourceManager';
+export { EditSourceModal } from './EditSourceModal';
 export {
   getSourceErrorKey,
   getFriendlySourceErrorKey,

@@ -29,6 +29,7 @@ import {
 } from './utils';
 import { devQueryFn, devRemoveSource } from './dev-mock';
 import { AddSourceModal } from './AddSourceModal';
+import { EditSourceModal } from './EditSourceModal';
 import { SourceDetailDrawer } from './SourceDetailDrawer';
 import { SourceCard } from './SourceCard';
 
@@ -43,6 +44,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
   const dir = i18n.dir();
   const [showAdd, setShowAdd] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [editSourceId, setEditSourceId] = useState<string | null>(null);
   const [addedBanner, setAddedBanner] = useState<string | null>(null);
   const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
@@ -113,6 +115,11 @@ export function SourceManager({ courseId }: { courseId: string }) {
     },
     [deleteSource, t]
   );
+
+  const handleEdit = useCallback((e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setEditSourceId(id);
+  }, []);
 
   return (
     <div
@@ -202,6 +209,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
             source={source}
             onSelect={setDetailId}
             onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         ))}
       </div>
@@ -220,6 +228,21 @@ export function SourceManager({ courseId }: { courseId: string }) {
           onClose={() => setDetailId(null)}
         />
       )}
+
+      {/* Edit modal */}
+      {editSourceId && (() => {
+        const editSource = data?.find((s: KnowledgeSource) => s.id === editSourceId);
+        return editSource ? (
+          <EditSourceModal
+            source={editSource}
+            onClose={() => setEditSourceId(null)}
+            onUpdated={() => {
+              refetch();
+              setEditSourceId(null);
+            }}
+          />
+        ) : null;
+      })()}
 
       {/* Add modal */}
       {showAdd && (

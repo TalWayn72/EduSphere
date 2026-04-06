@@ -7,7 +7,7 @@
  * EXCEPTION NOTE (150-line rule): Page-level orchestrator wiring multiple
  * hooks and sub-components; all rendering delegated.
  */
-import { useCallback, useRef } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -28,7 +28,9 @@ import { useCitationReview } from '@/hooks/useCitationReview';
 import { usePlayerKeyboardShortcuts } from '@/hooks/usePlayerKeyboardShortcuts';
 import { YouTubeUrlInput } from '@/components/lesson/YouTubeUrlInput';
 import { EnrichedTranscriptPanel } from '@/components/enriched-transcript/EnrichedTranscriptPanel';
+import { SyncTranscriptScroller } from '@/components/enriched-transcript/SyncTranscriptScroller';
 import { CitationReviewPanel } from '@/components/lesson/CitationReviewPanel';
+import { CitationEditModal } from '@/components/lesson/CitationEditModal';
 import { TimestampAnchorEditor } from '@/components/lesson/TimestampAnchorEditor';
 import {
   INGEST_YOUTUBE_LESSON_MUTATION,
@@ -36,15 +38,23 @@ import {
   PUBLISH_ENRICHED_LESSON_MUTATION,
 } from '@/lib/graphql/enriched-lesson.queries';
 
+const PROCESSING_STATUS_LABELS: Record<string, string> = {
+  EXTRACTING_TRANSCRIPT: 'Extracting transcript...',
+  RUNNING_NER: 'Analyzing entities...',
+  RESOLVING_CITATIONS: 'Resolving citations...',
+};
+
+const TERMINAL_STATUSES = new Set(['READY', 'PUBLISHED', 'PENDING', undefined]);
+
 export function LessonEnrichmentEditor() {
   const { lessonId = '' } = useParams<{ lessonId: string }>();
-  const { data, fetching, refetch } = useEnrichedLesson(lessonId);
+  const { data, fetching, refetch } = useEnrichedLesson(lessonId, {
+    pollWhileProcessing: true,
+  });
   const { approve, reject } = useCitationReview();
   const player = useYouTubePlayer();
-  const editCitationRef = useRef<string | null>(null);
-  const setEditCitationId = useCallback((id: string | null) => {
-    editCitationRef.current = id;
-  }, []);
+  const [editCitationId, setEditCitationId] = useState<string | null>(null);
+  const editCitation = (data?.citations ?? []).find((c) => c.id === editCitationId) ?? null;
 
   const [, ingest] = useMutation(INGEST_YOUTUBE_LESSON_MUTATION);
   const [, setTimestamp] = useMutation(SET_BLOCK_ANCHOR_TIMESTAMP_MUTATION);
@@ -95,8 +105,14 @@ export function LessonEnrichmentEditor() {
             ]}
             className="mb-0 flex-1"
           />
-          {data?.enrichmentStatus && (
+          {data?.enrichmentStatus && TERMINAL_STATUSES.has(data.enrichmentStatus) && (
             <Badge variant="outline">{data.enrichmentStatus}</Badge>
+          )}
+          {data?.enrichmentStatus && !TERMINAL_STATUSES.has(data.enrichmentStatus) && (
+            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+              <span className="h-3.5 w-3.5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <span>{PROCESSING_STATUS_LABELS[data.enrichmentStatus] ?? data.enrichmentStatus}</span>
+            </div>
           )}
           <Button
             onClick={handlePublish}
@@ -134,10 +150,12 @@ export function LessonEnrichmentEditor() {
                   />
                 </div>
                 <div className="flex-1 overflow-hidden border-t">
-                  <EnrichedTranscriptPanel
+                  {/* GAP-5: auto-scroll to active block as video plays */}
+                  <SyncTranscriptScroller
                     blocks={data?.blocks ?? []}
                     currentTime={player.currentTime}
-                    mode="authoring"
+                    onSeek={player.seekTo}
+                    className="h-full"
                   />
                 </div>
               </div>
@@ -183,6 +201,14 @@ export function LessonEnrichmentEditor() {
           </ResizablePanelGroup>
         )}
       </div>
+
+      {/* Citation edit modal */}
+      <CitationEditModal
+        open={editCitationId !== null}
+        citation={editCitation}
+        onClose={() => setEditCitationId(null)}
+        onSaved={refetch}
+      />
     </Layout>
   );
 }

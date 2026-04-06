@@ -18,9 +18,12 @@ import {
   inArray,
 } from '@edusphere/db';
 import type { KnowledgeSource, SourceType } from '@edusphere/db';
+import { createSourceNode } from '@edusphere/db';
 import { randomUUID } from 'node:crypto';
 import { DocumentParserService } from './document-parser.service.js';
 import { EmbeddingService } from '../embedding/embedding.service.js';
+import { KsChunkEmbeddingStoreService } from '../embedding/ks-chunk-embedding-store.service.js';
+import { KnowledgeSourceReindexService } from './knowledge-source-reindex.service.js';
 import { MinioUrlService } from './minio-url.service.js';
 
 /** Map source type to MIME for MinIO upload ContentType header. */
@@ -52,6 +55,8 @@ export class KnowledgeSourceProcessingService {
   constructor(
     private readonly parser: DocumentParserService,
     private readonly embeddings: EmbeddingService,
+    private readonly ksChunkStore: KsChunkEmbeddingStoreService,
+    private readonly reindex: KnowledgeSourceReindexService,
     private readonly minioUrl: MinioUrlService
   ) {}
 
@@ -151,8 +156,8 @@ export class KnowledgeSourceProcessingService {
       let embeddedCount = 0;
       for (const chunk of chunks) {
         try {
-          const segmentId = `ks:${sourceId}:${chunk.index}`;
-          await this.embeddings.generateEmbedding(chunk.text, segmentId);
+          const vector = await this.embeddings.callEmbeddingProvider(chunk.text);
+          await this.ksChunkStore.upsert(sourceId, chunk.index, vector);
           embeddedCount++;
         } catch (err) {
           this.logger.warn(`Embedding failed for chunk ${chunk.index}: ${err}`);
@@ -179,6 +184,8 @@ export class KnowledgeSourceProcessingService {
           `Failed to update source ${sourceId} to READY`
         );
       }
+
+      await this.indexSourceInGraph(updated, input);
       return updated;
     } catch (error) {
       const errorMessage =
@@ -197,6 +204,27 @@ export class KnowledgeSourceProcessingService {
         );
       }
       return failed;
+    }
+  }
+
+  /** Index source in knowledge graph — non-fatal on failure. */
+  private async indexSourceInGraph(
+    source: KnowledgeSource,
+    input: CreateSourceInput
+  ): Promise<void> {
+    try {
+      await createSourceNode(this.db, {
+        id: source.id,
+        tenant_id: input.tenantId,
+        name: input.title,
+        source_type: input.sourceType,
+        origin: input.origin,
+        course_id: input.courseId,
+        chunk_count: source.chunk_count,
+      });
+      this.logger.log(`Graph: indexed Source node ${source.id}`);
+    } catch (err) {
+      this.logger.warn(`Graph indexing failed for source ${source.id}: ${err}`);
     }
   }
 
@@ -224,6 +252,7 @@ export class KnowledgeSourceProcessingService {
     return { text: '', wordCount: 0, metadata: { note: 'unsupported type' } };
   }
 
+  /** Delegates to KnowledgeSourceReindexService (split for file-size compliance). */
   async reindexCourseEmbeddings(
     tenantId: string,
     courseId: string
@@ -232,76 +261,6 @@ export class KnowledgeSourceProcessingService {
     embeddingsGenerated: number;
     errors: string[];
   }> {
-    const sources = await this.db
-      .select()
-      .from(schema.knowledgeSources)
-      .where(
-        and(
-          eq(schema.knowledgeSources.tenant_id, tenantId),
-          eq(schema.knowledgeSources.course_id, courseId),
-          eq(schema.knowledgeSources.status, 'READY')
-        )
-      );
-
-    this.logger.log(
-      `Reindexing ${sources.length} READY sources for course ${courseId} (tenant: ${tenantId})`
-    );
-
-    let sourcesProcessed = 0;
-    let embeddingsGenerated = 0;
-    const errors: string[] = [];
-
-    for (const source of sources) {
-      try {
-        const result = await this.reindexSingleSource(source);
-        embeddingsGenerated += result.count;
-        sourcesProcessed++;
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        errors.push(`Source ${source.id}: ${msg}`);
-        this.logger.error(`Reindex failed for source ${source.id}: ${msg}`);
-      }
-    }
-
-    this.logger.log(
-      `Reindex complete: ${sourcesProcessed}/${sources.length} sources, ${embeddingsGenerated} embeddings`
-    );
-
-    return { sourcesProcessed, embeddingsGenerated, errors };
-  }
-
-  private async reindexSingleSource(
-    source: KnowledgeSource
-  ): Promise<{ count: number }> {
-    const text = source.raw_content ?? '';
-    if (text.trim().length === 0) {
-      throw new Error('no raw_content available');
-    }
-
-    const chunks = this.parser.chunkText(text);
-    let count = 0;
-
-    for (const chunk of chunks) {
-      try {
-        const segmentId = `ks:${source.id}:${chunk.index}`;
-        await this.embeddings.generateEmbedding(chunk.text, segmentId);
-        count++;
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        this.logger.warn(
-          `Reindex embed failed for source ${source.id} chunk ${chunk.index}: ${msg}`
-        );
-      }
-    }
-
-    await this.db
-      .update(schema.knowledgeSources)
-      .set({ chunk_count: count })
-      .where(eq(schema.knowledgeSources.id, source.id));
-
-    this.logger.log(
-      `Reindexed source ${source.id}: ${count}/${chunks.length} chunks`
-    );
-    return { count };
+    return this.reindex.reindexCourseEmbeddings(tenantId, courseId);
   }
 }

@@ -74,6 +74,11 @@ input AddYoutubeSourceInput {
   url: String!
 }
 
+input UpdateKnowledgeSourceInput {
+  title: String
+  metadata: JSON
+}
+
 input AddFileSourceInput {
   courseId: ID!
   title: String!
@@ -126,6 +131,13 @@ extend type Mutation {
   the GraphQL gateway without a multipart transport layer.
   """
   addFileSource(input: AddFileSourceInput!): KnowledgeSource!
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+
+  """
+  Update title and/or metadata of a knowledge source.
+  """
+  updateKnowledgeSource(id: ID!, input: UpdateKnowledgeSourceInput!): KnowledgeSource!
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
 

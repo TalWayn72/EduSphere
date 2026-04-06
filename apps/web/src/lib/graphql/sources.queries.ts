@@ -85,3 +85,18 @@ export const DELETE_KNOWLEDGE_SOURCE = gql`
     deleteKnowledgeSource(id: $id)
   }
 `;
+
+export const UPDATE_KNOWLEDGE_SOURCE = gql`
+  mutation UpdateKnowledgeSource($id: ID!, $input: UpdateKnowledgeSourceInput!) {
+    updateKnowledgeSource(id: $id, input: $input) {
+      id
+      title
+      metadata
+      status
+      sourceType
+      origin
+      chunkCount
+      createdAt
+    }
+  }
+`;

@@ -4,6 +4,7 @@ import { EmbeddingService } from './embedding.service';
 import { EmbeddingStoreService } from './embedding-store.service';
 import { EmbeddingProviderService } from './embedding-provider.service';
 import { EmbeddingFallbackService } from './embedding-fallback.service';
+import { KsChunkEmbeddingStoreService } from './ks-chunk-embedding-store.service';
 
 @Module({
   providers: [
@@ -12,7 +13,8 @@ import { EmbeddingFallbackService } from './embedding-fallback.service';
     EmbeddingFallbackService,
     EmbeddingStoreService,
     EmbeddingProviderService,
+    KsChunkEmbeddingStoreService,
   ],
-  exports: [EmbeddingService],
+  exports: [EmbeddingService, KsChunkEmbeddingStoreService],
 })
 export class EmbeddingModule {}

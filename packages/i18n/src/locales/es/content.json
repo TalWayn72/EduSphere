@@ -32,6 +32,31 @@
   "agentResponding": "Agent is responding...",
   "askOrDebate": "Ask or debate...",
   "transcriptNoResults": "No se encontraron resultados",
+  "citationEdit": {
+    "title": "Edit Citation",
+    "description": "Update the citation details. Changes will be saved to the lesson.",
+    "bookName": "Book Name",
+    "part": "Part / Section",
+    "page": "Page",
+    "column": "Column",
+    "paragraph": "Paragraph",
+    "sourceText": "Source Text",
+    "sourceTextHint": "The quoted text as it appears in the source",
+    "resolvedText": "Resolved Text",
+    "resolvedTextHint": "The matching passage from the knowledge graph",
+    "confidence": "Confidence",
+    "status": "Status",
+    "statusVerified": "Verified",
+    "statusUnverified": "Unverified",
+    "statusRejected": "Rejected",
+    "statusEdited": "Edited",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "saveError": "Failed to save citation. Please try again.",
+    "bookNameRequired": "Book name is required",
+    "sourceTextRequired": "Source text is required"
+  },
   "liveSession": {
     "joinError": "Error al unirse a la sesión",
     "joining": "Uniéndose...",
@@ -131,6 +156,7 @@
     "uploadFromDevice": "Upload from device",
     "chooseFile": "Choose file...",
     "uploadingFile": "Uploading...",
+    "readingFile": "Reading file... {{progress}}%",
     "autoModule": "This module runs automatically — no additional settings."
   }
 }

@@ -82,6 +82,12 @@ vi.mock('./locale-prompt.js', () => ({
   injectLocale: vi.fn().mockImplementation((prompt: string) => prompt),
 }));
 
+vi.mock('./chat-mode-prompts.js', () => ({
+  CHAVRUTA_SYSTEM_PROMPT: 'Chavruta Socratic partner prompt',
+  QUIZ_SYSTEM_PROMPT: 'Quiz teacher prompt',
+  EXPLAIN_SYSTEM_PROMPT: 'Patient explainer prompt',
+}));
+
 import { AiLegacyRunnerService } from './ai-legacy-runner.service.js';
 
 describe('AiLegacyRunnerService', () => {
@@ -97,6 +103,39 @@ describe('AiLegacyRunnerService', () => {
   it('resolves EXPLAIN system prompt from default map', () => {
     const prompt = service.resolveSystemPrompt({ template: 'EXPLAIN' });
     expect(prompt).toContain('explainer');
+  });
+
+  it('resolves CHAVRUTA_DEBATE system prompt', () => {
+    const prompt = service.resolveSystemPrompt({ template: 'CHAVRUTA_DEBATE' });
+    expect(prompt).toContain('Socratic');
+  });
+
+  it('resolves QUIZ_GENERATOR system prompt', () => {
+    const prompt = service.resolveSystemPrompt({ template: 'QUIZ_GENERATOR' });
+    expect(prompt).toContain('Quiz');
+  });
+
+  it('resolves EXPLANATION_GENERATOR system prompt', () => {
+    const prompt = service.resolveSystemPrompt({
+      template: 'EXPLANATION_GENERATOR',
+    });
+    expect(prompt).toContain('explainer');
+  });
+
+  it('CHAVRUTA_DEBATE and QUIZ_GENERATOR have different prompts', () => {
+    const chavruta = service.resolveSystemPrompt({
+      template: 'CHAVRUTA_DEBATE',
+    });
+    const quiz = service.resolveSystemPrompt({ template: 'QUIZ_GENERATOR' });
+    expect(chavruta).not.toBe(quiz);
+  });
+
+  it('QUIZ_GENERATOR and EXPLANATION_GENERATOR have different prompts', () => {
+    const quiz = service.resolveSystemPrompt({ template: 'QUIZ_GENERATOR' });
+    const explain = service.resolveSystemPrompt({
+      template: 'EXPLANATION_GENERATOR',
+    });
+    expect(quiz).not.toBe(explain);
   });
 
   it('falls back to systemPrompt from config for unknown template', () => {

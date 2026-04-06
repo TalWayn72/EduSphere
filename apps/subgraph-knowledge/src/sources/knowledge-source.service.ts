@@ -114,6 +114,32 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
     return this.processingService.createAndProcess(input);
   }
 
+  async updateSource(
+    id: string,
+    tenantId: string,
+    input: { title?: string; metadata?: Record<string, unknown> }
+  ): Promise<KnowledgeSource> {
+    await this.findById(id, tenantId);
+    const updateData: Partial<{ title: string; metadata: Record<string, unknown> }> = {};
+    if (input.title !== undefined) updateData.title = input.title;
+    if (input.metadata !== undefined) updateData.metadata = input.metadata;
+
+    const [updated] = await this.db
+      .update(schema.knowledgeSources)
+      .set(updateData)
+      .where(
+        and(
+          eq(schema.knowledgeSources.id, id),
+          eq(schema.knowledgeSources.tenant_id, tenantId)
+        )
+      )
+      .returning();
+
+    if (!updated) throw new NotFoundException(`KnowledgeSource ${id} not found`);
+    this.logger.log(`Updated knowledge source ${id}`);
+    return updated;
+  }
+
   async deleteSource(id: string, tenantId: string): Promise<void> {
     await this.findById(id, tenantId);
     await this.db

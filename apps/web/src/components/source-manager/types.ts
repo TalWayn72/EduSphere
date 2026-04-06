@@ -22,6 +22,7 @@ export interface KnowledgeSource {
   status: SourceStatus;
   chunkCount: number;
   errorMessage?: string;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 

@@ -1,5 +1,5 @@
 /**
- * Tests for AiTab — AI Chavruta chat panel sub-component of UnifiedLearningPage.
+ * Tests for AiTab — AI chat panel with selectable modes.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -52,6 +52,8 @@ function makeChat(
     chatEndRef: { current: null },
     isStreaming: false,
     isSending: false,
+    mode: 'CHAVRUTA',
+    setMode: vi.fn(),
     ...overrides,
   };
 }
@@ -108,7 +110,6 @@ describe('AiTab', () => {
     const { container } = render(
       <AiTab chat={makeChat({ isStreaming: true })} />
     );
-    // 3 bounce dots rendered as span elements inside the streaming indicator
     const bouncingDots = container.querySelectorAll('.animate-bounce');
     expect(bouncingDots.length).toBe(3);
   });
@@ -121,26 +122,25 @@ describe('AiTab', () => {
     expect(bouncingDots.length).toBe(0);
   });
 
-  it('renders all four quick prompt buttons', () => {
+  it('renders CHAVRUTA quick prompt buttons by default', () => {
     render(<AiTab chat={makeChat()} />);
     expect(screen.getByText('Debate free will')).toBeDefined();
-    expect(screen.getByText('Quiz me')).toBeDefined();
-    expect(screen.getByText('Summarize')).toBeDefined();
-    expect(screen.getByText('Explain Rambam')).toBeDefined();
+    expect(screen.getByText('Challenge this idea')).toBeDefined();
+    expect(screen.getByText('Present a counter-argument')).toBeDefined();
+    expect(screen.getByText('Prove from sources')).toBeDefined();
   });
 
   it('calls setChatInput when a quick prompt is clicked', () => {
     const setChatInput = vi.fn();
     render(<AiTab chat={makeChat({ setChatInput })} />);
-    fireEvent.click(screen.getByText('Quiz me'));
-    expect(setChatInput).toHaveBeenCalledWith('Quiz me');
+    fireEvent.click(screen.getByText('Debate free will'));
+    expect(setChatInput).toHaveBeenCalledWith('Debate free will');
   });
 
   it('calls sendMessage when send button is clicked', () => {
     const sendMessage = vi.fn().mockResolvedValue(undefined);
     render(<AiTab chat={makeChat({ sendMessage })} />);
     const buttons = screen.getAllByRole('button');
-    // Send button is the last button (after quick prompts and mode buttons)
     const sendBtn = buttons[buttons.length - 1];
     fireEvent.click(sendBtn!);
     expect(sendMessage).toHaveBeenCalledTimes(1);
@@ -189,5 +189,54 @@ describe('AiTab', () => {
     render(<AiTab chat={makeChat({ messages: [consentMsg] })} />);
     expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
     expect(screen.queryByText('consent-required')).not.toBeInTheDocument();
+  });
+
+  it('CHAVRUTA mode button has active styling by default', () => {
+    render(<AiTab chat={makeChat({ mode: 'CHAVRUTA' })} />);
+    const btn = screen.getByText('CHAVRUTA').closest('button');
+    expect(btn?.className).toContain('bg-primary');
+  });
+
+  it('clicking QUIZ mode calls setMode with QUIZ', () => {
+    const setMode = vi.fn();
+    render(<AiTab chat={makeChat({ setMode })} />);
+    fireEvent.click(screen.getByText('QUIZ'));
+    expect(setMode).toHaveBeenCalledWith('QUIZ');
+  });
+
+  it('clicking EXPLAIN mode calls setMode with EXPLAIN', () => {
+    const setMode = vi.fn();
+    render(<AiTab chat={makeChat({ setMode })} />);
+    fireEvent.click(screen.getByText('EXPLAIN'));
+    expect(setMode).toHaveBeenCalledWith('EXPLAIN');
+  });
+
+  it('switching to QUIZ mode shows quiz-specific quick prompts', () => {
+    render(<AiTab chat={makeChat()} />);
+    fireEvent.click(screen.getByText('QUIZ'));
+    expect(screen.getByText('Start quiz')).toBeDefined();
+    expect(screen.getByText('Next question')).toBeDefined();
+    expect(screen.getByText('Give me a hint')).toBeDefined();
+    expect(screen.getByText('Explain the answer')).toBeDefined();
+  });
+
+  it('switching to EXPLAIN mode shows explain-specific quick prompts', () => {
+    render(<AiTab chat={makeChat()} />);
+    fireEvent.click(screen.getByText('EXPLAIN'));
+    expect(screen.getByText('Explain simply')).toBeDefined();
+    expect(screen.getByText('Give an example')).toBeDefined();
+    expect(screen.getByText('Why is this important?')).toBeDefined();
+    expect(screen.getByText('Connect to real life')).toBeDefined();
+  });
+
+  it('quick prompts change when mode changes from CHAVRUTA to QUIZ', () => {
+    render(<AiTab chat={makeChat()} />);
+    // Initially CHAVRUTA prompts visible
+    expect(screen.getByText('Debate free will')).toBeDefined();
+    // Switch to QUIZ
+    fireEvent.click(screen.getByText('QUIZ'));
+    // CHAVRUTA prompt gone, QUIZ prompt present
+    expect(screen.queryByText('Debate free will')).toBeNull();
+    expect(screen.getByText('Start quiz')).toBeDefined();
   });
 });

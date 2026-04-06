@@ -9,18 +9,20 @@ const mockUpdateSet = vi.fn(() => ({
     returning: mockUpdateReturning,
   })),
 }));
-const mockSelectFrom = vi.fn();
 
 const mockDb = {
   insert: vi.fn(() => ({
     values: vi.fn(() => ({ returning: mockInsertReturning })),
   })),
   update: vi.fn(() => ({ set: mockUpdateSet })),
-  select: vi.fn(() => ({ from: mockSelectFrom })),
+  select: vi.fn(() => ({ from: vi.fn() })),
 };
+
+const mockCreateSourceNode = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
+  createSourceNode: (...args: unknown[]) => mockCreateSourceNode(...args),
   schema: {
     knowledgeSources: {
       id: 'id',
@@ -54,10 +56,26 @@ vi.mock('./document-parser.service', () => ({
 }));
 
 // ─── EmbeddingService mock ─────────────────────────────────────────────────
-const mockGenerateEmbedding = vi.fn();
+const mockCallEmbeddingProvider = vi.fn();
 vi.mock('../embedding/embedding.service', () => ({
   EmbeddingService: class {
-    generateEmbedding = mockGenerateEmbedding;
+    callEmbeddingProvider = mockCallEmbeddingProvider;
+  },
+}));
+
+// ─── KsChunkEmbeddingStoreService mock ────────────────────────────────────
+const mockKsUpsert = vi.fn();
+vi.mock('../embedding/ks-chunk-embedding-store.service', () => ({
+  KsChunkEmbeddingStoreService: class {
+    upsert = mockKsUpsert;
+  },
+}));
+
+// ─── KnowledgeSourceReindexService mock ───────────────────────────────────
+const mockReindexCourse = vi.fn();
+vi.mock('./knowledge-source-reindex.service', () => ({
+  KnowledgeSourceReindexService: class {
+    reindexCourseEmbeddings = mockReindexCourse;
   },
 }));
 
@@ -72,6 +90,8 @@ vi.mock('./minio-url.service', () => ({
 import { KnowledgeSourceProcessingService } from './knowledge-source-processing.service.js';
 import { DocumentParserService } from './document-parser.service.js';
 import { EmbeddingService } from '../embedding/embedding.service.js';
+import { KsChunkEmbeddingStoreService } from '../embedding/ks-chunk-embedding-store.service.js';
+import { KnowledgeSourceReindexService } from './knowledge-source-reindex.service.js';
 import { MinioUrlService } from './minio-url.service.js';
 
 const baseInput = {
@@ -99,6 +119,8 @@ describe('KnowledgeSourceProcessingService', () => {
     service = new KnowledgeSourceProcessingService(
       new DocumentParserService() as never,
       new EmbeddingService() as never,
+      new KsChunkEmbeddingStoreService() as never,
+      new KnowledgeSourceReindexService() as never,
       new MinioUrlService() as never
     );
   });
@@ -112,17 +134,16 @@ describe('KnowledgeSourceProcessingService', () => {
         metadata: {},
       });
       mockChunkText.mockReturnValue([{ text: 'Hello world', index: 0 }]);
-      mockGenerateEmbedding.mockResolvedValue(undefined);
+      mockCallEmbeddingProvider.mockResolvedValue([0.1, 0.2, 0.3]);
+      mockKsUpsert.mockResolvedValue(undefined);
       mockUpdateReturning.mockResolvedValue([
         { ...fakeSource, status: 'READY', chunk_count: 1 },
       ]);
 
       const result = await service.processSource('src-1', baseInput);
       expect(result.status).toBe('READY');
-      expect(mockGenerateEmbedding).toHaveBeenCalledWith(
-        'Hello world',
-        'ks:src-1:0'
-      );
+      expect(mockCallEmbeddingProvider).toHaveBeenCalledWith('Hello world');
+      expect(mockKsUpsert).toHaveBeenCalledWith('src-1', 0, [0.1, 0.2, 0.3]);
     });
 
     it('marks source FAILED when extraction throws', async () => {
@@ -145,16 +166,17 @@ describe('KnowledgeSourceProcessingService', () => {
         { text: 'chunk1', index: 0 },
         { text: 'chunk2', index: 1 },
       ]);
-      mockGenerateEmbedding
+      mockCallEmbeddingProvider
         .mockRejectedValueOnce(new Error('embed error'))
-        .mockResolvedValueOnce(undefined);
+        .mockResolvedValueOnce([0.1]);
+      mockKsUpsert.mockResolvedValue(undefined);
       mockUpdateReturning.mockResolvedValue([
         { ...fakeSource, status: 'READY', chunk_count: 1 },
       ]);
 
       const result = await service.processSource('src-1', baseInput);
       expect(result.status).toBe('READY');
-      expect(mockGenerateEmbedding).toHaveBeenCalledTimes(2);
+      expect(mockCallEmbeddingProvider).toHaveBeenCalledTimes(2);
     });
 
     it('throws when update returns no rows', async () => {
@@ -172,57 +194,22 @@ describe('KnowledgeSourceProcessingService', () => {
     });
   });
 
-  // ── reindexCourseEmbeddings ───────────────────────────────────────────
+  // ── reindexCourseEmbeddings — delegates to KnowledgeSourceReindexService
   describe('reindexCourseEmbeddings', () => {
-    it('reindexes all READY sources for a course', async () => {
-      const source = { ...fakeSource, status: 'READY', raw_content: 'content' };
-      mockSelectFrom.mockReturnValue({
-        where: vi.fn().mockResolvedValue([source]),
-      });
-      mockChunkText.mockReturnValue([{ text: 'content', index: 0 }]);
-      mockGenerateEmbedding.mockResolvedValue(undefined);
-      mockUpdateSet.mockReturnValue({
-        where: vi.fn().mockResolvedValue(undefined),
-      });
-
-      const result = await service.reindexCourseEmbeddings(
-        'tenant-1',
-        'course-1'
-      );
-      expect(result.sourcesProcessed).toBe(1);
-      expect(result.embeddingsGenerated).toBe(1);
-      expect(result.errors).toEqual([]);
-    });
-
-    it('collects errors for failed source reindexing', async () => {
-      const source = { ...fakeSource, status: 'READY', raw_content: '' };
-      mockSelectFrom.mockReturnValue({
-        where: vi.fn().mockResolvedValue([source]),
-      });
-
-      const result = await service.reindexCourseEmbeddings(
-        'tenant-1',
-        'course-1'
-      );
-      expect(result.sourcesProcessed).toBe(0);
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0]).toContain('no raw_content');
-    });
-
-    it('returns zeros when no READY sources exist', async () => {
-      mockSelectFrom.mockReturnValue({
-        where: vi.fn().mockResolvedValue([]),
-      });
-
-      const result = await service.reindexCourseEmbeddings(
-        'tenant-1',
-        'course-1'
-      );
-      expect(result).toEqual({
-        sourcesProcessed: 0,
-        embeddingsGenerated: 0,
+    it('delegates to KnowledgeSourceReindexService', async () => {
+      mockReindexCourse.mockResolvedValue({
+        sourcesProcessed: 3,
+        embeddingsGenerated: 15,
         errors: [],
       });
+
+      const result = await service.reindexCourseEmbeddings(
+        'tenant-1',
+        'course-1'
+      );
+      expect(result.sourcesProcessed).toBe(3);
+      expect(result.embeddingsGenerated).toBe(15);
+      expect(mockReindexCourse).toHaveBeenCalledWith('tenant-1', 'course-1');
     });
   });
 
@@ -251,6 +238,46 @@ describe('KnowledgeSourceProcessingService', () => {
       await expect(service.createAndProcess(baseInput)).rejects.toThrow(
         InternalServerErrorException
       );
+    });
+  });
+
+  // ── Graph indexing (GAP 9) ────────────────────────────────────────────
+  describe('graph indexing via createSourceNode', () => {
+    it('calls createSourceNode when source is marked READY', async () => {
+      mockParseText.mockResolvedValue({
+        text: 'hello',
+        wordCount: 1,
+        metadata: {},
+      });
+      mockChunkText.mockReturnValue([{ text: 'hello', index: 0 }]);
+      mockCallEmbeddingProvider.mockResolvedValue([0.1, 0.2]);
+      mockKsUpsert.mockResolvedValue(undefined);
+      mockUpdateReturning.mockResolvedValue([
+        { ...fakeSource, status: 'READY', chunk_count: 1 },
+      ]);
+
+      await service.processSource('src-1', baseInput);
+      expect(mockCreateSourceNode).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          id: 'src-1',
+          tenant_id: 'tenant-1',
+          name: 'Test Source',
+          source_type: 'TEXT',
+        })
+      );
+    });
+
+    it('still marks source READY even when createSourceNode throws', async () => {
+      mockCreateSourceNode.mockRejectedValueOnce(new Error('graph down'));
+      mockParseText.mockResolvedValue({ text: 'hello', wordCount: 1, metadata: {} });
+      mockChunkText.mockReturnValue([]);
+      mockUpdateReturning.mockResolvedValue([
+        { ...fakeSource, status: 'READY', chunk_count: 0 },
+      ]);
+
+      const result = await service.processSource('src-1', baseInput);
+      expect(result.status).toBe('READY');
     });
   });
 });

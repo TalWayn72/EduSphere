@@ -136,6 +136,51 @@ export async function searchKnowledgeGraph(
     }
   }
 
+  // ── Phase 1b: knowledge source chunk pgvector search ─────────────────────
+  if (queryVector !== null && results.length < limit) {
+    try {
+      const vectorString = `[${queryVector.join(',')}]`;
+      type KsRow = {
+        source_id: string;
+        chunk_index: number;
+        source_title: string;
+        similarity: string;
+      };
+      // Double-cast via unknown to bridge Drizzle's QueryResult return type.
+      type RawExecute = {
+        execute: (sql: unknown) => Promise<{ rows: unknown[] }>;
+      };
+      const ksResult = await (db as unknown as RawExecute).execute(sql`
+        SELECT ksce.source_id, ksce.chunk_index, ks.title AS source_title,
+               1 - (ksce.embedding <=> ${vectorString}::vector) AS similarity
+        FROM knowledge_source_chunk_embeddings ksce
+        JOIN knowledge_sources ks ON ks.id = ksce.source_id
+        WHERE ks.tenant_id = ${tenantId}
+          AND ks.status = 'READY'
+        ORDER BY ksce.embedding <=> ${vectorString}::vector ASC
+        LIMIT ${limit}
+      `);
+      const ksRows = ksResult.rows as KsRow[];
+      for (const row of ksRows) {
+        const key = `ks:${row.source_id}:${row.chunk_index}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        results.push({
+          id: key,
+          text: `[Source: ${row.source_title}]`,
+          type: 'knowledge_source_chunk',
+          similarity:
+            parseFloat(row.similarity) * ragConfig.vectorWeight,
+        });
+        if (results.length >= limit) break;
+      }
+    } catch (err) {
+      logger.warn(
+        `Knowledge source chunk search failed, skipping: ${String(err)}`
+      );
+    }
+  }
+
   // ── Phase 2: ILIKE fallback (always run, dedup against Phase 1) ──────────
   const remaining = limit - results.length;
   if (remaining > 0) {

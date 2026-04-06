@@ -7,6 +7,8 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
+import { useFileReadProgress } from '@/hooks/useFileReadProgress';
+import { Progress } from '@/components/ui/progress';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -74,6 +76,7 @@ export function AddSourceModal({
     };
   }, [success, onClose]);
 
+  const { readFileAsBase64, progress, isReading } = useFileReadProgress();
   const callbacks = { onAdded, setSuccess, setError, t };
   const addUrl = useAddUrlMutation(callbacks);
   const addText = useAddTextMutation(callbacks);
@@ -99,15 +102,7 @@ export function AddSourceModal({
       } else if (tab === 'file') {
         const file = fileRef.current?.files?.[0];
         if (!file) return setError(t('sources.fileRequired'));
-        const contentBase64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const dataUrl = reader.result as string;
-            resolve(dataUrl.split(',')[1] ?? '');
-          };
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(file);
-        });
+        const contentBase64 = await readFileAsBase64(file);
         await addFile.mutateAsync({
           courseId,
           title: fileTitle || file.name,
@@ -212,14 +207,24 @@ export function AddSourceModal({
             />
           )}
           {!success && tab === 'file' && (
-            <FilePanel
-              fileTitle={fileTitle}
-              selectedFileName={selectedFileName}
-              busy={busy}
-              fileRef={fileRef}
-              onTitleChange={setFileTitle}
-              onFileSelect={handleFileSelect}
-            />
+            <>
+              <FilePanel
+                fileTitle={fileTitle}
+                selectedFileName={selectedFileName}
+                busy={busy}
+                fileRef={fileRef}
+                onTitleChange={setFileTitle}
+                onFileSelect={handleFileSelect}
+              />
+              {isReading && (
+                <div className="mt-1" data-testid="file-read-progress">
+                  <Progress value={progress} className="h-2" />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('sources.readingFile', { progress })}
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           {!success && error && (
