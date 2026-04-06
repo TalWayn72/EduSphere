@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Checkout audit-logs branch
         id: checkout-audit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: audit-logs
           fetch-depth: 1
@@ -27,7 +27,7 @@ jobs:
 
       - name: Checkout main branch (fallback)
         if: steps.checkout-audit.outcome == 'failure'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Create audit-logs directory
         run: mkdir -p audit-logs/github

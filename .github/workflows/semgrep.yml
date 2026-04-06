@@ -20,7 +20,7 @@ jobs:
       security-events: write # For SARIF upload
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run Semgrep — Community ruleset
         uses: semgrep/semgrep-action@v1
