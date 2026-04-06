@@ -37,7 +37,7 @@ export class KsChunkEmbeddingStoreService implements OnModuleDestroy {
     vector: number[]
   ): Promise<void> {
     const vecStr = `[${vector.join(',')}]`;
-    await this.db.execute<unknown>(sql`
+    await this.db.execute(sql`
       INSERT INTO knowledge_source_chunk_embeddings (source_id, chunk_index, embedding)
       VALUES (${sourceId}::uuid, ${chunkIndex}, ${vecStr}::vector)
       ON CONFLICT (source_id, chunk_index)
