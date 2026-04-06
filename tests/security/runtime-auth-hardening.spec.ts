@@ -141,16 +141,17 @@ describe('SEC-3: JWT audience validation present', () => {
 
   it('packages/auth/src/middleware.ts passes clientId to JWTValidator constructor', () => {
     const content = readSource('packages/auth/src/middleware.ts');
-    // The JWTValidator constructor call must include clientId (3rd arg)
+    // The JWTValidator constructor call must include clientId (3rd arg).
+    // A 4th optional issuerUrl arg may also be present (BUG-redirect-loop fix).
     expect(content).toMatch(
-      /new\s+JWTValidator\s*\(\s*keycloakConfig\.url\s*,\s*keycloakConfig\.realm\s*,\s*keycloakConfig\.clientId\s*\)/
+      /new\s+JWTValidator\s*\([\s\S]*?keycloakConfig\.url[\s\S]*?keycloakConfig\.realm[\s\S]*?keycloakConfig\.clientId/
     );
   });
 
   it('packages/auth/src/jwt.ts JWTValidator stores audience from clientId parameter', () => {
     const content = readSource('packages/auth/src/jwt.ts');
-    // Constructor accepts clientId and stores it
-    expect(content).toMatch(/constructor\s*\(.*clientId/);
+    // Constructor accepts clientId and stores it. Parameters may span multiple lines.
+    expect(content).toMatch(/constructor\s*\([\s\S]*?clientId/);
     expect(content).toContain('this.audience');
     // jwtVerify is called with audience when available
     expect(content).toContain('audience');

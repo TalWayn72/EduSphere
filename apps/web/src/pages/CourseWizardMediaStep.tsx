@@ -118,10 +118,7 @@ export function CourseWizardMediaStep({
         <p className="text-sm font-medium flex items-center gap-2">
           <Youtube className="h-4 w-4" /> {t('wizard.addYoutubeVideo')}
         </p>
-        <YouTubeUrlInput
-          onSubmit={ingestYouTube}
-          loading={youtubeLoading}
-        />
+        <YouTubeUrlInput onSubmit={ingestYouTube} loading={youtubeLoading} />
         {youtubeError && (
           <p className="text-sm text-destructive">{youtubeError}</p>
         )}

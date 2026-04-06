@@ -73,11 +73,31 @@ vi.mock('@/components/ui/badge', () => ({
 }));
 
 vi.mock('lucide-react', () => ({
-  CheckCircle2: ({ className }: { className?: string }) => <span data-testid="icon-check" className={className}>check</span>,
-  XCircle: ({ className }: { className?: string }) => <span data-testid="icon-x" className={className}>x</span>,
-  Loader2: ({ className }: { className?: string }) => <span data-testid="icon-loader" className={className}>loading</span>,
-  Send: ({ className }: { className?: string }) => <span data-testid="icon-send" className={className}>send</span>,
-  ArrowRight: ({ className }: { className?: string }) => <span data-testid="icon-arrow-right" className={className}>→</span>,
+  CheckCircle2: ({ className }: { className?: string }) => (
+    <span data-testid="icon-check" className={className}>
+      check
+    </span>
+  ),
+  XCircle: ({ className }: { className?: string }) => (
+    <span data-testid="icon-x" className={className}>
+      x
+    </span>
+  ),
+  Loader2: ({ className }: { className?: string }) => (
+    <span data-testid="icon-loader" className={className}>
+      loading
+    </span>
+  ),
+  Send: ({ className }: { className?: string }) => (
+    <span data-testid="icon-send" className={className}>
+      send
+    </span>
+  ),
+  ArrowRight: ({ className }: { className?: string }) => (
+    <span data-testid="icon-arrow-right" className={className}>
+      →
+    </span>
+  ),
 }));
 
 import { CoursePublishSheet } from './CoursePublishSheet';

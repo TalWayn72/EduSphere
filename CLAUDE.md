@@ -200,6 +200,50 @@ The existing rule "Don't ask questions — Execute directly" means:
 11. **Security-first** - RLS validation, JWT scopes, input sanitization, no secrets in code
 12. **Parallel agent execution mandatory** - Split every task into sub-tasks and spawn Agents in parallel for maximum efficiency. The Orchestrator's ONLY execution tool is the Agent tool — all other work is done by agents.
 
+## Memory Architecture — 5 Layers (IRON RULES)
+
+EduSphere uses a 5-layer persistent memory system with hook-based automation.
+
+### Layer Overview
+
+| Layer | File | Purpose | Update | Loaded |
+|-------|------|---------|--------|--------|
+| L1 | `CLAUDE.md` | Iron Rules (this file) | Manual, rare | Auto — every session |
+| L2 | `docs/memory/primer.md` | Session state — last recap, status, next steps | Hybrid: Orchestrator + Stop hook | SessionStart hook injection |
+| L3 | git-context (dynamic) | Branch, commits, dirty files | SessionStart hook generates live | SessionStart hook injection |
+| L4 | `MEMORY.md` + memory files | Behavioral — corrections, patterns | Auto by Claude on correction | Auto — every session |
+| L5 | `docs/memory/kb-index.md` | Reference — divisions, MCP, ports, users | Manual, infrequent | On demand only |
+
+### Hooks (4 active)
+
+| Hook | Trigger | Script | Action |
+|------|---------|--------|--------|
+| SessionStart (startup/resume) | Every session start | `scripts/memory/session-start.sh` | Injects L2 primer + L3 git context |
+| SessionStart (compact) | After compaction | `scripts/memory/session-resume-compact.sh` | Re-injects L2+L3 with compaction notice |
+| PreCompact (auto) | Before compaction | `scripts/memory/pre-compact.sh` | Saves timestamp to primer |
+| Stop | Session end | `scripts/memory/session-end.sh` | Appends git snapshot + staleness check |
+
+### IRON RULE — Memory Access Hierarchy (NEVER VIOLATE)
+
+| Level | Who | Memory Access | How |
+|-------|-----|---------------|-----|
+| L0 | Orchestrator | Full — all 5 layers | Hooks inject L2+L3 auto. Reads L5 on demand. Updates primer.md before Stop. |
+| L1 | Division Leads | **NONE directly** | Receives relevant memory excerpts as **plain text in Orchestrator brief**. MUST NOT Read/Write any `docs/memory/*` or `scripts/memory/*` files. |
+| L2 | Specialists | **NONE directly** | Receives relevant context as **plain text in Lead brief**. MUST NOT Read/Write any `docs/memory/*` or `scripts/memory/*` files. |
+
+**Violation:** A Lead or Specialist reading/writing `docs/memory/*` directly.
+
+### IRON RULE — Orchestrator Primer Update (NEVER VIOLATE)
+
+> **Before ending any session**, the Orchestrator MUST update `docs/memory/primer.md` with:
+> 1. What was accomplished this session
+> 2. Current state of work
+> 3. Next steps planned
+> 4. Any open decisions or blockers
+>
+> The Stop hook will then automatically append a git snapshot.
+> **Violation:** Ending a session without updating primer.md.
+
 ## Environment Setup
 
 ### Required Environment Variables
@@ -554,6 +598,22 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 - `feat(agent): add Chavruta debate agent template`
 - `fix(db): RLS policy for annotations layer filtering`
 - `refactor(knowledge): optimize HybridRAG fusion algorithm`
+
+### Post-Push CI Verification — IRON RULE
+
+After every `git push`, the Orchestrator MUST verify CI passes:
+
+| Step | Command | Action on Failure |
+|------|---------|-------------------|
+| 1. Wait 30s | — | Allow CI to start |
+| 2. Check runs | `gh run list --limit 3` | Verify workflow triggered |
+| 3. Monitor | `gh run watch` or poll every 2 min | Wait for completion |
+| 4. On failure | `gh run view <id> --log-failed` | Investigate, spawn fix agents |
+| 5. Re-push | Fix → commit → push → repeat from step 1 | Until ALL checks pass |
+
+**IRON RULE:** A push with failing CI is NOT complete. The Orchestrator MUST iterate fix cycles until all checks are green. No exceptions.
+
+**Maximum cycles:** 5 attempts. If CI still fails after 5 fix-push cycles, report to user with full failure analysis.
 
 ## Documentation Sync
 

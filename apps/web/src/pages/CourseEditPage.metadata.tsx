@@ -69,8 +69,8 @@ export function CourseEditMetadata({
     } else if (focus === 'description') {
       descRef.current?.focus();
     }
-  // Run once on mount; searchParams is stable for the lifetime of this render.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Run once on mount; searchParams is stable for the lifetime of this render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const {

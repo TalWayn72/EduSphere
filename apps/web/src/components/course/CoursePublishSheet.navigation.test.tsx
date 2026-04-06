@@ -97,10 +97,7 @@ const NOOP_MUTATION = [
   vi.fn().mockResolvedValue({ data: null, error: undefined }),
 ] as never;
 
-function makeReadinessQuery(
-  checks: typeof SOME_FAIL_CHECKS,
-  ready: boolean
-) {
+function makeReadinessQuery(checks: typeof SOME_FAIL_CHECKS, ready: boolean) {
   return [
     {
       data: { courseReadiness: { ready, checks } },
@@ -145,7 +142,9 @@ describe('CoursePublishSheet — click-to-fix navigation', () => {
 
     expect(screen.getByTestId('check-has_title').tagName).toBe('DIV');
     expect(screen.getByTestId('check-has_lessons').tagName).toBe('DIV');
-    expect(screen.getByTestId('check-has_pipeline_results').tagName).toBe('DIV');
+    expect(screen.getByTestId('check-has_pipeline_results').tagName).toBe(
+      'DIV'
+    );
   });
 
   it('clicking a failed check closes sheet and navigates to correct URL', async () => {

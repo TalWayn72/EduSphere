@@ -191,6 +191,7 @@ describe('Citation Pipeline — Full Integration', () => {
 
       // Check if this segment has a citation
       const citation = NER_RESPONSE.citations.find(
+        // eslint-disable-next-line security/detect-object-injection
         (c) => TRANSCRIPT_SEGMENTS[c.segmentIndex]?.id === segment.id
       );
 
@@ -220,6 +221,7 @@ describe('Citation Pipeline — Full Integration', () => {
 
     // Verify ordering is sequential
     for (let i = 0; i < blocks.length - 1; i++) {
+      // eslint-disable-next-line security/detect-object-injection
       expect(blocks[i].blockOrder).toBeLessThan(blocks[i + 1].blockOrder);
     }
   });

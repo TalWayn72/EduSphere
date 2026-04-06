@@ -53,6 +53,16 @@ async function runCustomMigrations(pool: Pool): Promise<void> {
   }
 }
 
+async function bootstrapExtensions(pool: Pool): Promise<void> {
+  // Must run before any migration that uses vector(768) or gen_random_uuid().
+  // Safe to re-run: IF NOT EXISTS is idempotent.
+  await pool.query(`
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    CREATE EXTENSION IF NOT EXISTS "vector";
+  `);
+  process.stderr.write('[migrate] PostgreSQL extensions ensured (uuid-ossp, vector).\n');
+}
+
 async function runMigrations(): Promise<void> {
   const connectionString =
     process.env.DATABASE_URL ||
@@ -60,6 +70,9 @@ async function runMigrations(): Promise<void> {
   const pool = getOrCreatePool(connectionString);
 
   const db = drizzle(pool);
+
+  process.stderr.write('[migrate] Bootstrapping PostgreSQL extensions...\n');
+  await bootstrapExtensions(pool);
 
   process.stderr.write('[migrate] Running Drizzle-managed migrations...\n');
   await migrate(db, { migrationsFolder: './migrations' });

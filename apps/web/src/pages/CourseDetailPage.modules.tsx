@@ -180,7 +180,9 @@ export function CourseModuleList({ modules, courseId }: Props) {
     );
   }
 
-  const sorted = [...(modules ?? [])].sort((a, b) => a.orderIndex - b.orderIndex);
+  const sorted = [...(modules ?? [])].sort(
+    (a, b) => a.orderIndex - b.orderIndex
+  );
 
   return (
     <div className="space-y-3">

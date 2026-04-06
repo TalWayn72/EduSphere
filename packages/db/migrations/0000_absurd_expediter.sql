@@ -1,3 +1,9 @@
+-- Enable required PostgreSQL extensions before any DDL that depends on them.
+-- pgvector (vector type) must exist before annotation_embeddings / concept_embeddings / content_embeddings.
+-- uuid-ossp (gen_random_uuid) is used as column defaults throughout.
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "vector";
+--> statement-breakpoint
 CREATE TABLE "tenants" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,

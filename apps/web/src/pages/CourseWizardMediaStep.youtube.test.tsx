@@ -114,9 +114,7 @@ describe('CourseWizardMediaStep — YouTube section', () => {
 
   it('"Ingest" button is disabled when URL field is empty', () => {
     renderStep();
-    expect(
-      screen.getByRole('button', { name: /ingest/i })
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: /ingest/i })).toBeDisabled();
   });
 
   it('"Ingest" button is enabled after a valid YouTube URL is entered', async () => {
@@ -126,9 +124,7 @@ describe('CourseWizardMediaStep — YouTube section', () => {
       { target: { value: VALID_YT_URL } }
     );
     await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /ingest/i })
-      ).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /ingest/i })).not.toBeDisabled()
     );
   });
 

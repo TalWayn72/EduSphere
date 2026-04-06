@@ -42,10 +42,7 @@ const YOUTUBE_URL = 'https://youtube.com/live/lDvP782frEs?feature=share';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SCREENSHOTS_DIR = path.resolve(
-  __dirname,
-  '../../../docs/screenshots'
-);
+const SCREENSHOTS_DIR = path.resolve(__dirname, '../../../docs/screenshots');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -85,7 +82,9 @@ async function loginViaKeycloak(page: Page): Promise<void> {
     // DEV_MODE: use the dev login button (auto-auth as super admin)
     await devBtn.click();
     await page
-      .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+      .waitForURL((url) => !url.toString().includes('/login'), {
+        timeout: 20_000,
+      })
       .catch(() => {});
     await page.waitForLoadState('domcontentloaded');
     return;
@@ -102,7 +101,9 @@ async function loginViaKeycloak(page: Page): Promise<void> {
     .catch(() => {});
 
   // Click "Sign In with Keycloak"
-  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  const signInBtn = page.getByRole('button', {
+    name: /sign in with keycloak/i,
+  });
   await signInBtn.waitFor({ timeout: 15_000 });
   await signInBtn.click();
 
@@ -181,13 +182,19 @@ test.describe('Create Course with YouTube Video — instructor.rachel', () => {
       await createCourseLink.click();
     } else {
       // Fallback: look for any Create/New Course button/link by text
-      const createBtn = page.getByRole('link', { name: /create.*(course|new)|new.*course/i }).first();
-      const hasBtnByText = await createBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      const createBtn = page
+        .getByRole('link', { name: /create.*(course|new)|new.*course/i })
+        .first();
+      const hasBtnByText = await createBtn
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       if (hasBtnByText) {
         await createBtn.click();
       } else {
         // Last resort: navigate sidebar to Courses, then find create button
-        await page.goto(`${BASE_URL}/courses/new`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${BASE_URL}/courses/new`, {
+          waitUntil: 'domcontentloaded',
+        });
         // Wait for Keycloak SSO check to complete
         await page.waitForTimeout(12_000);
       }
@@ -196,9 +203,10 @@ test.describe('Create Course with YouTube Video — instructor.rachel', () => {
     // Wait for the Create Course page heading
     await page
       .waitForFunction(
-        () => document.body.textContent?.includes('Create New Course') ||
-              document.body.textContent?.includes('Create Course') ||
-              !!document.querySelector('input[name="title"]'),
+        () =>
+          document.body.textContent?.includes('Create New Course') ||
+          document.body.textContent?.includes('Create Course') ||
+          !!document.querySelector('input[name="title"]'),
         { timeout: 15_000 }
       )
       .catch(() => {});
@@ -229,9 +237,7 @@ test.describe('Create Course with YouTube Video — instructor.rachel', () => {
       await difficultyTrigger.click();
       await page.waitForTimeout(300);
       // Select first available option
-      const firstOption = page
-        .locator('[role="option"]')
-        .first();
+      const firstOption = page.locator('[role="option"]').first();
       if (await firstOption.isVisible({ timeout: 2_000 }).catch(() => false)) {
         await firstOption.click();
       } else {
@@ -333,8 +339,7 @@ test.describe('Create Course with YouTube Video — instructor.rachel', () => {
 
     // Detect GraphQL schema errors (backend schema mismatch)
     const hasGraphQLSchemaError =
-      bodyText?.includes('Unknown type') ||
-      bodyText?.includes('[GraphQL]');
+      bodyText?.includes('Unknown type') || bodyText?.includes('[GraphQL]');
 
     const hasIngestError =
       bodyText?.toLowerCase().includes('ingest failed') ||
@@ -350,22 +355,36 @@ test.describe('Create Course with YouTube Video — instructor.rachel', () => {
     // Log the outcome
     if (hasGraphQLSchemaError) {
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] BACKEND SCHEMA MISMATCH: GraphQL error after Ingest click.');
+      console.log(
+        '[create-course-youtube] BACKEND SCHEMA MISMATCH: GraphQL error after Ingest click.'
+      );
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] Error visible in screenshot create-course-yt-08-after-ingest.png');
+      console.log(
+        '[create-course-youtube] Error visible in screenshot create-course-yt-08-after-ingest.png'
+      );
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] Likely cause: IngestYoutubeLessonInput type not registered in backend schema.');
+      console.log(
+        '[create-course-youtube] Likely cause: IngestYoutubeLessonInput type not registered in backend schema.'
+      );
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] NOTE: URL was correctly parsed (Video ID shown), Ingest button clicked — UI flow is correct.');
+      console.log(
+        '[create-course-youtube] NOTE: URL was correctly parsed (Video ID shown), Ingest button clicked — UI flow is correct.'
+      );
     } else if (hasIngestError) {
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] Ingest returned an application error — see screenshot create-course-yt-08-after-ingest.png');
+      console.log(
+        '[create-course-youtube] Ingest returned an application error — see screenshot create-course-yt-08-after-ingest.png'
+      );
     } else if (hasSuccess) {
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] Ingest succeeded — video ID shown in UI');
+      console.log(
+        '[create-course-youtube] Ingest succeeded — video ID shown in UI'
+      );
     } else {
       // eslint-disable-next-line no-console
-      console.log('[create-course-youtube] Ingest outcome unclear — check screenshot');
+      console.log(
+        '[create-course-youtube] Ingest outcome unclear — check screenshot'
+      );
     }
 
     // The test validates UI correctness (not backend schema validity).

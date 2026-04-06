@@ -130,7 +130,9 @@ describe('extractVideoId (real implementation)', () => {
   const VIDEO_ID = 'lDvP782frEs';
 
   it('extracts ID from watch URL', () => {
-    expect(extractId(`https://www.youtube.com/watch?v=${VIDEO_ID}`)).toBe(VIDEO_ID);
+    expect(extractId(`https://www.youtube.com/watch?v=${VIDEO_ID}`)).toBe(
+      VIDEO_ID
+    );
   });
 
   it('extracts ID from youtu.be short URL', () => {
@@ -138,19 +140,27 @@ describe('extractVideoId (real implementation)', () => {
   });
 
   it('extracts ID from embed URL', () => {
-    expect(extractId(`https://www.youtube.com/embed/${VIDEO_ID}`)).toBe(VIDEO_ID);
+    expect(extractId(`https://www.youtube.com/embed/${VIDEO_ID}`)).toBe(
+      VIDEO_ID
+    );
   });
 
   it('extracts ID from shorts URL', () => {
-    expect(extractId(`https://www.youtube.com/shorts/${VIDEO_ID}`)).toBe(VIDEO_ID);
+    expect(extractId(`https://www.youtube.com/shorts/${VIDEO_ID}`)).toBe(
+      VIDEO_ID
+    );
   });
 
   it('extracts ID from live URL (regression: was broken)', () => {
-    expect(extractId(`https://youtube.com/live/${VIDEO_ID}?feature=share`)).toBe(VIDEO_ID);
+    expect(
+      extractId(`https://youtube.com/live/${VIDEO_ID}?feature=share`)
+    ).toBe(VIDEO_ID);
   });
 
   it('extracts ID from live URL with www prefix', () => {
-    expect(extractId(`https://www.youtube.com/live/${VIDEO_ID}`)).toBe(VIDEO_ID);
+    expect(extractId(`https://www.youtube.com/live/${VIDEO_ID}`)).toBe(
+      VIDEO_ID
+    );
   });
 
   it('returns null for invalid URL', () => {
