@@ -603,6 +603,70 @@ services:
     networks:
       - edusphere
 
+  # ═══════════════════════════════════════════════════════════════
+  # MinIO — S3-compatible object storage (Ports 9000/9001)
+  # API: http://localhost:9000  Console: http://localhost:9001
+  # Credentials: minioadmin / minioadmin123
+  # ═══════════════════════════════════════════════════════════════
+  minio:
+    image: minio/minio:latest
+    container_name: edusphere-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    mem_limit: 512m
+    mem_reservation: 128m
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Transcription Worker
+  # ═══════════════════════════════════════════════════════════════
+  transcription-worker:
+    build:
+      context: .
+      dockerfile: apps/transcription-worker/Dockerfile
+    container_name: edusphere-transcription-worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      NATS_URL: nats://edusphere-nats:4222
+      DATABASE_URL: postgresql://edusphere:edusphere_dev_password@edusphere-postgres:5432/edusphere
+      MINIO_ENDPOINT: edusphere-minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET_NAME: edusphere
+      WHISPER_URL: http://edusphere-whisper-server:3200
+    depends_on:
+      nats:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - edusphere
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    mem_limit: 512m
+    mem_reservation: 128m
+
 networks:
   edusphere:
     driver: bridge
@@ -612,3 +676,4 @@ volumes:
   redis_data:
   prometheus_data:
   grafana_data:
+  minio_data:

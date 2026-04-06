@@ -299,6 +299,12 @@ describe('urql graphcache keys config — id-less types mapped to null', () => {
     'TenantLanguageSettings',
     'PublicTenantBranding',
     'BrandedLoginData',
+    // BUG-fix (UserStats/DayActivity): added after BUG-124 discovery
+    'UserStats',
+    'DayActivity',
+    // BUG-124: RecommendedCourse has courseId/title/instructorName/reason — no id field
+    // Must be mapped to null in urql graphcache keys to suppress "Invalid key" warnings.
+    'RecommendedCourse',
   ];
 
   it.each(ID_LESS_KEYS)('key resolver for %s returns null', (typeName) => {

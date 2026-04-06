@@ -3,12 +3,14 @@
  * quick-prompt chips, and the text input + send button.
  */
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Send, RotateCcw } from 'lucide-react';
 import { AGENT_MODES } from './agent-modes-data';
 import type { AgentModeId, AgentModeDefinition, ChatMsg } from './agent-modes';
+import { RequirementLink } from '@/components/RequirementLink';
 
 /** Extracted to module-level constant to avoid creating a new object every render. */
 const PANEL_STYLE: React.CSSProperties = { height: 'calc(100vh - 22rem)' };
@@ -46,6 +48,7 @@ export const AgentChatPanel = React.memo(function AgentChatPanel({
   onReset,
 }: AgentChatPanelProps) {
   const { t } = useTranslation('agents');
+  const location = useLocation();
   const mode = AGENT_MODES.find((m) => m.id === activeMode)!;
 
   return (
@@ -86,7 +89,11 @@ export const AgentChatPanel = React.memo(function AgentChatPanel({
                   : 'bg-muted rounded-bl-none'
               }`}
             >
-              {msg.content}
+              {msg.content === 'consent-required' ? (
+                <RequirementLink variant="inline" returnTo={location.pathname} />
+              ) : (
+                msg.content
+              )}
             </div>
           </div>
         ))}

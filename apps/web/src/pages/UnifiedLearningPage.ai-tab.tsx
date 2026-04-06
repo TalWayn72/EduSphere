@@ -3,8 +3,10 @@
  * Extracted from ContentViewer right-side panel.
  */
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { Bot, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RequirementLink } from '@/components/RequirementLink';
 import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
 import { ProgressStatus } from '@/components/ProgressStatus';
 import { AI_CHAT_MESSAGES } from '@/lib/progress-messages';
@@ -22,6 +24,7 @@ const QUICK_PROMPTS = [
 
 export function AiTab({ chat }: Props) {
   const { t } = useTranslation('content');
+  const location = useLocation();
   const {
     messages,
     chatInput,
@@ -74,7 +77,11 @@ export function AiTab({ chat }: Props) {
                   : 'bg-muted rounded-bl-none'
               }`}
             >
-              {msg.content}
+              {msg.content === 'consent-required' ? (
+                <RequirementLink variant="inline" returnTo={location.pathname} />
+              ) : (
+                msg.content
+              )}
             </div>
           </div>
         ))}

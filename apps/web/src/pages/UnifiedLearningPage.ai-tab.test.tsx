@@ -9,6 +9,13 @@ import type { ChatMessage } from '@/hooks/useAgentChat';
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────────
 
+vi.mock('react-router-dom', () => ({
+  useLocation: () => ({ pathname: '/learn/test-lesson' }),
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -171,5 +178,16 @@ describe('AiTab', () => {
     const input = screen.getByRole('textbox');
     fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
     expect(sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('renders RequirementLink when message content is consent-required', () => {
+    const consentMsg: ChatMessage = {
+      id: 'c1',
+      role: 'agent',
+      content: 'consent-required',
+    };
+    render(<AiTab chat={makeChat({ messages: [consentMsg] })} />);
+    expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
+    expect(screen.queryByText('consent-required')).not.toBeInTheDocument();
   });
 });

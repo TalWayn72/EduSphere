@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { TranscriptionWorker } from './transcription.worker';
+// BUG-123 reproducer: import SUBJECT constant indirectly via the module
+// The publisher (content subgraph) sends to 'EDUSPHERE.media.uploaded'.
+// This test verifies the worker subscribes to the same subject.
+const EXPECTED_SUBJECT = 'EDUSPHERE.media.uploaded';
+const EXPECTED_STREAM_PATTERN = 'EDUSPHERE.media.>';
 
 describe('TranscriptionWorker', () => {
   const mockTranscriptionService = {
@@ -57,7 +62,7 @@ describe('TranscriptionWorker', () => {
       await expect(worker.onModuleInit()).resolves.toBeUndefined();
     });
 
-    it('subscribes to media.uploaded when connection is available', async () => {
+    it('subscribes to EDUSPHERE.media.uploaded when connection is available', async () => {
       const subscription = makeSubscription([]);
       const mockConn = {
         subscribe: vi.fn().mockReturnValue(subscription),
@@ -66,9 +71,56 @@ describe('TranscriptionWorker', () => {
 
       await worker.onModuleInit();
 
-      expect(mockConn.subscribe).toHaveBeenCalledWith('media.uploaded', {
+      // BUG-123 fix: must match publisher subject 'EDUSPHERE.media.uploaded'
+      expect(mockConn.subscribe).toHaveBeenCalledWith('EDUSPHERE.media.uploaded', {
         queue: 'transcription-workers',
       });
+    });
+
+    // BUG-123 reproducer: worker MUST subscribe to EDUSPHERE.media.uploaded,
+    // not the bare 'media.uploaded'. Publisher (content subgraph line 316)
+    // sends to 'EDUSPHERE.media.uploaded'. These tests prove the mismatch
+    // before the fix and verify correct behaviour after.
+    it('BUG-123: subscribes to EDUSPHERE.media.uploaded (matches publisher subject)', async () => {
+      const subscription = makeSubscription([]);
+      const mockConn = {
+        subscribe: vi.fn().mockReturnValue(subscription),
+      };
+      mockNatsService.getConnection.mockReturnValue(mockConn);
+
+      await worker.onModuleInit();
+
+      expect(mockConn.subscribe).toHaveBeenCalledWith(EXPECTED_SUBJECT, {
+        queue: 'transcription-workers',
+      });
+    });
+  });
+
+  describe('BUG-123: subject/stream constant validation', () => {
+    it('SUBJECT constant must equal EDUSPHERE.media.uploaded', () => {
+      // This test inspects the subscription call to verify the constant value.
+      // It will FAIL before the fix (wrong subject) and PASS after.
+      const subscription = makeSubscription([]);
+      const mockConn = {
+        subscribe: vi.fn().mockReturnValue(subscription),
+      };
+      mockNatsService.getConnection.mockReturnValue(mockConn);
+
+      // Run synchronously to capture subscribe call args
+      const initPromise = worker.onModuleInit();
+      return initPromise.then(() => {
+        const calledWith = mockConn.subscribe.mock.calls[0]?.[0] as string;
+        expect(calledWith).toBe(EXPECTED_SUBJECT);
+        expect(calledWith).toMatch(/^EDUSPHERE\./);
+      });
+    });
+
+    it('EXPECTED_STREAM_PATTERN covers EDUSPHERE.media.uploaded', () => {
+      // Verifies that 'EDUSPHERE.media.>' would match 'EDUSPHERE.media.uploaded'
+      // using NATS wildcard semantics (> matches one or more tokens)
+      const subject = EXPECTED_SUBJECT; // 'EDUSPHERE.media.uploaded'
+      const patternPrefix = EXPECTED_STREAM_PATTERN.replace('.>', '');
+      expect(subject.startsWith(patternPrefix)).toBe(true);
     });
   });
 

@@ -5,6 +5,7 @@
  * Transitions to evaluation report when session completes.
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useMutation, useQuery } from 'urql';
 import { Button } from '@/components/ui/button';
 import { Send, X } from 'lucide-react';
@@ -14,6 +15,7 @@ import {
   MY_SCENARIO_SESSION_QUERY,
 } from '@/lib/graphql/roleplay.queries';
 import { RoleplayEvaluationReport } from './RoleplayEvaluationReport';
+import { RequirementLink } from '@/components/RequirementLink';
 
 interface Scenario {
   id: string;
@@ -44,6 +46,7 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 const POLL_INTERVAL_MS = 2500;
 
 export function RoleplaySimulator({ scenario, onClose }: Props) {
+  const location = useLocation();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -199,7 +202,11 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
                   : 'bg-blue-600 text-white rounded-bl-sm'
               }`}
             >
-              {msg.content}
+              {msg.content === 'consent-required' ? (
+                <RequirementLink variant="inline" returnTo={location.pathname} />
+              ) : (
+                msg.content
+              )}
             </div>
           </div>
         ))}

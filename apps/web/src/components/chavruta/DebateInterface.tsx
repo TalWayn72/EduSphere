@@ -1,11 +1,13 @@
 /** DebateInterface — Chavruta debate UI. AI messages carry EU AI Act Art.50 badge. */
 import React, { useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Send, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { DebateMessage } from '@/hooks/useChavrutaDebate';
 import { ProgressStatus } from '@/components/ProgressStatus';
 import { AI_CHAT_MESSAGES } from '@/lib/progress-messages';
+import { RequirementLink } from '@/components/RequirementLink';
 
 export interface DebateInterfaceProps {
   topic: string;
@@ -26,7 +28,13 @@ function AIDisclosureBadge() {
   );
 }
 
-function MessageBubble({ message }: { message: DebateMessage }) {
+function MessageBubble({
+  message,
+  returnTo,
+}: {
+  message: DebateMessage;
+  returnTo: string;
+}) {
   const isUser = message.role === 'user';
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -48,7 +56,11 @@ function MessageBubble({ message }: { message: DebateMessage }) {
               : 'bg-muted text-foreground rounded-bl-sm'
           }`}
         >
-          {message.content}
+          {message.content === 'consent-required' ? (
+            <RequirementLink variant="inline" returnTo={returnTo} />
+          ) : (
+            message.content
+          )}
         </div>
         <time
           className="text-[10px] text-muted-foreground/60 px-1"
@@ -90,6 +102,7 @@ export function DebateInterface({
 }: DebateInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = React.useState('');
+  const location = useLocation();
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -128,7 +141,7 @@ export function DebateInterface({
           </p>
         )}
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
+          <MessageBubble key={msg.id} message={msg} returnTo={location.pathname} />
         ))}
         {isLoading && (
           <>

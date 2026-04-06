@@ -1,9 +1,11 @@
 /** Right column: AI Chavruta chat panel. */
 import React, { useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bot, Send, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { RequirementLink } from '@/components/RequirementLink';
 
 /** Pre-computed animation delay styles for the typing indicator dots. */
 const DOT_DELAY_STYLES: React.CSSProperties[] = [
@@ -53,6 +55,7 @@ export const AiChatPanel = React.memo(function AiChatPanel({
   onSourceClick,
 }: AiChatPanelProps) {
   const { t } = useTranslation(['content']);
+  const location = useLocation();
   const [expandedSources, setExpandedSources] = useState<Set<string>>(
     new Set()
   );
@@ -116,7 +119,11 @@ export const AiChatPanel = React.memo(function AiChatPanel({
                     : 'bg-muted rounded-bl-none'
                 }`}
               >
-                {msg.content}
+                {msg.content === 'consent-required' ? (
+                  <RequirementLink variant="inline" returnTo={location.pathname} />
+                ) : (
+                  msg.content
+                )}
               </div>
               {msg.sources && msg.sources.length > 0 && (
                 <div className="max-w-[85%] mt-1">

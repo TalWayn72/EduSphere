@@ -82,7 +82,7 @@ export class NatsService implements OnModuleInit, OnModuleDestroy {
       const jsm: JetStreamManager = await this.connection.jetstreamManager();
       // Ensure MEDIA stream exists (created by content subgraph; idempotent here)
       const streams = [
-        { name: 'MEDIA', subjects: ['media.*'] },
+        { name: 'MEDIA', subjects: ['EDUSPHERE.media.>'] },
         { name: 'TRANSCRIPTION', subjects: ['transcription.*'] },
       ];
       for (const stream of streams) {

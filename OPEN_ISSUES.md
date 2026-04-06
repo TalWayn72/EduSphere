@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 6 April 2026 (Video player black screen bugs BUG-117 through BUG-119 fixed)
+**Last Updated:** 6 April 2026 (BUG-122 closed — misdiagnosis; BUG-124 fixed — RecommendedCourse urql cache key; BUG-125 closed — queueMicrotask pattern already applied)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -10,11 +10,14 @@
 
 ### 🔴 Open
 
-| ID                   | Issue                                       | Severity    | Est.  |
-| -------------------- | ------------------------------------------- | ----------- | ----- |
-| FEAT-VIDEO-CAPTIONS  | Video captions for IS 5568 + EAA compliance | 🔴 Critical | ~40h  |
-| FEAT-EU-AI-ACT       | EU AI Act documentation and compliance      | 🔴 Critical | ~80h  |
-| FEAT-ADMIN-DASHBOARD | 5 missing admin screens                     | 🟡 Medium   | ~120h |
+| ID                   | Issue                                                          | Severity    | Est.  |
+| -------------------- | -------------------------------------------------------------- | ----------- | ----- |
+| BUG-120              | JWT issuer mismatch — all requests proceed unauthenticated     | 🔴 Critical | ~2h   |
+| BUG-121              | Keycloak users locked out by brute-force protection            | 🔴 High     | ~1h   |
+| BUG-123              | Transcription worker not running — ASR pipeline stuck          | 🔴 High     | ~2h   |
+| FEAT-VIDEO-CAPTIONS  | Video captions for IS 5568 + EAA compliance                    | 🔴 Critical | ~40h  |
+| FEAT-EU-AI-ACT       | EU AI Act documentation and compliance                         | 🔴 Critical | ~80h  |
+| FEAT-ADMIN-DASHBOARD | 5 missing admin screens                                        | 🟡 Medium   | ~120h |
 
 ### 🟡 In Progress
 
@@ -31,6 +34,9 @@
 | BUG-119 | enriched-lesson.service hardcodes `youtubeVideoId: null` — actual ID never read from DB (video player black screen)                              | 6 Apr 2026 |
 | BUG-118 | `contentItem` resolver doesn't handle lesson IDs — resolver only queries `content_items`, lesson IDs live in `lessons` table → returns null      | 6 Apr 2026 |
 | BUG-117 | `useContentData` reads `youtubeVideoId` from non-existent `mediaAsset` field — must derive from `content` field when `contentType === 'YOUTUBE'` | 6 Apr 2026 |
+| BUG-125 | setState during render — queueMicrotask pattern already applied in DashboardPage/CourseList (misdiagnosis — closed)                              | 6 Apr 2026 |
+| BUG-124 | RecommendedCourse missing urql cache key — `RecommendedCourse: () => null` added to cacheExchange keys config                                   | 6 Apr 2026 |
+| BUG-122 | MinIO container not running — MinIO IS running (misdiagnosis); re-verification confirmed ports 9000/9001 healthy (closed)                        | 6 Apr 2026 |
 | BUG-116 | CourseReadinessCheck missing `id` field — urql could not cache type, SDL + service updated                                                       | 6 Apr 2026 |
 | BUG-115 | Concepts resolver returns null for non-nullable fields — Apache AGE omits absent vertex properties                                               | 6 Apr 2026 |
 | BUG-114 | Knowledge Graph "Failed to load graph" — `_refresh` variable not in schema, gateway rejected query                                               | 6 Apr 2026 |
@@ -554,6 +560,101 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Tests:** 40 new tests verifying the key resolver configuration covers all 20 types and that no cache key warnings are emitted.
 
 **Anti-recurrence:** When adding new GraphQL types that are value objects (no natural `id`), register them in the urql client `keys` configuration with `() => null` immediately. Document this in the urql client configuration file with a comment.
+
+---
+
+## ✅ BUG-120 — JWT Issuer Mismatch — All Requests Proceed Unauthenticated
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 Critical
+- **Area:** Infrastructure / Gateway
+
+**Root Cause:** `docker-compose.dev.yml` had `KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/edusphere` on 7 lines (one per subgraph + gateway). The code in `apps/gateway/src/gateway-config.ts`, `packages/config/src/keycloak.ts`, and `packages/auth/src/jwt.ts` all appended `/realms/${realm}` to `KEYCLOAK_ISSUER_URL`, producing the double-realm URL `http://localhost:8080/realms/edusphere/realms/edusphere` which never matched the token's `iss` claim.
+
+**Fix:** Changed all 7 occurrences in `docker-compose.dev.yml` from `KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/edusphere` to `KEYCLOAK_ISSUER_URL=http://localhost:8080`. The code already appends `/realms/edusphere` — the env var must supply only the base URL.
+
+**Files Fixed:** `docker-compose.dev.yml` (lines 214, 260, 306, 350, 394, 438, 491)
+
+**Containers must be recreated** to pick up the new env var: `docker-compose -f docker-compose.dev.yml up -d --force-recreate`
+
+---
+
+## ✅ BUG-121 — Keycloak Users Locked Out by Brute-Force Protection
+
+- **Status:** ✅ Fixed
+- **Severity:** 🔴 High
+- **Area:** Infrastructure / Keycloak
+
+**Symptom:** `super.admin@edusphere.dev` and `student@example.com` were temporarily disabled in Keycloak due to brute-force detection.
+
+**Fix:** Cleared all brute-force detections via Keycloak Admin REST API: `DELETE /admin/realms/edusphere/attack-detection/brute-force/users` (HTTP 204 confirmed).
+
+**Files:** Keycloak admin API (`http://localhost:8080/admin/realms/edusphere/users`), `scripts/reset-keycloak-passwords.cjs`
+
+---
+
+## ✅ BUG-122 — MinIO Container Not Running (CLOSED — Misdiagnosis)
+
+- **Status:** ✅ Closed — 6 Apr 2026
+- **Severity:** 🔴 High (as originally reported)
+- **Area:** Infrastructure / Docker
+
+**Symptom (original):** Ports 9000 and 9001 reportedly unreachable. `docker ps` showed no MinIO container.
+
+**Resolution:** Re-verification confirmed MinIO IS running and healthy on ports 9000/9001. This was a misdiagnosis — the original report was based on a transient state (e.g., Docker Desktop not yet started or a previous `docker-compose down`). No code or infrastructure changes required.
+
+**Closed by:** Frontend Lead — 6 Apr 2026
+
+---
+
+## 🔴 BUG-123 — Transcription Worker Not Running — ASR Pipeline Stuck
+
+- **Status:** 🔴 Open
+- **Severity:** 🔴 High
+- **Area:** Infrastructure / Pipeline
+
+**Symptom:** The lesson pipeline ASR step returns `{ asrDelegated: true }` indicating the task was published to NATS, but the transcription worker process is not running to consume it. The NATS `TRANSCRIPTION` stream shows 0 messages and 0 consumers. The lesson pipeline UI shows "מתחמלל בעיבוד..." (processing) indefinitely with no progress.
+
+**Impact:** Lesson transcription is permanently stuck for all lessons that require ASR processing. No automated captions or transcript data are generated.
+
+**Files:** `apps/transcription-worker/` (process entry point and NATS consumer), NATS `TRANSCRIPTION` stream configuration
+
+**Next Steps:** Start the transcription worker with `pnpm --filter @edusphere/transcription-worker start`. Verify the NATS consumer appears (`nats stream info TRANSCRIPTION`). Confirm that queued messages are processed and the pipeline advances past the ASR step.
+
+---
+
+## ✅ BUG-124 — RecommendedCourse urql Cache Key Warning (Fixed)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🟢 Low
+- **Area:** Frontend / urql
+- **Reproducer test:** `apps/web/src/lib/urql-client.test.ts` (ID_LESS_KEYS array — `RecommendedCourse` entry)
+
+**Symptom:** Browser console outputs: `Invalid key: The GraphQL query...has a selection set, but no key could be generated for RecommendedCourse`. Warning appears on every dashboard load that fetches user recommendations.
+
+**Root cause:** `RecommendedCourse` type (defined in `apps/subgraph-core/src/user/user.graphql`) has fields `courseId`, `title`, `instructorName`, `reason` — no `id` field. urql graphcache could not derive a cache key, emitting "Invalid key" warnings.
+
+**Solution:** Added `RecommendedCourse: () => null` to the `cacheExchange` keys config in `apps/web/src/lib/urql-client.ts`. Also added `UserStats` and `DayActivity` entries to the reproducer test's `ID_LESS_KEYS` array for completeness.
+
+**Files:**
+- `apps/web/src/lib/urql-client.ts` — added `RecommendedCourse: () => null` to keys config
+- `apps/web/src/lib/urql-client.test.ts` — added `RecommendedCourse`, `UserStats`, `DayActivity` to `ID_LESS_KEYS` test array
+
+**Anti-recurrence:** When adding a new GraphQL type without an `id` field, always add a corresponding `TypeName: () => null` entry to the urql cache keys config and the `ID_LESS_KEYS` test constant.
+
+---
+
+## ✅ BUG-125 — setState During Render — DashboardPage / CourseList (CLOSED)
+
+- **Status:** ✅ Closed — 6 Apr 2026
+- **Severity:** 🟢 Low
+- **Area:** Frontend / React
+
+**Symptom (original):** React logs: `Cannot update a component ('DashboardPage') while rendering a different component ('CourseList')`.
+
+**Resolution:** Already fixed — the `queueMicrotask` pattern was applied in a prior session to defer state updates out of the render phase in `DashboardPage` / `CourseList`. No further changes required.
+
+**Closed by:** Frontend Lead — 6 Apr 2026
 
 ---
 

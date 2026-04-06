@@ -228,6 +228,12 @@ export const urqlClient = createClient({
         SkillProfile: () => null,
         SocialRecommendation: () => null,
         SocialFeedItem: () => null,
+        // BUG-fix: UserStats and DayActivity have no id fields — suppress urql graphcache key warnings
+        UserStats: () => null,
+        DayActivity: () => null,
+        // BUG-124: RecommendedCourse has courseId/title/instructorName/reason — no id field
+        // Suppress "Invalid key: The GraphQL query...RecommendedCourse...no key could be generated"
+        RecommendedCourse: () => null,
       },
       updates: {
         Mutation: {

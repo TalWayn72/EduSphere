@@ -30,7 +30,47 @@
       "mcp__nats__*",
       "mcp__typescript-diagnostics__*",
       "mcp__playwright__*",
-      "mcp__context7__*"
+      "mcp__context7__*",
+      "mcp__chrome-devtools__*"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [{
+          "type": "command",
+          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-start.sh\"",
+          "timeout": 10
+        }]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [{
+          "type": "command",
+          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-resume-compact.sh\"",
+          "timeout": 10
+        }]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [{
+          "type": "command",
+          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/pre-compact.sh\"",
+          "timeout": 15
+        }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{
+          "type": "command",
+          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-end.sh\"",
+          "timeout": 10
+        }]
+      }
     ]
   }
 }

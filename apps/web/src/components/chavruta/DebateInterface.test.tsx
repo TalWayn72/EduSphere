@@ -6,6 +6,13 @@ import type { DebateMessage } from '@/hooks/useChavrutaDebate';
 // jsdom does not implement scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
+vi.mock('react-router-dom', () => ({
+  useLocation: () => ({ pathname: '/chavruta/debate' }),
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
+
 const makeMsg = (overrides: Partial<DebateMessage> = {}): DebateMessage => ({
   id: 'msg-1',
   role: 'user',
@@ -117,5 +124,14 @@ describe('DebateInterface', () => {
   it('displays EU AI Act disclosure text', () => {
     render(<DebateInterface {...defaultProps} />);
     expect(screen.getByText(/EU AI Act Art\. 50/)).toBeInTheDocument();
+  });
+
+  it('renders RequirementLink when message content is consent-required', () => {
+    const messages = [
+      makeMsg({ role: 'ai', content: 'consent-required' }),
+    ];
+    render(<DebateInterface {...defaultProps} messages={messages} />);
+    expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
+    expect(screen.queryByText('consent-required')).not.toBeInTheDocument();
   });
 });

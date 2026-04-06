@@ -4,11 +4,11 @@ import type { MediaUploadedEvent } from './transcription.types';
 import { TranscriptionService } from './transcription.service';
 import { NatsService } from '../nats/nats.service';
 
-const SUBJECT = 'media.uploaded';
+const SUBJECT = 'EDUSPHERE.media.uploaded';
 const QUEUE_GROUP = 'transcription-workers';
 
 /**
- * NATS consumer that listens on `media.uploaded` and delegates to
+ * NATS consumer that listens on `EDUSPHERE.media.uploaded` and delegates to
  * TranscriptionService. Uses a queue group so multiple worker instances
  * share the load without duplicate processing.
  */
@@ -50,14 +50,14 @@ export class TranscriptionWorker implements OnModuleInit {
           const raw = sc.decode(msg.data);
           const event = JSON.parse(raw) as MediaUploadedEvent;
           this.logger.log(
-            `Received media.uploaded: assetId=${event.assetId} fileKey=${event.fileKey}`
+            `Received ${SUBJECT}: assetId=${event.assetId} fileKey=${event.fileKey}`
           );
           // Fire-and-forget; errors are handled inside transcribeFile
           this.transcriptionService.transcribeFile(event).catch((err) => {
             this.logger.error('Unhandled error in transcribeFile', err);
           });
         } catch (err) {
-          this.logger.error('Failed to parse media.uploaded message', err);
+          this.logger.error('Failed to parse EDUSPHERE.media.uploaded message', err);
         }
       }
     })().catch((err) => {

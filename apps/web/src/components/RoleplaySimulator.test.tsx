@@ -9,6 +9,13 @@ import {
 import * as urql from 'urql';
 import { RoleplaySimulator } from './RoleplaySimulator';
 
+vi.mock('react-router-dom', () => ({
+  useLocation: () => ({ pathname: '/roleplay/simulator' }),
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
+
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
@@ -197,5 +204,26 @@ describe('RoleplaySimulator', () => {
       (b) => !b.getAttribute('aria-label')?.includes('Close')
     );
     expect(sendBtn).toBeDisabled();
+  });
+
+  it('renders RequirementLink when message content is consent-required', async () => {
+    vi.mocked(urql.useMutation)
+      .mockReturnValueOnce([
+        { fetching: false } as never,
+        vi.fn().mockResolvedValue({
+          data: { startRoleplaySession: { id: 'sess-consent' } },
+        }),
+      ])
+      .mockReturnValue([{ fetching: false } as never, NOOP_EXECUTE]);
+
+    const consentScenario = { ...mockScenario, sceneDescription: 'consent-required' };
+    await act(async () => {
+      render(<RoleplaySimulator scenario={consentScenario} onClose={onClose} />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('consent-required')).not.toBeInTheDocument();
   });
 });

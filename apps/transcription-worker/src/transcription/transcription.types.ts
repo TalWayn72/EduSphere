@@ -1,5 +1,6 @@
 /**
- * Payload published on NATS subject `media.uploaded`
+ * Payload published on NATS subject `EDUSPHERE.media.uploaded`
+ * (published by apps/subgraph-content/src/media/media.service.ts)
  */
 export interface MediaUploadedEvent {
   fileKey: string;

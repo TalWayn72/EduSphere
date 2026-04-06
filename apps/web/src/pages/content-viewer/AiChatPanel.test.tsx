@@ -18,6 +18,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 
+vi.mock('react-router-dom', () => ({
+  useLocation: () => ({ pathname: '/learn/content-test' }),
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (k: string, opts?: Record<string, unknown>) => {
@@ -437,5 +444,13 @@ describe('AiChatPanel', () => {
       );
       expect(quickPromptsGroup).toBeInTheDocument();
     });
+  });
+
+  it('renders RequirementLink when message content is consent-required', () => {
+    renderPanel({
+      chatMessages: [{ id: 'c1', role: 'assistant', content: 'consent-required' }],
+    });
+    expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
+    expect(screen.queryByText('consent-required')).not.toBeInTheDocument();
   });
 });

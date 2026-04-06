@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { getCurrentUser, DEV_MODE } from '@/lib/auth';
@@ -81,7 +81,24 @@ export function useCourseListData() {
     };
   }, []);
 
+  // useCallback ensures showToast is a stable reference so the useEffect
+  // dependency array below does not cause spurious re-runs.
+  const showToast = useCallback((msg: string) => {
+    // Defer setState out of any in-progress render flush to prevent React's
+    // "Cannot update a component while rendering a different component" warning.
+    // This can happen when location.state changes trigger this effect while a
+    // sibling component (e.g. DashboardPage) is mid-render.
+    queueMicrotask(() => {
+      setToast(msg);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => setToast(null), 3500);
+    });
+  }, []);
+
   // Show success message from navigation state (CourseCreatePage, DeleteCourse, etc.)
+  // Both showToast (setState) and window.history.replaceState are deferred via
+  // queueMicrotask, preventing "Cannot update a component while rendering a
+  // different component" (React 19 concurrent mode strictness).
   useEffect(() => {
     const state = location.state as {
       message?: string;
@@ -91,15 +108,11 @@ export function useCourseListData() {
       showToast(state.message);
     }
     if (state?.message || state?.deleted) {
-      window.history.replaceState({}, '');
+      // Defer history mutation so it does not coincide with any pending
+      // React render cycle on sibling or parent components.
+      queueMicrotask(() => window.history.replaceState({}, ''));
     }
-  }, [location.state]);
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    toastTimeoutRef.current = setTimeout(() => setToast(null), 3500);
-  };
+  }, [location.state, showToast]);
 
   const enrolledCourseIds = new Set(
     (enrollmentsData?.myEnrollments ?? [])
