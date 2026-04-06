@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 6 April 2026 (Knowledge Graph bugs BUG-112 through BUG-116 fixed)
+**Last Updated:** 6 April 2026 (Video player black screen bugs BUG-117 through BUG-119 fixed)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -26,13 +26,16 @@
 
 ### ✅ Fixed (6 Apr 2026 Session)
 
-| ID      | Issue                                                                                                 | Fixed In   |
-| ------- | ----------------------------------------------------------------------------------------------------- | ---------- |
-| BUG-116 | CourseReadinessCheck missing `id` field — urql could not cache type, SDL + service updated            | 6 Apr 2026 |
-| BUG-115 | Concepts resolver returns null for non-nullable fields — Apache AGE omits absent vertex properties    | 6 Apr 2026 |
-| BUG-114 | Knowledge Graph "Failed to load graph" — `_refresh` variable not in schema, gateway rejected query    | 6 Apr 2026 |
-| BUG-113 | WebSocket reconnection flood — rapid reconnection attempts to ws://localhost:4000/graphql             | 6 Apr 2026 |
-| BUG-112 | urql cache key warnings for CourseReadinessCheck — 20 types without `id` fields missing key resolvers | 6 Apr 2026 |
+| ID      | Issue                                                                                                                                                  | Fixed In   |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| BUG-119 | enriched-lesson.service hardcodes `youtubeVideoId: null` — actual ID never read from DB (video player black screen)                                    | 6 Apr 2026 |
+| BUG-118 | `contentItem` resolver doesn't handle lesson IDs — resolver only queries `content_items`, lesson IDs live in `lessons` table → returns null            | 6 Apr 2026 |
+| BUG-117 | `useContentData` reads `youtubeVideoId` from non-existent `mediaAsset` field — must derive from `content` field when `contentType === 'YOUTUBE'`       | 6 Apr 2026 |
+| BUG-116 | CourseReadinessCheck missing `id` field — urql could not cache type, SDL + service updated                                                             | 6 Apr 2026 |
+| BUG-115 | Concepts resolver returns null for non-nullable fields — Apache AGE omits absent vertex properties                                                     | 6 Apr 2026 |
+| BUG-114 | Knowledge Graph "Failed to load graph" — `_refresh` variable not in schema, gateway rejected query                                                     | 6 Apr 2026 |
+| BUG-113 | WebSocket reconnection flood — rapid reconnection attempts to ws://localhost:4000/graphql                                                              | 6 Apr 2026 |
+| BUG-112 | urql cache key warnings for CourseReadinessCheck — 20 types without `id` fields missing key resolvers                                                 | 6 Apr 2026 |
 
 ### ✅ Fixed (31 Mar 2026 Session)
 
@@ -404,6 +407,63 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Tests:** 12 regression tests added (6 unit + 6 static security canary tests).
 
 **Anti-recurrence:** Why not caught previously — unit tests mocked the service so RLS was never exercised; no integration test ran against real DB with RLS enabled; security tests checked schema existence but not code usage of `withTenantContext()`. The new canary tests scan source code to ensure all DB-accessing service methods use `withTenantContext()`.
+
+---
+
+## ✅ BUG-119 — enriched-lesson.service Hardcodes youtubeVideoId: null (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🟡 Medium
+- **Files Changed:** `apps/subgraph-content/src/enriched-lesson/enriched-lesson.service.ts`, `apps/subgraph-content/src/enriched-lesson/enriched-lesson.service.spec.ts`
+- **Related:** BUG-117, BUG-118 (same video player black screen root cause cluster)
+
+**Problem:** `getEnrichedLesson()` returned `youtubeVideoId: null` hardcoded in its response object instead of reading the actual value from the database. The video player always received `null` for the YouTube video ID, causing a permanent black screen on enriched lesson pages.
+
+**Root Cause:** The service method was written with a `youtubeVideoId: null` placeholder during initial scaffolding of the enriched lesson feature. The DB join needed to resolve the actual YouTube video ID (stored in `media_assets` via `lesson_assets`) was never implemented.
+
+**Solution:** Added a `fetchYoutubeVideoId(lessonId: string)` private method to the service. It joins `lesson_assets` and `media_assets` tables using Drizzle ORM to retrieve the `youtube_video_id` column and returns it (or `null` if no YouTube asset exists). The `getEnrichedLesson()` method now awaits this call and maps the result into the response.
+
+**Tests:** 8 new unit tests added to `enriched-lesson.service.spec.ts` covering: video ID resolved from DB, returns null when no YouTube asset, handles lesson with multiple asset types, handles DB error gracefully, correct join conditions, correct column mapping, idempotent on repeated calls, and TypeScript type safety of return value.
+
+**Anti-recurrence:** Placeholder `null` values in service responses that depend on DB data must never be left in merged code. New service methods that return DB-sourced fields must have a test asserting the field is non-null when the row exists.
+
+---
+
+## ✅ BUG-118 — contentItem Resolver Doesn't Handle Lesson IDs (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🔴 High
+- **Files Changed:** `apps/subgraph-content/src/content-item/content-item.service.ts`, `apps/subgraph-content/src/content-item/content-item.service.spec.ts`
+- **Related:** BUG-117, BUG-119 (same video player black screen root cause cluster)
+
+**Problem:** The `/learn/:contentId` route passes the lesson ID as the `id` argument to the `contentItem(id)` GraphQL query. However, the resolver's `findById()` method only queried the `content_items` table. Lesson IDs exist in the `lessons` table — not in `content_items` — so the lookup returned `null`. The frontend received a null content item, yielding a black video player with no error shown.
+
+**Root Cause:** The `contentItem` resolver was designed around the `content_items` entity but the routing layer navigates using lesson IDs, which are a different entity stored in the `lessons` table with associated assets stored in `lesson_assets` and `media_assets`. No fallback lookup existed to bridge the two ID spaces.
+
+**Solution:** Added a fallback path in `findById()`: when the initial `content_items` query returns no result, the method executes a secondary query that joins `lessons` → `lesson_assets` → `media_assets` and maps the result to a `ContentItem` shape compatible with the resolver's return type. The fallback is transparent to the caller — they receive a properly shaped `ContentItem` object regardless of whether the ID originated from `content_items` or `lessons`.
+
+**Tests:** 3 new test cases added: (1) returns content item when ID matches `content_items`, (2) falls back to lesson JOIN and returns mapped item when ID matches `lessons`, (3) returns `null` when ID exists in neither table.
+
+**Anti-recurrence:** Route parameters that may refer to entities across multiple tables must be documented in the resolver or service. The `contentItem(id)` query contract should note that IDs may be either content item IDs or lesson IDs. Consider a unified ID resolver utility to avoid ad-hoc fallback chains in future services.
+
+---
+
+## ✅ BUG-117 — useContentData Reads youtubeVideoId from Non-Existent mediaAsset Field (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🔴 High
+- **Files Changed:** `apps/web/src/hooks/useContentData.ts`, `apps/web/src/hooks/useContentData.test.ts`
+- **Related:** BUG-118, BUG-119 (same video player black screen root cause cluster)
+
+**Problem:** The `useContentData` hook derived the YouTube video ID by accessing `item?.mediaAsset?.youtubeVideoId`. The `ContentItem` GraphQL type has no `mediaAsset` field — the expression always evaluated to `undefined`. The video player received no video ID, displaying a black screen.
+
+**Root Cause:** The `mediaAsset` field path was copied from an older schema draft or a different entity type. The actual `ContentItem` GraphQL type stores the YouTube video ID directly in the `content` string field when `contentType === 'YOUTUBE'`. The hook was never updated to reflect the final schema.
+
+**Solution:** Updated the derivation logic to check `item.contentType === 'YOUTUBE'` and read the video ID from `item.content` in that case. All other `contentType` values continue to use their existing derivation paths unchanged.
+
+**Tests:** 3 regression tests added to `useContentData.test.ts`: (1) returns `content` value as video ID when `contentType === 'YOUTUBE'`, (2) returns `undefined` when `contentType !== 'YOUTUBE'`, (3) handles null/undefined `item` gracefully without throwing.
+
+**Anti-recurrence:** When the GraphQL schema changes, all field access paths in hooks and components that reference the changed type must be audited. TypeScript strict mode should catch `mediaAsset` as a non-existent property — this indicates a type mismatch was suppressed. Future schema changes to `ContentItem` must include a search for all consumer hooks reading from the type.
 
 ---
 

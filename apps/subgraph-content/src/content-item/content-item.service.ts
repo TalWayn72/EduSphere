@@ -10,8 +10,10 @@ import {
   createDatabaseConnection,
   schema,
   eq,
+  and,
   asc,
   inArray,
+  isNull,
   closeAllPools,
   withReadReplica,
 } from '@edusphere/db';
@@ -107,12 +109,68 @@ export class ContentItemService implements OnModuleDestroy {
         .limit(1)
     );
 
-    if (!row) {
-      this.logger.warn(`ContentItem not found: ${id}`);
-      throw new NotFoundException(`ContentItem with ID ${id} not found`);
-    }
+    if (row) return this.map(row);
 
-    return this.map(row);
+    // Fallback: the ID may be a lesson ID — look up lessons + lesson_assets + media_assets
+    const lessonRow = await this.findLessonAsContentItem(id);
+    if (lessonRow) return lessonRow;
+
+    this.logger.warn(`ContentItem not found: ${id}`);
+    throw new NotFoundException(`ContentItem with ID ${id} not found`);
+  }
+
+  /**
+   * Fallback for lesson IDs passed to contentItem(id).
+   * Joins lessons → lesson_assets → media_assets to build a ContentItemMapped.
+   */
+  private async findLessonAsContentItem(
+    id: string
+  ): Promise<ContentItemMapped | null> {
+    const rows = await withReadReplica((db) =>
+      db
+        .select({
+          id: schema.lessons.id,
+          moduleId: schema.lessons.module_id,
+          title: schema.lessons.title,
+          youtubeVideoId: schema.media_assets.youtube_video_id,
+          duration: schema.media_assets.duration,
+          createdAt: schema.lessons.created_at,
+          updatedAt: schema.lessons.updated_at,
+        })
+        .from(schema.lessons)
+        .leftJoin(
+          schema.lesson_assets,
+          eq(schema.lesson_assets.lesson_id, schema.lessons.id)
+        )
+        .leftJoin(
+          schema.media_assets,
+          eq(schema.media_assets.id, schema.lesson_assets.media_asset_id)
+        )
+        .where(
+          and(
+            eq(schema.lessons.id, id),
+            isNull(schema.lessons.deleted_at)
+          )
+        )
+        .limit(1)
+    );
+
+    const r = rows[0];
+    if (!r) return null;
+
+    this.logger.debug(`ContentItem fallback resolved lesson: ${id}`);
+    return {
+      id: r.id,
+      moduleId: r.moduleId ?? '',
+      title: r.title,
+      contentType: r.youtubeVideoId ? 'YOUTUBE' : 'VIDEO',
+      content: r.youtubeVideoId ?? null,
+      fileId: null,
+      duration: r.duration ?? null,
+      orderIndex: 0,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+    };
   }
 
   async findByIdBatch(ids: string[]): Promise<Map<string, ContentItemMapped>> {

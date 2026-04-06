@@ -11,6 +11,9 @@
  *  7. validateMicrolessonIfNeeded() throws BadRequestException for invalid JSON.
  *  8. validateMicrolessonIfNeeded() throws BadRequestException when durationSeconds exceeds 420.
  *  9. onModuleDestroy() calls closeAllPools().
+ * 10. findById() falls back to lesson table when no content_item found (BUG-118).
+ * 11. findById() lesson fallback returns YOUTUBE contentType with bare youtubeVideoId as content.
+ * 12. findById() throws NotFoundException when neither content_item nor lesson exists.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
@@ -25,6 +28,7 @@ const mockSelectBuilder = {
   where: vi.fn().mockReturnThis(),
   limit: vi.fn().mockReturnThis(),
   orderBy: vi.fn().mockReturnThis(),
+  leftJoin: vi.fn().mockReturnThis(),
 };
 
 const mockDb = {
@@ -42,9 +46,28 @@ vi.mock('@edusphere/db', () => ({
       type: 'type',
       orderIndex: 'orderIndex',
     },
+    lessons: {
+      id: 'lessons.id',
+      module_id: 'lessons.module_id',
+      title: 'lessons.title',
+      created_at: 'lessons.created_at',
+      updated_at: 'lessons.updated_at',
+      deleted_at: 'lessons.deleted_at',
+    },
+    lesson_assets: {
+      lesson_id: 'lesson_assets.lesson_id',
+      media_asset_id: 'lesson_assets.media_asset_id',
+    },
+    media_assets: {
+      id: 'media_assets.id',
+      youtube_video_id: 'media_assets.youtube_video_id',
+      duration: 'media_assets.duration',
+    },
   },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
+  and: vi.fn((...args: unknown[]) => ({ args, op: 'and' })),
   asc: vi.fn((col: unknown) => ({ col, dir: 'asc' })),
+  isNull: vi.fn((col: unknown) => ({ col, op: 'isNull' })),
   inArray: vi.fn((col: unknown, vals: unknown) => ({
     col,
     vals,
@@ -215,5 +238,62 @@ describe('ContentItemService', () => {
     await service.onModuleDestroy();
 
     expect(mockCloseAllPools).toHaveBeenCalledTimes(1);
+  });
+
+  // ── Test 10 — BUG-118 ───────────────────────────────────────────────────────
+  it('findById() should fall back to lessons table when no content_item found', async () => {
+    // First call (contentItems) → empty
+    mockSelectBuilder.limit.mockResolvedValueOnce([]);
+    // Second call (lessons fallback) → lesson row
+    const lessonRow = {
+      id: 'lesson-uuid-1',
+      moduleId: 'module-uuid-1',
+      title: 'עץ חיים — צמצום',
+      youtubeVideoId: 'K6d8hqTqKyA',
+      duration: 400,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+    mockSelectBuilder.limit.mockResolvedValueOnce([lessonRow]);
+
+    const result = await service.findById('lesson-uuid-1');
+
+    expect(result.id).toBe('lesson-uuid-1');
+    expect(result.contentType).toBe('YOUTUBE');
+    expect(result.title).toBe('עץ חיים — צמצום');
+    expect(result.duration).toBe(400);
+  });
+
+  // ── Test 11 — BUG-118 ───────────────────────────────────────────────────────
+  it('findById() lesson fallback returns bare youtubeVideoId as content and YOUTUBE contentType', async () => {
+    mockSelectBuilder.limit.mockResolvedValueOnce([]);
+    const lessonRow = {
+      id: 'lesson-uuid-2',
+      moduleId: 'module-uuid-2',
+      title: 'Test Lesson',
+      youtubeVideoId: 'K6d8hqTqKyA',
+      duration: 300,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+    mockSelectBuilder.limit.mockResolvedValueOnce([lessonRow]);
+
+    const result = await service.findById('lesson-uuid-2');
+
+    expect(result.contentType).toBe('YOUTUBE');
+    expect(result.content).toBe('K6d8hqTqKyA');
+    expect(result.fileId).toBeNull();
+    expect(result.orderIndex).toBe(0);
+  });
+
+  // ── Test 12 — BUG-118 ───────────────────────────────────────────────────────
+  it('findById() throws NotFoundException when neither content_item nor lesson exists', async () => {
+    // Both calls return empty
+    mockSelectBuilder.limit.mockResolvedValueOnce([]);
+    mockSelectBuilder.limit.mockResolvedValueOnce([]);
+
+    await expect(service.findById('nonexistent-uuid')).rejects.toThrow(
+      NotFoundException
+    );
   });
 });

@@ -57,18 +57,15 @@ describe('useContentData', () => {
     ]);
   });
 
-  it('returns real item data when query succeeds', () => {
+  it('returns title and mock video url when contentItem has no content field', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
           contentItem: {
             id: 'ci-1',
             title: 'My Video',
-            mediaAsset: {
-              id: 'ma-1',
-              url: 'http://real.mp4',
-              hlsManifestUrl: 'http://real.m3u8',
-            },
+            contentType: 'VIDEO',
+            content: null,
             transcript: {
               segments: [{ id: 't1', startTime: 1, endTime: 3, text: 'World' }],
             },
@@ -77,12 +74,72 @@ describe('useContentData', () => {
       })
     );
     const { result } = renderHook(() => useContentData('ci-1'));
-    expect(result.current.videoUrl).toBe('http://real.mp4');
+    expect(result.current.videoUrl).toBe('http://mock.mp4');
     expect(result.current.videoTitle).toBe('My Video');
-    expect(result.current.hlsManifestUrl).toBe('http://real.m3u8');
+    expect(result.current.hlsManifestUrl).toBeNull();
     expect(result.current.transcript).toEqual([
       { id: 't1', startTime: 1, endTime: 3, text: 'World' },
     ]);
+  });
+
+  it('returns content field as videoUrl for non-YOUTUBE items', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-4',
+            title: 'Direct Video',
+            contentType: 'VIDEO',
+            content: 'http://cdn.example.com/video.mp4',
+            transcript: null,
+          },
+        },
+      })
+    );
+    const { result } = renderHook(() => useContentData('ci-4'));
+    expect(result.current.videoUrl).toBe('http://cdn.example.com/video.mp4');
+    expect(result.current.youtubeVideoId).toBeNull();
+    expect(result.current.isYouTubeContent).toBe(false);
+  });
+
+  it('extracts youtubeVideoId from content field for YOUTUBE contentType', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-yt-1',
+            title: 'YouTube Lesson',
+            contentType: 'YOUTUBE',
+            content: 'dQw4w9WgXcQ',
+            transcript: null,
+          },
+        },
+      })
+    );
+    const { result } = renderHook(() => useContentData('ci-yt-1'));
+    expect(result.current.youtubeVideoId).toBe('dQw4w9WgXcQ');
+    expect(result.current.isYouTubeContent).toBe(true);
+    // videoUrl falls back to mock for YouTube items (player uses youtubeVideoId directly)
+    expect(result.current.videoUrl).toBe('http://mock.mp4');
+  });
+
+  it('returns isYouTubeContent=false when contentType is YOUTUBE but content is null', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-yt-2',
+            title: 'Broken YouTube',
+            contentType: 'YOUTUBE',
+            content: null,
+            transcript: null,
+          },
+        },
+      })
+    );
+    const { result } = renderHook(() => useContentData('ci-yt-2'));
+    expect(result.current.youtubeVideoId).toBeNull();
+    expect(result.current.isYouTubeContent).toBe(false);
   });
 
   it('pauses query when contentId is empty string', () => {
@@ -106,7 +163,8 @@ describe('useContentData', () => {
           contentItem: {
             id: 'c1',
             title: 'T',
-            mediaAsset: null,
+            contentType: 'VIDEO',
+            content: null,
             transcript: null,
           },
         },
@@ -131,7 +189,8 @@ describe('useContentData', () => {
           contentItem: {
             id: 'ci-2',
             title: 'Mapped',
-            mediaAsset: { id: 'ma-2', url: 'http://x.mp4' },
+            contentType: 'VIDEO',
+            content: 'http://x.mp4',
             transcript: {
               segments: [
                 {
@@ -159,18 +218,15 @@ describe('useContentData', () => {
     });
   });
 
-  it('hlsManifestUrl is null when mediaAsset has no hls url', () => {
+  it('hlsManifestUrl is always null (not yet in supergraph ContentItem schema)', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
           contentItem: {
             id: 'ci-3',
             title: 'NoHLS',
-            mediaAsset: {
-              id: 'ma-3',
-              url: 'http://plain.mp4',
-              hlsManifestUrl: null,
-            },
+            contentType: 'VIDEO',
+            content: 'http://plain.mp4',
             transcript: null,
           },
         },

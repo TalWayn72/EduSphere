@@ -101,14 +101,29 @@ export class EnrichedLessonService implements OnModuleDestroy {
     await this.findLessonOrThrow(lessonId, tenantCtx);
     const blocks = await this.getBlocks(lessonId, tenantCtx);
     const hasBlocks = blocks.length > 0;
+    const youtubeVideoId = await this.fetchYoutubeVideoId(lessonId);
 
     return {
       id: lessonId,
       lessonId,
-      youtubeVideoId: null,
+      youtubeVideoId,
       transcriptReady: hasBlocks,
       enrichmentStatus: hasBlocks ? 'READY' : 'PENDING',
     };
+  }
+
+  /** Fetch youtube_video_id from lesson_assets → media_assets join. */
+  private async fetchYoutubeVideoId(lessonId: string): Promise<string | null> {
+    const rows = await this.db
+      .select({ youtubeVideoId: schema.media_assets.youtube_video_id })
+      .from(schema.lesson_assets)
+      .innerJoin(
+        schema.media_assets,
+        eq(schema.lesson_assets.media_asset_id, schema.media_assets.id)
+      )
+      .where(eq(schema.lesson_assets.lesson_id, lessonId))
+      .limit(1);
+    return rows[0]?.youtubeVideoId ?? null;
   }
 
   /** Get enriched transcript blocks for a lesson, ordered by block_order. */
@@ -216,11 +231,12 @@ export class EnrichedLessonService implements OnModuleDestroy {
       timestamp: new Date().toISOString(),
     });
 
+    const youtubeVideoId = await this.fetchYoutubeVideoId(lessonId);
     this.logger.log(`Enriched lesson published: lesson=${lessonId}`);
     return {
       id: lessonId,
       lessonId,
-      youtubeVideoId: null,
+      youtubeVideoId,
       transcriptReady: true,
       enrichmentStatus: 'PUBLISHED',
     };

@@ -3,6 +3,11 @@
  *
  * Falls back to mock video/transcript when the query errors or returns nothing
  * (e.g. gateway offline in local dev without VITE_DEV_MODE=true).
+ *
+ * YouTube detection: ContentItem with contentType === 'YOUTUBE' stores the
+ * YouTube video ID in the `content` field. The supergraph ContentItem type does
+ * NOT expose a mediaAsset field, so youtubeVideoId is derived from content
+ * rather than mediaAsset.youtubeVideoId.
  */
 import { useQuery } from 'urql';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
@@ -13,15 +18,6 @@ import {
   TranscriptSegment,
 } from '@/lib/mock-content-data';
 
-interface MediaAsset {
-  id: string;
-  url: string;
-  duration?: number | null;
-  thumbnailUrl?: string | null;
-  hlsManifestUrl?: string | null;
-  youtubeVideoId?: string | null;
-}
-
 interface TranscriptSegmentRaw {
   id: string;
   startTime: number;
@@ -31,17 +27,20 @@ interface TranscriptSegmentRaw {
   speakerId?: string | null;
 }
 
+/**
+ * Shape returned by CONTENT_ITEM_QUERY.
+ * NOTE: ContentItem in the supergraph schema does not have a mediaAsset field.
+ * youtubeVideoId is derived from the `content` field when contentType is 'YOUTUBE'.
+ */
 interface ContentItemData {
   id: string;
   title: string;
-  description?: string | null;
-  mediaAsset?: MediaAsset | null;
+  contentType?: string | null;
+  /** For YOUTUBE items: stores the YouTube video ID. For others: lesson body/url. */
+  content?: string | null;
   transcript?: { segments: TranscriptSegmentRaw[] } | null;
 }
 
-// NOTE: The generated ContentItemQuery type does not include mediaAsset or
-// transcript fields — those are not yet exposed in the supergraph schema.
-// Keeping the local interface until the schema is updated.
 interface ContentQueryResult {
   contentItem?: ContentItemData | null;
 }
@@ -70,11 +69,16 @@ export function useContentData(contentId: string): ContentData {
   const item = result.data?.contentItem;
   const hasError = !!result.error && !item;
 
-  const youtubeVideoId = item?.mediaAsset?.youtubeVideoId ?? null;
+  // YouTube video ID is stored in the `content` field for YOUTUBE-type items.
+  const youtubeVideoId =
+    item?.contentType === 'YOUTUBE' && item.content ? item.content : null;
   const isYouTubeContent = !!youtubeVideoId;
 
-  const videoUrl = item?.mediaAsset?.url ?? mockVideo.url;
-  const hlsManifestUrl = item?.mediaAsset?.hlsManifestUrl ?? null;
+  // For hosted video items, `content` may hold a direct URL; fall back to mock.
+  const videoUrl =
+    (!isYouTubeContent && item?.content) ? item.content : mockVideo.url;
+  // HLS manifests are not yet surfaced on ContentItem — always null until schema is extended.
+  const hlsManifestUrl: string | null = null;
   const videoTitle = item?.title ?? mockVideo.title;
 
   const transcript: TranscriptSegment[] =
