@@ -977,6 +977,7 @@ export type CourseReadiness = {
 
 export type CourseReadinessCheck = {
   __typename?: 'CourseReadinessCheck';
+  id: Scalars['ID']['output'];
   message?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   passed: Scalars['Boolean']['output'];

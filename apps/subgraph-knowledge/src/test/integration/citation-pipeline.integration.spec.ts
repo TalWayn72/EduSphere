@@ -190,8 +190,8 @@ describe('Citation Pipeline — Full Integration', () => {
       });
 
       // Check if this segment has a citation
+      // eslint-disable-next-line security/detect-object-injection
       const citation = NER_RESPONSE.citations.find(
-        // eslint-disable-next-line security/detect-object-injection
         (c) => TRANSCRIPT_SEGMENTS[c.segmentIndex]?.id === segment.id
       );
 

@@ -60,7 +60,9 @@ async function bootstrapExtensions(pool: Pool): Promise<void> {
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     CREATE EXTENSION IF NOT EXISTS "vector";
   `);
-  process.stderr.write('[migrate] PostgreSQL extensions ensured (uuid-ossp, vector).\n');
+  process.stderr.write(
+    '[migrate] PostgreSQL extensions ensured (uuid-ossp, vector).\n'
+  );
 }
 
 async function runMigrations(): Promise<void> {
