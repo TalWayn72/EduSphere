@@ -36,7 +36,7 @@ jobs:
           curl -sL https://github.com/grafana/k6/releases/download/v${{ env.K6_VERSION }}/k6-v${{ env.K6_VERSION }}-linux-amd64.tar.gz | tar xz
           sudo mv k6-v${{ env.K6_VERSION }}-linux-amd64/k6 /usr/local/bin/
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         with:
           version: 10.30.1
 
