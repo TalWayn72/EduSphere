@@ -109,7 +109,7 @@ jobs:
       # ── Build and push ──────────────────────────────────────────────────────
       - name: Build and push Docker image — ${{ matrix.service }}
         id: build-push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: apps/${{ matrix.service }}/Dockerfile

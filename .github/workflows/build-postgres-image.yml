@@ -54,7 +54,7 @@ jobs:
             type=raw,value=pg18-${{ github.sha }}
 
       - name: Build and push image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: infrastructure/docker/postgres-age
           file: infrastructure/docker/postgres-age/Dockerfile
