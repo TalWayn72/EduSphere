@@ -163,8 +163,13 @@ describe('EnrichedLessonService', () => {
       { id: LESSON_ID, courseId: 'c1', tenant_id: TENANT_CTX.tenantId },
     ]);
     // getBlocks → 2 blocks
-    mockSelectBuilder.orderBy.mockResolvedValueOnce([{ id: 'b1' }, { id: 'b2' }]);
-    mockSelectBuilder.limit.mockResolvedValueOnce([{ youtubeVideoId: 'K6d8hqTqKyA' }]);
+    mockSelectBuilder.orderBy.mockResolvedValueOnce([
+      { id: 'b1' },
+      { id: 'b2' },
+    ]);
+    mockSelectBuilder.limit.mockResolvedValueOnce([
+      { youtubeVideoId: 'K6d8hqTqKyA' },
+    ]);
 
     const result = await service.getEnrichedLesson(LESSON_ID, TENANT_CTX);
 
@@ -201,7 +206,9 @@ describe('EnrichedLessonService', () => {
       { id: LESSON_ID, courseId: 'c1', tenant_id: TENANT_CTX.tenantId },
     ]);
     mockSelectBuilder.orderBy.mockResolvedValueOnce([]);
-    mockSelectBuilder.limit.mockResolvedValueOnce([{ youtubeVideoId: 'abc123' }]);
+    mockSelectBuilder.limit.mockResolvedValueOnce([
+      { youtubeVideoId: 'abc123' },
+    ]);
 
     await service.getEnrichedLesson(LESSON_ID, TENANT_CTX);
 

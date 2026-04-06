@@ -89,7 +89,9 @@ export function useMediaUpload(
 
     // Guard: courseId must be a real UUID — backend rejects the "draft" placeholder
     if (!courseId || courseId === DRAFT_COURSE_ID) {
-      toast.error('Please complete course details first before uploading files.');
+      toast.error(
+        'Please complete course details first before uploading files.'
+      );
       return;
     }
 

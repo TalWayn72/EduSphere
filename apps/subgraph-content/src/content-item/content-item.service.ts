@@ -147,10 +147,7 @@ export class ContentItemService implements OnModuleDestroy {
           eq(schema.media_assets.id, schema.lesson_assets.media_asset_id)
         )
         .where(
-          and(
-            eq(schema.lessons.id, id),
-            isNull(schema.lessons.deleted_at)
-          )
+          and(eq(schema.lessons.id, id), isNull(schema.lessons.deleted_at))
         )
         .limit(1)
     );

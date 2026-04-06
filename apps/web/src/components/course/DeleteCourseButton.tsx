@@ -62,9 +62,7 @@ export function DeleteCourseButton({
                 {button}
               </span>
             </TooltipTrigger>
-            <TooltipContent>
-              {t('deleteCourseNoPermission')}
-            </TooltipContent>
+            <TooltipContent>{t('deleteCourseNoPermission')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       )}

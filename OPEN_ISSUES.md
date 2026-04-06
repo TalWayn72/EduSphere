@@ -26,16 +26,16 @@
 
 ### ✅ Fixed (6 Apr 2026 Session)
 
-| ID      | Issue                                                                                                                                                  | Fixed In   |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| BUG-119 | enriched-lesson.service hardcodes `youtubeVideoId: null` — actual ID never read from DB (video player black screen)                                    | 6 Apr 2026 |
-| BUG-118 | `contentItem` resolver doesn't handle lesson IDs — resolver only queries `content_items`, lesson IDs live in `lessons` table → returns null            | 6 Apr 2026 |
-| BUG-117 | `useContentData` reads `youtubeVideoId` from non-existent `mediaAsset` field — must derive from `content` field when `contentType === 'YOUTUBE'`       | 6 Apr 2026 |
-| BUG-116 | CourseReadinessCheck missing `id` field — urql could not cache type, SDL + service updated                                                             | 6 Apr 2026 |
-| BUG-115 | Concepts resolver returns null for non-nullable fields — Apache AGE omits absent vertex properties                                                     | 6 Apr 2026 |
-| BUG-114 | Knowledge Graph "Failed to load graph" — `_refresh` variable not in schema, gateway rejected query                                                     | 6 Apr 2026 |
-| BUG-113 | WebSocket reconnection flood — rapid reconnection attempts to ws://localhost:4000/graphql                                                              | 6 Apr 2026 |
-| BUG-112 | urql cache key warnings for CourseReadinessCheck — 20 types without `id` fields missing key resolvers                                                 | 6 Apr 2026 |
+| ID      | Issue                                                                                                                                            | Fixed In   |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| BUG-119 | enriched-lesson.service hardcodes `youtubeVideoId: null` — actual ID never read from DB (video player black screen)                              | 6 Apr 2026 |
+| BUG-118 | `contentItem` resolver doesn't handle lesson IDs — resolver only queries `content_items`, lesson IDs live in `lessons` table → returns null      | 6 Apr 2026 |
+| BUG-117 | `useContentData` reads `youtubeVideoId` from non-existent `mediaAsset` field — must derive from `content` field when `contentType === 'YOUTUBE'` | 6 Apr 2026 |
+| BUG-116 | CourseReadinessCheck missing `id` field — urql could not cache type, SDL + service updated                                                       | 6 Apr 2026 |
+| BUG-115 | Concepts resolver returns null for non-nullable fields — Apache AGE omits absent vertex properties                                               | 6 Apr 2026 |
+| BUG-114 | Knowledge Graph "Failed to load graph" — `_refresh` variable not in schema, gateway rejected query                                               | 6 Apr 2026 |
+| BUG-113 | WebSocket reconnection flood — rapid reconnection attempts to ws://localhost:4000/graphql                                                        | 6 Apr 2026 |
+| BUG-112 | urql cache key warnings for CourseReadinessCheck — 20 types without `id` fields missing key resolvers                                            | 6 Apr 2026 |
 
 ### ✅ Fixed (31 Mar 2026 Session)
 

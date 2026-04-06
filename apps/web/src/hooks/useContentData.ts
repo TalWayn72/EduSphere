@@ -76,7 +76,7 @@ export function useContentData(contentId: string): ContentData {
 
   // For hosted video items, `content` may hold a direct URL; fall back to mock.
   const videoUrl =
-    (!isYouTubeContent && item?.content) ? item.content : mockVideo.url;
+    !isYouTubeContent && item?.content ? item.content : mockVideo.url;
   // HLS manifests are not yet surfaced on ContentItem — always null until schema is extended.
   const hlsManifestUrl: string | null = null;
   const videoTitle = item?.title ?? mockVideo.title;
