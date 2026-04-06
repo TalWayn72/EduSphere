@@ -104,6 +104,7 @@ export default [
         FileList: 'readonly',
         requestAnimationFrame: 'readonly',
         cancelAnimationFrame: 'readonly',
+        queueMicrotask: 'readonly',
         MediaQueryList: 'readonly',
         IntersectionObserverCallback: 'readonly',
         IntersectionObserverInit: 'readonly',
