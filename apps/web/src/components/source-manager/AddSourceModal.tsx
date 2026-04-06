@@ -219,7 +219,7 @@ export function AddSourceModal({
               {isReading && (
                 <div className="mt-1" data-testid="file-read-progress">
                   <Progress value={progress} className="h-2" />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {t('sources.readingFile', { progress })}
                   </p>
                 </div>

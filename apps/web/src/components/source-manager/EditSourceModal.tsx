@@ -149,11 +149,11 @@ export function EditSourceModal({
             <button
               onClick={handleSave}
               disabled={busy}
-              className="flex items-center gap-2 px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-500"
+              className="flex items-center gap-2 px-5 py-2 text-sm bg-blue-600 text-white dark:text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-500"
               data-testid="edit-source-save-btn"
             >
               {busy && (
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="w-3.5 h-3.5 border-2 border-white dark:border-white border-t-transparent rounded-full animate-spin" />
               )}
               {busy ? t('sources.saving', 'Saving...') : t('sources.save', 'Save')}
             </button>

@@ -17,6 +17,7 @@ import { useFileReadProgress } from './useFileReadProgress';
 
 let capturedOnLoad: (() => void) | null = null;
 let capturedOnError: (() => void) | null = null;
+// eslint-disable-next-line no-undef
 let capturedOnProgress: ((e: Partial<ProgressEvent>) => void) | null = null;
 let mockResult: string = 'data:application/pdf;base64,SGVsbG8=';
 let mockError: DOMException | null = null;
@@ -26,6 +27,7 @@ class MockFileReader {
   error: DOMException | null = null;
   onload: (() => void) | null = null;
   onerror: (() => void) | null = null;
+  // eslint-disable-next-line no-undef
   onprogress: ((e: Partial<ProgressEvent>) => void) | null = null;
 
   readAsDataURL(_file: File) {

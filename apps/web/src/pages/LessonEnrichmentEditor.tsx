@@ -110,7 +110,7 @@ export function LessonEnrichmentEditor() {
           )}
           {data?.enrichmentStatus && !TERMINAL_STATUSES.has(data.enrichmentStatus) && (
             <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-              <span className="h-3.5 w-3.5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <span className="h-3.5 w-3.5 border-2 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
               <span>{PROCESSING_STATUS_LABELS[data.enrichmentStatus] ?? data.enrichmentStatus}</span>
             </div>
           )}
