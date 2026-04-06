@@ -21,6 +21,8 @@ import {
 } from '@edusphere/db';
 
 interface CourseReadinessCheck {
+  /** Stable ID for urql normalized cache — same as the check name. */
+  id: string;
   name: string;
   passed: boolean;
   message: string | null;
@@ -51,11 +53,13 @@ export class CoursePublishService {
       !!course['description'] &&
       String(course['description']).trim().length > 0;
     checks.push({
+      id: 'has_title',
       name: 'has_title',
       passed: hasTitle,
       message: hasTitle ? null : 'Course must have a title',
     });
     checks.push({
+      id: 'has_description',
       name: 'has_description',
       passed: hasDesc,
       message: hasDesc ? null : 'Course must have a description',
@@ -74,6 +78,7 @@ export class CoursePublishService {
     );
     const hasLessons = lessons.length > 0;
     checks.push({
+      id: 'has_lessons',
       name: 'has_lessons',
       passed: hasLessons,
       message: hasLessons ? null : 'Course must have at least one lesson',
@@ -86,6 +91,7 @@ export class CoursePublishService {
         return s === 'READY' || s === 'PUBLISHED';
       });
     checks.push({
+      id: 'lessons_ready',
       name: 'lessons_ready',
       passed: allReady,
       message: allReady
@@ -113,6 +119,7 @@ export class CoursePublishService {
       }
     }
     checks.push({
+      id: 'has_pipeline_results',
       name: 'has_pipeline_results',
       passed: hasPipelineResults,
       message: hasPipelineResults

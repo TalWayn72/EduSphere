@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 5 April 2026 (Semantic-Enriched Lesson Creation — Phases 1-5 complete, integration testing)
+**Last Updated:** 6 April 2026 (Knowledge Graph bugs BUG-112 through BUG-116 fixed)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -23,6 +23,16 @@
 | FEAT-SEMANTIC-LESSON-CREATION | Semantic-Enriched Lesson Creation — Phases 1-5 complete, integration testing phase                           | 5 Apr 2026  |
 | FEAT-API-MUTATIONS            | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
 | FEAT-AGENT-SANDBOX            | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026 |
+
+### ✅ Fixed (6 Apr 2026 Session)
+
+| ID      | Issue                                                                                                         | Fixed In   |
+| ------- | ------------------------------------------------------------------------------------------------------------- | ---------- |
+| BUG-116 | CourseReadinessCheck missing `id` field — urql could not cache type, SDL + service updated                    | 6 Apr 2026 |
+| BUG-115 | Concepts resolver returns null for non-nullable fields — Apache AGE omits absent vertex properties             | 6 Apr 2026 |
+| BUG-114 | Knowledge Graph "Failed to load graph" — `_refresh` variable not in schema, gateway rejected query            | 6 Apr 2026 |
+| BUG-113 | WebSocket reconnection flood — rapid reconnection attempts to ws://localhost:4000/graphql                      | 6 Apr 2026 |
+| BUG-112 | urql cache key warnings for CourseReadinessCheck — 20 types without `id` fields missing key resolvers         | 6 Apr 2026 |
 
 ### ✅ Fixed (31 Mar 2026 Session)
 
@@ -394,6 +404,96 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Tests:** 12 regression tests added (6 unit + 6 static security canary tests).
 
 **Anti-recurrence:** Why not caught previously — unit tests mocked the service so RLS was never exercised; no integration test ran against real DB with RLS enabled; security tests checked schema existence but not code usage of `withTenantContext()`. The new canary tests scan source code to ensure all DB-accessing service methods use `withTenantContext()`.
+
+---
+
+## ✅ BUG-116 — CourseReadinessCheck Missing id Field (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🟡 Medium
+- **Files Changed:** `apps/subgraph-content/src/course/course.graphql`, `apps/subgraph-content/dist/course/course.graphql`, `apps/gateway/supergraph.graphql`, `apps/subgraph-content/src/course/course-publish.service.ts`
+
+**Problem:** The `CourseReadinessCheck` GraphQL type had no `id` field. urql graphcache could not cache objects of this type, generating warnings and causing stale/broken cache behavior on the course publish panel.
+
+**Root Cause:** The SDL definition for `CourseReadinessCheck` was created without an `id` field. urql's graphcache requires every cacheable type to have a unique key — by convention `id: ID!`. Without it, urql falls back to printing a warning and treating the object as uncacheable.
+
+**Solution:** Added `id: ID!` to the `CourseReadinessCheck` SDL type definition in both the subgraph SDL and the composed supergraph. Populated the field in `course-publish.service.ts` with a deterministic check name string (e.g., `"check:has-content"`) so it is stable across fetches.
+
+**Tests:** 40 new tests covering the readiness check SDL contract and cache key resolution.
+
+**Anti-recurrence:** All future value-object types that appear in GraphQL responses must include `id: ID!` or be explicitly registered with `() => null` key resolvers in the urql client configuration.
+
+---
+
+## ✅ BUG-115 — Concepts Resolver Returns Null for Non-Nullable Fields (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🔴 Critical
+- **File Changed:** `apps/subgraph-knowledge/src/graph/graph-concept.service.ts`
+
+**Problem:** The `concepts` GraphQL query returned a GraphQL execution error: `Cannot return null for non-nullable field Concept.id` (and similarly for `tenantId`, `name`, `definition`). The Knowledge Graph page displayed a critical error banner instead of the graph.
+
+**Root Cause:** `mapConcept()` in `graph-concept.service.ts` mapped optional Apache AGE vertex properties directly to the SDL-declared `String!` (non-nullable) fields. Apache AGE omits properties from vertex results when the property was never set during node creation, returning `undefined` instead of an empty string — violating the GraphQL non-nullable contract.
+
+**Solution:** Added `?? ''` null-coalescing fallbacks for `id`, `tenantId`, `name`, and `definition` in `mapConcept()`. This satisfies the non-nullable SDL contract while Apache AGE graph nodes are being populated progressively.
+
+**Anti-recurrence:** Any future `mapX()` function that reads Apache AGE vertex properties into non-nullable SDL fields must use `?? ''` or equivalent fallbacks. Added a code review checklist item for Apache AGE property mapping.
+
+---
+
+## ✅ BUG-114 — Knowledge Graph "Failed to Load Graph" (_refresh Variable) (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🔴 Critical
+- **File Changed:** `apps/web/src/pages/knowledge-graph/use-graph-data.ts`
+
+**Problem:** The Knowledge Graph page always displayed "Failed to load graph". Every query request was rejected by the gateway with a 400 Bad Request.
+
+**Root Cause:** `useQuery` in `use-graph-data.ts` passed `_refresh: refreshKey` as a GraphQL variable, intended as a cache-busting trick. However, the `concepts(limit: Int)` schema definition has no `_refresh` argument. The gateway's strict input validation rejected any query that passed an undeclared variable, returning 400 for every request.
+
+**Solution:** Removed the `_refresh` variable from the query variables entirely. Cache busting is now handled correctly by passing `requestPolicy: 'network-only'` to `useQuery`, which forces a fresh network fetch without injecting invalid variables into the GraphQL operation.
+
+**Tests:** Regression test added to verify the query no longer sends `_refresh` and that `requestPolicy: 'network-only'` is applied on refresh.
+
+**Anti-recurrence:** GraphQL variables must always correspond to declared query arguments. Cache-busting via fake variables is an anti-pattern — use `requestPolicy: 'network-only'` or urql's `pause`/`resume` pattern instead.
+
+---
+
+## ✅ BUG-113 — WebSocket Reconnection Flood (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🟡 Medium
+- **File Changed:** `apps/web/src/lib/urql-client.ts`
+
+**Problem:** WebSocket connections to `ws://localhost:4000/graphql` failed repeatedly with rapid reconnection attempts. Browser DevTools showed dozens of failed WS connection attempts per second, flooding the console and degrading performance.
+
+**Root Cause:** The urql WebSocket exchange was configured without reconnection limits. When the gateway WebSocket endpoint was unavailable (e.g., during startup or when not needed), the client retried immediately and infinitely, creating a connection flood.
+
+**Solution:**
+
+- Added `lazy: true` to the WebSocket client — connections are only opened when a subscription is actually active, not eagerly on page load.
+- Added a `shouldRetry` callback capped at 5 attempts — after 5 consecutive failures the client stops retrying and waits for the next user interaction.
+- Added a safe fallback URL to prevent crashes when `VITE_GRAPHQL_WS_URL` is undefined.
+
+**Anti-recurrence:** All WebSocket clients must be configured with `lazy: true` and bounded retry logic. Unbounded reconnection loops are a resource exhaustion risk.
+
+---
+
+## ✅ BUG-112 — urql Cache Key Warnings for CourseReadinessCheck (6 Apr 2026)
+
+- **Status:** ✅ Fixed — 6 Apr 2026
+- **Severity:** 🟡 Medium
+- **File Changed:** `apps/web/src/lib/urql-client.ts`
+
+**Problem:** urql graphcache logged warnings for 20 GraphQL types that lack `id` fields: `CourseReadinessCheck`, `RelatedConcept`, `ConceptNode`, and 17 others. These warnings indicated that urql could not generate stable cache keys for these types, causing silent cache misses and potential stale data rendering.
+
+**Root Cause:** urql graphcache requires every object type to either have an `id` field (or a custom key resolver). Value objects and result types that are intentionally non-identifiable (no natural `id`) were not registered in the cache configuration, so urql fell back to warning and treating them as uncacheable.
+
+**Solution:** Added explicit `() => null` key resolvers for all 20 affected types in the `cacheExchange` configuration in `urql-client.ts`. The `() => null` resolver tells urql that these types are intentionally non-identifiable embedded value objects — cache them inline within their parent, no warning.
+
+**Tests:** 40 new tests verifying the key resolver configuration covers all 20 types and that no cache key warnings are emitted.
+
+**Anti-recurrence:** When adding new GraphQL types that are value objects (no natural `id`), register them in the urql client `keys` configuration with `() => null` immediately. Document this in the urql client configuration file with a comment.
 
 ---
 

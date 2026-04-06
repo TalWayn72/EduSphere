@@ -226,6 +226,54 @@ describe('GraphConceptService', () => {
     });
   });
 
+  // ── Regression: mapConcept must not return null for non-nullable SDL fields ──
+  describe('mapConcept() — null-safe non-nullable fields regression', () => {
+    it('returns empty string for definition when AGE vertex omits it', async () => {
+      const nodeWithoutDefinition = {
+        id: 'concept-2',
+        tenant_id: 'tenant-1',
+        name: 'React',
+        // definition intentionally omitted — AGE may omit absent properties
+        source_ids: '[]',
+        created_at: null,
+        updated_at: null,
+      };
+      mockFindConceptById.mockResolvedValue(nodeWithoutDefinition);
+      const result = await service.findConceptById(
+        'concept-2',
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+      // Must return '' not undefined/null — SDL declares definition: String!
+      expect(result.definition).toBe('');
+      expect(result.name).toBe('React');
+      expect(result.id).toBe('concept-2');
+    });
+
+    it('returns empty strings for all non-nullable fields when node has only partial data', async () => {
+      const sparseNode = {
+        id: 'concept-3',
+        tenant_id: 'tenant-1',
+        name: 'Vue',
+        source_ids: undefined,
+        created_at: null,
+        updated_at: null,
+        // definition missing
+      };
+      mockFindConceptById.mockResolvedValue(sparseNode);
+      const result = await service.findConceptById(
+        'concept-3',
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+      // Non-nullable String! fields must never be null/undefined
+      expect(result.definition).toBe('');
+      expect(result.sourceIds).toEqual([]);
+    });
+  });
+
   // linkConcepts and findRelatedConcepts live in GraphConceptLinkService.
   // See graph-concept-link.service.spec.ts for those tests.
 });

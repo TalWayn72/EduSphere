@@ -73,9 +73,13 @@ export function useGraphData() {
   }, [toast]);
 
   // ── Real: fetch all concepts ──
+  // BUG-fix: `_refresh` is not a field in the concepts(limit: Int) schema argument
+  // and causes "Cannot return null for non-nullable field" GraphQL errors because
+  // the gateway rejects unknown variables. Cache busting is achieved through
+  // requestPolicy: 'network-only' alone — no extra variable needed.
   const [conceptsResult] = useQuery<{ concepts: ApiConcept[] }>({
     query: GET_CONCEPTS_QUERY,
-    variables: { limit: 50, _refresh: refreshKey },
+    variables: { limit: 50 },
     pause: DEV_MODE,
     requestPolicy: refreshKey > 0 ? 'network-only' : 'cache-first',
   } as Parameters<typeof useQuery>[0]);

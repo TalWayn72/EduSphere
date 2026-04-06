@@ -41,6 +41,11 @@ type User @key(fields: "id") {
 }
 
 type CourseReadinessCheck {
+  """
+  Stable ID for urql normalized cache — derived from the check name.
+  Allows urql to key CourseReadinessCheck objects without querying a DB id.
+  """
+  id: ID!
   name: String!
   passed: Boolean!
   message: String

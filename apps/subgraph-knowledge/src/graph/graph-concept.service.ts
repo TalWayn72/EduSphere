@@ -23,10 +23,14 @@ export class GraphConceptService {
 
   mapConcept(node: GraphConceptNode) {
     return {
-      id: node.id,
-      tenantId: node.tenant_id,
-      name: node.name,
-      definition: node.definition,
+      // BUG-FIX: Provide safe fallbacks for all non-nullable SDL fields.
+      // Apache AGE may omit optional vertex properties when they are absent,
+      // returning undefined. Without fallbacks the resolver returns null for
+      // String!/ID! fields, causing a GraphQL non-nullable violation error.
+      id: node.id ?? '',
+      tenantId: node.tenant_id ?? '',
+      name: node.name ?? '',
+      definition: node.definition ?? '',
       sourceIds: JSON.parse(node.source_ids || '[]') as string[],
       createdAt: safeIsoDate(node.created_at),
       updatedAt: safeIsoDate(node.updated_at),

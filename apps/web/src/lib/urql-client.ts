@@ -130,10 +130,40 @@ const authErrorExchange = errorExchange({
 
 // ─── WebSocket client ─────────────────────────────────────────────────────────
 
+// BUG-fix: WebSocket connection failures — cap reconnect attempts and use
+// lazy connection to avoid hammering the gateway when WS is unavailable.
+// `lazy: true` delays connection until the first subscription is executed.
+// `shouldRetry` limits attempts so the browser console is not flooded with
+// rapid-fire "WebSocket connection failed" errors during development.
+const WS_MAX_RETRIES = 5;
+let _wsRetryCount = 0;
+
 const wsClient = createWsClient({
   url:
     import.meta.env.VITE_GRAPHQL_WS_URL ??
-    import.meta.env.VITE_GRAPHQL_URL.replace(/^http/, 'ws'),
+    (import.meta.env.VITE_GRAPHQL_URL
+      ? import.meta.env.VITE_GRAPHQL_URL.replace(/^http/, 'ws')
+      : 'ws://localhost:4000/graphql'),
+  lazy: true,
+  shouldRetry: () => {
+    _wsRetryCount += 1;
+    if (_wsRetryCount > WS_MAX_RETRIES) {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console -- DEV-only WS retry cap trace
+        console.debug(
+          `[WS] Capped reconnect attempts at ${WS_MAX_RETRIES} — real-time updates paused.`
+        );
+      }
+      return false;
+    }
+    return true;
+  },
+  on: {
+    connected: () => {
+      // Reset the retry counter on successful connection
+      _wsRetryCount = 0;
+    },
+  },
   connectionParams: () => {
     const token = getToken();
     return token ? { authorization: `Bearer ${token}` } : {};
@@ -175,6 +205,29 @@ export const urqlClient = createClient({
         BrandedLoginData: () => null,
         CourseProgress: (data) =>
           (data as { courseId?: string }).courseId ?? null,
+        // BUG-fix: types without id fields must be mapped to null to suppress
+        // urql graphcache "Invalid key" warnings. These types have no natural
+        // cache key — they are always fetched as sub-objects of a parent.
+        CourseReadiness: () => null,
+        CourseReadinessCheck: () => null,
+        RelatedConcept: () => null,
+        ConceptRelationship: () => null,
+        ConceptNode: () => null,
+        LearningPath: () => null,
+        SemanticResult: () => null,
+        SkillTreeEdge: () => null,
+        SkillTree: () => null,
+        SkillTreeNode: () => null,
+        AdaptiveLearningPath: () => null,
+        AdaptivePathItem: () => null,
+        AutoPath: () => null,
+        AutoPathNode: () => null,
+        UserMasteryTopic: () => null,
+        SkillGapItem: () => null,
+        SkillGapReport: () => null,
+        SkillProfile: () => null,
+        SocialRecommendation: () => null,
+        SocialFeedItem: () => null,
       },
       updates: {
         Mutation: {
