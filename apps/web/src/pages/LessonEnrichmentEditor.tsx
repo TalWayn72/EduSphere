@@ -54,7 +54,8 @@ export function LessonEnrichmentEditor() {
   const { approve, reject } = useCitationReview();
   const player = useYouTubePlayer();
   const [editCitationId, setEditCitationId] = useState<string | null>(null);
-  const editCitation = (data?.citations ?? []).find((c) => c.id === editCitationId) ?? null;
+  const editCitation =
+    (data?.citations ?? []).find((c) => c.id === editCitationId) ?? null;
 
   const [, ingest] = useMutation(INGEST_YOUTUBE_LESSON_MUTATION);
   const [, setTimestamp] = useMutation(SET_BLOCK_ANCHOR_TIMESTAMP_MUTATION);
@@ -105,15 +106,20 @@ export function LessonEnrichmentEditor() {
             ]}
             className="mb-0 flex-1"
           />
-          {data?.enrichmentStatus && TERMINAL_STATUSES.has(data.enrichmentStatus) && (
-            <Badge variant="outline">{data.enrichmentStatus}</Badge>
-          )}
-          {data?.enrichmentStatus && !TERMINAL_STATUSES.has(data.enrichmentStatus) && (
-            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-              <span className="h-3.5 w-3.5 border-2 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
-              <span>{PROCESSING_STATUS_LABELS[data.enrichmentStatus] ?? data.enrichmentStatus}</span>
-            </div>
-          )}
+          {data?.enrichmentStatus &&
+            TERMINAL_STATUSES.has(data.enrichmentStatus) && (
+              <Badge variant="outline">{data.enrichmentStatus}</Badge>
+            )}
+          {data?.enrichmentStatus &&
+            !TERMINAL_STATUSES.has(data.enrichmentStatus) && (
+              <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                <span className="h-3.5 w-3.5 border-2 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
+                <span>
+                  {PROCESSING_STATUS_LABELS[data.enrichmentStatus] ??
+                    data.enrichmentStatus}
+                </span>
+              </div>
+            )}
           <Button
             onClick={handlePublish}
             disabled={data?.enrichmentStatus !== 'READY'}

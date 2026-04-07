@@ -120,7 +120,10 @@ export const AiChatPanel = React.memo(function AiChatPanel({
                 }`}
               >
                 {msg.content === 'consent-required' ? (
-                  <RequirementLink variant="inline" returnTo={location.pathname} />
+                  <RequirementLink
+                    variant="inline"
+                    returnTo={location.pathname}
+                  />
                 ) : (
                   msg.content
                 )}

@@ -174,7 +174,8 @@ export class KnowledgeSourceResolver {
   @Mutation()
   async updateKnowledgeSource(
     @Args('id') id: string,
-    @Args('input') input: { title?: string; metadata?: Record<string, unknown> },
+    @Args('input')
+    input: { title?: string; metadata?: Record<string, unknown> },
     @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);

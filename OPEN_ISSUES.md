@@ -10,11 +10,11 @@
 
 ### 🔴 Open
 
-| ID                   | Issue                                              | Severity    | Est.  |
-| -------------------- | -------------------------------------------------- | ----------- | ----- |
-| FEAT-VIDEO-CAPTIONS  | Video captions for IS 5568 + EAA compliance        | 🔴 Critical | ~40h  |
-| FEAT-EU-AI-ACT       | EU AI Act documentation and compliance             | 🔴 Critical | ~80h  |
-| FEAT-ADMIN-DASHBOARD | 5 missing admin screens                            | 🟡 Medium   | ~120h |
+| ID                   | Issue                                       | Severity    | Est.  |
+| -------------------- | ------------------------------------------- | ----------- | ----- |
+| FEAT-VIDEO-CAPTIONS  | Video captions for IS 5568 + EAA compliance | 🔴 Critical | ~40h  |
+| FEAT-EU-AI-ACT       | EU AI Act documentation and compliance      | 🔴 Critical | ~80h  |
+| FEAT-ADMIN-DASHBOARD | 5 missing admin screens                     | 🟡 Medium   | ~120h |
 
 ### 🟡 In Progress
 
@@ -25,24 +25,24 @@
 
 ### ✅ Fixed (7 Apr 2026 Session)
 
-| ID                        | Issue                                                                                                          | Fixed In   |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------- |
-| BUG-120                   | JWT double-realm issuer mismatch — `docker-compose.dev.yml` KEYCLOAK_ISSUER_URL included `/realms/edusphere`  | 7 Apr 2026 |
-| BUG-121                   | Keycloak brute-force lockout — cleared via Admin REST API (DELETE attack-detection/brute-force/users)         | 7 Apr 2026 |
-| BUG-122                   | MinIO not running — misdiagnosis, MinIO IS healthy on ports 9000/9001 (closed)                                | 7 Apr 2026 |
-| BUG-123                   | NATS subject mismatch — transcription worker subject + stream pattern fixed                                   | 7 Apr 2026 |
-| BUG-124                   | RecommendedCourse urql cache key — `RecommendedCourse: () => null` added to cacheExchange keys config        | 7 Apr 2026 |
-| BUG-125                   | setState during render — queueMicrotask already applied (misdiagnosis — closed)                               | 7 Apr 2026 |
-| FIX-DELETE-COURSE-UX      | Delete Course permission UX — button hidden for non-owners, confirmation modal added                          | 7 Apr 2026 |
-| GAP-1                     | RAG embedding pipeline for knowledge sources — pipeline wired, sources now indexed on ingest                  | 7 Apr 2026 |
-| GAP-2                     | AI Chat modes (CHAVRUTA/QUIZ/EXPLAIN) differentiation — mode-aware prompts and UI labels                      | 7 Apr 2026 |
-| GAP-3                     | Citation edit modal — inline editor for instructor citation review and correction                              | 7 Apr 2026 |
-| GAP-4                     | Enrichment status polling — frontend polls `enrichmentStatus` subscription until COMPLETED/FAILED             | 7 Apr 2026 |
-| GAP-5                     | Transcript highlight sync in editor — active block highlights as YouTube timestamp advances                   | 7 Apr 2026 |
-| GAP-6                     | Citation hover popover (student view) — hovering citation card shows full source metadata                     | 7 Apr 2026 |
-| GAP-7                     | Source edit capability — instructor can update source URL, title, and author inline                           | 7 Apr 2026 |
-| GAP-8                     | File upload progress bar — MinIO multipart upload reports byte progress to frontend                           | 7 Apr 2026 |
-| GAP-9                         | Knowledge graph indexing for sources — source nodes created in AGE graph on lesson publish                    | 7 Apr 2026 |
+| ID                            | Issue                                                                                                        | Fixed In   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- |
+| BUG-120                       | JWT double-realm issuer mismatch — `docker-compose.dev.yml` KEYCLOAK_ISSUER_URL included `/realms/edusphere` | 7 Apr 2026 |
+| BUG-121                       | Keycloak brute-force lockout — cleared via Admin REST API (DELETE attack-detection/brute-force/users)        | 7 Apr 2026 |
+| BUG-122                       | MinIO not running — misdiagnosis, MinIO IS healthy on ports 9000/9001 (closed)                               | 7 Apr 2026 |
+| BUG-123                       | NATS subject mismatch — transcription worker subject + stream pattern fixed                                  | 7 Apr 2026 |
+| BUG-124                       | RecommendedCourse urql cache key — `RecommendedCourse: () => null` added to cacheExchange keys config        | 7 Apr 2026 |
+| BUG-125                       | setState during render — queueMicrotask already applied (misdiagnosis — closed)                              | 7 Apr 2026 |
+| FIX-DELETE-COURSE-UX          | Delete Course permission UX — button hidden for non-owners, confirmation modal added                         | 7 Apr 2026 |
+| GAP-1                         | RAG embedding pipeline for knowledge sources — pipeline wired, sources now indexed on ingest                 | 7 Apr 2026 |
+| GAP-2                         | AI Chat modes (CHAVRUTA/QUIZ/EXPLAIN) differentiation — mode-aware prompts and UI labels                     | 7 Apr 2026 |
+| GAP-3                         | Citation edit modal — inline editor for instructor citation review and correction                            | 7 Apr 2026 |
+| GAP-4                         | Enrichment status polling — frontend polls `enrichmentStatus` subscription until COMPLETED/FAILED            | 7 Apr 2026 |
+| GAP-5                         | Transcript highlight sync in editor — active block highlights as YouTube timestamp advances                  | 7 Apr 2026 |
+| GAP-6                         | Citation hover popover (student view) — hovering citation card shows full source metadata                    | 7 Apr 2026 |
+| GAP-7                         | Source edit capability — instructor can update source URL, title, and author inline                          | 7 Apr 2026 |
+| GAP-8                         | File upload progress bar — MinIO multipart upload reports byte progress to frontend                          | 7 Apr 2026 |
+| GAP-9                         | Knowledge graph indexing for sources — source nodes created in AGE graph on lesson publish                   | 7 Apr 2026 |
 | FEAT-SEMANTIC-LESSON-CREATION | Semantic-Enriched Lesson Creation — all 5 phases + 9 integration gaps complete                               | 7 Apr 2026 |
 
 ### ✅ Fixed (6 Apr 2026 Session)
@@ -654,6 +654,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Solution:** Added `RecommendedCourse: () => null` to the `cacheExchange` keys config in `apps/web/src/lib/urql-client.ts`. Also added `UserStats` and `DayActivity` entries to the reproducer test's `ID_LESS_KEYS` array for completeness.
 
 **Files:**
+
 - `apps/web/src/lib/urql-client.ts` — added `RecommendedCourse: () => null` to keys config
 - `apps/web/src/lib/urql-client.test.ts` — added `RecommendedCourse`, `UserStats`, `DayActivity` to `ID_LESS_KEYS` test array
 
@@ -709,6 +710,7 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 **Problem:** The Delete Course button was visible to all authenticated users regardless of ownership or role. Non-owner users could see (but not complete) the delete action, causing confusion. No confirmation modal prevented accidental deletions.
 
 **Fix:**
+
 - Delete button now hidden for users who are not the course owner or an admin (`INSTRUCTOR` role + ownership check).
 - Confirmation modal added — user must type the course name to confirm deletion.
 - Permission check uses `userId === course.instructorId || userRole === 'ORG_ADMIN' || userRole === 'SUPER_ADMIN'`.
@@ -725,17 +727,17 @@ This correctly excludes `updateUserPreferences`, `emailNotifications`, `preferen
 
 These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON-CREATION` (Phases 1–5). All were closed in the 7 Apr 2026 session.
 
-| Gap   | Description                              | Files                                                                           |
-| ----- | ---------------------------------------- | ------------------------------------------------------------------------------- |
-| GAP-1 | RAG embedding pipeline for sources       | `apps/subgraph-knowledge/src/rag/source-embedding.service.ts`                  |
-| GAP-2 | AI Chat mode differentiation             | `apps/web/src/pages/content-viewer/AiChatPanel.tsx`, agent prompt templates     |
-| GAP-3 | Citation edit modal                      | `apps/web/src/components/citation/CitationEditModal.tsx`                        |
-| GAP-4 | Enrichment status polling                | `apps/web/src/pages/UnifiedLearningPage.ai-tab.tsx`                            |
-| GAP-5 | Transcript highlight sync in editor      | `apps/web/src/pages/agents/AgentChatPanel.tsx`                                 |
-| GAP-6 | Citation hover popover (student view)    | `apps/web/src/components/chavruta/DebateInterface.tsx`                         |
-| GAP-7 | Source edit capability                   | `apps/web/src/components/RoleplaySimulator.tsx`                                |
-| GAP-8 | File upload progress bar                 | `apps/web/src/pages/content-viewer/AiChatPanel.tsx`                           |
-| GAP-9 | Knowledge graph indexing for sources     | `apps/subgraph-knowledge/src/graph/graph-source.service.ts`                    |
+| Gap   | Description                           | Files                                                                       |
+| ----- | ------------------------------------- | --------------------------------------------------------------------------- |
+| GAP-1 | RAG embedding pipeline for sources    | `apps/subgraph-knowledge/src/rag/source-embedding.service.ts`               |
+| GAP-2 | AI Chat mode differentiation          | `apps/web/src/pages/content-viewer/AiChatPanel.tsx`, agent prompt templates |
+| GAP-3 | Citation edit modal                   | `apps/web/src/components/citation/CitationEditModal.tsx`                    |
+| GAP-4 | Enrichment status polling             | `apps/web/src/pages/UnifiedLearningPage.ai-tab.tsx`                         |
+| GAP-5 | Transcript highlight sync in editor   | `apps/web/src/pages/agents/AgentChatPanel.tsx`                              |
+| GAP-6 | Citation hover popover (student view) | `apps/web/src/components/chavruta/DebateInterface.tsx`                      |
+| GAP-7 | Source edit capability                | `apps/web/src/components/RoleplaySimulator.tsx`                             |
+| GAP-8 | File upload progress bar              | `apps/web/src/pages/content-viewer/AiChatPanel.tsx`                         |
+| GAP-9 | Knowledge graph indexing for sources  | `apps/subgraph-knowledge/src/graph/graph-source.service.ts`                 |
 
 **Tests:** Each gap closed with corresponding unit/component tests. Full regression run confirms all 9 fixes pass.
 

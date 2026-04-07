@@ -120,7 +120,10 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
     input: { title?: string; metadata?: Record<string, unknown> }
   ): Promise<KnowledgeSource> {
     await this.findById(id, tenantId);
-    const updateData: Partial<{ title: string; metadata: Record<string, unknown> }> = {};
+    const updateData: Partial<{
+      title: string;
+      metadata: Record<string, unknown>;
+    }> = {};
     if (input.title !== undefined) updateData.title = input.title;
     if (input.metadata !== undefined) updateData.metadata = input.metadata;
 
@@ -135,7 +138,8 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
       )
       .returning();
 
-    if (!updated) throw new NotFoundException(`KnowledgeSource ${id} not found`);
+    if (!updated)
+      throw new NotFoundException(`KnowledgeSource ${id} not found`);
     this.logger.log(`Updated knowledge source ${id}`);
     return updated;
   }

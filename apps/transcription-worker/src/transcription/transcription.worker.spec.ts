@@ -72,9 +72,12 @@ describe('TranscriptionWorker', () => {
       await worker.onModuleInit();
 
       // BUG-123 fix: must match publisher subject 'EDUSPHERE.media.uploaded'
-      expect(mockConn.subscribe).toHaveBeenCalledWith('EDUSPHERE.media.uploaded', {
-        queue: 'transcription-workers',
-      });
+      expect(mockConn.subscribe).toHaveBeenCalledWith(
+        'EDUSPHERE.media.uploaded',
+        {
+          queue: 'transcription-workers',
+        }
+      );
     });
 
     // BUG-123 reproducer: worker MUST subscribe to EDUSPHERE.media.uploaded,

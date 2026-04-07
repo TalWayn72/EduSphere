@@ -270,7 +270,11 @@ describe('KnowledgeSourceProcessingService', () => {
 
     it('still marks source READY even when createSourceNode throws', async () => {
       mockCreateSourceNode.mockRejectedValueOnce(new Error('graph down'));
-      mockParseText.mockResolvedValue({ text: 'hello', wordCount: 1, metadata: {} });
+      mockParseText.mockResolvedValue({
+        text: 'hello',
+        wordCount: 1,
+        metadata: {},
+      });
       mockChunkText.mockReturnValue([]);
       mockUpdateReturning.mockResolvedValue([
         { ...fakeSource, status: 'READY', chunk_count: 0 },

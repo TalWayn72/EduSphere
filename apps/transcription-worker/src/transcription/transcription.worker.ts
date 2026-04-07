@@ -57,7 +57,10 @@ export class TranscriptionWorker implements OnModuleInit {
             this.logger.error('Unhandled error in transcribeFile', err);
           });
         } catch (err) {
-          this.logger.error('Failed to parse EDUSPHERE.media.uploaded message', err);
+          this.logger.error(
+            'Failed to parse EDUSPHERE.media.uploaded message',
+            err
+          );
         }
       }
     })().catch((err) => {

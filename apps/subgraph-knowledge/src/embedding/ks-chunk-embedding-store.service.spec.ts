@@ -21,7 +21,7 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((_col, val) => ({ eq: val })),
   sql: new Proxy(
     (strings: TemplateStringsArray, ..._values: unknown[]) => strings[0],
-    { get: (_t, k) => k === 'raw' ? undefined : vi.fn() }
+    { get: (_t, k) => (k === 'raw' ? undefined : vi.fn()) }
   ),
   closeAllPools: vi.fn(),
 }));
@@ -51,9 +51,9 @@ describe('KsChunkEmbeddingStoreService', () => {
     it('propagates database errors', async () => {
       mockExecute.mockRejectedValue(new Error('DB error'));
 
-      await expect(
-        service.upsert('source-uuid', 0, [0.1])
-      ).rejects.toThrow('DB error');
+      await expect(service.upsert('source-uuid', 0, [0.1])).rejects.toThrow(
+        'DB error'
+      );
     });
   });
 
@@ -64,11 +64,7 @@ describe('KsChunkEmbeddingStoreService', () => {
         { source_id: 'src-1', chunk_index: 5, similarity: '0.72' },
       ]);
 
-      const results = await service.search(
-        '[0.1,0.2]',
-        'tenant-1',
-        5
-      );
+      const results = await service.search('[0.1,0.2]', 'tenant-1', 5);
 
       expect(results).toHaveLength(2);
       expect(results[0]).toEqual({

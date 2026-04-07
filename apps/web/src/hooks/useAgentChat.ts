@@ -182,22 +182,19 @@ export function useAgentChat(
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const appendMockResponse = useCallback(
-    (currentMode: ChatMode) => {
-      setIsStreaming(true);
-      const responses = MOCK_RESPONSES_BY_MODE[currentMode];
-      mockTimeoutRef.current = setTimeout(() => {
-        const reply =
-          responses[Math.floor(Math.random() * responses.length)] ?? '';
-        setConfirmedMessages((prev) => [
-          ...prev,
-          { id: Date.now().toString(), role: 'agent', content: reply },
-        ]);
-        setIsStreaming(false);
-      }, 800);
-    },
-    []
-  );
+  const appendMockResponse = useCallback((currentMode: ChatMode) => {
+    setIsStreaming(true);
+    const responses = MOCK_RESPONSES_BY_MODE[currentMode];
+    mockTimeoutRef.current = setTimeout(() => {
+      const reply =
+        responses[Math.floor(Math.random() * responses.length)] ?? '';
+      setConfirmedMessages((prev) => [
+        ...prev,
+        { id: Date.now().toString(), role: 'agent', content: reply },
+      ]);
+      setIsStreaming(false);
+    }, 800);
+  }, []);
 
   const sendMessage = useCallback(() => {
     const trimmed = chatInput.trim();

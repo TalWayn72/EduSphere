@@ -80,9 +80,7 @@ export class KsChunkEmbeddingStoreService implements OnModuleDestroy {
   async deleteBySource(sourceId: string): Promise<number> {
     const rows = await this.db
       .delete(schema.knowledge_source_chunk_embeddings)
-      .where(
-        eq(schema.knowledge_source_chunk_embeddings.source_id, sourceId)
-      )
+      .where(eq(schema.knowledge_source_chunk_embeddings.source_id, sourceId))
       .returning({ id: schema.knowledge_source_chunk_embeddings.id });
     if (rows.length > 0) {
       this.logger.log(

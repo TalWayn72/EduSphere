@@ -127,9 +127,7 @@ describe('DebateInterface', () => {
   });
 
   it('renders RequirementLink when message content is consent-required', () => {
-    const messages = [
-      makeMsg({ role: 'ai', content: 'consent-required' }),
-    ];
+    const messages = [makeMsg({ role: 'ai', content: 'consent-required' })];
     render(<DebateInterface {...defaultProps} messages={messages} />);
     expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
     expect(screen.queryByText('consent-required')).not.toBeInTheDocument();

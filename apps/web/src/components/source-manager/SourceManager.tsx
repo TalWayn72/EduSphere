@@ -230,19 +230,22 @@ export function SourceManager({ courseId }: { courseId: string }) {
       )}
 
       {/* Edit modal */}
-      {editSourceId && (() => {
-        const editSource = data?.find((s: KnowledgeSource) => s.id === editSourceId);
-        return editSource ? (
-          <EditSourceModal
-            source={editSource}
-            onClose={() => setEditSourceId(null)}
-            onUpdated={() => {
-              refetch();
-              setEditSourceId(null);
-            }}
-          />
-        ) : null;
-      })()}
+      {editSourceId &&
+        (() => {
+          const editSource = data?.find(
+            (s: KnowledgeSource) => s.id === editSourceId
+          );
+          return editSource ? (
+            <EditSourceModal
+              source={editSource}
+              onClose={() => setEditSourceId(null)}
+              onUpdated={() => {
+                refetch();
+                setEditSourceId(null);
+              }}
+            />
+          ) : null;
+        })()}
 
       {/* Add modal */}
       {showAdd && (

@@ -12,7 +12,10 @@ vi.mock('@/pages/AnnotationCard', () => ({
     ann: Annotation;
     onSeek: (id: string, ts?: number) => void;
   }) => (
-    <div data-testid="annotation-card" onClick={() => onSeek(ann.contentId, ann.contentTimestamp)}>
+    <div
+      data-testid="annotation-card"
+      onClick={() => onSeek(ann.contentId, ann.contentTimestamp)}
+    >
       {ann.content}
     </div>
   ),

@@ -56,15 +56,26 @@ export function InlineCitationBlock({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="outline" className="text-xs gap-1 cursor-pointer">
+                <Badge
+                  variant="outline"
+                  className="text-xs gap-1 cursor-pointer"
+                >
                   <BookOpen className="h-3 w-3" />
                   {citation.bookName}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">
                 <p className="font-medium text-xs">{citation.bookName}</p>
-                {citation.part && <p className="text-xs text-muted-foreground">{citation.part}</p>}
-                {citation.page && <p className="text-xs text-muted-foreground">p. {citation.page}</p>}
+                {citation.part && (
+                  <p className="text-xs text-muted-foreground">
+                    {citation.part}
+                  </p>
+                )}
+                {citation.page && (
+                  <p className="text-xs text-muted-foreground">
+                    p. {citation.page}
+                  </p>
+                )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

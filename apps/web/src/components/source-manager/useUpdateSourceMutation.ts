@@ -4,7 +4,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
 import { UPDATE_KNOWLEDGE_SOURCE } from '@/lib/graphql/sources.queries';
-import { IS_DEV_MODE, authHeaders, getSourceErrorKey, hasValidAuth } from './utils';
+import {
+  IS_DEV_MODE,
+  authHeaders,
+  getSourceErrorKey,
+  hasValidAuth,
+} from './utils';
 
 interface UpdateSourceInput {
   id: string;

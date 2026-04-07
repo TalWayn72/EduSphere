@@ -57,12 +57,18 @@ export function EditSourceModal({
       try {
         metadata = JSON.parse(metadataStr) as Record<string, unknown>;
       } catch {
-        setError(t('sources.metadataInvalidJson', 'Metadata must be valid JSON'));
+        setError(
+          t('sources.metadataInvalidJson', 'Metadata must be valid JSON')
+        );
         return;
       }
     }
 
-    await updateSource.mutateAsync({ id: source.id, title: title.trim(), metadata });
+    await updateSource.mutateAsync({
+      id: source.id,
+      title: title.trim(),
+      metadata,
+    });
   };
 
   const busy = updateSource.isPending;
@@ -84,7 +90,10 @@ export function EditSourceModal({
             {t('sources.editSourceTitle', 'Edit Source')}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            {t('sources.editSourceDescription', 'Update the source title or metadata')}
+            {t(
+              'sources.editSourceDescription',
+              'Update the source title or metadata'
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -92,7 +101,9 @@ export function EditSourceModal({
           {success && (
             <div className="flex items-center gap-2 text-green-700 bg-green-50 rounded-lg px-3 py-2 dark:bg-green-950 dark:text-green-300">
               <span>&#x2705;</span>
-              <span className="text-sm">{t('sources.updatedSuccess', 'Source updated')}</span>
+              <span className="text-sm">
+                {t('sources.updatedSuccess', 'Source updated')}
+              </span>
             </div>
           )}
 
@@ -155,7 +166,9 @@ export function EditSourceModal({
               {busy && (
                 <span className="w-3.5 h-3.5 border-2 border-white dark:border-white border-t-transparent rounded-full animate-spin" />
               )}
-              {busy ? t('sources.saving', 'Saving...') : t('sources.save', 'Save')}
+              {busy
+                ? t('sources.saving', 'Saving...')
+                : t('sources.save', 'Save')}
             </button>
           </div>
         )}

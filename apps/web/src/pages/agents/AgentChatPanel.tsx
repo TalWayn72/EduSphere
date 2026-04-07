@@ -90,7 +90,10 @@ export const AgentChatPanel = React.memo(function AgentChatPanel({
               }`}
             >
               {msg.content === 'consent-required' ? (
-                <RequirementLink variant="inline" returnTo={location.pathname} />
+                <RequirementLink
+                  variant="inline"
+                  returnTo={location.pathname}
+                />
               ) : (
                 msg.content
               )}

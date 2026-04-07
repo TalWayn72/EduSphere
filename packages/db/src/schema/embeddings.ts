@@ -99,5 +99,7 @@ CREATE INDEX IF NOT EXISTS idx_ks_chunk_embeddings_hnsw
   WITH (m = 32, ef_construction = 128);
 `;
 
-export type KsChunkEmbedding = typeof knowledge_source_chunk_embeddings.$inferSelect;
-export type NewKsChunkEmbedding = typeof knowledge_source_chunk_embeddings.$inferInsert;
+export type KsChunkEmbedding =
+  typeof knowledge_source_chunk_embeddings.$inferSelect;
+export type NewKsChunkEmbedding =
+  typeof knowledge_source_chunk_embeddings.$inferInsert;

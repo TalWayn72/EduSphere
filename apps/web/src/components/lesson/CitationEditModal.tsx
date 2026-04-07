@@ -139,12 +139,22 @@ export function CitationEditModal({
       onSaved();
       onClose();
     } catch {
-      setSaveError(t('citationEdit.saveError', 'Failed to save citation. Please try again.'));
+      setSaveError(
+        t(
+          'citationEdit.saveError',
+          'Failed to save citation. Please try again.'
+        )
+      );
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -152,7 +162,10 @@ export function CitationEditModal({
             {t('citationEdit.title', 'Edit Citation')}
           </DialogTitle>
           <DialogDescription>
-            {t('citationEdit.description', 'Update the citation details. Changes will be saved to the lesson.')}
+            {t(
+              'citationEdit.description',
+              'Update the citation details. Changes will be saved to the lesson.'
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -179,20 +192,46 @@ export function CitationEditModal({
           {/* Part / Page / Column / Paragraph — 2-column grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="ce-part">{t('citationEdit.part', 'Part / Section')}</Label>
-              <Input id="ce-part" {...register('part')} disabled={isSubmitting} dir="auto" />
+              <Label htmlFor="ce-part">
+                {t('citationEdit.part', 'Part / Section')}
+              </Label>
+              <Input
+                id="ce-part"
+                {...register('part')}
+                disabled={isSubmitting}
+                dir="auto"
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ce-page">{t('citationEdit.page', 'Page')}</Label>
-              <Input id="ce-page" {...register('page')} disabled={isSubmitting} dir="auto" />
+              <Input
+                id="ce-page"
+                {...register('page')}
+                disabled={isSubmitting}
+                dir="auto"
+              />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ce-column">{t('citationEdit.column', 'Column')}</Label>
-              <Input id="ce-column" {...register('column')} disabled={isSubmitting} dir="auto" />
+              <Label htmlFor="ce-column">
+                {t('citationEdit.column', 'Column')}
+              </Label>
+              <Input
+                id="ce-column"
+                {...register('column')}
+                disabled={isSubmitting}
+                dir="auto"
+              />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ce-paragraph">{t('citationEdit.paragraph', 'Paragraph')}</Label>
-              <Input id="ce-paragraph" {...register('paragraph')} disabled={isSubmitting} dir="auto" />
+              <Label htmlFor="ce-paragraph">
+                {t('citationEdit.paragraph', 'Paragraph')}
+              </Label>
+              <Input
+                id="ce-paragraph"
+                {...register('paragraph')}
+                disabled={isSubmitting}
+                dir="auto"
+              />
             </div>
           </div>
 
@@ -202,23 +241,44 @@ export function CitationEditModal({
               {t('citationEdit.sourceText', 'Source Text')}
               <span className="text-destructive ms-1">*</span>
             </Label>
-            <Textarea id="ce-sourceText" {...register('sourceText')} rows={3}
-              disabled={isSubmitting} className="resize-none" dir="auto"
-              placeholder={t('citationEdit.sourceTextHint', 'The quoted text as it appears in the source')}
+            <Textarea
+              id="ce-sourceText"
+              {...register('sourceText')}
+              rows={3}
+              disabled={isSubmitting}
+              className="resize-none"
+              dir="auto"
+              placeholder={t(
+                'citationEdit.sourceTextHint',
+                'The quoted text as it appears in the source'
+              )}
             />
             {errors.sourceText && (
               <p className="text-xs text-destructive">
-                {t('citationEdit.sourceTextRequired', 'Source text is required')}
+                {t(
+                  'citationEdit.sourceTextRequired',
+                  'Source text is required'
+                )}
               </p>
             )}
           </div>
 
           {/* Resolved Text */}
           <div className="space-y-1.5">
-            <Label htmlFor="ce-resolvedText">{t('citationEdit.resolvedText', 'Resolved Text')}</Label>
-            <Textarea id="ce-resolvedText" {...register('resolvedText')} rows={3}
-              disabled={isSubmitting} className="resize-none" dir="auto"
-              placeholder={t('citationEdit.resolvedTextHint', 'The matching passage from the knowledge graph')}
+            <Label htmlFor="ce-resolvedText">
+              {t('citationEdit.resolvedText', 'Resolved Text')}
+            </Label>
+            <Textarea
+              id="ce-resolvedText"
+              {...register('resolvedText')}
+              rows={3}
+              disabled={isSubmitting}
+              className="resize-none"
+              dir="auto"
+              placeholder={t(
+                'citationEdit.resolvedTextHint',
+                'The matching passage from the knowledge graph'
+              )}
             />
           </div>
 
@@ -263,10 +323,18 @@ export function CitationEditModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="VERIFIED">{t('citationEdit.statusVerified', 'Verified')}</SelectItem>
-                    <SelectItem value="UNVERIFIED">{t('citationEdit.statusUnverified', 'Unverified')}</SelectItem>
-                    <SelectItem value="REJECTED">{t('citationEdit.statusRejected', 'Rejected')}</SelectItem>
-                    <SelectItem value="EDITED">{t('citationEdit.statusEdited', 'Edited')}</SelectItem>
+                    <SelectItem value="VERIFIED">
+                      {t('citationEdit.statusVerified', 'Verified')}
+                    </SelectItem>
+                    <SelectItem value="UNVERIFIED">
+                      {t('citationEdit.statusUnverified', 'Unverified')}
+                    </SelectItem>
+                    <SelectItem value="REJECTED">
+                      {t('citationEdit.statusRejected', 'Rejected')}
+                    </SelectItem>
+                    <SelectItem value="EDITED">
+                      {t('citationEdit.statusEdited', 'Edited')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -280,11 +348,18 @@ export function CitationEditModal({
           )}
 
           <DialogFooter className="gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               {t('citationEdit.cancel', 'Cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="me-2 h-4 w-4 animate-spin" />
+              )}
               {isSubmitting
                 ? t('citationEdit.saving', 'Saving...')
                 : t('citationEdit.save', 'Save Changes')}

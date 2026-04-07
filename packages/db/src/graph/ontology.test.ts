@@ -449,7 +449,10 @@ describe('createSourceNode()', () => {
       name: 'My Source',
       source_type: 'FILE_PDF',
     });
-    const params = mockExecuteCypher.mock.calls[0][3] as Record<string, unknown>;
+    const params = mockExecuteCypher.mock.calls[0][3] as Record<
+      string,
+      unknown
+    >;
     expect(params).toMatchObject({ id: 'source-abc' });
   });
 

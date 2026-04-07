@@ -13,7 +13,12 @@ interface SourceCardProps {
   onEdit?: (e: React.MouseEvent, id: string) => void;
 }
 
-export function SourceCard({ source, onSelect, onDelete, onEdit }: SourceCardProps) {
+export function SourceCard({
+  source,
+  onSelect,
+  onDelete,
+  onEdit,
+}: SourceCardProps) {
   const { t } = useTranslation('content');
 
   return (

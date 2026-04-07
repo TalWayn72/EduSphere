@@ -203,7 +203,10 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
               }`}
             >
               {msg.content === 'consent-required' ? (
-                <RequirementLink variant="inline" returnTo={location.pathname} />
+                <RequirementLink
+                  variant="inline"
+                  returnTo={location.pathname}
+                />
               ) : (
                 msg.content
               )}

@@ -37,7 +37,8 @@ vi.mock('@/components/ui/button', () => ({
 const T = {
   humanChavruta: 'Human Chavruta',
   aiChavruta: 'AI Chavruta',
-  humanChavrutaDescription: 'Study with a peer in real-time collaborative sessions',
+  humanChavrutaDescription:
+    'Study with a peer in real-time collaborative sessions',
   aiChavrutaDescription: 'Study with an AI partner available 24/7',
   alwaysAvailable: 'Always available',
   findPartner: 'Find a Chavruta Partner',

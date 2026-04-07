@@ -34,21 +34,27 @@ describe('chat-mode-prompts', () => {
   it('CHAVRUTA prompt references Socratic or Chavruta behavior', () => {
     const text = CHAVRUTA_SYSTEM_PROMPT.toLowerCase();
     expect(
-      text.includes('socratic') || text.includes('chavruta') || text.includes('חברותא')
+      text.includes('socratic') ||
+        text.includes('chavruta') ||
+        text.includes('חברותא')
     ).toBe(true);
   });
 
   it('QUIZ prompt references quiz or question behavior', () => {
     const text = QUIZ_SYSTEM_PROMPT.toLowerCase();
     expect(
-      text.includes('quiz') || text.includes('question') || text.includes('בוחן')
+      text.includes('quiz') ||
+        text.includes('question') ||
+        text.includes('בוחן')
     ).toBe(true);
   });
 
   it('EXPLAIN prompt references explaining or teaching behavior', () => {
     const text = EXPLAIN_SYSTEM_PROMPT.toLowerCase();
     expect(
-      text.includes('explain') || text.includes('teach') || text.includes('להסביר')
+      text.includes('explain') ||
+        text.includes('teach') ||
+        text.includes('להסביר')
     ).toBe(true);
   });
 });

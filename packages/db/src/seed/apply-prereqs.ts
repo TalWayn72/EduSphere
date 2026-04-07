@@ -7,16 +7,24 @@ import { Pool } from 'pg';
 
 async function main(): Promise<void> {
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
+    connectionString:
+      process.env.DATABASE_URL ||
+      'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
   });
 
   // Step 1: youtube_video_id on media_assets
-  await pool.query('ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS youtube_video_id text');
+  await pool.query(
+    'ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS youtube_video_id text'
+  );
   console.log('  ✓ youtube_video_id column added to media_assets');
 
   // Step 1b: start_time / end_time on visual_anchors (from migration 0044)
-  await pool.query('ALTER TABLE visual_anchors ADD COLUMN IF NOT EXISTS start_time numeric(10, 3)');
-  await pool.query('ALTER TABLE visual_anchors ADD COLUMN IF NOT EXISTS end_time numeric(10, 3)');
+  await pool.query(
+    'ALTER TABLE visual_anchors ADD COLUMN IF NOT EXISTS start_time numeric(10, 3)'
+  );
+  await pool.query(
+    'ALTER TABLE visual_anchors ADD COLUMN IF NOT EXISTS end_time numeric(10, 3)'
+  );
   console.log('  ✓ start_time/end_time columns added to visual_anchors');
 
   // Step 2: enriched_transcript_blocks table
@@ -54,7 +62,9 @@ async function main(): Promise<void> {
   `);
   console.log('  ✓ Indexes created');
 
-  await pool.query('ALTER TABLE enriched_transcript_blocks ENABLE ROW LEVEL SECURITY');
+  await pool.query(
+    'ALTER TABLE enriched_transcript_blocks ENABLE ROW LEVEL SECURITY'
+  );
   await pool.query(`
     DO $$ BEGIN
       IF NOT EXISTS (
@@ -72,9 +82,15 @@ async function main(): Promise<void> {
   console.log('  ✓ RLS enabled and policy created');
 
   // Step 3: Add enriched-lesson columns to lesson_citations
-  await pool.query(`ALTER TABLE lesson_citations ADD COLUMN IF NOT EXISTS knowledge_source_id uuid`);
-  await pool.query(`ALTER TABLE lesson_citations ADD COLUMN IF NOT EXISTS resolved_text text`);
-  await pool.query(`ALTER TABLE lesson_citations ADD COLUMN IF NOT EXISTS graph_source_id text`);
+  await pool.query(
+    `ALTER TABLE lesson_citations ADD COLUMN IF NOT EXISTS knowledge_source_id uuid`
+  );
+  await pool.query(
+    `ALTER TABLE lesson_citations ADD COLUMN IF NOT EXISTS resolved_text text`
+  );
+  await pool.query(
+    `ALTER TABLE lesson_citations ADD COLUMN IF NOT EXISTS graph_source_id text`
+  );
   console.log('  ✓ lesson_citations enriched columns added');
 
   // Mark both migrations in custom_migrations tracking table

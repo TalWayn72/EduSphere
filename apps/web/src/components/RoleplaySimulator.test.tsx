@@ -216,9 +216,14 @@ describe('RoleplaySimulator', () => {
       ])
       .mockReturnValue([{ fetching: false } as never, NOOP_EXECUTE]);
 
-    const consentScenario = { ...mockScenario, sceneDescription: 'consent-required' };
+    const consentScenario = {
+      ...mockScenario,
+      sceneDescription: 'consent-required',
+    };
     await act(async () => {
-      render(<RoleplaySimulator scenario={consentScenario} onClose={onClose} />);
+      render(
+        <RoleplaySimulator scenario={consentScenario} onClose={onClose} />
+      );
     });
 
     await waitFor(() => {

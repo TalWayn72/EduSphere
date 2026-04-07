@@ -87,7 +87,10 @@ export const DELETE_KNOWLEDGE_SOURCE = gql`
 `;
 
 export const UPDATE_KNOWLEDGE_SOURCE = gql`
-  mutation UpdateKnowledgeSource($id: ID!, $input: UpdateKnowledgeSourceInput!) {
+  mutation UpdateKnowledgeSource(
+    $id: ID!
+    $input: UpdateKnowledgeSourceInput!
+  ) {
     updateKnowledgeSource(id: $id, input: $input) {
       id
       title

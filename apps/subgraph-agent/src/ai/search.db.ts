@@ -169,8 +169,7 @@ export async function searchKnowledgeGraph(
           id: key,
           text: `[Source: ${row.source_title}]`,
           type: 'knowledge_source_chunk',
-          similarity:
-            parseFloat(row.similarity) * ragConfig.vectorWeight,
+          similarity: parseFloat(row.similarity) * ragConfig.vectorWeight,
         });
         if (results.length >= limit) break;
       }

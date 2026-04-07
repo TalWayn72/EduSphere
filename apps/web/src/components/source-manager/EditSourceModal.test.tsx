@@ -19,12 +19,14 @@ const mockMutateAsync = vi.fn();
 const mockIsPending = { isPending: false };
 
 vi.mock('./useUpdateSourceMutation', () => ({
-  useUpdateSourceMutation: vi.fn(({ onUpdated }: { onUpdated: () => void }) => ({
-    mutateAsync: mockMutateAsync.mockImplementation(async () => {
-      onUpdated();
-    }),
-    isPending: mockIsPending.isPending,
-  })),
+  useUpdateSourceMutation: vi.fn(
+    ({ onUpdated }: { onUpdated: () => void }) => ({
+      mutateAsync: mockMutateAsync.mockImplementation(async () => {
+        onUpdated();
+      }),
+      isPending: mockIsPending.isPending,
+    })
+  ),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -60,7 +62,11 @@ describe('EditSourceModal', () => {
 
   it('renders with source title pre-filled', () => {
     render(
-      <EditSourceModal source={mockSource} onClose={onClose} onUpdated={onUpdated} />
+      <EditSourceModal
+        source={mockSource}
+        onClose={onClose}
+        onUpdated={onUpdated}
+      />
     );
     const titleInput = screen.getByTestId('edit-source-title-input');
     expect((titleInput as HTMLInputElement).value).toBe('Test Source');
@@ -68,7 +74,11 @@ describe('EditSourceModal', () => {
 
   it('renders metadata as JSON string', () => {
     render(
-      <EditSourceModal source={mockSource} onClose={onClose} onUpdated={onUpdated} />
+      <EditSourceModal
+        source={mockSource}
+        onClose={onClose}
+        onUpdated={onUpdated}
+      />
     );
     const metaInput = screen.getByTestId('edit-source-metadata-input');
     expect((metaInput as HTMLTextAreaElement).value).toContain('"language"');
@@ -76,7 +86,11 @@ describe('EditSourceModal', () => {
 
   it('calls onUpdated on successful save', async () => {
     render(
-      <EditSourceModal source={mockSource} onClose={onClose} onUpdated={onUpdated} />
+      <EditSourceModal
+        source={mockSource}
+        onClose={onClose}
+        onUpdated={onUpdated}
+      />
     );
     fireEvent.click(screen.getByTestId('edit-source-save-btn'));
     await waitFor(() => {
@@ -89,7 +103,11 @@ describe('EditSourceModal', () => {
 
   it('shows error when title is empty', async () => {
     render(
-      <EditSourceModal source={mockSource} onClose={onClose} onUpdated={onUpdated} />
+      <EditSourceModal
+        source={mockSource}
+        onClose={onClose}
+        onUpdated={onUpdated}
+      />
     );
     const titleInput = screen.getByTestId('edit-source-title-input');
     fireEvent.change(titleInput, { target: { value: '' } });
@@ -102,7 +120,11 @@ describe('EditSourceModal', () => {
 
   it('shows error on invalid JSON metadata', async () => {
     render(
-      <EditSourceModal source={mockSource} onClose={onClose} onUpdated={onUpdated} />
+      <EditSourceModal
+        source={mockSource}
+        onClose={onClose}
+        onUpdated={onUpdated}
+      />
     );
     const metaInput = screen.getByTestId('edit-source-metadata-input');
     fireEvent.change(metaInput, { target: { value: '{invalid json' } });
@@ -114,7 +136,11 @@ describe('EditSourceModal', () => {
 
   it('calls onClose when cancel is clicked', () => {
     render(
-      <EditSourceModal source={mockSource} onClose={onClose} onUpdated={onUpdated} />
+      <EditSourceModal
+        source={mockSource}
+        onClose={onClose}
+        onUpdated={onUpdated}
+      />
     );
     fireEvent.click(screen.getByText('sources.cancel'));
     expect(onClose).toHaveBeenCalled();

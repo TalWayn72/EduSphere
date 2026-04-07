@@ -85,7 +85,9 @@ describe('AgentChatPanel', () => {
       <AgentChatPanel
         activeMode="chavruta"
         translatedMode={DEFAULT_TRANSLATED_MODE}
-        messages={[{ id: 'c1', role: 'assistant', content: 'consent-required' }]}
+        messages={[
+          { id: 'c1', role: 'assistant', content: 'consent-required' },
+        ]}
         chatInput=""
         isTyping={false}
         streamingContent=""

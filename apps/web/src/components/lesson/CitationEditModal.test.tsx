@@ -106,7 +106,9 @@ describe('CitationEditModal', () => {
         onSaved={onSaved}
       />
     );
-    const textarea = screen.getByLabelText(/Source Text/i) as HTMLTextAreaElement;
+    const textarea = screen.getByLabelText(
+      /Source Text/i
+    ) as HTMLTextAreaElement;
     expect(textarea.value).toBe('ויאמר אלוהים יהי אור');
   });
 

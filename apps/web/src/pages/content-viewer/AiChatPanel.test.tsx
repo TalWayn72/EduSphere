@@ -448,7 +448,9 @@ describe('AiChatPanel', () => {
 
   it('renders RequirementLink when message content is consent-required', () => {
     renderPanel({
-      chatMessages: [{ id: 'c1', role: 'assistant', content: 'consent-required' }],
+      chatMessages: [
+        { id: 'c1', role: 'assistant', content: 'consent-required' },
+      ],
     });
     expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
     expect(screen.queryByText('consent-required')).not.toBeInTheDocument();

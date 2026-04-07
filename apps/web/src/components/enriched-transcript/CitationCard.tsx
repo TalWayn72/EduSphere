@@ -93,7 +93,10 @@ export function CitationCard({
           <TooltipContent side="top" className="max-w-xs">
             <p className="font-medium text-xs">{formatReference(citation)}</p>
             {citation.sourceText && (
-              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2" dir="auto">
+              <p
+                className="text-xs text-muted-foreground mt-0.5 line-clamp-2"
+                dir="auto"
+              >
                 {citation.sourceText}
               </p>
             )}

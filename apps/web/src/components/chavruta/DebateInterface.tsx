@@ -141,7 +141,11 @@ export function DebateInterface({
           </p>
         )}
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} returnTo={location.pathname} />
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+            returnTo={location.pathname}
+          />
         ))}
         {isLoading && (
           <>

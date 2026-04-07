@@ -97,7 +97,9 @@ describe('useEnrichedLesson', () => {
       vi.advanceTimersByTime(6100);
     });
 
-    expect(mockReexecute).toHaveBeenCalledWith({ requestPolicy: 'network-only' });
+    expect(mockReexecute).toHaveBeenCalledWith({
+      requestPolicy: 'network-only',
+    });
     expect(mockReexecute.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 

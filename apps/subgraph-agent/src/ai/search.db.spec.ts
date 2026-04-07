@@ -55,7 +55,9 @@ function setupDbMock(vectorRows: unknown[] = []) {
   const db = { execute: mockExecute };
   mockCreateDatabaseConnection.mockReturnValue(db);
   // First call = transcript_segments pgvector query, second call = knowledge_source_chunk_embeddings query (returns empty)
-  mockExecute.mockResolvedValueOnce({ rows: vectorRows }).mockResolvedValue({ rows: [] });
+  mockExecute
+    .mockResolvedValueOnce({ rows: vectorRows })
+    .mockResolvedValue({ rows: [] });
 }
 
 function setupIlikeMock(ilikeRows: Array<{ id: string; text: string }> = []) {
