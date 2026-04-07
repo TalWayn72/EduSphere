@@ -248,15 +248,21 @@ describe('CourseList', () => {
     expect(screen.queryByTestId('offline-banner')).not.toBeInTheDocument();
   });
 
-  it('logs network error to console.error when query fails', () => {
+  it('logs network error to console.error when query fails with networkError', () => {
+    // useCourseListData logs via error?.networkError — only urql CombinedError
+    // instances with a .networkError property trigger the console.error call.
     const consoleSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => undefined);
+    const mockError = {
+      message: '[GraphQL] Unexpected error [Network]',
+      networkError: new Error('[GraphQL] Unexpected error [Network]'),
+    };
     vi.mocked(useQuery).mockReturnValueOnce([
       {
         data: undefined,
         fetching: false,
-        error: new Error('[GraphQL] Unexpected error [Network]'),
+        error: mockError,
       },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
@@ -583,7 +589,7 @@ describe('CourseList', () => {
   });
 
   // ── BUG-103 regression guard: deleted state triggers refetch ───────────────
-  it('refetches courses when navigated to with deleted state', () => {
+  it('refetches courses when navigated to with deleted state', async () => {
     const mockReexecute = vi.fn();
     vi.mocked(useQuery).mockReturnValue([
       {
@@ -614,9 +620,10 @@ describe('CourseList', () => {
       </MemoryRouter>
     );
 
-    // BUG-103: When navigated with deleted state, the component shows a toast
-    // and clears the navigation state via replaceState.
-    // The courses data is already loaded via the mocked useQuery above.
-    expect(screen.getByText(/Course deleted/i)).toBeInTheDocument();
+    // BUG-103: showToast uses queueMicrotask to defer setState, so the toast
+    // appears asynchronously — waitFor is required to observe it.
+    await waitFor(() =>
+      expect(screen.getByText(/Course deleted/i)).toBeInTheDocument()
+    );
   });
 });

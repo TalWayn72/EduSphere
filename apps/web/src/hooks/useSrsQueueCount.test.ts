@@ -83,8 +83,10 @@ describe('useSrsQueueCount', () => {
   });
 
   // ── Error logging ─────────────────────────────────────────────────────────
+  // The hook handles errors gracefully with a 0 fallback — no console logging
+  // occurs by design (errors are silently swallowed to avoid noise in Layout).
 
-  it('logs error to console when GraphQL error occurs', () => {
+  it('does not log to console when GraphQL error occurs (silent degradation)', () => {
     const consoleSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => undefined);
@@ -96,10 +98,7 @@ describe('useSrsQueueCount', () => {
       },
     ]);
     renderHook(() => useSrsQueueCount());
-    expect(consoleSpy).toHaveBeenCalledWith(
-      '[useSrsQueueCount] GraphQL error:',
-      'GraphQL fetch failed'
-    );
+    expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 

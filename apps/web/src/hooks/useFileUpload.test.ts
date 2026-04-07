@@ -402,8 +402,10 @@ describe('useFileUpload', () => {
 
   describe('structured logging', () => {
     it('logs with [useFileUpload] prefix on success', async () => {
-      const errorSpy = vi
-        .spyOn(console, 'error')
+      // Source uses console.warn (not console.error) for success/info logs
+      // guarded by import.meta.env.DEV — spy on warn to capture them.
+      const warnSpy = vi
+        .spyOn(console, 'warn')
         .mockImplementation(() => undefined);
       const opts = makeOptions();
 
@@ -413,7 +415,7 @@ describe('useFileUpload', () => {
         await result.current.upload(makeFile());
       });
 
-      const logMessages = errorSpy.mock.calls.map((c) => String(c[0]));
+      const logMessages = warnSpy.mock.calls.map((c) => String(c[0]));
       const prefixedLogs = logMessages.filter((m) =>
         m.startsWith('[useFileUpload]')
       );
@@ -426,8 +428,9 @@ describe('useFileUpload', () => {
 
     it('logs retry attempts with [useFileUpload] prefix', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
-      const errorSpy = vi
-        .spyOn(console, 'error')
+      // Source uses console.warn for retry attempt messages under import.meta.env.DEV
+      const warnSpy = vi
+        .spyOn(console, 'warn')
         .mockImplementation(() => undefined);
 
       const presign = vi
@@ -442,7 +445,7 @@ describe('useFileUpload', () => {
         await result.current.upload(makeFile());
       });
 
-      const logMessages = errorSpy.mock.calls.map((c) => String(c[0]));
+      const logMessages = warnSpy.mock.calls.map((c) => String(c[0]));
       const retryLogs = logMessages.filter(
         (m) => m.startsWith('[useFileUpload]') && m.includes('retrying')
       );

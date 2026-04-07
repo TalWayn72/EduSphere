@@ -372,7 +372,9 @@ describe('SRSWidget', () => {
     expect(screen.queryByText(/connection refused/)).not.toBeInTheDocument();
   });
 
-  it('BUG-049: logs console.error when countResult has a GraphQL error', () => {
+  it('BUG-049: does NOT log console.error when countResult has a GraphQL error (silent degradation)', () => {
+    // Source explicitly handles errors with graceful fallback to 0 — no console
+    // logging occurs by design to prevent noise in the Layout component tree.
     const consoleSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => undefined);
@@ -408,10 +410,8 @@ describe('SRSWidget', () => {
 
     renderWidget();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      '[SRSWidget] GraphQL error fetching queue count:',
-      'SRS network error — fetch failed'
-    );
+    // No console.error should have been called — errors are silently swallowed
+    expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 });

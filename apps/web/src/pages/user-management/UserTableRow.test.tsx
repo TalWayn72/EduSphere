@@ -127,7 +127,10 @@ describe('UserTableRow — basic rendering', () => {
 
   it('renders role badge with current role', () => {
     renderRow();
-    expect(screen.getByText('INSTRUCTOR')).toBeTruthy();
+    // The role text appears in both the Badge (trigger) and the SelectItem option.
+    // getAllByText handles the multiple-matches case.
+    const roleTexts = screen.getAllByText('INSTRUCTOR');
+    expect(roleTexts.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders all role options in select', () => {
