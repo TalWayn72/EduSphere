@@ -38,38 +38,46 @@
     "SessionStart": [
       {
         "matcher": "startup|resume",
-        "hooks": [{
-          "type": "command",
-          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-start.sh\"",
-          "timeout": 10
-        }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-start.sh\"",
+            "timeout": 10
+          }
+        ]
       },
       {
         "matcher": "compact",
-        "hooks": [{
-          "type": "command",
-          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-resume-compact.sh\"",
-          "timeout": 10
-        }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-resume-compact.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PreCompact": [
       {
         "matcher": "auto",
-        "hooks": [{
-          "type": "command",
-          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/pre-compact.sh\"",
-          "timeout": 15
-        }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/pre-compact.sh\"",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "hooks": [{
-          "type": "command",
-          "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-end.sh\"",
-          "timeout": 10
-        }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/memory/session-end.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ]
   }
