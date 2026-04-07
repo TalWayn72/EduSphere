@@ -21,7 +21,7 @@ describe('discussion.queries', () => {
     };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
-    expect(def.name?.value).toBe('MyDiscussions');
+    expect(def.name?.value).toBe('MyDiscussionsList');
   });
 
   it('exports DISCUSSION_QUERY as a query DocumentNode', () => {
@@ -35,7 +35,7 @@ describe('discussion.queries', () => {
     };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('query');
-    expect(def.name?.value).toBe('Discussion');
+    expect(def.name?.value).toBe('DiscussionDetail');
   });
 
   it('exports DISCUSSION_MESSAGES_QUERY as a query DocumentNode', () => {
@@ -65,7 +65,7 @@ describe('discussion.queries', () => {
     };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('mutation');
-    expect(def.name?.value).toBe('AddMessage');
+    expect(def.name?.value).toBe('AddDiscussionMessage');
   });
 
   it('exports LIKE_MESSAGE_MUTATION as a mutation DocumentNode', () => {
@@ -95,7 +95,7 @@ describe('discussion.queries', () => {
     };
     expect(def.kind).toBe('OperationDefinition');
     expect(def.operation).toBe('subscription');
-    expect(def.name?.value).toBe('MessageAdded');
+    expect(def.name?.value).toBe('DiscussionMessageAdded');
   });
 
   it('exports JOIN_DISCUSSION_MUTATION as a mutation DocumentNode', () => {
