@@ -135,8 +135,8 @@ describe('useUnsavedChangesGuard', () => {
 
   // ── Observability (logging) ───────────────────────────────────────────────
 
-  it('logs console.error with component name when navigation is blocked', () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  it('logs console.debug with component name when navigation is blocked', () => {
+    const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
     vi.mocked(RRD.useBlocker).mockReturnValue({
       state: 'blocked',
       proceed: vi.fn(),
@@ -145,14 +145,14 @@ describe('useUnsavedChangesGuard', () => {
     renderHook(() => useUnsavedChangesGuard(true, 'LessonPipelinePage'), {
       wrapper: MemoryRouter,
     });
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(debugSpy).toHaveBeenCalledWith(
       expect.stringContaining('[LessonPipelinePage]')
     );
-    errorSpy.mockRestore();
+    debugSpy.mockRestore();
   });
 
   it('does NOT log when navigation is NOT blocked (unblocked state)', () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
     vi.mocked(RRD.useBlocker).mockReturnValue({
       state: 'unblocked',
       proceed: vi.fn(),
@@ -161,7 +161,7 @@ describe('useUnsavedChangesGuard', () => {
     renderHook(() => useUnsavedChangesGuard(false, 'TestComponent'), {
       wrapper: MemoryRouter,
     });
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(debugSpy).not.toHaveBeenCalled();
+    debugSpy.mockRestore();
   });
 });

@@ -73,8 +73,8 @@ describe('VideoPlayerCore', () => {
 
   it('renders speed selector button with default 1x', () => {
     render(<VideoPlayerCore src="https://example.com/video.mp4" />);
-    // The speed trigger button contains "1×"
-    expect(screen.getByText(/^1×/)).toBeInTheDocument();
+    // The speed trigger button contains "1x" (plain x, not multiplication sign)
+    expect(screen.getByText(/^1x/)).toBeInTheDocument();
   });
 
   it('renders seek bar with aria-label Seek', () => {

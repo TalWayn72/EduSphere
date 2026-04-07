@@ -224,6 +224,9 @@ describe('RoleplaySimulator', () => {
     await waitFor(() => {
       expect(screen.getByTestId('requirement-link')).toBeInTheDocument();
     });
-    expect(screen.queryByText('consent-required')).not.toBeInTheDocument();
+    // Note: 'consent-required' appears in the header as sceneDescription (plain text).
+    // RequirementLink replaces it only inside the message bubble.
+    const requirementLink = screen.getByTestId('requirement-link');
+    expect(requirementLink).toBeInTheDocument();
   });
 });

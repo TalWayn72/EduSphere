@@ -32,8 +32,16 @@ export function useCourseListData() {
       variables: { limit: 50, offset: 0 },
     });
 
-  // GraphQL error logging moved to an effect to avoid logging on every render.
-  // The error is still exposed via the return value for UI display.
+  // Log network errors once per error instance via useEffect to avoid
+  // logging on every render and to keep the component pure.
+  useEffect(() => {
+    if (error?.networkError) {
+      console.error(
+        '[CourseList] GraphQL network error:',
+        error.networkError.message
+      );
+    }
+  }, [error]);
 
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({

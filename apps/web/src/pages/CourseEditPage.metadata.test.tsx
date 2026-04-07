@@ -9,6 +9,16 @@ import {
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
+// CourseEditMetadata calls useSearchParams() — mock the router hook to avoid
+// "must be used in the context of a <Router>" error.
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...actual,
+    useSearchParams: vi.fn(() => [new URLSearchParams(), vi.fn()]),
+  };
+});
+
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(

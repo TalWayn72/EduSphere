@@ -111,12 +111,18 @@ describe('SearchPage', () => {
   });
 
   it('renders suggested search chips in the empty state', () => {
+    // Buttons use aria-label="Search for: <query>" (from t('searchSuggestion')),
+    // so we match by the accessible name, not the visible text content.
     renderSearch();
-    expect(screen.getByRole('button', { name: 'Talmud' })).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'chavruta' })
+      screen.getByRole('button', { name: 'Search for: Talmud' })
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Rambam' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Search for: chavruta' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Search for: Rambam' })
+    ).toBeInTheDocument();
   });
 
   // ── Input interaction ──────────────────────────────────────────────────────
@@ -131,8 +137,11 @@ describe('SearchPage', () => {
   });
 
   it('populates input when a suggestion chip is clicked', async () => {
+    // Chip buttons have aria-label="Search for: <query>", so we target by accessible name.
     renderSearch();
-    await userEvent.click(screen.getByRole('button', { name: 'Talmud' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Search for: Talmud' })
+    );
     const input = screen.getByPlaceholderText(
       /search courses, transcripts/i
     ) as HTMLInputElement;

@@ -10,9 +10,9 @@ vi.mock('@/pages/AnnotationCard', () => ({
     onSeek,
   }: {
     ann: Annotation;
-    onSeek: () => void;
+    onSeek: (id: string, ts?: number) => void;
   }) => (
-    <div data-testid="annotation-card" onClick={onSeek}>
+    <div data-testid="annotation-card" onClick={() => onSeek(ann.contentId, ann.contentTimestamp)}>
       {ann.content}
     </div>
   ),
@@ -53,7 +53,7 @@ describe('AnnotationItem — rendering', () => {
 
   it('renders a delete button with aria-label', () => {
     renderItem();
-    const btn = screen.getByRole('button', { name: 'deleteAriaLabel' });
+    const btn = screen.getByRole('button', { name: 'Delete annotation' });
     expect(btn).toBeTruthy();
   });
 
@@ -68,7 +68,7 @@ describe('AnnotationItem — delete interaction', () => {
   it('calls onDeleteRequest with annotation id when delete clicked', () => {
     const onDeleteRequest = vi.fn();
     renderItem({ onDeleteRequest });
-    fireEvent.click(screen.getByRole('button', { name: 'deleteAriaLabel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete annotation' }));
     expect(onDeleteRequest).toHaveBeenCalledTimes(1);
     expect(onDeleteRequest).toHaveBeenCalledWith('ann-42');
   });
@@ -77,7 +77,7 @@ describe('AnnotationItem — delete interaction', () => {
     const onDeleteRequest = vi.fn();
     const ann = { ...baseAnnotation, id: 'ann-special' };
     renderItem({ ann, onDeleteRequest });
-    fireEvent.click(screen.getByRole('button', { name: 'deleteAriaLabel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete annotation' }));
     expect(onDeleteRequest).toHaveBeenCalledWith('ann-special');
   });
 
@@ -85,7 +85,7 @@ describe('AnnotationItem — delete interaction', () => {
     const onSeek = vi.fn();
     const onDeleteRequest = vi.fn();
     renderItem({ onSeek, onDeleteRequest });
-    fireEvent.click(screen.getByRole('button', { name: 'deleteAriaLabel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete annotation' }));
     expect(onSeek).not.toHaveBeenCalled();
     expect(onDeleteRequest).toHaveBeenCalledTimes(1);
   });

@@ -26,6 +26,10 @@ import { resolve } from 'path';
 const SRC = resolve(__dirname, 'CourseCreatePage.tsx');
 const source = readFileSync(SRC, 'utf-8');
 
+// form.watch() lives in the custom hook extracted from CourseCreatePage
+const HOOK_SRC = resolve(__dirname, 'useCourseCreate.tsx');
+const hookSource = readFileSync(HOOK_SRC, 'utf-8');
+
 // ── Helper ───────────────────────────────────────────────────────────────────
 
 function countOccurrences(text: string, pattern: RegExp): number {
@@ -75,21 +79,22 @@ describe('CourseCreatePage — lazy import guards', () => {
 });
 
 // ── 2. form.watch subscription guard ────────────────────────────────────────
+// form.watch() lives in useCourseCreate (the custom hook) — not in the page component itself.
 
 describe('CourseCreatePage — form.watch() subscription count', () => {
   it('uses only ONE form.watch() call (array form) to avoid N re-renders per keystroke', () => {
-    // Count occurrences of form.watch( in the source
-    const count = countOccurrences(source, /form\.watch\(/g);
+    // Count occurrences of form.watch( in the hook source
+    const count = countOccurrences(hookSource, /form\.watch\(/g);
     expect(count).toBe(1);
   });
 
   it('the single form.watch() call passes an array of field names', () => {
     // Should be: form.watch(['title', 'description', 'difficulty', 'thumbnail'])
-    expect(source).toMatch(/form\.watch\(\[/);
+    expect(hookSource).toMatch(/form\.watch\(\[/);
   });
 
   it('does NOT call form.watch with individual string arguments outside the array', () => {
     // Pattern that would indicate individual field subscription: form.watch('fieldName')
-    expect(source).not.toMatch(/form\.watch\(['"][a-zA-Z]/);
+    expect(hookSource).not.toMatch(/form\.watch\(['"][a-zA-Z]/);
   });
 });

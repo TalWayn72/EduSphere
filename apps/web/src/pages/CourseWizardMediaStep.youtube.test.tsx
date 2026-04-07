@@ -57,6 +57,15 @@ vi.mock('@/lib/graphql/enriched-lesson.queries', () => ({
   INGEST_YOUTUBE_LESSON_MUTATION: 'INGEST_YOUTUBE_LESSON_MUTATION',
 }));
 
+vi.mock('@/lib/graphql/lesson.queries', () => ({
+  CREATE_LESSON_MUTATION: 'CREATE_LESSON_MUTATION',
+}));
+
+vi.mock('@/lib/auth', () => ({
+  getCurrentUser: vi.fn(() => ({ id: 'user-1' })),
+  DEV_MODE: false,
+}));
+
 vi.mock('@/components/AltTextModal', () => ({
   AltTextModal: ({ open }: { open: boolean }) =>
     open ? <div data-testid="alt-text-modal" /> : null,
@@ -130,18 +139,25 @@ describe('CourseWizardMediaStep — YouTube section', () => {
 
   it('calls urqlClient.mutation with correct input on Ingest click', async () => {
     const { urqlClient } = await import('@/lib/urql-client');
-    vi.mocked(urqlClient.mutation).mockReturnValue({
-      toPromise: vi.fn().mockResolvedValue({
-        data: {
-          ingestYoutubeLesson: {
-            id: 'lesson-1',
-            youtubeVideoId: 'dQw4w9WgXcQ',
-            enrichmentStatus: 'PENDING',
+    vi.mocked(urqlClient.mutation)
+      .mockReturnValueOnce({
+        toPromise: vi.fn().mockResolvedValue({
+          data: { createLesson: { id: 'lesson-1' } },
+          error: null,
+        }),
+      } as never)
+      .mockReturnValue({
+        toPromise: vi.fn().mockResolvedValue({
+          data: {
+            ingestYoutubeLesson: {
+              id: 'lesson-1',
+              youtubeVideoId: 'dQw4w9WgXcQ',
+              enrichmentStatus: 'PENDING',
+            },
           },
-        },
-        error: null,
-      }),
-    } as never);
+          error: null,
+        }),
+      } as never);
 
     renderStep();
     fireEvent.change(
@@ -156,7 +172,7 @@ describe('CourseWizardMediaStep — YouTube section', () => {
         expect.objectContaining({
           input: expect.objectContaining({
             youtubeUrl: VALID_YT_URL,
-            courseId: 'course-1',
+            lessonId: 'lesson-1',
           }),
         })
       )
@@ -165,18 +181,25 @@ describe('CourseWizardMediaStep — YouTube section', () => {
 
   it('calls onChange with a YOUTUBE mediaList entry on success', async () => {
     const { urqlClient } = await import('@/lib/urql-client');
-    vi.mocked(urqlClient.mutation).mockReturnValue({
-      toPromise: vi.fn().mockResolvedValue({
-        data: {
-          ingestYoutubeLesson: {
-            id: 'lesson-1',
-            youtubeVideoId: 'dQw4w9WgXcQ',
-            enrichmentStatus: 'PENDING',
+    vi.mocked(urqlClient.mutation)
+      .mockReturnValueOnce({
+        toPromise: vi.fn().mockResolvedValue({
+          data: { createLesson: { id: 'lesson-1' } },
+          error: null,
+        }),
+      } as never)
+      .mockReturnValue({
+        toPromise: vi.fn().mockResolvedValue({
+          data: {
+            ingestYoutubeLesson: {
+              id: 'lesson-1',
+              youtubeVideoId: 'dQw4w9WgXcQ',
+              enrichmentStatus: 'PENDING',
+            },
           },
-        },
-        error: null,
-      }),
-    } as never);
+          error: null,
+        }),
+      } as never);
 
     const onChange = vi.fn();
     renderStep({ onChange });

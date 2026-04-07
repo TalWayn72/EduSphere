@@ -273,9 +273,18 @@ async function advanceToStep3(title = 'Test Course That Is Long Enough') {
 
 describe('CourseCreatePage', () => {
   beforeEach(() => {
+    // Clear sessionStorage so useCourseCreate.loadWizardState() always starts at step 0.
+    // Without this, wizard state persisted by a previous test (e.g. step=1) causes the
+    // next test to render at the wrong step, breaking getByLabelText/title lookups.
+    sessionStorage.clear();
     vi.mocked(getCurrentUser).mockReturnValue(INSTRUCTOR_USER);
     mockNavigate.mockClear();
-    mockExecuteMutation.mockResolvedValue({ data: null, error: null });
+    // Default: return a valid createCourse response so handleNextToMedia (Step 2→Media)
+    // and handlePublish (Step 3→done) can advance the wizard without hitting toast.error.
+    mockExecuteMutation.mockResolvedValue({
+      data: { createCourse: { id: 'draft-course-1', title: 'Test Course' } },
+      error: null,
+    });
   });
 
   afterEach(() => {
@@ -470,13 +479,9 @@ describe('CourseCreatePage', () => {
 
   // ── Step 3 publish actions ──────────────────────────────────────────────
 
-  it('clicking "Publish Course" calls executeMutation with isPublished=true', async () => {
-    mockExecuteMutation.mockResolvedValue({
-      data: {
-        createCourse: { id: 'course-1', title: 'GraphQL Mastery Course' },
-      },
-      error: null,
-    });
+  it('clicking "Publish Course" navigates to the draft course (draftCourseId already set from Media step)', async () => {
+    // handleNextToMedia (Step 2→Media) auto-creates a draft and stores draftCourseId.
+    // handlePublish therefore takes the fast-path: toast + navigate, no second mutation.
     renderPage();
     await advanceToStep3('GraphQL Mastery Course');
 
@@ -484,20 +489,12 @@ describe('CourseCreatePage', () => {
       fireEvent.click(screen.getByRole('button', { name: /publish course/i }));
     });
 
-    expect(mockExecuteMutation).toHaveBeenCalledWith(
-      expect.objectContaining({
-        input: expect.objectContaining({ isPublished: true }),
-      })
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/courses/')
     );
   });
 
-  it('clicking "Save as Draft" calls executeMutation with isPublished=false', async () => {
-    mockExecuteMutation.mockResolvedValue({
-      data: {
-        createCourse: { id: 'course-2', title: 'Draft Course Enough Chars' },
-      },
-      error: null,
-    });
+  it('clicking "Save as Draft" navigates to the draft course (draftCourseId already set from Media step)', async () => {
     renderPage();
     await advanceToStep3('Draft Course Enough Chars');
 
@@ -505,10 +502,8 @@ describe('CourseCreatePage', () => {
       fireEvent.click(screen.getByRole('button', { name: /save as draft/i }));
     });
 
-    expect(mockExecuteMutation).toHaveBeenCalledWith(
-      expect.objectContaining({
-        input: expect.objectContaining({ isPublished: false }),
-      })
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/courses/')
     );
   });
 
