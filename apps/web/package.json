@@ -118,7 +118,7 @@
     "@edusphere/tsconfig": "workspace:*",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
-    "@remotion/cli": "^4.0.434",
+    "@remotion/cli": "^4.0.447",
     "@storybook/addon-a11y": "^8.6.18",
     "@storybook/addon-essentials": "^8.0.0",
     "@storybook/addon-interactions": "^8.6.14",
