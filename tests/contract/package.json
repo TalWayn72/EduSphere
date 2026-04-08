@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "vitest": "^4.0.18",
-    "graphql": "^16.0.0"
+    "graphql": "^16.13.2"
   }
 }
