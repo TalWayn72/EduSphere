@@ -192,11 +192,7 @@ describe('SyncTranscriptScroller', () => {
     const onSeek = vi.fn();
 
     render(
-      <SyncTranscriptScroller
-        blocks={BLOCKS}
-        currentTime={0}
-        onSeek={onSeek}
-      />
+      <SyncTranscriptScroller blocks={BLOCKS} currentTime={0} onSeek={onSeek} />
     );
 
     await user.click(screen.getByTestId('block-b2'));
@@ -213,7 +209,9 @@ describe('SyncTranscriptScroller', () => {
     );
 
     // Simulate user scroll
-    fireEvent.wheel(screen.getByTestId('enriched-transcript-panel').parentElement!);
+    fireEvent.wheel(
+      screen.getByTestId('enriched-transcript-panel').parentElement!
+    );
 
     // Advance to b2
     rerender(

@@ -157,7 +157,9 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
         });
         this.logger.log(`Graph: synced Source node ${id} after update`);
       } catch (err) {
-        this.logger.warn(`Graph sync failed for source ${id} on update: ${err}`);
+        this.logger.warn(
+          `Graph sync failed for source ${id} on update: ${err}`
+        );
       }
     }
 

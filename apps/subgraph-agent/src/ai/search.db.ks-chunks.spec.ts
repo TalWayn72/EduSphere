@@ -86,7 +86,11 @@ describe('searchKnowledgeGraph — knowledge source chunk_text (Phase 1b)', () =
       .mockResolvedValue({ rows: [] });
 
     mockWithTenantContext.mockImplementation(
-      async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => {
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (tx: unknown) => Promise<unknown>
+      ) => {
         const tx = {
           select: () => ({
             from: () => ({
@@ -135,7 +139,11 @@ describe('searchKnowledgeGraph — knowledge source chunk_text (Phase 1b)', () =
       .mockResolvedValue({ rows: [] });
 
     mockWithTenantContext.mockImplementation(
-      async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => {
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (tx: unknown) => Promise<unknown>
+      ) => {
         const tx = {
           select: () => ({
             from: () => ({

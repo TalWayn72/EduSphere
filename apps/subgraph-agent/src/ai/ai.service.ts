@@ -97,7 +97,10 @@ export class AIService {
 
         // QUIZ modes: use the conversational quiz workflow (turn-by-turn question/answer)
         // rather than runLangGraphQuiz which generates a quiz object and ignores the message.
-        if (templateType === 'QUIZ_GENERATOR' || templateType === 'QUIZ_ASSESS') {
+        if (
+          templateType === 'QUIZ_GENERATOR' ||
+          templateType === 'QUIZ_ASSESS'
+        ) {
           const model = this.legacyRunner.getModel();
           const input: ExecutionInput = { message, context, sessionId };
           return this.legacyRunner.runQuiz(model, input, locale);
