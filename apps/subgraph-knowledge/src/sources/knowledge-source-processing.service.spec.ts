@@ -143,7 +143,12 @@ describe('KnowledgeSourceProcessingService', () => {
       const result = await service.processSource('src-1', baseInput);
       expect(result.status).toBe('READY');
       expect(mockCallEmbeddingProvider).toHaveBeenCalledWith('Hello world');
-      expect(mockKsUpsert).toHaveBeenCalledWith('src-1', 0, [0.1, 0.2, 0.3]);
+      expect(mockKsUpsert).toHaveBeenCalledWith(
+        'src-1',
+        0,
+        [0.1, 0.2, 0.3],
+        'Hello world'
+      );
     });
 
     it('marks source FAILED when extraction throws', async () => {

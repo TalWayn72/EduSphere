@@ -79,6 +79,7 @@ export function EnrichedTranscriptPanel({
                 citation={block.citation}
                 transcriptText={getBlockText(block)}
                 isActive={active}
+                blockId={block.id}
                 onClick={() => onBlockClick?.(block)}
               />
             ) : (

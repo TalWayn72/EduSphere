@@ -94,8 +94,18 @@ describe('KnowledgeSourceReindexService', () => {
       expect(result.embeddingsGenerated).toBe(2);
       expect(result.errors).toEqual([]);
       expect(mockKsUpsert).toHaveBeenCalledTimes(2);
-      expect(mockKsUpsert).toHaveBeenCalledWith('src-1', 0, [0.1, 0.2]);
-      expect(mockKsUpsert).toHaveBeenCalledWith('src-1', 1, [0.1, 0.2]);
+      expect(mockKsUpsert).toHaveBeenCalledWith(
+        'src-1',
+        0,
+        [0.1, 0.2],
+        'Hello world'
+      );
+      expect(mockKsUpsert).toHaveBeenCalledWith(
+        'src-1',
+        1,
+        [0.1, 0.2],
+        'content here'
+      );
     });
 
     it('skips source with empty raw_content and records error', async () => {

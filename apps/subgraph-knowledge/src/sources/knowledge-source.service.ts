@@ -22,6 +22,7 @@ import {
   and,
   inArray,
   closeAllPools,
+  createSourceNode,
 } from '@edusphere/db';
 import type { KnowledgeSource } from '@edusphere/db';
 import {
@@ -141,6 +142,25 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
     if (!updated)
       throw new NotFoundException(`KnowledgeSource ${id} not found`);
     this.logger.log(`Updated knowledge source ${id}`);
+
+    // Sync the AGE graph Source node with the new title — non-fatal on failure.
+    if (input.title !== undefined) {
+      try {
+        await createSourceNode(this.db, {
+          id: updated.id,
+          tenant_id: updated.tenant_id,
+          name: updated.title,
+          source_type: updated.source_type,
+          origin: updated.origin ?? '',
+          course_id: updated.course_id ?? '',
+          chunk_count: updated.chunk_count,
+        });
+        this.logger.log(`Graph: synced Source node ${id} after update`);
+      } catch (err) {
+        this.logger.warn(`Graph sync failed for source ${id} on update: ${err}`);
+      }
+    }
+
     return updated;
   }
 

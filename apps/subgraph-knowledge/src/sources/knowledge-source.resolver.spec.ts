@@ -6,6 +6,7 @@ const mockListByCourseSources = vi.fn();
 const mockFindById = vi.fn();
 const mockCreateAndProcess = vi.fn();
 const mockDeleteSource = vi.fn();
+const mockUpdateSource = vi.fn();
 
 vi.mock('./knowledge-source.service.js', () => ({
   KnowledgeSourceService: class {
@@ -13,6 +14,7 @@ vi.mock('./knowledge-source.service.js', () => ({
     findById = mockFindById;
     createAndProcess = mockCreateAndProcess;
     deleteSource = mockDeleteSource;
+    updateSource = mockUpdateSource;
   },
 }));
 
@@ -201,6 +203,43 @@ describe('KnowledgeSourceResolver', () => {
       const result = await resolver.deleteKnowledgeSource('ks-1', makeCtx());
       expect(mockDeleteSource).toHaveBeenCalledWith('ks-1', 'tenant-1');
       expect(result).toBe(true);
+    });
+  });
+
+  describe('updateKnowledgeSource()', () => {
+    it('calls service.updateSource and returns mapped result', async () => {
+      const updated = { ...sampleRow, title: 'Renamed Source' };
+      mockUpdateSource.mockResolvedValue(updated);
+      const result = await resolver.updateKnowledgeSource(
+        'ks-1',
+        { title: 'Renamed Source' },
+        makeCtx()
+      );
+      expect(mockUpdateSource).toHaveBeenCalledWith('ks-1', 'tenant-1', {
+        title: 'Renamed Source',
+      });
+      expect(result.title).toBe('Renamed Source');
+    });
+
+    it('passes metadata update through to service', async () => {
+      const updated = { ...sampleRow, metadata: { lang: 'he' } };
+      mockUpdateSource.mockResolvedValue(updated);
+      await resolver.updateKnowledgeSource(
+        'ks-1',
+        { metadata: { lang: 'he' } },
+        makeCtx()
+      );
+      expect(mockUpdateSource).toHaveBeenCalledWith('ks-1', 'tenant-1', {
+        metadata: { lang: 'he' },
+      });
+    });
+
+    it('throws UnauthorizedException when tenantId is missing', async () => {
+      const ctx = { authContext: {} } as never;
+      await expect(
+        resolver.updateKnowledgeSource('ks-1', { title: 'X' }, ctx)
+      ).rejects.toThrow(UnauthorizedException);
+      expect(mockUpdateSource).not.toHaveBeenCalled();
     });
   });
 

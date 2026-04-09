@@ -95,7 +95,28 @@ export class AIService {
           };
         }
 
-        // LangGraph templates (QUIZ_GENERATOR, QUIZ_ASSESS, TUTOR, EXPLANATION_GENERATOR).
+        // QUIZ modes: use the conversational quiz workflow (turn-by-turn question/answer)
+        // rather than runLangGraphQuiz which generates a quiz object and ignores the message.
+        if (templateType === 'QUIZ_GENERATOR' || templateType === 'QUIZ_ASSESS') {
+          const model = this.legacyRunner.getModel();
+          const input: ExecutionInput = { message, context, sessionId };
+          return this.legacyRunner.runQuiz(model, input, locale);
+        }
+
+        // EXPLAIN mode: use the legacy generic runner with EXPLAIN_SYSTEM_PROMPT
+        // for clean conversational explanations rather than the TUTOR LangGraph workflow.
+        if (templateType === 'EXPLANATION_GENERATOR') {
+          const model = this.legacyRunner.getModel();
+          const input: ExecutionInput = { message, context, sessionId };
+          return this.legacyRunner.runGeneric(
+            model,
+            { template: 'EXPLANATION_GENERATOR' },
+            input,
+            locale
+          );
+        }
+
+        // LangGraph templates (TUTOR — keeps RAG tool access via runLangGraphTutor).
         const lgResult = await this.langgraphRunner.run(
           sessionId,
           message,

@@ -171,7 +171,7 @@ describe('CitationResolutionService', () => {
       const results: ResolvedCitation[] = [];
 
       for (let i = 0; i < SAMPLE_CANDIDATES.length; i++) {
-        const candidate = SAMPLE_CANDIDATES[i];
+        const candidate = SAMPLE_CANDIDATES.at(i)!;
         const graphSource =
           await mockCypherSourceService.findSourceByTitleFuzzy(
             candidate.bookName

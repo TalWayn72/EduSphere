@@ -159,7 +159,7 @@ export class KnowledgeSourceProcessingService {
           const vector = await this.embeddings.callEmbeddingProvider(
             chunk.text
           );
-          await this.ksChunkStore.upsert(sourceId, chunk.index, vector);
+          await this.ksChunkStore.upsert(sourceId, chunk.index, vector, chunk.text);
           embeddedCount++;
         } catch (err) {
           this.logger.warn(`Embedding failed for chunk ${chunk.index}: ${err}`);

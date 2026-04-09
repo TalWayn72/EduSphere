@@ -471,32 +471,30 @@ describe('AIService', () => {
       });
     });
 
-    it('routes QUIZ_GENERATOR to runLangGraphQuiz', async () => {
+    it('routes QUIZ_GENERATOR to legacy quiz workflow (NOT runLangGraphQuiz)', async () => {
       const result = await service.continueSession(
         SESSION_ID,
         MESSAGE,
         'QUIZ_GENERATOR',
         CTX
       );
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(
-        SESSION_ID,
-        MESSAGE,
-        CTX,
-        'en',
-        MOCK_CHECKPOINTER
-      );
-      expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
+      // runLangGraphQuiz generates a quiz object and ignores the user message —
+      // the conversational quiz workflow (via legacyRunner.runQuiz) is correct here.
+      // The legacy quiz workflow starts in LOAD_CONTENT state which returns without an LLM call.
+      expect(mockRunLangGraphQuiz).not.toHaveBeenCalled();
+      expect(result.text).toBeDefined();
+      expect(typeof result.text).toBe('string');
     });
 
-    it('routes QUIZ_ASSESS to runLangGraphQuiz', async () => {
-      await service.continueSession(SESSION_ID, MESSAGE, 'QUIZ_ASSESS', CTX);
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(
+    it('routes QUIZ_ASSESS to legacy quiz workflow (NOT runLangGraphQuiz)', async () => {
+      const result = await service.continueSession(
         SESSION_ID,
         MESSAGE,
-        CTX,
-        'en',
-        MOCK_CHECKPOINTER
+        'QUIZ_ASSESS',
+        CTX
       );
+      expect(mockRunLangGraphQuiz).not.toHaveBeenCalled();
+      expect(result.text).toBeDefined();
     });
 
     it('routes TUTOR to runLangGraphTutor', async () => {
@@ -518,21 +516,35 @@ describe('AIService', () => {
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
-    it('routes EXPLANATION_GENERATOR to runLangGraphTutor', async () => {
+    it('routes EXPLANATION_GENERATOR to legacy runGeneric (NOT runLangGraphTutor)', async () => {
+      mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
+      const result = await service.continueSession(
+        SESSION_ID,
+        MESSAGE,
+        'EXPLANATION_GENERATOR',
+        CTX
+      );
+      // runLangGraphTutor loses conversational quality; legacy runGeneric with
+      // EXPLAIN_SYSTEM_PROMPT gives clean step-by-step explanations.
+      expect(mockRunLangGraphTutor).not.toHaveBeenCalled();
+      expect(mockGenerateText).toHaveBeenCalled();
+      expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
+    });
+
+    it('EXPLANATION_GENERATOR uses EXPLAIN system prompt', async () => {
+      let capturedCall: Record<string, unknown> = {};
+      mockGenerateText.mockImplementation((args: unknown) => {
+        capturedCall = args as Record<string, unknown>;
+        return Promise.resolve(MOCK_GENERATE_RESULT);
+      });
       await service.continueSession(
         SESSION_ID,
         MESSAGE,
         'EXPLANATION_GENERATOR',
         CTX
       );
-      // Sixth argument is a tools object (searchKnowledgeGraph + fetchCourseContent)
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(
-        SESSION_ID,
-        MESSAGE,
-        CTX,
-        'en',
-        MOCK_CHECKPOINTER,
-        expect.any(Object)
+      expect(String(capturedCall['system'] ?? '').toLowerCase()).toContain(
+        'explain'
       );
     });
 

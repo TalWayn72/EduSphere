@@ -20,6 +20,8 @@ interface InlineCitationBlockProps {
   transcriptText: string;
   isActive?: boolean;
   onClick?: () => void;
+  /** data-block-id for SyncTranscriptScroller scroll-targeting */
+  blockId?: string;
 }
 
 export function InlineCitationBlock({
@@ -27,6 +29,7 @@ export function InlineCitationBlock({
   transcriptText,
   isActive = false,
   onClick,
+  blockId,
 }: InlineCitationBlockProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -38,6 +41,7 @@ export function InlineCitationBlock({
         isActive ? 'bg-primary/10 border-primary/30' : 'bg-card border-border'
       }`}
       data-testid={`inline-citation-${citation.id}`}
+      data-block-id={blockId}
     >
       {/* Transcript text with citation indicator */}
       <button

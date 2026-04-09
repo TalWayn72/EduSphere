@@ -1,4 +1,11 @@
-import { pgTable, uuid, timestamp, integer, vector } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  timestamp,
+  integer,
+  text,
+  vector,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk } from './_shared';
 import { transcript_segments } from './content';
@@ -86,6 +93,7 @@ export const knowledge_source_chunk_embeddings = pgTable(
       .notNull()
       .references(() => knowledgeSources.id, { onDelete: 'cascade' }),
     chunk_index: integer('chunk_index').notNull(),
+    chunk_text: text('chunk_text').notNull().default(''),
     embedding: vector('embedding', { dimensions: 768 }).notNull(),
     created_at: timestamp('created_at', { withTimezone: true })
       .notNull()

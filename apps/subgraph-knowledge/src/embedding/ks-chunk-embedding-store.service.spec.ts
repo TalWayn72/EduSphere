@@ -42,7 +42,7 @@ describe('KsChunkEmbeddingStoreService', () => {
       const vector = Array.from({ length: 768 }, () => 0.1);
 
       await expect(
-        service.upsert('source-uuid', 0, vector)
+        service.upsert('source-uuid', 0, vector, 'chunk content here')
       ).resolves.toBeUndefined();
 
       expect(mockExecute).toHaveBeenCalledOnce();
@@ -51,17 +51,27 @@ describe('KsChunkEmbeddingStoreService', () => {
     it('propagates database errors', async () => {
       mockExecute.mockRejectedValue(new Error('DB error'));
 
-      await expect(service.upsert('source-uuid', 0, [0.1])).rejects.toThrow(
-        'DB error'
-      );
+      await expect(
+        service.upsert('source-uuid', 0, [0.1], 'text')
+      ).rejects.toThrow('DB error');
     });
   });
 
   describe('search', () => {
     it('returns mapped results from raw SQL rows', async () => {
       mockExecute.mockResolvedValue([
-        { source_id: 'src-1', chunk_index: 2, similarity: '0.87' },
-        { source_id: 'src-1', chunk_index: 5, similarity: '0.72' },
+        {
+          source_id: 'src-1',
+          chunk_index: 2,
+          chunk_text: 'Hello world chunk',
+          similarity: '0.87',
+        },
+        {
+          source_id: 'src-1',
+          chunk_index: 5,
+          chunk_text: 'Another chunk text',
+          similarity: '0.72',
+        },
       ]);
 
       const results = await service.search('[0.1,0.2]', 'tenant-1', 5);
@@ -70,9 +80,11 @@ describe('KsChunkEmbeddingStoreService', () => {
       expect(results[0]).toEqual({
         sourceId: 'src-1',
         chunkIndex: 2,
+        chunkText: 'Hello world chunk',
         similarity: 0.87,
       });
       expect(results[1]!.similarity).toBeCloseTo(0.72);
+      expect(results[1]!.chunkText).toBe('Another chunk text');
     });
 
     it('returns empty array when no results', async () => {

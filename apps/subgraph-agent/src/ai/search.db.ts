@@ -143,6 +143,7 @@ export async function searchKnowledgeGraph(
       type KsRow = {
         source_id: string;
         chunk_index: number;
+        chunk_text: string;
         source_title: string;
         similarity: string;
       };
@@ -151,7 +152,8 @@ export async function searchKnowledgeGraph(
         execute: (sql: unknown) => Promise<{ rows: unknown[] }>;
       };
       const ksResult = await (db as unknown as RawExecute).execute(sql`
-        SELECT ksce.source_id, ksce.chunk_index, ks.title AS source_title,
+        SELECT ksce.source_id, ksce.chunk_index, ksce.chunk_text,
+               ks.title AS source_title,
                1 - (ksce.embedding <=> ${vectorString}::vector) AS similarity
         FROM knowledge_source_chunk_embeddings ksce
         JOIN knowledge_sources ks ON ks.id = ksce.source_id
@@ -167,7 +169,7 @@ export async function searchKnowledgeGraph(
         seen.add(key);
         results.push({
           id: key,
-          text: `[Source: ${row.source_title}]`,
+          text: row.chunk_text.slice(0, 200),
           type: 'knowledge_source_chunk',
           similarity: parseFloat(row.similarity) * ragConfig.vectorWeight,
         });

@@ -12,21 +12,29 @@ import { NotFoundException } from '@nestjs/common';
 
 // ─── Hoist mocks ──────────────────────────────────────────────────────────────
 
-const { mockCloseAllPools, mockInsert, mockSelect, mockUpdate, mockDelete } =
-  vi.hoisted(() => {
-    const mockInsert = vi.fn();
-    const mockSelect = vi.fn();
-    const mockUpdate = vi.fn();
-    const mockDelete = vi.fn();
-    const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-    return {
-      mockCloseAllPools,
-      mockInsert,
-      mockSelect,
-      mockUpdate,
-      mockDelete,
-    };
-  });
+const {
+  mockCloseAllPools,
+  mockInsert,
+  mockSelect,
+  mockUpdate,
+  mockDelete,
+  mockCreateSourceNode,
+} = vi.hoisted(() => {
+  const mockInsert = vi.fn();
+  const mockSelect = vi.fn();
+  const mockUpdate = vi.fn();
+  const mockDelete = vi.fn();
+  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+  const mockCreateSourceNode = vi.fn().mockResolvedValue(undefined);
+  return {
+    mockCloseAllPools,
+    mockInsert,
+    mockSelect,
+    mockUpdate,
+    mockDelete,
+    mockCreateSourceNode,
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => ({
@@ -36,6 +44,7 @@ vi.mock('@edusphere/db', () => ({
     delete: mockDelete,
   }),
   closeAllPools: mockCloseAllPools,
+  createSourceNode: (...args: unknown[]) => mockCreateSourceNode(...args),
   schema: {
     knowledgeSources: {
       id: 'id',
@@ -277,6 +286,45 @@ describe('KnowledgeSourceService', () => {
         metadata: { lang: 'he' },
       });
       expect(result.metadata).toEqual({ lang: 'he' });
+    });
+
+    it('syncs AGE graph Source node when title is updated', async () => {
+      const updated = { ...MOCK_SOURCE, title: 'Graph Sync Title' };
+      mockSelect.mockImplementation(buildSelect([MOCK_SOURCE]));
+      mockUpdate.mockImplementation(buildUpdate(updated));
+
+      await service.updateSource('ks-1', TENANT, { title: 'Graph Sync Title' });
+
+      expect(mockCreateSourceNode).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          id: 'ks-1',
+          tenant_id: TENANT,
+          name: 'Graph Sync Title',
+        })
+      );
+    });
+
+    it('does NOT sync AGE graph when only metadata is updated', async () => {
+      const updated = { ...MOCK_SOURCE, metadata: { tag: 'math' } };
+      mockSelect.mockImplementation(buildSelect([MOCK_SOURCE]));
+      mockUpdate.mockImplementation(buildUpdate(updated));
+
+      await service.updateSource('ks-1', TENANT, { metadata: { tag: 'math' } });
+
+      expect(mockCreateSourceNode).not.toHaveBeenCalled();
+    });
+
+    it('still returns updated source when graph sync fails', async () => {
+      const updated = { ...MOCK_SOURCE, title: 'Graph Down' };
+      mockSelect.mockImplementation(buildSelect([MOCK_SOURCE]));
+      mockUpdate.mockImplementation(buildUpdate(updated));
+      mockCreateSourceNode.mockRejectedValueOnce(new Error('AGE unreachable'));
+
+      const result = await service.updateSource('ks-1', TENANT, {
+        title: 'Graph Down',
+      });
+      expect(result.title).toBe('Graph Down');
     });
   });
 

@@ -85,7 +85,7 @@ export class KnowledgeSourceReindexService {
     for (const chunk of chunks) {
       try {
         const vector = await this.embeddings.callEmbeddingProvider(chunk.text);
-        await this.ksChunkStore.upsert(source.id, chunk.index, vector);
+        await this.ksChunkStore.upsert(source.id, chunk.index, vector, chunk.text);
         count++;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
