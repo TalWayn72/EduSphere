@@ -3858,6 +3858,31 @@ type Mutation {
   Cancel a running agent execution
   """
   cancelAgentExecution(executionId: UUID!): AgentExecution! @authenticated
+
+  # ─── AI Chat Session mutations ───
+
+  """
+  Start a new AI agent chat session.
+  templateType selects the LangGraph runner:
+  - CHAVRUTA_DEBATE → dialectical Socratic debate (thesis → contradiction → synthesis)
+  - QUIZ_GENERATOR  → turn-by-turn interactive quiz (question/answer conversation)
+  - EXPLANATION_GENERATOR → patient step-by-step teaching workflow
+  Each mode invokes a distinct LangGraph state machine. Routing is performed
+  in AiService before delegating to the correct runner.
+  """
+  startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession!
+    @authenticated
+
+  """
+  Send a user message within an active agent session.
+  Response is streamed via the messageStream subscription.
+  """
+  sendMessage(sessionId: ID!, content: String!): AgentMessage! @authenticated
+
+  """
+  End an active agent session and mark it COMPLETED.
+  """
+  endSession(sessionId: ID!): Boolean! @authenticated
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -4477,6 +4502,31 @@ type SemanticSearchResult {
 }
 
 """
+Result of a knowledge source chunk search (RAG pipeline).
+Returned when the vector search hits knowledge_source_chunk_embeddings.
+chunk_text contains the real extracted chunk text (up to 200 chars) that
+is passed to the LLM as RAG context.
+"""
+type KnowledgeSourceChunkResult {
+  """
+  Composite key: "<sourceId>-<chunkIndex>"
+  """
+  id: String!
+  """
+  Actual chunk text extracted from the source document (max 200 chars)
+  """
+  chunk_text: String!
+  """
+  Source type identifier — always "knowledge_source_chunk"
+  """
+  type: String!
+  """
+  Weighted cosine similarity (0–1, after vectorWeight factor applied)
+  """
+  similarity: Float!
+}
+
+"""
 Result of a course embedding reindex operation.
 Returned by the `reindexCourseEmbeddings` mutation.
 """
@@ -4995,6 +5045,17 @@ type Mutation {
     @authenticated
     @requiresScopes(scopes: [["knowledge:write"]])
 
+  # ─── KnowledgeSource mutations (NotebookLM-style course attachments) ───
+
+  """
+  Update the title and/or metadata of a KnowledgeSource.
+  Also syncs the corresponding Apache AGE Source node title in the knowledge graph.
+  """
+  updateKnowledgeSource(
+    id: ID!
+    input: UpdateKnowledgeSourceInput!
+  ): KnowledgeSource! @authenticated @requiresScopes(scopes: [["course:write"]])
+
   """
   Link a source to a concept (CITES edge)
   """
@@ -5087,6 +5148,60 @@ input CreateContradictionInput {
   severity: ContradictionSeverity!
   sourceAssetIdA: UUID
   sourceAssetIdB: UUID
+}
+
+"""
+NotebookLM-style information source attached to a course.
+Supports DOCX, PDF, TXT files, URLs, YouTube transcripts, and raw text.
+"""
+type KnowledgeSource {
+  id: ID!
+  courseId: ID!
+  tenantId: ID!
+  title: String!
+  sourceType: KnowledgeSourceType!
+  """
+  Original file name, URL, or YouTube link
+  """
+  origin: String
+  """
+  Full extracted plaintext (may be large — use with care)
+  """
+  rawContent: String
+  """
+  Preview of first 500 chars
+  """
+  preview: String
+  status: KnowledgeSourceStatus!
+  chunkCount: Int!
+  errorMessage: String
+  metadata: JSON
+  """
+  Presigned MinIO URL for viewing the original file. Null for URL/YouTube/Text sources.
+  """
+  fileUrl: String
+  createdAt: String!
+}
+
+enum KnowledgeSourceType {
+  FILE_DOCX
+  FILE_PDF
+  FILE_TXT
+  URL
+  YOUTUBE
+  TEXT
+}
+
+enum KnowledgeSourceStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+input UpdateKnowledgeSourceInput {
+  title: String
+  metadata: JSON
 }
 
 input ConceptFilterInput {

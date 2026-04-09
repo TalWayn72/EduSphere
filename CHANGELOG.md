@@ -6,6 +6,30 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [Unreleased] — 2026-04-09
+
+### Added
+
+- **RAG embedding pipeline** — `chunk_text` column in `knowledge_source_chunk_embeddings` enables real semantic search results; the RAG pipeline now returns actual chunk text instead of source-title placeholders
+- **AI Chat modes** — CHAVRUTA (Socratic debate), QUIZ (interactive turn-by-turn testing), and EXPLAIN (patient teaching) now invoke distinct LangGraph runners; routing bug that sent QUIZ/EXPLAIN to the wrong workflow is fixed
+- **Citation hover popover** — inline citation blocks display a popover with source text preview, reference label, and confidence badge on hover
+- **File upload progress bar** — XHR-based real-time upload progress events replace the indeterminate spinner in the knowledge source file upload flow
+- **Knowledge graph sync** — AGE `Source` nodes are updated automatically when a `KnowledgeSource` title changes (via `updateKnowledgeSource` mutation)
+- **`InlineCitationBlock` `data-block-id`** — citation blocks now carry a `data-block-id` attribute so `SyncTranscriptScroller` can scroll to the active citation
+- **60+ new tests** across RAG pipeline, AI chat mode routing, citation resolution, and knowledge-source mutations
+
+### Fixed
+
+- AI Chat routing bug: QUIZ and EXPLAIN modes were routed to the generic CHAVRUTA runner instead of their dedicated LangGraph workflows
+- Citation blocks invisible to `SyncTranscriptScroller` due to missing `data-block-id` attribute
+- `search.db` Phase 1b mock returning phantom source-title results instead of real chunk text in unit tests
+
+### Dependencies
+
+- `eslint-config-prettier` bumped to 10.1.8
+
+---
+
 ## [0.67.0] — 2026-04-01 — CI Pipeline Fixes
 
 ### Fixed
