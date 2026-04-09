@@ -36,7 +36,6 @@ export function useFileReadProgress(): UseFileReadProgressResult {
 
       const reader = new FileReader();
 
-      // eslint-disable-next-line no-undef
       reader.onprogress = (e: ProgressEvent<FileReader>) => {
         if (e.lengthComputable && mountedRef.current) {
           setProgress(Math.round((e.loaded / e.total) * 100));

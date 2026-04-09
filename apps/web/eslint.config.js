@@ -113,6 +113,7 @@ export default [
         sessionStorage: 'readonly',
         Storage: 'readonly',
         DOMException: 'readonly',
+        ProgressEvent: 'readonly',
       },
     },
     plugins: {
