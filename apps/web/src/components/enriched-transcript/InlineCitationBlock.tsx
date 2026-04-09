@@ -1,8 +1,8 @@
 /**
  * InlineCitationBlock — student-facing inline citation within transcript flow.
  *
- * Shows the transcript text with a citation indicator that expands
- * to reveal the source text and reference on click.
+ * Hover over the badge → quick-preview popover (source text, reference, confidence).
+ * Click the row → full expand with complete resolved text.
  */
 import { useState } from 'react';
 import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
@@ -15,6 +15,92 @@ import {
 } from '@/components/ui/tooltip';
 import type { LessonCitation } from './enriched-transcript.types';
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Returns a colour class for confidence 0-1. */
+function confidenceVariant(confidence: number): string {
+  if (confidence >= 0.9) return 'bg-green-100 text-green-800 border-green-200';
+  if (confidence >= 0.7)
+    return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  return 'bg-red-100 text-red-800 border-red-200';
+}
+
+function confidenceLabel(confidence: number): string {
+  return `${Math.round(confidence * 100)}%`;
+}
+
+function truncate(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max)}…` : text;
+}
+
+// ── Hover-preview sub-component ──────────────────────────────────────────────
+
+interface CitationHoverPreviewProps {
+  citation: LessonCitation;
+  children: React.ReactNode;
+}
+
+function CitationHoverPreview({
+  citation,
+  children,
+}: CitationHoverPreviewProps) {
+  const previewText = citation.resolvedText
+    ? truncate(citation.resolvedText, 100)
+    : citation.sourceText
+      ? truncate(citation.sourceText, 100)
+      : null;
+
+  const reference = [
+    citation.bookName,
+    citation.part,
+    citation.page ? `p. ${citation.page}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent
+          side="top"
+          className="max-w-xs p-3 space-y-1.5"
+          data-testid="citation-hover-preview"
+        >
+          {/* Source preview text */}
+          {previewText && (
+            <p
+              className="text-xs leading-relaxed italic"
+              dir="auto"
+              data-testid="hover-preview-text"
+            >
+              {previewText}
+            </p>
+          )}
+
+          {/* Book name + page reference */}
+          <p
+            className="text-xs font-medium"
+            data-testid="hover-preview-reference"
+          >
+            {reference}
+          </p>
+
+          {/* Confidence badge */}
+          <span
+            className={`inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-medium ${confidenceVariant(citation.confidence)}`}
+            data-testid="hover-preview-confidence"
+          >
+            {confidenceLabel(citation.confidence)} match
+          </span>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+// ── Props ─────────────────────────────────────────────────────────────────────
+
 interface InlineCitationBlockProps {
   citation: LessonCitation;
   transcriptText: string;
@@ -23,6 +109,8 @@ interface InlineCitationBlockProps {
   /** data-block-id for SyncTranscriptScroller scroll-targeting */
   blockId?: string;
 }
+
+// ── Main component ────────────────────────────────────────────────────────────
 
 export function InlineCitationBlock({
   citation,
@@ -56,33 +144,20 @@ export function InlineCitationBlock({
         <span className="flex-1 text-sm leading-relaxed" dir="auto">
           {transcriptText}
         </span>
+
         <span className="shrink-0 flex items-center gap-1 mt-0.5">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="text-xs gap-1 cursor-pointer"
-                >
-                  <BookOpen className="h-3 w-3" />
-                  {citation.bookName}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-xs">
-                <p className="font-medium text-xs">{citation.bookName}</p>
-                {citation.part && (
-                  <p className="text-xs text-muted-foreground">
-                    {citation.part}
-                  </p>
-                )}
-                {citation.page && (
-                  <p className="text-xs text-muted-foreground">
-                    p. {citation.page}
-                  </p>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {/* Hover-preview wraps the badge */}
+          <CitationHoverPreview citation={citation}>
+            <Badge
+              variant="outline"
+              className="text-xs gap-1 cursor-pointer"
+              data-testid="citation-badge"
+            >
+              <BookOpen className="h-3 w-3" />
+              {citation.bookName}
+            </Badge>
+          </CitationHoverPreview>
+
           {expanded ? (
             <ChevronUp className="h-3 w-3 text-muted-foreground" />
           ) : (
@@ -91,9 +166,12 @@ export function InlineCitationBlock({
         </span>
       </button>
 
-      {/* Expanded source text */}
+      {/* Expanded source text (full detail on click) */}
       {expanded && (
-        <div className="px-3 pb-3 pt-1 border-t space-y-1.5">
+        <div
+          className="px-3 pb-3 pt-1 border-t space-y-1.5"
+          data-testid="citation-expanded-panel"
+        >
           <p className="text-xs text-muted-foreground italic">
             {citation.bookName}
             {citation.part ? `, ${citation.part}` : ''}

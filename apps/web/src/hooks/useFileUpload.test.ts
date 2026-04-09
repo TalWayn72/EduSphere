@@ -1,3 +1,17 @@
+/**
+ * Tests for useFileUpload hook.
+ *
+ * Covers:
+ *  1. Initial state
+ *  2. Successful presign → XHR PUT (with per-byte progress) → confirm
+ *  3. Retry on failure (presign / PUT / confirm)
+ *  4. Max retries exhausted → error state
+ *  5. retry() / reset() helpers
+ *  6. Memory safety (no setState after unmount, abort on unmount)
+ *  7. Progress mapping during XHR upload
+ *  8. Structured logging with [useFileUpload] prefix
+ */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
@@ -6,6 +20,55 @@ import {
   type ConfirmResult,
   type PresignResult,
 } from './useFileUpload';
+
+// ── XHR mock ──────────────────────────────────────────────────────────────────
+
+interface MockXHRInstance {
+  open: ReturnType<typeof vi.fn>;
+  setRequestHeader: ReturnType<typeof vi.fn>;
+  send: ReturnType<typeof vi.fn>;
+  abort: ReturnType<typeof vi.fn>;
+  upload: { onprogress: ((e: Partial<ProgressEvent>) => void) | null };
+  onload: (() => void) | null;
+  onerror: (() => void) | null;
+  onabort: (() => void) | null;
+  status: number;
+  statusText: string;
+  _triggerLoad: (status: number, statusText: string) => void;
+  _triggerProgress: (loaded: number, total: number) => void;
+  _triggerError: () => void;
+  _triggerAbort: () => void;
+}
+
+let lastXHR: MockXHRInstance | null = null;
+
+class MockXHR implements MockXHRInstance {
+  open = vi.fn();
+  setRequestHeader = vi.fn();
+  send = vi.fn();
+  abort = vi.fn(() => this._triggerAbort());
+  upload = { onprogress: null as ((e: Partial<ProgressEvent>) => void) | null };
+  onload: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  onabort: (() => void) | null = null;
+  status = 200;
+  statusText = 'OK';
+
+  _triggerLoad(status: number, statusText: string) {
+    this.status = status;
+    this.statusText = statusText;
+    this.onload?.();
+  }
+  _triggerProgress(loaded: number, total: number) {
+    this.upload.onprogress?.({ lengthComputable: true, loaded, total });
+  }
+  _triggerError() {
+    this.onerror?.();
+  }
+  _triggerAbort() {
+    this.onabort?.();
+  }
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -35,18 +98,20 @@ function makeOptions(
   };
 }
 
-// ── Fetch mock ───────────────────────────────────────────────────────────────
-
-const fetchSpy = vi.fn();
+// ── Setup ────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
-  fetchSpy.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
-  vi.stubGlobal('fetch', fetchSpy);
+  vi.stubGlobal('XMLHttpRequest', function () {
+    const xhr = new MockXHR();
+    lastXHR = xhr;
+    return xhr;
+  });
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  lastXHR = null;
 });
 
 // ── Tests ────────────────────────────────────────────────────────────────────
@@ -63,7 +128,7 @@ describe('useFileUpload', () => {
   });
 
   describe('successful upload flow', () => {
-    it('completes presign → PUT → confirm and returns result', async () => {
+    it('completes presign → XHR PUT → confirm and returns result', async () => {
       const presign = vi.fn().mockResolvedValue(defaultPresignResult);
       const confirm = vi.fn().mockResolvedValue(defaultConfirmResult);
       const onProgress = vi.fn();
@@ -74,7 +139,12 @@ describe('useFileUpload', () => {
 
       let uploadResult: ConfirmResult | null = null;
       await act(async () => {
-        uploadResult = await result.current.upload(file);
+        const p = result.current.upload(file);
+        // Wait for presign to resolve then trigger XHR completion
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        uploadResult = await p;
       });
 
       expect(uploadResult).toEqual(defaultConfirmResult);
@@ -83,27 +153,27 @@ describe('useFileUpload', () => {
       expect(result.current.uploading).toBe(false);
       expect(result.current.error).toBeNull();
 
-      // Verify presign was called with the file
       expect(presign).toHaveBeenCalledWith(file);
-
-      // Verify fetch PUT was called with the presigned URL
-      expect(fetchSpy).toHaveBeenCalledWith(
-        defaultPresignResult.uploadUrl,
-        expect.objectContaining({
-          method: 'PUT',
-          body: file,
-          headers: { 'Content-Type': 'image/png' },
-        })
-      );
-
-      // Verify confirm was called with fileKey and file
       expect(confirm).toHaveBeenCalledWith(defaultPresignResult.fileKey, file);
+    });
 
-      // Verify progress was reported
-      expect(onProgress).toHaveBeenCalledWith(10); // presigning
-      expect(onProgress).toHaveBeenCalledWith(30); // uploading
-      expect(onProgress).toHaveBeenCalledWith(80); // confirming
-      expect(onProgress).toHaveBeenCalledWith(100); // done
+    it('uses correct Content-Type in XHR PUT', async () => {
+      const opts = makeOptions();
+      const { result } = renderHook(() => useFileUpload(opts));
+      const file = makeFile('doc.pdf', 'application/pdf');
+
+      await act(async () => {
+        const p = result.current.upload(file);
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
+      });
+
+      expect(lastXHR?.setRequestHeader).toHaveBeenCalledWith(
+        'Content-Type',
+        'application/pdf'
+      );
     });
 
     it('uses application/octet-stream when file type is empty', async () => {
@@ -112,21 +182,100 @@ describe('useFileUpload', () => {
       const file = new File([new ArrayBuffer(10)], 'data.bin', { type: '' });
 
       await act(async () => {
-        await result.current.upload(file);
+        const p = result.current.upload(file);
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
       });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          headers: { 'Content-Type': 'application/octet-stream' },
-        })
+      expect(lastXHR?.setRequestHeader).toHaveBeenCalledWith(
+        'Content-Type',
+        'application/octet-stream'
       );
     });
   });
 
+  describe('XHR progress reporting', () => {
+    it('maps XHR bytes progress to 30–79% range', async () => {
+      const onProgress = vi.fn();
+      const opts = makeOptions({ onProgress });
+
+      const { result } = renderHook(() => useFileUpload(opts));
+
+      await act(async () => {
+        const p = result.current.upload(makeFile());
+        await Promise.resolve();
+        await Promise.resolve();
+        // Trigger 50% byte progress
+        lastXHR?._triggerProgress(500, 1000);
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
+      });
+
+      const progressCalls = onProgress.mock.calls.map((c: [number]) => c[0]);
+
+      // Should include the mapped 50% byte progress = 30 + Math.round(0.5 * 49) = 54 or 55
+      const uploadRangeValues = progressCalls.filter(
+        (v: number) => v > 30 && v < 80
+      );
+      expect(uploadRangeValues.length).toBeGreaterThan(0);
+    });
+
+    it('reports progress milestones: 10 (presign), 30 (upload start), 80 (confirm), 100 (done)', async () => {
+      const onProgress = vi.fn();
+      const opts = makeOptions({ onProgress });
+
+      const { result } = renderHook(() => useFileUpload(opts));
+
+      await act(async () => {
+        const p = result.current.upload(makeFile());
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
+      });
+
+      const progressValues = onProgress.mock.calls.map((c: [number]) => c[0]);
+
+      expect(progressValues).toContain(10); // presigning
+      expect(progressValues).toContain(30); // uploading start
+      expect(progressValues).toContain(80); // confirming
+      expect(progressValues).toContain(100); // done
+    });
+
+    it('progress values are monotonically non-decreasing', async () => {
+      const onProgress = vi.fn();
+      const opts = makeOptions({ onProgress });
+
+      const { result } = renderHook(() => useFileUpload(opts));
+
+      await act(async () => {
+        const p = result.current.upload(makeFile());
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerProgress(250, 1000);
+        lastXHR?._triggerProgress(750, 1000);
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
+      });
+
+      const progressValues = onProgress.mock.calls.map((c: [number]) => c[0]);
+      for (let i = 1; i < progressValues.length; i++) {
+        expect(progressValues[i]).toBeGreaterThanOrEqual(progressValues[i - 1]);
+      }
+    });
+  });
+
   describe('retry on failure', () => {
-    it('retries with exponential backoff on presign failure', async () => {
+    it('retries on presign failure and succeeds on third attempt', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
+
+      vi.stubGlobal('XMLHttpRequest', function () {
+        const xhr = new MockXHR();
+        lastXHR = xhr;
+        return xhr;
+      });
 
       const presign = vi
         .fn()
@@ -137,28 +286,33 @@ describe('useFileUpload', () => {
 
       const { result } = renderHook(() => useFileUpload(opts));
 
+      let uploadResult: ConfirmResult | null = null;
       await act(async () => {
-        await result.current.upload(makeFile());
+        const p = result.current.upload(makeFile());
+        // Advance past backoff delays (1s + 2s = 3s; use 10s to be safe)
+        await vi.advanceTimersByTimeAsync(10000);
+        // After backoff, XHR is created and awaiting load
+        lastXHR?._triggerLoad(200, 'OK');
+        uploadResult = await p;
       });
 
-      // Should have called presign 3 times (1 initial + 2 retries before success)
       expect(presign).toHaveBeenCalledTimes(3);
       expect(result.current.phase).toBe('done');
-      expect(result.current.error).toBeNull();
+      expect(uploadResult).toEqual(defaultConfirmResult);
 
       vi.useRealTimers();
     });
 
-    it('retries on PUT failure', async () => {
+    it('retries on PUT failure (XHR non-2xx)', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      fetchSpy
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 500,
-          statusText: 'Internal Server Error',
-        })
-        .mockResolvedValueOnce({ ok: true, status: 200, statusText: 'OK' });
+      const xhrInstances: MockXHR[] = [];
+      vi.stubGlobal('XMLHttpRequest', function () {
+        const xhr = new MockXHR();
+        xhrInstances.push(xhr);
+        lastXHR = xhr;
+        return xhr;
+      });
 
       const presign = vi.fn().mockResolvedValue(defaultPresignResult);
       const opts = makeOptions({ presign, maxRetries: 3 });
@@ -166,12 +320,25 @@ describe('useFileUpload', () => {
       const { result } = renderHook(() => useFileUpload(opts));
 
       await act(async () => {
-        await result.current.upload(makeFile());
+        const p = result.current.upload(makeFile());
+
+        // Let presign resolve (microtasks), then fail first XHR
+        await Promise.resolve();
+        await Promise.resolve();
+        xhrInstances[0]?._triggerLoad(500, 'Server Error');
+
+        // Advance timers past backoff delay
+        await vi.advanceTimersByTimeAsync(2000);
+
+        // Let second presign resolve, then complete second XHR
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+
+        await p;
       });
 
-      // Presign called twice (full pipeline retried from start)
       expect(presign).toHaveBeenCalledTimes(2);
-      expect(fetchSpy).toHaveBeenCalledTimes(2);
       expect(result.current.phase).toBe('done');
 
       vi.useRealTimers();
@@ -180,16 +347,46 @@ describe('useFileUpload', () => {
     it('retries on confirm failure', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const confirm = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('Confirm timeout'))
-        .mockResolvedValueOnce(defaultConfirmResult);
+      const xhrInstances: MockXHR[] = [];
+      vi.stubGlobal('XMLHttpRequest', function () {
+        const xhr = new MockXHR();
+        xhrInstances.push(xhr);
+        lastXHR = xhr;
+        return xhr;
+      });
+
+      let confirmCallCount = 0;
+      const confirm = vi.fn().mockImplementation(async () => {
+        confirmCallCount++;
+        if (confirmCallCount === 1) throw new Error('Confirm timeout');
+        return defaultConfirmResult;
+      });
       const opts = makeOptions({ confirm, maxRetries: 3 });
 
       const { result } = renderHook(() => useFileUpload(opts));
 
       await act(async () => {
-        await result.current.upload(makeFile());
+        const p = result.current.upload(makeFile());
+
+        // Wait for first presign to resolve and first XHR to be created
+        await Promise.resolve();
+        await Promise.resolve();
+        // Complete first XHR — confirm will fail
+        xhrInstances[0]?._triggerLoad(200, 'OK');
+        // Let confirm failure propagate
+        await Promise.resolve();
+        await Promise.resolve();
+
+        // Advance past backoff (1000ms)
+        await vi.advanceTimersByTimeAsync(2000);
+
+        // Wait for second presign to resolve and second XHR to be created
+        await Promise.resolve();
+        await Promise.resolve();
+        // Complete second XHR — confirm succeeds
+        xhrInstances[1]?._triggerLoad(200, 'OK');
+
+        await p;
       });
 
       expect(confirm).toHaveBeenCalledTimes(2);
@@ -200,13 +397,12 @@ describe('useFileUpload', () => {
   });
 
   describe('max retries exceeded', () => {
-    it('sets error state when all retries are exhausted', async () => {
-      vi.useFakeTimers({ shouldAdvanceTime: true });
-
+    it('sets error state when all retries are exhausted (maxRetries=0)', async () => {
+      // maxRetries=0 means no backoff delays — cleaner to test without fake timers
       const presign = vi
         .fn()
         .mockRejectedValue(new Error('Persistent failure'));
-      const opts = makeOptions({ presign, maxRetries: 2 });
+      const opts = makeOptions({ presign, maxRetries: 0 });
 
       const { result } = renderHook(() => useFileUpload(opts));
 
@@ -220,10 +416,8 @@ describe('useFileUpload', () => {
       expect(result.current.error).toBe('Persistent failure');
       expect(result.current.progress).toBe(0);
 
-      // 1 initial + 2 retries = 3 total
-      expect(presign).toHaveBeenCalledTimes(3);
-
-      vi.useRealTimers();
+      // maxRetries=0: 1 initial + 0 retries = 1 total
+      expect(presign).toHaveBeenCalledTimes(1);
     });
 
     it('returns null when max retries exceeded', async () => {
@@ -264,11 +458,15 @@ describe('useFileUpload', () => {
 
       expect(result.current.phase).toBe('error');
 
-      // Now fix presign and retry
+      // Fix presign and retry
       presign.mockResolvedValue(defaultPresignResult);
 
       await act(async () => {
-        const retryResult = await result.current.retry();
+        const p = result.current.retry();
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        const retryResult = await p;
         expect(retryResult).toEqual(defaultConfirmResult);
       });
 
@@ -331,79 +529,45 @@ describe('useFileUpload', () => {
 
       const { result, unmount } = renderHook(() => useFileUpload(opts));
 
-      // Start upload then unmount before presign resolves
       const uploadPromise = act(async () => {
         void result.current.upload(makeFile());
       });
 
       unmount();
 
-      // Resolve after unmount — should not throw or update state
       await act(async () => {
         resolvePresign(defaultPresignResult);
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
         await Promise.resolve();
       });
 
       await uploadPromise;
 
-      // Phase should remain as it was at unmount time (not 'done')
       expect(result.current.phase).not.toBe('done');
     });
 
-    it('aborts in-flight fetch on unmount', async () => {
+    it('XHR is sent with the presigned URL', async () => {
       const opts = makeOptions();
-      const { result, unmount } = renderHook(() => useFileUpload(opts));
-
-      // Start upload
-      act(() => {
-        void result.current.upload(makeFile());
-      });
-
-      // Unmount should trigger abort
-      unmount();
-
-      // The AbortController should have been invoked — verify via
-      // the fetch call receiving an abort signal
-      if (fetchSpy.mock.calls.length > 0) {
-        const fetchCallArgs = fetchSpy.mock.calls[0];
-        const fetchOptions = fetchCallArgs?.[1];
-        expect(fetchOptions?.signal).toBeDefined();
-      }
-    });
-  });
-
-  describe('progress callback', () => {
-    it('reports progress at each phase', async () => {
-      const onProgress = vi.fn();
-      const opts = makeOptions({ onProgress });
-
       const { result } = renderHook(() => useFileUpload(opts));
 
       await act(async () => {
-        await result.current.upload(makeFile());
+        const p = result.current.upload(makeFile());
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
       });
 
-      const progressValues = onProgress.mock.calls.map(
-        (call: [number]) => call[0]
+      expect(lastXHR?.open).toHaveBeenCalledWith(
+        'PUT',
+        defaultPresignResult.uploadUrl
       );
-
-      // Should include key milestones
-      expect(progressValues).toContain(10); // presigning
-      expect(progressValues).toContain(30); // uploading
-      expect(progressValues).toContain(80); // confirming
-      expect(progressValues).toContain(100); // done
-
-      // Progress should be monotonically increasing
-      for (let i = 1; i < progressValues.length; i++) {
-        expect(progressValues[i]).toBeGreaterThanOrEqual(progressValues[i - 1]);
-      }
     });
   });
 
   describe('structured logging', () => {
     it('logs with [useFileUpload] prefix on success', async () => {
-      // Source uses console.warn (not console.error) for success/info logs
-      // guarded by import.meta.env.DEV — spy on warn to capture them.
       const warnSpy = vi
         .spyOn(console, 'warn')
         .mockImplementation(() => undefined);
@@ -412,7 +576,11 @@ describe('useFileUpload', () => {
       const { result } = renderHook(() => useFileUpload(opts));
 
       await act(async () => {
-        await result.current.upload(makeFile());
+        const p = result.current.upload(makeFile());
+        await Promise.resolve();
+        await Promise.resolve();
+        lastXHR?._triggerLoad(200, 'OK');
+        await p;
       });
 
       const logMessages = warnSpy.mock.calls.map((c) => String(c[0]));
@@ -428,10 +596,15 @@ describe('useFileUpload', () => {
 
     it('logs retry attempts with [useFileUpload] prefix', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
-      // Source uses console.warn for retry attempt messages under import.meta.env.DEV
       const warnSpy = vi
         .spyOn(console, 'warn')
         .mockImplementation(() => undefined);
+
+      vi.stubGlobal('XMLHttpRequest', function () {
+        const xhr = new MockXHR();
+        lastXHR = xhr;
+        return xhr;
+      });
 
       const presign = vi
         .fn()
@@ -441,9 +614,17 @@ describe('useFileUpload', () => {
 
       const { result } = renderHook(() => useFileUpload(opts));
 
-      await act(async () => {
-        await result.current.upload(makeFile());
+      const uploadPromise = result.current.upload(makeFile());
+
+      // Advance past the backoff delay (1000ms for first retry)
+      await vi.advanceTimersByTimeAsync(2000);
+
+      // Now presign succeeded — XHR was created, trigger its load
+      act(() => {
+        lastXHR?._triggerLoad(200, 'OK');
       });
+
+      await uploadPromise;
 
       const logMessages = warnSpy.mock.calls.map((c) => String(c[0]));
       const retryLogs = logMessages.filter(

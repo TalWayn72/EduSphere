@@ -1,14 +1,12 @@
 /**
  * AddSourceModal — Modal for adding a new knowledge source (URL, text, YouTube, file).
- *
- * BUG-098: Converted from raw div overlay to Radix Dialog for accessibility
- * compliance (DialogTitle + aria-describedby). Also adds auth pre-check
- * so unauthenticated users see a clear login prompt instead of a 400 error.
+ * BUG-098: Radix Dialog for a11y. Auth pre-check prevents 400 errors on expired sessions.
+ * Progress: Phase 1 (FileReader base64) via useFileReadProgress,
+ *           Phase 2 (network upload) via useXHRGraphQLUpload (XHR upload.onprogress).
  */
-
 import { useState, useRef, useEffect } from 'react';
 import { useFileReadProgress } from '@/hooks/useFileReadProgress';
-import { Progress } from '@/components/ui/progress';
+import { useXHRGraphQLUpload } from '@/hooks/useXHRGraphQLUpload';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -19,19 +17,40 @@ import {
 } from '@/components/ui/dialog';
 import type { AddTab } from './types';
 import { TAB_KEYS, TAB_LABEL_KEYS } from './types';
-import { getSourceErrorKey, hasValidAuth } from './utils';
+import {
+  getSourceErrorKey,
+  hasValidAuth,
+  authHeaders,
+  IS_DEV_MODE,
+} from './utils';
 import {
   useAddUrlMutation,
   useAddTextMutation,
   useAddYoutubeMutation,
-  useAddFileMutation,
 } from './useAddSourceMutations';
+import { ADD_FILE_SOURCE } from '@/lib/graphql/sources.queries';
 import {
   UrlPanel,
   TextPanel,
   YoutubePanel,
   FilePanel,
 } from './AddSourceTabPanels';
+import { UploadProgressBar } from './UploadProgressBar';
+import { devAddSource } from './dev-mock';
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface AddFileSourceResponse {
+  addFileSource: {
+    id: string;
+    title: string;
+    sourceType: string;
+    status: string;
+    origin?: string;
+  };
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function AddSourceModal({
   courseId,
@@ -53,7 +72,7 @@ export function AddSourceModal({
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [youtubeTitle, setYoutubeTitle] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
-  const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -76,12 +95,24 @@ export function AddSourceModal({
     };
   }, [success, onClose]);
 
-  const { readFileAsBase64, progress, isReading } = useFileReadProgress();
+  const {
+    readFileAsBase64,
+    progress: readProgress,
+    isReading,
+  } = useFileReadProgress();
+
+  const {
+    execute: executeXHR,
+    isUploading,
+    uploadProgress,
+  } = useXHRGraphQLUpload<AddFileSourceResponse>({
+    headers: authHeaders(),
+  });
+
   const callbacks = { onAdded, setSuccess, setError, t };
   const addUrl = useAddUrlMutation(callbacks);
   const addText = useAddTextMutation(callbacks);
   const addYoutube = useAddYoutubeMutation(callbacks);
-  const addFile = useAddFileMutation(callbacks);
 
   const handleSubmit = async () => {
     setError('');
@@ -102,14 +133,34 @@ export function AddSourceModal({
       } else if (tab === 'file') {
         const file = fileRef.current?.files?.[0];
         if (!file) return setError(t('sources.fileRequired'));
+
+        // Phase 1: Read file as base64 (local, shows read progress bar)
         const contentBase64 = await readFileAsBase64(file);
-        await addFile.mutateAsync({
+
+        const input = {
           courseId,
           title: fileTitle || file.name,
           fileName: file.name,
           contentBase64,
           mimeType: file.type || 'application/octet-stream',
-        });
+        };
+
+        if (IS_DEV_MODE) {
+          const lower = file.name.toLowerCase();
+          const devType = lower.endsWith('.docx')
+            ? ('FILE_DOCX' as const)
+            : lower.endsWith('.txt')
+              ? ('FILE_TXT' as const)
+              : ('FILE_PDF' as const);
+          devAddSource(devType, input.title, file.name);
+          onAdded();
+          setSuccess(true);
+        } else {
+          // Phase 2: Upload via XHR for real upload progress
+          await executeXHR(ADD_FILE_SOURCE, { input });
+          onAdded();
+          setSuccess(true);
+        }
       }
     } catch (e) {
       setError(t(getSourceErrorKey(e)));
@@ -118,9 +169,9 @@ export function AddSourceModal({
     }
   };
 
-  const handleFileSelect = (name: string) => {
-    setSelectedFileName(name);
-    if (!fileTitle) setFileTitle(name);
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    if (!fileTitle) setFileTitle(file.name);
   };
 
   return (
@@ -210,20 +261,22 @@ export function AddSourceModal({
             <>
               <FilePanel
                 fileTitle={fileTitle}
-                selectedFileName={selectedFileName}
+                selectedFileName={selectedFile?.name ?? ''}
                 busy={busy}
                 fileRef={fileRef}
                 onTitleChange={setFileTitle}
-                onFileSelect={handleFileSelect}
+                onFileSelect={(_name) => {
+                  const file = fileRef.current?.files?.[0];
+                  if (file) handleFileSelect(file);
+                }}
               />
-              {isReading && (
-                <div className="mt-1" data-testid="file-read-progress">
-                  <Progress value={progress} className="h-2" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {t('sources.readingFile', { progress })}
-                  </p>
-                </div>
-              )}
+              <UploadProgressBar
+                isReading={isReading}
+                readProgress={readProgress}
+                isUploading={isUploading}
+                uploadProgress={uploadProgress}
+                fileSize={selectedFile?.size}
+              />
             </>
           )}
 

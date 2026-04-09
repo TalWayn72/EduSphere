@@ -3,11 +3,12 @@
  * flow used across AssetUploader, CourseWizardMediaStep, and other upload surfaces.
  *
  * Features:
- * - Presign URL → PUT to presigned URL → confirm upload (3-step pipeline)
+ * - Presign URL → XHR PUT to presigned URL (real per-byte progress) → confirm
+ * - XHR upload.onprogress maps to 30–80% of overall pipeline progress
  * - Retry with exponential backoff (1s, 2s, 4s by default)
  * - Progress callback for UI feedback
  * - Structured logging with [useFileUpload] prefix
- * - Memory-safe: aborts in-flight fetch on unmount
+ * - Memory-safe: aborts in-flight XHR on unmount
  */
 import { useState, useCallback, useRef, useEffect } from 'react';
 
@@ -51,7 +52,7 @@ export interface UseFileUploadReturn {
   phase: UploadPhase;
   /** Human-readable error message (null when no error) */
   error: string | null;
-  /** Upload progress 0..100 */
+  /** Upload progress 0..100 (XHR-accurate during uploading phase) */
   progress: number;
   /** Retry the last failed upload */
   retry: () => Promise<ConfirmResult | null>;
@@ -64,6 +65,10 @@ export interface UseFileUploadReturn {
 const BASE_DELAY_MS = 1_000;
 const LOG_PREFIX = '[useFileUpload]';
 
+/** Overall progress boundaries for each phase */
+const PHASE_START = { presigning: 0, uploading: 30, confirming: 80 } as const;
+const PHASE_END = { uploading: 79 } as const;
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function delay(ms: number, signal?: AbortSignal): Promise<void> {
@@ -73,6 +78,46 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
       clearTimeout(timer);
       reject(new DOMException('Aborted', 'AbortError'));
     });
+  });
+}
+
+/**
+ * PUT a file to a presigned URL via XHR so we get granular upload.onprogress
+ * events. Resolves with HTTP status on success, rejects on network error or
+ * non-2xx status. Aborts when `signal` fires.
+ */
+function xhrPut(
+  url: string,
+  file: File,
+  signal: AbortSignal,
+  onProgress: (loaded: number, total: number) => void
+): Promise<number> {
+  return new Promise<number>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.onprogress = (e: ProgressEvent) => {
+      if (e.lengthComputable) onProgress(e.loaded, e.total);
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.status);
+      } else {
+        reject(new Error(`PUT failed: ${xhr.status} ${xhr.statusText}`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('PUT network error'));
+    xhr.onabort = () => reject(new DOMException('Aborted', 'AbortError'));
+
+    signal.addEventListener('abort', () => xhr.abort());
+
+    xhr.open('PUT', url);
+    xhr.setRequestHeader(
+      'Content-Type',
+      file.type || 'application/octet-stream'
+    );
+    xhr.send(file);
   });
 }
 
@@ -129,7 +174,7 @@ export function useFileUpload(
 
           // ── Step 1: Presign ────────────────────────────────────────
           if (mountedRef.current) setPhase('presigning');
-          reportProgress(10);
+          reportProgress(PHASE_START.presigning + 10);
 
           const { uploadUrl, fileKey } = await presign(file);
 
@@ -138,32 +183,30 @@ export function useFileUpload(
 
           if (!mountedRef.current) return null;
 
-          // ── Step 2: PUT to presigned URL ───────────────────────────
+          // ── Step 2: XHR PUT with real per-byte progress ────────────
           setPhase('uploading');
-          reportProgress(30);
+          reportProgress(PHASE_START.uploading);
 
-          const putResponse = await fetch(uploadUrl, {
-            method: 'PUT',
-            body: file,
-            headers: {
-              'Content-Type': file.type || 'application/octet-stream',
-            },
-            signal: controller.signal,
-          });
+          await xhrPut(
+            uploadUrl,
+            file,
+            controller.signal,
+            (loaded: number, total: number) => {
+              if (!mountedRef.current) return;
+              // Map 0..total bytes → 30..79% of overall progress
+              const range = PHASE_END.uploading - PHASE_START.uploading;
+              const pct =
+                PHASE_START.uploading + Math.round((loaded / total) * range);
+              reportProgress(pct);
+            }
+          );
 
-          if (!putResponse.ok) {
-            throw new Error(
-              `PUT failed: ${putResponse.status} ${putResponse.statusText}`
-            );
-          }
-
-          if (import.meta.env.DEV)
-            console.warn(`${LOG_PREFIX} PUT OK — status=${putResponse.status}`);
+          if (import.meta.env.DEV) console.warn(`${LOG_PREFIX} PUT OK`);
           if (!mountedRef.current) return null;
 
           // ── Step 3: Confirm ────────────────────────────────────────
           setPhase('confirming');
-          reportProgress(80);
+          reportProgress(PHASE_START.confirming);
 
           const result = await confirm(fileKey, file);
 
