@@ -1,7 +1,7 @@
 name: GitHub Audit Log Export
 
 # SOC2 CC3.3 / GDPR Art.32: Retain audit logs beyond GitHub's 90-day limit.
-# Exports GitHub organization audit logs every 6 hours to a dedicated branch.
+# Exports GitHub organization audit logs every 6 hours to audit-logs/github/ on master.
 
 on:
   schedule:
@@ -17,17 +17,11 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout audit-logs branch
-        id: checkout-audit
+      - name: Checkout master branch
         uses: actions/checkout@v4
         with:
-          ref: audit-logs
+          ref: master
           fetch-depth: 1
-        continue-on-error: true # Branch may not exist yet
-
-      - name: Checkout main branch (fallback)
-        if: steps.checkout-audit.outcome == 'failure'
-        uses: actions/checkout@v4
 
       - name: Create audit-logs directory
         run: mkdir -p audit-logs/github
@@ -88,9 +82,8 @@ jobs:
           else
             EVENTS=$(git diff --staged --stat | tail -1)
             git commit -m "chore(audit): export GitHub audit logs $(date -u +%Y-%m-%dT%H:%M:%SZ) - SOC2 CC3.3 - $EVENTS"
-            git push origin HEAD:audit-logs 2>/dev/null || \
-              git push --set-upstream origin HEAD:audit-logs
-            echo "✅ Audit logs pushed to audit-logs branch"
+            git push origin HEAD:master
+            echo "✅ Audit logs committed to master"
           fi
 
       - name: Summary
@@ -98,5 +91,6 @@ jobs:
           echo "## Audit Log Export Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Date:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
           echo "- **Files:** $(find audit-logs/ -name '*.jsonl' | wc -l) total" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch:** \`audit-logs\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** \`master\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Path:** \`audit-logs/github/\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Retention:** Unlimited (git history)" >> $GITHUB_STEP_SUMMARY

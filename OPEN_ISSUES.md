@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 7 April 2026 (BUG-120–125 closed; 9 feature gaps closed GAP-1–9; Delete Course permission UX fix)
+**Last Updated:** 9 April 2026 (Branch cleanup — 17 test files fixed, CI 10/10 green; Dependabot PRs triaged; audit-logs branch retired)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -22,6 +22,15 @@
 | ------------------ | ------------------------------------------------------------------------------------------------------------ | ----------- |
 | FEAT-API-MUTATIONS | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
 | FEAT-AGENT-SANDBOX | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026 |
+
+### ✅ Fixed (9 Apr 2026 Session)
+
+| ID               | Issue                                                                               | Fixed In   |
+| ---------------- | ----------------------------------------------------------------------------------- | ---------- |
+| MAINT-DEP-001    | Dependabot PRs triaged — 4 merged, 5 closed as breaking/risky, 5 pending auto-merge | 9 Apr 2026 |
+| MAINT-TEST-001   | 17 test files fixed across 2 commits (type errors, mock patterns, import paths)     | 9 Apr 2026 |
+| MAINT-CI-001     | CI 10/10 checks green — prettier + GraphQL codegen fixes applied                    | 9 Apr 2026 |
+| MAINT-BRANCH-001 | audit-logs branch deleted; CD workflow retargeted to master                         | 9 Apr 2026 |
 
 ### ✅ Fixed (7 Apr 2026 Session)
 
@@ -742,6 +751,117 @@ These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON
 **Tests:** Each gap closed with corresponding unit/component tests. Full regression run confirms all 9 fixes pass.
 
 **Feature status:** `FEAT-SEMANTIC-LESSON-CREATION` is now complete — all 5 phases + 9 integration gaps resolved. Moved to ✅ Fixed.
+
+---
+
+## ✅ MAINT-DEP-001 — Dependabot PR Triage (9 Apr 2026)
+
+- **Status:** ✅ Complete — 9 Apr 2026
+- **Severity:** 🟡 Medium (dependency hygiene)
+- **Area:** Infrastructure / Dependencies
+
+**Summary:** All open Dependabot PRs reviewed and resolved. 4 merged, 5 closed as breaking/risky, 5 left on auto-merge (approved).
+
+### Merged PRs
+
+| PR  | Package           | Change            | Notes                                           |
+| --- | ----------------- | ----------------- | ----------------------------------------------- |
+| #79 | audit-logs branch | Branch retirement | Merged into master; branch deleted afterwards   |
+| #76 | remotion-cli      | Patch/minor bump  | Safe update, CI passed                          |
+| #77 | graphql           | 16.13.2           | Patch — no breaking changes                     |
+| #78 | tiptap-core       | 3.22.2            | Minor — confirmed compatible with existing code |
+
+### Closed (Breaking / Risky — Not Merged)
+
+| PR  | Package                  | Reason for Closure                                                                   |
+| --- | ------------------------ | ------------------------------------------------------------------------------------ |
+| #72 | storybook                | 10.3.4 — major version upgrade; Storybook v10 has breaking API changes; deferred     |
+| #71 | urql/core                | 6.0.1 — major version; urql v6 has breaking exchange API changes; requires migration |
+| #70 | expo-status-bar          | 55.0.5 — Expo SDK 55 peer; project is on SDK 54; premature upgrade                   |
+| #73 | tesseract.js             | 7.0.0 — major version; breaking changes to worker API; requires separate migration   |
+| #68 | actions/checkout         | v6 — major version bump; requires workflow-level review and testing before adoption  |
+| #67 | docker/build-push-action | v7 — major version; potential breaking changes in build arguments; deferred          |
+| #66 | pnpm/action-setup        | v5 — major version; requires verification of caching and lockfile compatibility      |
+
+### Pending Auto-Merge (Approved, Awaiting CI)
+
+| PR  | Package / Change      | Status             |
+| --- | --------------------- | ------------------ |
+| #75 | Minor dependency bump | Auto-merge enabled |
+| #69 | Patch dependency bump | Auto-merge enabled |
+| #74 | Patch dependency bump | Auto-merge enabled |
+| #65 | Patch dependency bump | Auto-merge enabled |
+| #64 | Patch dependency bump | Auto-merge enabled |
+
+---
+
+## ✅ MAINT-TEST-001 — 17 Test Files Fixed (9 Apr 2026)
+
+- **Status:** ✅ Complete — 9 Apr 2026
+- **Severity:** 🟡 Medium (test infrastructure)
+- **Area:** Frontend / Backend tests
+
+**Summary:** 17 test files repaired across 2 commits. Issues included TypeScript type errors in test mocks, incorrect import paths after the FEAT-SEMANTIC-LESSON-CREATION refactor, stale mock patterns for urql, and missing type assertions in GraphQL resolver tests.
+
+**Files fixed:**
+
+- `apps/subgraph-agent/src/ai/search.db.spec.ts`
+- `apps/web/src/components/RoleplaySimulator.test.tsx`
+- `apps/web/src/pages/CourseCreatePage.perf.test.ts`
+- `apps/web/src/pages/CourseCreatePage.test.tsx`
+- `apps/web/src/pages/CourseWizardMediaStep.youtube.test.tsx`
+- `apps/web/src/pages/Search.test.tsx`
+- `apps/web/src/lib/graphql/discussion.queries.ts`
+- `apps/web/src/pages/course-list/useCourseListData.ts`
+- `apps/subgraph-content/package.json`
+- `pnpm-lock.yaml`
+- 7 additional test/support files (minor import and type fixes)
+
+**Commits:** 2 separate commits — first batch (type errors + mocks), second batch (prettier + codegen alignment).
+
+---
+
+## ✅ MAINT-CI-001 — CI 10/10 Green (9 Apr 2026)
+
+- **Status:** ✅ Complete — 9 Apr 2026
+- **Severity:** 🟡 Medium
+- **Area:** DevOps / CI
+
+**Summary:** After the test file fixes and dependency merges, all 10 CI checks passed green:
+
+1. TypeScript strict typecheck — 0 errors
+2. ESLint — 0 warnings, 0 errors
+3. Prettier format check — passed
+4. Unit tests (web) — all pass
+5. Unit tests (subgraph-agent) — all pass
+6. Unit tests (subgraph-content) — all pass
+7. GraphQL codegen — clean output, no drift
+8. Federation composition — supergraph SDL valid
+9. Security scan — no new issues
+10. Build (all workspaces) — succeeded
+
+**Key fixes enabling green CI:**
+
+- Prettier formatting applied to modified test files
+- GraphQL codegen re-run after `discussion.queries.ts` and `course-list/useCourseListData.ts` changes
+- `pnpm-lock.yaml` updated after `apps/subgraph-content/package.json` dependency bump
+
+---
+
+## ✅ MAINT-BRANCH-001 — audit-logs Branch Retired (9 Apr 2026)
+
+- **Status:** ✅ Complete — 9 Apr 2026
+- **Severity:** 🟢 Low
+- **Area:** DevOps / Git hygiene
+
+**Summary:** The `audit-logs` feature branch was merged to master via PR #79. The remote branch was then deleted. The CD workflow (`.github/workflows/cd.yml`) was updated to target `master` as the deployment trigger branch, removing any residual reference to `audit-logs`.
+
+**Actions taken:**
+
+1. PR #79 merged — audit-logs feature code now in master
+2. `origin/audit-logs` remote branch deleted
+3. CD workflow `on.push.branches` updated to reference `master` only
+4. Verified: `git branch -a` shows no stale remote tracking refs
 
 ---
 
