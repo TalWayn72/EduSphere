@@ -76,8 +76,6 @@ vi.mock('react-i18next', () => ({
         'createLesson.selectTemplate': 'Select Pipeline Template',
         'createLesson.thematicDescription':
           'Instructor-defined topic — 8 processing steps',
-        'createLesson.typeThematic': 'General (Thematic)',
-        'createLesson.typeSequential': 'Sequential',
         'createLesson.sequentialDescription':
           'Sequential study — 9 steps + citation verification',
         'createLesson.createAndContinue':
