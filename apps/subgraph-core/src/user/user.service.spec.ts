@@ -135,13 +135,13 @@ describe('UserService', () => {
   describe('findById()', () => {
     it('returns user when found (no auth context)', async () => {
       mockLimit.mockResolvedValue([MOCK_USER]);
-      const result = await service.findById('user-1');
+      const result = await service.findById('user-1', MOCK_AUTH);
       expect(result).toEqual(MOCK_USER);
     });
 
     it('returns null when user not found (no auth context)', async () => {
       mockLimit.mockResolvedValue([]);
-      const result = await service.findById('nonexistent');
+      const result = await service.findById('nonexistent', MOCK_AUTH);
       expect(result).toBeNull();
     });
 
@@ -177,7 +177,8 @@ describe('UserService', () => {
     });
 
     it('skips withTenantContext when authContext has no tenantId', async () => {
-      const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
+      // SUPER_ADMIN with no tenantId is allowed cross-tenant lookup without withTenantContext
+      const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '', isSuperAdmin: true };
       mockLimit.mockResolvedValue([MOCK_USER]);
       await service.findById('user-1', noTenantAuth);
       expect(withTenantContext).not.toHaveBeenCalled();
@@ -185,14 +186,14 @@ describe('UserService', () => {
 
     it('returned user includes a preferences field', async () => {
       mockLimit.mockResolvedValue([MOCK_USER]);
-      const result = await service.findById('user-1');
+      const result = await service.findById('user-1', MOCK_AUTH);
       expect(result).not.toBeNull();
       expect(result).toHaveProperty('preferences');
     });
 
     it('preferences field has the expected shape (locale and theme)', async () => {
       mockLimit.mockResolvedValue([MOCK_USER]);
-      const result = await service.findById('user-1');
+      const result = await service.findById('user-1', MOCK_AUTH);
       expect(result).not.toBeNull();
       const prefs = (result as Record<string, unknown>)[
         'preferences'
@@ -203,7 +204,7 @@ describe('UserService', () => {
 
     it('preferences falls back to defaults when stored preferences is null', async () => {
       mockLimit.mockResolvedValue([{ ...MOCK_USER, preferences: null }]);
-      const result = await service.findById('user-1');
+      const result = await service.findById('user-1', MOCK_AUTH);
       expect(result).not.toBeNull();
       const prefs = (result as Record<string, unknown>)[
         'preferences'
@@ -223,7 +224,7 @@ describe('UserService', () => {
       mockFrom.mockReturnValue({
         limit: vi.fn().mockReturnValue({ offset: mockOffset2 }),
       });
-      const result = await service.findAll(10, 0);
+      const result = await service.findAll(10, 0, MOCK_AUTH);
       expect(Array.isArray(result)).toBe(true);
     });
 

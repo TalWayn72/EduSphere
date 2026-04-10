@@ -1,5 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
+
+// Mock @edusphere/db before importing the resolver
+vi.mock('@edusphere/db', () => ({
+  db: {
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    }),
+  },
+  schema: { agent_definitions: {} },
+  eq: vi.fn(),
+  and: vi.fn(),
+  createDatabaseConnection: vi.fn(() => ({})),
+  closeAllPools: vi.fn(),
+}));
+
 import { AgentSessionResolver } from './agent-session.resolver';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -61,7 +80,8 @@ describe('AgentSessionResolver', () => {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     resolver = new AgentSessionResolver(
       mockAgentSessionService as any,
-      mockAgentMessageService as any
+      mockAgentMessageService as any,
+      undefined as any // AIService — not needed for most tests
     );
     /* eslint-enable @typescript-eslint/no-explicit-any */
   });
@@ -114,19 +134,20 @@ describe('AgentSessionResolver', () => {
 
   describe('getAgentTemplates()', () => {
     it('returns a list of templates without calling any service', async () => {
-      const _ctx = buildContext();
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('returns at least one template', async () => {
-      const _ctx = buildContext();
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       expect(result.length).toBeGreaterThan(0);
     });
 
     it('returns templates with required fields: id, name, templateType, systemPrompt', async () => {
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       for (const template of result) {
         expect(template).toHaveProperty('id');
         expect(template).toHaveProperty('name');
@@ -136,7 +157,8 @@ describe('AgentSessionResolver', () => {
     });
 
     it('includes TUTOR template', async () => {
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       const tutor = result.find(
         (t: { templateType: string }) => t.templateType === 'TUTOR'
       );
@@ -144,7 +166,8 @@ describe('AgentSessionResolver', () => {
     });
 
     it('includes QUIZ_GENERATOR template', async () => {
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       const quiz = result.find(
         (t: { templateType: string }) => t.templateType === 'QUIZ_GENERATOR'
       );
@@ -152,7 +175,8 @@ describe('AgentSessionResolver', () => {
     });
 
     it('includes DEBATE_FACILITATOR template', async () => {
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       const debate = result.find(
         (t: { templateType: string }) => t.templateType === 'DEBATE_FACILITATOR'
       );
@@ -160,7 +184,8 @@ describe('AgentSessionResolver', () => {
     });
 
     it('includes EXPLANATION_GENERATOR template', async () => {
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       const explainer = result.find(
         (t: { templateType: string }) =>
           t.templateType === 'EXPLANATION_GENERATOR'
@@ -359,7 +384,8 @@ describe('AgentSessionResolver', () => {
   describe('getAgentTemplates() templateType non-null guarantee', () => {
     // BUG-105: regression guard — every template must have non-null templateType
     it('returns all templates with non-null templateType', async () => {
-      const result = await resolver.getAgentTemplates();
+      const ctx = buildContext();
+      const result = await resolver.getAgentTemplates(ctx);
       for (const template of result) {
         expect(template.templateType).toBeDefined();
         expect(template.templateType).not.toBeNull();

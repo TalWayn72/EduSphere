@@ -85,26 +85,26 @@ describe('AdminOverviewResolver', () => {
     const ctx = makeContext({
       tenantId: 'tenant-abc',
       userId: 'u1',
-      roles: [],
+      roles: ['ORG_ADMIN'],
     });
     await resolver.adminOverview(ctx);
     expect(mockService.getOverview).toHaveBeenCalledWith('tenant-abc');
   });
 
   it('passes empty string to service when tenantId is missing from authContext', async () => {
-    const ctx = makeContext({ userId: 'u1', roles: [] }); // no tenantId
+    const ctx = makeContext({ userId: 'u1', roles: ['ORG_ADMIN'] }); // no tenantId
     await resolver.adminOverview(ctx);
     expect(mockService.getOverview).toHaveBeenCalledWith('');
   });
 
   it('returns the result from service.getOverview', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: [] });
+    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: ['ORG_ADMIN'] });
     const result = await resolver.adminOverview(ctx);
     expect(result).toBe(OVERVIEW_DATA);
   });
 
   it('preserves the full result shape returned by the service', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: [] });
+    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: ['ORG_ADMIN'] });
     const result = (await resolver.adminOverview(ctx)) as typeof OVERVIEW_DATA;
     expect(result.totalUsers).toBe(42);
     expect(result.lastScimSync).toBe('2026-02-01T00:00:00.000Z');
@@ -123,20 +123,20 @@ describe('AdminOverviewResolver', () => {
     const ctx = makeContext({
       tenantId: 'tenant-abc',
       userId: 'u1',
-      roles: [],
+      roles: ['ORG_ADMIN'],
     });
     await resolver.adminDashboardStats(ctx);
     expect(mockService.getDashboardStats).toHaveBeenCalledWith('tenant-abc');
   });
 
   it('adminDashboardStats returns result from service', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: [] });
+    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: ['ORG_ADMIN'] });
     const result = await resolver.adminDashboardStats(ctx);
     expect(result).toBe(DASHBOARD_STATS_DATA);
   });
 
   it('adminDashboardStats passes empty string when tenantId missing', async () => {
-    const ctx = makeContext({ userId: 'u1', roles: [] });
+    const ctx = makeContext({ userId: 'u1', roles: ['ORG_ADMIN'] });
     await resolver.adminDashboardStats(ctx);
     expect(mockService.getDashboardStats).toHaveBeenCalledWith('');
   });

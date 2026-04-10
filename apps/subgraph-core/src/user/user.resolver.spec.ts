@@ -88,12 +88,11 @@ describe('UserResolver', () => {
     });
 
     it('passes undefined authContext when not in context', async () => {
-      mockUserService.findById.mockResolvedValue(null);
+      // Resolver now requires authentication — throws UnauthorizedException
+      const { UnauthorizedException } = await import('@nestjs/common');
       const ctx = { req: {} };
-      await resolver.getUser('user-1', ctx);
-      expect(mockUserService.findById).toHaveBeenCalledWith(
-        'user-1',
-        undefined
+      await expect(resolver.getUser('user-1', ctx)).rejects.toBeInstanceOf(
+        UnauthorizedException
       );
     });
   });

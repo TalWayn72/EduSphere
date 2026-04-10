@@ -9,6 +9,7 @@ const mockEmbeddingService = {
   semanticSearch: vi.fn(),
   semanticSearchByVector: vi.fn(),
   semanticSearchByContentItem: vi.fn(),
+  semanticSearchByVectorAndContentItem: vi.fn(),
   create: vi.fn(),
   delete: vi.fn(),
   deleteByContentItem: vi.fn(),
@@ -103,16 +104,16 @@ describe('EmbeddingResolver', () => {
 
   describe('semanticSearchByContentItem()', () => {
     it('delegates to embeddingService.semanticSearchByVector (legacy shim)', async () => {
-      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
+      mockEmbeddingService.semanticSearchByVectorAndContentItem.mockResolvedValue([]);
       const result = await resolver.semanticSearchByContentItem(
         'content-1',
         [0.1, 0.2],
         3,
         MOCK_GQL_CTX
       );
-      // Resolver ignores contentItemId and delegates entirely to semanticSearchByVector
-      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
+      expect(mockEmbeddingService.semanticSearchByVectorAndContentItem).toHaveBeenCalledWith(
         [0.1, 0.2],
+        'content-1',
         {
           tenantId: 'tenant-uuid-001',
           userId: 'user-uuid-001',
@@ -125,15 +126,16 @@ describe('EmbeddingResolver', () => {
     });
 
     it('uses default limit=5 when not provided', async () => {
-      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
+      mockEmbeddingService.semanticSearchByVectorAndContentItem.mockResolvedValue([]);
       await resolver.semanticSearchByContentItem(
         'content-1',
         [0.1],
         5,
         MOCK_GQL_CTX
       );
-      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
+      expect(mockEmbeddingService.semanticSearchByVectorAndContentItem).toHaveBeenCalledWith(
         [0.1],
+        'content-1',
         {
           tenantId: 'tenant-uuid-001',
           userId: 'user-uuid-001',

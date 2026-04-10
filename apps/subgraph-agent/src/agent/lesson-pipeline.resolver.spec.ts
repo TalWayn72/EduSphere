@@ -85,7 +85,8 @@ describe('LessonPipelineResolver', () => {
         VALID_INPUT,
         expect.anything(), // model
         'test-uuid-1234', // executionId
-        expect.any(Function) // searchFn
+        expect.any(Function), // searchFn
+        expect.any(Function) // graphEnrichFn
       );
       expect(result).toEqual({
         id: 'exec-1',

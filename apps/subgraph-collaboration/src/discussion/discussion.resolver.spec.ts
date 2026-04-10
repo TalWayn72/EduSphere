@@ -1,16 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  DiscussionResolver,
-  DiscussionMessageResolver,
-  DiscussionParticipantResolver,
-} from './discussion.resolver';
-import { DiscussionService } from './discussion.service';
-import type { AuthContext } from '@edusphere/auth';
 
-// ── Mock graphql-yoga pubSub ──────────────────────────────────────────────────
-
-const mockPublish = vi.fn();
-const mockSubscribe = vi.fn(() => ({ [Symbol.asyncIterator]: vi.fn() }));
+// ── Mock graphql-yoga pubSub (hoisted to avoid TDZ error) ────────────────────
+const { mockPublish, mockSubscribe } = vi.hoisted(() => ({
+  mockPublish: vi.fn(),
+  mockSubscribe: vi.fn(() => ({ [Symbol.asyncIterator]: vi.fn() })),
+}));
 
 vi.mock('graphql-yoga', () => ({
   createPubSub: vi.fn(() => ({
@@ -18,6 +12,14 @@ vi.mock('graphql-yoga', () => ({
     subscribe: mockSubscribe,
   })),
 }));
+
+import {
+  DiscussionResolver,
+  DiscussionMessageResolver,
+  DiscussionParticipantResolver,
+} from './discussion.resolver';
+import { DiscussionService } from './discussion.service';
+import type { AuthContext } from '@edusphere/auth';
 
 // ── Mock DiscussionService ────────────────────────────────────────────────────
 
