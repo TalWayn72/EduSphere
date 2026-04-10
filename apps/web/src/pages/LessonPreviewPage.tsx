@@ -70,7 +70,7 @@ const ASSET_ICONS: Record<string, string> = {
 function PreviewBanner({ onClose }: { onClose: () => void }) {
   return (
     <div
-      className="sticky top-0 z-50 bg-amber-500 text-white px-6 py-2 flex items-center justify-between dark:bg-amber-600"
+      className="sticky top-0 z-50 bg-amber-500 text-foreground dark:text-foreground px-6 py-2 flex items-center justify-between dark:bg-amber-600"
       role="banner"
       aria-label="מצב תצוגה מקדימה"
     >
@@ -81,7 +81,7 @@ function PreviewBanner({ onClose }: { onClose: () => void }) {
         variant="ghost"
         size="sm"
         onClick={onClose}
-        className="text-white hover:bg-amber-600"
+        className="text-foreground dark:text-foreground hover:bg-amber-600"
         aria-label="סגור תצוגה מקדימה"
       >
         ✕ סגור
