@@ -82,7 +82,9 @@ vi.mock('@edusphere/db', () => ({
 
 // ── pubSub mock (the resolver publishes NATS-equivalent events via pubSub) ───
 
-const mockPubSubPublish = vi.fn();
+const { mockPubSubPublish } = vi.hoisted(() => ({
+  mockPubSubPublish: vi.fn(),
+}));
 
 vi.mock('graphql-yoga', () => ({
   createPubSub: vi.fn(() => ({
