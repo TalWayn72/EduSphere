@@ -21,7 +21,8 @@ function getModel(): LanguageModel {
   const ollama = createOllama({
     baseURL: process.env['OLLAMA_URL'] ?? 'http://localhost:11434',
   });
-  return ollama('llama3') as unknown as LanguageModel;
+  const modelId = process.env['OLLAMA_MODEL'] ?? 'llama3.2';
+  return ollama(modelId) as unknown as LanguageModel;
 }
 
 interface SemanticSearchResponse {

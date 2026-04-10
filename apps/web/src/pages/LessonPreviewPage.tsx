@@ -2,7 +2,7 @@
  * LessonPreviewPage — read-only student preview of a lesson.
  * Route: /courses/:courseId/lessons/:lessonId/preview
  *
- * Shows lesson content (title, description, structured notes, diagrams)
+ * Shows lesson content (title, assets, enriched blocks, YouTube video)
  * with a sticky preview banner. Hides all edit/mutation buttons.
  */
 import { useState, useEffect } from 'react';
@@ -11,9 +11,11 @@ import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LESSON_QUERY } from '@/lib/graphql/lesson.queries';
+import { ENRICHED_LESSON_QUERY } from '@/lib/graphql/enriched-lesson.queries';
+import { EnrichedBlocksSection, YouTubeEmbed } from './lesson-preview/EnrichedBlocksSection';
+import type { EnrichedTranscriptBlock } from '@/components/enriched-transcript/enriched-transcript.types';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -48,6 +50,16 @@ interface LessonPreviewData {
   } | null;
 }
 
+interface EnrichedLessonPreviewData {
+  enrichedLesson: {
+    id: string;
+    youtubeVideoId?: string | null;
+    transcriptReady: boolean;
+    enrichmentStatus: string;
+    blocks: EnrichedTranscriptBlock[];
+  } | null;
+}
+
 const ASSET_ICONS: Record<string, string> = {
   VIDEO: '🎥',
   AUDIO: '🎙️',
@@ -55,13 +67,28 @@ const ASSET_ICONS: Record<string, string> = {
   WHITEBOARD: '📋',
 };
 
-const OUTPUT_LABELS: Record<string, string> = {
-  STRUCTURED_NOTES: 'סיכום מובנה',
-  SUMMARIZATION: 'תקציר',
-  DIAGRAM_GENERATOR: 'דיאגרמות',
-  CITATION_VERIFIER: 'אימות מקורות',
-  QA_GATE: 'בקרת איכות',
-};
+function PreviewBanner({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="sticky top-0 z-50 bg-amber-500 text-white px-6 py-2 flex items-center justify-between dark:bg-amber-600"
+      role="banner"
+      aria-label="מצב תצוגה מקדימה"
+    >
+      <span className="font-semibold text-sm">
+        תצוגה מקדימה — כך יראו התלמידים את השיעור
+      </span>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onClose}
+        className="text-white hover:bg-amber-600"
+        aria-label="סגור תצוגה מקדימה"
+      >
+        ✕ סגור
+      </Button>
+    </div>
+  );
+}
 
 export function LessonPreviewPage() {
   const { courseId, lessonId } = useParams<{
@@ -76,14 +103,22 @@ export function LessonPreviewPage() {
   }, []);
 
   const isValidId = lessonId ? UUID_RE.test(lessonId) : false;
+  const pause = !mounted || !lessonId || !isValidId;
 
   const [{ data, fetching, error }] = useQuery<LessonPreviewData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
-    pause: !mounted || !lessonId || !isValidId,
+    pause,
   });
 
-  if (!mounted || fetching) {
+  const [{ data: enrichedData, fetching: enrichedFetching }] =
+    useQuery<EnrichedLessonPreviewData>({
+      query: ENRICHED_LESSON_QUERY,
+      variables: { lessonId },
+      pause,
+    });
+
+  if (!mounted || fetching || enrichedFetching) {
     return (
       <Layout>
         <PreviewBanner onClose={() => navigate(-1)} />
@@ -111,7 +146,15 @@ export function LessonPreviewPage() {
   }
 
   const lesson = data.lesson;
-  const results = lesson.pipeline?.currentRun?.results ?? [];
+  const enriched = enrichedData?.enrichedLesson;
+  const enrichedBlocks = enriched?.blocks ?? [];
+  const hasEnrichedBlocks =
+    enrichedBlocks.length > 0 &&
+    (enriched?.enrichmentStatus === 'READY' ||
+      enriched?.enrichmentStatus === 'PUBLISHED');
+  const youtubeVideoId = enriched?.youtubeVideoId;
+  const pipelineResults = lesson.pipeline?.currentRun?.results ?? [];
+  const hasContent = hasEnrichedBlocks || pipelineResults.length > 0;
 
   return (
     <Layout>
@@ -132,6 +175,8 @@ export function LessonPreviewPage() {
           </div>
         </header>
 
+        {youtubeVideoId && <YouTubeEmbed videoId={youtubeVideoId} />}
+
         {lesson.assets.length > 0 && (
           <section
             className="bg-card rounded-xl border p-4 mb-4"
@@ -151,22 +196,25 @@ export function LessonPreviewPage() {
           </section>
         )}
 
-        {results.length > 0 && (
+        {hasEnrichedBlocks && (
+          <div className="mb-4">
+            <EnrichedBlocksSection blocks={enrichedBlocks} />
+          </div>
+        )}
+
+        {!hasEnrichedBlocks && pipelineResults.length > 0 && (
           <section className="space-y-4" aria-labelledby="results-heading">
             <h2 id="results-heading" className="text-lg font-semibold">
               תוצרי השיעור
             </h2>
-            {results.map((result) => (
+            {pipelineResults.map((result) => (
               <article
                 key={result.id}
                 className="bg-card rounded-xl border p-4"
               >
                 <h3 className="text-sm font-semibold mb-2">
-                  {OUTPUT_LABELS[result.moduleName] ?? result.moduleName}
+                  {result.moduleName}
                 </h3>
-                <Badge variant="secondary" className="mb-2">
-                  {result.outputType}
-                </Badge>
                 {result.outputData && (
                   <div className="text-sm text-muted-foreground whitespace-pre-wrap mt-2">
                     {typeof result.outputData === 'object'
@@ -189,7 +237,7 @@ export function LessonPreviewPage() {
           </section>
         )}
 
-        {results.length === 0 && (
+        {!hasContent && (
           <div className="text-center py-12 text-muted-foreground">
             <p className="text-lg mb-1">אין עדיין תוצרים לשיעור זה</p>
             <p className="text-sm">יש להריץ את ה-Pipeline כדי ליצור תוכן.</p>
@@ -197,28 +245,5 @@ export function LessonPreviewPage() {
         )}
       </PageShell>
     </Layout>
-  );
-}
-
-function PreviewBanner({ onClose }: { onClose: () => void }) {
-  return (
-    <div
-      className="sticky top-0 z-50 bg-amber-500 text-white px-6 py-2 flex items-center justify-between dark:bg-amber-600 dark:text-white"
-      role="banner"
-      aria-label="מצב תצוגה מקדימה"
-    >
-      <span className="font-semibold text-sm">
-        תצוגה מקדימה — כך יראו התלמידים את השיעור
-      </span>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onClose}
-        className="text-white hover:bg-amber-600 dark:text-white"
-        aria-label="סגור תצוגה מקדימה"
-      >
-        ✕ סגור
-      </Button>
-    </div>
   );
 }

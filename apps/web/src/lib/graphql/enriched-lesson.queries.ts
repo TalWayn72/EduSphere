@@ -16,9 +16,6 @@ const CITATION_FIELDS = gql`
     paragraph
     matchStatus
     confidence
-    resolvedText
-    knowledgeSourceId
-    graphSourceId
   }
 `;
 
@@ -38,9 +35,6 @@ const ENRICHED_BLOCK_FIELDS = gql`
     anchor {
       id
       anchorText
-      startTime
-      endTime
-      visualAssetId
     }
   }
   ${CITATION_FIELDS}
@@ -55,10 +49,6 @@ export const ENRICHED_LESSON_QUERY = gql`
       youtubeVideoId
       transcriptReady
       enrichmentStatus
-      lesson {
-        id
-        title
-      }
       blocks {
         ...EnrichedBlockFields
       }

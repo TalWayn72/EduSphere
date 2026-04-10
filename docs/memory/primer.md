@@ -78,3 +78,45 @@ curl http://localhost:4000/graphql  # gateway responds
 <!-- PreCompact auto-save: 2026-04-10T06:15:31Z -->
 
 <!-- PreCompact auto-save: 2026-04-10T07:54:48Z -->
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 1 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:14:41Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 2 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:14:51Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 2 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:14:58Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 2 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:15:06Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 2 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:15:14Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 2 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:15:22Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
+- Modified: 2 files | Untracked: 93 files
+- Timestamp: 2026-04-10T14:15:29Z

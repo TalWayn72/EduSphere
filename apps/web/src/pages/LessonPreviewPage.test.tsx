@@ -1,8 +1,8 @@
 /**
  * LessonPreviewPage unit tests — Phase 65.
  *
- * Tests: sticky preview banner, lesson content rendering, no edit buttons,
- * loading skeleton, back button navigation.
+ * Tests: sticky preview banner, lesson content rendering, enriched blocks,
+ * YouTube embed, no edit buttons, loading skeleton, back button navigation.
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -38,6 +38,10 @@ vi.mock('@/lib/graphql/lesson.queries', () => ({
   LESSON_QUERY: 'LESSON_QUERY',
 }));
 
+vi.mock('@/lib/graphql/enriched-lesson.queries', () => ({
+  ENRICHED_LESSON_QUERY: 'ENRICHED_LESSON_QUERY',
+}));
+
 vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="layout">{children}</div>
@@ -65,12 +69,6 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children }: { children: React.ReactNode; variant?: string }) => (
-    <span>{children}</span>
-  ),
-}));
-
 vi.mock('@/components/ui/skeleton', () => ({
   Skeleton: ({ className }: { className: string }) => (
     <div data-testid="skeleton" className={className} />
@@ -83,59 +81,137 @@ import * as router from 'react-router-dom';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const LESSON_DATA = {
-  lesson: {
-    id: '550e8400-e29b-41d4-a716-446655440000',
-    title: 'שיעור ראשון',
-    type: 'THEMATIC',
-    series: 'סדרה א',
-    lessonDate: '2026-01-15T00:00:00Z',
-    status: 'DRAFT',
-    assets: [
-      { id: 'a1', assetType: 'VIDEO', sourceUrl: 'http://example.com/v.mp4' },
-      { id: 'a2', assetType: 'NOTES', fileUrl: 'http://example.com/n.pdf' },
-    ],
-    pipeline: {
-      id: 'pipe-1',
-      status: 'COMPLETED',
-      currentRun: {
-        results: [
-          {
-            id: 'r1',
-            moduleName: 'STRUCTURED_NOTES',
-            outputType: 'MARKDOWN',
-            outputData: { shortSummary: 'סיכום קצר של השיעור' },
-            fileUrl: null,
-          },
-          {
-            id: 'r2',
-            moduleName: 'DIAGRAM_GENERATOR',
-            outputType: 'SVG',
-            outputData: null,
-            fileUrl: 'http://example.com/diagram.svg',
-          },
-        ],
-      },
+const BASE_LESSON = {
+  id: '550e8400-e29b-41d4-a716-446655440000',
+  title: 'שיעור ראשון',
+  type: 'THEMATIC',
+  series: 'סדרה א',
+  lessonDate: '2026-01-15T00:00:00Z',
+  status: 'DRAFT',
+  assets: [
+    { id: 'a1', assetType: 'VIDEO', sourceUrl: 'http://example.com/v.mp4' },
+    { id: 'a2', assetType: 'NOTES', fileUrl: 'http://example.com/n.pdf' },
+  ],
+  pipeline: {
+    id: 'pipe-1',
+    status: 'COMPLETED',
+    currentRun: {
+      results: [
+        {
+          id: 'r1',
+          moduleName: 'STRUCTURED_NOTES',
+          outputType: 'MARKDOWN',
+          outputData: { shortSummary: 'סיכום קצר של השיעור' },
+          fileUrl: null,
+        },
+        {
+          id: 'r2',
+          moduleName: 'DIAGRAM_GENERATOR',
+          outputType: 'SVG',
+          outputData: null,
+          fileUrl: 'http://example.com/diagram.svg',
+        },
+      ],
     },
   },
 };
 
-function makeDataQuery(data: unknown) {
-  return [{ data, fetching: false, error: undefined }, vi.fn()] as never;
+const LESSON_DATA = { lesson: BASE_LESSON };
+
+const ENRICHED_DATA_READY = {
+  enrichedLesson: {
+    id: 'enriched-1',
+    youtubeVideoId: 'abc123',
+    transcriptReady: true,
+    enrichmentStatus: 'READY',
+    blocks: [
+      {
+        id: 'b1',
+        lessonId: BASE_LESSON.id,
+        blockType: 'HEADING',
+        blockOrder: 1,
+        content: { text: 'כותרת ראשית' },
+        startTime: null,
+        endTime: null,
+        citation: null,
+        anchor: null,
+        segmentId: null,
+      },
+      {
+        id: 'b2',
+        lessonId: BASE_LESSON.id,
+        blockType: 'TEXT',
+        blockOrder: 2,
+        content: { text: 'תוכן עשיר של השיעור' },
+        startTime: 10,
+        endTime: 30,
+        citation: null,
+        anchor: null,
+        segmentId: null,
+      },
+    ],
+  },
+};
+
+const ENRICHED_DATA_EMPTY = {
+  enrichedLesson: {
+    id: 'enriched-2',
+    youtubeVideoId: null,
+    transcriptReady: false,
+    enrichmentStatus: 'PENDING',
+    blocks: [],
+  },
+};
+
+/** Mock useQuery to return first call for LESSON_QUERY and second for ENRICHED_LESSON_QUERY */
+function mockBothQueries(
+  lessonResult: unknown,
+  enrichedResult: unknown
+): void {
+  let callCount = 0;
+  vi.mocked(urql.useQuery).mockImplementation(() => {
+    callCount++;
+    if (callCount % 2 === 1) {
+      // First call — LESSON_QUERY
+      return [
+        { data: lessonResult, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never;
+    }
+    // Second call — ENRICHED_LESSON_QUERY
+    return [
+      { data: enrichedResult, fetching: false, error: undefined },
+      vi.fn(),
+    ] as never;
+  });
 }
 
-function makeLoadingQuery() {
-  return [
+function mockBothLoading(): void {
+  vi.mocked(urql.useQuery).mockReturnValue([
     { data: undefined, fetching: true, error: undefined },
     vi.fn(),
-  ] as never;
+  ] as never);
 }
 
-function makeErrorQuery() {
-  return [
-    { data: undefined, fetching: false, error: { message: 'Network error' } },
-    vi.fn(),
-  ] as never;
+function mockLessonError(): void {
+  let callCount = 0;
+  vi.mocked(urql.useQuery).mockImplementation(() => {
+    callCount++;
+    if (callCount % 2 === 1) {
+      return [
+        {
+          data: undefined,
+          fetching: false,
+          error: { message: 'Network error' },
+        },
+        vi.fn(),
+      ] as never;
+    }
+    return [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ] as never;
+  });
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -143,10 +219,14 @@ function makeErrorQuery() {
 describe('LessonPreviewPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(router.useParams).mockReturnValue({
+      courseId: 'course-abc',
+      lessonId: '550e8400-e29b-41d4-a716-446655440000',
+    });
   });
 
   it('renders sticky preview banner with Hebrew text', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
     render(<LessonPreviewPage />);
 
     expect(
@@ -156,14 +236,14 @@ describe('LessonPreviewPage', () => {
   });
 
   it('shows lesson title', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('שיעור ראשון')).toBeInTheDocument();
   });
 
-  it('shows lesson type, series and date', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+  it('shows lesson type and series', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
     render(<LessonPreviewPage />);
 
     expect(screen.getByText(/הגות/)).toBeInTheDocument();
@@ -171,7 +251,7 @@ describe('LessonPreviewPage', () => {
   });
 
   it('shows lesson assets', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('חומרי שיעור')).toBeInTheDocument();
@@ -179,20 +259,73 @@ describe('LessonPreviewPage', () => {
     expect(screen.getByText('NOTES')).toBeInTheDocument();
   });
 
-  it('renders pipeline results (structured notes)', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+  it('renders enriched HEADING block when enrichmentStatus is READY', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
+    render(<LessonPreviewPage />);
+
+    expect(screen.getByText('כותרת ראשית')).toBeInTheDocument();
+    expect(screen.getByText('תוכן עשיר של השיעור')).toBeInTheDocument();
+  });
+
+  it('renders "תוכן מועשר" section heading for enriched blocks', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
+    render(<LessonPreviewPage />);
+
+    expect(screen.getByText('תוכן מועשר')).toBeInTheDocument();
+  });
+
+  it('renders YouTube iframe when youtubeVideoId is present', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
+    render(<LessonPreviewPage />);
+
+    const iframe = document.querySelector('iframe');
+    expect(iframe).toBeInTheDocument();
+    expect(iframe?.getAttribute('src')).toContain('abc123');
+  });
+
+  it('renders enriched blocks when enrichmentStatus is PUBLISHED', () => {
+    const enrichedPublished = {
+      enrichedLesson: {
+        ...ENRICHED_DATA_READY.enrichedLesson,
+        enrichmentStatus: 'PUBLISHED',
+      },
+    };
+    mockBothQueries(LESSON_DATA, enrichedPublished);
+    render(<LessonPreviewPage />);
+
+    expect(screen.getByText('תוכן מועשר')).toBeInTheDocument();
+    expect(screen.getByText('כותרת ראשית')).toBeInTheDocument();
+  });
+
+  it('does NOT render enriched section when enrichmentStatus is PENDING', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_EMPTY);
+    render(<LessonPreviewPage />);
+
+    expect(screen.queryByText('תוכן מועשר')).not.toBeInTheDocument();
+  });
+
+  it('shows pipeline results as fallback when no enriched blocks', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_EMPTY);
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('תוצרי השיעור')).toBeInTheDocument();
-    expect(screen.getByText('סיכום מובנה')).toBeInTheDocument();
-    expect(screen.getByText('דיאגרמות')).toBeInTheDocument();
+    expect(screen.getByText('STRUCTURED_NOTES')).toBeInTheDocument();
+  });
+
+  it('shows empty state only when no enriched blocks AND no pipeline results', () => {
+    const lessonNoResults = {
+      lesson: { ...BASE_LESSON, pipeline: null },
+    };
+    mockBothQueries(lessonNoResults, ENRICHED_DATA_EMPTY);
+    render(<LessonPreviewPage />);
+
+    expect(screen.getByText('אין עדיין תוצרים לשיעור זה')).toBeInTheDocument();
   });
 
   it('does NOT render edit/mutation buttons', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
     render(<LessonPreviewPage />);
 
-    // No edit, save, delete, or publish buttons should be visible
     const allButtons = screen.getAllByRole('button');
     const buttonTexts = allButtons.map((b) => b.textContent ?? '');
     expect(buttonTexts.join(' ')).not.toMatch(
@@ -201,19 +334,18 @@ describe('LessonPreviewPage', () => {
   });
 
   it('shows loading skeleton while fetching', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeLoadingQuery());
+    mockBothLoading();
     render(<LessonPreviewPage />);
 
     const skeletons = screen.getAllByTestId('skeleton');
     expect(skeletons.length).toBeGreaterThanOrEqual(2);
-    // Should still show the banner during loading
     expect(
       screen.getByRole('banner', { name: /תצוגה מקדימה/i })
     ).toBeInTheDocument();
   });
 
   it('close button on banner navigates back', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_READY);
     render(<LessonPreviewPage />);
 
     const closeBtn = screen.getByRole('button', { name: /סגור תצוגה מקדימה/i });
@@ -225,34 +357,21 @@ describe('LessonPreviewPage', () => {
   });
 
   it('shows error message on query error', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeErrorQuery());
+    mockLessonError();
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('שגיאה בטעינת השיעור.')).toBeInTheDocument();
   });
 
   it('shows not found message when lesson is null', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery({ lesson: null }));
+    mockBothQueries({ lesson: null }, ENRICHED_DATA_EMPTY);
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('השיעור לא נמצא.')).toBeInTheDocument();
   });
 
-  it('shows empty results message when no pipeline results', () => {
-    const lessonNoResults = {
-      lesson: {
-        ...LESSON_DATA.lesson,
-        pipeline: null,
-      },
-    };
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(lessonNoResults));
-    render(<LessonPreviewPage />);
-
-    expect(screen.getByText('אין עדיין תוצרים לשיעור זה')).toBeInTheDocument();
-  });
-
-  it('renders file link for results with fileUrl', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery(LESSON_DATA));
+  it('renders file link for pipeline results with fileUrl', () => {
+    mockBothQueries(LESSON_DATA, ENRICHED_DATA_EMPTY);
     render(<LessonPreviewPage />);
 
     const fileLink = screen.getByText('פתח קובץ');
@@ -268,7 +387,7 @@ describe('LessonPreviewPage', () => {
       courseId: 'course-abc',
       lessonId: 'not-a-uuid',
     });
-    vi.mocked(urql.useQuery).mockReturnValue(makeDataQuery({ lesson: null }));
+    mockBothQueries({ lesson: null }, { enrichedLesson: null });
     render(<LessonPreviewPage />);
 
     expect(screen.getByText('השיעור לא נמצא.')).toBeInTheDocument();

@@ -401,6 +401,8 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_SERVICE_NAME=subgraph-agent
       - NATS_URL=nats://nats:4222
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2
       - NODE_OPTIONS=--max-old-space-size=768
       - ALLOW_DEV_TOKEN=true
       - DEV_TOKEN_ROLE=SUPER_ADMIN
@@ -420,6 +422,8 @@ services:
         condition: service_healthy
       nats:
         condition: service_healthy
+      ollama:
+        condition: service_started
     networks:
       - edusphere
 
@@ -672,6 +676,29 @@ services:
     mem_limit: 512m
     mem_reservation: 128m
 
+  # ═══════════════════════════════════════════════════════════════
+  # Ollama — Local LLM inference server (Port 11434)
+  # Pull models: docker exec edusphere-ollama ollama pull llama3
+  # ═══════════════════════════════════════════════════════════════
+  ollama:
+    image: ollama/ollama:latest
+    container_name: edusphere-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    mem_limit: 8g
+    mem_reservation: 2g
+    networks:
+      - edusphere
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list > /dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+
 networks:
   edusphere:
     driver: bridge
@@ -682,3 +709,4 @@ volumes:
   prometheus_data:
   grafana_data:
   minio_data:
+  ollama_data:
