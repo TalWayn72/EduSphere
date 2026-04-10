@@ -1,19 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import * as urql from 'urql';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
-
-vi.mock('urql', () => ({
-  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce(
-      (acc: string, str: string, i: number) =>
-        acc + str + String(values[i] ?? ''),
-      ''
-    ),
-  useQuery: vi.fn(),
-  useMutation: vi.fn(),
-}));
 
 vi.mock('@/lib/graphql/lesson.queries', () => ({
   CREATE_LESSON_MUTATION: 'CREATE_LESSON_MUTATION',
@@ -26,18 +14,12 @@ import { CreateLessonStep2 } from './CreateLessonPage.step2';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const NOOP_EXECUTE = vi
-  .fn()
-  .mockResolvedValue({ data: null, error: undefined });
-
 const renderStep2 = (props: {
-  lessonId?: string;
   courseId?: string;
-  onNext?: () => void;
+  onNext?: (videoUrl?: string) => void;
 }) =>
   render(
     <CreateLessonStep2
-      lessonId={props.lessonId ?? ''}
       courseId={props.courseId ?? 'course-1'}
       onNext={props.onNext ?? vi.fn()}
     />
@@ -48,15 +30,11 @@ const renderStep2 = (props: {
 describe('CreateLessonStep2', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false },
-      NOOP_EXECUTE,
-    ] as never);
   });
 
   it('renders the step heading via i18n', () => {
     renderStep2({});
-    expect(screen.getByText('Add Materials')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Add Materials/i })).toBeInTheDocument();
   });
 
   it('renders the skip hint paragraph via i18n', () => {
@@ -65,7 +43,7 @@ describe('CreateLessonStep2', () => {
   });
 
   it('renders YouTube URL input with placeholder', () => {
-    renderStep2({ lessonId: 'lesson-1' });
+    renderStep2({});
     expect(screen.getByPlaceholderText(/youtube\.com/i)).toBeInTheDocument();
   });
 
@@ -76,32 +54,21 @@ describe('CreateLessonStep2', () => {
     expect(fileInput).toHaveAttribute('accept', '.pdf,.docx,.txt');
   });
 
-  it('shows "Add" button when lessonId is provided', () => {
-    renderStep2({ lessonId: 'lesson-1' });
-    expect(screen.getByRole('button', { name: /^Add$/i })).toBeInTheDocument();
-  });
-
-  it('does NOT show "Add" button when lessonId is empty', () => {
-    renderStep2({ lessonId: '' });
-    const buttons = screen.getAllByRole('button');
-    expect(buttons.every((b) => !/^Add$/i.test(b.textContent ?? ''))).toBe(
-      true
-    );
-  });
-
-  it('shows deferred hint text when lessonId is empty via i18n', () => {
-    renderStep2({ lessonId: '' });
+  it('shows deferred hint text (link will be added after creating)', () => {
+    renderStep2({});
     expect(
       screen.getByText(/link will be added after creating/i)
     ).toBeInTheDocument();
   });
 
-  it('shows i18n validation error for invalid YouTube URL', async () => {
-    renderStep2({ lessonId: 'lesson-1' });
+  it('shows validation error for invalid YouTube URL when continuing', async () => {
+    renderStep2({});
     fireEvent.change(screen.getByPlaceholderText(/youtube\.com/i), {
       target: { value: 'https://vimeo.com/123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /^Add$/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Template/i })
+    );
     await waitFor(() =>
       expect(
         screen.getByText(/Must be a valid YouTube URL/i)
@@ -109,19 +76,17 @@ describe('CreateLessonStep2', () => {
     );
   });
 
-  it('calls addAsset mutation with valid YouTube URL', async () => {
-    renderStep2({ lessonId: 'lesson-1' });
+  it('calls onNext with video URL when valid YouTube URL is entered', async () => {
+    const onNext = vi.fn();
+    renderStep2({ onNext });
     fireEvent.change(screen.getByPlaceholderText(/youtube\.com/i), {
       target: { value: 'https://youtube.com/watch?v=abc123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /^Add$/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Continue to Template/i })
+    );
     await waitFor(() =>
-      expect(NOOP_EXECUTE).toHaveBeenCalledWith(
-        expect.objectContaining({
-          lessonId: 'lesson-1',
-          input: expect.objectContaining({ assetType: 'VIDEO' }),
-        })
-      )
+      expect(onNext).toHaveBeenCalledWith('https://youtube.com/watch?v=abc123')
     );
   });
 
@@ -132,7 +97,7 @@ describe('CreateLessonStep2', () => {
     expect(onNext).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onNext when "Continue to Template" button is clicked', () => {
+  it('calls onNext when "Continue to Template" button is clicked with empty URL', () => {
     const onNext = vi.fn();
     renderStep2({ onNext });
     fireEvent.click(

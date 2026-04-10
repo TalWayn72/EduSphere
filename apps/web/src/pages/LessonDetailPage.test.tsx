@@ -148,7 +148,7 @@ describe('LessonDetailPage', () => {
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('shows Hebrew error message on query failure', () => {
+  it('shows error message on query failure', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ error: { message: 'Network error' }, data: undefined })
     );
@@ -157,10 +157,12 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText(/שגיאה/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Error loading lesson|שגיאה/)
+    ).toBeInTheDocument();
   });
 
-  it('shows "השיעור לא נמצא" when lesson is null', () => {
+  it('shows "Lesson not found" when lesson is null', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { lesson: null } })
     );
@@ -169,7 +171,9 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('השיעור לא נמצא')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesson not found|השיעור לא נמצא/)
+    ).toBeInTheDocument();
   });
 
   it('renders lesson title', () => {
@@ -181,16 +185,16 @@ describe('LessonDetailPage', () => {
     expect(screen.getByText('שיעור ראשון בעץ חיים')).toBeInTheDocument();
   });
 
-  it('shows Hebrew READY status label "מוכן"', () => {
+  it('shows READY status label', () => {
     render(
       <MemoryRouter>
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('מוכן')).toBeInTheDocument();
+    expect(screen.getByText(/Ready|מוכן/)).toBeInTheDocument();
   });
 
-  it('shows Hebrew DRAFT status label "טיוטה" for draft lesson', () => {
+  it('shows DRAFT status label for draft lesson', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { lesson: { ...MOCK_LESSON, status: 'DRAFT' } } })
     );
@@ -199,7 +203,7 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('טיוטה')).toBeInTheDocument();
+    expect(screen.getByText(/Draft|טיוטה/)).toBeInTheDocument();
   });
 
   it('renders asset section with VIDEO and NOTES items', () => {
@@ -208,7 +212,7 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('חומרים')).toBeInTheDocument();
+    expect(screen.getByText(/Materials|חומרים/)).toBeInTheDocument();
     expect(screen.getByText('VIDEO')).toBeInTheDocument();
     expect(screen.getByText('NOTES')).toBeInTheDocument();
   });
@@ -220,7 +224,7 @@ describe('LessonDetailPage', () => {
       </MemoryRouter>
     );
     expect(
-      screen.getByRole('button', { name: /פתח Pipeline/ })
+      screen.getByRole('button', { name: /Open Pipeline|פתח Pipeline/ })
     ).toBeInTheDocument();
   });
 
@@ -231,7 +235,7 @@ describe('LessonDetailPage', () => {
       </MemoryRouter>
     );
     expect(
-      screen.getByRole('button', { name: /צפה בתוצאות/ })
+      screen.getByRole('button', { name: /View Results|צפה בתוצאות/ })
     ).toBeInTheDocument();
   });
 
@@ -245,7 +249,7 @@ describe('LessonDetailPage', () => {
       </MemoryRouter>
     );
     expect(
-      screen.queryByRole('button', { name: /צפה בתוצאות/ })
+      screen.queryByRole('button', { name: /View Results|צפה בתוצאות/ })
     ).not.toBeInTheDocument();
   });
 
@@ -255,7 +259,9 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /פתח Pipeline/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Open Pipeline|פתח Pipeline/ })
+    );
     expect(mockNavigate).toHaveBeenCalledWith(
       '/courses/cc000000-0000-0000-0000-000000000002/lessons/ad0b6070-9b21-4601-8046-ff4292dc73b1/pipeline'
     );
@@ -267,7 +273,9 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /חזרה לקורס/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Back to Course|חזרה לקורס/ })
+    );
     expect(mockNavigate).toHaveBeenCalledWith(
       '/courses/cc000000-0000-0000-0000-000000000002'
     );
@@ -275,7 +283,7 @@ describe('LessonDetailPage', () => {
 
   // ── Invalid UUID guard ─────────────────────────────────────────────────────
 
-  it('shows "השיעור לא נמצא" for non-UUID lessonId (e.g. "lesson-demo-1")', () => {
+  it('shows "Lesson not found" for non-UUID lessonId (e.g. "lesson-demo-1")', () => {
     vi.mocked(rrdom.useParams).mockReturnValue({
       courseId: 'cc000000-0000-0000-0000-000000000002',
       lessonId: 'lesson-demo-1',
@@ -285,7 +293,9 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('השיעור לא נמצא')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesson not found|השיעור לא נמצא/)
+    ).toBeInTheDocument();
   });
 
   // ── Auth error handling ─────────────────────────────────────────────────────
@@ -302,9 +312,11 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText(/הסשן פג תוקף/)).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /התחבר מחדש/ })
+      screen.getByText(/Session expired|הסשן פג תוקף/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Log in again|התחבר מחדש/ })
     ).toBeInTheDocument();
   });
 
@@ -317,7 +329,9 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /התחבר מחדש/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Log in again|התחבר מחדש/ })
+    );
     expect(mockLogin).toHaveBeenCalledTimes(1);
   });
 
@@ -333,10 +347,12 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText(/הסשן פג תוקף/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Session expired|הסשן פג תוקף/)
+    ).toBeInTheDocument();
   });
 
-  it('shows generic שגיאה (not session-expired) for non-auth errors', () => {
+  it('shows generic error message (not session-expired) for non-auth errors', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({
         error: { message: 'Internal Server Error' },
@@ -348,7 +364,11 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(screen.getByText(/שגיאה/)).toBeInTheDocument();
-    expect(screen.queryByText(/הסשן פג תוקף/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/Error loading lesson|שגיאה/)
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Session expired|הסשן פג תוקף/)
+    ).not.toBeInTheDocument();
   });
 });

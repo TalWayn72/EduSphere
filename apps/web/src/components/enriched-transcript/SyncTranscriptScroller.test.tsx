@@ -213,6 +213,9 @@ describe('SyncTranscriptScroller', () => {
       screen.getByTestId('enriched-transcript-panel').parentElement!
     );
 
+    // Clear mock so we only track calls that happen AFTER the wheel event
+    scrollIntoViewMock.mockClear();
+
     // Advance to b2
     rerender(
       <SyncTranscriptScroller

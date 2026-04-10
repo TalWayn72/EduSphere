@@ -72,11 +72,9 @@ describe('PrimaryStatCards', () => {
   it('shows descriptive subtexts', () => {
     render(<PrimaryStatCards {...defaultProps} />);
     expect(screen.getByText('Available in catalog')).toBeInTheDocument();
-    // "Estimated" text appears in both Study Time and Concepts cards
-    const estimatedTexts = screen.getAllByText(
-      'Estimated — real tracking coming soon'
-    );
-    expect(estimatedTexts).toHaveLength(2);
+    // "BETA" subtext appears in both Study Time and Concepts cards
+    const betaTexts = screen.getAllByText(/BETA — real tracking coming soon/);
+    expect(betaTexts).toHaveLength(2);
   });
 
   it('uses translation keys for titles', () => {
@@ -124,9 +122,12 @@ describe('SecondaryStatCards', () => {
     expect(dots.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows placeholder "—" for Study Groups', () => {
-    render(<SecondaryStatCards {...defaultProps} />);
-    expect(screen.getByText('—')).toBeInTheDocument();
+  it('shows placeholder "..." for Study Groups when count is null', () => {
+    render(
+      <SecondaryStatCards {...defaultProps} studyGroupsCount={null} />
+    );
+    const dots = screen.getAllByText('...');
+    expect(dots.length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows Study Groups label', () => {

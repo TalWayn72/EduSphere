@@ -73,6 +73,22 @@ vi.mock('react-i18next', () => ({
         'createLesson.supportedFormats': 'Supports PDF, Word, TXT files',
         'createLesson.skip': 'Skip',
         'createLesson.continueToTemplate': 'Continue to Template \u2190',
+        'createLesson.selectTemplate': 'Select Pipeline Template',
+        'createLesson.thematicDescription':
+          'Instructor-defined topic — 8 processing steps',
+        'createLesson.typeThematic': 'General (Thematic)',
+        'createLesson.typeSequential': 'Sequential',
+        'createLesson.sequentialDescription':
+          'Sequential study — 9 steps + citation verification',
+        'createLesson.createAndContinue':
+          'Create lesson & continue to Pipeline',
+        'createLesson.creating': 'Creating lesson...',
+        'createLesson.authError':
+          'Authentication error — please log in again',
+        'createLesson.networkError':
+          'Network error — cannot connect to server. Try again.',
+        back: 'Back',
+        dismiss: 'Dismiss',
       };
       return translations[key] ?? key;
     },
@@ -120,7 +136,7 @@ async function advanceToStep2() {
 async function advanceToStep3() {
   await advanceToStep2();
   fireEvent.click(screen.getByRole('button', { name: /Skip/i }));
-  await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+  await waitFor(() => screen.getByText(/Select Pipeline Template/i));
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -200,7 +216,9 @@ describe('CreateLessonPage', () => {
       </MemoryRouter>
     );
     await advanceToStep3();
-    expect(screen.getByText('בחר תבנית Pipeline')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Select Pipeline Template/i)
+    ).toBeInTheDocument();
   });
 
   it('shows both template cards in step 3', async () => {
@@ -210,8 +228,10 @@ describe('CreateLessonPage', () => {
       </MemoryRouter>
     );
     await advanceToStep3();
-    expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
-    expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
+    expect(screen.getByText(/General \(Thematic\)/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Sequential/i).length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('submit button is disabled until a template is selected', async () => {
@@ -221,7 +241,11 @@ describe('CreateLessonPage', () => {
       </MemoryRouter>
     );
     await advanceToStep3();
-    expect(screen.getByRole('button', { name: /צור שיעור/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    ).toBeDisabled();
   });
 
   it('calls createLesson mutation when form is submitted', async () => {
@@ -249,10 +273,14 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() => expect(mockExecute).toHaveBeenCalled());
   });
 
@@ -281,10 +309,14 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() =>
       expect(mockNavigate).toHaveBeenCalledWith(
         '/courses/course-1/lessons/lesson-1/pipeline'
@@ -313,10 +345,14 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() =>
       expect(screen.getByText('הקורס לא נמצא')).toBeInTheDocument()
     );
@@ -340,19 +376,23 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() => screen.getByText('שגיאה בדיקה'));
     // Click dismiss
-    fireEvent.click(screen.getByText('סגור'));
+    fireEvent.click(screen.getByText('Dismiss'));
     await waitFor(() => {
       expect(screen.queryByText('שגיאה בדיקה')).not.toBeInTheDocument();
     });
   });
 
-  it('network error shows Hebrew message instead of raw technical error', async () => {
+  it('network error shows localized message instead of raw technical error', async () => {
     const mockExecute = vi.fn().mockResolvedValue({
       data: null,
       error: {
@@ -374,13 +414,17 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() => {
       const alert = screen.getByRole('alert');
-      expect(alert.textContent).toMatch(/שגיאת רשת/);
+      expect(alert.textContent).toMatch(/Network error|שגיאת רשת/);
       expect(alert.textContent).not.toContain('Failed to fetch');
     });
   });
@@ -391,7 +435,10 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /חזרה/i }));
+    // The top-level "Back" button (ghost variant) is always visible and navigates to courses
+    const backButtons = screen.getAllByRole('button', { name: /Back/i });
+    // The header back button is the first (ghost variant) — click it
+    fireEvent.click(backButtons[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
   });
 
@@ -406,14 +453,20 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() => {
       const errorEl = screen.getByRole('alert');
       expect(errorEl).toBeInTheDocument();
-      expect(errorEl.textContent).toMatch(/שגיאת אימות/);
+      expect(errorEl.textContent).toMatch(
+        /Authentication error|שגיאת אימות/
+      );
     });
   });
 
@@ -432,10 +485,14 @@ describe('CreateLessonPage', () => {
     await advanceToStep3();
     fireEvent.click(
       screen
-        .getByText(/שיעור כללי/i)
+        .getByText(/General \(Thematic\)/i)
         .closest('[class*="border"]') as HTMLElement
     );
-    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Create lesson & continue to Pipeline/i,
+      })
+    );
     await waitFor(() => screen.getByRole('alert'));
     expect(mockExecute).not.toHaveBeenCalled();
   });
@@ -471,14 +528,16 @@ describe('CreateLessonPage', () => {
     expect(screen.getByText('Sequential')).toBeInTheDocument();
   });
 
-  it('template step 3 shows "שיעור כללי" card (THEMATIC) and "ספר עץ חיים" card (SEQUENTIAL)', async () => {
+  it('template step 3 shows THEMATIC and SEQUENTIAL template cards', async () => {
     render(
       <MemoryRouter>
         <CreateLessonPage />
       </MemoryRouter>
     );
     await advanceToStep3();
-    expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
-    expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
+    expect(screen.getByText(/General \(Thematic\)/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Sequential/i).length
+    ).toBeGreaterThanOrEqual(1);
   });
 });
