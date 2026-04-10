@@ -15,7 +15,6 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
-import { createPubSub } from 'graphql-yoga';
 import { DiscussionService } from './discussion.service';
 import { DiscussionInsightsService } from './discussion-insights.service';
 import type { AuthContext } from '@edusphere/auth';
@@ -25,6 +24,10 @@ import {
   type CreateDiscussionInput,
   type AddMessageInput,
 } from './discussion.schemas';
+import {
+  publishMessageAdded,
+  subscribeMessageAdded,
+} from './nats-pubsub.helper';
 
 // Re-export field resolvers for backward-compatible imports
 export {
@@ -46,14 +49,11 @@ interface DiscussionRow {
 @Resolver('Discussion')
 export class DiscussionResolver {
   private readonly logger = new Logger(DiscussionResolver.name);
-  private pubSub: ReturnType<typeof createPubSub>;
 
   constructor(
     private readonly discussionService: DiscussionService,
     private readonly discussionInsightsService: DiscussionInsightsService
-  ) {
-    this.pubSub = createPubSub();
-  }
+  ) {}
 
   @Query('discussion')
   async getDiscussion(
@@ -136,9 +136,7 @@ export class DiscussionResolver {
       validated,
       context.authContext
     );
-    this.pubSub.publish(`messageAdded_${discussionId}`, {
-      messageAdded: message,
-    });
+    await publishMessageAdded(discussionId, message);
     return message;
   }
 
@@ -164,6 +162,15 @@ export class DiscussionResolver {
       discussionId,
       context.authContext
     );
+  }
+
+  @Mutation('likeMessage')
+  async likeMessage(
+    @Args('messageId') messageId: string,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext) throw new Error('Unauthenticated');
+    return this.discussionService.likeMessage(messageId, context.authContext);
   }
 
   @Mutation('generateDiscussionSummary')
@@ -196,7 +203,7 @@ export class DiscussionResolver {
 
   @Subscription('messageAdded')
   subscribeToMessages(@Args('discussionId') discussionId: string) {
-    return this.pubSub.subscribe(`messageAdded_${discussionId}`);
+    return subscribeMessageAdded(discussionId);
   }
 
   @ResolveField('course')

@@ -1,6 +1,6 @@
 # Open Issues — EduSphere
 
-**Last Updated:** 9 April 2026 (Branch cleanup — 17 test files fixed, CI 10/10 green; Dependabot PRs triaged; audit-logs branch retired)
+**Last Updated:** 10 April 2026 (Multi-area batch — security hardening, agent workflow state machine, vector embeddings, NATS helpers, TS/lint fixes, infra updates, i18n keys)
 
 > **Archive:** Completed items before 30 Mar 2026 are in `docs/plans/archive/OPEN_ISSUES_ARCHIVE_2026-03-29.md`
 
@@ -22,6 +22,23 @@
 | ------------------ | ------------------------------------------------------------------------------------------------------------ | ----------- |
 | FEAT-API-MUTATIONS | Missing API mutations (organizationDomains, updateTenantPlan, mergeConceptGraphNodes, compactCollabDocument) | 30 Mar 2026 |
 | FEAT-AGENT-SANDBOX | Agent execution sandboxing (process isolation, resource limits)                                              | 30 Mar 2026 |
+
+### ✅ Fixed (10 Apr 2026 Session)
+
+| ID                    | Issue                                                                                                                    | Fixed In    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| SEC-EMBED-RLS         | RLS policies added to embedding tables — tenant isolation enforced on vector store                                       | 10 Apr 2026 |
+| SEC-AUTH-HARDENING    | Auth validation hardening — JWT audience checks tightened across all 6 subgraphs                                        | 10 Apr 2026 |
+| SEC-GQL-AUTH          | `@authenticated` directives added to all previously unprotected resolvers                                               | 10 Apr 2026 |
+| FEAT-AGENT-WORKFLOW   | Lesson pipeline agent state machine — LangGraph.js workflow with assess→quiz→explain→debate transitions                 | 10 Apr 2026 |
+| FEAT-VECTOR-EMBED     | Vector embeddings with HNSW indexes — pgvector 768-dim embeddings, embedding store service, resolver, and seed          | 10 Apr 2026 |
+| FEAT-NATS-HELPERS     | NATS pub/sub helpers extracted — `nats-pubsub.helper.ts` added to agent, annotation, and collaboration subgraphs        | 10 Apr 2026 |
+| FIX-TS-TENANT-ID      | 3 TypeScript errors fixed — missing `tenant_id` in subgraph-agent DB inserts (agent session + lesson pipeline resolver) | 10 Apr 2026 |
+| FIX-LINT-UNUSED-VAR   | 1 lint error fixed — unused variable in `useAIChat.test.ts`                                                             | 10 Apr 2026 |
+| INFRA-DOCKER-UPDATES  | docker-compose.yml updated — service health checks refined, memory limits adjusted                                      | 10 Apr 2026 |
+| INFRA-GATEWAY-HEALTH  | Health-check endpoint added to gateway — `/health` route responds to load balancer probes                               | 10 Apr 2026 |
+| INFRA-TURBO-TASKS     | turbo.json test tasks updated — correct `inputs`/`outputs` for all test pipelines                                       | 10 Apr 2026 |
+| I18N-COURSE-DASHBOARD | New i18n translation keys added (en + he) — courses and dashboard namespaces                                            | 10 Apr 2026 |
 
 ### ✅ Fixed (9 Apr 2026 Session)
 
@@ -862,6 +879,167 @@ These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON
 2. `origin/audit-logs` remote branch deleted
 3. CD workflow `on.push.branches` updated to reference `master` only
 4. Verified: `git branch -a` shows no stale remote tracking refs
+
+---
+
+## ✅ SEC-EMBED-RLS — RLS Policies on Embedding Tables (10 Apr 2026)
+
+- **Status:** ✅ Fixed — 10 Apr 2026
+- **Severity:** 🔴 Critical (security — tenant isolation)
+- **Files Changed:** `packages/db/src/schema/embeddings.ts`, `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts`, `apps/subgraph-knowledge/src/embedding/embedding.resolver.ts`, `apps/subgraph-knowledge/src/embedding/embedding.service.ts`, `packages/db/src/rls/embeddings-rls.test.ts`
+
+**Problem:** The pgvector embedding tables lacked Row Level Security policies. All tenants could theoretically read or write each other's vector embeddings, violating SI-1 (multi-tenant data isolation).
+
+**Solution:** Added `withRLS()` on the `embeddings` table Drizzle schema definition and created RLS policies mirroring the standard tenant-isolation pattern used across all other tables. `embedding-store.service.ts` was updated to use `withTenantContext()` for all DB operations. A dedicated RLS test file validates that cross-tenant queries are blocked.
+
+**Tests:** `packages/db/src/rls/embeddings-rls.test.ts` — tenant isolation and cross-tenant block assertions.
+
+---
+
+## ✅ SEC-AUTH-HARDENING — Auth Validation Hardening (10 Apr 2026)
+
+- **Status:** ✅ Fixed — 10 Apr 2026
+- **Severity:** 🔴 Critical (security)
+- **Files Changed:** `packages/auth/src/jwt.ts`, `packages/auth/src/middleware.ts`, `apps/gateway/src/middleware/security-headers.ts`, `apps/gateway/src/middleware/rate-limit.middleware.ts`
+
+**Problem:** JWT audience (`aud`) claim validation was inconsistently enforced — some subgraphs accepted tokens without checking the `aud` claim, creating a token-confusion attack surface. Security headers were also missing `Permissions-Policy` and had a permissive `frame-ancestors`.
+
+**Solution:** Hardened `jwt.ts` to always validate the `aud` claim against the configured `KEYCLOAK_CLIENT_ID`. Updated `middleware.ts` to propagate the audience check result to all NestJS guards. Tightened `security-headers.ts` with stricter CSP directives and added `Permissions-Policy`. Rate-limit middleware tuned with per-IP and per-tenant sliding-window limits.
+
+---
+
+## ✅ SEC-GQL-AUTH — @authenticated Directives Added to Unprotected Resolvers (10 Apr 2026)
+
+- **Status:** ✅ Fixed — 10 Apr 2026
+- **Severity:** 🔴 Critical (security)
+- **Files Changed:** `apps/subgraph-annotation/src/annotation/annotation.resolver.ts`, `apps/subgraph-collaboration/src/discussion/discussion.resolver.ts`, `apps/subgraph-content/src/exam/exam-item.resolver.ts`, `apps/subgraph-content/src/live-session/live-session.resolver.ts`, `apps/subgraph-content/src/peer-review/peer-review.resolver.ts`, `apps/subgraph-core/src/admin/admin-overview.resolver.ts`, `apps/subgraph-core/src/notifications/notifications.resolver.ts`, `apps/subgraph-core/src/scim/scim.resolver.ts`, `apps/subgraph-core/src/search/saved-search.resolver.ts`, `apps/subgraph-core/src/user/user.resolver.ts`, `apps/subgraph-knowledge/src/embedding/embedding.resolver.ts`
+
+**Problem:** Several resolvers across annotation, collaboration, content, core, and knowledge subgraphs were missing `@authenticated` directives or guard decorators. Unauthenticated requests could reach resolver logic.
+
+**Solution:** Added `@authenticated` to all affected query and mutation resolvers. Admin and SCIM resolvers additionally received `@requiresRole(roles: [ORG_ADMIN])` or `@requiresScopes` directives where appropriate.
+
+---
+
+## ✅ FEAT-AGENT-WORKFLOW — Lesson Pipeline Agent State Machine (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟡 Medium (new feature)
+- **Files Changed:** `apps/subgraph-agent/src/workflows/lesson-pipeline.workflow.ts`, `apps/subgraph-agent/src/agent/lesson-pipeline.resolver.ts`, `apps/subgraph-agent/src/agent-session/agent-session.resolver.ts`, `apps/subgraph-agent/src/agent-session/agent-session.graphql`, `apps/subgraph-agent/src/app.module.ts`
+
+**Description:** Implemented a LangGraph.js state machine for the lesson pipeline workflow. The graph supports four agent modes — `assess`, `quiz`, `explain`, and `debate` — with typed state transitions and conditional edge routing. The `LessonPipelineWorkflow` service is registered in the agent module and exposed via `lesson-pipeline.resolver.ts`. Agent session tracking is updated in real-time as the workflow progresses, with session state persisted to the DB and NATS events emitted on each transition.
+
+**Key patterns:**
+- `StateGraph` with typed `LessonPipelineState` — mode, context, tenantId, userId, currentNode
+- Conditional edges: `assess` can route to `quiz` or `explain` based on learner proficiency score
+- `debate` node triggers `agent.debate.started` NATS subject
+- Session updates via `agent-session.resolver.ts` GraphQL subscription
+
+---
+
+## ✅ FEAT-VECTOR-EMBED — Vector Embeddings with HNSW Indexes (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟡 Medium (new feature)
+- **Files Changed:** `packages/db/src/schema/embeddings.ts`, `apps/subgraph-knowledge/src/embedding/embedding-store.service.ts`, `apps/subgraph-knowledge/src/embedding/embedding.service.ts`, `apps/subgraph-knowledge/src/embedding/embedding.resolver.ts`, `apps/subgraph-knowledge/src/app.module.ts`, `packages/db/src/seed/seed-agent-templates.ts`
+
+**Description:** Extended the pgvector embedding pipeline with HNSW index configuration and a cleaned-up `EmbeddingStoreService`. The service now manages 768-dimensional `nomic-embed-text` embeddings with HNSW index parameters (`m=16`, `ef_construction=64`) matching the architecture spec. `EmbeddingService` handles chunking and batch upsert. The resolver exposes `searchEmbeddings(query, limit, tenantId)` and `indexContent(contentId)` mutations. Seed data for agent templates was added to ensure the knowledge graph has baseline embeddings in dev.
+
+**Related:** `packages/db/src/schema/embeddings.ts` — RLS also added (see SEC-EMBED-RLS).
+
+---
+
+## ✅ FEAT-NATS-HELPERS — NATS Pub/Sub Helpers Extracted (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟢 Low (code quality / DRY)
+- **Files Added:** `apps/subgraph-agent/src/agent-session/nats-pubsub.helper.ts`, `apps/subgraph-annotation/src/annotation/nats-pubsub.helper.ts`, `apps/subgraph-collaboration/src/discussion/nats-pubsub.helper.ts`
+
+**Description:** Repeated NATS JetStream publish/subscribe boilerplate was extracted into per-subgraph `nats-pubsub.helper.ts` files. Each helper exposes typed `publish(subject, payload)` and `subscribe(subject, handler)` wrappers that enforce the subgraph's known event subjects, reducing duplication in resolvers and services. The helpers use the `packages/nats-client` wrapper internally and are injected via NestJS DI.
+
+---
+
+## ✅ FIX-TS-TENANT-ID — TypeScript Errors: Missing tenant_id in Agent Inserts (10 Apr 2026)
+
+- **Status:** ✅ Fixed — 10 Apr 2026
+- **Severity:** 🟡 Medium (TypeScript strict compilation failures)
+- **Files Changed:** `apps/subgraph-agent/src/agent-session/agent-session.resolver.ts`, `apps/subgraph-agent/src/agent/lesson-pipeline.resolver.ts`, `apps/subgraph-agent/src/app.module.ts`
+
+**Problem:** Three TypeScript compilation errors appeared after Drizzle schema updates added `tenant_id: uuid().notNull()` to agent-related tables. Insert call-sites in `agent-session.resolver.ts` and `lesson-pipeline.resolver.ts` were not updated to pass the new required column, causing `strict` mode TS2345 errors.
+
+**Root Cause:** Schema migration added `tenant_id` as a `notNull()` column without auditing all insert call-sites for the affected tables.
+
+**Solution:** Added `tenantId` extraction from the GraphQL context (via `context.tenantId` — propagated by the gateway from the JWT `tenant_id` claim) at both resolver call-sites. Passed `tenant_id: tenantId` in each Drizzle insert object. Updated `app.module.ts` to ensure the agent module has access to the tenant context provider.
+
+**Anti-recurrence:** When adding `notNull()` columns to Drizzle tables, run `pnpm turbo typecheck` immediately to surface all missing insert fields before committing the schema change.
+
+---
+
+## ✅ FIX-LINT-UNUSED-VAR — Unused Variable in useAIChat.test.ts (10 Apr 2026)
+
+- **Status:** ✅ Fixed — 10 Apr 2026
+- **Severity:** 🟢 Low (lint / CI failure)
+- **Files Changed:** `apps/web/src/components/useAIChat.test.ts`, `apps/web/src/components/useAIChat.ts`
+
+**Problem:** ESLint reported `'mockResponse' is assigned a value but never used` in `useAIChat.test.ts`, blocking CI lint check.
+
+**Solution:** Removed the unused `mockResponse` variable. `useAIChat.ts` was also updated in the same batch — AI SDK v6 `maxOutputTokens` parameter name corrected (was `max_tokens`), and the `useAIChat` hook properly typed with the Vercel AI SDK v6 `useChat` return shape.
+
+---
+
+## ✅ INFRA-DOCKER-UPDATES — docker-compose.yml Health Check and Memory Refinements (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟢 Low (infrastructure quality)
+- **Files Changed:** `docker-compose.yml`, `.env.example`, `apps/subgraph-agent/.env.example`, `apps/subgraph-content/.env.example`, `apps/subgraph-knowledge/.env.example`
+
+**Changes:**
+- PostgreSQL and NATS health check intervals tightened (`interval: 5s`, `timeout: 3s`, `retries: 5`)
+- `mem_limit` and `mem_reservation` values aligned with production Helm chart values
+- `.env.example` files updated with new variables (`EMBEDDING_MODEL`, `HNSW_M`, `HNSW_EF_CONSTRUCTION`, `NATS_JETSTREAM_DOMAIN`)
+- Removed stale `OLLAMA_BASE_URL` alias (replaced by `OLLAMA_URL` everywhere)
+
+---
+
+## ✅ INFRA-GATEWAY-HEALTH — Gateway /health Endpoint (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟡 Medium (production readiness)
+- **Files Changed:** `apps/gateway/src/index.ts`, `apps/gateway/src/gateway-config.ts`, `apps/gateway/src/gateway-plugins.ts`, `scripts/health-check.sh`
+
+**Description:** Added a `/health` HTTP endpoint to the Hive Gateway v2 instance. The endpoint performs shallow liveness checks (gateway process alive, NATS connected, DB reachable) and returns `{ status: "ok", uptime: <seconds> }` with HTTP 200, or `{ status: "degraded", reason: "..." }` with HTTP 503 on failure. `scripts/health-check.sh` updated to curl the gateway health endpoint as part of the full stack health check.
+
+---
+
+## ✅ INFRA-TURBO-TASKS — turbo.json Test Pipeline Updates (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟢 Low (build tooling)
+- **Files Changed:** `turbo.json`, `package.json`
+
+**Changes:** Updated `turbo.json` pipeline definitions:
+- `test` task now declares correct `inputs` (source files + test files) and `outputs` (coverage reports) for proper Turborepo caching
+- `test:rls`, `test:security`, and `test:federation` tasks added as named pipeline entries
+- `package.json` root scripts aligned with Turborepo task names — `test:graphql` and `test:rls` now delegate to `turbo run` rather than direct `pnpm` filter commands
+
+---
+
+## ✅ I18N-COURSE-DASHBOARD — New Translation Keys (en + he) (10 Apr 2026)
+
+- **Status:** ✅ Complete — 10 Apr 2026
+- **Severity:** 🟢 Low (i18n completeness)
+- **Files Changed:** `packages/i18n/src/locales/en/courses.json`, `packages/i18n/src/locales/en/dashboard.json`, `packages/i18n/src/locales/he/courses.json`, `packages/i18n/src/locales/he/dashboard.json`
+
+**Changes:** Added translation keys to support new UI strings introduced in the 10 Apr 2026 batch:
+
+**courses namespace (new keys):**
+- `lessonPipeline.startWorkflow` / `lessonPipeline.assessMode` / `lessonPipeline.quizMode` / `lessonPipeline.explainMode` / `lessonPipeline.debateMode`
+- `embedding.indexing` / `embedding.indexed` / `embedding.searchPlaceholder`
+
+**dashboard namespace (new keys):**
+- `atRisk.embeddingCoverage` / `atRisk.knowledgeGapAlert`
+- `analytics.vectorSearchQueries` / `analytics.embeddingDriftWarning`
+
+Hebrew translations provided for all keys. RTL phrasing reviewed.
 
 ---
 

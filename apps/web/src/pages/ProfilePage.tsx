@@ -11,6 +11,7 @@ import {
   BookOpen,
   Trophy,
   MessageSquare,
+  ExternalLink,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
@@ -20,6 +21,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getCurrentUser } from '@/lib/auth';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
 import { MY_TOTAL_POINTS_QUERY } from '@/lib/graphql/gamification.queries';
+import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
 import { BadgesGrid } from '@/components/BadgesGrid';
 import { ProfileVisibilityCard } from './ProfileVisibilityCard';
 
@@ -91,6 +93,13 @@ export function ProfilePage() {
     query: MY_TOTAL_POINTS_QUERY,
   });
 
+  const currentUserId = meResult.data?.me?.id ?? localUser?.id ?? '';
+  const [annotationsResult] = useQuery({
+    query: MY_ANNOTATIONS_QUERY,
+    variables: { userId: currentUserId, limit: 500, offset: 0 },
+    pause: !currentUserId,
+  });
+
   if (!localUser) {
     return <Navigate to="/login" replace />;
   }
@@ -110,6 +119,14 @@ export function ProfilePage() {
   const coursesCount = coursesResult.data?.courses?.length ?? '—';
 
   const totalPoints = pointsResult.data?.myTotalPoints;
+  const annotationCount =
+    (
+      annotationsResult.data as
+        | { annotationsByUser?: unknown[] }
+        | undefined
+    )?.annotationsByUser?.length;
+
+  const keycloakAccountUrl = `${import.meta.env.VITE_KEYCLOAK_URL ?? ''}/realms/${import.meta.env.VITE_KEYCLOAK_REALM ?? 'edusphere'}/account`;
 
   const stats = [
     {
@@ -129,7 +146,11 @@ export function ProfilePage() {
     {
       icon: MessageSquare,
       label: t('profile.stats.annotationsCreated'),
-      value: '—',
+      value: annotationsResult.fetching
+        ? '...'
+        : annotationCount !== undefined
+          ? String(annotationCount)
+          : '0',
     },
   ];
 
@@ -148,9 +169,21 @@ export function ProfilePage() {
         {/* Identity card */}
         <Card className="p-6">
           <div className="flex items-start gap-6">
-            <Avatar className="h-20 w-20 text-2xl">
-              <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-            </Avatar>
+            <div className="relative group">
+              <Avatar className="h-20 w-20 text-2xl">
+                <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+              </Avatar>
+              <a
+                href={keycloakAccountUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={t('profile.manageAvatar', 'Manage avatar in account settings')}
+                className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label={t('profile.manageAvatar', 'Manage avatar in account settings')}
+              >
+                <ExternalLink className="h-5 w-5 text-white dark:text-white" />
+              </a>
+            </div>
             <div className="flex-1 space-y-3">
               <div>
                 <h2 className="text-xl font-semibold">
@@ -160,11 +193,22 @@ export function ProfilePage() {
                   @{localUser.username}
                 </p>
               </div>
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColor}`}
-              >
-                {roleLabel}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColor}`}
+                >
+                  {roleLabel}
+                </span>
+                <a
+                  href={keycloakAccountUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  {t('profile.manageAccount', 'Manage account')}
+                </a>
+              </div>
             </div>
           </div>
         </Card>

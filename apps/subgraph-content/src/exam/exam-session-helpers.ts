@@ -138,6 +138,7 @@ export class ExamSessionHelpers {
     tx: DrizzleDB,
     sessionId: string,
     itemId: string,
+    tenantId: string,
     data: { answerData?: unknown; answeredAt?: Date }
   ): Promise<void> {
     const existing = await tx
@@ -159,14 +160,15 @@ export class ExamSessionHelpers {
     } else {
       await tx
         .insert(schema.examResponses)
-        .values({ sessionId, itemId, ...data });
+        .values({ tenantId, sessionId, itemId, ...data });
     }
   }
 
   async toggleFlag(
     tx: DrizzleDB,
     sessionId: string,
-    itemId: string
+    itemId: string,
+    tenantId: string
   ): Promise<void> {
     const rows = await tx
       .select()
@@ -186,6 +188,7 @@ export class ExamSessionHelpers {
         .where(eq(schema.examResponses.id, rows[0]!.id));
     } else {
       await tx.insert(schema.examResponses).values({
+        tenantId,
         sessionId,
         itemId,
         isFlagged: true,

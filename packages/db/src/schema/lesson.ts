@@ -6,7 +6,9 @@ import {
   numeric,
   integer,
   timestamp,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { users } from './core';
@@ -49,22 +51,36 @@ export const lessons = pgTable('lessons', {
 
 // ─── Lesson Assets ────────────────────────────────────────────────────────────
 
-export const lesson_assets = pgTable('lesson_assets', {
-  id: pk(),
-  lesson_id: uuid('lesson_id')
-    .notNull()
-    .references(() => lessons.id, { onDelete: 'cascade' }),
-  asset_type: text('asset_type', {
-    enum: ['VIDEO', 'AUDIO', 'NOTES', 'WHITEBOARD'],
-  }).notNull(),
-  source_url: text('source_url'),
-  file_url: text('file_url'),
-  media_asset_id: uuid('media_asset_id').references(() => media_assets.id, {
-    onDelete: 'set null',
-  }),
-  metadata: jsonb('metadata').notNull().default({}),
-  ...timestamps,
-});
+export const lesson_assets = pgTable(
+  'lesson_assets',
+  {
+    id: pk(),
+    lesson_id: uuid('lesson_id')
+      .notNull()
+      .references(() => lessons.id, { onDelete: 'cascade' }),
+    asset_type: text('asset_type', {
+      enum: ['VIDEO', 'AUDIO', 'NOTES', 'WHITEBOARD'],
+    }).notNull(),
+    source_url: text('source_url'),
+    file_url: text('file_url'),
+    media_asset_id: uuid('media_asset_id').references(() => media_assets.id, {
+      onDelete: 'set null',
+    }),
+    metadata: jsonb('metadata').notNull().default({}),
+    ...timestamps,
+  },
+  (t) => [
+    pgPolicy('lesson_assets_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM lessons l
+          WHERE l.id = ${t.lesson_id}
+            AND l.tenant_id::text = current_setting('app.current_tenant', TRUE)
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 // ─── Lesson Pipelines ─────────────────────────────────────────────────────────
 
@@ -86,40 +102,71 @@ export const lesson_pipelines = pgTable('lesson_pipelines', {
 
 // ─── Lesson Pipeline Runs ─────────────────────────────────────────────────────
 
-export const lesson_pipeline_runs = pgTable('lesson_pipeline_runs', {
-  id: pk(),
-  pipeline_id: uuid('pipeline_id')
-    .notNull()
-    .references(() => lesson_pipelines.id, { onDelete: 'cascade' }),
-  lesson_id: uuid('lesson_id').references(() => lessons.id, {
-    onDelete: 'cascade',
-  }),
-  run_number: integer('run_number').notNull().default(1),
-  triggered_by: text('triggered_by').default('MANUAL'),
-  started_at: timestamp('started_at', { withTimezone: true }),
-  completed_at: timestamp('completed_at', { withTimezone: true }),
-  status: text('status', {
-    enum: ['RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'],
-  })
-    .notNull()
-    .default('RUNNING'),
-  logs: jsonb('logs').notNull().default([]),
-  ...timestamps,
-});
+export const lesson_pipeline_runs = pgTable(
+  'lesson_pipeline_runs',
+  {
+    id: pk(),
+    pipeline_id: uuid('pipeline_id')
+      .notNull()
+      .references(() => lesson_pipelines.id, { onDelete: 'cascade' }),
+    lesson_id: uuid('lesson_id').references(() => lessons.id, {
+      onDelete: 'cascade',
+    }),
+    run_number: integer('run_number').notNull().default(1),
+    triggered_by: text('triggered_by').default('MANUAL'),
+    started_at: timestamp('started_at', { withTimezone: true }),
+    completed_at: timestamp('completed_at', { withTimezone: true }),
+    status: text('status', {
+      enum: ['RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'],
+    })
+      .notNull()
+      .default('RUNNING'),
+    logs: jsonb('logs').notNull().default([]),
+    ...timestamps,
+  },
+  (t) => [
+    pgPolicy('lesson_pipeline_runs_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM lesson_pipelines lp
+          JOIN lessons l ON l.id = lp.lesson_id
+          WHERE lp.id = ${t.pipeline_id}
+            AND l.tenant_id::text = current_setting('app.current_tenant', TRUE)
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 // ─── Lesson Pipeline Results ──────────────────────────────────────────────────
 
-export const lesson_pipeline_results = pgTable('lesson_pipeline_results', {
-  id: pk(),
-  run_id: uuid('run_id')
-    .notNull()
-    .references(() => lesson_pipeline_runs.id, { onDelete: 'cascade' }),
-  module_name: text('module_name').notNull(),
-  output_type: text('output_type').notNull(),
-  output_data: jsonb('output_data').notNull().default({}),
-  file_url: text('file_url'),
-  ...timestamps,
-});
+export const lesson_pipeline_results = pgTable(
+  'lesson_pipeline_results',
+  {
+    id: pk(),
+    run_id: uuid('run_id')
+      .notNull()
+      .references(() => lesson_pipeline_runs.id, { onDelete: 'cascade' }),
+    module_name: text('module_name').notNull(),
+    output_type: text('output_type').notNull(),
+    output_data: jsonb('output_data').notNull().default({}),
+    file_url: text('file_url'),
+    ...timestamps,
+  },
+  (t) => [
+    pgPolicy('lesson_pipeline_results_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM lesson_pipeline_runs lpr
+          JOIN lesson_pipelines lp ON lp.id = lpr.pipeline_id
+          JOIN lessons l ON l.id = lp.lesson_id
+          WHERE lpr.id = ${t.run_id}
+            AND l.tenant_id::text = current_setting('app.current_tenant', TRUE)
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 // ─── Lesson Citations ─────────────────────────────────────────────────────────
 

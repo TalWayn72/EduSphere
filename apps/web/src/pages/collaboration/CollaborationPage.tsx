@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { DEV_MODE } from '@/lib/auth';
 import { Layout } from '@/components/Layout';
 import { Loader2, AlertTriangle } from 'lucide-react';
@@ -12,10 +13,18 @@ import {
   MY_DISCUSSIONS_QUERY,
   CREATE_DISCUSSION_MUTATION,
 } from '@/lib/graphql/collaboration.queries';
+import { COURSES_QUERY } from '@/lib/queries';
 import type { BackendDiscussion, MatchState } from './collaboration.types';
 import { toSessionUrl } from './collaboration.types';
 import { MatchPanel } from './MatchPanel';
 import { SessionList } from './SessionList';
+
+// Timeout in ms before we declare "no human partner found"
+const HUMAN_MATCH_TIMEOUT_MS = 8000;
+
+interface CoursesResult {
+  courses: { id: string; title: string }[];
+}
 
 export function CollaborationPage() {
   const { t } = useTranslation(['collaboration', 'common']);
@@ -47,6 +56,13 @@ export function CollaborationPage() {
     pause: !mounted || DEV_MODE,
   });
 
+  // Fetch user's enrolled courses so we can use a real courseId
+  const [{ data: coursesData }] = useQuery<CoursesResult>({
+    query: COURSES_QUERY,
+    variables: { limit: 1, offset: 0 },
+    pause: !mounted || DEV_MODE,
+  });
+
   const [createResult, executeCreate] = useMutation(CREATE_DISCUSSION_MUTATION);
 
   const isSchemaValidationError =
@@ -63,6 +79,10 @@ export function CollaborationPage() {
     (d) => d.discussionType !== 'CHAVRUTA'
   );
 
+  // Use first enrolled course id, fall back to a sentinel only if none available yet
+  const activeCourseId =
+    coursesData?.courses?.[0]?.id ?? '00000000-0000-0000-0000-000000000001';
+
   const handleStartMatching = (mode: 'human' | 'ai') => {
     setMatchMode(mode);
     setMatchState('searching');
@@ -78,19 +98,34 @@ export function CollaborationPage() {
         );
       }, 1000);
     } else {
-      matchTimeoutRef1.current = setTimeout(() => setMatchState('found'), 3000);
+      // Real human match: after timeout show "no partners available" feedback
+      matchTimeoutRef1.current = setTimeout(() => {
+        setMatchState('idle');
+        toast.info(
+          t(
+            'noPartnersAvailable',
+            'No partners available right now — try AI matching instead'
+          )
+        );
+      }, HUMAN_MATCH_TIMEOUT_MS);
     }
   };
 
   const handleCreateChavruta = async () => {
     const result = await executeCreate({
       input: {
-        courseId: '00000000-0000-0000-0000-000000000001',
+        courseId: activeCourseId,
         title: `Chavruta session ${new Date().toLocaleTimeString()}`,
         discussionType: 'CHAVRUTA',
       },
     });
-    if (!result.error && result.data) {
+    if (result.error) {
+      toast.error(
+        t('createError', 'Failed to create Chavruta session. Please try again.')
+      );
+      return;
+    }
+    if (result.data) {
       const disc = (result.data as { createDiscussion: BackendDiscussion })
         .createDiscussion;
       reexecute({ requestPolicy: 'network-only' });

@@ -46,6 +46,39 @@ export function useGraphViewport() {
     isPanning.current = false;
   }, []);
 
+  // Touch handlers — mirror mouse panning for mobile devices
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if ((e.target as SVGElement).closest('g[data-node]')) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+      isPanning.current = true;
+      panStart.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        tx: translate.x,
+        ty: translate.y,
+      };
+    },
+    [translate]
+  );
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPanning.current) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    // Prevent default scroll while panning the graph
+    e.preventDefault();
+    setTranslate({
+      x: panStart.current.tx + (touch.clientX - panStart.current.x),
+      y: panStart.current.ty + (touch.clientY - panStart.current.y),
+    });
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    isPanning.current = false;
+  }, []);
+
   const resetView = useCallback(() => {
     setScale(1);
     setTranslate({ x: 0, y: 0 });
@@ -66,6 +99,9 @@ export function useGraphViewport() {
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
     resetView,
     zoomIn,
     zoomOut,

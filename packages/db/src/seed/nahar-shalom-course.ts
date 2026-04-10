@@ -952,23 +952,24 @@ async function seedKabbalisticConcepts(
     );
   }
 
-  // Relationships
+  // Relationships — labels must match whitelisted ontology types:
+  // RELATED_TO | PREREQUISITE_OF | CONTRADICTS | DERIVED_FROM | PART_OF | AUTHORED_BY
   const relationships: Array<[string, string, string]> = [
-    ['צמצום', 'PRECEDES', 'רשימו'],
-    ['צמצום', 'PRECEDES', 'קו'],
-    ['קו', 'ENABLES', 'ספירות'],
-    ['ספירות', 'COMPOSE', 'פרצופים'],
-    ['ספירות', 'EXIST_IN', 'אצילות'],
-    ['ספירות', 'EXIST_IN', 'בריאה'],
-    ['ספירות', 'EXIST_IN', 'יצירה'],
-    ['ספירות', 'EXIST_IN', 'עשיה'],
-    ['שבירת הכלים', 'REQUIRES', 'תיקון'],
-    ['כוונות', 'RELATE_TO', 'ספירות'],
-    ['כוונות', 'RELATE_TO', 'פרצופים'],
-    ['הרש"ש', 'AUTHORED', 'נהר שלום'],
-    ['הרש"ש', 'AUTHORED', 'רחובות הנהר'],
-    ['רחובות הנהר', 'PART_OF', 'נהר שלום'],
-    ['נהר שלום', 'TEACHES', 'כוונות'],
+    ['צמצום', 'PREREQUISITE_OF', 'רשימו'],      // PRECEDES → PREREQUISITE_OF
+    ['צמצום', 'PREREQUISITE_OF', 'קו'],          // PRECEDES → PREREQUISITE_OF
+    ['קו', 'PREREQUISITE_OF', 'ספירות'],         // ENABLES → PREREQUISITE_OF
+    ['ספירות', 'PART_OF', 'פרצופים'],            // COMPOSE → PART_OF
+    ['ספירות', 'PART_OF', 'אצילות'],             // EXIST_IN → PART_OF
+    ['ספירות', 'PART_OF', 'בריאה'],              // EXIST_IN → PART_OF
+    ['ספירות', 'PART_OF', 'יצירה'],              // EXIST_IN → PART_OF
+    ['ספירות', 'PART_OF', 'עשיה'],               // EXIST_IN → PART_OF
+    ['שבירת הכלים', 'PREREQUISITE_OF', 'תיקון'], // REQUIRES → PREREQUISITE_OF
+    ['כוונות', 'RELATED_TO', 'ספירות'],          // RELATE_TO → RELATED_TO
+    ['כוונות', 'RELATED_TO', 'פרצופים'],         // RELATE_TO → RELATED_TO
+    ['נהר שלום', 'AUTHORED_BY', 'הרש"ש'],        // AUTHORED → AUTHORED_BY (reversed direction)
+    ['רחובות הנהר', 'AUTHORED_BY', 'הרש"ש'],     // AUTHORED → AUTHORED_BY (reversed direction)
+    ['רחובות הנהר', 'PART_OF', 'נהר שלום'],      // PART_OF — already whitelisted
+    ['נהר שלום', 'RELATED_TO', 'כוונות'],        // TEACHES → RELATED_TO
   ];
 
   for (const [from, rel, to] of relationships) {

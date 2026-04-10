@@ -138,6 +138,7 @@ export class CourseGeneratorService implements OnModuleDestroy {
       .values({
         agent_id: agentId,
         user_id: userId,
+        tenant_id: tenantId,
         input: {
           prompt: options.prompt,
           targetAudienceLevel: options.targetAudienceLevel,

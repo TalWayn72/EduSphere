@@ -130,6 +130,7 @@ export class CertExamGenService implements OnModuleDestroy {
       .values({
         agent_id: agentId,
         user_id: userId,
+        tenant_id: tenantId,
         input: { ...options, tenantId },
         status: 'RUNNING',
         metadata: { templateType: 'CERT_EXAM_GENERATOR' },

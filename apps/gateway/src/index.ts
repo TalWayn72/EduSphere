@@ -53,6 +53,13 @@ const server = createServer(async (req, res) => {
   // OWASP ASVS V14.4: Apply security headers to every response.
   applySecurityHeaders(res);
 
+  // Health check endpoint — handled before rate-limiting and Yoga
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok' }));
+    return;
+  }
+
   // Extract rate-limit key from raw HTTP headers (before Yoga parsing)
   const tenantHeader =
     req.headers['x-tenant-id'] ??

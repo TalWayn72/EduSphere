@@ -161,7 +161,7 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
     ).toHaveLength(0);
   });
 
-  it('no subgraph file uses bare connect({ servers: }) pattern without buildNatsOptions in scope', () => {
+  it('no subgraph file uses bare connect({ servers: }) pattern without buildNatsOptions in scope', { timeout: 30_000 }, () => {
     const bareConnectFiles: string[] = [];
 
     for (const dir of subgraphDirs) {

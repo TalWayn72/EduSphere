@@ -76,16 +76,20 @@ export class JWTValidator {
   }
 
   async validate(token: string): Promise<AuthContext> {
-    // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
+    // Dev bypass for E2E tests (BUG-23): accept a configurable dev token in
     // non-production environments so Playwright tests work without a live Keycloak.
     // NEVER active in production (NODE_ENV === 'production').
-    // SEC-1 hardening: requires ALLOW_DEV_TOKEN=true AND non-production env.
+    // SEC-2 hardening: requires ALLOW_DEV_TOKEN=true to be explicitly set.
+    // Token value: DEV_TOKEN_SECRET env var, or falls back to 'dev-token-mock-jwt'.
     // Grants STUDENT role by default — SUPER_ADMIN requires DEV_TOKEN_ROLE=SUPER_ADMIN.
     if (
       process.env.NODE_ENV !== 'production' &&
       process.env['ALLOW_DEV_TOKEN'] === 'true' &&
-      token === 'dev-token-mock-jwt'
+      token === (process.env['DEV_TOKEN_SECRET'] ?? 'dev-token-mock-jwt')
     ) {
+      process.stderr.write(
+        '[AUTH WARN] DEV TOKEN USED — this should never happen in staging/production\n'
+      );
       const devRole = (process.env['DEV_TOKEN_ROLE'] as UserRole) ?? 'STUDENT';
       const validRole = UserRole.safeParse(devRole).success
         ? devRole
@@ -122,7 +126,7 @@ export class JWTValidator {
         firstName: claims.given_name,
         lastName: claims.family_name,
         roles,
-        scopes: [],
+        scopes: (payload.scope as string)?.split(' ').filter(Boolean) ?? [],
         tenantId: claims.tenant_id,
         isSuperAdmin: roles.includes('SUPER_ADMIN'),
       };

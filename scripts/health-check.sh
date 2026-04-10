@@ -149,6 +149,18 @@ check_warn "Jaeger" \
   "curl -sf http://localhost:16686/" \
   "Start with: docker-compose -f docker-compose.monitoring.yml up -d"
 
+# 9. Gateway
+check_warn "Gateway (port 4000)" \
+  "curl -sf http://localhost:4000/health" \
+  "Start with: pnpm --filter @edusphere/gateway dev"
+
+# 10. Subgraphs (optional in dev — not all may be running)
+for PORT in 4001 4002 4003 4004 4005 4006; do
+  check_warn "Subgraph (port $PORT)" \
+    "curl -sf http://localhost:${PORT}/health" \
+    "Start subgraph or run: pnpm turbo dev --filter='@edusphere/subgraph-*'"
+done
+
 # ─── GPU Health (optional) ────────────────
 echo ""
 echo "=== GPU Health ==="

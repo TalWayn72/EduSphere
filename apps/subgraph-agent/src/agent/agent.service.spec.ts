@@ -262,6 +262,7 @@ describe('AgentService', () => {
       await service.startExecution({
         agentId: 'agent-1',
         userId: 'user-1',
+        tenantId: 'tenant-1',
         input: {},
       });
       expect(capturedValues.status).toBe('QUEUED');
@@ -279,6 +280,7 @@ describe('AgentService', () => {
       await service.startExecution({
         agentId: 'agent-42',
         userId: 'user-1',
+        tenantId: 'tenant-1',
         input: {},
       });
       expect(capturedValues.agent_id).toBe('agent-42');
@@ -296,6 +298,7 @@ describe('AgentService', () => {
       await service.startExecution({
         agentId: 'agent-1',
         userId: 'user-99',
+        tenantId: 'tenant-1',
         input: {},
       });
       expect(capturedValues.user_id).toBe('user-99');
@@ -313,6 +316,7 @@ describe('AgentService', () => {
       await service.startExecution({
         agentId: 'agent-1',
         userId: 'user-1',
+        tenantId: 'tenant-1',
         input: {},
       });
       expect(capturedValues.metadata).toEqual({});
@@ -331,6 +335,7 @@ describe('AgentService', () => {
       await service.startExecution({
         agentId: 'agent-1',
         userId: 'user-1',
+        tenantId: 'tenant-1',
         input: {},
         metadata: meta,
       });
@@ -344,6 +349,7 @@ describe('AgentService', () => {
       const result = await service.startExecution({
         agentId: 'agent-1',
         userId: 'user-1',
+        tenantId: 'tenant-1',
         input: {},
       });
       expect(result).toEqual(MOCK_EXECUTION);

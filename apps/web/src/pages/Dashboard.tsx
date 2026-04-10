@@ -34,6 +34,7 @@ export function Dashboard() {
     statsResult,
     coursesEnrolled,
     annotationsCreated,
+    studyGroupsCount,
     totalMinutesDisplay,
     conceptsMastered,
     deferredActivity,
@@ -106,6 +107,7 @@ export function Dashboard() {
         <SecondaryStatCards
           coursesEnrolled={coursesEnrolled}
           annotationsCreated={annotationsCreated}
+          studyGroupsCount={studyGroupsCount}
         />
 
         <DailyLearningWidget />

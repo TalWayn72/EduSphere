@@ -35,10 +35,17 @@ export class RateLimitMiddleware implements NestMiddleware, OnModuleDestroy {
   }
 
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const tenantId = (req.headers['x-tenant-id'] as string) ?? 'global';
     const ip = req.ip ?? 'unknown';
-    // Hash-like key — do not embed raw tenant data in logs or metrics
-    const key = `rate:${tenantId}:${ip}`;
+    // Use JWT-validated tenantId from auth context (set by auth middleware after token verification).
+    // Never trust the raw x-tenant-id header as a rate-limit key — it is forgeable by clients.
+    // For unauthenticated requests, key on IP address only.
+    const authContext = (req as unknown as Record<string, unknown>)[
+      'authContext'
+    ] as { tenantId?: string } | undefined;
+    const validatedTenantId = authContext?.tenantId;
+    const key = validatedTenantId
+      ? `rate:${validatedTenantId}:${ip}`
+      : `rate:unauthenticated:${ip}`;
 
     const allowed = this.redis
       ? await this.checkRedis(key)

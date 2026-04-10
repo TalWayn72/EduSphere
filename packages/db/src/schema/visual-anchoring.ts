@@ -10,7 +10,9 @@ import {
   numeric,
   unique,
   index,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { users } from './core';
@@ -56,8 +58,12 @@ export const visualAssets = pgTable(
     index('idx_visual_assets_course').on(t.course_id),
     index('idx_visual_assets_scan').on(t.scan_status),
     index('idx_visual_assets_uploader').on(t.uploader_id),
+    pgPolicy('visual_assets_rls', {
+      using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+      withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+    }),
   ]
-);
+).enableRLS();
 
 export type VisualAsset = typeof visualAssets.$inferSelect;
 export type NewVisualAsset = typeof visualAssets.$inferInsert;
@@ -115,8 +121,12 @@ export const visualAnchors = pgTable(
       t.document_order
     ),
     index('idx_visual_anchors_visual_asset').on(t.visual_asset_id),
+    pgPolicy('visual_anchors_rls', {
+      using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+      withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+    }),
   ]
-);
+).enableRLS();
 
 export type VisualAnchor = typeof visualAnchors.$inferSelect;
 export type NewVisualAnchor = typeof visualAnchors.$inferInsert;
@@ -152,8 +162,12 @@ export const documentVersions = pgTable(
       t.media_asset_id,
       t.version_number
     ),
+    pgPolicy('document_versions_rls', {
+      using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+      withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+    }),
   ]
-);
+).enableRLS();
 
 export type DocumentVersion = typeof documentVersions.$inferSelect;
 export type NewDocumentVersion = typeof documentVersions.$inferInsert;

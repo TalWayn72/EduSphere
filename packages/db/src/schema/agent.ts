@@ -44,6 +44,9 @@ export const agent_definitions = pgTable('agent_definitions', {
 // Agent Executions
 export const agent_executions = pgTable('agent_executions', {
   id: pk(),
+  tenant_id: uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id, { onDelete: 'cascade' }),
   agent_id: uuid('agent_id')
     .notNull()
     .references(() => agent_definitions.id, { onDelete: 'cascade' }),

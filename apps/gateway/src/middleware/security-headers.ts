@@ -9,16 +9,29 @@ import type { ServerResponse } from 'node:http';
 const IS_PROD = process.env.NODE_ENV === 'production';
 
 /**
+ * Additional WebSocket origins for connect-src CSP directive.
+ * Set ALLOWED_WS_ORIGINS as a space-separated list of explicit origins
+ * (e.g. "ws://localhost:4000 wss://api.edusphere.app").
+ * connect-src always includes ws: wss: for GraphQL subscriptions.
+ */
+const additionalWsOrigins: string = process.env['ALLOWED_WS_ORIGINS'] ?? '';
+
+/**
  * Content-Security-Policy directive map.
  * script-src keeps 'unsafe-inline' only in dev so GraphQL Playground works.
  * In production, no inline scripts are permitted.
+ * connect-src includes ws: wss: for GraphQL WebSocket subscriptions.
  */
+const connectSrc = additionalWsOrigins
+  ? `connect-src 'self' ws: wss: ${additionalWsOrigins}`
+  : "connect-src 'self' ws: wss:";
+
 const CSP_DIRECTIVES: readonly string[] = [
   "default-src 'self'",
   IS_PROD ? "script-src 'self'" : "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'", // Tailwind injects inline styles
   "img-src 'self' data: blob:",
-  "connect-src 'self' ws: wss:", // GraphQL subscriptions via WebSocket
+  connectSrc, // Includes ws: wss: for GraphQL subscriptions
   "font-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",

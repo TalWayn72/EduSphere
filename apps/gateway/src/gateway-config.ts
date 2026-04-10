@@ -1,9 +1,13 @@
 import pino from 'pino';
 
-export const logger = pino({
-  transport: { target: 'pino-pretty' },
-  level: 'info',
-});
+const usePretty =
+  process.env.LOG_PRETTY === 'true' || process.env.NODE_ENV === 'development';
+
+export const logger = pino(
+  usePretty
+    ? { transport: { target: 'pino-pretty' }, level: 'info' }
+    : { level: 'info' }
+);
 
 export const JWKS_URL =
   process.env.KEYCLOAK_JWKS_URL ||

@@ -31,7 +31,13 @@
     "weeklyGoal": "יעד שבועי",
     "days": "ימים",
     "hours": "שעות",
-    "minutes": "דקות"
+    "minutes": "דקות",
+    "studyTimeBeta": "BETA — מעקב אמיתי בקרוב",
+    "conceptsBeta": "BETA — מעקב אמיתי בקרוב",
+    "studyGroups": "קבוצות לימוד",
+    "availableInCatalog": "זמין בקטלוג",
+    "notesAndHighlights": "הערות והדגשות",
+    "activeCollaborations": "שיתופי פעולה פעילים"
   },
   "heatmap": {
     "studyDays": "{{count}} ימי לימוד",
@@ -53,6 +59,8 @@
       "coursesAvailable": "קורסים זמינים",
       "conceptsMastered": "מושגים שנרכשו",
       "annotationsCreated": "הערות שנוצרו"
-    }
+    },
+    "manageAvatar": "ניהול אווטאר בהגדרות חשבון",
+    "manageAccount": "ניהול חשבון"
   }
 }

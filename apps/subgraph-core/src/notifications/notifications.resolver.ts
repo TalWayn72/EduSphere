@@ -2,6 +2,7 @@ import {
   Resolver,
   Subscription,
   Mutation,
+  Query,
   Args,
   Context,
 } from '@nestjs/graphql';
@@ -11,6 +12,7 @@ import type { Notification } from './nats-notification.bridge';
 import type { AuthContext } from '@edusphere/auth';
 import { PushTokenService } from './push-token.service';
 import type { PushTokenDto } from './push-token.service';
+import { NotificationDeliveriesService } from './notification-deliveries.service';
 
 interface GraphQLContext {
   req: unknown;
@@ -24,7 +26,10 @@ interface NotificationPayload {
 
 @Resolver('Notification')
 export class NotificationsResolver {
-  constructor(private readonly pushTokenService: PushTokenService) {}
+  constructor(
+    private readonly pushTokenService: PushTokenService,
+    private readonly deliveriesService: NotificationDeliveriesService
+  ) {}
 
   /**
    * Subscribe to real-time notifications for a specific user.
@@ -56,6 +61,76 @@ export class NotificationsResolver {
     }
 
     return notificationPubSub.subscribe(`notificationReceived.${userId}`);
+  }
+
+  /**
+   * Paginated delivery history for the authenticated user (Relay cursor).
+   */
+  @Query('myNotificationHistory')
+  async myNotificationHistory(
+    @Args('first') first: number | undefined,
+    @Args('after') after: string | undefined,
+    @Context() context: GraphQLContext
+  ): Promise<unknown> {
+    const authCtx = context.authContext;
+    if (!authCtx?.userId || !authCtx.tenantId) {
+      throw new UnauthorizedException('Authentication required');
+    }
+    return this.deliveriesService.getHistory(
+      authCtx.userId,
+      authCtx.tenantId,
+      first ?? 20,
+      after
+    );
+  }
+
+  /**
+   * Analytics aggregation for ORG_ADMIN / SUPER_ADMIN (enforced by SDL directive).
+   */
+  @Query('notificationDeliveryAnalytics')
+  async notificationDeliveryAnalytics(
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+    @Context() context: GraphQLContext
+  ) {
+    const authCtx = context.authContext;
+    if (!authCtx?.tenantId) {
+      throw new UnauthorizedException('Authentication required');
+    }
+    return this.deliveriesService.getAnalytics(
+      authCtx.tenantId,
+      new Date(startDate),
+      new Date(endDate)
+    );
+  }
+
+  /**
+   * Mark a single delivery record as read; returns the updated delivery.
+   */
+  @Mutation('markNotificationDeliveryRead')
+  async markNotificationDeliveryRead(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ): Promise<unknown> {
+    const authCtx = context.authContext;
+    if (!authCtx?.userId || !authCtx.tenantId) {
+      throw new UnauthorizedException('Authentication required');
+    }
+    return this.deliveriesService.markRead(id, authCtx.userId, authCtx.tenantId);
+  }
+
+  /**
+   * Bulk mark all unread deliveries as read; returns the count updated.
+   */
+  @Mutation('markAllNotificationDeliveriesRead')
+  async markAllNotificationDeliveriesRead(
+    @Context() context: GraphQLContext
+  ): Promise<number> {
+    const authCtx = context.authContext;
+    if (!authCtx?.userId || !authCtx.tenantId) {
+      throw new UnauthorizedException('Authentication required');
+    }
+    return this.deliveriesService.markAllRead(authCtx.userId, authCtx.tenantId);
   }
 
   /**

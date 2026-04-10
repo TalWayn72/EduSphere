@@ -125,4 +125,8 @@ export class DiscussionService implements OnModuleDestroy {
   async leaveDiscussion(discussionId: string, authContext: AuthContext) {
     return this.threads.leaveDiscussion(discussionId, authContext);
   }
+
+  async likeMessage(messageId: string, authContext: AuthContext) {
+    return this.messages.toggleLike(messageId, authContext);
+  }
 }

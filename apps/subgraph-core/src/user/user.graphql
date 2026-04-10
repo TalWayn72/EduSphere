@@ -114,14 +114,14 @@ input ListUsersInput {
 
 type Query {
   _health: String! @shareable
-  user(id: ID!): User
+  user(id: ID!): User @authenticated
   users(
     limit: Int = 10
     offset: Int = 0
       @deprecated(
         reason: "Use cursor-based pagination with 'after' argument instead. Will be removed 2026-09-01."
       )
-  ): [User!]!
+  ): [User!]! @authenticated
   me: User
   myStats: UserStats! @authenticated
   publicProfile(userId: ID!): PublicProfile

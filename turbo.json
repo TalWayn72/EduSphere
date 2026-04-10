@@ -54,6 +54,11 @@
       "dependsOn": ["^codegen"],
       "outputs": ["src/generated/**", "graphql-types/**"]
     },
+    "test:graphql": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["DATABASE_URL", "NATS_URL"]
+    },
     "schema:check": {
       "dependsOn": ["compose"],
       "outputs": [],

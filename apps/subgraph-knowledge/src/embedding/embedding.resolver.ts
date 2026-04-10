@@ -8,9 +8,13 @@ import {
 } from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import type { TenantContext } from '@edusphere/db';
+import type { AuthContext } from '@edusphere/auth';
 import { EmbeddingService } from './embedding.service';
 
 type GqlContext = {
+  /** Populated by auth middleware (preferred path). */
+  authContext?: AuthContext | null;
+  /** Legacy flat fields — present when authContext is absent (gateway fallback). */
   tenantId?: string | null;
   userId?: string | null;
   role?: string | null;
@@ -18,15 +22,20 @@ type GqlContext = {
 
 /** Extract a typed TenantContext from the GraphQL request context or throw. */
 function requireTenantCtx(ctx: GqlContext): TenantContext {
-  if (!ctx.tenantId || !ctx.userId || !ctx.role) {
+  // Prefer authContext (populated by JWT middleware); fall back to flat fields.
+  const tenantId = ctx.authContext?.tenantId ?? ctx.tenantId;
+  const userId = ctx.authContext?.userId ?? ctx.userId;
+  const role = ctx.authContext?.roles?.[0] ?? ctx.role;
+
+  if (!tenantId || !userId || !role) {
     throw new UnauthorizedException(
       'Missing tenant context for embedding query'
     );
   }
   return {
-    tenantId: ctx.tenantId,
-    userId: ctx.userId,
-    userRole: ctx.role as TenantContext['userRole'],
+    tenantId,
+    userId,
+    userRole: role as TenantContext['userRole'],
   };
 }
 
@@ -65,15 +74,15 @@ export class EmbeddingResolver {
 
   @Query('semanticSearchByContentItem')
   async semanticSearchByContentItem(
-    @Args('contentItemId') _contentItemId: string,
+    @Args('contentItemId') contentItemId: string,
     @Args('query') query: number[],
     @Args('limit') limit: number = 5,
     @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireTenantCtx(ctx);
-    // Legacy — delegates to vector search ignoring contentItemId filter
-    return this.embeddingService.semanticSearchByVector(
+    return this.embeddingService.semanticSearchByVectorAndContentItem(
       query,
+      contentItemId,
       tenantCtx,
       limit,
       0.7

@@ -17,6 +17,7 @@ import { DropOffFunnelChart } from '@/components/analytics/DropOffFunnelChart';
 import { AtRiskLearnersPanel } from '@/components/analytics/AtRiskLearnersPanel';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageShell } from '@/components/PageShell';
+import { Bot, Clock, Zap } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -248,16 +249,36 @@ export function InstructorAnalyticsDashboard() {
         )}
 
         {activeTab === 'AI Usage' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">AI Agent Usage</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                AI usage analytics coming soon.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <StatCard
+                icon={<Bot className="h-4 w-4" />}
+                label="Total AI Sessions"
+                value={fetching ? '—' : '—'}
+              />
+              <StatCard
+                icon={<Zap className="h-4 w-4" />}
+                label="Most Used Agent"
+                value={fetching ? '—' : '—'}
+              />
+              <StatCard
+                icon={<Clock className="h-4 w-4" />}
+                label="Avg Session Duration"
+                value={fetching ? '—' : '—'}
+              />
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">AI Agent Usage</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Detailed AI usage data will be available once the agent
+                  analytics API is connected to this dashboard.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </PageShell>
     </Layout>

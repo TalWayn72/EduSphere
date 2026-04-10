@@ -231,11 +231,12 @@ export class UserAdminService implements OnModuleInit {
       this.userService.getDb(),
       tenantCtx,
       async (tx) => {
-        const rows = await (opts.role
+        const roleFilter = opts.role as UserRole | undefined;
+        const rows = await (roleFilter
           ? tx
               .select()
               .from(schema.users)
-              .where(eq(schema.users.role, opts.role as UserRole))
+              .where(eq(schema.users.role, roleFilter))
               .limit(opts.limit)
               .offset(opts.offset)
           : tx
@@ -246,8 +247,8 @@ export class UserAdminService implements OnModuleInit {
         const countQuery = tx
           .select({ total: sql<number>`cast(count(*) as integer)` })
           .from(schema.users);
-        const [countResult] = opts.role
-          ? await countQuery.where(eq(schema.users.role, opts.role as UserRole))
+        const [countResult] = roleFilter
+          ? await countQuery.where(eq(schema.users.role, roleFilter))
           : await countQuery;
         return {
           users: rows

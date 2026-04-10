@@ -19,7 +19,16 @@ interface GraphCanvasProps {
   onMouseMove: (e: React.MouseEvent) => void;
   onMouseUp: () => void;
   onSelectNode: (id: string) => void;
+  /** Touch equivalents for mobile panning support */
+  onTouchStart?: (e: React.TouchEvent) => void;
+  onTouchMove?: (e: React.TouchEvent) => void;
+  onTouchEnd?: () => void;
 }
+
+const TOUCH_SVG_STYLE: React.CSSProperties = {
+  ...SVG_STYLE,
+  touchAction: 'none', // prevent browser scroll/zoom during graph panning
+};
 
 export const GraphCanvas = React.memo(function GraphCanvas({
   svgRef,
@@ -35,17 +44,23 @@ export const GraphCanvas = React.memo(function GraphCanvas({
   onMouseMove,
   onMouseUp,
   onSelectNode,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
 }: GraphCanvasProps) {
   return (
     <svg
       ref={svgRef}
       viewBox={`0 0 ${SVG_W} ${SVG_H}`}
       className="w-full cursor-grab active:cursor-grabbing select-none"
-      style={SVG_STYLE}
+      style={TOUCH_SVG_STYLE}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseUp}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       <g
         transform={`translate(${CX + translate.x},${CY + translate.y}) scale(${scale}) translate(${-CX},${-CY})`}

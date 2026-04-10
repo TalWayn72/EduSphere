@@ -1,6 +1,7 @@
 import { Resolver, Query, Context } from '@nestjs/graphql';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { AdminOverviewService } from './admin-overview.service';
+import { requireAnyRole } from '@edusphere/auth';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -17,6 +18,11 @@ export class AdminOverviewResolver {
     if (!context.authContext) {
       throw new UnauthorizedException('Unauthenticated');
     }
+    try {
+      requireAnyRole(context.authContext, ['ORG_ADMIN', 'SUPER_ADMIN']);
+    } catch {
+      throw new ForbiddenException('Insufficient role: ORG_ADMIN or SUPER_ADMIN required');
+    }
     return this.adminOverviewService.getOverview(
       context.authContext.tenantId || ''
     );
@@ -26,6 +32,11 @@ export class AdminOverviewResolver {
   async adminDashboardStats(@Context() context: GraphQLContext) {
     if (!context.authContext) {
       throw new UnauthorizedException('Unauthenticated');
+    }
+    try {
+      requireAnyRole(context.authContext, ['ORG_ADMIN', 'SUPER_ADMIN']);
+    } catch {
+      throw new ForbiddenException('Insufficient role: ORG_ADMIN or SUPER_ADMIN required');
     }
     return this.adminOverviewService.getDashboardStats(
       context.authContext.tenantId || ''

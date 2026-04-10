@@ -109,7 +109,7 @@ export class ExamDeliveryService implements OnModuleDestroy {
     if (remaining <= 0) throw new BadRequestException('Session has expired');
 
     await withTenantContext(this.db, ctx, async (tx) => {
-      await this.helpers.upsertResponse(tx, sessionId, itemId, {
+      await this.helpers.upsertResponse(tx, sessionId, itemId, tenantId, {
         answerData,
         answeredAt: new Date(),
       });
@@ -131,7 +131,7 @@ export class ExamDeliveryService implements OnModuleDestroy {
     const session = await this.helpers.loadSession(sessionId, ctx);
     this.helpers.assertActive(session, userId);
     await withTenantContext(this.db, ctx, (tx) =>
-      this.helpers.toggleFlag(tx, sessionId, itemId)
+      this.helpers.toggleFlag(tx, sessionId, itemId, tenantId)
     );
     return true;
   }

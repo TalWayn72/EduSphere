@@ -31,7 +31,13 @@
     "weeklyGoal": "Weekly Goal",
     "days": "days",
     "hours": "hours",
-    "minutes": "minutes"
+    "minutes": "minutes",
+    "studyTimeBeta": "BETA — real tracking coming soon",
+    "conceptsBeta": "BETA — real tracking coming soon",
+    "studyGroups": "Study Groups",
+    "availableInCatalog": "Available in catalog",
+    "notesAndHighlights": "Notes and highlights",
+    "activeCollaborations": "Active collaborations"
   },
   "heatmap": {
     "studyDays": "{{count}} study days",
@@ -53,6 +59,8 @@
       "coursesAvailable": "Courses Available",
       "conceptsMastered": "Concepts Mastered",
       "annotationsCreated": "Annotations Created"
-    }
+    },
+    "manageAvatar": "Manage avatar in account settings",
+    "manageAccount": "Manage account"
   }
 }

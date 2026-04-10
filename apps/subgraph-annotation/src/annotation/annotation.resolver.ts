@@ -11,13 +11,16 @@ import {
 } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
-import { createPubSub } from 'graphql-yoga';
 import { AnnotationService } from './annotation.service';
 import {
   CreateAnnotationInputSchema,
   UpdateAnnotationInputSchema,
 } from './annotation.schemas';
 import type { AuthContext } from '@edusphere/auth';
+import {
+  publishAnnotationAdded,
+  subscribeAnnotationAdded,
+} from './nats-pubsub.helper';
 
 const tracer = trace.getTracer('subgraph-annotation');
 
@@ -25,10 +28,6 @@ interface GraphQLContext {
   req: unknown;
   authContext?: AuthContext;
 }
-
-const pubSub = createPubSub<{
-  [key: `annotationAdded_${string}`]: [{ annotationAdded: unknown }];
-}>();
 
 @Resolver('Annotation')
 export class AnnotationResolver {
@@ -118,10 +117,8 @@ export class AnnotationResolver {
         context.authContext
       );
 
-      // Broadcast to all subscribers watching this asset
-      pubSub.publish(`annotationAdded_${assetId}`, {
-        annotationAdded: annotation,
-      });
+      // Broadcast to all subscribers watching this asset (NATS + in-process)
+      await publishAnnotationAdded(assetId, annotation);
 
       this.logger.debug(
         `Published annotationAdded for assetId=${assetId} id=${(annotation as { id: string }).id}`
@@ -214,7 +211,7 @@ export class AnnotationResolver {
     },
   })
   subscribeToAnnotationAdded(@Args('assetId') assetId: string) {
-    return pubSub.subscribe(`annotationAdded_${assetId}`);
+    return subscribeAnnotationAdded(assetId);
   }
 
   @ResolveField('textRange')

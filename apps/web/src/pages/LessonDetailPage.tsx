@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { Button } from '@/components/ui/button';
@@ -41,13 +42,6 @@ interface LessonData {
   } | null;
 }
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: 'טיוטה', color: 'bg-muted text-foreground' },
-  PROCESSING: { label: 'בעיבוד...', color: 'bg-yellow-100 text-yellow-700' },
-  READY: { label: 'מוכן', color: 'bg-green-100 text-green-700' },
-  PUBLISHED: { label: 'פורסם', color: 'bg-blue-100 text-blue-700' },
-};
-
 const ASSET_ICONS: Record<string, string> = {
   VIDEO: '🎥',
   AUDIO: '🎙️',
@@ -61,6 +55,7 @@ export function LessonDetailPage() {
     lessonId: string;
   }>();
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
 
   // Defer query to prevent urql cache race with concurrently-unmounting siblings
   const [mounted, setMounted] = useState(false);
@@ -87,7 +82,9 @@ export function LessonDetailPage() {
   if (!isValidId) {
     return (
       <Layout>
-        <div className="p-6 text-muted-foreground">השיעור לא נמצא</div>
+        <div className="p-6 text-muted-foreground">
+          {t('lesson.notFound', 'Lesson not found')}
+        </div>
       </Layout>
     );
   }
@@ -98,12 +95,14 @@ export function LessonDetailPage() {
         <Layout>
           <div className="p-6 space-y-3">
             <p className="text-amber-700 font-medium dark:text-amber-300">
-              הסשן פג תוקף
+              {t('lesson.sessionExpired', 'Session expired')}
             </p>
             <p className="text-sm text-muted-foreground">
-              יש להתחבר מחדש כדי להמשיך.
+              {t('lesson.pleaseLogInAgain', 'Please log in again to continue.')}
             </p>
-            <Button onClick={() => login()}>התחבר מחדש</Button>
+            <Button onClick={() => login()}>
+              {t('lesson.logInAgain', 'Log in again')}
+            </Button>
           </div>
         </Layout>
       );
@@ -111,7 +110,7 @@ export function LessonDetailPage() {
     return (
       <Layout>
         <div className="p-6 text-red-600 dark:text-red-400">
-          שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.
+          {t('lesson.loadError', 'Error loading lesson. Please try again later.')}
         </div>
       </Layout>
     );
@@ -121,10 +120,19 @@ export function LessonDetailPage() {
   if (!lesson) {
     return (
       <Layout>
-        <div className="p-6 text-muted-foreground">השיעור לא נמצא</div>
+        <div className="p-6 text-muted-foreground">
+          {t('lesson.notFound', 'Lesson not found')}
+        </div>
       </Layout>
     );
   }
+
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    DRAFT: { label: t('lesson.statusDraft', 'Draft'), color: 'bg-muted text-foreground' },
+    PROCESSING: { label: t('lesson.statusProcessing', 'Processing...'), color: 'bg-yellow-100 text-yellow-700' },
+    READY: { label: t('lesson.statusReady', 'Ready'), color: 'bg-green-100 text-green-700' },
+    PUBLISHED: { label: t('lesson.statusPublished', 'Published'), color: 'bg-blue-100 text-blue-700' },
+  };
 
   const statusInfo = STATUS_LABELS[lesson.status] ?? {
     label: lesson.status,
@@ -137,8 +145,8 @@ export function LessonDetailPage() {
         <Breadcrumbs
           className="mb-4"
           items={[
-            { label: 'Courses', href: '/courses' },
-            { label: 'Course', href: `/courses/${courseId}` },
+            { label: t('backToCourses', 'Courses'), href: '/courses' },
+            { label: t('courseDetails', 'Course'), href: `/courses/${courseId}` },
             { label: lesson.title },
           ]}
         />
@@ -148,7 +156,7 @@ export function LessonDetailPage() {
             size="sm"
             onClick={() => navigate(`/courses/${courseId}`)}
           >
-            ← חזרה לקורס
+            ← {t('lesson.backToCourse', 'Back to Course')}
           </Button>
         </div>
 
@@ -162,11 +170,19 @@ export function LessonDetailPage() {
             </span>
           </div>
           <div className="flex gap-4 text-sm text-muted-foreground">
-            <span>סוג: {lesson.type === 'THEMATIC' ? 'הגות' : 'על הסדר'}</span>
-            {lesson.series && <span>סדרה: {lesson.series}</span>}
+            <span>
+              {t('lesson.type', 'Type')}:{' '}
+              {lesson.type === 'THEMATIC'
+                ? t('createLesson.typeThematic')
+                : t('createLesson.typeSequential')}
+            </span>
+            {lesson.series && (
+              <span>{t('lesson.series', 'Series')}: {lesson.series}</span>
+            )}
             {lesson.lessonDate && (
               <span>
-                תאריך: {new Date(lesson.lessonDate).toLocaleDateString('he-IL')}
+                {t('lesson.date', 'Date')}:{' '}
+                {new Date(lesson.lessonDate).toLocaleDateString()}
               </span>
             )}
           </div>
@@ -174,7 +190,9 @@ export function LessonDetailPage() {
 
         {lesson.assets.length > 0 && (
           <div className="bg-card rounded-xl border p-4 mb-4">
-            <h2 className="text-base font-semibold mb-3">חומרים</h2>
+            <h2 className="text-base font-semibold mb-3">
+              {t('lesson.materials', 'Materials')}
+            </h2>
             <div className="space-y-2">
               {lesson.assets.map((asset) => (
                 <div key={asset.id} className="flex items-center gap-2 text-sm">
@@ -204,7 +222,7 @@ export function LessonDetailPage() {
               navigate(`/courses/${courseId}/lessons/${lessonId}/preview`)
             }
           >
-            👁 תצוגה מקדימה
+            👁 {t('lesson.preview', 'Preview')}
           </Button>
           <Button
             variant="outline"
@@ -213,7 +231,7 @@ export function LessonDetailPage() {
               navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`)
             }
           >
-            🔧 פתח Pipeline
+            🔧 {t('lesson.openPipeline', 'Open Pipeline')}
           </Button>
           {(lesson.status === 'READY' || lesson.status === 'PUBLISHED') && (
             <Button
@@ -222,7 +240,7 @@ export function LessonDetailPage() {
                 navigate(`/courses/${courseId}/lessons/${lessonId}/results`)
               }
             >
-              📊 צפה בתוצאות
+              📊 {t('lesson.viewResults', 'View Results')}
             </Button>
           )}
         </div>

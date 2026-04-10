@@ -48,6 +48,11 @@ export type CitationSearchFn = (
   { id: string; text: string; similarity: number; source?: string }[]
 >;
 
+/** Callback for Apache AGE graph enrichment — injected by the resolver at runtime. */
+export type GraphEnrichFn = (
+  topic: string
+) => Promise<{ name: string; type?: string }[]>;
+
 interface PipelineContext {
   input: LessonPipelineInput;
   parsedTopic: string;
@@ -60,6 +65,7 @@ interface PipelineContext {
   currentStage: string;
   error: string | null;
   searchFn?: CitationSearchFn;
+  graphEnrichFn?: GraphEnrichFn;
 }
 
 // ── Stage implementations ─────────────────────────────────────────────────────
@@ -130,11 +136,32 @@ async function generateOutline(
 }
 
 async function enrichWithGraph(ctx: PipelineContext): Promise<PipelineContext> {
-  // Stub: in production, uses Apache AGE graph traversal to add concept links
-  const enriched =
-    ctx.outline +
-    '\n\n<!-- Knowledge Graph enrichment: concepts linked to EduSphere KG -->';
-  return { ...ctx, enrichedOutline: enriched, currentStage: 'verifyHebrew' };
+  if (!ctx.graphEnrichFn) {
+    // No graph function injected — pass outline through unchanged.
+    return { ...ctx, enrichedOutline: ctx.outline, currentStage: 'verifyHebrew' };
+  }
+
+  try {
+    const concepts = await ctx.graphEnrichFn(ctx.parsedTopic);
+    if (concepts.length === 0) {
+      return { ...ctx, enrichedOutline: ctx.outline, currentStage: 'verifyHebrew' };
+    }
+
+    const conceptBlock = concepts
+      .map((c) => `- **${c.name}**${c.type ? ` _(${c.type})_` : ''}`)
+      .join('\n');
+
+    const enriched =
+      ctx.outline +
+      `\n\n<!-- Knowledge Graph: related concepts for "${ctx.parsedTopic}" -->\n` +
+      '## Related Concepts (from Knowledge Graph)\n\n' +
+      conceptBlock;
+
+    return { ...ctx, enrichedOutline: enriched, currentStage: 'verifyHebrew' };
+  } catch {
+    // Graph query failed — continue with unenriched outline.
+    return { ...ctx, enrichedOutline: ctx.outline, currentStage: 'verifyHebrew' };
+  }
 }
 
 async function verifyHebrew(ctx: PipelineContext): Promise<PipelineContext> {
@@ -171,7 +198,8 @@ export async function runLessonPipeline(
   input: LessonPipelineInput,
   model: LanguageModel,
   executionId: string,
-  searchFn?: CitationSearchFn
+  searchFn?: CitationSearchFn,
+  graphEnrichFn?: GraphEnrichFn
 ): Promise<LessonPipelineResult> {
   let ctx: PipelineContext = {
     input,
@@ -185,6 +213,7 @@ export async function runLessonPipeline(
     currentStage: 'parsePrompt',
     error: null,
     searchFn,
+    graphEnrichFn,
   };
 
   try {

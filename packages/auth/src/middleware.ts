@@ -57,14 +57,21 @@ export class AuthMiddleware {
         return;
       }
 
-      // Dev bypass: accept dev-token-mock-jwt in non-production environments
+      // Dev bypass: accept a configurable dev token in non-production environments
       // so Playwright/integration tests work without a live Keycloak.
-      // SEC-1 hardening: requires ALLOW_DEV_TOKEN=true AND non-production env.
+      // SEC-2 hardening: requires ALLOW_DEV_TOKEN=true AND DEV_TOKEN_SECRET env var set.
+      // Token value must equal DEV_TOKEN_SECRET — hardcoded literal 'dev-token-mock-jwt'
+      // no longer accepted, preventing accidental activation.
+      const devTokenSecret = process.env['DEV_TOKEN_SECRET'];
       if (
         process.env.NODE_ENV !== 'production' &&
         process.env['ALLOW_DEV_TOKEN'] === 'true' &&
-        token === 'dev-token-mock-jwt'
+        devTokenSecret &&
+        token === devTokenSecret
       ) {
+        this.logger.warn(
+          '[AuthMiddleware] DEV TOKEN USED — this should never happen in staging/production'
+        );
         context.authContext = {
           userId: '00000000-0000-0000-0000-000000000001',
           email: 'super.admin@edusphere.dev',

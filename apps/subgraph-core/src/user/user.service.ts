@@ -8,6 +8,7 @@ import {
   OnModuleDestroy,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -86,7 +87,13 @@ export class UserService implements OnModuleDestroy {
   }
 
   async findById(id: string, authContext?: AuthContext) {
-    if (authContext && authContext.tenantId) {
+    if (!authContext) {
+      throw new UnauthorizedException('Tenant context required');
+    }
+    if (!authContext.tenantId && !authContext.isSuperAdmin) {
+      throw new UnauthorizedException('Tenant context required');
+    }
+    if (authContext.tenantId) {
       const tenantCtx = this.toTenantContext(authContext);
       return withTenantContext(this.db, tenantCtx, async (tx) => {
         const [user] = await tx
@@ -97,6 +104,7 @@ export class UserService implements OnModuleDestroy {
         return this.mapUser(user) || null;
       });
     }
+    // SUPER_ADMIN without tenantId — cross-tenant lookup permitted
     const [user] = await this.db
       .select()
       .from(schema.users)
@@ -106,7 +114,13 @@ export class UserService implements OnModuleDestroy {
   }
 
   async findAll(limit: number, offset: number, authContext?: AuthContext) {
-    if (authContext && authContext.tenantId) {
+    if (!authContext) {
+      throw new UnauthorizedException('Tenant context required');
+    }
+    if (!authContext.tenantId && !authContext.isSuperAdmin) {
+      throw new UnauthorizedException('Tenant context required');
+    }
+    if (authContext.tenantId) {
       const tenantCtx = this.toTenantContext(authContext);
       return withTenantContext(this.db, tenantCtx, async (tx) => {
         const rows = await tx
@@ -117,6 +131,7 @@ export class UserService implements OnModuleDestroy {
         return rows.map((u) => this.mapUser(u));
       });
     }
+    // SUPER_ADMIN without tenantId — cross-tenant lookup permitted
     const rows = await this.db
       .select()
       .from(schema.users)

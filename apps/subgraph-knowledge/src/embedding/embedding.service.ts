@@ -133,6 +133,25 @@ export class EmbeddingService implements OnModuleDestroy {
       : this.fallback.vectorSearch(vecStr, limit, minSimilarity);
   }
 
+  async semanticSearchByVectorAndContentItem(
+    queryVector: number[],
+    contentItemId: string,
+    tenantCtx: TenantContext,
+    limit = 5,
+    minSimilarity = 0.7
+  ): Promise<SearchResult[]> {
+    const vecStr = `[${queryVector.join(',')}]`;
+    return this.store
+      ? this.store.searchByVectorAndContentItem(
+          vecStr,
+          contentItemId,
+          limit,
+          tenantCtx,
+          minSimilarity
+        )
+      : this.fallback.vectorSearch(vecStr, limit, minSimilarity);
+  }
+
   // -- Delete ----------------------------------------------------------------
 
   async deleteByConceptId(conceptId: string): Promise<number> {

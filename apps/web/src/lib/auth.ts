@@ -11,9 +11,15 @@ const AUTH_LOGIN_TIMESTAMP_KEY_INTERNAL = 'edusphere_auth_login_ts';
 /** @deprecated Use DEV_LOGGED_IN_KEY. Kept for backward-compat cleanup in logout(). */
 const _DEV_LOGOUT_KEY_LEGACY = 'edusphere_dev_logged_out';
 
-export const DEV_MODE =
-  import.meta.env.VITE_DEV_MODE === 'true' ||
-  !import.meta.env.VITE_KEYCLOAK_URL;
+export const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
+// If VITE_KEYCLOAK_URL is not configured and DEV_MODE is not explicitly enabled,
+// throw at module load time to surface the misconfiguration immediately.
+if (!import.meta.env.VITE_KEYCLOAK_URL && !DEV_MODE) {
+  throw new Error(
+    '[Auth] VITE_KEYCLOAK_URL is required. Set VITE_DEV_MODE=true for local development without Keycloak.'
+  );
+}
 
 const keycloakConfig = {
   url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
@@ -94,7 +100,7 @@ export function initKeycloak(): Promise<boolean> {
     })
     .catch((error) => {
       initPromise = null; // allow retry on genuine errors
-      console.error('[Auth] Keycloak initialization failed:', error);
+      // Error is re-thrown to caller — caller is responsible for error reporting
       throw error;
     });
 
@@ -298,9 +304,7 @@ function setupTokenRefresh(): void {
         // FE-2: Do NOT call logout() here — the useTokenExpiryWatcher hook
         // will detect the expired token and show a re-auth dialog instead
         // of abruptly redirecting the user to the login page.
-        console.error(
-          '[Auth] Silent token refresh failed — session may expire soon.'
-        );
+        // Token refresh failed — useTokenExpiryWatcher hook will detect and show re-auth dialog
       });
   }, 60000);
 }

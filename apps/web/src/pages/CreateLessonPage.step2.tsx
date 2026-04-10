@@ -1,25 +1,23 @@
+/**
+ * CreateLessonStep2 — collect assets (YouTube URL, file) before lesson creation.
+ * The lesson does not exist yet at this step, so assets are collected and passed
+ * to the parent via onNext(videoUrl) for post-creation upload.
+ */
 import { useState } from 'react';
-import { useMutation } from 'urql';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { ADD_LESSON_ASSET_MUTATION } from '@/lib/graphql/lesson.queries';
 
 interface Props {
-  lessonId: string;
   courseId: string;
-  onNext: () => void;
+  /** Called when user proceeds. Passes the (optional) YouTube URL they entered. */
+  onNext: (videoUrl?: string) => void;
 }
 
-export function CreateLessonStep2({
-  lessonId,
-  courseId: _courseId,
-  onNext,
-}: Props) {
+export function CreateLessonStep2({ courseId: _courseId, onNext }: Props) {
   const { t } = useTranslation('courses');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoError, setVideoError] = useState('');
-  const [, addAsset] = useMutation(ADD_LESSON_ASSET_MUTATION);
 
   const youtubeUrlSchema = z
     .string()
@@ -29,21 +27,22 @@ export function CreateLessonStep2({
       t('createLesson.youtubeValidation')
     );
 
-  const handleAddVideo = async () => {
+  const validateVideoUrl = (): boolean => {
+    if (!videoUrl) return true; // empty is valid (optional field)
     const parsed = youtubeUrlSchema.safeParse(videoUrl);
     if (!parsed.success) {
       setVideoError(
         parsed.error.issues[0]?.message ?? t('createLesson.invalidUrl')
       );
-      return;
+      return false;
     }
     setVideoError('');
-    if (lessonId) {
-      await addAsset({
-        lessonId,
-        input: { assetType: 'VIDEO', sourceUrl: videoUrl },
-      });
-    }
+    return true;
+  };
+
+  const handleContinue = () => {
+    if (!validateVideoUrl()) return;
+    onNext(videoUrl || undefined);
   };
 
   return (
@@ -63,27 +62,23 @@ export function CreateLessonStep2({
           <div className="flex gap-2">
             <input
               value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
+              onChange={(e) => {
+                setVideoUrl(e.target.value);
+                if (videoError) setVideoError('');
+              }}
               placeholder="https://youtube.com/watch?v=..."
               className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               dir="ltr"
             />
-            {lessonId && (
-              <Button size="sm" variant="outline" onClick={handleAddVideo}>
-                {t('createLesson.addButton')}
-              </Button>
-            )}
           </div>
           {videoError && (
             <p className="text-red-500 text-xs mt-1 dark:text-red-400">
               {videoError}
             </p>
           )}
-          {!lessonId && (
-            <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
-              {t('createLesson.linkAddedAfterCreation')}
-            </p>
-          )}
+          <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
+            {t('createLesson.linkAddedAfterCreation')}
+          </p>
         </div>
 
         <div>
@@ -102,10 +97,10 @@ export function CreateLessonStep2({
       </div>
 
       <div className="flex gap-3 mt-6">
-        <Button variant="outline" className="flex-1" onClick={onNext}>
+        <Button variant="outline" className="flex-1" onClick={() => onNext()}>
           {t('createLesson.skip')}
         </Button>
-        <Button className="flex-1" onClick={onNext}>
+        <Button className="flex-1" onClick={handleContinue}>
           {t('createLesson.continueToTemplate')}
         </Button>
       </div>

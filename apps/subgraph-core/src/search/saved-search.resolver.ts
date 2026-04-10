@@ -24,7 +24,7 @@ export class SavedSearchResolver {
     const auth = requireAuth(ctx);
     return this.savedSearchService.listSavedSearches(
       auth.userId,
-      auth.tenantId
+      auth.tenantId!
     );
   }
 
@@ -36,7 +36,7 @@ export class SavedSearchResolver {
     const auth = requireAuth(ctx);
     return this.savedSearchService.createSavedSearch({
       userId: auth.userId,
-      tenantId: auth.tenantId,
+      tenantId: auth.tenantId!,
       name: input.name,
       query: input.query,
       filters: input.filters
@@ -51,7 +51,7 @@ export class SavedSearchResolver {
     return this.savedSearchService.deleteSavedSearch(
       id,
       auth.userId,
-      auth.tenantId
+      auth.tenantId!
     );
   }
 }

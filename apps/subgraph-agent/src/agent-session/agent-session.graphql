@@ -41,9 +41,9 @@ type Course @key(fields: "id") {
 scalar JSON
 
 extend type Query {
-  agentSession(id: ID!): AgentSession
-  myAgentSessions: [AgentSession!]!
-  agentTemplates: [AgentTemplate!]!
+  agentSession(id: ID!): AgentSession @authenticated
+  myAgentSessions: [AgentSession!]! @authenticated
+  agentTemplates: [AgentTemplate!]! @authenticated
 }
 
 extend type Mutation {

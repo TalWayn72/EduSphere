@@ -19,8 +19,8 @@ import { authMiddleware } from './auth/auth.middleware';
         await authMiddleware.validateRequest(ctx);
         return ctx;
       },
-      playground: true,
-      introspection: true,
+      playground: process.env['NODE_ENV'] !== 'production',
+      introspection: process.env['NODE_ENV'] !== 'production',
     }),
     AnnotationModule,
   ],

@@ -238,6 +238,9 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
                     onMouseDown={viewport.handleMouseDown}
                     onMouseMove={viewport.handleMouseMove}
                     onMouseUp={viewport.handleMouseUp}
+                    onTouchStart={viewport.handleTouchStart}
+                    onTouchMove={viewport.handleTouchMove}
+                    onTouchEnd={viewport.handleTouchEnd}
                     onSelectNode={graph.setSelectedId}
                   />
                   <EdgeLegend />

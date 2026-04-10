@@ -85,11 +85,6 @@ export function AnnotationsPage() {
       removeOptimisticAnnotation(idToDelete);
       const { error: deleteErr } = await executeDelete({ id: idToDelete });
       if (deleteErr) {
-        console.error(
-          '[AnnotationsPage] delete annotation failed:',
-          deleteErr.message,
-          deleteErr
-        );
         toast.error(t('deleteError', 'Failed to delete annotation'));
         return;
       }

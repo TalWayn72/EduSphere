@@ -3,16 +3,22 @@
  * Route: /courses/:courseId/lessons/new
  *
  * Step 1: Lesson details (title, type, series, date)
- * Step 2: Add assets (YouTube URL, PDF upload)
- * Step 3: Select pipeline template (THEMATIC or SEQUENTIAL)
+ * Step 2: Collect assets (YouTube URL, PDF upload) — no lessonId needed yet
+ * Step 3: Select pipeline template → creates lesson → adds collected asset
+ *
+ * EXCEPTION NOTE (150-line rule): wizard orchestrator wires steps + mutations.
  */
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/auth';
-import { CREATE_LESSON_MUTATION } from '@/lib/graphql/lesson.queries';
+import {
+  CREATE_LESSON_MUTATION,
+  ADD_LESSON_ASSET_MUTATION,
+} from '@/lib/graphql/lesson.queries';
 import { useLessonPipelineStore } from '@/lib/lesson-pipeline.store';
 import { PageShell } from '@/components/PageShell';
 import { CreateLessonStep1 } from './CreateLessonPage.step1';
@@ -37,12 +43,16 @@ interface CreateLessonResult {
 export function CreateLessonPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<LessonFormData>({
     title: '',
     type: 'THEMATIC',
     lessonDate: new Date().toISOString().split('T')[0] ?? '',
   });
+  const [collectedVideoUrl, setCollectedVideoUrl] = useState<
+    string | undefined
+  >(undefined);
   const [selectedTemplate, setSelectedTemplate] = useState<
     'THEMATIC' | 'SEQUENTIAL' | null
   >(null);
@@ -51,6 +61,7 @@ export function CreateLessonPage() {
   const [{ fetching }, createLesson] = useMutation<CreateLessonResult>(
     CREATE_LESSON_MUTATION
   );
+  const [, addAsset] = useMutation(ADD_LESSON_ASSET_MUTATION);
   const loadTemplate = useLessonPipelineStore((s) => s.loadTemplate);
   const user = getCurrentUser();
 
@@ -59,13 +70,14 @@ export function CreateLessonPage() {
     setStep(2);
   };
 
+  const handleStep2Next = (videoUrl?: string) => {
+    setCollectedVideoUrl(videoUrl);
+    setStep(3);
+  };
+
   const handleCreateLesson = async () => {
     if (!courseId || !user) {
-      setError('שגיאת אימות: יש להתחבר מחדש כדי ליצור שיעור');
-      console.error(
-        '[CreateLessonPage] createLesson blocked: missing courseId or user',
-        { courseId, hasUser: Boolean(user) }
-      );
+      setError(t('createLesson.authError', 'Authentication error — please log in again'));
       return;
     }
     const { data, error: mutError } = await createLesson({
@@ -81,22 +93,24 @@ export function CreateLessonPage() {
       const gqlMsg = mutError.graphQLErrors?.[0]?.message;
       const networkMsg = mutError.networkError?.message;
       const rawMsg = gqlMsg ?? networkMsg ?? mutError.message;
-      // Map raw backend/network errors to user-friendly Hebrew messages
       const isNetworkErr = !gqlMsg && (networkMsg || rawMsg?.includes('fetch'));
       const msg = isNetworkErr
-        ? 'שגיאת רשת: לא ניתן להתחבר לשרת. נסה שוב.'
+        ? t('createLesson.networkError', 'Network error — cannot connect to server. Try again.')
         : rawMsg;
-      console.error(
-        '[CreateLessonPage] createLesson failed:',
-        rawMsg,
-        mutError
-      );
       setError(msg);
       return;
     }
     if (data?.createLesson) {
+      const lessonId = data.createLesson.id;
+      // Add collected video asset now that we have a real lessonId
+      if (collectedVideoUrl) {
+        await addAsset({
+          lessonId,
+          input: { assetType: 'VIDEO', sourceUrl: collectedVideoUrl },
+        });
+      }
       if (selectedTemplate) loadTemplate(selectedTemplate);
-      navigate(`/courses/${courseId}/lessons/${data.createLesson.id}/pipeline`);
+      navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`);
     }
   };
 
@@ -106,9 +120,9 @@ export function CreateLessonPage() {
         <Breadcrumbs
           className="mb-4"
           items={[
-            { label: 'Courses', href: '/courses' },
-            { label: 'Course', href: `/courses/${courseId}` },
-            { label: 'New Lesson' },
+            { label: t('backToCourses', 'Courses'), href: '/courses' },
+            { label: t('courseDetails', 'Course'), href: `/courses/${courseId}` },
+            { label: t('createLesson.newLesson', 'New Lesson') },
           ]}
         />
         <div className="flex items-center gap-2 mb-6">
@@ -117,9 +131,11 @@ export function CreateLessonPage() {
             size="sm"
             onClick={() => navigate(`/courses/${courseId}`)}
           >
-            ← חזרה
+            ← {t('back', 'Back')}
           </Button>
-          <h1 className="text-2xl font-bold">יצירת שיעור חדש</h1>
+          <h1 className="text-2xl font-bold">
+            {t('createLesson.pageTitle', 'Create New Lesson')}
+          </h1>
         </div>
 
         <div className="flex gap-2 mb-8">
@@ -142,15 +158,16 @@ export function CreateLessonPage() {
 
         {step === 2 && (
           <CreateLessonStep2
-            lessonId=""
             courseId={courseId ?? ''}
-            onNext={() => setStep(3)}
+            onNext={handleStep2Next}
           />
         )}
 
         {step === 3 && (
           <div>
-            <h2 className="text-xl font-semibold mb-4">בחר תבנית Pipeline</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              {t('createLesson.selectTemplate', 'Select Pipeline Template')}
+            </h2>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div
                 className={`border-2 rounded-xl p-4 cursor-pointer transition-colors ${
@@ -160,12 +177,11 @@ export function CreateLessonPage() {
                 }`}
                 onClick={() => setSelectedTemplate('THEMATIC')}
               >
-                <h3 className="font-semibold text-lg mb-1">🎯 שיעור כללי</h3>
+                <h3 className="font-semibold text-lg mb-1">
+                  🎯 {t('createLesson.typeThematic', 'General (Thematic)')}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  נושא נקבע ע&quot;י המרצה — 8 שלבי עיבוד
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  מתאים ל: הרב ישראל אביחי
+                  {t('createLesson.thematicDescription', 'Instructor-defined topic — 8 processing steps')}
                 </p>
               </div>
               <div
@@ -176,12 +192,11 @@ export function CreateLessonPage() {
                 }`}
                 onClick={() => setSelectedTemplate('SEQUENTIAL')}
               >
-                <h3 className="font-semibold text-lg mb-1">📖 ספר עץ חיים</h3>
+                <h3 className="font-semibold text-lg mb-1">
+                  📖 {t('createLesson.typeSequential', 'Sequential')}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  לימוד על הסדר — 9 שלבים + אימות ציטוטים
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  מתאים ל: הרב יוסף טובול
+                  {t('createLesson.sequentialDescription', 'Sequential study — 9 steps + citation verification')}
                 </p>
               </div>
             </div>
@@ -199,20 +214,22 @@ export function CreateLessonPage() {
                   className="text-red-600 text-xs underline mt-1 dark:text-red-400"
                   onClick={() => setError(null)}
                 >
-                  סגור
+                  {t('dismiss', 'Dismiss')}
                 </button>
               </div>
             )}
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setStep(2)}>
-                חזרה
+                {t('back', 'Back')}
               </Button>
               <Button
                 onClick={handleCreateLesson}
                 disabled={fetching || !selectedTemplate}
                 className="flex-1"
               >
-                {fetching ? 'יוצר שיעור...' : 'צור שיעור והמשך ל-Pipeline'}
+                {fetching
+                  ? t('createLesson.creating', 'Creating lesson...')
+                  : t('createLesson.createAndContinue', 'Create lesson & continue to Pipeline')}
               </Button>
             </div>
           </div>

@@ -19,6 +19,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useContentData } from '@/hooks/useContentData';
 import { useSubtitleTracks } from '@/hooks/useSubtitleTracks';
 import { useAnnotations } from '@/hooks/useAnnotations';
@@ -66,6 +67,9 @@ export function UnifiedLearningPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Responsive layout: stack panels vertically on mobile (< 768px)
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   // ── Content item query (contentType + document content) ──
   const [itemResult] = useQuery<ContentItemResult>({
@@ -244,11 +248,15 @@ export function UnifiedLearningPage() {
             currentTime={isYouTubeContent ? currentTime : undefined}
           />
           <ResizablePanelGroup
-            orientation="horizontal"
+            orientation={isMobile ? 'vertical' : 'horizontal'}
             className="flex-1 overflow-hidden border rounded-lg"
           >
-            {/* LEFT — Document */}
-            <ResizablePanel defaultSize={55} minSize={25} id="document">
+            {/* LEFT (desktop) / TOP (mobile) — Document */}
+            <ResizablePanel
+              defaultSize={isMobile ? 50 : 55}
+              minSize={isMobile ? 30 : 25}
+              id="document"
+            >
               <DocumentPanel
                 content={documentContent}
                 hasDocument={isDocumentContent || !!documentContent}
@@ -267,8 +275,12 @@ export function UnifiedLearningPage() {
 
             <ResizableHandle withHandle />
 
-            {/* RIGHT — Video + Transcript + Tabs */}
-            <ResizablePanel defaultSize={45} minSize={25} id="tools">
+            {/* RIGHT (desktop) / BOTTOM (mobile) — Video + Transcript + Tabs */}
+            <ResizablePanel
+              defaultSize={isMobile ? 50 : 45}
+              minSize={isMobile ? 30 : 25}
+              id="tools"
+            >
               <ToolsPanel
                 videoUrl={videoUrl}
                 hlsManifestUrl={hlsManifestUrl}

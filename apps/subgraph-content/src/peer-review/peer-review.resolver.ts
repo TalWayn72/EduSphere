@@ -4,97 +4,108 @@
  * IDOR prevention: always passes ctx.userId (never raw arg) to service.
  */
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { OnModuleDestroy } from '@nestjs/common';
 import { UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  withTenantContext,
+  closeAllPools,
+} from '@edusphere/db';
+import type { Database, TenantContext } from '@edusphere/db';
 import { PeerReviewService } from './peer-review.service.js';
 import type { GraphQLContext } from '../auth/auth.middleware.js';
 
-function mapAssignment(a: {
-  id: string;
-  contentItemId: string;
-  submitterId: string;
-  reviewerId: string;
-  status: string;
-  submissionText: string | null;
-  feedback: string | null;
-  score: number | null;
-  createdAt: Date;
-}) {
-  return {
-    id: a.id,
-    contentItemId: a.contentItemId,
-    contentItemTitle: a.contentItemId, // title resolution via DataLoader in a future phase
-    submitterId: a.submitterId,
-    submitterDisplayName: null,
-    status: a.status,
-    submissionText: a.submissionText ?? null,
-    feedback: a.feedback ?? null,
-    score: a.score ?? null,
-    createdAt: a.createdAt.toISOString(),
-  };
-}
-
-function mapSubmission(a: {
-  id: string;
-  contentItemId: string;
-  status: string;
-  score: number | null;
-  feedback: string | null;
-  createdAt: Date;
-}) {
-  return {
-    id: a.id,
-    contentItemId: a.contentItemId,
-    contentItemTitle: a.contentItemId,
-    status: a.status,
-    score: a.score ?? null,
-    feedback: a.feedback ?? null,
-    createdAt: a.createdAt.toISOString(),
-  };
-}
+type UserRole = 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER';
 
 @Resolver()
-export class PeerReviewResolver {
+export class PeerReviewResolver implements OnModuleDestroy {
   private readonly logger = new Logger(PeerReviewResolver.name);
+  private readonly db: Database;
 
-  constructor(private readonly peerReviewService: PeerReviewService) {}
+  constructor(private readonly peerReviewService: PeerReviewService) {
+    this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
+
+  /** Resolve content item title from DB; returns the raw ID as fallback. */
+  private async resolveTitle(
+    contentItemId: string,
+    tenantId: string,
+    userId: string,
+    role: UserRole
+  ): Promise<string> {
+    try {
+      const ctx: TenantContext = { tenantId, userId, userRole: role };
+      const [row] = await withTenantContext(this.db, ctx, async (tx) =>
+        tx
+          .select({ title: schema.contentItems.title })
+          .from(schema.contentItems)
+          .where(eq(schema.contentItems.id, contentItemId))
+          .limit(1)
+      );
+      return row?.title ?? contentItemId;
+    } catch {
+      return contentItemId;
+    }
+  }
+
+  private extractRole(auth: GraphQLContext['authContext']): UserRole {
+    return (auth?.roles?.[0] as UserRole) ?? 'STUDENT';
+  }
 
   @Query('myReviewAssignments')
   async myReviewAssignments(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
+    const role = this.extractRole(auth);
     const list = await this.peerReviewService.getMyAssignmentsToReview(
       auth.userId,
-      {
-        tenantId: auth.tenantId,
-        userId: auth.userId,
-        userRole:
-          (auth.roles?.[0] as
-            | 'SUPER_ADMIN'
-            | 'ORG_ADMIN'
-            | 'INSTRUCTOR'
-            | 'STUDENT'
-            | 'RESEARCHER') ?? 'STUDENT',
-      }
+      { tenantId: auth.tenantId, userId: auth.userId, userRole: role }
     );
-    return list.map(mapAssignment);
+    const titles = await Promise.all(
+      list.map((a) => this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role))
+    );
+    return list.map((a, i) => ({
+      id: a.id,
+      contentItemId: a.contentItemId,
+      contentItemTitle: titles[i],
+      submitterId: a.submitterId,
+      submitterDisplayName: null,
+      status: a.status,
+      submissionText: a.submissionText ?? null,
+      feedback: a.feedback ?? null,
+      score: a.score ?? null,
+      createdAt: a.createdAt.toISOString(),
+    }));
   }
 
   @Query('mySubmissions')
   async mySubmissions(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
+    const role = this.extractRole(auth);
     const list = await this.peerReviewService.getMySubmissions(auth.userId, {
       tenantId: auth.tenantId,
       userId: auth.userId,
-      userRole:
-        (auth.roles?.[0] as
-          | 'SUPER_ADMIN'
-          | 'ORG_ADMIN'
-          | 'INSTRUCTOR'
-          | 'STUDENT'
-          | 'RESEARCHER') ?? 'STUDENT',
+      userRole: role,
     });
-    return list.map(mapSubmission);
+    const titles = await Promise.all(
+      list.map((a) => this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role))
+    );
+    return list.map((a, i) => ({
+      id: a.id,
+      contentItemId: a.contentItemId,
+      contentItemTitle: titles[i],
+      status: a.status,
+      score: a.score ?? null,
+      feedback: a.feedback ?? null,
+      createdAt: a.createdAt.toISOString(),
+    }));
   }
 
   @Query('peerReviewRubric')
@@ -107,13 +118,7 @@ export class PeerReviewResolver {
     const rubric = await this.peerReviewService.getRubric(contentItemId, {
       tenantId: auth.tenantId,
       userId: auth.userId ?? '',
-      userRole:
-        (auth.roles?.[0] as
-          | 'SUPER_ADMIN'
-          | 'ORG_ADMIN'
-          | 'INSTRUCTOR'
-          | 'STUDENT'
-          | 'RESEARCHER') ?? 'STUDENT',
+      userRole: this.extractRole(auth),
     });
     if (!rubric) return null;
     return {
@@ -145,13 +150,7 @@ export class PeerReviewResolver {
     const rubric = await this.peerReviewService.createRubric(input, {
       tenantId: auth.tenantId,
       userId: auth.userId,
-      userRole:
-        (auth.roles?.[0] as
-          | 'SUPER_ADMIN'
-          | 'ORG_ADMIN'
-          | 'INSTRUCTOR'
-          | 'STUDENT'
-          | 'RESEARCHER') ?? 'INSTRUCTOR',
+      userRole: this.extractRole(auth) ?? 'INSTRUCTOR',
     });
     return {
       id: rubric.id,
@@ -170,6 +169,7 @@ export class PeerReviewResolver {
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
+    const role = this.extractRole(auth);
     this.logger.log(
       { contentItemId, userId: auth.userId, tenantId: auth.tenantId },
       'submitForPeerReview'
@@ -178,19 +178,23 @@ export class PeerReviewResolver {
       contentItemId,
       auth.userId,
       submissionText,
-      {
-        tenantId: auth.tenantId,
-        userId: auth.userId,
-        userRole:
-          (auth.roles?.[0] as
-            | 'SUPER_ADMIN'
-            | 'ORG_ADMIN'
-            | 'INSTRUCTOR'
-            | 'STUDENT'
-            | 'RESEARCHER') ?? 'STUDENT',
-      }
+      { tenantId: auth.tenantId, userId: auth.userId, userRole: role }
     );
-    return assignments.map(mapAssignment);
+    const titles = await Promise.all(
+      assignments.map((a) => this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role))
+    );
+    return assignments.map((a, i) => ({
+      id: a.id,
+      contentItemId: a.contentItemId,
+      contentItemTitle: titles[i],
+      submitterId: a.submitterId,
+      submitterDisplayName: null,
+      status: a.status,
+      submissionText: a.submissionText ?? null,
+      feedback: a.feedback ?? null,
+      score: a.score ?? null,
+      createdAt: a.createdAt.toISOString(),
+    }));
   }
 
   @Mutation('submitPeerReview')
@@ -208,17 +212,7 @@ export class PeerReviewResolver {
       auth.userId,
       criteriaScores,
       feedback ?? '',
-      {
-        tenantId: auth.tenantId,
-        userId: auth.userId,
-        userRole:
-          (auth.roles?.[0] as
-            | 'SUPER_ADMIN'
-            | 'ORG_ADMIN'
-            | 'INSTRUCTOR'
-            | 'STUDENT'
-            | 'RESEARCHER') ?? 'STUDENT',
-      }
+      { tenantId: auth.tenantId, userId: auth.userId, userRole: this.extractRole(auth) }
     );
   }
 }

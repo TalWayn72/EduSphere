@@ -1,6 +1,8 @@
 import { pgTable, uuid, text, real, timestamp } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps } from './_shared';
+import { courses } from './content';
+import { users } from './core';
 
 /**
  * scorm_packages — stores metadata about imported SCORM packages.
@@ -8,7 +10,9 @@ import { pk, tenantId, timestamps } from './_shared';
  */
 export const scormPackages = pgTable('scorm_packages', {
   id: pk(),
-  course_id: uuid('course_id').notNull(),
+  course_id: uuid('course_id')
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
   tenant_id: tenantId(),
   manifest_version: text('manifest_version', { enum: ['1.2', '2004'] })
     .notNull()
@@ -26,7 +30,10 @@ export const scormPackages = pgTable('scorm_packages', {
  */
 export const scormSessions = pgTable('scorm_sessions', {
   id: pk(),
-  user_id: uuid('user_id').notNull(),
+  user_id: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  // content_item_id references the legacy contentItems table (plain uuid — no circular import)
   content_item_id: uuid('content_item_id').notNull(),
   tenant_id: tenantId(),
   lesson_status: text('lesson_status').notNull().default('not attempted'),

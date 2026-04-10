@@ -8,7 +8,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { schema, eq, desc, withTenantContext, sql } from '@edusphere/db';
+import { schema, eq, and, desc, withTenantContext, sql } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import type { AddMessageInput } from './discussion.schemas';
 import { DiscussionThreadService } from './discussion-thread.service';
@@ -151,6 +151,55 @@ export class DiscussionMessageService {
         .where(eq(schema.discussion_messages.discussion_id, discussionId));
 
       return result[0]?.count || 0;
+    });
+  }
+
+  /**
+   * Toggle like on a message: insert if not liked, delete if already liked.
+   * Returns true when the message is now liked, false when unliked.
+   * RLS on discussion_message_likes enforces tenant isolation.
+   */
+  async toggleLike(
+    messageId: string,
+    authContext: AuthContext
+  ): Promise<boolean> {
+    const tenantCtx = this.threadService.toTenantContext(authContext);
+
+    return withTenantContext(this.threadService.db, tenantCtx, async (tx) => {
+      // Check if like exists
+      const [existing] = await tx
+        .select({ messageId: schema.discussionMessageLikes.messageId })
+        .from(schema.discussionMessageLikes)
+        .where(
+          and(
+            eq(schema.discussionMessageLikes.messageId, messageId),
+            eq(schema.discussionMessageLikes.userId, authContext.userId)
+          )
+        )
+        .limit(1);
+
+      if (existing) {
+        // Remove like
+        await tx
+          .delete(schema.discussionMessageLikes)
+          .where(
+            and(
+              eq(schema.discussionMessageLikes.messageId, messageId),
+              eq(schema.discussionMessageLikes.userId, authContext.userId)
+            )
+          );
+        this.logger.debug(`unliked message=${messageId} user=${authContext.userId}`);
+        return false;
+      }
+
+      // Insert like
+      await tx.insert(schema.discussionMessageLikes).values({
+        messageId,
+        userId: authContext.userId,
+        tenantId: tenantCtx.tenantId,
+      });
+      this.logger.debug(`liked message=${messageId} user=${authContext.userId}`);
+      return true;
     });
   }
 }

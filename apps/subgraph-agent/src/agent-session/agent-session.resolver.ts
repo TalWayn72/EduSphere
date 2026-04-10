@@ -15,8 +15,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
-import { createPubSub } from 'graphql-yoga';
 import type { AuthContext } from '@edusphere/auth';
+import { db, schema, eq, and } from '@edusphere/db';
 import { AgentSessionService } from './agent-session.service';
 import { AgentMessageService } from '../agent-message/agent-message.service';
 import { AIService } from '../ai/ai.service';
@@ -24,6 +24,10 @@ import {
   StartAgentSessionSchema,
   SendMessageSchema,
 } from './agent-session.schemas';
+import {
+  publishMessageStream,
+  subscribeMessageStream,
+} from './nats-pubsub.helper';
 
 interface AgentMessagePayload {
   id: string;
@@ -38,8 +42,6 @@ const tracer = trace.getTracer('subgraph-agent');
 @Resolver('AgentSession')
 export class AgentSessionResolver {
   private readonly logger = new Logger(AgentSessionResolver.name);
-  private readonly pubSub =
-    createPubSub<Record<string, [{ messageStream: AgentMessagePayload }]>>();
 
   constructor(
     private readonly agentSessionService: AgentSessionService,
@@ -59,38 +61,42 @@ export class AgentSessionResolver {
     return this.agentSessionService.findByUser(authContext.userId, authContext);
   }
 
+  /** Default fallback templates returned when agent_definitions table is empty. */
+  private static readonly DEFAULT_TEMPLATES = [
+    { id: '1', name: 'Tutor', templateType: 'TUTOR', systemPrompt: 'You are a helpful tutor.', parameters: {} },
+    { id: '2', name: 'Quiz Generator', templateType: 'QUIZ_GENERATOR', systemPrompt: 'You generate educational quizzes.', parameters: {} },
+    { id: '3', name: 'Debate Facilitator', templateType: 'DEBATE_FACILITATOR', systemPrompt: 'You facilitate debates and discussions.', parameters: {} },
+    { id: '4', name: 'Explanation Generator', templateType: 'EXPLANATION_GENERATOR', systemPrompt: 'You explain complex topics in simple terms.', parameters: {} },
+  ];
+
   @Query('agentTemplates')
-  async getAgentTemplates() {
-    return [
-      {
-        id: '1',
-        name: 'Tutor',
-        templateType: 'TUTOR',
-        systemPrompt: 'You are a helpful tutor.',
-        parameters: {},
-      },
-      {
-        id: '2',
-        name: 'Quiz Generator',
-        templateType: 'QUIZ_GENERATOR',
-        systemPrompt: 'You generate educational quizzes.',
-        parameters: {},
-      },
-      {
-        id: '3',
-        name: 'Debate Facilitator',
-        templateType: 'DEBATE_FACILITATOR',
-        systemPrompt: 'You facilitate debates and discussions.',
-        parameters: {},
-      },
-      {
-        id: '4',
-        name: 'Explanation Generator',
-        templateType: 'EXPLANATION_GENERATOR',
-        systemPrompt: 'You explain complex topics in simple terms.',
-        parameters: {},
-      },
-    ];
+  async getAgentTemplates(@Context() context: unknown) {
+    const authContext = this.extractAuthContext(context);
+    try {
+      const rows = await db
+        .select()
+        .from(schema.agent_definitions)
+        .where(
+          and(
+            eq(schema.agent_definitions.tenant_id, authContext.tenantId ?? ''),
+            eq(schema.agent_definitions.is_active, true)
+          )
+        )
+        .limit(50);
+
+      if (rows.length > 0) {
+        return rows.map((r) => ({
+          id: r.id,
+          name: r.name,
+          templateType: r.template,
+          systemPrompt: (r.config as Record<string, unknown>)?.systemPrompt ?? '',
+          parameters: r.config ?? {},
+        }));
+      }
+    } catch (err) {
+      this.logger.warn(`agentTemplates DB query failed, using defaults: ${String(err)}`);
+    }
+    return AgentSessionResolver.DEFAULT_TEMPLATES;
   }
 
   @Mutation('startAgentSession')
@@ -159,9 +165,10 @@ export class AgentSessionResolver {
         authContext
       );
 
-      this.pubSub.publish(`messageStream_${sessionId}`, {
-        messageStream: userMessage as unknown as AgentMessagePayload,
-      });
+      await publishMessageStream(
+        sessionId,
+        userMessage as unknown as AgentMessagePayload
+      );
 
       // Resolve agent type and locale from session, then invoke AIService.
       let agentReply = `Echo: ${content}`;
@@ -206,9 +213,10 @@ export class AgentSessionResolver {
         authContext
       );
 
-      this.pubSub.publish(`messageStream_${sessionId}`, {
-        messageStream: assistantMessage as unknown as AgentMessagePayload,
-      });
+      await publishMessageStream(
+        sessionId,
+        assistantMessage as unknown as AgentMessagePayload
+      );
 
       this.logger.debug(
         `sendMessage: session=${sessionId} user=${authContext.userId}`
@@ -230,14 +238,12 @@ export class AgentSessionResolver {
     const authContext = this.extractAuthContext(context);
     await this.agentSessionService.complete(id, authContext);
     // Signal subscribers that the stream is done
-    this.pubSub.publish('messageStream_' + id, {
-      messageStream: {
-        id: '__end__',
-        sessionId: id,
-        role: 'SYSTEM' as const,
-        content: '',
-        createdAt: new Date().toISOString(),
-      },
+    await publishMessageStream(id, {
+      id: '__end__',
+      sessionId: id,
+      role: 'SYSTEM',
+      content: '',
+      createdAt: new Date().toISOString(),
     });
     return true;
   }
@@ -249,7 +255,7 @@ export class AgentSessionResolver {
     ) => payload.messageStream.sessionId === variables.sessionId,
   })
   subscribeToMessageStream(@Args('sessionId') sessionId: string) {
-    return this.pubSub.subscribe(`messageStream_${sessionId}`);
+    return subscribeMessageStream(sessionId);
   }
 
   @ResolveField('templateType')

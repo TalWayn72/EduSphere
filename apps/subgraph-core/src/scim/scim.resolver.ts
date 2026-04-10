@@ -34,7 +34,7 @@ export class ScimResolver {
   @Query('scimTokens')
   async getScimTokens(@Context() ctx: GqlCtx) {
     const auth = this.requireAdmin(ctx);
-    return this.tokenService.listTokens(auth.tenantId);
+    return this.tokenService.listTokens(auth.tenantId!);
   }
 
   @Query('scimSyncLog')
@@ -44,7 +44,7 @@ export class ScimResolver {
   ) {
     const auth = this.requireAdmin(ctx);
     const tenantCtx: TenantContext = {
-      tenantId: auth.tenantId,
+      tenantId: auth.tenantId!,
       userId: auth.userId,
       userRole: 'ORG_ADMIN',
     };
@@ -52,7 +52,7 @@ export class ScimResolver {
       tx
         .select()
         .from(schema.scimSyncLog)
-        .where(eq(schema.scimSyncLog.tenantId, auth.tenantId))
+        .where(eq(schema.scimSyncLog.tenantId, auth.tenantId!))
         .orderBy(desc(schema.scimSyncLog.createdAt))
         .limit(limit ?? 50)
     );
@@ -73,7 +73,7 @@ export class ScimResolver {
   ) {
     const auth = this.requireAdmin(ctx);
     return this.tokenService.generateToken(
-      auth.tenantId,
+      auth.tenantId!,
       auth.userId,
       input.description,
       input.expiresInDays
@@ -83,6 +83,6 @@ export class ScimResolver {
   @Mutation('revokeScimToken')
   async revokeScimToken(@Args('id') id: string, @Context() ctx: GqlCtx) {
     const auth = this.requireAdmin(ctx);
-    return this.tokenService.revokeToken(auth.tenantId, id);
+    return this.tokenService.revokeToken(auth.tenantId!, id);
   }
 }

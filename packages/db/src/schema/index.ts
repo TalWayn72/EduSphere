@@ -231,3 +231,6 @@ export * from './gdpr-erasure-log';
 
 // Enriched Transcript Blocks (FEAT: Semantic-Enriched Lesson Creation)
 export * from './enriched-transcript';
+
+// Drizzle relations — type-safe relational query API for 5 core entity chains
+export * from './relations';

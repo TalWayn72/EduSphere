@@ -188,6 +188,50 @@ export class EmbeddingStoreService implements OnModuleDestroy {
     });
   }
 
+  /**
+   * Vector similarity search scoped to a specific content item.
+   * Filters content_embeddings by joining through transcript_segments →
+   * transcripts → media_assets, then matching content_items.file_id = asset.id.
+   * Falls back to un-filtered searchByVector if contentItemId is empty.
+   */
+  async searchByVectorAndContentItem(
+    vecStr: string,
+    contentItemId: string,
+    limit: number,
+    ctx: TenantContext,
+    minSimilarity = 0
+  ): Promise<SearchResult[]> {
+    if (!contentItemId) {
+      return this.searchByVector(vecStr, limit, ctx, minSimilarity);
+    }
+    return withTenantContext(this.db, ctx, async (tx) => {
+      const simCondition =
+        minSimilarity > 0
+          ? sql`AND 1 - (ce.embedding <=> ${vecStr}::vector) >= ${minSimilarity}`
+          : sql``;
+      const rows = (await tx.execute<SimRow>(sql`
+        SELECT ce.id, ce.segment_id,
+          1 - (ce.embedding <=> ${vecStr}::vector) AS similarity
+        FROM content_embeddings ce
+        JOIN transcript_segments ts ON ts.id = ce.segment_id
+        JOIN transcripts tr ON tr.id = ts.transcript_id
+        JOIN media_assets ma ON ma.id = tr.asset_id
+        JOIN content_items ci ON ci.file_id = ma.id
+        WHERE ci.id = ${contentItemId}::uuid
+          AND ma.tenant_id = current_setting('app.current_tenant', TRUE)::uuid
+          ${simCondition}
+        ORDER BY ce.embedding <=> ${vecStr}::vector ASC
+        LIMIT ${limit}
+      `)) as unknown as SimRow[];
+      return rows.map((r) => ({
+        id: r.id,
+        refId: r.segment_id,
+        type: 'content',
+        similarity: parseFloat(r.similarity),
+      }));
+    });
+  }
+
   async ilikeFallback(
     query: string,
     limit: number,

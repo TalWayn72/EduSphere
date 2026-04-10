@@ -209,6 +209,7 @@ describe('AgentService fire-and-forget timeout (memory safety)', () => {
     await service.startExecution({
       agentId: 'agent-1',
       userId: 'user-1',
+      tenantId: 'tenant-1',
       input: { message: 'test' },
     });
     await new Promise<void>((resolve) => setTimeout(resolve, 50));

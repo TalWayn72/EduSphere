@@ -231,7 +231,16 @@
     "notesFile": "📄 קובץ הערות (PDF)",
     "supportedFormats": "תמיכה בקבצי PDF, Word, TXT",
     "skip": "דלג",
-    "continueToTemplate": "המשך לבחירת תבנית ←"
+    "continueToTemplate": "המשך לבחירת תבנית ←",
+    "pageTitle": "יצירת שיעור חדש",
+    "newLesson": "שיעור חדש",
+    "authError": "שגיאת אימות: יש להתחבר מחדש כדי ליצור שיעור",
+    "networkError": "שגיאת רשת: לא ניתן להתחבר לשרת. נסה שוב.",
+    "selectTemplate": "בחר תבנית Pipeline",
+    "thematicDescription": "נושא נקבע ע\"י המרצה — 8 שלבי עיבוד",
+    "sequentialDescription": "לימוד על הסדר — 9 שלבים + אימות ציטוטים",
+    "creating": "יוצר שיעור...",
+    "createAndContinue": "צור שיעור והמשך ל-Pipeline"
   },
   "forkCourse": "שכפל קורס",
   "forkCourseSuccess": "הקורס שוכפל בהצלחה!",
@@ -264,5 +273,24 @@
     "builderTitle": "בונה קורסים AI — בנה תוך 10 דקות",
     "builderDescription": "תאר את הקורס → AI יוצר את כל המודולים, השיעורים ושאלות החידון באופן אוטומטי.",
     "launchAiBuilder": "הפעל בונה AI →"
+  },
+  "lesson": {
+    "notFound": "השיעור לא נמצא",
+    "sessionExpired": "הסשן פג תוקף",
+    "pleaseLogInAgain": "יש להתחבר מחדש כדי להמשיך.",
+    "logInAgain": "התחבר מחדש",
+    "loadError": "שגיאה בטעינת השיעור. אנא נסו שוב מאוחר יותר.",
+    "statusDraft": "טיוטה",
+    "statusProcessing": "בעיבוד...",
+    "statusReady": "מוכן",
+    "statusPublished": "פורסם",
+    "backToCourse": "חזרה לקורס",
+    "type": "סוג",
+    "series": "סדרה",
+    "date": "תאריך",
+    "materials": "חומרים",
+    "preview": "תצוגה מקדימה",
+    "openPipeline": "פתח Pipeline",
+    "viewResults": "צפה בתוצאות"
   }
 }

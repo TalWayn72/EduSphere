@@ -17,6 +17,7 @@ import { AIService } from '../ai/ai.service';
 interface StartExecutionInput {
   agentId: string;
   userId: string;
+  tenantId: string;
   input: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 }
@@ -78,6 +79,7 @@ export class AgentService implements OnModuleDestroy {
       .values({
         agent_id: input.agentId,
         user_id: input.userId,
+        tenant_id: input.tenantId,
         input: input.input,
         status: 'QUEUED',
         metadata: input.metadata || {},

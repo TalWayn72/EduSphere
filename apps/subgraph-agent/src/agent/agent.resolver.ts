@@ -48,6 +48,7 @@ export class AgentResolver {
       input as {
         agentId: string;
         userId: string;
+        tenantId: string;
         input: Record<string, unknown>;
         metadata?: Record<string, unknown>;
       }

@@ -29,6 +29,8 @@
     "changelog": "bash scripts/generate-changelog.sh",
     "pre-e2e": "bash scripts/pre-e2e-gate.sh",
     "health": "bash scripts/health-check.sh",
+    "test:graphql": "pnpm turbo test:graphql",
+    "test:federation": "pnpm turbo test --filter=@edusphere/gateway",
     "verify-services": "bash scripts/verify-services.sh"
   },
   "devDependencies": {

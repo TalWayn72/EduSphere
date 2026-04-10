@@ -9,7 +9,9 @@ import {
   unique,
   timestamp,
   index,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { users } from './core';
@@ -175,9 +177,13 @@ export const proctoring_sessions = pgTable(
   'proctoring_sessions',
   {
     id: pk(),
-    tenant_id: tenantId(),
+    tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
+    // FK to exam_sessions.id — kept as plain uuid to avoid circular import
+    // (exam-items/blueprints already import from content.ts)
     assessment_id: uuid('assessment_id').notNull(),
-    user_id: uuid('user_id').notNull(),
+    user_id: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
     status: text('status').notNull().default('PENDING'),
     started_at: timestamp('started_at', { withTimezone: true }),
     ended_at: timestamp('ended_at', { withTimezone: true }),
@@ -188,8 +194,23 @@ export const proctoring_sessions = pgTable(
   (t) => [
     index('idx_proctoring_sessions_assessment').on(t.assessment_id),
     index('idx_proctoring_sessions_tenant').on(t.tenant_id),
+    index('idx_proctoring_sessions_user').on(t.user_id),
+    pgPolicy('proctoring_sessions_rls', {
+      using: sql`
+        tenant_id::text = current_setting('app.current_tenant', TRUE)
+        AND (
+          user_id::text = current_setting('app.current_user_id', TRUE)
+          OR current_setting('app.current_user_role', TRUE)
+              IN ('INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN')
+        )
+      `,
+      withCheck: sql`
+        tenant_id::text = current_setting('app.current_tenant', TRUE)
+        AND user_id::text = current_setting('app.current_user_id', TRUE)
+      `,
+    }),
   ]
-);
+).enableRLS();
 
 export type ProctoringSession = typeof proctoring_sessions.$inferSelect;
 export type NewProctoringSession = typeof proctoring_sessions.$inferInsert;

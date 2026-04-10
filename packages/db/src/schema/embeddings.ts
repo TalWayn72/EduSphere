@@ -5,6 +5,8 @@ import {
   integer,
   text,
   vector,
+  index,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk } from './_shared';
@@ -16,41 +18,93 @@ import { knowledgeSources } from './knowledge-sources';
 // Dimensions: 768 (nomic-embed-text dev / text-embedding-3-small prod)
 
 // Content Embeddings (for transcript segments)
-export const content_embeddings = pgTable('content_embeddings', {
-  id: pk(),
-  segment_id: uuid('segment_id')
-    .notNull()
-    .references(() => transcript_segments.id, { onDelete: 'cascade' })
-    .unique(),
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  created_at: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+// RLS: tenant isolation via parent transcript_segments.tenant_id join
+export const content_embeddings = pgTable(
+  'content_embeddings',
+  {
+    id: pk(),
+    segment_id: uuid('segment_id')
+      .notNull()
+      .references(() => transcript_segments.id, { onDelete: 'cascade' })
+      .unique(),
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('idx_content_embeddings_segment').on(t.segment_id),
+    pgPolicy('content_embeddings_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM transcript_segments ts
+          JOIN media_assets ma ON ma.id = ts.media_asset_id
+          JOIN courses c ON c.id = ma.course_id
+          WHERE ts.id = ${t.segment_id}
+            AND c.tenant_id::text = current_setting('app.current_tenant', TRUE)
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 // Annotation Embeddings
-export const annotation_embeddings = pgTable('annotation_embeddings', {
-  id: pk(),
-  annotation_id: uuid('annotation_id')
-    .notNull()
-    .references(() => annotations.id, { onDelete: 'cascade' })
-    .unique(),
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  created_at: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+// RLS: tenant isolation via parent annotations.tenant_id join
+export const annotation_embeddings = pgTable(
+  'annotation_embeddings',
+  {
+    id: pk(),
+    annotation_id: uuid('annotation_id')
+      .notNull()
+      .references(() => annotations.id, { onDelete: 'cascade' })
+      .unique(),
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('idx_annotation_embeddings_annotation').on(t.annotation_id),
+    pgPolicy('annotation_embeddings_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM annotations a
+          WHERE a.id = ${t.annotation_id}
+            AND a.tenant_id::text = current_setting('app.current_tenant', TRUE)
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 // Concept Embeddings (for knowledge graph concepts)
-export const concept_embeddings = pgTable('concept_embeddings', {
-  id: pk(),
-  concept_id: uuid('concept_id').notNull().unique(),
-  // Note: No FK to AGE graph — conceptually references ag_catalog vertex
-  embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  created_at: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+// RLS: tenant isolation via concept_id — conceptually references ag_catalog vertex
+// Access restricted to instructors+ since concepts are shared knowledge assets
+export const concept_embeddings = pgTable(
+  'concept_embeddings',
+  {
+    id: pk(),
+    concept_id: uuid('concept_id').notNull().unique(),
+    // Note: No FK to AGE graph — conceptually references ag_catalog vertex
+    tenant_id: uuid('tenant_id').notNull(),
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('idx_concept_embeddings_concept').on(t.concept_id),
+    index('idx_concept_embeddings_tenant').on(t.tenant_id),
+    pgPolicy('concept_embeddings_rls', {
+      using: sql`
+        tenant_id::text = current_setting('app.current_tenant', TRUE)
+      `,
+      withCheck: sql`
+        tenant_id::text = current_setting('app.current_tenant', TRUE)
+      `,
+    }),
+  ]
+).enableRLS();
 
 // HNSW indexes for cosine similarity search (applied via migration)
 export const contentEmbeddingsHnswIdx = sql`
@@ -98,8 +152,20 @@ export const knowledge_source_chunk_embeddings = pgTable(
     created_at: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
-  }
-);
+  },
+  (t) => [
+    index('idx_ks_chunk_embeddings_source').on(t.source_id),
+    pgPolicy('ks_chunk_embeddings_rls', {
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM knowledge_sources ks
+          WHERE ks.id = ${t.source_id}
+            AND ks.tenant_id::text = current_setting('app.current_tenant', TRUE)
+        )
+      `,
+    }),
+  ]
+).enableRLS();
 
 export const ksChunkEmbeddingsHnswIdx = sql`
 CREATE INDEX IF NOT EXISTS idx_ks_chunk_embeddings_hnsw
@@ -111,3 +177,6 @@ export type KsChunkEmbedding =
   typeof knowledge_source_chunk_embeddings.$inferSelect;
 export type NewKsChunkEmbedding =
   typeof knowledge_source_chunk_embeddings.$inferInsert;
+
+// exam_item_embeddings lives in schema/exam/exam-items.ts (already has enableRLS)
+// Re-exported from exam/index.ts — no changes needed here

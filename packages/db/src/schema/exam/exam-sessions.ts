@@ -19,7 +19,7 @@ import {
   pgEnum,
   pgPolicy,
 } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
+import { sql, relations } from 'drizzle-orm';
 import { users } from '../core';
 import { examBlueprints } from './exam-blueprints';
 import { examItems } from './exam-items';
@@ -97,6 +97,7 @@ export const examResponses = pgTable(
   'exam_responses',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    tenantId: uuid('tenant_id').notNull(),
     sessionId: uuid('session_id')
       .notNull()
       .references(() => examSessions.id, { onDelete: 'cascade' }),
@@ -112,8 +113,31 @@ export const examResponses = pgTable(
   (t) => [
     index('idx_exam_responses_session').on(t.sessionId),
     index('idx_exam_responses_item').on(t.itemId),
+    index('idx_exam_responses_tenant').on(t.tenantId),
+    pgPolicy('exam_responses_rls', {
+      using: sql`
+        tenant_id::text = current_setting('app.current_tenant', TRUE)
+        AND (
+          EXISTS (
+            SELECT 1 FROM exam_sessions es
+            WHERE es.id = session_id
+              AND es.user_id::text = current_setting('app.current_user_id', TRUE)
+          )
+          OR current_setting('app.current_user_role', TRUE)
+              IN ('INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN')
+        )
+      `,
+      withCheck: sql`
+        tenant_id::text = current_setting('app.current_tenant', TRUE)
+        AND EXISTS (
+          SELECT 1 FROM exam_sessions es
+          WHERE es.id = session_id
+            AND es.user_id::text = current_setting('app.current_user_id', TRUE)
+        )
+      `,
+    }),
   ]
-);
+).enableRLS();
 
 export type ExamSession = typeof examSessions.$inferSelect;
 export type NewExamSession = typeof examSessions.$inferInsert;

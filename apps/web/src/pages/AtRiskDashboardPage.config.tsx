@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
+import { Info } from 'lucide-react';
 
 const STORAGE_KEY = 'edusphere_risk_thresholds';
 
@@ -124,6 +125,13 @@ export function RiskThresholdConfig() {
             }
             className="max-w-xs"
           />
+        </div>
+        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+          <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          <span>
+            Settings saved locally — admin API coming soon. These thresholds
+            apply to your browser session only.
+          </span>
         </div>
         <Button onClick={handleSave} disabled={saving} size="sm">
           {saving ? 'Saving…' : 'Save Thresholds'}

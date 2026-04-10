@@ -3,6 +3,7 @@ import { useQuery } from 'urql';
 import { getCurrentUser } from '@/lib/auth';
 import { ME_QUERY, COURSES_QUERY, MY_STATS_QUERY } from '@/lib/queries';
 import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
+import { MY_DISCUSSIONS_QUERY } from '@/lib/graphql/collaboration.queries';
 import { MOCK_STATS } from '@/lib/mock-analytics';
 import type {
   MeQueryResult,
@@ -10,6 +11,10 @@ import type {
   MyAnnotationsQueryResult,
   MyStatsQueryResult,
 } from './Dashboard.types';
+
+interface MyDiscussionsResult {
+  myDiscussions: { id: string; discussionType: string }[];
+}
 
 export function useDashboardQueries() {
   const localUser = getCurrentUser();
@@ -43,6 +48,12 @@ export function useDashboardQueries() {
   });
   const myStats = statsResult.data?.myStats;
 
+  const [discussionsResult] = useQuery<MyDiscussionsResult>({
+    query: MY_DISCUSSIONS_QUERY,
+    variables: { limit: 100, offset: 0 },
+    pause: !mounted,
+  });
+
   // --- Derived stats ---
   const coursesEnrolled =
     statsResult.fetching && coursesResult.fetching
@@ -73,12 +84,20 @@ export function useDashboardQueries() {
 
   const firstName = meResult.data?.me?.firstName ?? localUser?.firstName;
 
+  // Study groups = CHAVRUTA discussions
+  const studyGroupsCount = discussionsResult.fetching
+    ? null
+    : (discussionsResult.data?.myDiscussions?.filter(
+        (d) => d.discussionType === 'CHAVRUTA'
+      ).length ?? 0);
+
   return {
     localUser,
     meResult,
     statsResult,
     coursesEnrolled,
     annotationsCreated,
+    studyGroupsCount,
     totalMinutesDisplay,
     conceptsMastered,
     deferredActivity,

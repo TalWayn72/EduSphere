@@ -51,15 +51,18 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
             ? wsConnectionParams['authorization']
             : undefined;
 
-        const tenantId =
-          request.headers.get('x-tenant-id') ??
+        // FIX-8: Do not use raw x-tenant-id header for rate limiting (forgeable).
+        // Rate limit on IP address at the pre-auth stage; post-auth keying is
+        // handled in RateLimitMiddleware using JWT-validated tenantId.
+        const clientIp =
           request.headers.get('x-forwarded-for') ??
+          request.headers.get('x-real-ip') ??
           'unknown';
 
-        const rateCheck = checkRateLimit(tenantId);
+        const rateCheck = checkRateLimit(clientIp);
         if (!rateCheck.allowed) {
           logger.warn(
-            { tenantId, resetAt: rateCheck.resetAt },
+            { clientIp, resetAt: rateCheck.resetAt },
             'G-09: rate limit exceeded (context)'
           );
           throw Object.assign(new Error('Rate limit exceeded'), {
@@ -77,11 +80,16 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
         if (authHeader?.startsWith('Bearer ')) {
           const token = authHeader.slice(7);
 
-          // Dev bypass for E2E tests (BUG-23): accept well-known dev token
+          // Dev bypass for E2E tests (BUG-23): accept a configurable dev token.
+          // SEC-2 hardening: requires ALLOW_DEV_TOKEN=true to be explicitly set.
+          // Default accepted token: 'dev-token-mock-jwt'. Override via DEV_TOKEN_SECRET.
+          // Grants STUDENT role by default — SUPER_ADMIN requires DEV_TOKEN_ROLE=SUPER_ADMIN.
+          const devTokenSecret = process.env['DEV_TOKEN_SECRET'];
           if (
             process.env.NODE_ENV !== 'production' &&
             process.env['ALLOW_DEV_TOKEN'] === 'true' &&
-            token === 'dev-token-mock-jwt'
+            (token === 'dev-token-mock-jwt' ||
+              (devTokenSecret != null && token === devTokenSecret))
           ) {
             const devRole = process.env['DEV_TOKEN_ROLE'] ?? 'STUDENT';
             resolvedTenantId = '00000000-0000-0000-0000-000000000000';
@@ -90,7 +98,7 @@ export function createGatewayPlugins(pubSub: PubSubEngine) {
             isAuthenticated = true;
             logger.warn(
               { role },
-              'SEC-1: dev-token bypass active — for E2E tests only'
+              'SEC-2: dev-token bypass active — this should NEVER appear in staging/production'
             );
           } else {
             try {

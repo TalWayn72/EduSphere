@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { Logger } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { LiveSessionService } from './live-session.service';
 import type { GraphQLContext } from '../auth/auth.middleware';
 
@@ -21,6 +21,9 @@ export class LiveSessionResolver {
     @Args('contentItemId') contentItemId: string,
     @Context() ctx: GraphQLContext
   ) {
+    if (!ctx.authContext?.userId) {
+      throw new UnauthorizedException('Authentication required');
+    }
     const tenantId = extractTenantId(ctx);
     return this.liveSessionService.getByContentItem(contentItemId, tenantId);
   }
@@ -32,6 +35,9 @@ export class LiveSessionResolver {
     @Args('meetingName') meetingName: string,
     @Context() ctx: GraphQLContext
   ) {
+    if (!ctx.authContext?.userId) {
+      throw new UnauthorizedException('Authentication required');
+    }
     const tenantId = extractTenantId(ctx);
     return this.liveSessionService.createLiveSession(
       contentItemId,

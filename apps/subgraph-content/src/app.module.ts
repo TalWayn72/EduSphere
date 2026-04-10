@@ -49,8 +49,8 @@ import { EnrichedLessonModule } from './enriched-lesson/enriched-lesson.module';
         await authMiddleware.validateRequest(ctx);
         return ctx;
       },
-      playground: true,
-      introspection: true,
+      playground: process.env['NODE_ENV'] !== 'production',
+      introspection: process.env['NODE_ENV'] !== 'production',
     }),
     CourseModule,
     ModuleModule,

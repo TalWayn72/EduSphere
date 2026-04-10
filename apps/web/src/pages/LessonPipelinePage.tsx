@@ -131,15 +131,11 @@ export function LessonPipelinePage() {
     setMounted(true);
   }, []);
 
-  const [{ data, error: lessonError }, reexecute] = useQuery<LessonQueryData>({
+  const [{ data }, reexecute] = useQuery<LessonQueryData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
     pause: !mounted || !lessonId,
   });
-  useEffect(() => {
-    if (lessonError)
-      console.error('[LessonPipelinePage] query error:', lessonError.message);
-  }, [lessonError]);
 
   const [{ fetching: saving }, savePipeline] = useMutation(
     SAVE_LESSON_PIPELINE_MUTATION
@@ -213,11 +209,6 @@ export function LessonPipelinePage() {
     });
     if (saveError) {
       const msg = saveError.graphQLErrors?.[0]?.message ?? saveError.message;
-      console.error(
-        '[LessonPipelinePage] savePipeline failed:',
-        msg,
-        saveError
-      );
       setPipelineError(msg);
       return;
     }
@@ -239,11 +230,6 @@ export function LessonPipelinePage() {
       });
       if (saveError) {
         const msg = saveError.graphQLErrors?.[0]?.message ?? saveError.message;
-        console.error(
-          '[LessonPipelinePage] save-before-run failed:',
-          msg,
-          saveError
-        );
         setPipelineError(msg);
         return;
       }
@@ -257,7 +243,6 @@ export function LessonPipelinePage() {
     const { error: runError } = await startRun({ pipelineId });
     if (runError) {
       const msg = runError.graphQLErrors?.[0]?.message ?? runError.message;
-      console.error('[LessonPipelinePage] startRun failed:', msg, runError);
       setPipelineError(msg);
       return;
     }
@@ -269,7 +254,6 @@ export function LessonPipelinePage() {
     if (!runId) return;
     const { error } = await cancelRun({ runId });
     if (error)
-      console.error('[LessonPipelinePage] cancelRun failed:', error.message);
     reexecute({ requestPolicy: 'network-only' });
   };
 
@@ -317,10 +301,6 @@ export function LessonPipelinePage() {
               input: { name, nodes, config: {} },
             });
             if (error) {
-              console.error(
-                '[LessonPipelinePage] createTemplate failed:',
-                error.message
-              );
               toast.error('Failed to save template. Please try again.');
               return false;
             }
