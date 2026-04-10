@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { AuthContext } from '@edusphere/auth';
 
 // ── NATS mock (hoisted to avoid TDZ error) ────────────────────────────────────
-const { mockPublish, mockNatsClient } = vi.hoisted(() => {
-  const mockPublish = vi.fn().mockResolvedValue(undefined);
-  const mockNatsClient = { publish: mockPublish, close: vi.fn() };
-  return { mockPublish, mockNatsClient };
+const { _mockPublish, mockNatsClient } = vi.hoisted(() => {
+  const _mockPublish = vi.fn().mockResolvedValue(undefined);
+  const mockNatsClient = { publish: _mockPublish, close: vi.fn() };
+  return { _mockPublish, mockNatsClient };
 });
 
 vi.mock('@edusphere/nats-client', () => ({

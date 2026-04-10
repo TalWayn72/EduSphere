@@ -23,7 +23,13 @@
     "weeklyGoal": "每周目标",
     "days": "天",
     "hours": "小时",
-    "minutes": "分钟"
+    "minutes": "分钟",
+    "studyTimeBeta": "测试版 — 真实追踪即将推出",
+    "conceptsBeta": "测试版 — 真实追踪即将推出",
+    "studyGroups": "学习小组",
+    "availableInCatalog": "在目录中可用",
+    "notesAndHighlights": "笔记和高亮",
+    "activeCollaborations": "活跃协作"
   },
   "heatmap": {
     "studyDays": "{{count}} 个学习日",
@@ -45,7 +51,9 @@
       "coursesAvailable": "可用课程",
       "conceptsMastered": "已掌握概念",
       "annotationsCreated": "已创建注释"
-    }
+    },
+    "manageAvatar": "在账户设置中管理头像",
+    "manageAccount": "管理账户"
   },
   "subtitle": "Here is what is happening in your learning journey.",
   "recommendedForYou": "Recommended for You",

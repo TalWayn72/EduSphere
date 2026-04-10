@@ -23,7 +23,13 @@
     "weeklyGoal": "Target mingguan",
     "days": "hari",
     "hours": "jam",
-    "minutes": "menit"
+    "minutes": "menit",
+    "studyTimeBeta": "BETA — pelacakan nyata segera hadir",
+    "conceptsBeta": "BETA — pelacakan nyata segera hadir",
+    "studyGroups": "Kelompok belajar",
+    "availableInCatalog": "Tersedia di katalog",
+    "notesAndHighlights": "Catatan dan sorotan",
+    "activeCollaborations": "Kolaborasi aktif"
   },
   "heatmap": {
     "studyDays": "{{count}} hari belajar",
@@ -45,7 +51,9 @@
       "coursesAvailable": "Kursus tersedia",
       "conceptsMastered": "Konsep yang dikuasai",
       "annotationsCreated": "Anotasi dibuat"
-    }
+    },
+    "manageAvatar": "Kelola avatar di pengaturan akun",
+    "manageAccount": "Kelola akun"
   },
   "subtitle": "Here is what is happening in your learning journey.",
   "recommendedForYou": "Recommended for You",

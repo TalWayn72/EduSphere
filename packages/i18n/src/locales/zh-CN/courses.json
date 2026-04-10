@@ -263,6 +263,34 @@
     "notesFile": "📄 Notes File (PDF)",
     "supportedFormats": "Supports PDF, Word, TXT files",
     "skip": "Skip",
-    "continueToTemplate": "Continue to Template ←"
+    "continueToTemplate": "Continue to Template ←",
+    "pageTitle": "创建新课时",
+    "newLesson": "新课时",
+    "authError": "认证错误 — 请重新登录",
+    "networkError": "网络错误 — 无法连接到服务器。请重试。",
+    "selectTemplate": "选择流水线模板",
+    "thematicDescription": "教师定义的主题 — 8个处理步骤",
+    "sequentialDescription": "顺序学习 — 9个步骤 + 引用验证",
+    "creating": "正在创建课时...",
+    "createAndContinue": "创建课时并继续到流水线"
+  },
+  "lesson": {
+    "notFound": "找不到课时",
+    "sessionExpired": "会话已过期",
+    "pleaseLogInAgain": "请重新登录以继续。",
+    "logInAgain": "重新登录",
+    "loadError": "加载课时时出错。请稍后重试。",
+    "statusDraft": "草稿",
+    "statusProcessing": "处理中...",
+    "statusReady": "就绪",
+    "statusPublished": "已发布",
+    "backToCourse": "返回课程",
+    "type": "类型",
+    "series": "系列",
+    "date": "日期",
+    "materials": "材料",
+    "preview": "预览",
+    "openPipeline": "打开流水线",
+    "viewResults": "查看结果"
   }
 }

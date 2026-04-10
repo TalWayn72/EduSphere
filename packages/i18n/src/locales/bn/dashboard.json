@@ -23,7 +23,13 @@
     "weeklyGoal": "সাপ্তাহিক লক্ষ্য",
     "days": "দিন",
     "hours": "ঘন্টা",
-    "minutes": "মিনিট"
+    "minutes": "মিনিট",
+    "studyTimeBeta": "বেটা — শীঘ্রই বাস্তব ট্র্যাকিং আসছে",
+    "conceptsBeta": "বেটা — শীঘ্রই বাস্তব ট্র্যাকিং আসছে",
+    "studyGroups": "অধ্যয়ন দল",
+    "availableInCatalog": "ক্যাটালগে উপলব্ধ",
+    "notesAndHighlights": "নোট এবং হাইলাইট",
+    "activeCollaborations": "সক্রিয় সহযোগিতা"
   },
   "heatmap": {
     "studyDays": "{{count}} অধ্যয়ন দিন",
@@ -45,7 +51,9 @@
       "coursesAvailable": "উপলব্ধ কোর্স",
       "conceptsMastered": "আয়ত্ত করা ধারণা",
       "annotationsCreated": "তৈরি করা অ্যানোটেশন"
-    }
+    },
+    "manageAvatar": "অ্যাকাউন্ট সেটিংসে অবতার পরিচালনা করুন",
+    "manageAccount": "অ্যাকাউন্ট পরিচালনা করুন"
   },
   "subtitle": "Here is what is happening in your learning journey.",
   "recommendedForYou": "Recommended for You",

@@ -23,7 +23,13 @@
     "weeklyGoal": "Objetivo semanal",
     "days": "días",
     "hours": "horas",
-    "minutes": "minutos"
+    "minutes": "minutos",
+    "studyTimeBeta": "BETA — seguimiento real próximamente",
+    "conceptsBeta": "BETA — seguimiento real próximamente",
+    "studyGroups": "Grupos de estudio",
+    "availableInCatalog": "Disponible en el catálogo",
+    "notesAndHighlights": "Notas y destacados",
+    "activeCollaborations": "Colaboraciones activas"
   },
   "heatmap": {
     "studyDays": "{{count}} días de estudio",
@@ -45,7 +51,9 @@
       "coursesAvailable": "Cursos disponibles",
       "conceptsMastered": "Conceptos dominados",
       "annotationsCreated": "Anotaciones creadas"
-    }
+    },
+    "manageAvatar": "Gestionar avatar en la configuración de la cuenta",
+    "manageAccount": "Gestionar cuenta"
   },
   "subtitle": "Here is what is happening in your learning journey.",
   "recommendedForYou": "Recommended for You",

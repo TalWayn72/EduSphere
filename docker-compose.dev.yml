@@ -32,6 +32,7 @@ services:
       retries: 5
     mem_limit: 2g
     mem_reservation: 512m
+    restart: unless-stopped
     networks:
       - edusphere
 
@@ -106,6 +107,7 @@ services:
       retries: 5
     mem_limit: 256m
     mem_reservation: 64m
+    restart: unless-stopped
     networks:
       - edusphere
 
@@ -128,6 +130,7 @@ services:
       retries: 5
     mem_limit: 256m
     mem_reservation: 64m
+    restart: unless-stopped
     networks:
       - edusphere
 
@@ -162,6 +165,7 @@ services:
       start_period: 30s
     mem_limit: 1g
     mem_reservation: 256m
+    restart: unless-stopped
     networks:
       - edusphere
 
@@ -628,6 +632,7 @@ services:
       start_period: 15s
     mem_limit: 512m
     mem_reservation: 128m
+    restart: unless-stopped
     networks:
       - edusphere
 

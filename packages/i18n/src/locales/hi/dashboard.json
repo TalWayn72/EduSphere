@@ -23,7 +23,13 @@
     "weeklyGoal": "साप्ताहिक लक्ष्य",
     "days": "दिन",
     "hours": "घंटे",
-    "minutes": "मिनट"
+    "minutes": "मिनट",
+    "studyTimeBeta": "बीटा — वास्तविक ट्रैकिंग जल्द आ रही है",
+    "conceptsBeta": "बीटा — वास्तविक ट्रैकिंग जल्द आ रही है",
+    "studyGroups": "अध्ययन समूह",
+    "availableInCatalog": "कैटलॉग में उपलब्ध",
+    "notesAndHighlights": "नोट्स और हाइलाइट्स",
+    "activeCollaborations": "सक्रिय सहयोग"
   },
   "heatmap": {
     "studyDays": "{{count}} अध्ययन दिन",
@@ -45,7 +51,9 @@
       "coursesAvailable": "उपलब्ध पाठ्यक्रम",
       "conceptsMastered": "महारत हासिल अवधारणाएं",
       "annotationsCreated": "बनाए गए एनोटेशन"
-    }
+    },
+    "manageAvatar": "खाता सेटिंग में अवतार प्रबंधित करें",
+    "manageAccount": "खाता प्रबंधित करें"
   },
   "subtitle": "Here is what is happening in your learning journey.",
   "recommendedForYou": "Recommended for You",

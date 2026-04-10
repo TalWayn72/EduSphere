@@ -31,7 +31,7 @@ const MOCK_AI_MSG = {
 
 function renderAITutorLive(sessionId: string, mocks: MockedResponse[] = []) {
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedProvider mocks={mocks}>
       <AITutorLive sessionId={sessionId} />
     </MockedProvider>
   );

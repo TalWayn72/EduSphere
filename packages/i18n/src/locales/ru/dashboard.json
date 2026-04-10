@@ -23,7 +23,13 @@
     "weeklyGoal": "Еженедельная цель",
     "days": "дней",
     "hours": "часов",
-    "minutes": "минут"
+    "minutes": "минут",
+    "studyTimeBeta": "БЕТА — реальное отслеживание появится скоро",
+    "conceptsBeta": "БЕТА — реальное отслеживание появится скоро",
+    "studyGroups": "Учебные группы",
+    "availableInCatalog": "Доступно в каталоге",
+    "notesAndHighlights": "Заметки и выделения",
+    "activeCollaborations": "Активные совместные работы"
   },
   "heatmap": {
     "studyDays": "{{count}} дней учёбы",
@@ -45,7 +51,9 @@
       "coursesAvailable": "Доступные курсы",
       "conceptsMastered": "Освоенные концепции",
       "annotationsCreated": "Созданные аннотации"
-    }
+    },
+    "manageAvatar": "Управляйте аватаром в настройках аккаунта",
+    "manageAccount": "Управление аккаунтом"
   },
   "subtitle": "Here is what is happening in your learning journey.",
   "recommendedForYou": "Recommended for You",

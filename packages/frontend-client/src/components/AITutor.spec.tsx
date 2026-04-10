@@ -73,7 +73,7 @@ const MOCK_MESSAGES = [
 
 function renderAITutor(mocks: MockedResponse[] = []) {
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedProvider mocks={mocks}>
       <AITutor />
     </MockedProvider>
   );

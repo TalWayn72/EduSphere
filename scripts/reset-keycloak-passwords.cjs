@@ -39,7 +39,7 @@ function httpReq(method, path, body, token, contentType) {
 }
 
 async function getAdminToken() {
-  const body = 'client_id=admin-cli&username=admin&password=admin&grant_type=password';
+  const body = 'client_id=admin-cli&username=admin&password=admin123&grant_type=password';
   const r = await httpReq('POST', '/realms/master/protocol/openid-connect/token', body, null, 'application/x-www-form-urlencoded');
   const token = JSON.parse(r.body).access_token;
   if (!token) throw new Error('Admin token failed: ' + r.body.slice(0, 200));
