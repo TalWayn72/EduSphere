@@ -13,7 +13,12 @@ describe('RateLimitMiddleware', () => {
     delete process.env['REDIS_RATE_LIMIT_URL'];
     delete process.env['REDIS_URL'];
     middleware = new RateLimitMiddleware();
-    mockReq = { headers: { 'x-tenant-id': 'tenant-abc' }, ip: '127.0.0.1' };
+    // Rate limiting now keys on JWT-validated authContext.tenantId (not x-tenant-id header)
+    mockReq = {
+      headers: { 'x-tenant-id': 'tenant-abc' },
+      ip: '127.0.0.1',
+      authContext: { tenantId: 'tenant-abc' },
+    } as unknown as Partial<Request>;
     mockRes = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
@@ -42,7 +47,8 @@ describe('RateLimitMiddleware', () => {
     const req2 = {
       headers: { 'x-tenant-id': 'tenant-xyz' },
       ip: '127.0.0.1',
-    } as Partial<Request>;
+      authContext: { tenantId: 'tenant-xyz' },
+    } as unknown as Partial<Request>;
     for (let i = 0; i < 200; i++) {
       await middleware.use(mockReq as Request, mockRes as Response, mockNext);
     }
