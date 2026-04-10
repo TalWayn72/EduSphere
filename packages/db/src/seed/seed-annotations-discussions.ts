@@ -54,6 +54,20 @@ const PART_IDS = {
 export async function seedAnnotationsDiscussions(): Promise<void> {
   const db = createDatabaseConnection();
 
+  // 0. Ensure the enriched media asset exists (seed-enriched-lesson may not have run) ────
+  await db
+    .insert(schema.media_assets)
+    .values({
+      id:         ASSET_ID,
+      tenant_id:  DEMO_TENANT,
+      title:      'Nahar Shalom — Enriched Lesson Asset',
+      media_type: 'DOCUMENT',
+      file_url:   'https://placeholder/nahar-shalom.docx',
+      transcription_status: 'COMPLETED',
+      metadata:   {},
+    })
+    .onConflictDoNothing();
+
   // 1. Annotations ──────────────────────────────────────────────────────────────
   await db
     .insert(schema.annotations)
