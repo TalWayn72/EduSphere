@@ -96,6 +96,4 @@ export async function seedAgentTemplates(): Promise<void> {
     .onConflictDoNothing();
 
   console.log('✅ Agent templates seeded: 4 templates (Chavruta, QuizMaster, Explainer, ResearchScout)');
-
-  await db.$client.end();
 }

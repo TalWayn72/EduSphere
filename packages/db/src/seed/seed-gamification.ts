@@ -241,6 +241,4 @@ export async function seedGamification(): Promise<void> {
     .onConflictDoNothing();
 
   console.log('✅ Gamification seeded: 5 badges, 3 user-badge awards, points, XP, 5-day streak');
-
-  await db.$client.end();
 }

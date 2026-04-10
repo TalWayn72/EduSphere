@@ -179,9 +179,9 @@ type Query
   @join__type(graph: CONTENT)
   @join__type(graph: CORE)
   @join__type(graph: KNOWLEDGE) {
-  agentSession(id: ID!): AgentSession @join__field(graph: AGENT)
-  myAgentSessions: [AgentSession!]! @join__field(graph: AGENT)
-  agentTemplates: [AgentTemplate!]! @join__field(graph: AGENT)
+  agentSession(id: ID!): AgentSession @join__field(graph: AGENT) @authenticated
+  myAgentSessions: [AgentSession!]! @join__field(graph: AGENT) @authenticated
+  agentTemplates: [AgentTemplate!]! @join__field(graph: AGENT) @authenticated
   agentExecution(id: ID!): AgentExecution @join__field(graph: AGENT)
   agentExecutionsByUser(userId: ID!, limit: Int = 20): [AgentExecution!]!
     @join__field(graph: AGENT)
@@ -741,14 +741,14 @@ type Query
     @join__field(graph: CORE)
     @authenticated
   myCompetencyGoals: [CompetencyGoal!]! @join__field(graph: CORE) @authenticated
-  user(id: ID!): User @join__field(graph: CORE)
+  user(id: ID!): User @join__field(graph: CORE) @authenticated
   users(
     limit: Int = 10
     offset: Int = 0
       @deprecated(
         reason: "Use cursor-based pagination with 'after' argument instead. Will be removed 2026-09-01."
       )
-  ): [User!]! @join__field(graph: CORE)
+  ): [User!]! @join__field(graph: CORE) @authenticated
   me: User @join__field(graph: CORE)
   myStats: UserStats! @join__field(graph: CORE) @authenticated
   publicProfile(userId: ID!): PublicProfile @join__field(graph: CORE)

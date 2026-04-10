@@ -189,6 +189,4 @@ export async function seedAnnotationsDiscussions(): Promise<void> {
     .onConflictDoNothing();
 
   console.log('✅ Annotations & Discussions seeded: 4 annotations, 2 discussions, 5 messages, 4 participants');
-
-  await db.$client.end();
 }

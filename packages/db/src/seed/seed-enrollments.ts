@@ -65,7 +65,6 @@ export async function seedEnrollments(): Promise<void> {
       'seed-enrollments: no content items found for modules 1-5; skipping progress rows. ' +
         'Run seedNaharShalomCourse() first.'
     );
-    await db.$client.end();
     return;
   }
 
@@ -87,6 +86,4 @@ export async function seedEnrollments(): Promise<void> {
   console.log(
     `✅ Enrollments seeded: 2 enrollments, ${items.length} progress records (modules 1-5)`
   );
-
-  await db.$client.end();
 }

@@ -224,6 +224,4 @@ export async function seedExam(): Promise<void> {
   }
 
   console.log(`✅ Exam seeded: 1 ACTIVE blueprint, ${EXAM_ITEMS.length} MCQ items`);
-
-  await db.$client.end();
 }
