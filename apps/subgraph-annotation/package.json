@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@edusphere/auth": "workspace:*",
+    "@edusphere/nats-client": "workspace:*",
+    "nats": "^2.29.3",
     "@edusphere/config": "workspace:*",
     "@edusphere/db": "workspace:*",
     "@edusphere/graphql-shared": "workspace:*",
