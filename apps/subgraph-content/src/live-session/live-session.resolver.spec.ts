@@ -41,7 +41,7 @@ function makeCtx(
       opts.tenantId || opts.userId
         ? {
             tenantId: opts.tenantId,
-            userId: opts.userId ?? '',
+            userId: opts.userId ?? 'test-user-id',
             email: 'test@example.com',
             username: 'testuser',
             roles: [],
@@ -110,21 +110,22 @@ describe('LiveSessionResolver', () => {
 
   describe('extractTenantId — x-tenant-id header fallback', () => {
     it('falls back to x-tenant-id header when authContext is missing', async () => {
-      mockLiveSessionService.getByContentItem.mockResolvedValue(null);
+      mockLiveSessionService.getById.mockResolvedValue(null);
 
-      await resolver.getLiveSession(
-        'content-1',
+      // Use getLiveSessionById which does not require authContext.userId
+      await resolver.getLiveSessionById(
+        'session-1',
         makeCtx({ headerTenantId: 'header-tenant' })
       );
 
-      expect(mockLiveSessionService.getByContentItem).toHaveBeenCalledWith(
-        'content-1',
+      expect(mockLiveSessionService.getById).toHaveBeenCalledWith(
+        'session-1',
         'header-tenant'
       );
     });
 
     it('handles array header values (picks first element)', async () => {
-      mockLiveSessionService.getByContentItem.mockResolvedValue(null);
+      mockLiveSessionService.getById.mockResolvedValue(null);
 
       const ctx = {
         req: {
@@ -132,10 +133,10 @@ describe('LiveSessionResolver', () => {
         },
       } as unknown as GraphQLContext;
 
-      await resolver.getLiveSession('content-1', ctx);
+      await resolver.getLiveSessionById('session-1', ctx);
 
-      expect(mockLiveSessionService.getByContentItem).toHaveBeenCalledWith(
-        'content-1',
+      expect(mockLiveSessionService.getById).toHaveBeenCalledWith(
+        'session-1',
         'first-tenant'
       );
     });
@@ -145,12 +146,13 @@ describe('LiveSessionResolver', () => {
 
   describe('extractTenantId — returns empty string when both sources missing', () => {
     it('returns empty string when authContext and header are both absent', async () => {
-      mockLiveSessionService.getByContentItem.mockResolvedValue(null);
+      mockLiveSessionService.getById.mockResolvedValue(null);
 
-      await resolver.getLiveSession('content-1', makeCtx());
+      // Use getLiveSessionById which does not require authContext.userId
+      await resolver.getLiveSessionById('session-1', makeCtx());
 
-      expect(mockLiveSessionService.getByContentItem).toHaveBeenCalledWith(
-        'content-1',
+      expect(mockLiveSessionService.getById).toHaveBeenCalledWith(
+        'session-1',
         ''
       );
     });
@@ -160,16 +162,17 @@ describe('LiveSessionResolver', () => {
 
   describe('regression guard — old ctx.req.user?.tenant_id pattern', () => {
     it('old pattern ctx.req.user.tenant_id does NOT extract tenantId', async () => {
-      mockLiveSessionService.getByContentItem.mockResolvedValue(null);
+      mockLiveSessionService.getById.mockResolvedValue(null);
 
       // Pass context that only has the OLD pattern — tenantId should be empty
-      await resolver.getLiveSession(
-        'content-1',
+      // Use getLiveSessionById which does not require authContext.userId
+      await resolver.getLiveSessionById(
+        'session-1',
         makeOldCtx('old-tenant') as never
       );
 
-      expect(mockLiveSessionService.getByContentItem).toHaveBeenCalledWith(
-        'content-1',
+      expect(mockLiveSessionService.getById).toHaveBeenCalledWith(
+        'session-1',
         '' // NOT 'old-tenant' — old pattern does not work
       );
     });
