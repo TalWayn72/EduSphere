@@ -102,7 +102,7 @@ describe('TranscriptReadyConsumer', () => {
     expect(mockCreateBlocks).toHaveBeenCalledWith('lesson-123', {
       tenantId: 'tenant-xyz',
       userId: 'system',
-      userRole: 'SYSTEM',
+      userRole: 'SUPER_ADMIN',
     });
   });
 

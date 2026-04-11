@@ -104,7 +104,7 @@ export class TranscriptReadyConsumer implements OnModuleInit, OnModuleDestroy {
     await this.blocksService.createBlocksFromSegments(lessonId, {
       tenantId,
       userId: 'system',
-      userRole: 'SYSTEM',
+      userRole: 'SUPER_ADMIN',
     });
   }
 

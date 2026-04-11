@@ -63,6 +63,8 @@ vi.mock('@edusphere/db', () => ({
     lessons: { id: 'id', course_id: 'course_id' },
   },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
+  and: vi.fn((...args: unknown[]) => ({ and: args })),
+  or: vi.fn((...args: unknown[]) => ({ or: args })),
   withTenantContext: vi.fn(),
 }));
 
@@ -207,7 +209,11 @@ describe('LessonAssetService', () => {
       media_asset_id: null,
       metadata: {},
     };
+    // Dedup guard select().from().where().limit(1) → no existing asset
+    mockLimit.mockResolvedValueOnce([]);
+    // Insert returning the new row
     mockReturning.mockResolvedValueOnce([insertedRow]);
+    // Lesson lookup for NATS event
     mockLimit.mockResolvedValueOnce([{ course_id: 'course-abc' }]);
 
     const tenantCtx = {
