@@ -49,6 +49,10 @@ export const ENRICHED_LESSON_QUERY = gql`
       youtubeVideoId
       transcriptReady
       enrichmentStatus
+      lesson {
+        id
+        title
+      }
       blocks {
         ...EnrichedBlockFields
       }

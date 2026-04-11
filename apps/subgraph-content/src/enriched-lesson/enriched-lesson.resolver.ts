@@ -105,6 +105,17 @@ export class EnrichedLessonResolver {
 
   // ── Field Resolvers ──────────────────────────────────────────────
 
+  @ResolveField('lesson')
+  getLesson(@Parent() enriched: EnrichedLessonView) {
+    // Return a minimal Lesson stub so the SDL's `lesson: Lesson!` field is satisfied.
+    // The lessonId and lessonTitle are populated by getEnrichedLesson/publishEnrichedLesson.
+    return {
+      __typename: 'Lesson',
+      id: enriched.lessonId,
+      title: enriched.lessonTitle ?? '',
+    };
+  }
+
   @ResolveField('blocks')
   async getBlocks(
     @Parent() enriched: EnrichedLessonView,

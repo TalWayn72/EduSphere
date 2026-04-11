@@ -34,6 +34,8 @@ export function mapCitation(row: Record<string, unknown>) {
 export interface EnrichedLessonView {
   id: string;
   lessonId: string;
+  /** Lesson title — used by the `lesson` field resolver on EnrichedLesson. */
+  lessonTitle?: string;
   youtubeVideoId: string | null;
   transcriptReady: boolean;
   enrichmentStatus: string;

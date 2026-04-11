@@ -152,7 +152,19 @@ export function LessonPreviewPage() {
     enrichedBlocks.length > 0 &&
     (enriched?.enrichmentStatus === 'READY' ||
       enriched?.enrichmentStatus === 'PUBLISHED');
-  const youtubeVideoId = enriched?.youtubeVideoId;
+
+  // Extract YouTube video ID: prefer enrichedLesson field, fall back to asset sourceUrl
+  function extractYouTubeId(url: string): string | null {
+    const match =
+      /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/.exec(
+        url
+      );
+    return match?.[1] ?? null;
+  }
+  const youtubeVideoIdFromAssets = lesson.assets
+    .map((a) => (a.sourceUrl ? extractYouTubeId(a.sourceUrl) : null))
+    .find(Boolean) ?? null;
+  const youtubeVideoId = enriched?.youtubeVideoId ?? youtubeVideoIdFromAssets;
   const pipelineResults = lesson.pipeline?.currentRun?.results ?? [];
   const hasContent = hasEnrichedBlocks || pipelineResults.length > 0;
 

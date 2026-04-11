@@ -1,5 +1,5 @@
 # EduSphere Session Primer
-Last Updated: 2026-04-10T07:54:48Z
+Last Updated: 2026-04-11T18:47:05Z
 
 ## Last Session Summary (2026-04-10)
 - Docker infrastructure: 14 containers all healthy (postgres, keycloak, nats, minio, jaeger + subgraphs)
@@ -120,3 +120,167 @@ curl http://localhost:4000/graphql  # gateway responds
 - Last commit: 264bc71a fix(infra): add restart policies, fix CI failures, add 5-user auth E2E
 - Modified: 2 files | Untracked: 93 files
 - Timestamp: 2026-04-10T14:15:29Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 8d6104a2 feat(web): YouTube lesson creation with transcript, enriched preview, and AI summary
+- Modified: 1 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:10:51Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 8d6104a2 feat(web): YouTube lesson creation with transcript, enriched preview, and AI summary
+- Modified: 3 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:10:59Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 8d6104a2 feat(web): YouTube lesson creation with transcript, enriched preview, and AI summary
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:11:07Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:11:16Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:11:27Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:11:58Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:12:07Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:12:16Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:12:26Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:12:36Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:12:45Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:12:54Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:13:02Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:13:09Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-10T16:13:18Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-11T17:25:53Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 2 files | Untracked: 104 files
+- Timestamp: 2026-04-11T17:48:22Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 9 files | Untracked: 104 files
+- Timestamp: 2026-04-11T18:05:41Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 9 files | Untracked: 104 files
+- Timestamp: 2026-04-11T18:06:01Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 9 files | Untracked: 104 files
+- Timestamp: 2026-04-11T18:06:09Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 9 files | Untracked: 104 files
+- Timestamp: 2026-04-11T18:21:53Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 9 files | Untracked: 104 files
+- Timestamp: 2026-04-11T18:26:30Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 9 files | Untracked: 114 files
+- Timestamp: 2026-04-11T18:40:38Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 10 files | Untracked: 115 files
+- Timestamp: 2026-04-11T18:42:36Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 10 files | Untracked: 115 files
+- Timestamp: 2026-04-11T18:42:52Z
+
+<!-- PreCompact auto-save: 2026-04-11T18:47:05Z -->
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 10 files | Untracked: 115 files
+- Timestamp: 2026-04-11T18:47:11Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
+- Modified: 10 files | Untracked: 115 files
+- Timestamp: 2026-04-11T18:51:29Z

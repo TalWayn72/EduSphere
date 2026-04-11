@@ -63,7 +63,8 @@ export interface EnrichedLessonData {
   youtubeVideoId?: string | null;
   transcriptReady: boolean;
   enrichmentStatus: EnrichmentStatus;
-  lesson: { id: string; title: string };
+  /** Lesson metadata — available when ENRICHED_LESSON_QUERY requests the lesson field. */
+  lesson?: { id: string; title: string } | null;
   blocks: EnrichedTranscriptBlock[];
   citations: LessonCitation[];
 }

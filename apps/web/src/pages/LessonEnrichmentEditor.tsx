@@ -90,7 +90,7 @@ export function LessonEnrichmentEditor() {
     refetch();
   }, [publish, lessonId, refetch]);
 
-  const title = data?.lesson.title ?? 'Lesson Enrichment Editor';
+  const title = data?.lesson?.title ?? 'Lesson Enrichment Editor';
   const videoId = data?.youtubeVideoId;
 
   return (

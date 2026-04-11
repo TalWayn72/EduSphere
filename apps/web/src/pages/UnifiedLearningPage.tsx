@@ -82,21 +82,55 @@ export function UnifiedLearningPage() {
   const isDocumentContent = DOC_TYPES.has(contentType.toUpperCase());
 
   // Fallback document content when gateway offline
-  const documentContent: string =
+  const rawDocumentContent: string =
     item?.content ?? (itemResult.error ? mockDocumentContent : '');
 
   // ── Video / transcript hook (has mock fallback) ──
+  // NOTE: when contentId is a lessonId (not a contentItem ID), useContentData
+  // returns null for the item and falls back to mock data. We override
+  // youtubeVideoId / isYouTubeContent below using enrichedLesson data.
   const {
     videoUrl,
     hlsManifestUrl,
     videoTitle,
     transcript,
-    youtubeVideoId,
-    isYouTubeContent,
+    youtubeVideoId: contentYoutubeVideoId,
+    isYouTubeContent: contentIsYouTube,
   } = useContentData(contentId);
 
-  // ── Enriched lesson data (for YouTube content) ──
-  const enrichedLesson = useEnrichedLesson(isYouTubeContent ? contentId : '');
+  // ── Enriched lesson data — always fetch; provides youtubeVideoId for lessons ──
+  // The /learn/:contentId route may receive a lessonId (not a contentItem ID).
+  // useContentData may return isYouTubeContent=false when the contentItem query
+  // returns null. We fetch enrichedLesson unconditionally and use its
+  // youtubeVideoId as a fallback detection mechanism.
+  const enrichedLesson = useEnrichedLesson(contentId);
+
+  // Merge YouTube detection: prefer contentItem result, fall back to enrichedLesson.
+  const youtubeVideoId =
+    contentYoutubeVideoId ?? enrichedLesson.data?.youtubeVideoId ?? null;
+  const isYouTubeContent = contentIsYouTube || !!youtubeVideoId;
+
+  // When contentId is an enrichedLesson ID (not a contentItem ID), item is null
+  // and rawDocumentContent is ''. Synthesise markdown from enriched blocks so the
+  // document panel renders lesson content instead of "אין מסמך לתוכן זה".
+  const enrichedMarkdown: string = (() => {
+    const blocks = enrichedLesson.data?.blocks;
+    if (!blocks || blocks.length === 0) return '';
+    return blocks
+      .slice()
+      .sort((a, b) => a.blockOrder - b.blockOrder)
+      .map((b) => {
+        const text =
+          (b.content as Record<string, unknown>)['text'] as string | undefined;
+        if (!text) return '';
+        if (b.blockType === 'HEADING') return `## ${text}`;
+        return text;
+      })
+      .filter(Boolean)
+      .join('\n\n');
+  })();
+
+  const documentContent: string = rawDocumentContent || enrichedMarkdown;
 
   // ── Subtitle tracks (empty array when query not available) ──
   const subtitleTracks = useSubtitleTracks(contentId);
@@ -206,7 +240,8 @@ export function UnifiedLearningPage() {
       color: '#3b82f6',
     }));
 
-  const title = item?.title ?? videoTitle;
+  const title =
+    item?.title ?? enrichedLesson.data?.lesson?.title ?? videoTitle;
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {

@@ -87,6 +87,7 @@ export class EnrichedLessonService implements OnModuleDestroy {
     return {
       id: input.lessonId,
       lessonId: input.lessonId,
+      lessonTitle: lesson.title ?? '',
       youtubeVideoId: videoId,
       transcriptReady: false,
       enrichmentStatus: 'EXTRACTING_TRANSCRIPT',
@@ -98,31 +99,38 @@ export class EnrichedLessonService implements OnModuleDestroy {
     lessonId: string,
     tenantCtx: TenantContext
   ): Promise<EnrichedLessonView | null> {
-    await this.findLessonOrThrow(lessonId, tenantCtx);
+    const lesson = await this.findLessonOrThrow(lessonId, tenantCtx);
     const blocks = await this.getBlocks(lessonId, tenantCtx);
     const hasBlocks = blocks.length > 0;
-    const youtubeVideoId = await this.fetchYoutubeVideoId(lessonId);
+    const youtubeVideoId = await this.fetchYoutubeVideoId(lessonId, tenantCtx);
 
     return {
       id: lessonId,
       lessonId,
+      lessonTitle: lesson.title ?? '',
       youtubeVideoId,
       transcriptReady: hasBlocks,
       enrichmentStatus: hasBlocks ? 'READY' : 'PENDING',
     };
   }
 
-  /** Fetch youtube_video_id from lesson_assets → media_assets join. */
-  private async fetchYoutubeVideoId(lessonId: string): Promise<string | null> {
-    const rows = await this.db
-      .select({ youtubeVideoId: schema.media_assets.youtube_video_id })
-      .from(schema.lesson_assets)
-      .innerJoin(
-        schema.media_assets,
-        eq(schema.lesson_assets.media_asset_id, schema.media_assets.id)
-      )
-      .where(eq(schema.lesson_assets.lesson_id, lessonId))
-      .limit(1);
+  /** Fetch youtube_video_id from lesson_assets → media_assets join.
+   *  lesson_assets has RLS enabled, so withTenantContext is required. */
+  private async fetchYoutubeVideoId(
+    lessonId: string,
+    tenantCtx: TenantContext
+  ): Promise<string | null> {
+    const rows = await withTenantContext(this.db, tenantCtx, async (db) =>
+      db
+        .select({ youtubeVideoId: schema.media_assets.youtube_video_id })
+        .from(schema.lesson_assets)
+        .innerJoin(
+          schema.media_assets,
+          eq(schema.lesson_assets.media_asset_id, schema.media_assets.id)
+        )
+        .where(eq(schema.lesson_assets.lesson_id, lessonId))
+        .limit(1)
+    );
     return rows[0]?.youtubeVideoId ?? null;
   }
 
@@ -231,11 +239,12 @@ export class EnrichedLessonService implements OnModuleDestroy {
       timestamp: new Date().toISOString(),
     });
 
-    const youtubeVideoId = await this.fetchYoutubeVideoId(lessonId);
+    const youtubeVideoId = await this.fetchYoutubeVideoId(lessonId, tenantCtx);
     this.logger.log(`Enriched lesson published: lesson=${lessonId}`);
     return {
       id: lessonId,
       lessonId,
+      lessonTitle: lesson.title ?? '',
       youtubeVideoId,
       transcriptReady: true,
       enrichmentStatus: 'PUBLISHED',
@@ -250,6 +259,7 @@ export class EnrichedLessonService implements OnModuleDestroy {
         id: schema.lessons.id,
         courseId: schema.lessons.course_id,
         tenant_id: schema.lessons.tenant_id,
+        title: schema.lessons.title,
       })
       .from(schema.lessons)
       .where(
