@@ -2,7 +2,7 @@
  * ToolsPanel — right panel of UnifiedLearningPage.
  * Vertical ResizableGroup: top = Video + Transcript, bottom = Tabs (Annotations | AI | Collab).
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, FileText, Bot, Network } from 'lucide-react';
 import {
@@ -92,6 +92,17 @@ export function ToolsPanel({
 
   // YouTube player hook (only active when YouTube content)
   const ytPlayer = useYouTubePlayer();
+
+  // Forward seekTarget to YouTube player when isYouTube is true.
+  // seekTarget is set by parent (UnifiedLearningPage.seekTo) when transcript
+  // blocks are clicked, but VideoPlayerCore handles it internally via prop.
+  // For YouTube we must imperatively call ytPlayer.seekTo().
+  useEffect(() => {
+    if (isYouTube && seekTarget !== undefined) {
+      ytPlayer.seekTo(seekTarget);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seekTarget, isYouTube]);
 
   // Find the transcript segment active at currentTime for the Context panel.
   const activeSegment = useMemo((): TranscriptSegment | null => {
@@ -185,7 +196,7 @@ export function ToolsPanel({
               <BookOpen className="h-3.5 w-3.5" />
               {t('transcript', 'תמלול')}
             </div>
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 transcript-scroll">
               {isYouTube && enrichedBlocks.length > 0 ? (
                 <SyncTranscriptScroller
                   blocks={enrichedBlocks}

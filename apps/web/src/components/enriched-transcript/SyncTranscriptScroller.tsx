@@ -83,7 +83,7 @@ export function SyncTranscriptScroller({
   );
 
   return (
-    <div onWheel={handleWheel} className={className}>
+    <div onWheel={handleWheel} className={`min-h-0 ${className}`}>
       <EnrichedTranscriptPanel
         blocks={blocks}
         currentTime={currentTime}

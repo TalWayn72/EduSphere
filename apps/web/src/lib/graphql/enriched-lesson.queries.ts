@@ -106,3 +106,13 @@ export const PUBLISH_ENRICHED_LESSON_MUTATION = gql`
     }
   }
 `;
+
+export const CREATE_ENRICHED_BLOCKS_FROM_TRANSCRIPT_MUTATION = gql`
+  mutation CreateEnrichedBlocksFromTranscript($lessonId: ID!) {
+    createEnrichedBlocksFromTranscript(lessonId: $lessonId) {
+      id
+      enrichmentStatus
+      transcriptReady
+    }
+  }
+`;

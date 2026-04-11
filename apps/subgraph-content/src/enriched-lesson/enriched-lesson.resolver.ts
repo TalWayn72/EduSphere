@@ -11,6 +11,7 @@ import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 import { EnrichedLessonService } from './enriched-lesson.service';
+import { EnrichedLessonBlocksService } from './enriched-lesson-blocks.service';
 import {
   IngestYoutubeLessonSchema,
   UpdateCitationSchema,
@@ -42,7 +43,10 @@ function requireAuth(ctx: GqlContext): TenantContext {
 
 @Resolver('EnrichedLesson')
 export class EnrichedLessonResolver {
-  constructor(private readonly service: EnrichedLessonService) {}
+  constructor(
+    private readonly service: EnrichedLessonService,
+    private readonly blocksService: EnrichedLessonBlocksService
+  ) {}
 
   @Query('enrichedLesson')
   async getEnrichedLesson(
@@ -101,6 +105,15 @@ export class EnrichedLessonResolver {
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.service.publishEnrichedLesson(lessonId, tenantCtx);
+  }
+
+  @Mutation('createEnrichedBlocksFromTranscript')
+  async createEnrichedBlocksFromTranscript(
+    @Args('lessonId') lessonId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.blocksService.createBlocksFromSegments(lessonId, tenantCtx);
   }
 
   // ── Field Resolvers ──────────────────────────────────────────────

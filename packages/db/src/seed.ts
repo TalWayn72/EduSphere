@@ -11,6 +11,7 @@ import { seedGamification } from './seed/seed-gamification.js';
 import { seedAgentTemplates } from './seed/seed-agent-templates.js';
 import { seedAnnotationsDiscussions } from './seed/seed-annotations-discussions.js';
 import { seedExam } from './seed/seed-exam.js';
+import { seedKabbalahLesson } from './seed/seed-kabbalah-sefirat-haomer.js';
 
 const { tenants, users, courses, modules, media_assets } = schema;
 
@@ -234,6 +235,9 @@ async function seed() {
     console.log('📝 Seeding exam blueprint & items...');
     await seedExam();
 
+    console.log('🔯 Seeding Kabbalah Sefirat HaOmer lesson (YouTube 3QTC00L1x1w)...');
+    await seedKabbalahLesson();
+
     console.log('✅ Seed completed successfully!');
     console.log('');
     console.log('📊 Summary:');
@@ -257,6 +261,7 @@ async function seed() {
     console.log('   - 4 agent templates (Chavruta, Quiz, Explain, Research)');
     console.log('   - 4 annotations, 2 discussions, 5 messages');
     console.log('   - 1 ACTIVE exam blueprint + 10 MCQ items');
+    console.log('   - 1 Kabbalah lesson (ספירת העומר, YouTube 3QTC00L1x1w) + 67 enriched blocks (10 summary + 54 full transcript + 3 headings)');
   } catch (error) {
     console.error('❌ Seed failed:', error);
     process.exit(1);

@@ -86,4 +86,13 @@ extend type Mutation {
   publishEnrichedLesson(lessonId: ID!): EnrichedLesson!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """
+  Auto-generate enriched transcript blocks from existing transcript segments.
+  Groups consecutive segments into ~2-minute TEXT blocks and prepends a HEADING.
+  Idempotent — safe to call multiple times.
+  """
+  createEnrichedBlocksFromTranscript(lessonId: ID!): EnrichedLesson!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }

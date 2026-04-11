@@ -4,7 +4,7 @@
  * prop routing to sub-components.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ToolsPanel } from './UnifiedLearningPage.tools-panel';
 import { AnnotationLayer, type Annotation } from '@/types/annotations';
 import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
@@ -74,6 +74,36 @@ vi.mock('@/components/ContextPanel', () => ({
 
 vi.mock('@/components/VideoSketchOverlay', () => ({
   VideoSketchOverlay: () => <div data-testid="video-sketch-overlay" />,
+}));
+
+// Mock for YouTube seek regression test
+const mockYtSeekTo = vi.fn();
+vi.mock('@/hooks/useYouTubePlayer', () => ({
+  useYouTubePlayer: () => ({
+    playerRef: { current: null },
+    currentTime: 0,
+    duration: 0,
+    isPlaying: false,
+    play: vi.fn(),
+    pause: vi.fn(),
+    seekTo: mockYtSeekTo,
+    togglePlay: vi.fn(),
+    handleTimeUpdate: vi.fn(),
+    handleReady: vi.fn(),
+    handleStateChange: vi.fn(),
+  }),
+}));
+
+vi.mock('@/components/youtube/YouTubeEmbedPlayer', () => ({
+  YouTubeEmbedPlayer: vi.fn((_props: unknown, _ref: unknown) => (
+    <div data-testid="youtube-embed-player" />
+  )),
+}));
+
+vi.mock('@/components/enriched-transcript/SyncTranscriptScroller', () => ({
+  SyncTranscriptScroller: () => (
+    <div data-testid="sync-transcript-scroller" />
+  ),
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -213,5 +243,49 @@ describe('ToolsPanel', () => {
     fireEvent.click(tabs[1]!);
     expect(tabs[0]?.getAttribute('aria-selected')).toBe('false');
     expect(tabs[1]?.getAttribute('aria-selected')).toBe('true');
+  });
+
+  describe('YouTube seek — click-to-seek regression (BUG: seekTarget not forwarded to ytPlayer)', () => {
+    const ytProps = {
+      ...baseProps,
+      youtubeVideoId: 'abc123',
+      enrichedBlocks: [],
+    };
+
+    it('calls ytPlayer.seekTo when seekTarget changes for YouTube content', () => {
+      const { rerender } = render(<ToolsPanel {...ytProps} seekTarget={undefined} />);
+
+      act(() => {
+        rerender(<ToolsPanel {...ytProps} seekTarget={42} />);
+      });
+
+      expect(mockYtSeekTo).toHaveBeenCalledWith(42);
+    });
+
+    it('does NOT call ytPlayer.seekTo when seekTarget is undefined', () => {
+      mockYtSeekTo.mockClear();
+      render(<ToolsPanel {...ytProps} seekTarget={undefined} />);
+      expect(mockYtSeekTo).not.toHaveBeenCalled();
+    });
+
+    it('renders YouTubeEmbedPlayer instead of VideoPlayerCore for YouTube content', () => {
+      render(<ToolsPanel {...ytProps} />);
+      expect(screen.getByTestId('youtube-embed-player')).toBeDefined();
+      expect(screen.queryByTestId('video-player-core')).toBeNull();
+    });
+
+    it('renders SyncTranscriptScroller when enrichedBlocks are present', () => {
+      const block = {
+        id: 'b1',
+        lessonId: 'l1',
+        blockType: 'TEXT' as const,
+        blockOrder: 0,
+        content: { text: 'hello' },
+        startTime: 5,
+        endTime: 10,
+      };
+      render(<ToolsPanel {...ytProps} enrichedBlocks={[block]} />);
+      expect(screen.getByTestId('sync-transcript-scroller')).toBeDefined();
+    });
   });
 });

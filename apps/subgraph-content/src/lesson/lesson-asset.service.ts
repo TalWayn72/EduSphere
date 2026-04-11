@@ -8,6 +8,8 @@ import {
   createDatabaseConnection,
   schema,
   eq,
+  and,
+  or,
   closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
@@ -79,6 +81,35 @@ export class LessonAssetService implements OnModuleDestroy {
     input: AddLessonAssetInput,
     tenantCtx: TenantContext
   ) {
+    // Deduplication guard: return existing asset if one with the same URL already exists.
+    // This prevents duplicate rows when addAsset is called multiple times (e.g. lesson wizard
+    // retries or seed reruns) for the same lesson + source_url / file_url combination.
+    const urlToCheck = input.sourceUrl ?? input.fileUrl ?? null;
+    if (urlToCheck) {
+      const [existing] = await this.db
+        .select()
+        .from(schema.lesson_assets)
+        .where(
+          and(
+            eq(schema.lesson_assets.lesson_id, lessonId),
+            eq(schema.lesson_assets.asset_type, input.assetType),
+            or(
+              eq(schema.lesson_assets.source_url, urlToCheck),
+              eq(schema.lesson_assets.file_url, urlToCheck)
+            )
+          )
+        )
+        .limit(1);
+
+      if (existing) {
+        this.logger.warn(
+          `[LessonAssetService] Duplicate asset skipped for lesson "${lessonId}" ` +
+            `(url: ${urlToCheck}, type: ${input.assetType})`
+        );
+        return this.mapAsset(existing as unknown as Record<string, unknown>);
+      }
+    }
+
     let row: Record<string, unknown> | undefined;
     try {
       [row] = (await this.db

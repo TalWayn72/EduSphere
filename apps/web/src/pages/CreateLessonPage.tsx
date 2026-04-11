@@ -19,6 +19,7 @@ import {
   CREATE_LESSON_MUTATION,
   ADD_LESSON_ASSET_MUTATION,
 } from '@/lib/graphql/lesson.queries';
+import { CREATE_ENRICHED_BLOCKS_FROM_TRANSCRIPT_MUTATION } from '@/lib/graphql/enriched-lesson.queries';
 import { useLessonPipelineStore } from '@/lib/lesson-pipeline.store';
 import { PageShell } from '@/components/PageShell';
 import { CreateLessonStep1 } from './CreateLessonPage.step1';
@@ -62,6 +63,9 @@ export function CreateLessonPage() {
     CREATE_LESSON_MUTATION
   );
   const [, addAsset] = useMutation(ADD_LESSON_ASSET_MUTATION);
+  const [, createEnrichedBlocks] = useMutation(
+    CREATE_ENRICHED_BLOCKS_FROM_TRANSCRIPT_MUTATION
+  );
   const loadTemplate = useLessonPipelineStore((s) => s.loadTemplate);
   const user = getCurrentUser();
 
@@ -108,6 +112,10 @@ export function CreateLessonPage() {
           lessonId,
           input: { assetType: 'VIDEO', sourceUrl: collectedVideoUrl },
         });
+        // Fire-and-forget: trigger enriched block generation from transcript.
+        // The NATS consumer will also auto-generate blocks when transcription
+        // completes, so this call is idempotent and safe to ignore errors.
+        createEnrichedBlocks({ lessonId }).catch(() => undefined);
       }
       if (selectedTemplate) loadTemplate(selectedTemplate);
       navigate(`/courses/${courseId}/lessons/${lessonId}/pipeline`);

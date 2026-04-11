@@ -326,6 +326,26 @@
   }
 }
 
+/* ── Transcript panel scrollbar — visible thin scrollbar without extra deps ─ */
+.transcript-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(var(--border)) transparent; /* Firefox: thumb track */
+}
+.transcript-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.transcript-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.transcript-scroll::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border));
+  border-radius: 3px;
+}
+.dark .transcript-scroll::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.4);
+}
+
 /* ── RTL Support — applied when dir="rtl" is set on <html> ──────────────── */
 
 /* Flip space-x-* margin direction for RTL layouts */
