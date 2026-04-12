@@ -91,17 +91,27 @@ const BLOCKS: EnrichedTranscriptBlock[] = [
 
 describe('SyncTranscriptScroller', () => {
   let scrollIntoViewMock: ReturnType<typeof vi.fn>;
+  let originalScrollIntoView: typeof Element.prototype.scrollIntoView;
 
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
+    // jsdom does not implement scrollIntoView — assign a mock and save the
+    // original (undefined) value so we can restore it in afterEach.
+    originalScrollIntoView = Element.prototype.scrollIntoView;
     scrollIntoViewMock = vi.fn();
-    // Attach scrollIntoView mock to all elements via prototype
     Element.prototype.scrollIntoView = scrollIntoViewMock;
   });
 
   afterEach(() => {
-    vi.runAllTimers();
+    // Restore the prototype before clearing timers to avoid any
+    // scrollIntoView calls from still-pending timer callbacks.
+    Element.prototype.scrollIntoView = originalScrollIntoView;
+    // Clear pending timers without executing them — the component is unmounted
+    // by @testing-library/react's cleanup, so running timers here would fire
+    // callbacks against an already-unmounted tree and can cause React to
+    // schedule state updates outside of act(), hanging the test worker.
+    vi.clearAllTimers();
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
