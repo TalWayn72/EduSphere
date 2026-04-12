@@ -44,10 +44,10 @@ describe('initializeGraphOntology()', () => {
     mockExecuteCypher.mockResolvedValue([]);
   });
 
-  it('calls executeCypher exactly 5 times (one per vertex type)', async () => {
+  it('calls executeCypher exactly 6 times (one per vertex type)', async () => {
     const db = buildMockDb();
     await initializeGraphOntology(db);
-    expect(mockExecuteCypher).toHaveBeenCalledTimes(5);
+    expect(mockExecuteCypher).toHaveBeenCalledTimes(6);
   });
 
   it('creates a Concept vertex', async () => {
@@ -85,11 +85,18 @@ describe('initializeGraphOntology()', () => {
     expect(queries.some((q) => q.includes(':Source'))).toBe(true);
   });
 
-  it('all 5 vertex types are initialized with tenant_id=default', async () => {
+  it('creates a Domain vertex', async () => {
     const db = buildMockDb();
     await initializeGraphOntology(db);
     const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
-    const vertexTypes = ['Concept', 'Person', 'TopicCluster', 'Term', 'Source'];
+    expect(queries.some((q) => q.includes(':Domain'))).toBe(true);
+  });
+
+  it('all 6 vertex types are initialized with tenant_id=default', async () => {
+    const db = buildMockDb();
+    await initializeGraphOntology(db);
+    const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
+    const vertexTypes = ['Concept', 'Person', 'TopicCluster', 'Term', 'Source', 'Domain'];
     for (const vtype of vertexTypes) {
       const matching = queries.find((q) => q.includes(`:${vtype}`));
       expect(matching).toBeDefined();
