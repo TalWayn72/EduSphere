@@ -57,7 +57,12 @@ export class EnrichedLessonBlocksService {
     }
 
     const groups = this.groupSegments(segments);
-    const blocks = this.buildBlocks(lessonId, tenantCtx.tenantId, lesson.title ?? '', groups);
+    const blocks = this.buildBlocks(
+      lessonId,
+      tenantCtx.tenantId,
+      lesson.title ?? '',
+      groups
+    );
 
     await withTenantContext(this.db, tenantCtx, async (db) => {
       await db
@@ -148,10 +153,24 @@ export class EnrichedLessonBlocksService {
    * Group segments into chunks where each chunk spans at most BLOCK_DURATION_SECONDS.
    */
   private groupSegments(
-    segments: Array<{ id: string; start_time: string; end_time: string; text: string }>
-  ): Array<{ segmentId: string; startTime: number; endTime: number; text: string }[]> {
-    const groups: Array<{ segmentId: string; startTime: number; endTime: number; text: string }[]> = [];
-    let current: { segmentId: string; startTime: number; endTime: number; text: string }[] = [];
+    segments: Array<{
+      id: string;
+      start_time: string;
+      end_time: string;
+      text: string;
+    }>
+  ): Array<
+    { segmentId: string; startTime: number; endTime: number; text: string }[]
+  > {
+    const groups: Array<
+      { segmentId: string; startTime: number; endTime: number; text: string }[]
+    > = [];
+    let current: {
+      segmentId: string;
+      startTime: number;
+      endTime: number;
+      text: string;
+    }[] = [];
     let groupStart = 0;
 
     for (const seg of segments) {
@@ -168,7 +187,12 @@ export class EnrichedLessonBlocksService {
         groupStart = start;
       }
 
-      current.push({ segmentId: seg.id, startTime: start, endTime: end, text: seg.text });
+      current.push({
+        segmentId: seg.id,
+        startTime: start,
+        endTime: end,
+        text: seg.text,
+      });
     }
 
     if (current.length > 0) groups.push(current);
@@ -180,7 +204,9 @@ export class EnrichedLessonBlocksService {
     lessonId: string,
     tenantId: string,
     lessonTitle: string,
-    groups: Array<{ segmentId: string; startTime: number; endTime: number; text: string }[]>
+    groups: Array<
+      { segmentId: string; startTime: number; endTime: number; text: string }[]
+    >
   ) {
     const blocks: Array<{
       lesson_id: string;

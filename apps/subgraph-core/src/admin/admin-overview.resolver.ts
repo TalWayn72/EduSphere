@@ -21,7 +21,9 @@ export class AdminOverviewResolver {
     try {
       requireAnyRole(context.authContext, ['ORG_ADMIN', 'SUPER_ADMIN']);
     } catch {
-      throw new ForbiddenException('Insufficient role: ORG_ADMIN or SUPER_ADMIN required');
+      throw new ForbiddenException(
+        'Insufficient role: ORG_ADMIN or SUPER_ADMIN required'
+      );
     }
     return this.adminOverviewService.getOverview(
       context.authContext.tenantId || ''
@@ -36,7 +38,9 @@ export class AdminOverviewResolver {
     try {
       requireAnyRole(context.authContext, ['ORG_ADMIN', 'SUPER_ADMIN']);
     } catch {
-      throw new ForbiddenException('Insufficient role: ORG_ADMIN or SUPER_ADMIN required');
+      throw new ForbiddenException(
+        'Insufficient role: ORG_ADMIN or SUPER_ADMIN required'
+      );
     }
     return this.adminOverviewService.getDashboardStats(
       context.authContext.tenantId || ''

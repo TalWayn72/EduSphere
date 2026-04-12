@@ -38,7 +38,8 @@ export class UserResolver {
 
   @Query('user')
   async getUser(@Args('id') id: string, @Context() context: GraphQLContext) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     return this.userService.findById(id, context.authContext);
   }
 
@@ -48,7 +49,8 @@ export class UserResolver {
     @Args('offset') offset: number,
     @Context() context: GraphQLContext
   ) {
-    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
     return this.userService.findAll(limit, offset, context.authContext);
   }
 

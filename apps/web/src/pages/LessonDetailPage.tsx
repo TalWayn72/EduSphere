@@ -110,7 +110,10 @@ export function LessonDetailPage() {
     return (
       <Layout>
         <div className="p-6 text-red-600 dark:text-red-400">
-          {t('lesson.loadError', 'Error loading lesson. Please try again later.')}
+          {t(
+            'lesson.loadError',
+            'Error loading lesson. Please try again later.'
+          )}
         </div>
       </Layout>
     );
@@ -128,10 +131,22 @@ export function LessonDetailPage() {
   }
 
   const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-    DRAFT: { label: t('lesson.statusDraft', 'Draft'), color: 'bg-muted text-foreground' },
-    PROCESSING: { label: t('lesson.statusProcessing', 'Processing...'), color: 'bg-yellow-100 text-yellow-700' },
-    READY: { label: t('lesson.statusReady', 'Ready'), color: 'bg-green-100 text-green-700' },
-    PUBLISHED: { label: t('lesson.statusPublished', 'Published'), color: 'bg-blue-100 text-blue-700' },
+    DRAFT: {
+      label: t('lesson.statusDraft', 'Draft'),
+      color: 'bg-muted text-foreground',
+    },
+    PROCESSING: {
+      label: t('lesson.statusProcessing', 'Processing...'),
+      color: 'bg-yellow-100 text-yellow-700',
+    },
+    READY: {
+      label: t('lesson.statusReady', 'Ready'),
+      color: 'bg-green-100 text-green-700',
+    },
+    PUBLISHED: {
+      label: t('lesson.statusPublished', 'Published'),
+      color: 'bg-blue-100 text-blue-700',
+    },
   };
 
   const statusInfo = STATUS_LABELS[lesson.status] ?? {
@@ -146,7 +161,10 @@ export function LessonDetailPage() {
           className="mb-4"
           items={[
             { label: t('backToCourses', 'Courses'), href: '/courses' },
-            { label: t('courseDetails', 'Course'), href: `/courses/${courseId}` },
+            {
+              label: t('courseDetails', 'Course'),
+              href: `/courses/${courseId}`,
+            },
             { label: lesson.title },
           ]}
         />
@@ -177,7 +195,9 @@ export function LessonDetailPage() {
                 : t('createLesson.typeSequential')}
             </span>
             {lesson.series && (
-              <span>{t('lesson.series', 'Series')}: {lesson.series}</span>
+              <span>
+                {t('lesson.series', 'Series')}: {lesson.series}
+              </span>
             )}
             {lesson.lessonDate && (
               <span>

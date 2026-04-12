@@ -78,7 +78,9 @@ void (async () => {
           // ignore
         }
       }
-    })().catch(() => { /* ignore */ });
+    })().catch(() => {
+      /* ignore */
+    });
   } catch (err) {
     logger.warn(`NATS subscription setup failed: ${String(err)}`);
   }

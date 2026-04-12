@@ -6,14 +6,12 @@
  * Can also discover new recurring unrecognized patterns.
  */
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  createDatabaseConnection,
-  schema,
-  eq,
-  and,
-  sql,
+import { createDatabaseConnection, schema, eq, and, sql } from '@edusphere/db';
+import type {
+  JargonTerm,
+  JargonOccurrence,
+  NewJargonOccurrence,
 } from '@edusphere/db';
-import type { JargonTerm, JargonOccurrence, NewJargonOccurrence } from '@edusphere/db';
 import { EmbeddingProviderService } from '../embedding/embedding-provider.service.js';
 import { JargonTermService } from './jargon-term.service.js';
 
@@ -151,7 +149,10 @@ export class JargonDetectionService {
           count: 0,
           example: segment.text,
         };
-        patternMap.set(word, { count: existing.count + 1, example: existing.example });
+        patternMap.set(word, {
+          count: existing.count + 1,
+          example: existing.example,
+        });
       }
     }
 
@@ -204,12 +205,25 @@ export class JargonDetectionService {
   private matchTermsInSegment(
     text: string,
     terms: JargonTerm[]
-  ): Array<{ term: JargonTerm; original: string; corrected?: string; confidence: number }> {
-    const matches: Array<{ term: JargonTerm; original: string; corrected?: string; confidence: number }> = [];
+  ): Array<{
+    term: JargonTerm;
+    original: string;
+    corrected?: string;
+    confidence: number;
+  }> {
+    const matches: Array<{
+      term: JargonTerm;
+      original: string;
+      corrected?: string;
+      confidence: number;
+    }> = [];
     const lowerText = text.toLowerCase();
 
     for (const term of terms) {
-      const forms = [term.canonical_form, ...(Array.isArray(term.alt_forms) ? term.alt_forms as string[] : [])];
+      const forms = [
+        term.canonical_form,
+        ...(Array.isArray(term.alt_forms) ? (term.alt_forms as string[]) : []),
+      ];
       for (const form of forms) {
         if (form.length < 2) continue;
         const idx = lowerText.indexOf(form.toLowerCase());
@@ -275,10 +289,7 @@ export class JargonDetectionService {
       const matched = terms.find((t) => t.id === top.term_id);
       return matched ? { term: matched, confidence: similarity } : null;
     } catch (err) {
-      this.logger.debug(
-        { err, abbr },
-        'Fuzzy abbreviation match skipped'
-      );
+      this.logger.debug({ err, abbr }, 'Fuzzy abbreviation match skipped');
       return null;
     }
   }

@@ -123,9 +123,7 @@ describe('SecondaryStatCards', () => {
   });
 
   it('shows placeholder "..." for Study Groups when count is null', () => {
-    render(
-      <SecondaryStatCards {...defaultProps} studyGroupsCount={null} />
-    );
+    render(<SecondaryStatCards {...defaultProps} studyGroupsCount={null} />);
     const dots = screen.getAllByText('...');
     expect(dots.length).toBeGreaterThanOrEqual(1);
   });

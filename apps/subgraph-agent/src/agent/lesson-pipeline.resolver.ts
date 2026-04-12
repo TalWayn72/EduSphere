@@ -149,6 +149,12 @@ export class LessonPipelineResolver {
       '[LessonPipelineResolver] generateLesson started with real citations'
     );
 
-    return runLessonPipeline(input, model, executionId, searchFn, graphEnrichFn);
+    return runLessonPipeline(
+      input,
+      model,
+      executionId,
+      searchFn,
+      graphEnrichFn
+    );
   }
 }

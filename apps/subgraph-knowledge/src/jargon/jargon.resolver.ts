@@ -43,10 +43,7 @@ export class JargonDomainResolver {
   }
 
   @Query()
-  async jargonDomain(
-    @Args('id') id: string,
-    @Context() ctx: GraphQLContext
-  ) {
+  async jargonDomain(@Args('id') id: string, @Context() ctx: GraphQLContext) {
     const { tenantId } = this.auth(ctx);
     const d = await this.domainService.findById(id, tenantId);
     return this.toGQL(d);
@@ -88,9 +85,7 @@ export class JargonDomainResolver {
   }
 
   @ResolveField('relatedDomains')
-  async relatedDomains(
-    @Parent() domain: { id: string; tenantId: string }
-  ) {
+  async relatedDomains(@Parent() domain: { id: string; tenantId: string }) {
     const rows = await this.domainService.getRelatedDomains(
       domain.id,
       domain.tenantId
@@ -153,16 +148,18 @@ export class JargonTermResolver {
   ) {
     const { tenantId } = this.auth(ctx);
     const rows = search
-      ? await this.termService.searchTerms(domainId, tenantId, search, limit ?? 50)
+      ? await this.termService.searchTerms(
+          domainId,
+          tenantId,
+          search,
+          limit ?? 50
+        )
       : await this.termService.listByDomain(domainId, tenantId, limit ?? 50);
     return rows.map((t) => this.toGQL(t));
   }
 
   @Query()
-  async jargonTerm(
-    @Args('id') id: string,
-    @Context() ctx: GraphQLContext
-  ) {
+  async jargonTerm(@Args('id') id: string, @Context() ctx: GraphQLContext) {
     const { tenantId } = this.auth(ctx);
     const t = await this.termService.findById(id, tenantId);
     return this.toGQL(t);
@@ -205,9 +202,7 @@ export class JargonTermResolver {
   }
 
   @ResolveField('domain')
-  async domain(
-    @Parent() term: { domainId: string; tenantId: string }
-  ) {
+  async domain(@Parent() term: { domainId: string; tenantId: string }) {
     const d = await this.domainService.findById(term.domainId, term.tenantId);
     return {
       id: d.id,
@@ -269,9 +264,7 @@ export class JargonOccurrenceResolver {
   }
 
   @ResolveField('term')
-  async term(
-    @Parent() occ: { termId: string; tenantId: string }
-  ) {
+  async term(@Parent() occ: { termId: string; tenantId: string }) {
     const t = await this.termService.findById(occ.termId, occ.tenantId);
     return {
       id: t.id,

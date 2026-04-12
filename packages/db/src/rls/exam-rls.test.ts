@@ -67,7 +67,9 @@ describe('exam_sessions RLS policy structure', () => {
 
   it('uses app.current_user_id for user isolation (SI-1)', () => {
     expect(sessionsFile).toContain('app.current_user_id');
-    expect(sessionsFile).not.toMatch(/current_setting\('app\.current_user'[^_]/);
+    expect(sessionsFile).not.toMatch(
+      /current_setting\('app\.current_user'[^_]/
+    );
   });
 
   it('allows INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN to read all sessions in tenant', () => {

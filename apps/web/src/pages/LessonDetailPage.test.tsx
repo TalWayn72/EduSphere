@@ -157,9 +157,7 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(
-      screen.getByText(/Error loading lesson|שגיאה/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Error loading lesson|שגיאה/)).toBeInTheDocument();
   });
 
   it('shows "Lesson not found" when lesson is null', () => {
@@ -364,9 +362,7 @@ describe('LessonDetailPage', () => {
         <LessonDetailPage />
       </MemoryRouter>
     );
-    expect(
-      screen.getByText(/Error loading lesson|שגיאה/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Error loading lesson|שגיאה/)).toBeInTheDocument();
     expect(
       screen.queryByText(/Session expired|הסשן פג תוקף/)
     ).not.toBeInTheDocument();

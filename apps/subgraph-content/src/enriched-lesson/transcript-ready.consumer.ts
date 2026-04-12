@@ -15,7 +15,12 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { createDatabaseConnection, schema, eq } from '@edusphere/db';
 import { EnrichedLessonBlocksService } from './enriched-lesson-blocks.service';
@@ -73,12 +78,17 @@ export class TranscriptReadyConsumer implements OnModuleInit, OnModuleDestroy {
       try {
         const raw = JSON.parse(this.sc.decode(msg.data)) as unknown;
         if (!isValidPayload(raw)) {
-          this.logger.warn('Received malformed transcription.completed payload');
+          this.logger.warn(
+            'Received malformed transcription.completed payload'
+          );
           continue;
         }
         await this.handleTranscriptionCompleted(raw);
       } catch (err) {
-        this.logger.error({ err }, 'Error processing transcription.completed message');
+        this.logger.error(
+          { err },
+          'Error processing transcription.completed message'
+        );
       }
     }
   }

@@ -27,10 +27,6 @@ import { EmbeddingModule } from '../embedding/embedding.module.js';
     JargonTermResolver,
     JargonOccurrenceResolver,
   ],
-  exports: [
-    JargonDomainService,
-    JargonTermService,
-    JargonDetectionService,
-  ],
+  exports: [JargonDomainService, JargonTermService, JargonDetectionService],
 })
 export class JargonModule {}

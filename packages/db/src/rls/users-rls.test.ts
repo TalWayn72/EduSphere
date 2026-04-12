@@ -81,12 +81,16 @@ const SUPER_ADMIN_CTX: TenantContext = {
 
 describe('usersRLSPolicy: SQL references app.current_tenant', () => {
   it('USING clause references app.current_tenant', () => {
-    const raw = sqlToString(usersRLSPolicy as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      usersRLSPolicy as Parameters<typeof sqlToString>[0]
+    );
     expect(raw).toContain('app.current_tenant');
   });
 
   it('WITH CHECK clause references app.current_tenant', () => {
-    const raw = sqlToString(usersRLSPolicy as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      usersRLSPolicy as Parameters<typeof sqlToString>[0]
+    );
     const withCheckIdx = raw.toUpperCase().indexOf('WITH CHECK');
     expect(withCheckIdx).toBeGreaterThan(-1);
     const withCheckSection = raw.slice(withCheckIdx);
@@ -94,13 +98,17 @@ describe('usersRLSPolicy: SQL references app.current_tenant', () => {
   });
 
   it('has both USING and WITH CHECK clauses', () => {
-    const raw = sqlToString(usersRLSPolicy as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      usersRLSPolicy as Parameters<typeof sqlToString>[0]
+    );
     expect(raw.toUpperCase()).toContain('USING');
     expect(raw.toUpperCase()).toContain('WITH CHECK');
   });
 
   it('policy enables row level security', () => {
-    const raw = sqlToString(usersRLSPolicy as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      usersRLSPolicy as Parameters<typeof sqlToString>[0]
+    );
     expect(raw.toUpperCase()).toContain('ROW LEVEL SECURITY');
   });
 });

@@ -112,10 +112,7 @@ export class JargonTermService {
         .insert(schema.jargon_terms)
         .values(insert)
         .returning();
-      this.logger.log(
-        { tenantId, termId: created!.id },
-        'Added jargon term'
-      );
+      this.logger.log({ tenantId, termId: created!.id }, 'Added jargon term');
       // Fire-and-forget embedding generation
       this.generateEmbedding(created!.id).catch((err) =>
         this.logger.warn(
@@ -246,7 +243,9 @@ export class JargonTermService {
 
     if (!term) return;
 
-    const altForms = Array.isArray(term.alt_forms) ? term.alt_forms as string[] : [];
+    const altForms = Array.isArray(term.alt_forms)
+      ? (term.alt_forms as string[])
+      : [];
     const text = [term.canonical_form, ...altForms].join(' ');
 
     try {

@@ -14,7 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LESSON_QUERY } from '@/lib/graphql/lesson.queries';
 import { ENRICHED_LESSON_QUERY } from '@/lib/graphql/enriched-lesson.queries';
-import { EnrichedBlocksSection, YouTubeEmbed } from './lesson-preview/EnrichedBlocksSection';
+import {
+  EnrichedBlocksSection,
+  YouTubeEmbed,
+} from './lesson-preview/EnrichedBlocksSection';
 import type { EnrichedTranscriptBlock } from '@/components/enriched-transcript/enriched-transcript.types';
 
 const UUID_RE =
@@ -161,9 +164,10 @@ export function LessonPreviewPage() {
       );
     return match?.[1] ?? null;
   }
-  const youtubeVideoIdFromAssets = lesson.assets
-    .map((a) => (a.sourceUrl ? extractYouTubeId(a.sourceUrl) : null))
-    .find(Boolean) ?? null;
+  const youtubeVideoIdFromAssets =
+    lesson.assets
+      .map((a) => (a.sourceUrl ? extractYouTubeId(a.sourceUrl) : null))
+      .find(Boolean) ?? null;
   const youtubeVideoId = enriched?.youtubeVideoId ?? youtubeVideoIdFromAssets;
   const pipelineResults = lesson.pipeline?.currentRun?.results ?? [];
   const hasContent = hasEnrichedBlocks || pipelineResults.length > 0;

@@ -119,12 +119,9 @@ export function ProfilePage() {
   const coursesCount = coursesResult.data?.courses?.length ?? '—';
 
   const totalPoints = pointsResult.data?.myTotalPoints;
-  const annotationCount =
-    (
-      annotationsResult.data as
-        | { annotationsByUser?: unknown[] }
-        | undefined
-    )?.annotationsByUser?.length;
+  const annotationCount = (
+    annotationsResult.data as { annotationsByUser?: unknown[] } | undefined
+  )?.annotationsByUser?.length;
 
   const keycloakAccountUrl = `${import.meta.env.VITE_KEYCLOAK_URL ?? ''}/realms/${import.meta.env.VITE_KEYCLOAK_REALM ?? 'edusphere'}/account`;
 
@@ -177,9 +174,15 @@ export function ProfilePage() {
                 href={keycloakAccountUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={t('profile.manageAvatar', 'Manage avatar in account settings')}
+                title={t(
+                  'profile.manageAvatar',
+                  'Manage avatar in account settings'
+                )}
                 className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label={t('profile.manageAvatar', 'Manage avatar in account settings')}
+                aria-label={t(
+                  'profile.manageAvatar',
+                  'Manage avatar in account settings'
+                )}
               >
                 <ExternalLink className="h-5 w-5 text-white dark:text-white" />
               </a>

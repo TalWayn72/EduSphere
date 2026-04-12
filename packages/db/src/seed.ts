@@ -235,7 +235,9 @@ async function seed() {
     console.log('📝 Seeding exam blueprint & items...');
     await seedExam();
 
-    console.log('🔯 Seeding Kabbalah Sefirat HaOmer lesson (YouTube 3QTC00L1x1w)...');
+    console.log(
+      '🔯 Seeding Kabbalah Sefirat HaOmer lesson (YouTube 3QTC00L1x1w)...'
+    );
     await seedKabbalahLesson();
 
     console.log('✅ Seed completed successfully!');
@@ -256,12 +258,16 @@ async function seed() {
     console.log(
       '   - 5 concept embeddings (768-dim, Ollama or fixture vectors)'
     );
-    console.log('   - 2 enrollments + ~15 progress records (student 60% complete)');
+    console.log(
+      '   - 2 enrollments + ~15 progress records (student 60% complete)'
+    );
     console.log('   - 5 badges, 3 user-badge awards, XP totals, 5-day streak');
     console.log('   - 4 agent templates (Chavruta, Quiz, Explain, Research)');
     console.log('   - 4 annotations, 2 discussions, 5 messages');
     console.log('   - 1 ACTIVE exam blueprint + 10 MCQ items');
-    console.log('   - 1 Kabbalah lesson (ספירת העומר, YouTube 3QTC00L1x1w) + 67 enriched blocks (10 summary + 54 full transcript + 3 headings)');
+    console.log(
+      '   - 1 Kabbalah lesson (ספירת העומר, YouTube 3QTC00L1x1w) + 67 enriched blocks (10 summary + 54 full transcript + 3 headings)'
+    );
   } catch (error) {
     console.error('❌ Seed failed:', error);
     process.exit(1);

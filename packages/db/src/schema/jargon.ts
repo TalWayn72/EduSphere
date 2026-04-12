@@ -209,10 +209,9 @@ export const jargon_occurrences = pgTable(
     segment_id: uuid('segment_id').references(() => transcript_segments.id, {
       onDelete: 'set null',
     }),
-    block_id: uuid('block_id').references(
-      () => enriched_transcript_blocks.id,
-      { onDelete: 'set null' }
-    ),
+    block_id: uuid('block_id').references(() => enriched_transcript_blocks.id, {
+      onDelete: 'set null',
+    }),
     start_time: numeric('start_time', { precision: 10, scale: 3 }),
     end_time: numeric('end_time', { precision: 10, scale: 3 }),
     original_text: text('original_text').notNull(),

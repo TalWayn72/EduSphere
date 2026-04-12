@@ -25,9 +25,9 @@
 
 ### ✅ Fixed (10 Apr 2026 Session)
 
-| ID                    | Issue                                                                                                                    | Fixed In    |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| SEC-EMBED-RLS         | RLS policies added to embedding tables — tenant isolation enforced on vector store                                       | 10 Apr 2026 |
+| ID                    | Issue                                                                                                                   | Fixed In    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------- |
+| SEC-EMBED-RLS         | RLS policies added to embedding tables — tenant isolation enforced on vector store                                      | 10 Apr 2026 |
 | SEC-AUTH-HARDENING    | Auth validation hardening — JWT audience checks tightened across all 6 subgraphs                                        | 10 Apr 2026 |
 | SEC-GQL-AUTH          | `@authenticated` directives added to all previously unprotected resolvers                                               | 10 Apr 2026 |
 | FEAT-AGENT-WORKFLOW   | Lesson pipeline agent state machine — LangGraph.js workflow with assess→quiz→explain→debate transitions                 | 10 Apr 2026 |
@@ -929,6 +929,7 @@ These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON
 **Description:** Implemented a LangGraph.js state machine for the lesson pipeline workflow. The graph supports four agent modes — `assess`, `quiz`, `explain`, and `debate` — with typed state transitions and conditional edge routing. The `LessonPipelineWorkflow` service is registered in the agent module and exposed via `lesson-pipeline.resolver.ts`. Agent session tracking is updated in real-time as the workflow progresses, with session state persisted to the DB and NATS events emitted on each transition.
 
 **Key patterns:**
+
 - `StateGraph` with typed `LessonPipelineState` — mode, context, tenantId, userId, currentNode
 - Conditional edges: `assess` can route to `quiz` or `explain` based on learner proficiency score
 - `debate` node triggers `agent.debate.started` NATS subject
@@ -993,6 +994,7 @@ These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON
 - **Files Changed:** `docker-compose.yml`, `.env.example`, `apps/subgraph-agent/.env.example`, `apps/subgraph-content/.env.example`, `apps/subgraph-knowledge/.env.example`
 
 **Changes:**
+
 - PostgreSQL and NATS health check intervals tightened (`interval: 5s`, `timeout: 3s`, `retries: 5`)
 - `mem_limit` and `mem_reservation` values aligned with production Helm chart values
 - `.env.example` files updated with new variables (`EMBEDDING_MODEL`, `HNSW_M`, `HNSW_EF_CONSTRUCTION`, `NATS_JETSTREAM_DOMAIN`)
@@ -1017,6 +1019,7 @@ These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON
 - **Files Changed:** `turbo.json`, `package.json`
 
 **Changes:** Updated `turbo.json` pipeline definitions:
+
 - `test` task now declares correct `inputs` (source files + test files) and `outputs` (coverage reports) for proper Turborepo caching
 - `test:rls`, `test:security`, and `test:federation` tasks added as named pipeline entries
 - `package.json` root scripts aligned with Turborepo task names — `test:graphql` and `test:rls` now delegate to `turbo run` rather than direct `pnpm` filter commands
@@ -1032,10 +1035,12 @@ These 9 gaps were identified during integration testing of `FEAT-SEMANTIC-LESSON
 **Changes:** Added translation keys to support new UI strings introduced in the 10 Apr 2026 batch:
 
 **courses namespace (new keys):**
+
 - `lessonPipeline.startWorkflow` / `lessonPipeline.assessMode` / `lessonPipeline.quizMode` / `lessonPipeline.explainMode` / `lessonPipeline.debateMode`
 - `embedding.indexing` / `embedding.indexed` / `embedding.searchPlaceholder`
 
 **dashboard namespace (new keys):**
+
 - `atRisk.embeddingCoverage` / `atRisk.knowledgeGapAlert`
 - `analytics.vectorSearchQueries` / `analytics.embeddingDriftWarning`
 

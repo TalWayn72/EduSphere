@@ -120,8 +120,9 @@ export function UnifiedLearningPage() {
       .slice()
       .sort((a, b) => a.blockOrder - b.blockOrder)
       .map((b) => {
-        const text =
-          (b.content as Record<string, unknown>)['text'] as string | undefined;
+        const text = (b.content as Record<string, unknown>)['text'] as
+          | string
+          | undefined;
         if (!text) return '';
         if (b.blockType === 'HEADING') return `## ${text}`;
         return text;
@@ -240,8 +241,7 @@ export function UnifiedLearningPage() {
       color: '#3b82f6',
     }));
 
-  const title =
-    item?.title ?? enrichedLesson.data?.lesson?.title ?? videoTitle;
+  const title = item?.title ?? enrichedLesson.data?.lesson?.title ?? videoTitle;
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {

@@ -6,7 +6,11 @@
  * Note: examItemStatistics moved to PsychometricsResolver for live CTT analysis.
  */
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { UnauthorizedException, Logger, BadRequestException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { generateText } from 'ai';
 import { createOllama } from 'ollama-ai-provider';
 import type { GraphQLContext } from '../auth/auth.middleware';
@@ -88,7 +92,10 @@ export class ExamItemResolver {
       throw new BadRequestException(parsed.error.issues);
     }
     const { courseId, domainTag, bloomLevels, count } = parsed.data;
-    this.logger.log({ tenantId, userId, courseId, domainTag, count }, 'generateExamItems');
+    this.logger.log(
+      { tenantId, userId, courseId, domainTag, count },
+      'generateExamItems'
+    );
 
     const hasAI = Boolean(
       process.env['OPENAI_API_KEY'] ||
@@ -99,14 +106,16 @@ export class ExamItemResolver {
     if (!hasAI) {
       throw new BadRequestException(
         'AI generation is unavailable: no AI provider configured. ' +
-        'Set OLLAMA_URL, OPENAI_API_KEY, or ANTHROPIC_API_KEY to enable AI exam generation.'
+          'Set OLLAMA_URL, OPENAI_API_KEY, or ANTHROPIC_API_KEY to enable AI exam generation.'
       );
     }
 
     try {
       const ollamaUrl = process.env['OLLAMA_URL'] ?? 'http://localhost:11434';
       const ollama = createOllama({ baseURL: ollamaUrl + '/api' });
-      const model = ollama(process.env['OLLAMA_MODEL'] ?? 'llama3.2') as ReturnType<typeof ollama>;
+      const model = ollama(
+        process.env['OLLAMA_MODEL'] ?? 'llama3.2'
+      ) as ReturnType<typeof ollama>;
 
       const prompt = `Generate ${count} multiple-choice exam questions for the topic "${domainTag}" in course ${courseId}.
 Bloom's taxonomy levels required: ${bloomLevels.join(', ')}.
@@ -119,15 +128,24 @@ Output ONLY the JSON array, no markdown fences.`;
         maxOutputTokens: 2000,
       });
 
-      let items: Array<{ stem: string; options: string[]; correctIndex: number; bloomLevel: string }> = [];
+      let items: Array<{
+        stem: string;
+        options: string[];
+        correctIndex: number;
+        bloomLevel: string;
+      }> = [];
       try {
         items = JSON.parse(text.trim()) as typeof items;
       } catch {
-        this.logger.warn({ tenantId }, 'generateExamItems: AI response not valid JSON');
+        this.logger.warn(
+          { tenantId },
+          'generateExamItems: AI response not valid JSON'
+        );
       }
 
       const validItems = items.filter(
-        (item) => item?.stem && Array.isArray(item.options) && item.options.length === 4
+        (item) =>
+          item?.stem && Array.isArray(item.options) && item.options.length === 4
       );
 
       return {
@@ -137,7 +155,11 @@ Output ONLY the JSON array, no markdown fences.`;
           id: `generated-${idx}`,
           courseId,
           stem: item.stem,
-          options: item.options.map((text, i) => ({ id: `opt-${idx}-${i}`, text, isCorrect: i === item.correctIndex })),
+          options: item.options.map((text, i) => ({
+            id: `opt-${idx}-${i}`,
+            text,
+            isCorrect: i === item.correctIndex,
+          })),
           itemType: 'MCQ',
           bloomLevel: item.bloomLevel ?? bloomLevels[0],
           difficultyEstimate: parsed.data.targetDifficulty ?? 0.5,
@@ -147,7 +169,10 @@ Output ONLY the JSON array, no markdown fences.`;
       };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error({ tenantId, err: msg }, 'generateExamItems AI call failed');
+      this.logger.error(
+        { tenantId, err: msg },
+        'generateExamItems AI call failed'
+      );
       throw new BadRequestException(`AI generation failed: ${msg}`);
     }
   }

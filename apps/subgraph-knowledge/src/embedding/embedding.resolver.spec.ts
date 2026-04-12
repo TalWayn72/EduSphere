@@ -104,14 +104,18 @@ describe('EmbeddingResolver', () => {
 
   describe('semanticSearchByContentItem()', () => {
     it('delegates to embeddingService.semanticSearchByVector (legacy shim)', async () => {
-      mockEmbeddingService.semanticSearchByVectorAndContentItem.mockResolvedValue([]);
+      mockEmbeddingService.semanticSearchByVectorAndContentItem.mockResolvedValue(
+        []
+      );
       const result = await resolver.semanticSearchByContentItem(
         'content-1',
         [0.1, 0.2],
         3,
         MOCK_GQL_CTX
       );
-      expect(mockEmbeddingService.semanticSearchByVectorAndContentItem).toHaveBeenCalledWith(
+      expect(
+        mockEmbeddingService.semanticSearchByVectorAndContentItem
+      ).toHaveBeenCalledWith(
         [0.1, 0.2],
         'content-1',
         {
@@ -126,14 +130,18 @@ describe('EmbeddingResolver', () => {
     });
 
     it('uses default limit=5 when not provided', async () => {
-      mockEmbeddingService.semanticSearchByVectorAndContentItem.mockResolvedValue([]);
+      mockEmbeddingService.semanticSearchByVectorAndContentItem.mockResolvedValue(
+        []
+      );
       await resolver.semanticSearchByContentItem(
         'content-1',
         [0.1],
         5,
         MOCK_GQL_CTX
       );
-      expect(mockEmbeddingService.semanticSearchByVectorAndContentItem).toHaveBeenCalledWith(
+      expect(
+        mockEmbeddingService.semanticSearchByVectorAndContentItem
+      ).toHaveBeenCalledWith(
         [0.1],
         'content-1',
         {

@@ -27,7 +27,11 @@ import {
   JARGON_TERMS_QUERY,
   IMPORT_JARGON_TERMS_MUTATION,
 } from '@/lib/graphql/jargon.queries';
-import type { JargonDomain, JargonTerm, AddJargonTermInput } from '@/types/jargon.types';
+import type {
+  JargonDomain,
+  JargonTerm,
+  AddJargonTermInput,
+} from '@/types/jargon.types';
 import { JargonTermForm } from '@/components/jargon/JargonTermForm';
 
 interface Props {
@@ -46,15 +50,22 @@ function parseCsvToTerms(csv: string, domainId: string): AddJargonTermInput[] {
   // Skip header row
   return lines.slice(1).flatMap((line) => {
     const cols = line.split(',').map((c) => c.trim());
-    const [canonicalForm, phoneticHint, altFormsRaw, definitionShort, language] =
-      cols;
+    const [
+      canonicalForm,
+      phoneticHint,
+      altFormsRaw,
+      definitionShort,
+      language,
+    ] = cols;
     if (!canonicalForm) return [];
     return [
       {
         domainId,
         canonicalForm,
         phoneticHint: phoneticHint || undefined,
-        altForms: altFormsRaw ? altFormsRaw.split('|').map((s) => s.trim()) : [],
+        altForms: altFormsRaw
+          ? altFormsRaw.split('|').map((s) => s.trim())
+          : [],
         definitionShort: definitionShort ?? '',
         language: language ?? 'en',
       },

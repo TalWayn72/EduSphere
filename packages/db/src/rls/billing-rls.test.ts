@@ -92,18 +92,14 @@ describe('tenant_subscriptions: tenant isolation policy', () => {
 
 describe('tenant_subscriptions: admin write policy allows SUPER_ADMIN', () => {
   it('admin_write policy allows SUPER_ADMIN cross-tenant', () => {
-    const policyStart = billingFile.indexOf(
-      'tenant_subscriptions_admin_write'
-    );
+    const policyStart = billingFile.indexOf('tenant_subscriptions_admin_write');
     const policyEnd = billingFile.indexOf('].enableRLS()', policyStart);
     const policySection = billingFile.slice(policyStart, policyEnd);
     expect(policySection).toContain('SUPER_ADMIN');
   });
 
   it('admin_write policy also allows same-tenant access', () => {
-    const policyStart = billingFile.indexOf(
-      'tenant_subscriptions_admin_write'
-    );
+    const policyStart = billingFile.indexOf('tenant_subscriptions_admin_write');
     const policyEnd = billingFile.indexOf('].enableRLS()', policyStart);
     const policySection = billingFile.slice(policyStart, policyEnd);
     expect(policySection).toContain('app.current_tenant');

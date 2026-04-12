@@ -45,7 +45,10 @@ vi.mock('@edusphere/nats-client', () => ({
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   schema: {
-    lesson_assets: { lesson_id: 'la.lesson_id', media_asset_id: 'la.media_asset_id' },
+    lesson_assets: {
+      lesson_id: 'la.lesson_id',
+      media_asset_id: 'la.media_asset_id',
+    },
     media_assets: { id: 'ma.id' },
   },
   eq: vi.fn(),
@@ -97,7 +100,10 @@ describe('TranscriptReadyConsumer', () => {
     const c = consumer as unknown as {
       handleTranscriptionCompleted: (p: unknown) => Promise<void>;
     };
-    await c.handleTranscriptionCompleted({ assetId: 'asset-abc', tenantId: 'tenant-xyz' });
+    await c.handleTranscriptionCompleted({
+      assetId: 'asset-abc',
+      tenantId: 'tenant-xyz',
+    });
 
     expect(mockCreateBlocks).toHaveBeenCalledWith('lesson-123', {
       tenantId: 'tenant-xyz',
@@ -113,7 +119,10 @@ describe('TranscriptReadyConsumer', () => {
     const c = consumer as unknown as {
       handleTranscriptionCompleted: (p: unknown) => Promise<void>;
     };
-    await c.handleTranscriptionCompleted({ assetId: 'asset-unknown', tenantId: 'tenant-xyz' });
+    await c.handleTranscriptionCompleted({
+      assetId: 'asset-unknown',
+      tenantId: 'tenant-xyz',
+    });
 
     expect(mockCreateBlocks).not.toHaveBeenCalled();
   });

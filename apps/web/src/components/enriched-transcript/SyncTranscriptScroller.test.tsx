@@ -5,8 +5,7 @@
  * click-to-seek, onCitationExpand forwarding,
  * autoScroll=false disables scrollIntoView.
  */
-import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -94,6 +93,7 @@ describe('SyncTranscriptScroller', () => {
   let scrollIntoViewMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllMocks();
     scrollIntoViewMock = vi.fn();
     // Attach scrollIntoView mock to all elements via prototype
@@ -101,6 +101,8 @@ describe('SyncTranscriptScroller', () => {
   });
 
   afterEach(() => {
+    vi.runAllTimers();
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -187,15 +189,14 @@ describe('SyncTranscriptScroller', () => {
     expect(scrollIntoViewMock).not.toHaveBeenCalled();
   });
 
-  it('calls onSeek with block startTime when a block is clicked', async () => {
-    const user = userEvent.setup();
+  it('calls onSeek with block startTime when a block is clicked', () => {
     const onSeek = vi.fn();
 
     render(
       <SyncTranscriptScroller blocks={BLOCKS} currentTime={0} onSeek={onSeek} />
     );
 
-    await user.click(screen.getByTestId('block-b2'));
+    fireEvent.click(screen.getByTestId('block-b2'));
     expect(onSeek).toHaveBeenCalledWith(5);
   });
 
@@ -216,7 +217,7 @@ describe('SyncTranscriptScroller', () => {
     // Clear mock so we only track calls that happen AFTER the wheel event
     scrollIntoViewMock.mockClear();
 
-    // Advance to b2
+    // Advance to b2 — auto-scroll should be suppressed while userScrolled=true
     rerender(
       <SyncTranscriptScroller
         blocks={BLOCKS}
@@ -230,10 +231,14 @@ describe('SyncTranscriptScroller', () => {
       behavior: 'smooth',
       block: 'center',
     });
+
+    // Flush the 3-second cooldown so the timer is cleaned up before next test
+    act(() => {
+      vi.runAllTimers();
+    });
   });
 
-  it('forwards onCitationExpand to EnrichedTranscriptPanel', async () => {
-    const user = userEvent.setup();
+  it('forwards onCitationExpand to EnrichedTranscriptPanel', () => {
     const onCitationExpand = vi.fn();
 
     const citationBlock: EnrichedTranscriptBlock = {
@@ -255,7 +260,7 @@ describe('SyncTranscriptScroller', () => {
       />
     );
 
-    await user.click(screen.getByTestId('expand-cit-1'));
+    fireEvent.click(screen.getByTestId('expand-cit-1'));
     expect(onCitationExpand).toHaveBeenCalledWith('cit-1');
   });
 

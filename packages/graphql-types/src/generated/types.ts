@@ -83,6 +83,15 @@ export type AddFileSourceInput = {
   title: Scalars['String']['input'];
 };
 
+export type AddJargonTermInput = {
+  altForms?: InputMaybe<Array<Scalars['String']['input']>>;
+  canonicalForm: Scalars['String']['input'];
+  definitionShort?: InputMaybe<Scalars['String']['input']>;
+  domainId: Scalars['ID']['input'];
+  language?: InputMaybe<Scalars['String']['input']>;
+  phoneticHint?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type AddLessonAssetInput = {
   assetType: LessonAssetType;
   fileUrl?: InputMaybe<Scalars['String']['input']>;
@@ -752,6 +761,11 @@ export type ConceptRelationship = {
   toConcept: Concept;
 };
 
+export type ConfirmDomainInput = {
+  domainIds: Array<Scalars['ID']['input']>;
+  lessonId: Scalars['ID']['input'];
+};
+
 export enum ConsentType {
   AiProcessing = 'AI_PROCESSING',
   Analytics = 'ANALYTICS',
@@ -1155,6 +1169,13 @@ export type CreateExamItemInput = {
   source?: InputMaybe<ExamItemSource>;
 };
 
+export type CreateJargonDomainInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  parentDomainId?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type CreateLessonInput = {
   courseId: Scalars['ID']['input'];
   instructorId: Scalars['ID']['input'];
@@ -1348,6 +1369,13 @@ export enum DeliveryStatus {
   Sent = 'SENT'
 }
 
+export type DetectedDomain = {
+  __typename?: 'DetectedDomain';
+  confidence: Scalars['Float']['output'];
+  domain: JargonDomain;
+  method: Scalars['String']['output'];
+};
+
 /** Discussion in a course */
 export type Discussion = {
   __typename?: 'Discussion';
@@ -1447,6 +1475,18 @@ export type DocumentVersion = {
   id: Scalars['ID']['output'];
   mediaAssetId: Scalars['ID']['output'];
   versionNumber: Scalars['Int']['output'];
+};
+
+export type DomainDetectionResult = {
+  __typename?: 'DomainDetectionResult';
+  domains: Array<DetectedDomain>;
+  suggestedTerms: Array<JargonTerm>;
+};
+
+export type DomainProximity = {
+  __typename?: 'DomainProximity';
+  domain: JargonDomain;
+  score: Scalars['Float']['output'];
 };
 
 export type DomainScore = {
@@ -1885,6 +1925,49 @@ export type InviteUserInput = {
   message?: InputMaybe<Scalars['String']['input']>;
   role: Scalars['String']['input'];
 };
+
+export type JargonDomain = {
+  __typename?: 'JargonDomain';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  language: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  parentDomain?: Maybe<JargonDomain>;
+  relatedDomains: Array<DomainProximity>;
+  tenantId: Scalars['ID']['output'];
+  termCount: Scalars['Int']['output'];
+};
+
+export type JargonOccurrence = {
+  __typename?: 'JargonOccurrence';
+  correctedText?: Maybe<Scalars['String']['output']>;
+  endTime?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  originalText: Scalars['String']['output'];
+  startTime?: Maybe<Scalars['Float']['output']>;
+  term: JargonTerm;
+};
+
+export type JargonTerm = {
+  __typename?: 'JargonTerm';
+  altForms: Array<Scalars['String']['output']>;
+  canonicalForm: Scalars['String']['output'];
+  confidence?: Maybe<Scalars['Float']['output']>;
+  definitionShort?: Maybe<Scalars['String']['output']>;
+  domain: JargonDomain;
+  domainId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  language: Scalars['String']['output'];
+  phoneticHint?: Maybe<Scalars['String']['output']>;
+  source: JargonTermSource;
+};
+
+export enum JargonTermSource {
+  Auto = 'AUTO',
+  Imported = 'IMPORTED',
+  Manual = 'MANUAL'
+}
 
 export type JoinSessionResult = {
   __typename?: 'JoinSessionResult';
@@ -2397,6 +2480,7 @@ export type Mutation = {
    * the GraphQL gateway without a multipart transport layer.
    */
   addFileSource: KnowledgeSource;
+  addJargonTerm: JargonTerm;
   addLessonAsset: LessonAsset;
   addLessonStep: CourseLessonPlan;
   /** Add a message to a discussion */
@@ -2440,6 +2524,7 @@ export type Mutation = {
   compactCollabDocument: CollabDocument;
   completeAssessmentCampaign: AssessmentResult;
   completeOnboarding: OnboardingState;
+  confirmLessonDomains: Array<JargonDomain>;
   confirmMediaUpload: MediaAsset;
   confirmVisualAssetUpload: VisualAsset;
   createAgentTemplate: AgentTemplate;
@@ -2463,8 +2548,15 @@ export type Mutation = {
   createDiscussion: Discussion;
   createDocumentVersion: DocumentVersion;
   createEmbedding: Embedding;
+  /**
+   * Auto-generate enriched transcript blocks from existing transcript segments.
+   * Groups consecutive segments into ~2-minute TEXT blocks and prepends a HEADING.
+   * Idempotent — safe to call multiple times.
+   */
+  createEnrichedBlocksFromTranscript: EnrichedLesson;
   createExamBlueprint: ExamBlueprint;
   createExamItem: ExamItem;
+  createJargonDomain: JargonDomain;
   createLesson: Lesson;
   createLessonPlan: CourseLessonPlan;
   createLiveSession: LiveSession;
@@ -2549,6 +2641,7 @@ export type Mutation = {
   importFromDrive: ImportJob;
   importFromWebsite: ImportJob;
   importFromYoutube: ImportJob;
+  importJargonTerms: Scalars['Int']['output'];
   importScormPackage: ScormImportResult;
   ingestContent: ContentIngestionResult;
   ingestYoutubeLesson: EnrichedLesson;
@@ -2783,6 +2876,11 @@ export type MutationAddFileSourceArgs = {
 };
 
 
+export type MutationAddJargonTermArgs = {
+  input: AddJargonTermInput;
+};
+
+
 export type MutationAddLessonAssetArgs = {
   input: AddLessonAssetInput;
   lessonId: Scalars['ID']['input'];
@@ -2922,6 +3020,11 @@ export type MutationCompleteAssessmentCampaignArgs = {
 };
 
 
+export type MutationConfirmLessonDomainsArgs = {
+  input: ConfirmDomainInput;
+};
+
+
 export type MutationConfirmMediaUploadArgs = {
   courseId: Scalars['ID']['input'];
   fileKey: Scalars['String']['input'];
@@ -3046,6 +3149,11 @@ export type MutationCreateEmbeddingArgs = {
 };
 
 
+export type MutationCreateEnrichedBlocksFromTranscriptArgs = {
+  lessonId: Scalars['ID']['input'];
+};
+
+
 export type MutationCreateExamBlueprintArgs = {
   input: CreateExamBlueprintInput;
 };
@@ -3053,6 +3161,11 @@ export type MutationCreateExamBlueprintArgs = {
 
 export type MutationCreateExamItemArgs = {
   input: CreateExamItemInput;
+};
+
+
+export type MutationCreateJargonDomainArgs = {
+  input: CreateJargonDomainInput;
 };
 
 
@@ -3453,6 +3566,12 @@ export type MutationImportFromWebsiteArgs = {
 
 export type MutationImportFromYoutubeArgs = {
   input: YoutubeImportInput;
+};
+
+
+export type MutationImportJargonTermsArgs = {
+  domainId: Scalars['ID']['input'];
+  terms: Array<AddJargonTermInput>;
 };
 
 
@@ -4894,6 +5013,7 @@ export type Query = {
    * Returns null when no lessons are available.
    */
   dailyMicrolesson?: Maybe<ContentItem>;
+  detectLessonDomains: DomainDetectionResult;
   /** Get a single discussion by ID */
   discussion?: Maybe<Discussion>;
   /** Get all messages in a discussion */
@@ -4922,6 +5042,10 @@ export type Query = {
   getVisualAnchors: Array<VisualAnchor>;
   getVisualAssets: Array<VisualAsset>;
   instructorEarnings: EarningsSummary;
+  jargonDomain?: Maybe<JargonDomain>;
+  jargonDomains: Array<JargonDomain>;
+  jargonTerm?: Maybe<JargonTerm>;
+  jargonTerms: Array<JargonTerm>;
   /** Check knowledge graph topology coverage for a course before badge issuance. */
   knowledgePathCoverage: KnowledgePathCoverage;
   knowledgeSource?: Maybe<KnowledgeSource>;
@@ -4935,6 +5059,7 @@ export type Query = {
    */
   learningPath?: Maybe<LearningPath>;
   lesson?: Maybe<Lesson>;
+  lessonJargonOccurrences: Array<JargonOccurrence>;
   lessonPipelineRun?: Maybe<LessonPipelineRun>;
   lessonPipelineRuns: Array<LessonPipelineRun>;
   lessonsByCourse: Array<Lesson>;
@@ -5370,6 +5495,11 @@ export type QueryCrmSyncLogArgs = {
 };
 
 
+export type QueryDetectLessonDomainsArgs = {
+  lessonId: Scalars['ID']['input'];
+};
+
+
 export type QueryDiscussionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -5485,6 +5615,28 @@ export type QueryGetVisualAssetsArgs = {
 };
 
 
+export type QueryJargonDomainArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryJargonDomainsArgs = {
+  language?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryJargonTermArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryJargonTermsArgs = {
+  domainId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryKnowledgePathCoverageArgs = {
   courseId: Scalars['ID']['input'];
   requiredConceptIds: Array<Scalars['ID']['input']>;
@@ -5520,6 +5672,11 @@ export type QueryLearningPathArgs = {
 
 export type QueryLessonArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryLessonJargonOccurrencesArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 

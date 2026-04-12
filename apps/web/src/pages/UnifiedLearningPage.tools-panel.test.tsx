@@ -101,9 +101,7 @@ vi.mock('@/components/youtube/YouTubeEmbedPlayer', () => ({
 }));
 
 vi.mock('@/components/enriched-transcript/SyncTranscriptScroller', () => ({
-  SyncTranscriptScroller: () => (
-    <div data-testid="sync-transcript-scroller" />
-  ),
+  SyncTranscriptScroller: () => <div data-testid="sync-transcript-scroller" />,
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -253,7 +251,9 @@ describe('ToolsPanel', () => {
     };
 
     it('calls ytPlayer.seekTo when seekTarget changes for YouTube content', () => {
-      const { rerender } = render(<ToolsPanel {...ytProps} seekTarget={undefined} />);
+      const { rerender } = render(
+        <ToolsPanel {...ytProps} seekTarget={undefined} />
+      );
 
       act(() => {
         rerender(<ToolsPanel {...ytProps} seekTarget={42} />);

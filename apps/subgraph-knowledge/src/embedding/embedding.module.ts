@@ -15,6 +15,10 @@ import { KsChunkEmbeddingStoreService } from './ks-chunk-embedding-store.service
     EmbeddingProviderService,
     KsChunkEmbeddingStoreService,
   ],
-  exports: [EmbeddingService, KsChunkEmbeddingStoreService, EmbeddingProviderService],
+  exports: [
+    EmbeddingService,
+    KsChunkEmbeddingStoreService,
+    EmbeddingProviderService,
+  ],
 })
 export class EmbeddingModule {}

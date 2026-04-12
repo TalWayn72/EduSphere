@@ -140,9 +140,7 @@ export class JargonPostProcessorService {
           txDb
             .select()
             .from(schema.transcript_segments)
-            .where(
-              eq(schema.transcript_segments.transcript_id, transcriptId)
-            )
+            .where(eq(schema.transcript_segments.transcript_id, transcriptId))
             .orderBy(schema.transcript_segments.start_time)
       );
       return rows.map((s) => ({
@@ -162,10 +160,10 @@ export class JargonPostProcessorService {
     terms: TermPayload[],
     lessonId: string
   ): {
-    occurrences: typeof schema.jargon_occurrences.$inferInsert[];
+    occurrences: (typeof schema.jargon_occurrences.$inferInsert)[];
     correctedCount: number;
   } {
-    const occurrences: typeof schema.jargon_occurrences.$inferInsert[] = [];
+    const occurrences: (typeof schema.jargon_occurrences.$inferInsert)[] = [];
     let correctedCount = 0;
 
     for (const segment of segments) {

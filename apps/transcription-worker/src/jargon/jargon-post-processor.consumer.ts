@@ -35,9 +35,7 @@ export class JargonPostProcessorConsumer
   private connection: NatsConnection | null = null;
   private readonly sc = StringCodec();
 
-  constructor(
-    private readonly postProcessor: JargonPostProcessorService
-  ) {}
+  constructor(private readonly postProcessor: JargonPostProcessorService) {}
 
   async onModuleInit(): Promise<void> {
     const natsUrl = process.env['NATS_URL'] ?? 'nats://localhost:4222';
@@ -66,9 +64,7 @@ export class JargonPostProcessorConsumer
     const sub = this.connection.subscribe(SUBJECT, {
       queue: QUEUE_GROUP,
     });
-    this.logger.log(
-      `Subscribed to ${SUBJECT} (queue: ${QUEUE_GROUP})`
-    );
+    this.logger.log(`Subscribed to ${SUBJECT} (queue: ${QUEUE_GROUP})`);
 
     (async () => {
       for await (const msg of sub) {

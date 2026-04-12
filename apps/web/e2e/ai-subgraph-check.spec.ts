@@ -16,13 +16,15 @@ async function loginDevMode(page: import('@playwright/test').Page) {
   const btn = page.getByRole('button', { name: /Sign In \(Dev Mode\)/i });
   await expect(btn).toBeVisible({ timeout: 10_000 });
   await btn.click();
-  await page.waitForURL(/\/(dashboard|courses|learn|admin)/, { timeout: 20_000 });
+  await page.waitForURL(/\/(dashboard|courses|learn|admin)/, {
+    timeout: 20_000,
+  });
 }
 
 test.describe('ai-subgraph-check', () => {
   test('AI Tutor page loads after login', async ({ page }) => {
     await loginDevMode(page);
-    await page.goto('/agents');  // actual route for AI Tutor / Agent Studio
+    await page.goto('/agents'); // actual route for AI Tutor / Agent Studio
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
     await page.screenshot({
@@ -33,7 +35,9 @@ test.describe('ai-subgraph-check', () => {
     expect(page.url()).not.toMatch(/\/login/);
   });
 
-  test('agent subgraph responds to agentTemplates query', async ({ request }) => {
+  test('agent subgraph responds to agentTemplates query', async ({
+    request,
+  }) => {
     // Direct API test — use valid scalar fields only (id, name)
     const response = await request.post('http://localhost:4005/graphql', {
       data: { query: '{ agentTemplates { id name } }' },
@@ -48,13 +52,14 @@ test.describe('ai-subgraph-check', () => {
     expect(hasDataOrErrors).toBe(true);
     // Must NOT be a gateway/network error
     if ('errors' in body && !('data' in body)) {
-      const codes = (body.errors as Array<{extensions?: {code?: string}}>)
-        .map(e => e.extensions?.code ?? 'UNKNOWN');
+      const codes = (
+        body.errors as Array<{ extensions?: { code?: string } }>
+      ).map((e) => e.extensions?.code ?? 'UNKNOWN');
       // Schema validation errors mean the query was received and processed
       console.log('Error codes:', codes);
       // Acceptable: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND
       // NOT acceptable: INTERNAL_SERVER_ERROR from connection failure
-      const hasNetworkError = codes.some(c => c === 'INTERNAL_SERVER_ERROR');
+      const hasNetworkError = codes.some((c) => c === 'INTERNAL_SERVER_ERROR');
       expect(hasNetworkError).toBe(false);
     }
   });
@@ -66,7 +71,10 @@ test.describe('ai-subgraph-check', () => {
     });
     const body = await response.json();
     console.log('Gateway agentTemplates status:', response.status());
-    console.log('Gateway agentTemplates body:', JSON.stringify(body).slice(0, 300));
+    console.log(
+      'Gateway agentTemplates body:',
+      JSON.stringify(body).slice(0, 300)
+    );
     expect(response.status()).toBe(200);
     const hasDataOrErrors = 'data' in body || 'errors' in body;
     expect(hasDataOrErrors).toBe(true);

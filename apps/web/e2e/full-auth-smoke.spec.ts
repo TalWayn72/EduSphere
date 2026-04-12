@@ -125,7 +125,9 @@ async function loginAndNavigate(
     await page.waitForLoadState('domcontentloaded');
   } else {
     // Keycloak OIDC flow
-    const signInBtn = page.getByRole('button', { name: /Sign In with Keycloak/i });
+    const signInBtn = page.getByRole('button', {
+      name: /Sign In with Keycloak/i,
+    });
     await signInBtn.waitFor({ timeout: 10_000 });
     await signInBtn.click();
 
@@ -158,9 +160,10 @@ async function verifyDashboard(page: Page): Promise<void> {
     .waitForSelector('h1, h2, main, [data-testid]', { timeout: 25_000 })
     .catch(() => {});
   // Verify we are NOT redirected back to /login (i.e. session is valid)
-  expect(page.url(), 'Dashboard should be accessible without redirect to /login').not.toMatch(
-    /\/login/
-  );
+  expect(
+    page.url(),
+    'Dashboard should be accessible without redirect to /login'
+  ).not.toMatch(/\/login/);
 }
 
 // ---------------------------------------------------------------------------
@@ -173,7 +176,9 @@ async function capture(page: Page, filename: string): Promise<void> {
   await page
     .waitForFunction(
       () =>
-        !document.body.textContent?.includes('Initializing authentication...') &&
+        !document.body.textContent?.includes(
+          'Initializing authentication...'
+        ) &&
         !document.querySelector('.loading-spinner') &&
         document.readyState === 'complete',
       { timeout: 10_000 }
@@ -219,14 +224,22 @@ test.describe('full-auth-smoke — SUPER_ADMIN', () => {
 
     // Navigate to courses
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle').catch(() => page.waitForLoadState('domcontentloaded'));
-    await page.waitForSelector('h1, h2, main, article, [data-testid]', { timeout: 15_000 }).catch(() => {});
+    await page
+      .waitForLoadState('networkidle')
+      .catch(() => page.waitForLoadState('domcontentloaded'));
+    await page
+      .waitForSelector('h1, h2, main, article, [data-testid]', {
+        timeout: 15_000,
+      })
+      .catch(() => {});
     await capture(page, `auth-smoke-${user.slug}-02-courses.png`);
 
     // SUPER_ADMIN: verify admin panel link / admin route is accessible
     await page.goto('/admin');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('h1, h2, main, [data-testid]', { timeout: 15_000 }).catch(() => {});
+    await page
+      .waitForSelector('h1, h2, main, [data-testid]', { timeout: 15_000 })
+      .catch(() => {});
     await capture(page, `auth-smoke-${user.slug}-03-admin.png`);
 
     // Confirm we are NOT on the login page (admin route accessible)
@@ -248,8 +261,14 @@ test.describe('full-auth-smoke — INSTRUCTOR', () => {
 
     // Navigate to courses
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle').catch(() => page.waitForLoadState('domcontentloaded'));
-    await page.waitForSelector('h1, h2, main, article, [data-testid]', { timeout: 15_000 }).catch(() => {});
+    await page
+      .waitForLoadState('networkidle')
+      .catch(() => page.waitForLoadState('domcontentloaded'));
+    await page
+      .waitForSelector('h1, h2, main, article, [data-testid]', {
+        timeout: 15_000,
+      })
+      .catch(() => {});
     await capture(page, `auth-smoke-${user.slug}-02-courses.png`);
 
     // INSTRUCTOR: verify course creation button or route is accessible
@@ -284,8 +303,14 @@ test.describe('full-auth-smoke — ORG_ADMIN', () => {
     await capture(page, `auth-smoke-${user.slug}-01-dashboard.png`);
 
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle').catch(() => page.waitForLoadState('domcontentloaded'));
-    await page.waitForSelector('h1, h2, main, article, [data-testid]', { timeout: 15_000 }).catch(() => {});
+    await page
+      .waitForLoadState('networkidle')
+      .catch(() => page.waitForLoadState('domcontentloaded'));
+    await page
+      .waitForSelector('h1, h2, main, article, [data-testid]', {
+        timeout: 15_000,
+      })
+      .catch(() => {});
     await capture(page, `auth-smoke-${user.slug}-02-courses.png`);
 
     await logout(page);
@@ -303,8 +328,14 @@ test.describe('full-auth-smoke — RESEARCHER', () => {
     await capture(page, `auth-smoke-${user.slug}-01-dashboard.png`);
 
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle').catch(() => page.waitForLoadState('domcontentloaded'));
-    await page.waitForSelector('h1, h2, main, article, [data-testid]', { timeout: 15_000 }).catch(() => {});
+    await page
+      .waitForLoadState('networkidle')
+      .catch(() => page.waitForLoadState('domcontentloaded'));
+    await page
+      .waitForSelector('h1, h2, main, article, [data-testid]', {
+        timeout: 15_000,
+      })
+      .catch(() => {});
     await capture(page, `auth-smoke-${user.slug}-02-courses.png`);
 
     await logout(page);

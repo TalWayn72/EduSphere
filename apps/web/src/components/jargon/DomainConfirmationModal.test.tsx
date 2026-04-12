@@ -7,12 +7,7 @@
  * urql hooks are fully mocked — no real GraphQL calls.
  */
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── i18n mock ─────────────────────────────────────────────────────────────────
@@ -29,7 +24,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 // ── urql mock ─────────────────────────────────────────────────────────────────
-const mockExecConfirm = vi.fn().mockResolvedValue({ data: {}, error: undefined });
+const mockExecConfirm = vi
+  .fn()
+  .mockResolvedValue({ data: {}, error: undefined });
 const mockExecCreate = vi.fn().mockResolvedValue({
   data: { createJargonDomain: { id: 'domain-new' } },
   error: undefined,
@@ -59,7 +56,8 @@ vi.mock('urql', () => ({
     },
     vi.fn(),
   ]),
-  useMutation: vi.fn()
+  useMutation: vi
+    .fn()
     .mockImplementationOnce(() => [{ fetching: false }, mockExecConfirm])
     .mockImplementationOnce(() => [{ fetching: false }, mockExecCreate])
     .mockImplementation(() => [{ fetching: false }, vi.fn()]),
@@ -75,7 +73,7 @@ vi.mock('@/components/ui/dialog', () => ({
     open: boolean;
     onOpenChange: () => void;
     children: React.ReactNode;
-  }) => open ? <div data-testid="dialog">{children}</div> : null,
+  }) => (open ? <div data-testid="dialog">{children}</div> : null),
   DialogContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="dialog-content">{children}</div>
   ),
@@ -233,9 +231,7 @@ describe('DomainConfirmationModal', () => {
 
   it('renders the description text', () => {
     renderModal();
-    expect(
-      screen.getByText(/automatically detected/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/automatically detected/i)).toBeInTheDocument();
   });
 
   // ── Domain list ───────────────────────────────────────────────────────────
@@ -297,9 +293,7 @@ describe('DomainConfirmationModal', () => {
     renderModal();
     // Use getAllByText to handle multiple "Confirm" matches, then find the button
     const confirmBtns = screen.getAllByText(/Confirm/i);
-    const confirmBtn = confirmBtns.find(
-      (el) => el.tagName === 'BUTTON'
-    );
+    const confirmBtn = confirmBtns.find((el) => el.tagName === 'BUTTON');
     expect(confirmBtn).toBeDefined();
     expect(confirmBtn).not.toBeDisabled();
   });
@@ -337,9 +331,7 @@ describe('DomainConfirmationModal', () => {
     fireEvent.click(screen.getByText('+ Add new domain'));
     // The form-Cancel button (second Cancel on page)
     const cancelBtns = screen.getAllByText(/Cancel/i);
-    const formCancel = cancelBtns.find(
-      (btn) => btn.closest('form') !== null
-    );
+    const formCancel = cancelBtns.find((btn) => btn.closest('form') !== null);
     if (formCancel) fireEvent.click(formCancel);
     expect(screen.queryByText('Add New Domain')).not.toBeInTheDocument();
   });

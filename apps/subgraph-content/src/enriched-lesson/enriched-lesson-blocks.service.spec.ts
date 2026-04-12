@@ -37,7 +37,8 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   withTenantContext: vi.fn(
-    (_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) => fn(mockDb)
+    (_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) =>
+      fn(mockDb)
   ),
   schema: {
     lessons: {
@@ -92,7 +93,12 @@ const LESSON_ROW = {
 const SEGMENTS = [
   { id: 's1', start_time: '0', end_time: '60', text: 'Hello world' },
   { id: 's2', start_time: '60', end_time: '120', text: 'How are you' },
-  { id: 's3', start_time: '130', end_time: '200', text: 'New block starts here' },
+  {
+    id: 's3',
+    start_time: '130',
+    end_time: '200',
+    text: 'New block starts here',
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -122,10 +128,14 @@ describe('EnrichedLessonBlocksService', () => {
     // fetchYoutubeVideoId
     mockSelectBuilder.limit.mockResolvedValueOnce([{ youtubeVideoId: 'abc' }]);
 
-    const result = await service.createBlocksFromSegments(LESSON_ID, TENANT_CTX);
+    const result = await service.createBlocksFromSegments(
+      LESSON_ID,
+      TENANT_CTX
+    );
 
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
-    const insertedValues = mockInsertBuilder.values.mock.calls[0]?.[0] as Array<{
+    const insertedValues = mockInsertBuilder.values.mock
+      .calls[0]?.[0] as Array<{
       block_type: string;
     }>;
     // HEADING + at least 1 TEXT block
@@ -141,7 +151,10 @@ describe('EnrichedLessonBlocksService', () => {
     // fetchSegments → empty
     mockSelectBuilder.orderBy.mockResolvedValueOnce([]);
 
-    const result = await service.createBlocksFromSegments(LESSON_ID, TENANT_CTX);
+    const result = await service.createBlocksFromSegments(
+      LESSON_ID,
+      TENANT_CTX
+    );
 
     expect(mockDb.insert).not.toHaveBeenCalled();
     expect(result.enrichmentStatus).toBe('PENDING');
@@ -169,7 +182,8 @@ describe('EnrichedLessonBlocksService', () => {
 
     await service.createBlocksFromSegments(LESSON_ID, TENANT_CTX);
 
-    const insertedValues = mockInsertBuilder.values.mock.calls[0]?.[0] as Array<{
+    const insertedValues = mockInsertBuilder.values.mock
+      .calls[0]?.[0] as Array<{
       block_type: string;
     }>;
     const textBlocks = insertedValues.filter((b) => b.block_type === 'TEXT');

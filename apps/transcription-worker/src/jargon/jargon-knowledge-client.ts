@@ -82,7 +82,9 @@ export async function detectLessonDomains(
         };
       };
     };
-    return json.data?.detectLessonDomains ?? { domains: [], suggestedTerms: [] };
+    return (
+      json.data?.detectLessonDomains ?? { domains: [], suggestedTerms: [] }
+    );
   } catch {
     return { domains: [], suggestedTerms: [] };
   }

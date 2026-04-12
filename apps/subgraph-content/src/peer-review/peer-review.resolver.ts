@@ -17,7 +17,12 @@ import type { Database, TenantContext } from '@edusphere/db';
 import { PeerReviewService } from './peer-review.service.js';
 import type { GraphQLContext } from '../auth/auth.middleware.js';
 
-type UserRole = 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER';
+type UserRole =
+  | 'SUPER_ADMIN'
+  | 'ORG_ADMIN'
+  | 'INSTRUCTOR'
+  | 'STUDENT'
+  | 'RESEARCHER';
 
 @Resolver()
 export class PeerReviewResolver implements OnModuleDestroy {
@@ -68,7 +73,9 @@ export class PeerReviewResolver implements OnModuleDestroy {
       { tenantId: auth.tenantId, userId: auth.userId, userRole: role }
     );
     const titles = await Promise.all(
-      list.map((a) => this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role))
+      list.map((a) =>
+        this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role)
+      )
     );
     return list.map((a, i) => ({
       id: a.id,
@@ -95,7 +102,9 @@ export class PeerReviewResolver implements OnModuleDestroy {
       userRole: role,
     });
     const titles = await Promise.all(
-      list.map((a) => this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role))
+      list.map((a) =>
+        this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role)
+      )
     );
     return list.map((a, i) => ({
       id: a.id,
@@ -181,7 +190,9 @@ export class PeerReviewResolver implements OnModuleDestroy {
       { tenantId: auth.tenantId, userId: auth.userId, userRole: role }
     );
     const titles = await Promise.all(
-      assignments.map((a) => this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role))
+      assignments.map((a) =>
+        this.resolveTitle(a.contentItemId, auth.tenantId!, auth.userId, role)
+      )
     );
     return assignments.map((a, i) => ({
       id: a.id,
@@ -212,7 +223,11 @@ export class PeerReviewResolver implements OnModuleDestroy {
       auth.userId,
       criteriaScores,
       feedback ?? '',
-      { tenantId: auth.tenantId, userId: auth.userId, userRole: this.extractRole(auth) }
+      {
+        tenantId: auth.tenantId,
+        userId: auth.userId,
+        userRole: this.extractRole(auth),
+      }
     );
   }
 }

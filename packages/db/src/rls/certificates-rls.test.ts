@@ -80,7 +80,9 @@ const INSTRUCTOR_CTX: TenantContext = {
 
 describe('certificatesRLS: USING clause structure', () => {
   it('USING clause references app.current_tenant', () => {
-    const raw = sqlToString(certificatesRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      certificatesRLS as Parameters<typeof sqlToString>[0]
+    );
     const usingIdx = raw.toUpperCase().indexOf('USING');
     expect(usingIdx).toBeGreaterThan(-1);
     const usingSection = raw.slice(
@@ -91,7 +93,9 @@ describe('certificatesRLS: USING clause structure', () => {
   });
 
   it('USING clause references app.current_user_id for student access (SI-1)', () => {
-    const raw = sqlToString(certificatesRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      certificatesRLS as Parameters<typeof sqlToString>[0]
+    );
     const usingIdx = raw.toUpperCase().indexOf('USING');
     const withCheckIdx = raw.toUpperCase().indexOf('WITH CHECK');
     const usingSection = raw.slice(usingIdx, withCheckIdx);
@@ -99,20 +103,26 @@ describe('certificatesRLS: USING clause structure', () => {
   });
 
   it('USING clause allows INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN', () => {
-    const raw = sqlToString(certificatesRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      certificatesRLS as Parameters<typeof sqlToString>[0]
+    );
     expect(raw).toContain('INSTRUCTOR');
     expect(raw).toContain('ORG_ADMIN');
     expect(raw).toContain('SUPER_ADMIN');
   });
 
   it('has both USING and WITH CHECK clauses', () => {
-    const raw = sqlToString(certificatesRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      certificatesRLS as Parameters<typeof sqlToString>[0]
+    );
     expect(raw.toUpperCase()).toContain('USING');
     expect(raw.toUpperCase()).toContain('WITH CHECK');
   });
 
   it('WITH CHECK enforces tenant isolation only (not user restriction)', () => {
-    const raw = sqlToString(certificatesRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      certificatesRLS as Parameters<typeof sqlToString>[0]
+    );
     const withCheckIdx = raw.toUpperCase().indexOf('WITH CHECK');
     const withCheckSection = raw.slice(withCheckIdx);
     expect(withCheckSection).toContain('app.current_tenant');

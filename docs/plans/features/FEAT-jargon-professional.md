@@ -5,6 +5,7 @@
 Lesson transcripts (especially Hebrew) suffer from STT errors on domain-specific terminology. Terms like ע"ב, ספירות, זו"ן are misrecognized as gibberish. This feature builds a domain-aware jargon dictionary that corrects transcripts, creates a living glossary wiki, and adds a source citation verification workflow — transforming raw transcripts into scholarly-grade enriched content.
 
 **Decisions made:**
+
 - Domain detection: auto from transcript + instructor confirmation
 - Glossary scope: tenant (organization) level, shared across courses
 - UX: tooltip/popover in transcript + dedicated wiki page
@@ -83,6 +84,7 @@ Lesson transcripts (especially Hebrew) suffer from STT errors on domain-specific
 ### 1.2 Apache AGE Graph — modify `packages/db/src/graph/ontology.ts`
 
 Add new vertex label `Domain` and edges:
+
 - `(:Domain)-[:RELATED_DOMAIN {proximity: float}]->(:Domain)`
 - `(:Term)-[:BELONGS_TO_DOMAIN]->(:Domain)`
 
@@ -91,10 +93,14 @@ Reuse existing `ConceptRelationshipType` pattern. Add `'RELATED_DOMAIN'` and `'B
 ### 1.3 Enriched Block Type Extension
 
 In `packages/db/src/schema/enriched-transcript.ts` line 34:
+
 - Extend `block_type` enum: `['TEXT', 'CITATION', 'VISUAL_ANCHOR', 'HEADING']` → add no new type
 - Instead, enhance TEXT blocks' `content` jsonb to include jargon highlights:
   ```json
-  { "text": "...", "jargonHighlights": [{"termId": "uuid", "start": 42, "end": 47}] }
+  {
+    "text": "...",
+    "jargonHighlights": [{ "termId": "uuid", "start": 42, "end": 47 }]
+  }
   ```
 
 ### 1.4 GraphQL SDL — new `apps/subgraph-knowledge/src/jargon/jargon.graphql`
@@ -116,21 +122,22 @@ Mutation:
 
 ### 1.5 Backend Services — `apps/subgraph-knowledge/src/jargon/`
 
-| Service | Responsibility |
-|---------|---------------|
-| `jargon-domain.service.ts` | CRUD domains, parent-child hierarchy, compute proximity via pgvector |
-| `jargon-term.service.ts` | CRUD terms, alt_forms, generate embeddings, bulk import |
+| Service                       | Responsibility                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `jargon-domain.service.ts`    | CRUD domains, parent-child hierarchy, compute proximity via pgvector           |
+| `jargon-term.service.ts`      | CRUD terms, alt_forms, generate embeddings, bulk import                        |
 | `jargon-detection.service.ts` | **Core algorithm**: Aho-Corasick multi-pattern match + pgvector fuzzy fallback |
-| `jargon-resolver.ts` | GraphQL resolvers |
+| `jargon-resolver.ts`          | GraphQL resolvers                                                              |
 
 ### 1.6 Jargon Post-Processor — `apps/transcription-worker/src/jargon/`
 
-| Service | Responsibility |
-|---------|---------------|
-| `jargon-post-processor.service.ts` | Runs after transcript stored, before enriched blocks. Corrects segments. |
-| `jargon-post-processor.consumer.ts` | NATS consumer for `lesson.transcript.ready` |
+| Service                             | Responsibility                                                           |
+| ----------------------------------- | ------------------------------------------------------------------------ |
+| `jargon-post-processor.service.ts`  | Runs after transcript stored, before enriched blocks. Corrects segments. |
+| `jargon-post-processor.consumer.ts` | NATS consumer for `lesson.transcript.ready`                              |
 
 **Pipeline insertion point** (existing flow → new step):
+
 ```
 transcript stored → NATS(lesson.transcript.ready)
   → [NEW] JargonPostProcessorConsumer:
@@ -159,9 +166,11 @@ transcript stored → NATS(lesson.transcript.ready)
 ### 1.8 Whisper Enhancement — modify `apps/transcription-worker/src/transcription/whisper.client.ts`
 
 Add `initial_prompt` parameter with domain-specific jargon terms:
+
 ```
 initial_prompt: "שיעור בקבלה. מושגים: ספירות, עץ חיים, זוהר, פרצוף, ע"ב, ס"ג, מ"ה, ב"ן..."
 ```
+
 Fetch top 50 terms from lesson's domains when domains are pre-assigned.
 
 ### 1.9 Domain Detection Algorithm
@@ -179,19 +188,19 @@ Fetch top 50 terms from lesson's domains when domains are pre-assigned.
 
 ### 1.10 Frontend — Phase 1
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
+| Component                     | Location                          | Purpose                                              |
+| ----------------------------- | --------------------------------- | ---------------------------------------------------- |
 | `DomainConfirmationModal.tsx` | `apps/web/src/components/jargon/` | After detection, instructor confirms/adjusts domains |
-| `JargonManagementPage.tsx` | `apps/web/src/pages/` | Tenant admin: manage domains + terms, bulk import |
-| `JargonTermForm.tsx` | `apps/web/src/components/jargon/` | Add/edit term with alt_forms, phonetic hint |
+| `JargonManagementPage.tsx`    | `apps/web/src/pages/`             | Tenant admin: manage domains + terms, bulk import    |
+| `JargonTermForm.tsx`          | `apps/web/src/components/jargon/` | Add/edit term with alt_forms, phonetic hint          |
 
 ### 1.11 NATS Events (Phase 1)
 
-| Subject | Publisher | Consumer |
-|---------|-----------|----------|
-| `jargon.domains.detected` | JargonPostProcessor | content-subgraph |
+| Subject                      | Publisher           | Consumer                           |
+| ---------------------------- | ------------------- | ---------------------------------- |
+| `jargon.domains.detected`    | JargonPostProcessor | content-subgraph                   |
 | `jargon.detection.completed` | JargonPostProcessor | content-subgraph (enriched blocks) |
-| `jargon.term.added` | JargonTermService | knowledge-subgraph (embedding) |
+| `jargon.term.added`          | JargonTermService   | knowledge-subgraph (embedding)     |
 
 ---
 
@@ -229,12 +238,13 @@ Mutation: updateGlossaryWiki(termId, wikiContent), aggregateGlossaryDefinition(t
 
 ### 2.3 Backend Services
 
-| Service | Responsibility |
-|---------|---------------|
+| Service                           | Responsibility                                                                                     |
+| --------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `glossary-aggregation.service.ts` | On `jargon.detection.completed` → update lesson refs, compute centrality, LLM-aggregate definition |
-| `glossary-search.service.ts` | HybridRAG search: pgvector on term embeddings + full-text on wiki_content |
+| `glossary-search.service.ts`      | HybridRAG search: pgvector on term embeddings + full-text on wiki_content                          |
 
 **Centrality algorithm:**
+
 ```
 centrality = (occurrence_count / total_lesson_segments) * time_weight
 time_weight: higher if term is discussed at length (not just mentioned once)
@@ -245,14 +255,15 @@ Collect transcript segments where term occurs → Ollama prompt: "Synthesize a d
 
 ### 2.4 Frontend — Phase 2
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| `JargonTooltip.tsx` | `enriched-transcript/` | Hover/click on highlighted term → short definition + wiki link |
-| `JargonHighlighter.tsx` | `enriched-transcript/` | Wraps jargon terms in `<mark>` with tooltip trigger |
-| `GlossaryWikiPage.tsx` | `pages/` | Full wiki page: definition, lesson refs (sorted by centrality), related terms |
-| `GlossarySearchBar.tsx` | `components/glossary/` | Debounced search across glossary |
+| Component               | Location               | Purpose                                                                       |
+| ----------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `JargonTooltip.tsx`     | `enriched-transcript/` | Hover/click on highlighted term → short definition + wiki link                |
+| `JargonHighlighter.tsx` | `enriched-transcript/` | Wraps jargon terms in `<mark>` with tooltip trigger                           |
+| `GlossaryWikiPage.tsx`  | `pages/`               | Full wiki page: definition, lesson refs (sorted by centrality), related terms |
+| `GlossarySearchBar.tsx` | `components/glossary/` | Debounced search across glossary                                              |
 
 **Tooltip UX (Radix HoverCard):**
+
 - Hover: term name + short definition (2-3 lines)
 - "View full page →" link to `/glossary/:termId`
 - Click on lesson ref → `/learn/:lessonId?t=<firstMentionTime>`
@@ -260,6 +271,7 @@ Collect transcript segments where term occurs → Ollama prompt: "Synthesize a d
 ### 2.5 Enriched Block Enhancement
 
 Modify `enriched-lesson-blocks.service.ts` (`createBlocksFromSegments`):
+
 - After grouping segments, query `jargon_occurrences` for the lesson
 - Inject `jargonHighlights` into each TEXT block's `content` jsonb
 - Frontend `JargonHighlighter` renders highlights from these offsets
@@ -307,6 +319,7 @@ Modify `enriched-lesson-blocks.service.ts` (`createBlocksFromSegments`):
 ### 3.3 Source Upload Workflow
 
 After transcription + jargon correction + citation NER:
+
 1. System lists all `detected_source_references` for the lesson
 2. For each reference (e.g., "ע"ח, ח"ב, מ"ד, ע"ד"):
    - "Upload source" button → opens KnowledgeSource upload dialog
@@ -332,76 +345,80 @@ After transcription + jargon correction + citation NER:
 
 ### 3.5 Frontend — Phase 3
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| `CitationFormatWizard.tsx` | `components/citation/` | Step-by-step: preset → custom description → LLM parse → confirm |
-| `SourceLinkingPanel.tsx` | `components/citation/` | List detected references + upload/link source buttons |
+| Component                       | Location               | Purpose                                                           |
+| ------------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| `CitationFormatWizard.tsx`      | `components/citation/` | Step-by-step: preset → custom description → LLM parse → confirm   |
+| `SourceLinkingPanel.tsx`        | `components/citation/` | List detected references + upload/link source buttons             |
 | `VerifiedCitationIndicator.tsx` | `enriched-transcript/` | Blue highlight for verified, yellow for pending, red for mismatch |
 
 ### 3.6 NATS Events (Phase 3)
 
-| Subject | Publisher | Consumer |
-|---------|-----------|----------|
-| `citation.source.linked` | CitationFormatService | CitationVerificationService |
+| Subject                           | Publisher                   | Consumer                        |
+| --------------------------------- | --------------------------- | ------------------------------- |
+| `citation.source.linked`          | CitationFormatService       | CitationVerificationService     |
 | `citation.verification.completed` | CitationVerificationService | content-subgraph (block update) |
 
 ---
 
 ## Critical Files to Modify
 
-| File | Change |
-|------|--------|
-| `packages/db/src/schema/jargon.ts` | **NEW** — 6 tables |
-| `packages/db/src/schema/glossary.ts` | **NEW** — 2 tables |
-| `packages/db/src/schema/citation-format.ts` | **NEW** — 2 tables |
-| `packages/db/src/schema/enriched-transcript.ts` | Enhance content jsonb with jargonHighlights |
-| `packages/db/src/graph/ontology.ts` | Add Domain vertex + 2 edge types |
-| `apps/subgraph-knowledge/src/jargon/` | **NEW** — domain, term, detection services + SDL |
-| `apps/subgraph-knowledge/src/glossary/` | **NEW** — aggregation, search services + SDL |
-| `apps/transcription-worker/src/jargon/` | **NEW** — post-processor consumer |
-| `apps/transcription-worker/src/transcription/whisper.client.ts` | Add initial_prompt with jargon terms |
-| `apps/subgraph-content/src/enriched-lesson/enriched-lesson-blocks.service.ts` | Inject jargon highlights into blocks |
-| `apps/subgraph-content/src/citation-format/` | **NEW** — format config, verification services + SDL |
-| `apps/web/src/components/jargon/` | **NEW** — DomainConfirmation, JargonManagement |
-| `apps/web/src/components/enriched-transcript/JargonTooltip.tsx` | **NEW** |
-| `apps/web/src/components/enriched-transcript/JargonHighlighter.tsx` | **NEW** |
-| `apps/web/src/pages/GlossaryWikiPage.tsx` | **NEW** — replace/extend current static glossary |
-| `apps/web/src/components/citation/CitationFormatWizard.tsx` | **NEW** |
-| `apps/web/src/components/citation/SourceLinkingPanel.tsx` | **NEW** |
+| File                                                                          | Change                                               |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `packages/db/src/schema/jargon.ts`                                            | **NEW** — 6 tables                                   |
+| `packages/db/src/schema/glossary.ts`                                          | **NEW** — 2 tables                                   |
+| `packages/db/src/schema/citation-format.ts`                                   | **NEW** — 2 tables                                   |
+| `packages/db/src/schema/enriched-transcript.ts`                               | Enhance content jsonb with jargonHighlights          |
+| `packages/db/src/graph/ontology.ts`                                           | Add Domain vertex + 2 edge types                     |
+| `apps/subgraph-knowledge/src/jargon/`                                         | **NEW** — domain, term, detection services + SDL     |
+| `apps/subgraph-knowledge/src/glossary/`                                       | **NEW** — aggregation, search services + SDL         |
+| `apps/transcription-worker/src/jargon/`                                       | **NEW** — post-processor consumer                    |
+| `apps/transcription-worker/src/transcription/whisper.client.ts`               | Add initial_prompt with jargon terms                 |
+| `apps/subgraph-content/src/enriched-lesson/enriched-lesson-blocks.service.ts` | Inject jargon highlights into blocks                 |
+| `apps/subgraph-content/src/citation-format/`                                  | **NEW** — format config, verification services + SDL |
+| `apps/web/src/components/jargon/`                                             | **NEW** — DomainConfirmation, JargonManagement       |
+| `apps/web/src/components/enriched-transcript/JargonTooltip.tsx`               | **NEW**                                              |
+| `apps/web/src/components/enriched-transcript/JargonHighlighter.tsx`           | **NEW**                                              |
+| `apps/web/src/pages/GlossaryWikiPage.tsx`                                     | **NEW** — replace/extend current static glossary     |
+| `apps/web/src/components/citation/CitationFormatWizard.tsx`                   | **NEW**                                              |
+| `apps/web/src/components/citation/SourceLinkingPanel.tsx`                     | **NEW**                                              |
 
 ## Existing Code to Reuse
 
-| What | Where | Reuse How |
-|------|-------|-----------|
-| Aho-Corasick | NPM `ahocorasick` or implement in `jargon-detection.service.ts` | Multi-pattern string matching |
-| Embedding generation | `apps/subgraph-knowledge/src/embedding/embedding.service.ts` | Generate term embeddings |
-| pgvector search | `apps/subgraph-knowledge/src/graph/graph-search.service.ts` | HybridRAG pattern for glossary search |
-| Cypher helpers | `packages/db/src/graph/ontology.ts` — `createConcept`, `createRelationship` | Pattern for Domain vertex CRUD |
-| CitationCard/InlineCitationBlock | `apps/web/src/components/enriched-transcript/` | Extend with verification status |
-| LLM structured output | `apps/transcription-worker/src/knowledge/hebrew-citation-ner.service.ts` | Pattern for domain detection + format parsing |
-| HoverCard | Radix `@radix-ui/react-hover-card` via shadcn/ui | JargonTooltip component |
-| SourceManager | `apps/web/src/components/source-manager/SourceManager.tsx` | Source upload in SourceLinkingPanel |
-| File upload | `apps/web/src/hooks/useFileUpload.ts` | 3-phase upload for source documents |
+| What                             | Where                                                                       | Reuse How                                     |
+| -------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------- |
+| Aho-Corasick                     | NPM `ahocorasick` or implement in `jargon-detection.service.ts`             | Multi-pattern string matching                 |
+| Embedding generation             | `apps/subgraph-knowledge/src/embedding/embedding.service.ts`                | Generate term embeddings                      |
+| pgvector search                  | `apps/subgraph-knowledge/src/graph/graph-search.service.ts`                 | HybridRAG pattern for glossary search         |
+| Cypher helpers                   | `packages/db/src/graph/ontology.ts` — `createConcept`, `createRelationship` | Pattern for Domain vertex CRUD                |
+| CitationCard/InlineCitationBlock | `apps/web/src/components/enriched-transcript/`                              | Extend with verification status               |
+| LLM structured output            | `apps/transcription-worker/src/knowledge/hebrew-citation-ner.service.ts`    | Pattern for domain detection + format parsing |
+| HoverCard                        | Radix `@radix-ui/react-hover-card` via shadcn/ui                            | JargonTooltip component                       |
+| SourceManager                    | `apps/web/src/components/source-manager/SourceManager.tsx`                  | Source upload in SourceLinkingPanel           |
+| File upload                      | `apps/web/src/hooks/useFileUpload.ts`                                       | 3-phase upload for source documents           |
 
 ## Verification Plan
 
 ### Phase 1 Tests
+
 - Unit: jargon schema RLS (8), domain/term CRUD (15), Aho-Corasick detection (15)
 - Integration: NATS post-processor flow (5), Whisper prompt enhancement (3)
 - Frontend: DomainConfirmationModal (5), JargonManagement (8)
 - E2E: `apps/web/e2e/jargon-management.spec.ts` — create domain, add terms, process lesson (3)
 
 ### Phase 2 Tests
+
 - Unit: glossary aggregation (12), search (8), centrality algo (5)
 - Frontend: JargonTooltip (5), GlossaryWikiPage (8), JargonHighlighter (5)
 - E2E: `apps/web/e2e/glossary-wiki.spec.ts` — search term, view wiki, click lesson ref (4)
 
 ### Phase 3 Tests
+
 - Unit: format parsing LLM (10), citation verification (12), source suggestion (8)
 - Frontend: CitationFormatWizard (6), SourceLinkingPanel (5), VerifiedCitationIndicator (4)
 - E2E: `apps/web/e2e/citation-verification.spec.ts` — configure format, link source, verify (4)
 
 ### Manual Verification
+
 - Upload Hebrew Kabbalah lesson → confirm jargon terms detected and corrected in transcript
 - Hover term in transcript → tooltip appears with definition
 - Navigate to glossary → term page shows lesson cross-references

@@ -30,15 +30,23 @@ async function authenticate(page: Page): Promise<'dev' | 'keycloak'> {
     localStorage.setItem('edusphere-sidebar-collapsed', 'true');
   });
 
-  await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  await page.goto(`${BASE}/login`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 30_000,
+  });
 
   const devBtn = page.locator('[data-testid="dev-login-btn"]');
-  const isDevMode = await devBtn.waitFor({ timeout: 4_000 }).then(() => true).catch(() => false);
+  const isDevMode = await devBtn
+    .waitFor({ timeout: 4_000 })
+    .then(() => true)
+    .catch(() => false);
 
   if (isDevMode) {
     await devBtn.click();
     await page
-      .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20_000 })
+      .waitForURL((url) => !url.toString().includes('/login'), {
+        timeout: 20_000,
+      })
       .catch(() => {});
     await page.waitForLoadState('domcontentloaded');
     return 'dev';
@@ -54,7 +62,9 @@ async function authenticate(page: Page): Promise<'dev' | 'keycloak'> {
     )
     .catch(() => {});
 
-  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  const signInBtn = page.getByRole('button', {
+    name: /sign in with keycloak/i,
+  });
   await signInBtn.waitFor({ timeout: 15_000 });
   await signInBtn.click();
 
@@ -79,7 +89,8 @@ async function authenticate(page: Page): Promise<'dev' | 'keycloak'> {
   // Wait for auth initialisation to complete (spinner disappears)
   await page
     .waitForFunction(
-      () => !document.body.textContent?.includes('Initializing authentication...'),
+      () =>
+        !document.body.textContent?.includes('Initializing authentication...'),
       { timeout: 20_000 }
     )
     .catch(() => {});
@@ -114,7 +125,10 @@ test.describe('Manual Prep Smoke — Live Docker Services', () => {
     await page.waitForTimeout(3_000);
     await page
       .waitForFunction(
-        () => !document.body.textContent?.includes('Initializing authentication...'),
+        () =>
+          !document.body.textContent?.includes(
+            'Initializing authentication...'
+          ),
         { timeout: 15_000 }
       )
       .catch(() => {});
@@ -145,7 +159,10 @@ test.describe('Manual Prep Smoke — Live Docker Services', () => {
     // Wait for auth spinner to disappear and real content to appear
     await page
       .waitForFunction(
-        () => !document.body.textContent?.includes('Initializing authentication...'),
+        () =>
+          !document.body.textContent?.includes(
+            'Initializing authentication...'
+          ),
         { timeout: 20_000 }
       )
       .catch(() => {});
@@ -173,7 +190,10 @@ test.describe('Manual Prep Smoke — Live Docker Services', () => {
     // Wait for auth spinner to disappear
     await page
       .waitForFunction(
-        () => !document.body.textContent?.includes('Initializing authentication...'),
+        () =>
+          !document.body.textContent?.includes(
+            'Initializing authentication...'
+          ),
         { timeout: 20_000 }
       )
       .catch(() => {});

@@ -1,5 +1,5 @@
 # EduSphere Session Primer
-Last Updated: 2026-04-11T18:47:05Z
+Last Updated: 2026-04-12T14:48:54Z
 
 ## Last Session Summary (2026-04-10)
 - Docker infrastructure: 14 containers all healthy (postgres, keycloak, nats, minio, jaeger + subgraphs)
@@ -284,3 +284,595 @@ curl http://localhost:4000/graphql  # gateway responds
 - Last commit: 51797902 fix(web): replace text-white with text-foreground in LessonPreviewPage banner
 - Modified: 10 files | Untracked: 115 files
 - Timestamp: 2026-04-11T18:51:29Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 1 files | Untracked: 149 files
+- Timestamp: 2026-04-11T19:09:36Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 149 files
+- Timestamp: 2026-04-11T19:09:52Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 149 files
+- Timestamp: 2026-04-11T19:10:08Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 149 files
+- Timestamp: 2026-04-11T19:10:23Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:17:19Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:17:29Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:17:39Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:17:50Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:18:02Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:19:07Z
+
+<!-- PreCompact auto-save: 2026-04-11T19:20:22Z -->
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 154 files
+- Timestamp: 2026-04-11T19:23:43Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 155 files
+- Timestamp: 2026-04-11T19:36:37Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 155 files
+- Timestamp: 2026-04-11T19:37:12Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 2 files | Untracked: 155 files
+- Timestamp: 2026-04-11T19:37:37Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 155 files
+- Timestamp: 2026-04-11T19:59:25Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 155 files
+- Timestamp: 2026-04-11T19:59:36Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 155 files
+- Timestamp: 2026-04-11T19:59:54Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 162 files
+- Timestamp: 2026-04-11T20:04:43Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 162 files
+- Timestamp: 2026-04-11T20:20:51Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 163 files
+- Timestamp: 2026-04-11T20:28:52Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 163 files
+- Timestamp: 2026-04-11T20:30:41Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 166 files
+- Timestamp: 2026-04-11T20:33:46Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 3 files | Untracked: 166 files
+- Timestamp: 2026-04-11T20:38:31Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 5 files | Untracked: 166 files
+- Timestamp: 2026-04-11T20:46:32Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 5 files | Untracked: 166 files
+- Timestamp: 2026-04-11T20:46:44Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 5 files | Untracked: 166 files
+- Timestamp: 2026-04-11T20:46:58Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 5 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:26:25Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:28:07Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:29:09Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:29:51Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:33:00Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:35:43Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:39:07Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 7 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:40:24Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 8 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:44:32Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 8 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:48:01Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 8 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:52:30Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 8 files | Untracked: 166 files
+- Timestamp: 2026-04-11T21:52:46Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 14 files | Untracked: 170 files
+- Timestamp: 2026-04-11T22:00:44Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: fb0b4012 fix(content): resolve 3 lesson viewer bugs — video playback, edit crash, preview player
+- Modified: 14 files | Untracked: 170 files
+- Timestamp: 2026-04-11T22:31:25Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 55ff7f00 fix(content): correct userRole type and update dedup guard mock setup in specs
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:18:35Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 55ff7f00 fix(content): correct userRole type and update dedup guard mock setup in specs
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:18:53Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 55ff7f00 fix(content): correct userRole type and update dedup guard mock setup in specs
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:19:30Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 55ff7f00 fix(content): correct userRole type and update dedup guard mock setup in specs
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:19:53Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:25:15Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:28:29Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:28:41Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:28:57Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:29:08Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:29:34Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:29:46Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:30:04Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:30:15Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:30:36Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:30:48Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:31:07Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:31:18Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:31:37Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T00:59:18Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 0f147318 fix(gateway): add createEnrichedBlocksFromTranscript to supergraph.graphql
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T01:01:00Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 48ab0d13 fix(i18n): add 26 missing course/lesson keys to 7 locales
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T01:02:47Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 48ab0d13 fix(i18n): add 26 missing course/lesson keys to 7 locales
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T01:32:37Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 48ab0d13 fix(i18n): add 26 missing course/lesson keys to 7 locales
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T01:33:21Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6f3e9996 fix(auth): align dev-token test with DEV_TOKEN_SECRET env requirement
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T01:35:19Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6f3e9996 fix(auth): align dev-token test with DEV_TOKEN_SECRET env requirement
+- Modified: 2 files | Untracked: 164 files
+- Timestamp: 2026-04-12T02:07:01Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6f3e9996 fix(auth): align dev-token test with DEV_TOKEN_SECRET env requirement
+- Modified: 3 files | Untracked: 164 files
+- Timestamp: 2026-04-12T02:19:38Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6f3e9996 fix(auth): align dev-token test with DEV_TOKEN_SECRET env requirement
+- Modified: 3 files | Untracked: 164 files
+- Timestamp: 2026-04-12T03:35:07Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6f3e9996 fix(auth): align dev-token test with DEV_TOKEN_SECRET env requirement
+- Modified: 3 files | Untracked: 164 files
+- Timestamp: 2026-04-12T10:18:43Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6f3e9996 fix(auth): align dev-token test with DEV_TOKEN_SECRET env requirement
+- Modified: 3 files | Untracked: 164 files
+- Timestamp: 2026-04-12T10:19:37Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: dac00ab4 fix(ci): increase web test shard timeout to prevent false failures
+- Modified: 3 files | Untracked: 164 files
+- Timestamp: 2026-04-12T10:22:41Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: dac00ab4 fix(ci): increase web test shard timeout to prevent false failures
+- Modified: 3 files | Untracked: 164 files
+- Timestamp: 2026-04-12T10:41:47Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: cab1ec16 feat(jargon): add Professional Jargon feature Phase 1 — domain dictionary + transcript recognition
+- Modified: 4 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:34:52Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 294d5159 fix(db): add jargon migration entry to Drizzle journal
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:35:20Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 8d89f2ca fix(jargon): resolve CI failures in test suite and Docker builds
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:39:40Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 8d89f2ca fix(jargon): resolve CI failures in test suite and Docker builds
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:40:11Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 8d89f2ca fix(jargon): resolve CI failures in test suite and Docker builds
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:40:30Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:44:57Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:45:12Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:45:31Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:46:35Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:46:46Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:47:27Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:48:12Z
+
+<!-- PreCompact auto-save: 2026-04-12T14:48:54Z -->
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:51:56Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:52:30Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:53:01Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:53:35Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: e5ceb070 fix(jargon): resolve remaining CI failures — regenerate pnpm lockfile
+- Modified: 3 files | Untracked: 168 files
+- Timestamp: 2026-04-12T14:54:00Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:21:32Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:22:02Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:22:27Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:22:41Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:23:06Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:23:32Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:23:44Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:24:21Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:24:36Z
+
+## Git Snapshot (auto — Stop hook)
+- Branch: master
+- Last commit: 6ac519e4 fix(jargon): resolve CI failures — Prettier, GraphQL codegen, and i18n completeness
+- Modified: 73 files | Untracked: 168 files
+- Timestamp: 2026-04-12T15:25:05Z

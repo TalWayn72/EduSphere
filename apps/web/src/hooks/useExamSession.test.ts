@@ -123,7 +123,11 @@ describe('useExamBlueprint', () => {
   });
 
   it('returns blueprint data when available', () => {
-    const blueprint = { id: 'bp-1', title: 'Test Blueprint', totalQuestions: 50 };
+    const blueprint = {
+      id: 'bp-1',
+      title: 'Test Blueprint',
+      totalQuestions: 50,
+    };
     vi.mocked(urql.useQuery).mockReturnValue([
       { fetching: false, data: { examBlueprint: blueprint } },
       vi.fn(),
@@ -147,7 +151,11 @@ describe('useExamSession query', () => {
   });
 
   it('returns session data when available', () => {
-    const session = { id: 'session-1', status: 'IN_PROGRESS', timeRemainingSeconds: 3600 };
+    const session = {
+      id: 'session-1',
+      status: 'IN_PROGRESS',
+      timeRemainingSeconds: 3600,
+    };
     vi.mocked(urql.useQuery).mockReturnValue([
       { fetching: false, data: { examSession: session } },
       vi.fn(),

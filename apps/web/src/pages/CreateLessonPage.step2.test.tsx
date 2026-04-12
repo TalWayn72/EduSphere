@@ -34,7 +34,9 @@ describe('CreateLessonStep2', () => {
 
   it('renders the step heading via i18n', () => {
     renderStep2({});
-    expect(screen.getByRole('heading', { name: /Add Materials/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Add Materials/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the skip hint paragraph via i18n', () => {

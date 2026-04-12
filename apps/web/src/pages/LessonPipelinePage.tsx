@@ -253,8 +253,7 @@ export function LessonPipelinePage() {
     const runId = currentRun?.id;
     if (!runId) return;
     const { error } = await cancelRun({ runId });
-    if (error)
-    reexecute({ requestPolicy: 'network-only' });
+    if (error) reexecute({ requestPolicy: 'network-only' });
   };
 
   return (

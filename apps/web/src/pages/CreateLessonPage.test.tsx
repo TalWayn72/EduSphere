@@ -81,8 +81,7 @@ vi.mock('react-i18next', () => ({
         'createLesson.createAndContinue':
           'Create lesson & continue to Pipeline',
         'createLesson.creating': 'Creating lesson...',
-        'createLesson.authError':
-          'Authentication error — please log in again',
+        'createLesson.authError': 'Authentication error — please log in again',
         'createLesson.networkError':
           'Network error — cannot connect to server. Try again.',
         back: 'Back',
@@ -214,9 +213,7 @@ describe('CreateLessonPage', () => {
       </MemoryRouter>
     );
     await advanceToStep3();
-    expect(
-      screen.getByText(/Select Pipeline Template/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Select Pipeline Template/i)).toBeInTheDocument();
   });
 
   it('shows both template cards in step 3', async () => {
@@ -227,9 +224,7 @@ describe('CreateLessonPage', () => {
     );
     await advanceToStep3();
     expect(screen.getByText(/General \(Thematic\)/i)).toBeInTheDocument();
-    expect(
-      screen.getAllByText(/Sequential/i).length
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Sequential/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('submit button is disabled until a template is selected', async () => {
@@ -462,9 +457,7 @@ describe('CreateLessonPage', () => {
     await waitFor(() => {
       const errorEl = screen.getByRole('alert');
       expect(errorEl).toBeInTheDocument();
-      expect(errorEl.textContent).toMatch(
-        /Authentication error|שגיאת אימות/
-      );
+      expect(errorEl.textContent).toMatch(/Authentication error|שגיאת אימות/);
     });
   });
 
@@ -534,8 +527,6 @@ describe('CreateLessonPage', () => {
     );
     await advanceToStep3();
     expect(screen.getByText(/General \(Thematic\)/i)).toBeInTheDocument();
-    expect(
-      screen.getAllByText(/Sequential/i).length
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Sequential/i).length).toBeGreaterThanOrEqual(1);
   });
 });

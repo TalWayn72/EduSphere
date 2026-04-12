@@ -13,30 +13,43 @@
 import 'dotenv/config';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { createDatabaseConnection, schema, eq, and, isNull, ne } from '../index.js';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  and,
+  isNull,
+  ne,
+} from '../index.js';
 import { withBypassRLS } from '../rls/withTenantContext.js';
 
 // __dirname available via tsx (CommonJS semantics for seed scripts)
-interface TranscriptBlock { startTime: number; endTime: number; text: string }
+interface TranscriptBlock {
+  startTime: number;
+  endTime: number;
+  text: string;
+}
 const transcriptBlocks: TranscriptBlock[] = JSON.parse(
-  readFileSync(join(__dirname, 'transcript-blocks-data.json'), 'utf8'),
+  readFileSync(join(__dirname, 'transcript-blocks-data.json'), 'utf8')
 ) as TranscriptBlock[];
 
 // ─── Stable UUIDs ─────────────────────────────────────────────────────────────
-const DEMO_TENANT     = '00000000-0000-0000-0000-000000000000';
-const INSTRUCTOR_ID   = 'cc000000-0000-0000-0000-000000000001';
+const DEMO_TENANT = '00000000-0000-0000-0000-000000000000';
+const INSTRUCTOR_ID = 'cc000000-0000-0000-0000-000000000001';
 // Dedicated stable course for ספירת העומר lessons (separate from נהר שלום cc000000-...0002)
-const COURSE_ID       = '55dfa451-bf85-4750-ac64-76d17dac5afb';
-const MODULE_ID       = 'cc100000-0000-0000-0000-000000000001';
+const COURSE_ID = '55dfa451-bf85-4750-ac64-76d17dac5afb';
+const MODULE_ID = 'cc100000-0000-0000-0000-000000000001';
 
-const LESSON_ID       = '52105dcc-f21a-4b2c-93fd-11d33b830aaa';
-const MEDIA_ASSET_ID  = '52105dcc-f21a-4b2c-93fd-11d33b830bbb';
+const LESSON_ID = '52105dcc-f21a-4b2c-93fd-11d33b830aaa';
+const MEDIA_ASSET_ID = '52105dcc-f21a-4b2c-93fd-11d33b830bbb';
 const LESSON_ASSET_ID = '52105dcc-f21a-4b2c-93fd-11d33b830ccc';
 
 // Block IDs (stable, for idempotent re-runs)
-const blk = (n: number) => `52105dcc-f21a-4b2c-93fd-aa${String(n).padStart(10, '0')}`;
+const blk = (n: number) =>
+  `52105dcc-f21a-4b2c-93fd-aa${String(n).padStart(10, '0')}`;
 // Transcript block IDs — stable via deterministic index prefix
-const tblk = (n: number) => `52105dcc-f21a-4b2c-93fd-bb${String(n).padStart(10, '0')}`;
+const tblk = (n: number) =>
+  `52105dcc-f21a-4b2c-93fd-bb${String(n).padStart(10, '0')}`;
 
 const YOUTUBE_VIDEO_ID = '3QTC00L1x1w';
 
@@ -51,7 +64,8 @@ export async function seedKabbalahLesson(): Promise<void> {
         id: COURSE_ID,
         tenant_id: DEMO_TENANT,
         title: 'ספירת העומר',
-        description: 'שיעורים בנושא ספירת העומר, מוחין דקטנות ומוחין דגדלות על פי תורת הקבלה',
+        description:
+          'שיעורים בנושא ספירת העומר, מוחין דקטנות ומוחין דגדלות על פי תורת הקבלה',
         creator_id: INSTRUCTOR_ID,
         instructor_id: INSTRUCTOR_ID,
         is_published: true,
@@ -102,7 +116,11 @@ export async function seedKabbalahLesson(): Promise<void> {
       })
       .onConflictDoUpdate({
         target: schema.lessons.id,
-        set: { status: 'PUBLISHED', course_id: COURSE_ID, updated_at: new Date() },
+        set: {
+          status: 'PUBLISHED',
+          course_id: COURSE_ID,
+          updated_at: new Date(),
+        },
       });
 
     // 3. Lesson asset — links lesson → media_asset (enables youtubeVideoId lookup).
@@ -266,17 +284,16 @@ export async function seedKabbalahLesson(): Promise<void> {
       .values([HEADING_BLOCK])
       .onConflictDoNothing();
 
-    const transcriptRows = transcriptBlocks
-      .map((block, idx) => ({
-        id: tblk(idx + 1),
-        tenant_id: DEMO_TENANT,
-        lesson_id: LESSON_ID,
-        block_type: 'TEXT' as const,
-        block_order: 11 + idx,
-        content: { text: block.text },
-        start_time: String(block.startTime),
-        end_time: String(block.endTime),
-      }));
+    const transcriptRows = transcriptBlocks.map((block, idx) => ({
+      id: tblk(idx + 1),
+      tenant_id: DEMO_TENANT,
+      lesson_id: LESSON_ID,
+      block_type: 'TEXT' as const,
+      block_order: 11 + idx,
+      content: { text: block.text },
+      start_time: String(block.startTime),
+      end_time: String(block.endTime),
+    }));
 
     // Insert in batches of 10 to avoid parameter limit
     const BATCH = 10;

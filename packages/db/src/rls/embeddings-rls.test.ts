@@ -119,7 +119,7 @@ describe('concept_embeddings RLS policy', () => {
 
   it('has both using and withCheck policies', () => {
     const tableStart = embeddingsFile.indexOf("'concept_embeddings'");
-    const tableEnd = embeddingsFile.indexOf("contentEmbeddingsHnswIdx");
+    const tableEnd = embeddingsFile.indexOf('contentEmbeddingsHnswIdx');
     const tableSection = embeddingsFile.slice(tableStart, tableEnd);
     expect(tableSection).toContain('withCheck');
     expect(tableSection).toContain('using');
@@ -127,7 +127,7 @@ describe('concept_embeddings RLS policy', () => {
 
   it('concept_embeddings has tenant_id column directly', () => {
     const tableStart = embeddingsFile.indexOf("'concept_embeddings'");
-    const tableEnd = embeddingsFile.indexOf("contentEmbeddingsHnswIdx");
+    const tableEnd = embeddingsFile.indexOf('contentEmbeddingsHnswIdx');
     const tableSection = embeddingsFile.slice(tableStart, tableEnd);
     expect(tableSection).toContain('tenant_id');
   });

@@ -116,7 +116,11 @@ export class NotificationsResolver {
     if (!authCtx?.userId || !authCtx.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    return this.deliveriesService.markRead(id, authCtx.userId, authCtx.tenantId);
+    return this.deliveriesService.markRead(
+      id,
+      authCtx.userId,
+      authCtx.tenantId
+    );
   }
 
   /**

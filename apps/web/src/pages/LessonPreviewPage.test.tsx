@@ -164,10 +164,7 @@ const ENRICHED_DATA_EMPTY = {
 };
 
 /** Mock useQuery to return first call for LESSON_QUERY and second for ENRICHED_LESSON_QUERY */
-function mockBothQueries(
-  lessonResult: unknown,
-  enrichedResult: unknown
-): void {
+function mockBothQueries(lessonResult: unknown, enrichedResult: unknown): void {
   let callCount = 0;
   vi.mocked(urql.useQuery).mockImplementation(() => {
     callCount++;

@@ -43,7 +43,7 @@ export function JargonManagementPage() {
   const domains = data?.jargonDomains ?? [];
 
   const selectedDomain = selectedDomainId
-    ? domains.find((d) => d.id === selectedDomainId) ?? null
+    ? (domains.find((d) => d.id === selectedDomainId) ?? null)
     : null;
 
   if (!role || !ADMIN_ROLES.has(role)) {

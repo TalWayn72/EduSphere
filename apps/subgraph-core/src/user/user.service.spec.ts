@@ -178,7 +178,11 @@ describe('UserService', () => {
 
     it('skips withTenantContext when authContext has no tenantId', async () => {
       // SUPER_ADMIN with no tenantId is allowed cross-tenant lookup without withTenantContext
-      const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '', isSuperAdmin: true };
+      const noTenantAuth: AuthContext = {
+        ...MOCK_AUTH,
+        tenantId: '',
+        isSuperAdmin: true,
+      };
       mockLimit.mockResolvedValue([MOCK_USER]);
       await service.findById('user-1', noTenantAuth);
       expect(withTenantContext).not.toHaveBeenCalled();

@@ -63,10 +63,34 @@ export class AgentSessionResolver {
 
   /** Default fallback templates returned when agent_definitions table is empty. */
   private static readonly DEFAULT_TEMPLATES = [
-    { id: '1', name: 'Tutor', templateType: 'TUTOR', systemPrompt: 'You are a helpful tutor.', parameters: {} },
-    { id: '2', name: 'Quiz Generator', templateType: 'QUIZ_GENERATOR', systemPrompt: 'You generate educational quizzes.', parameters: {} },
-    { id: '3', name: 'Debate Facilitator', templateType: 'DEBATE_FACILITATOR', systemPrompt: 'You facilitate debates and discussions.', parameters: {} },
-    { id: '4', name: 'Explanation Generator', templateType: 'EXPLANATION_GENERATOR', systemPrompt: 'You explain complex topics in simple terms.', parameters: {} },
+    {
+      id: '1',
+      name: 'Tutor',
+      templateType: 'TUTOR',
+      systemPrompt: 'You are a helpful tutor.',
+      parameters: {},
+    },
+    {
+      id: '2',
+      name: 'Quiz Generator',
+      templateType: 'QUIZ_GENERATOR',
+      systemPrompt: 'You generate educational quizzes.',
+      parameters: {},
+    },
+    {
+      id: '3',
+      name: 'Debate Facilitator',
+      templateType: 'DEBATE_FACILITATOR',
+      systemPrompt: 'You facilitate debates and discussions.',
+      parameters: {},
+    },
+    {
+      id: '4',
+      name: 'Explanation Generator',
+      templateType: 'EXPLANATION_GENERATOR',
+      systemPrompt: 'You explain complex topics in simple terms.',
+      parameters: {},
+    },
   ];
 
   @Query('agentTemplates')
@@ -89,12 +113,15 @@ export class AgentSessionResolver {
           id: r.id,
           name: r.name,
           templateType: r.template,
-          systemPrompt: (r.config as Record<string, unknown>)?.systemPrompt ?? '',
+          systemPrompt:
+            (r.config as Record<string, unknown>)?.systemPrompt ?? '',
           parameters: r.config ?? {},
         }));
       }
     } catch (err) {
-      this.logger.warn(`agentTemplates DB query failed, using defaults: ${String(err)}`);
+      this.logger.warn(
+        `agentTemplates DB query failed, using defaults: ${String(err)}`
+      );
     }
     return AgentSessionResolver.DEFAULT_TEMPLATES;
   }

@@ -96,7 +96,14 @@ describe('initializeGraphOntology()', () => {
     const db = buildMockDb();
     await initializeGraphOntology(db);
     const queries = mockExecuteCypher.mock.calls.map((c) => c[2] as string);
-    const vertexTypes = ['Concept', 'Person', 'TopicCluster', 'Term', 'Source', 'Domain'];
+    const vertexTypes = [
+      'Concept',
+      'Person',
+      'TopicCluster',
+      'Term',
+      'Source',
+      'Domain',
+    ];
     for (const vtype of vertexTypes) {
       const matching = queries.find((q) => q.includes(`:${vtype}`));
       expect(matching).toBeDefined();

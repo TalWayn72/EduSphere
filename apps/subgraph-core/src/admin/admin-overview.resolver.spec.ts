@@ -98,13 +98,21 @@ describe('AdminOverviewResolver', () => {
   });
 
   it('returns the result from service.getOverview', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: ['ORG_ADMIN'] });
+    const ctx = makeContext({
+      tenantId: 'tenant-1',
+      userId: 'u1',
+      roles: ['ORG_ADMIN'],
+    });
     const result = await resolver.adminOverview(ctx);
     expect(result).toBe(OVERVIEW_DATA);
   });
 
   it('preserves the full result shape returned by the service', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: ['ORG_ADMIN'] });
+    const ctx = makeContext({
+      tenantId: 'tenant-1',
+      userId: 'u1',
+      roles: ['ORG_ADMIN'],
+    });
     const result = (await resolver.adminOverview(ctx)) as typeof OVERVIEW_DATA;
     expect(result.totalUsers).toBe(42);
     expect(result.lastScimSync).toBe('2026-02-01T00:00:00.000Z');
@@ -130,7 +138,11 @@ describe('AdminOverviewResolver', () => {
   });
 
   it('adminDashboardStats returns result from service', async () => {
-    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: ['ORG_ADMIN'] });
+    const ctx = makeContext({
+      tenantId: 'tenant-1',
+      userId: 'u1',
+      roles: ['ORG_ADMIN'],
+    });
     const result = await resolver.adminDashboardStats(ctx);
     expect(result).toBe(DASHBOARD_STATS_DATA);
   });

@@ -83,6 +83,15 @@ export type AddFileSourceInput = {
   title: Scalars['String']['input'];
 };
 
+export type AddJargonTermInput = {
+  altForms?: InputMaybe<Array<Scalars['String']['input']>>;
+  canonicalForm: Scalars['String']['input'];
+  definitionShort?: InputMaybe<Scalars['String']['input']>;
+  domainId: Scalars['ID']['input'];
+  language?: InputMaybe<Scalars['String']['input']>;
+  phoneticHint?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type AddLessonAssetInput = {
   assetType: LessonAssetType;
   fileUrl?: InputMaybe<Scalars['String']['input']>;
@@ -752,6 +761,11 @@ export type ConceptRelationship = {
   toConcept: Concept;
 };
 
+export type ConfirmDomainInput = {
+  domainIds: Array<Scalars['ID']['input']>;
+  lessonId: Scalars['ID']['input'];
+};
+
 export enum ConsentType {
   AiProcessing = 'AI_PROCESSING',
   Analytics = 'ANALYTICS',
@@ -1155,6 +1169,13 @@ export type CreateExamItemInput = {
   source?: InputMaybe<ExamItemSource>;
 };
 
+export type CreateJargonDomainInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  parentDomainId?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type CreateLessonInput = {
   courseId: Scalars['ID']['input'];
   instructorId: Scalars['ID']['input'];
@@ -1348,6 +1369,13 @@ export enum DeliveryStatus {
   Sent = 'SENT'
 }
 
+export type DetectedDomain = {
+  __typename?: 'DetectedDomain';
+  confidence: Scalars['Float']['output'];
+  domain: JargonDomain;
+  method: Scalars['String']['output'];
+};
+
 /** Discussion in a course */
 export type Discussion = {
   __typename?: 'Discussion';
@@ -1447,6 +1475,18 @@ export type DocumentVersion = {
   id: Scalars['ID']['output'];
   mediaAssetId: Scalars['ID']['output'];
   versionNumber: Scalars['Int']['output'];
+};
+
+export type DomainDetectionResult = {
+  __typename?: 'DomainDetectionResult';
+  domains: Array<DetectedDomain>;
+  suggestedTerms: Array<JargonTerm>;
+};
+
+export type DomainProximity = {
+  __typename?: 'DomainProximity';
+  domain: JargonDomain;
+  score: Scalars['Float']['output'];
 };
 
 export type DomainScore = {
@@ -1885,6 +1925,49 @@ export type InviteUserInput = {
   message?: InputMaybe<Scalars['String']['input']>;
   role: Scalars['String']['input'];
 };
+
+export type JargonDomain = {
+  __typename?: 'JargonDomain';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  language: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  parentDomain?: Maybe<JargonDomain>;
+  relatedDomains: Array<DomainProximity>;
+  tenantId: Scalars['ID']['output'];
+  termCount: Scalars['Int']['output'];
+};
+
+export type JargonOccurrence = {
+  __typename?: 'JargonOccurrence';
+  correctedText?: Maybe<Scalars['String']['output']>;
+  endTime?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  originalText: Scalars['String']['output'];
+  startTime?: Maybe<Scalars['Float']['output']>;
+  term: JargonTerm;
+};
+
+export type JargonTerm = {
+  __typename?: 'JargonTerm';
+  altForms: Array<Scalars['String']['output']>;
+  canonicalForm: Scalars['String']['output'];
+  confidence?: Maybe<Scalars['Float']['output']>;
+  definitionShort?: Maybe<Scalars['String']['output']>;
+  domain: JargonDomain;
+  domainId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  language: Scalars['String']['output'];
+  phoneticHint?: Maybe<Scalars['String']['output']>;
+  source: JargonTermSource;
+};
+
+export enum JargonTermSource {
+  Auto = 'AUTO',
+  Imported = 'IMPORTED',
+  Manual = 'MANUAL'
+}
 
 export type JoinSessionResult = {
   __typename?: 'JoinSessionResult';
@@ -2397,6 +2480,7 @@ export type Mutation = {
    * the GraphQL gateway without a multipart transport layer.
    */
   addFileSource: KnowledgeSource;
+  addJargonTerm: JargonTerm;
   addLessonAsset: LessonAsset;
   addLessonStep: CourseLessonPlan;
   /** Add a message to a discussion */
@@ -2440,6 +2524,7 @@ export type Mutation = {
   compactCollabDocument: CollabDocument;
   completeAssessmentCampaign: AssessmentResult;
   completeOnboarding: OnboardingState;
+  confirmLessonDomains: Array<JargonDomain>;
   confirmMediaUpload: MediaAsset;
   confirmVisualAssetUpload: VisualAsset;
   createAgentTemplate: AgentTemplate;
@@ -2463,8 +2548,15 @@ export type Mutation = {
   createDiscussion: Discussion;
   createDocumentVersion: DocumentVersion;
   createEmbedding: Embedding;
+  /**
+   * Auto-generate enriched transcript blocks from existing transcript segments.
+   * Groups consecutive segments into ~2-minute TEXT blocks and prepends a HEADING.
+   * Idempotent — safe to call multiple times.
+   */
+  createEnrichedBlocksFromTranscript: EnrichedLesson;
   createExamBlueprint: ExamBlueprint;
   createExamItem: ExamItem;
+  createJargonDomain: JargonDomain;
   createLesson: Lesson;
   createLessonPlan: CourseLessonPlan;
   createLiveSession: LiveSession;
@@ -2549,6 +2641,7 @@ export type Mutation = {
   importFromDrive: ImportJob;
   importFromWebsite: ImportJob;
   importFromYoutube: ImportJob;
+  importJargonTerms: Scalars['Int']['output'];
   importScormPackage: ScormImportResult;
   ingestContent: ContentIngestionResult;
   ingestYoutubeLesson: EnrichedLesson;
@@ -2783,6 +2876,11 @@ export type MutationAddFileSourceArgs = {
 };
 
 
+export type MutationAddJargonTermArgs = {
+  input: AddJargonTermInput;
+};
+
+
 export type MutationAddLessonAssetArgs = {
   input: AddLessonAssetInput;
   lessonId: Scalars['ID']['input'];
@@ -2922,6 +3020,11 @@ export type MutationCompleteAssessmentCampaignArgs = {
 };
 
 
+export type MutationConfirmLessonDomainsArgs = {
+  input: ConfirmDomainInput;
+};
+
+
 export type MutationConfirmMediaUploadArgs = {
   courseId: Scalars['ID']['input'];
   fileKey: Scalars['String']['input'];
@@ -3046,6 +3149,11 @@ export type MutationCreateEmbeddingArgs = {
 };
 
 
+export type MutationCreateEnrichedBlocksFromTranscriptArgs = {
+  lessonId: Scalars['ID']['input'];
+};
+
+
 export type MutationCreateExamBlueprintArgs = {
   input: CreateExamBlueprintInput;
 };
@@ -3053,6 +3161,11 @@ export type MutationCreateExamBlueprintArgs = {
 
 export type MutationCreateExamItemArgs = {
   input: CreateExamItemInput;
+};
+
+
+export type MutationCreateJargonDomainArgs = {
+  input: CreateJargonDomainInput;
 };
 
 
@@ -3453,6 +3566,12 @@ export type MutationImportFromWebsiteArgs = {
 
 export type MutationImportFromYoutubeArgs = {
   input: YoutubeImportInput;
+};
+
+
+export type MutationImportJargonTermsArgs = {
+  domainId: Scalars['ID']['input'];
+  terms: Array<AddJargonTermInput>;
 };
 
 
@@ -4894,6 +5013,7 @@ export type Query = {
    * Returns null when no lessons are available.
    */
   dailyMicrolesson?: Maybe<ContentItem>;
+  detectLessonDomains: DomainDetectionResult;
   /** Get a single discussion by ID */
   discussion?: Maybe<Discussion>;
   /** Get all messages in a discussion */
@@ -4922,6 +5042,10 @@ export type Query = {
   getVisualAnchors: Array<VisualAnchor>;
   getVisualAssets: Array<VisualAsset>;
   instructorEarnings: EarningsSummary;
+  jargonDomain?: Maybe<JargonDomain>;
+  jargonDomains: Array<JargonDomain>;
+  jargonTerm?: Maybe<JargonTerm>;
+  jargonTerms: Array<JargonTerm>;
   /** Check knowledge graph topology coverage for a course before badge issuance. */
   knowledgePathCoverage: KnowledgePathCoverage;
   knowledgeSource?: Maybe<KnowledgeSource>;
@@ -4935,6 +5059,7 @@ export type Query = {
    */
   learningPath?: Maybe<LearningPath>;
   lesson?: Maybe<Lesson>;
+  lessonJargonOccurrences: Array<JargonOccurrence>;
   lessonPipelineRun?: Maybe<LessonPipelineRun>;
   lessonPipelineRuns: Array<LessonPipelineRun>;
   lessonsByCourse: Array<Lesson>;
@@ -5370,6 +5495,11 @@ export type QueryCrmSyncLogArgs = {
 };
 
 
+export type QueryDetectLessonDomainsArgs = {
+  lessonId: Scalars['ID']['input'];
+};
+
+
 export type QueryDiscussionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -5485,6 +5615,28 @@ export type QueryGetVisualAssetsArgs = {
 };
 
 
+export type QueryJargonDomainArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryJargonDomainsArgs = {
+  language?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryJargonTermArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryJargonTermsArgs = {
+  domainId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryKnowledgePathCoverageArgs = {
   courseId: Scalars['ID']['input'];
   requiredConceptIds: Array<Scalars['ID']['input']>;
@@ -5520,6 +5672,11 @@ export type QueryLearningPathArgs = {
 
 export type QueryLessonArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryLessonJargonOccurrencesArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -7773,16 +7930,16 @@ export type DiscussionMessageAddedSubscriptionVariables = Exact<{
 
 export type DiscussionMessageAddedSubscription = { __typename?: 'Subscription', messageAdded: { __typename?: 'DiscussionMessage', id: string, userId: string, content: string, messageType: MessageType, parentMessageId?: string | null, likesCount: number, isLikedByMe: boolean, createdAt: string } };
 
-export type CitationFieldsFragment = { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null };
+export type CitationFieldsFragment = { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null };
 
-export type EnrichedBlockFieldsFragment = { __typename?: 'EnrichedTranscriptBlock', id: string, lessonId: string, segmentId?: string | null, blockType: EnrichedBlockType, blockOrder: number, content: unknown, startTime?: number | null, endTime?: number | null, citation?: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null } | null, anchor?: { __typename?: 'VisualAnchor', id: string, anchorText: string, startTime?: number | null, endTime?: number | null, visualAssetId?: string | null } | null };
+export type EnrichedBlockFieldsFragment = { __typename?: 'EnrichedTranscriptBlock', id: string, lessonId: string, segmentId?: string | null, blockType: EnrichedBlockType, blockOrder: number, content: unknown, startTime?: number | null, endTime?: number | null, citation?: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null } | null, anchor?: { __typename?: 'VisualAnchor', id: string, anchorText: string } | null };
 
 export type EnrichedLessonQueryVariables = Exact<{
   lessonId: Scalars['ID']['input'];
 }>;
 
 
-export type EnrichedLessonQuery = { __typename?: 'Query', enrichedLesson?: { __typename?: 'EnrichedLesson', id: string, youtubeVideoId?: string | null, transcriptReady: boolean, enrichmentStatus: EnrichmentStatus, lesson: { __typename?: 'Lesson', id: string, title: string }, blocks: Array<{ __typename?: 'EnrichedTranscriptBlock', id: string, lessonId: string, segmentId?: string | null, blockType: EnrichedBlockType, blockOrder: number, content: unknown, startTime?: number | null, endTime?: number | null, citation?: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null } | null, anchor?: { __typename?: 'VisualAnchor', id: string, anchorText: string, startTime?: number | null, endTime?: number | null, visualAssetId?: string | null } | null }>, citations: Array<{ __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null }> } | null };
+export type EnrichedLessonQuery = { __typename?: 'Query', enrichedLesson?: { __typename?: 'EnrichedLesson', id: string, youtubeVideoId?: string | null, transcriptReady: boolean, enrichmentStatus: EnrichmentStatus, lesson: { __typename?: 'Lesson', id: string, title: string }, blocks: Array<{ __typename?: 'EnrichedTranscriptBlock', id: string, lessonId: string, segmentId?: string | null, blockType: EnrichedBlockType, blockOrder: number, content: unknown, startTime?: number | null, endTime?: number | null, citation?: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null } | null, anchor?: { __typename?: 'VisualAnchor', id: string, anchorText: string } | null }>, citations: Array<{ __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null }> } | null };
 
 export type IngestYoutubeLessonMutationVariables = Exact<{
   input: IngestYoutubeLessonInput;
@@ -7797,7 +7954,7 @@ export type UpdateLessonCitationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateLessonCitationMutation = { __typename?: 'Mutation', updateLessonCitation: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null, resolvedText?: string | null, knowledgeSourceId?: string | null, graphSourceId?: string | null } };
+export type UpdateLessonCitationMutation = { __typename?: 'Mutation', updateLessonCitation: { __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, column?: string | null, paragraph?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null } };
 
 export type SetBlockAnchorTimestampMutationVariables = Exact<{
   input: SetBlockAnchorTimestampInput;
@@ -7812,6 +7969,72 @@ export type PublishEnrichedLessonMutationVariables = Exact<{
 
 
 export type PublishEnrichedLessonMutation = { __typename?: 'Mutation', publishEnrichedLesson: { __typename?: 'EnrichedLesson', id: string, enrichmentStatus: EnrichmentStatus } };
+
+export type CreateEnrichedBlocksFromTranscriptMutationVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+}>;
+
+
+export type CreateEnrichedBlocksFromTranscriptMutation = { __typename?: 'Mutation', createEnrichedBlocksFromTranscript: { __typename?: 'EnrichedLesson', id: string, enrichmentStatus: EnrichmentStatus, transcriptReady: boolean } };
+
+export type JargonDomainsQueryVariables = Exact<{
+  language?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type JargonDomainsQuery = { __typename?: 'Query', jargonDomains: Array<{ __typename?: 'JargonDomain', id: string, tenantId: string, name: string, description?: string | null, language: string, termCount: number, parentDomain?: { __typename?: 'JargonDomain', id: string, name: string } | null, relatedDomains: Array<{ __typename?: 'DomainProximity', score: number, domain: { __typename?: 'JargonDomain', id: string, name: string } }> }> };
+
+export type JargonTermsQueryVariables = Exact<{
+  domainId: Scalars['ID']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type JargonTermsQuery = { __typename?: 'Query', jargonTerms: Array<{ __typename?: 'JargonTerm', id: string, domainId: string, canonicalForm: string, phoneticHint?: string | null, altForms: Array<string>, definitionShort?: string | null, language: string, source: JargonTermSource, confidence?: number | null }> };
+
+export type DetectLessonDomainsQueryVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+}>;
+
+
+export type DetectLessonDomainsQuery = { __typename?: 'Query', detectLessonDomains: { __typename?: 'DomainDetectionResult', domains: Array<{ __typename?: 'DetectedDomain', confidence: number, method: string, domain: { __typename?: 'JargonDomain', id: string, name: string, description?: string | null } }>, suggestedTerms: Array<{ __typename?: 'JargonTerm', id: string, canonicalForm: string, definitionShort?: string | null }> } };
+
+export type LessonJargonOccurrencesQueryVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+}>;
+
+
+export type LessonJargonOccurrencesQuery = { __typename?: 'Query', lessonJargonOccurrences: Array<{ __typename?: 'JargonOccurrence', id: string, lessonId: string, startTime?: number | null, endTime?: number | null, originalText: string, correctedText?: string | null, term: { __typename?: 'JargonTerm', id: string, canonicalForm: string, definitionShort?: string | null } }> };
+
+export type CreateJargonDomainMutationVariables = Exact<{
+  input: CreateJargonDomainInput;
+}>;
+
+
+export type CreateJargonDomainMutation = { __typename?: 'Mutation', createJargonDomain: { __typename?: 'JargonDomain', id: string, tenantId: string, name: string, description?: string | null, language: string, termCount: number, parentDomain?: { __typename?: 'JargonDomain', id: string, name: string } | null } };
+
+export type AddJargonTermMutationVariables = Exact<{
+  input: AddJargonTermInput;
+}>;
+
+
+export type AddJargonTermMutation = { __typename?: 'Mutation', addJargonTerm: { __typename?: 'JargonTerm', id: string, domainId: string, canonicalForm: string, phoneticHint?: string | null, altForms: Array<string>, definitionShort?: string | null, language: string, source: JargonTermSource, confidence?: number | null } };
+
+export type ConfirmLessonDomainsMutationVariables = Exact<{
+  input: ConfirmDomainInput;
+}>;
+
+
+export type ConfirmLessonDomainsMutation = { __typename?: 'Mutation', confirmLessonDomains: Array<{ __typename?: 'JargonDomain', id: string, name: string, description?: string | null, language: string, termCount: number }> };
+
+export type ImportJargonTermsMutationVariables = Exact<{
+  domainId: Scalars['ID']['input'];
+  terms: Array<AddJargonTermInput> | AddJargonTermInput;
+}>;
+
+
+export type ImportJargonTermsMutation = { __typename?: 'Mutation', importJargonTerms: number };
 
 export type ConceptQueryVariables = Exact<{
   id: Scalars['ID']['input'];

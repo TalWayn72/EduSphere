@@ -53,7 +53,9 @@ vi.mock('@edusphere/db', () => ({
   schema: {
     jargon_occurrences: { lesson_id: 'lesson_id', term_id: 'term_id' },
     domain_proximity: {
-      domain_a_id: 'domain_a_id', domain_b_id: 'domain_b_id', tenant_id: 'tenant_id',
+      domain_a_id: 'domain_a_id',
+      domain_b_id: 'domain_b_id',
+      tenant_id: 'tenant_id',
     },
   },
   eq: vi.fn(),
@@ -68,20 +70,33 @@ const TENANT_ID = 'tenant-uuid-1';
 const LESSON_ID = 'lesson-uuid-1';
 
 const TERM_SEPHIROT: JargonTerm = {
-  id: 'term-sephirot', domain_id: 'domain-kabbalah', tenant_id: TENANT_ID,
-  canonical_form: 'ספירות', alt_forms: ['ספירה', 'sefirot'],
-  definition_short: 'The ten divine attributes in Kabbalah', language: 'he',
+  id: 'term-sephirot',
+  domain_id: 'domain-kabbalah',
+  tenant_id: TENANT_ID,
+  canonical_form: 'ספירות',
+  alt_forms: ['ספירה', 'sefirot'],
+  definition_short: 'The ten divine attributes in Kabbalah',
+  language: 'he',
 };
 
 const TERM_EIN_SOF: JargonTerm = {
-  id: 'term-ein-sof', domain_id: 'domain-kabbalah', tenant_id: TENANT_ID,
-  canonical_form: 'אין סוף', alt_forms: ['Ein Sof', 'עין סוף'],
-  definition_short: 'The infinite divine essence', language: 'he',
+  id: 'term-ein-sof',
+  domain_id: 'domain-kabbalah',
+  tenant_id: TENANT_ID,
+  canonical_form: 'אין סוף',
+  alt_forms: ['Ein Sof', 'עין סוף'],
+  definition_short: 'The infinite divine essence',
+  language: 'he',
 };
 
 const TERM_GEMARA: JargonTerm = {
-  id: 'term-gemara', domain_id: 'domain-talmud', tenant_id: TENANT_ID,
-  canonical_form: 'גמרא', alt_forms: ['Gemara'], definition_short: 'The Talmud', language: 'he',
+  id: 'term-gemara',
+  domain_id: 'domain-talmud',
+  tenant_id: TENANT_ID,
+  canonical_form: 'גמרא',
+  alt_forms: ['Gemara'],
+  definition_short: 'The Talmud',
+  language: 'he',
 };
 
 // ── Private method re-implementations ─────────────────────────────────────────
@@ -89,8 +104,18 @@ const TERM_GEMARA: JargonTerm = {
 function matchTermsInSegment(
   text: string,
   terms: JargonTerm[]
-): Array<{ term: JargonTerm; original: string; corrected?: string; confidence: number }> {
-  const matches: Array<{ term: JargonTerm; original: string; corrected?: string; confidence: number }> = [];
+): Array<{
+  term: JargonTerm;
+  original: string;
+  corrected?: string;
+  confidence: number;
+}> {
+  const matches: Array<{
+    term: JargonTerm;
+    original: string;
+    corrected?: string;
+    confidence: number;
+  }> = [];
   const lowerText = text.toLowerCase();
   for (const term of terms) {
     const forms = [term.canonical_form, ...term.alt_forms];
@@ -102,7 +127,10 @@ function matchTermsInSegment(
         matches.push({
           term,
           original: originalSlice,
-          corrected: originalSlice !== term.canonical_form ? term.canonical_form : undefined,
+          corrected:
+            originalSlice !== term.canonical_form
+              ? term.canonical_form
+              : undefined,
           confidence: form === term.canonical_form ? 1.0 : 0.85,
         });
         break;
@@ -130,7 +158,9 @@ describe('JargonDetectionService', () => {
 
   describe('matchTermsInSegment', () => {
     it('matches canonical Hebrew term with confidence 1.0', () => {
-      const results = matchTermsInSegment('עשר ספירות נחשבות לכלים', [TERM_SEPHIROT]);
+      const results = matchTermsInSegment('עשר ספירות נחשבות לכלים', [
+        TERM_SEPHIROT,
+      ]);
       expect(results).toHaveLength(1);
       expect(results[0].term.id).toBe('term-sephirot');
       expect(results[0].confidence).toBe(1.0);
@@ -149,17 +179,27 @@ describe('JargonDetectionService', () => {
     });
 
     it('matches two different terms in the same segment', () => {
-      const results = matchTermsInSegment('אין סוף הוא מקור הספירות', [TERM_SEPHIROT, TERM_EIN_SOF]);
+      const results = matchTermsInSegment('אין סוף הוא מקור הספירות', [
+        TERM_SEPHIROT,
+        TERM_EIN_SOF,
+      ]);
       expect(results).toHaveLength(2);
     });
 
     it('returns empty array when segment has no jargon terms', () => {
-      const results = matchTermsInSegment('This has no Hebrew jargon', [TERM_SEPHIROT, TERM_EIN_SOF]);
+      const results = matchTermsInSegment('This has no Hebrew jargon', [
+        TERM_SEPHIROT,
+        TERM_EIN_SOF,
+      ]);
       expect(results).toHaveLength(0);
     });
 
     it('skips forms shorter than 2 characters', () => {
-      const shortTerm: JargonTerm = { ...TERM_GEMARA, canonical_form: 'א', alt_forms: [] };
+      const shortTerm: JargonTerm = {
+        ...TERM_GEMARA,
+        canonical_form: 'א',
+        alt_forms: [],
+      };
       const results = matchTermsInSegment('א תוכן', [shortTerm]);
       expect(results).toHaveLength(0);
     });
@@ -197,7 +237,9 @@ describe('JargonDetectionService', () => {
     });
 
     it('returns empty array when no abbreviations present', () => {
-      expect(extractAbbreviations('plain text without abbreviations')).toHaveLength(0);
+      expect(
+        extractAbbreviations('plain text without abbreviations')
+      ).toHaveLength(0);
     });
 
     it('does not match regular Hebrew text as abbreviations', () => {
@@ -219,7 +261,9 @@ describe('JargonDetectionService', () => {
     it('matches term when similarity meets 0.75 threshold', async () => {
       mockHasProvider.mockReturnValue(true);
       mockGenerateEmbedding.mockResolvedValue(new Array(768).fill(0.5));
-      mockDbExecute.mockResolvedValue({ rows: [{ term_id: 'term-sephirot', similarity: '0.88' }] });
+      mockDbExecute.mockResolvedValue({
+        rows: [{ term_id: 'term-sephirot', similarity: '0.88' }],
+      });
       const similarity = parseFloat('0.88');
       const matched = [TERM_SEPHIROT].find((t) => t.id === 'term-sephirot');
       expect(matched).toBeDefined();
@@ -234,7 +278,9 @@ describe('JargonDetectionService', () => {
     it('handles embedding error gracefully', async () => {
       mockHasProvider.mockReturnValue(true);
       mockGenerateEmbedding.mockRejectedValue(new Error('Ollama unavailable'));
-      await expect(mockEmbeddingProvider.generateEmbedding('ע"ב')).rejects.toThrow('Ollama unavailable');
+      await expect(
+        mockEmbeddingProvider.generateEmbedding('ע"ב')
+      ).rejects.toThrow('Ollama unavailable');
     });
   });
 
@@ -257,14 +303,21 @@ describe('JargonDetectionService', () => {
       }
       const suggestions = Array.from(patternMap.entries())
         .filter(([, v]) => v.count >= 3)
-        .map(([p, v]) => ({ pattern: p, occurrenceCount: v.count, exampleContext: v.example }));
+        .map(([p, v]) => ({
+          pattern: p,
+          occurrenceCount: v.count,
+          exampleContext: v.example,
+        }));
       expect(suggestions.some((s) => s.pattern === 'פרצוף')).toBe(true);
-      expect(suggestions.find((s) => s.pattern === 'פרצוף')!.occurrenceCount).toBe(3);
+      expect(
+        suggestions.find((s) => s.pattern === 'פרצוף')!.occurrenceCount
+      ).toBe(3);
     });
 
     it('caps results at 20 suggestions', () => {
       const entries = Array.from({ length: 30 }, (_, i) => [
-        `term${i}`, { count: 3, example: 'ctx' },
+        `term${i}`,
+        { count: 3, example: 'ctx' },
       ]) as Array<[string, { count: number; example: string }]>;
       const suggestions = entries.filter(([, v]) => v.count >= 3).slice(0, 20);
       expect(suggestions).toHaveLength(20);
@@ -292,7 +345,11 @@ describe('JargonDetectionService', () => {
   describe('detectJargon integration', () => {
     it('returns empty array when no terms configured', async () => {
       mockListByDomain.mockResolvedValue([]);
-      const terms = await mockTermService.listByDomain('domain-id', TENANT_ID, 500);
+      const terms = await mockTermService.listByDomain(
+        'domain-id',
+        TENANT_ID,
+        500
+      );
       expect(terms).toHaveLength(0);
     });
 
@@ -302,14 +359,24 @@ describe('JargonDetectionService', () => {
         onConflictDoNothing: vi.fn().mockReturnThis(),
         returning: vi.fn().mockResolvedValue([
           {
-            id: 'occ-1', lesson_id: LESSON_ID, term_id: TERM_SEPHIROT.id,
-            segment_id: 'seg-1', start_time: '0', end_time: '10',
-            original_text: 'ספירות', corrected_text: null, confidence: '1',
+            id: 'occ-1',
+            lesson_id: LESSON_ID,
+            term_id: TERM_SEPHIROT.id,
+            segment_id: 'seg-1',
+            start_time: '0',
+            end_time: '10',
+            original_text: 'ספירות',
+            corrected_text: null,
+            confidence: '1',
           },
         ]),
       };
       mockDbInsert.mockReturnValue(insertChain);
-      const result = await mockDb.insert({}).values([]).onConflictDoNothing().returning();
+      const result = await mockDb
+        .insert({})
+        .values([])
+        .onConflictDoNothing()
+        .returning();
       expect(result).toHaveLength(1);
     });
 
@@ -319,7 +386,9 @@ describe('JargonDetectionService', () => {
         { id: 's2', text: 'אין סוף הוא המקור', startTime: 10, endTime: 20 },
         { id: 's3', text: 'no jargon here', startTime: 20, endTime: 30 },
       ];
-      const results = segs.flatMap((s) => matchTermsInSegment(s.text, [TERM_SEPHIROT, TERM_EIN_SOF]));
+      const results = segs.flatMap((s) =>
+        matchTermsInSegment(s.text, [TERM_SEPHIROT, TERM_EIN_SOF])
+      );
       const ids = results.map((r) => r.term.id);
       expect(ids).toContain('term-sephirot');
       expect(ids).toContain('term-ein-sof');

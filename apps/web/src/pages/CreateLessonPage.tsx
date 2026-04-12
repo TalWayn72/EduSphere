@@ -81,7 +81,12 @@ export function CreateLessonPage() {
 
   const handleCreateLesson = async () => {
     if (!courseId || !user) {
-      setError(t('createLesson.authError', 'Authentication error — please log in again'));
+      setError(
+        t(
+          'createLesson.authError',
+          'Authentication error — please log in again'
+        )
+      );
       return;
     }
     const { data, error: mutError } = await createLesson({
@@ -99,7 +104,10 @@ export function CreateLessonPage() {
       const rawMsg = gqlMsg ?? networkMsg ?? mutError.message;
       const isNetworkErr = !gqlMsg && (networkMsg || rawMsg?.includes('fetch'));
       const msg = isNetworkErr
-        ? t('createLesson.networkError', 'Network error — cannot connect to server. Try again.')
+        ? t(
+            'createLesson.networkError',
+            'Network error — cannot connect to server. Try again.'
+          )
         : rawMsg;
       setError(msg);
       return;
@@ -129,7 +137,10 @@ export function CreateLessonPage() {
           className="mb-4"
           items={[
             { label: t('backToCourses', 'Courses'), href: '/courses' },
-            { label: t('courseDetails', 'Course'), href: `/courses/${courseId}` },
+            {
+              label: t('courseDetails', 'Course'),
+              href: `/courses/${courseId}`,
+            },
             { label: t('createLesson.newLesson', 'New Lesson') },
           ]}
         />
@@ -189,7 +200,10 @@ export function CreateLessonPage() {
                   🎯 {t('createLesson.typeThematic', 'General (Thematic)')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {t('createLesson.thematicDescription', 'Instructor-defined topic — 8 processing steps')}
+                  {t(
+                    'createLesson.thematicDescription',
+                    'Instructor-defined topic — 8 processing steps'
+                  )}
                 </p>
               </div>
               <div
@@ -204,7 +218,10 @@ export function CreateLessonPage() {
                   📖 {t('createLesson.typeSequential', 'Sequential')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {t('createLesson.sequentialDescription', 'Sequential study — 9 steps + citation verification')}
+                  {t(
+                    'createLesson.sequentialDescription',
+                    'Sequential study — 9 steps + citation verification'
+                  )}
                 </p>
               </div>
             </div>
@@ -237,7 +254,10 @@ export function CreateLessonPage() {
               >
                 {fetching
                   ? t('createLesson.creating', 'Creating lesson...')
-                  : t('createLesson.createAndContinue', 'Create lesson & continue to Pipeline')}
+                  : t(
+                      'createLesson.createAndContinue',
+                      'Create lesson & continue to Pipeline'
+                    )}
               </Button>
             </div>
           </div>

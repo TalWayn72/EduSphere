@@ -138,13 +138,21 @@ async function generateOutline(
 async function enrichWithGraph(ctx: PipelineContext): Promise<PipelineContext> {
   if (!ctx.graphEnrichFn) {
     // No graph function injected — pass outline through unchanged.
-    return { ...ctx, enrichedOutline: ctx.outline, currentStage: 'verifyHebrew' };
+    return {
+      ...ctx,
+      enrichedOutline: ctx.outline,
+      currentStage: 'verifyHebrew',
+    };
   }
 
   try {
     const concepts = await ctx.graphEnrichFn(ctx.parsedTopic);
     if (concepts.length === 0) {
-      return { ...ctx, enrichedOutline: ctx.outline, currentStage: 'verifyHebrew' };
+      return {
+        ...ctx,
+        enrichedOutline: ctx.outline,
+        currentStage: 'verifyHebrew',
+      };
     }
 
     const conceptBlock = concepts
@@ -160,7 +168,11 @@ async function enrichWithGraph(ctx: PipelineContext): Promise<PipelineContext> {
     return { ...ctx, enrichedOutline: enriched, currentStage: 'verifyHebrew' };
   } catch {
     // Graph query failed — continue with unenriched outline.
-    return { ...ctx, enrichedOutline: ctx.outline, currentStage: 'verifyHebrew' };
+    return {
+      ...ctx,
+      enrichedOutline: ctx.outline,
+      currentStage: 'verifyHebrew',
+    };
   }
 }
 

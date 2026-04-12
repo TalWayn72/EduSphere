@@ -161,37 +161,41 @@ describe('SI-7: No raw NATS connections without buildNatsOptions()', () => {
     ).toHaveLength(0);
   });
 
-  it('no subgraph file uses bare connect({ servers: }) pattern without buildNatsOptions in scope', { timeout: 30_000 }, () => {
-    const bareConnectFiles: string[] = [];
+  it(
+    'no subgraph file uses bare connect({ servers: }) pattern without buildNatsOptions in scope',
+    { timeout: 30_000 },
+    () => {
+      const bareConnectFiles: string[] = [];
 
-    for (const dir of subgraphDirs) {
-      const absDir = resolve(ROOT, dir);
-      const tsFiles = collectTsFiles(absDir);
+      for (const dir of subgraphDirs) {
+        const absDir = resolve(ROOT, dir);
+        const tsFiles = collectTsFiles(absDir);
 
-      for (const filePath of tsFiles) {
-        if (filePath.includes('.spec.') || filePath.includes('.test.'))
-          continue;
+        for (const filePath of tsFiles) {
+          if (filePath.includes('.spec.') || filePath.includes('.test.'))
+            continue;
 
-        const content = readFileSync(filePath, 'utf-8');
+          const content = readFileSync(filePath, 'utf-8');
 
-        // Pattern: connect({ servers: ... }) without buildNatsOptions anywhere in file
-        const hasBareConnect = /connect\(\{\s*servers\s*:/.test(content);
-        const hasBuildNatsOptions = content.includes('buildNatsOptions');
+          // Pattern: connect({ servers: ... }) without buildNatsOptions anywhere in file
+          const hasBareConnect = /connect\(\{\s*servers\s*:/.test(content);
+          const hasBuildNatsOptions = content.includes('buildNatsOptions');
 
-        if (hasBareConnect && !hasBuildNatsOptions) {
-          const relative = filePath
-            .replace(resolve(ROOT) + '\\', '')
-            .replace(/\\/g, '/');
-          bareConnectFiles.push(relative);
+          if (hasBareConnect && !hasBuildNatsOptions) {
+            const relative = filePath
+              .replace(resolve(ROOT) + '\\', '')
+              .replace(/\\/g, '/');
+            bareConnectFiles.push(relative);
+          }
         }
       }
-    }
 
-    expect(
-      bareConnectFiles,
-      `Files with bare connect({ servers: }) without buildNatsOptions: ${bareConnectFiles.join(', ')}`
-    ).toHaveLength(0);
-  });
+      expect(
+        bareConnectFiles,
+        `Files with bare connect({ servers: }) without buildNatsOptions: ${bareConnectFiles.join(', ')}`
+      ).toHaveLength(0);
+    }
+  );
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

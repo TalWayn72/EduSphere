@@ -13,8 +13,8 @@ import { inArray } from 'drizzle-orm';
 import { createDatabaseConnection, schema } from '../index.js';
 
 // ── Deterministic UUIDs ───────────────────────────────────────────────────────
-const COURSE_ID    = 'cc000000-0000-0000-0000-000000000002';
-const STUDENT_ID   = '00000000-0000-0000-0000-000000000005';
+const COURSE_ID = 'cc000000-0000-0000-0000-000000000002';
+const STUDENT_ID = '00000000-0000-0000-0000-000000000005';
 const KAB_INSTRUCT = 'cc000000-0000-0000-0000-000000000001';
 
 // First 5 module IDs (60% of the 8 modules)
@@ -28,7 +28,7 @@ const COMPLETED_MODULE_IDS = [
 
 // Enrollment IDs
 const ENROLLMENT_IDS = {
-  student:    'ee010000-0000-0000-0000-000000000001',
+  student: 'ee010000-0000-0000-0000-000000000001',
   instructor: 'ee010000-0000-0000-0000-000000000002',
 } as const;
 
@@ -40,16 +40,16 @@ export async function seedEnrollments(): Promise<void> {
     .insert(schema.userCourses)
     .values([
       {
-        id:       ENROLLMENT_IDS.student,
-        userId:   STUDENT_ID,
+        id: ENROLLMENT_IDS.student,
+        userId: STUDENT_ID,
         courseId: COURSE_ID,
-        status:   'ACTIVE',
+        status: 'ACTIVE',
       },
       {
-        id:       ENROLLMENT_IDS.instructor,
-        userId:   KAB_INSTRUCT,
+        id: ENROLLMENT_IDS.instructor,
+        userId: KAB_INSTRUCT,
         courseId: COURSE_ID,
-        status:   'ACTIVE',
+        status: 'ACTIVE',
       },
     ])
     .onConflictDoNothing();
@@ -73,12 +73,12 @@ export async function seedEnrollments(): Promise<void> {
     await db
       .insert(schema.userProgress)
       .values({
-        userId:        STUDENT_ID,
+        userId: STUDENT_ID,
         contentItemId: item.id,
-        isCompleted:   true,
-        progress:      100,
-        timeSpent:     300,
-        completedAt:   new Date('2026-03-15T10:00:00Z'),
+        isCompleted: true,
+        progress: 100,
+        timeSpent: 300,
+        completedAt: new Date('2026-03-15T10:00:00Z'),
       })
       .onConflictDoNothing();
   }

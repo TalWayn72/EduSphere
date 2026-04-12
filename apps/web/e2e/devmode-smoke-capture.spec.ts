@@ -25,14 +25,18 @@ async function capture(page: import('@playwright/test').Page, name: string) {
 }
 
 /** Login helper: click "Sign In (Dev Mode)" and wait for authenticated route */
-async function loginDevMode(page: import('@playwright/test').Page): Promise<void> {
+async function loginDevMode(
+  page: import('@playwright/test').Page
+): Promise<void> {
   await page.goto('/login');
   await page.waitForLoadState('domcontentloaded');
   const btn = page.getByRole('button', { name: /Sign In \(Dev Mode\)/i });
   await expect(btn).toBeVisible({ timeout: 10_000 });
   await btn.click();
   // Wait for redirect to authenticated route
-  await page.waitForURL(/\/(dashboard|courses|learn|admin)/, { timeout: 20_000 });
+  await page.waitForURL(/\/(dashboard|courses|learn|admin)/, {
+    timeout: 20_000,
+  });
 }
 
 test.describe('devmode-smoke', () => {
@@ -43,8 +47,12 @@ test.describe('devmode-smoke', () => {
     await capture(page, 'auth-smoke-devmode-01-login.png');
 
     // Verify DEV_MODE banner and button
-    await expect(page.getByText(/Dev Mode/i).first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('button', { name: /Sign In \(Dev Mode\)/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/Dev Mode/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(
+      page.getByRole('button', { name: /Sign In \(Dev Mode\)/i })
+    ).toBeVisible({ timeout: 5_000 });
     console.log('Login page URL:', page.url());
   });
 
@@ -64,10 +72,15 @@ test.describe('devmode-smoke', () => {
     await capture(page, 'auth-smoke-devmode-03-dashboard.png');
 
     const heading = page.getByRole('heading', { name: /dashboard/i });
-    const hasHeading = await heading.isVisible({ timeout: 8_000 }).catch(() => false);
+    const hasHeading = await heading
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
     console.log('Dashboard heading visible:', hasHeading);
     if (!hasHeading) {
-      const bodyText = await page.locator('body').innerText().catch(() => 'N/A');
+      const bodyText = await page
+        .locator('body')
+        .innerText()
+        .catch(() => 'N/A');
       console.log('Body text:', bodyText.slice(0, 300));
     }
     expect(page.url()).not.toMatch(/\/login/);
@@ -93,7 +106,9 @@ test.describe('devmode-smoke', () => {
     expect(page.url()).not.toMatch(/\/login/);
   });
 
-  test('admin page renders after login (SUPER_ADMIN role)', async ({ page }) => {
+  test('admin page renders after login (SUPER_ADMIN role)', async ({
+    page,
+  }) => {
     await loginDevMode(page);
     await page.goto('/admin');
     await page.waitForLoadState('domcontentloaded');

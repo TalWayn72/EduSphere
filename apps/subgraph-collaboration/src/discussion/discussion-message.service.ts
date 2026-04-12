@@ -188,7 +188,9 @@ export class DiscussionMessageService {
               eq(schema.discussionMessageLikes.userId, authContext.userId)
             )
           );
-        this.logger.debug(`unliked message=${messageId} user=${authContext.userId}`);
+        this.logger.debug(
+          `unliked message=${messageId} user=${authContext.userId}`
+        );
         return false;
       }
 
@@ -198,7 +200,9 @@ export class DiscussionMessageService {
         userId: authContext.userId,
         tenantId: tenantCtx.tenantId,
       });
-      this.logger.debug(`liked message=${messageId} user=${authContext.userId}`);
+      this.logger.debug(
+        `liked message=${messageId} user=${authContext.userId}`
+      );
       return true;
     });
   }
