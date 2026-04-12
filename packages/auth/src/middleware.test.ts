@@ -172,8 +172,10 @@ describe('AuthMiddleware.validateRequest', () => {
   it('sets authContext for dev-token-mock-jwt when NODE_ENV is not production AND ALLOW_DEV_TOKEN=true', async () => {
     const originalEnv = process.env.NODE_ENV;
     const originalAllow = process.env.ALLOW_DEV_TOKEN;
+    const originalSecret = process.env.DEV_TOKEN_SECRET;
     process.env.NODE_ENV = 'test';
     process.env.ALLOW_DEV_TOKEN = 'true';
+    process.env.DEV_TOKEN_SECRET = 'dev-token-mock-jwt';
     try {
       const ctx = makeContext('Bearer dev-token-mock-jwt');
       await middleware.validateRequest(ctx);
@@ -186,6 +188,11 @@ describe('AuthMiddleware.validateRequest', () => {
     } finally {
       process.env.NODE_ENV = originalEnv;
       process.env.ALLOW_DEV_TOKEN = originalAllow;
+      if (originalSecret === undefined) {
+        delete process.env.DEV_TOKEN_SECRET;
+      } else {
+        process.env.DEV_TOKEN_SECRET = originalSecret;
+      }
     }
   });
 
