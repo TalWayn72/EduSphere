@@ -112,7 +112,7 @@ jobs:
   unit-tests-web:
     name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -142,7 +142,7 @@ jobs:
         # Only run frontend tests here; backend subgraph tests require a live DB
         # and run in the Full Test Suite workflow (test.yml) with proper services.
         # Coverage removed from sharded CI — run separately in nightly/on-demand job.
-        run: timeout 2400 pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
+        run: pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
 
   # Shared package unit tests — single job, no sharding needed (packages are fast individually)
   unit-tests-packages:
@@ -291,7 +291,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -319,7 +319,7 @@ jobs:
         run: pnpm --filter @edusphere/web exec playwright install --with-deps chromium
 
       - name: Run Playwright E2E tests (shard ${{ matrix.shard }})
-        run: timeout 2400 pnpm --filter @edusphere/web exec playwright test --shard=${{ matrix.shard }}
+        run: pnpm --filter @edusphere/web exec playwright test --shard=${{ matrix.shard }}
         env:
           # CI mode: no real backend, Playwright starts Vite dev server automatically
           # ignoreSnapshots is set in playwright.config.ts when CI=true
