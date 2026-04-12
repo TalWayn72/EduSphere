@@ -240,6 +240,11 @@ const EmbeddingDashboardPage = lazy(() =>
     default: m.EmbeddingDashboardPage,
   }))
 );
+const JargonManagementPage = lazy(() =>
+  import('@/pages/JargonManagementPage').then((m) => ({
+    default: m.JargonManagementPage,
+  }))
+);
 
 const ADMIN_ROLES = { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] };
 
@@ -408,5 +413,9 @@ export const adminRoutes: RouteObject[] = [
   {
     path: '/admin/embeddings',
     element: guarded(<EmbeddingDashboardPage />, ADMIN_ROLES),
+  },
+  {
+    path: '/admin/jargon',
+    element: guarded(<JargonManagementPage />, ADMIN_ROLES),
   },
 ];

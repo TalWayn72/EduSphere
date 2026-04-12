@@ -1,0 +1,88 @@
+type JargonDomain {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String
+  language: String!
+  parentDomain: JargonDomain
+  termCount: Int!
+  relatedDomains: [DomainProximity!]!
+}
+
+type DomainProximity {
+  domain: JargonDomain!
+  score: Float!
+}
+
+type JargonTerm {
+  id: ID!
+  domainId: ID!
+  domain: JargonDomain!
+  canonicalForm: String!
+  phoneticHint: String
+  altForms: [String!]!
+  definitionShort: String
+  language: String!
+  source: JargonTermSource!
+  confidence: Float
+}
+
+enum JargonTermSource { AUTO MANUAL IMPORTED }
+
+type JargonOccurrence {
+  id: ID!
+  lessonId: ID!
+  term: JargonTerm!
+  startTime: Float
+  endTime: Float
+  originalText: String!
+  correctedText: String
+}
+
+type DomainDetectionResult {
+  domains: [DetectedDomain!]!
+  suggestedTerms: [JargonTerm!]!
+}
+
+type DetectedDomain {
+  domain: JargonDomain!
+  confidence: Float!
+  method: String!
+}
+
+input CreateJargonDomainInput {
+  name: String!
+  description: String
+  language: String
+  parentDomainId: ID
+}
+
+input AddJargonTermInput {
+  domainId: ID!
+  canonicalForm: String!
+  phoneticHint: String
+  altForms: [String!]
+  definitionShort: String
+  language: String
+}
+
+input ConfirmDomainInput {
+  lessonId: ID!
+  domainIds: [ID!]!
+}
+
+extend type Query {
+  jargonDomains(language: String): [JargonDomain!]! @authenticated
+  jargonDomain(id: ID!): JargonDomain @authenticated
+  jargonTerms(domainId: ID!, search: String, limit: Int = 50): [JargonTerm!]! @authenticated
+  jargonTerm(id: ID!): JargonTerm @authenticated
+  detectLessonDomains(lessonId: ID!): DomainDetectionResult! @authenticated
+  lessonJargonOccurrences(lessonId: ID!): [JargonOccurrence!]! @authenticated
+}
+
+extend type Mutation {
+  createJargonDomain(input: CreateJargonDomainInput!): JargonDomain! @authenticated @requiresScopes(scopes: [["course:write"]])
+  addJargonTerm(input: AddJargonTermInput!): JargonTerm! @authenticated @requiresScopes(scopes: [["course:write"]])
+  confirmLessonDomains(input: ConfirmDomainInput!): [JargonDomain!]! @authenticated @requiresScopes(scopes: [["course:write"]])
+  importJargonTerms(domainId: ID!, terms: [AddJargonTermInput!]!): Int! @authenticated @requiresScopes(scopes: [["course:write"]])
+}

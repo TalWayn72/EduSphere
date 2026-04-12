@@ -28,6 +28,7 @@ import {
   ScrollText,
   Bell,
   Database,
+  BookMarked,
 } from 'lucide-react';
 
 interface NavItem {
@@ -135,6 +136,11 @@ export function AdminSidebar() {
             to: '/admin/embeddings',
             icon: Database,
             label: t('sidebar.nav.embeddings', 'Embeddings'),
+          },
+          {
+            to: '/admin/jargon',
+            icon: BookMarked,
+            label: t('sidebar.nav.jargon', 'Jargon'),
           },
         ],
       },

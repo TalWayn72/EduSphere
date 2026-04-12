@@ -30,7 +30,8 @@
       "biExport": "ייצוא BI",
       "securitySettings": "הגדרות אבטחה",
       "auditLog": "יומן ביקורת",
-      "notificationTemplates": "תבניות התראות"
+      "notificationTemplates": "תבניות התראות",
+      "jargon": "ניהול מונחים"
     }
   },
   "dashboard": {
@@ -451,5 +452,82 @@
     "delivered": "נמסרו",
     "failed": "נכשלו",
     "noData": "אין נתונים זמינים"
+  },
+  "jargon": {
+    "management": {
+      "title": "ניהול מונחים מקצועיים",
+      "description": "ניהול אוצר מילים של תחומים מקצועיים.",
+      "domains": "תחומים",
+      "noDomains": "אין תחומים עדיין.",
+      "selectDomainPrompt": "בחר תחום כדי לצפות במונחיו.",
+      "termCount": "{{count}} מונחים",
+      "searchTerms": "חיפוש מונחים...",
+      "addTerm": "הוסף מונח",
+      "addTermTitle": "הוסף מונח",
+      "editTermTitle": "ערוך מונח",
+      "addDomain": "הוסף תחום",
+      "createDomainTitle": "צור תחום",
+      "deleteDomainTitle": "מחק תחום",
+      "deleteDomainConfirm": "למחוק את \"{{name}}\"? כל המונחים יוסרו.",
+      "deleteDomain": "מחק תחום",
+      "nameLabel": "שם",
+      "descriptionLabel": "תיאור",
+      "languageLabel": "שפה",
+      "cancel": "ביטול",
+      "create": "צור",
+      "creating": "יוצר...",
+      "delete": "מחק",
+      "deleting": "מוחק...",
+      "edit": "ערוך",
+      "colTerm": "מונח",
+      "colDefinition": "הגדרה",
+      "colAltForms": "צורות חלופיות",
+      "colConfidence": "ביטחון",
+      "noTerms": "לא נמצאו מונחים.",
+      "import": "ייבוא CSV",
+      "importTitle": "ייבוא מונחים מ-CSV",
+      "importDescription": "הדבק תוכן CSV. עמודות נדרשות: canonicalForm, phoneticHint, altForms, definitionShort, language",
+      "importButton": "ייבא",
+      "importing": "מייבא..."
+    },
+    "domainConfirmation": {
+      "title": "אישור תחומי שיעור",
+      "description": "התחומים המקצועיים הבאים זוהו אוטומטית. בחר את הרלוונטיים.",
+      "detecting": "מזהה תחומים...",
+      "detected": "תחומים שזוהו",
+      "addDomain": "+ הוסף תחום חדש",
+      "newDomainTitle": "הוסף תחום חדש",
+      "nameLabel": "שם",
+      "descriptionLabel": "תיאור",
+      "create": "צור",
+      "creating": "יוצר...",
+      "cancel": "ביטול",
+      "confirm": "אשר {{count}} תחום(ים)",
+      "confirming": "מאשר..."
+    },
+    "termForm": {
+      "canonicalForm": "צורה קנונית",
+      "phoneticHint": "רמז הגייה",
+      "phoneticHintPlaceholder": "למשל /ˈɛɡ.zəm.pəl/",
+      "altForms": "צורות חלופיות",
+      "altFormsPlaceholder": "הקלד ולחץ Enter...",
+      "removeAltForm": "הסר {{form}}",
+      "add": "הוסף",
+      "definition": "הגדרה קצרה",
+      "definitionPlaceholder": "הגדרה קצרה של המונח...",
+      "language": "שפה",
+      "save": "שמור מונח",
+      "saving": "שומר...",
+      "cancel": "ביטול"
+    },
+    "domainSelector": {
+      "ariaLabel": "בחר תחום",
+      "placeholder": "בחר תחום...",
+      "title": "בחירת תחום",
+      "searchPlaceholder": "חיפוש תחומים...",
+      "loading": "טוען...",
+      "noResults": "לא נמצאו תחומים.",
+      "clear": "נקה בחירה"
+    }
   }
 }

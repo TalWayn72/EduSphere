@@ -880,6 +880,24 @@ type Query
   enrichedLesson(lessonId: ID!): EnrichedLesson
     @join__field(graph: CONTENT)
     @authenticated
+  jargonDomains(language: String): [JargonDomain!]!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  jargonDomain(id: ID!): JargonDomain
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  jargonTerms(domainId: ID!, search: String, limit: Int = 50): [JargonTerm!]!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  jargonTerm(id: ID!): JargonTerm
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  detectLessonDomains(lessonId: ID!): DomainDetectionResult!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  lessonJargonOccurrences(lessonId: ID!): [JargonOccurrence!]!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
 }
 
 type Mutation
@@ -1934,6 +1952,22 @@ type Mutation
     @join__field(graph: KNOWLEDGE)
     @authenticated
     @requiresScopes(scopes: [["course:manage"]])
+  createJargonDomain(input: CreateJargonDomainInput!): JargonDomain!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  addJargonTerm(input: AddJargonTermInput!): JargonTerm!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  confirmLessonDomains(input: ConfirmDomainInput!): [JargonDomain!]!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  importJargonTerms(domainId: ID!, terms: [AddJargonTermInput!]!): Int!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 }
 
 type Subscription
@@ -5917,4 +5951,81 @@ input SetBlockAnchorTimestampInput @join__type(graph: CONTENT) {
   blockId: ID!
   startTime: Float!
   endTime: Float
+}
+
+type JargonDomain @join__type(graph: KNOWLEDGE) {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String
+  language: String!
+  parentDomain: JargonDomain
+  termCount: Int!
+  relatedDomains: [DomainProximity!]!
+}
+
+type DomainProximity @join__type(graph: KNOWLEDGE) {
+  domain: JargonDomain!
+  score: Float!
+}
+
+type JargonTerm @join__type(graph: KNOWLEDGE) {
+  id: ID!
+  domainId: ID!
+  domain: JargonDomain!
+  canonicalForm: String!
+  phoneticHint: String
+  altForms: [String!]!
+  definitionShort: String
+  language: String!
+  source: JargonTermSource!
+  confidence: Float
+}
+
+enum JargonTermSource @join__type(graph: KNOWLEDGE) {
+  AUTO @join__enumValue(graph: KNOWLEDGE)
+  MANUAL @join__enumValue(graph: KNOWLEDGE)
+  IMPORTED @join__enumValue(graph: KNOWLEDGE)
+}
+
+type JargonOccurrence @join__type(graph: KNOWLEDGE) {
+  id: ID!
+  lessonId: ID!
+  term: JargonTerm!
+  startTime: Float
+  endTime: Float
+  originalText: String!
+  correctedText: String
+}
+
+type DomainDetectionResult @join__type(graph: KNOWLEDGE) {
+  domains: [DetectedDomain!]!
+  suggestedTerms: [JargonTerm!]!
+}
+
+type DetectedDomain @join__type(graph: KNOWLEDGE) {
+  domain: JargonDomain!
+  confidence: Float!
+  method: String!
+}
+
+input CreateJargonDomainInput @join__type(graph: KNOWLEDGE) {
+  name: String!
+  description: String
+  language: String
+  parentDomainId: ID
+}
+
+input AddJargonTermInput @join__type(graph: KNOWLEDGE) {
+  domainId: ID!
+  canonicalForm: String!
+  phoneticHint: String
+  altForms: [String!]
+  definitionShort: String
+  language: String
+}
+
+input ConfirmDomainInput @join__type(graph: KNOWLEDGE) {
+  lessonId: ID!
+  domainIds: [ID!]!
 }

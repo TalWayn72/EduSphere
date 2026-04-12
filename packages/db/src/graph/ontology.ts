@@ -91,6 +91,23 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
     RETURN s
   `
   );
+
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
+    CREATE (d:Domain {
+      id: gen_random_uuid()::text,
+      tenant_id: 'default',
+      name: 'Sample Domain',
+      description: 'Test subject area domain for graph initialization',
+      language: 'he',
+      created_at: timestamp(),
+      updated_at: timestamp()
+    })
+    RETURN d
+  `
+  );
 }
 
 /**
@@ -213,6 +230,44 @@ export async function findLearningPath(
 }
 
 /**
+ * Create Domain vertex in the knowledge graph.
+ */
+export interface DomainProperties {
+  id?: string;
+  tenant_id: string;
+  name: string;
+  description?: string;
+  language?: string;
+  parent_domain_id?: string;
+}
+
+export async function createDomain(
+  db: DrizzleDB,
+  props: DomainProperties
+): Promise<string> {
+  const domainId = props.id || randomUUID();
+  const propsJson = JSON.stringify({
+    ...props,
+    id: domainId,
+    language: props.language ?? 'he',
+    parent_domain_id: props.parent_domain_id ?? '',
+    created_at: Date.now(),
+    updated_at: Date.now(),
+  });
+
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
+    CREATE (d:Domain ${propsJson})
+    RETURN d.id::text
+  `
+  );
+
+  return domainId;
+}
+
+/**
  * Allowed relationship types in the EduSphere knowledge graph.
  * Used as Cypher edge labels — must match the AGE graph schema.
  */
@@ -223,7 +278,9 @@ export type ConceptRelationshipType =
   | 'CONTRADICTS'
   | 'DERIVED_FROM'
   | 'PART_OF'
-  | 'AUTHORED_BY';
+  | 'AUTHORED_BY'
+  | 'RELATED_DOMAIN'
+  | 'BELONGS_TO_DOMAIN';
 
 /**
  * Create relationship between concepts — all IDs parameterized.

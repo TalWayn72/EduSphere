@@ -45,19 +45,21 @@ export class WhisperClient {
 
   async transcribe(
     filePath: string,
-    language = 'en'
+    language = 'en',
+    initialPrompt?: string
   ): Promise<WhisperResponse> {
     if (this.useLocal) {
-      return this.transcribeLocal(filePath, language);
+      return this.transcribeLocal(filePath, language, initialPrompt);
     }
-    return this.transcribeOpenAI(filePath, language);
+    return this.transcribeOpenAI(filePath, language, initialPrompt);
   }
 
   // ─── OpenAI Whisper ────────────────────────────────────────────────────────
 
   private async transcribeOpenAI(
     filePath: string,
-    language: string
+    language: string,
+    initialPrompt?: string
   ): Promise<WhisperResponse> {
     if (!this.openai) {
       throw new InternalServerErrorException('OpenAI client not initialised');
@@ -70,6 +72,7 @@ export class WhisperClient {
         language,
         response_format: 'verbose_json',
         timestamp_granularities: ['segment'],
+        ...(initialPrompt ? { prompt: initialPrompt } : {}),
       });
 
       const segments: WhisperSegment[] = (response.segments ?? []).map(
@@ -96,7 +99,8 @@ export class WhisperClient {
 
   private async transcribeLocal(
     filePath: string,
-    language: string
+    language: string,
+    initialPrompt?: string
   ): Promise<WhisperResponse> {
     try {
       this.logger.debug(
@@ -110,6 +114,9 @@ export class WhisperClient {
       formData.append('audio_file', blob, 'audio');
       formData.append('language', language);
       formData.append('output', 'json');
+      if (initialPrompt) {
+        formData.append('initial_prompt', initialPrompt);
+      }
 
       const res = await fetch(`${this.whisperUrl}/asr`, {
         method: 'POST',

@@ -12,6 +12,7 @@ import { authMiddleware } from './auth/auth.middleware';
 import { CohortInsightsModule } from './cohort-insights/cohort-insights.module';
 import { PeerMatchingModule } from './peer-matching/peer-matching.module';
 import { CitationResolutionModule } from './citation/citation-resolution.module';
+import { JargonModule } from './jargon/jargon.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CitationResolutionModule } from './citation/citation-resolution.module'
     CohortInsightsModule,
     PeerMatchingModule,
     CitationResolutionModule,
+    JargonModule,
   ],
 })
 export class AppModule {}
