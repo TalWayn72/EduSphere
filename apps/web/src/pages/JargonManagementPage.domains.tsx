@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, ChevronRight } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,10 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  CREATE_JARGON_DOMAIN_MUTATION,
-  DELETE_JARGON_DOMAIN_MUTATION,
-} from '@/lib/graphql/jargon.queries';
+import { CREATE_JARGON_DOMAIN_MUTATION } from '@/lib/graphql/jargon.queries';
 import type { JargonDomain } from '@/types/jargon.types';
 
 interface Props {
@@ -45,13 +42,9 @@ export function DomainsSidebar({
   const { t } = useTranslation('admin');
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState<DomainFormState>(BLANK);
-  const [deleteTarget, setDeleteTarget] = useState<JargonDomain | null>(null);
 
   const [{ fetching: creating }, execCreate] = useMutation(
     CREATE_JARGON_DOMAIN_MUTATION
-  );
-  const [{ fetching: deleting }, execDelete] = useMutation(
-    DELETE_JARGON_DOMAIN_MUTATION
   );
 
   async function handleCreate() {
@@ -59,13 +52,6 @@ export function DomainsSidebar({
     await execCreate({ input: form });
     setShowCreate(false);
     setForm(BLANK);
-    onRefetch();
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) return;
-    await execDelete({ id: deleteTarget.id });
-    setDeleteTarget(null);
     onRefetch();
   }
 
@@ -80,7 +66,7 @@ export function DomainsSidebar({
     return (
       <React.Fragment key={domain.id}>
         <div
-          className={`group flex items-center gap-1 rounded-md px-2 py-1.5 cursor-pointer text-sm transition-colors ${
+          className={`flex items-center gap-1 rounded-md px-2 py-1.5 cursor-pointer text-sm transition-colors ${
             isSelected
               ? 'bg-primary/10 text-primary font-medium'
               : 'hover:bg-accent text-foreground'
@@ -92,18 +78,9 @@ export function DomainsSidebar({
             <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground" />
           )}
           <span className="flex-1 truncate">{domain.name}</span>
-          <span className="text-xs text-muted-foreground">{domain.termCount}</span>
-          <button
-            type="button"
-            className="opacity-0 group-hover:opacity-100 p-0.5 text-destructive hover:text-destructive/80"
-            onClick={(e) => {
-              e.stopPropagation();
-              setDeleteTarget(domain);
-            }}
-            aria-label={t('jargon.management.deleteDomain', 'Delete domain')}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+          <span className="text-xs text-muted-foreground">
+            {domain.termCount}
+          </span>
         </div>
         {children.map((child) => renderDomain(child, depth + 1))}
       </React.Fragment>
@@ -151,7 +128,9 @@ export function DomainsSidebar({
               <Input
                 id="domain-name"
                 value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
                 className="mt-1"
               />
             </div>
@@ -186,41 +165,13 @@ export function DomainsSidebar({
             <Button variant="ghost" onClick={() => setShowCreate(false)}>
               {t('jargon.management.cancel', 'Cancel')}
             </Button>
-            <Button onClick={handleCreate} disabled={creating || !form.name.trim()}>
+            <Button
+              onClick={handleCreate}
+              disabled={creating || !form.name.trim()}
+            >
               {creating
                 ? t('jargon.management.creating', 'Creating...')
                 : t('jargon.management.create', 'Create')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete confirmation dialog */}
-      <Dialog
-        open={!!deleteTarget}
-        onOpenChange={() => setDeleteTarget(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {t('jargon.management.deleteDomainTitle', 'Delete Domain')}
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            {t(
-              'jargon.management.deleteDomainConfirm',
-              'Delete "{{name}}"? All terms will be removed.',
-              { name: deleteTarget?.name ?? '' }
-            )}
-          </p>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
-              {t('jargon.management.cancel', 'Cancel')}
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-              {deleting
-                ? t('jargon.management.deleting', 'Deleting...')
-                : t('jargon.management.delete', 'Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

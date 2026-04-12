@@ -4,7 +4,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
-import { Plus, Search, Trash2, Upload } from 'lucide-react';
+import { Plus, Search, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -25,20 +25,46 @@ import {
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import {
   JARGON_TERMS_QUERY,
-  DELETE_JARGON_TERM_MUTATION,
   IMPORT_JARGON_TERMS_MUTATION,
 } from '@/lib/graphql/jargon.queries';
-import type { JargonDomain, JargonTerm } from '@/types/jargon.types';
+import type { JargonDomain, JargonTerm, AddJargonTermInput } from '@/types/jargon.types';
 import { JargonTermForm } from '@/components/jargon/JargonTermForm';
 
 interface Props {
   domain: JargonDomain;
 }
 
+/**
+ * Parse a CSV string into AddJargonTermInput rows.
+ * Expected header: canonicalForm,phoneticHint,altForms,definitionShort,language
+ * altForms is a pipe-separated list within the cell.
+ */
+function parseCsvToTerms(csv: string, domainId: string): AddJargonTermInput[] {
+  const lines = csv.trim().split('\n');
+  if (lines.length < 2) return [];
+
+  // Skip header row
+  return lines.slice(1).flatMap((line) => {
+    const cols = line.split(',').map((c) => c.trim());
+    const [canonicalForm, phoneticHint, altFormsRaw, definitionShort, language] =
+      cols;
+    if (!canonicalForm) return [];
+    return [
+      {
+        domainId,
+        canonicalForm,
+        phoneticHint: phoneticHint || undefined,
+        altForms: altFormsRaw ? altFormsRaw.split('|').map((s) => s.trim()) : [],
+        definitionShort: definitionShort ?? '',
+        language: language ?? 'en',
+      },
+    ];
+  });
+}
+
 export function TermsPanel({ domain }: Props) {
   const { t } = useTranslation('admin');
   const [search, setSearch] = useState('');
-  const [editTerm, setEditTerm] = useState<JargonTerm | null>(null);
   const [showTermForm, setShowTermForm] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [csvContent, setCsvContent] = useState('');
@@ -50,30 +76,22 @@ export function TermsPanel({ domain }: Props) {
     }
   );
 
-  const [, execDeleteTerm] = useMutation(DELETE_JARGON_TERM_MUTATION);
   const [{ fetching: importing }, execImport] = useMutation(
     IMPORT_JARGON_TERMS_MUTATION
   );
 
   const terms = data?.jargonTerms ?? [];
 
-  const handleDeleteTerm = useCallback(
-    async (termId: string) => {
-      await execDeleteTerm({ id: termId });
-      refetch({ requestPolicy: 'network-only' });
-    },
-    [execDeleteTerm, refetch]
-  );
-
   const handleTermSaved = useCallback(() => {
     setShowTermForm(false);
-    setEditTerm(null);
     refetch({ requestPolicy: 'network-only' });
   }, [refetch]);
 
   const handleImport = useCallback(async () => {
     if (!csvContent.trim()) return;
-    await execImport({ domainId: domain.id, csvContent });
+    const terms = parseCsvToTerms(csvContent, domain.id);
+    if (terms.length === 0) return;
+    await execImport({ domainId: domain.id, terms });
     setShowImport(false);
     setCsvContent('');
     refetch({ requestPolicy: 'network-only' });
@@ -105,7 +123,6 @@ export function TermsPanel({ domain }: Props) {
         <Button
           size="sm"
           onClick={() => {
-            setEditTerm(null);
             setShowTermForm(true);
           }}
         >
@@ -136,7 +153,6 @@ export function TermsPanel({ domain }: Props) {
               <TableHead>
                 {t('jargon.management.colConfidence', 'Confidence')}
               </TableHead>
-              <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -167,28 +183,6 @@ export function TermsPanel({ domain }: Props) {
                     {Math.round(term.confidence * 100)}%
                   </span>
                 </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setEditTerm(term);
-                        setShowTermForm(true);
-                      }}
-                    >
-                      {t('jargon.management.edit', 'Edit')}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteTerm(term.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -199,28 +193,19 @@ export function TermsPanel({ domain }: Props) {
       <Dialog
         open={showTermForm}
         onOpenChange={(open) => {
-          if (!open) {
-            setShowTermForm(false);
-            setEditTerm(null);
-          }
+          if (!open) setShowTermForm(false);
         }}
       >
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {editTerm
-                ? t('jargon.management.editTermTitle', 'Edit Term')
-                : t('jargon.management.addTermTitle', 'Add Term')}
+              {t('jargon.management.addTermTitle', 'Add Term')}
             </DialogTitle>
           </DialogHeader>
           <JargonTermForm
             domainId={domain.id}
-            term={editTerm ?? undefined}
             onSave={handleTermSaved}
-            onCancel={() => {
-              setShowTermForm(false);
-              setEditTerm(null);
-            }}
+            onCancel={() => setShowTermForm(false)}
           />
         </DialogContent>
       </Dialog>
@@ -236,7 +221,7 @@ export function TermsPanel({ domain }: Props) {
           <p className="text-sm text-muted-foreground">
             {t(
               'jargon.management.importDescription',
-              'Paste CSV content. Expected columns: canonicalForm, phoneticHint, altForms, definitionShort, language'
+              'Paste CSV content. Expected columns: canonicalForm, phoneticHint, altForms (pipe-separated), definitionShort, language'
             )}
           </p>
           <textarea
@@ -244,7 +229,7 @@ export function TermsPanel({ domain }: Props) {
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono resize-y"
             value={csvContent}
             onChange={(e) => setCsvContent(e.target.value)}
-            placeholder="canonicalForm,definitionShort,language..."
+            placeholder="canonicalForm,phoneticHint,altForms,definitionShort,language..."
           />
           <div className="flex justify-end gap-2 mt-2">
             <Button

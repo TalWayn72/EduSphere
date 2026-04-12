@@ -1,5 +1,5 @@
 /**
- * JargonTermForm — Create or edit a jargon term with tag-style alt-forms input.
+ * JargonTermForm — Create a new jargon term with tag-style alt-forms input.
  */
 import React, { useState, KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,11 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import {
-  ADD_JARGON_TERM_MUTATION,
-  UPDATE_JARGON_TERM_MUTATION,
-} from '@/lib/graphql/jargon.queries';
-import type { JargonTerm } from '@/types/jargon.types';
+import { ADD_JARGON_TERM_MUTATION } from '@/lib/graphql/jargon.queries';
 
 const termSchema = z.object({
   canonicalForm: z.string().min(1, 'Canonical form is required'),
@@ -29,20 +25,16 @@ type TermFormValues = z.infer<typeof termSchema>;
 
 interface Props {
   domainId: string;
-  term?: JargonTerm;
   onSave: () => void;
   onCancel: () => void;
 }
 
-export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
+export function JargonTermForm({ domainId, onSave, onCancel }: Props) {
   const { t } = useTranslation('admin');
-  const [altForms, setAltForms] = useState<string[]>(term?.altForms ?? []);
+  const [altForms, setAltForms] = useState<string[]>([]);
   const [altInput, setAltInput] = useState('');
 
   const [{ fetching: adding }, execAdd] = useMutation(ADD_JARGON_TERM_MUTATION);
-  const [{ fetching: updating }, execUpdate] = useMutation(
-    UPDATE_JARGON_TERM_MUTATION
-  );
 
   const {
     register,
@@ -51,10 +43,10 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
   } = useForm<TermFormValues>({
     resolver: zodResolver(termSchema),
     defaultValues: {
-      canonicalForm: term?.canonicalForm ?? '',
-      phoneticHint: term?.phoneticHint ?? '',
-      definitionShort: term?.definitionShort ?? '',
-      language: term?.language ?? 'en',
+      canonicalForm: '',
+      phoneticHint: '',
+      definitionShort: '',
+      language: 'en',
     },
   });
 
@@ -78,33 +70,18 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
   }
 
   async function onSubmit(values: TermFormValues) {
-    if (term) {
-      await execUpdate({
-        id: term.id,
-        input: {
-          canonicalForm: values.canonicalForm,
-          phoneticHint: values.phoneticHint || undefined,
-          altForms,
-          definitionShort: values.definitionShort,
-          language: values.language,
-        },
-      });
-    } else {
-      await execAdd({
-        input: {
-          domainId,
-          canonicalForm: values.canonicalForm,
-          phoneticHint: values.phoneticHint || undefined,
-          altForms,
-          definitionShort: values.definitionShort,
-          language: values.language,
-        },
-      });
-    }
+    await execAdd({
+      input: {
+        domainId,
+        canonicalForm: values.canonicalForm,
+        phoneticHint: values.phoneticHint || undefined,
+        altForms,
+        definitionShort: values.definitionShort,
+        language: values.language,
+      },
+    });
     onSave();
   }
-
-  const isBusy = adding || updating;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -113,7 +90,11 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
           {t('jargon.termForm.canonicalForm', 'Canonical Form')}
           <span className="text-destructive ml-1">*</span>
         </Label>
-        <Input id="canonicalForm" {...register('canonicalForm')} className="mt-1" />
+        <Input
+          id="canonicalForm"
+          {...register('canonicalForm')}
+          className="mt-1"
+        />
         {errors.canonicalForm && (
           <p className="text-xs text-destructive mt-1">
             {errors.canonicalForm.message}
@@ -127,16 +108,17 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
         </Label>
         <Input
           id="phoneticHint"
-          placeholder={t('jargon.termForm.phoneticHintPlaceholder', 'e.g. /ˈɛɡ.zəm.pəl/')}
+          placeholder={t(
+            'jargon.termForm.phoneticHintPlaceholder',
+            'e.g. /ˈɛɡ.zəm.pəl/'
+          )}
           {...register('phoneticHint')}
           className="mt-1"
         />
       </div>
 
       <div>
-        <Label>
-          {t('jargon.termForm.altForms', 'Alternative Forms')}
-        </Label>
+        <Label>{t('jargon.termForm.altForms', 'Alternative Forms')}</Label>
         <div className="flex flex-wrap gap-1 mt-1 mb-1">
           {altForms.map((f) => (
             <Badge key={f} variant="secondary" className="gap-1">
@@ -145,7 +127,11 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
                 type="button"
                 onClick={() => removeAltForm(f)}
                 className="hover:text-destructive"
-                aria-label={t('jargon.termForm.removeAltForm', 'Remove {{form}}', { form: f })}
+                aria-label={t(
+                  'jargon.termForm.removeAltForm',
+                  'Remove {{form}}',
+                  { form: f }
+                )}
               >
                 <X className="h-3 w-3" />
               </button>
@@ -157,9 +143,17 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
             value={altInput}
             onChange={(e) => setAltInput(e.target.value)}
             onKeyDown={handleAltKeyDown}
-            placeholder={t('jargon.termForm.altFormsPlaceholder', 'Type and press Enter...')}
+            placeholder={t(
+              'jargon.termForm.altFormsPlaceholder',
+              'Type and press Enter...'
+            )}
           />
-          <Button type="button" variant="outline" size="sm" onClick={addAltForm}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addAltForm}
+          >
             {t('jargon.termForm.add', 'Add')}
           </Button>
         </div>
@@ -175,7 +169,10 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
           {...register('definitionShort')}
           rows={3}
           className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-          placeholder={t('jargon.termForm.definitionPlaceholder', 'Brief definition of the term...')}
+          placeholder={t(
+            'jargon.termForm.definitionPlaceholder',
+            'Brief definition of the term...'
+          )}
         />
         {errors.definitionShort && (
           <p className="text-xs text-destructive mt-1">
@@ -197,8 +194,8 @@ export function JargonTermForm({ domainId, term, onSave, onCancel }: Props) {
       </div>
 
       <div className="flex gap-2 pt-2">
-        <Button type="submit" disabled={isBusy}>
-          {isBusy
+        <Button type="submit" disabled={adding}>
+          {adding
             ? t('jargon.termForm.saving', 'Saving...')
             : t('jargon.termForm.save', 'Save Term')}
         </Button>

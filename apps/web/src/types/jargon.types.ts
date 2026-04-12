@@ -81,12 +81,6 @@ export interface CreateJargonDomainInput {
   parentDomainId?: string;
 }
 
-export interface UpdateJargonDomainInput {
-  name?: string;
-  description?: string;
-  language?: string;
-}
-
 export interface AddJargonTermInput {
   domainId: string;
   canonicalForm: string;
@@ -97,21 +91,8 @@ export interface AddJargonTermInput {
   source?: string;
 }
 
-export interface UpdateJargonTermInput {
-  canonicalForm?: string;
-  phoneticHint?: string;
-  altForms?: string[];
-  definitionShort?: string;
-  language?: string;
-}
-
-export interface ConfirmLessonDomainsResult {
+/** Input for confirmLessonDomains mutation — matches ConfirmDomainInput SDL */
+export interface ConfirmDomainInput {
   lessonId: string;
-  confirmedDomainIds: string[];
-}
-
-export interface ImportJargonTermsResult {
-  imported: number;
-  skipped: number;
-  errors: string[];
+  domainIds: string[];
 }

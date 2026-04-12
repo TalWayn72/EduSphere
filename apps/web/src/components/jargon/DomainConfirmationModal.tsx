@@ -25,10 +25,7 @@ import {
   CONFIRM_LESSON_DOMAINS_MUTATION,
   CREATE_JARGON_DOMAIN_MUTATION,
 } from '@/lib/graphql/jargon.queries';
-import type {
-  DetectLessonDomainsResult,
-  ConfirmLessonDomainsResult,
-} from '@/types/jargon.types';
+import type { DetectLessonDomainsResult } from '@/types/jargon.types';
 
 const newDomainSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -75,9 +72,9 @@ export function DomainConfirmationModal({
     pause: !mounted || !isOpen,
   });
 
-  const [{ fetching: confirming }, execConfirm] = useMutation<{
-    confirmLessonDomains: ConfirmLessonDomainsResult;
-  }>(CONFIRM_LESSON_DOMAINS_MUTATION);
+  const [{ fetching: confirming }, execConfirm] = useMutation(
+    CONFIRM_LESSON_DOMAINS_MUTATION
+  );
 
   const [{ fetching: creating }, execCreate] = useMutation(
     CREATE_JARGON_DOMAIN_MUTATION
@@ -108,14 +105,18 @@ export function DomainConfirmationModal({
 
   async function handleConfirm() {
     const ids = Array.from(selectedIds);
-    await execConfirm({ lessonId, domainIds: ids });
+    await execConfirm({ input: { lessonId, domainIds: ids } });
     onConfirm(ids);
     onClose();
   }
 
   async function handleCreateDomain(values: NewDomainForm) {
     const result = await execCreate({
-      input: { name: values.name, description: values.description, language: 'en' },
+      input: {
+        name: values.name,
+        description: values.description,
+        language: 'en',
+      },
     });
     if (!result.error && result.data?.createJargonDomain) {
       const newId = result.data.createJargonDomain.id as string;
@@ -164,7 +165,9 @@ export function DomainConfirmationModal({
                   <Badge variant={confidenceBadgeVariant(confidence)}>
                     {Math.round(confidence * 100)}%
                   </Badge>
-                  <span className="text-xs text-muted-foreground">{method}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {method}
+                  </span>
                 </div>
                 {domain.description && (
                   <p className="text-xs text-muted-foreground mt-1 truncate">
@@ -188,7 +191,11 @@ export function DomainConfirmationModal({
               <Label htmlFor="new-domain-name">
                 {t('jargon.domainConfirmation.nameLabel', 'Name')}
               </Label>
-              <Input id="new-domain-name" {...register('name')} className="mt-1" />
+              <Input
+                id="new-domain-name"
+                {...register('name')}
+                className="mt-1"
+              />
               {errors.name && (
                 <p className="text-xs text-destructive mt-1">
                   {errors.name.message}

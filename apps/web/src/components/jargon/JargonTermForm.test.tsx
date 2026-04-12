@@ -1,18 +1,13 @@
 /**
  * Unit tests for JargonTermForm.
  *
- * Tests: form validation (canonicalForm required), alt_forms tag input
- * (add via Enter/comma/button, remove via X), save button calls mutation,
- * edit mode pre-populates fields, loading state.
+ * Tests: form validation (canonicalForm required, definitionShort required),
+ * alt_forms tag input (add via Enter/comma/button, remove via X, no duplicates),
+ * save button calls ADD mutation, loading state.
  * urql mutations are fully mocked.
  */
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── i18n mock ─────────────────────────────────────────────────────────────────
@@ -25,16 +20,11 @@ vi.mock('react-i18next', () => ({
 
 // ── urql mock ─────────────────────────────────────────────────────────────────
 const mockExecAdd = vi.fn().mockResolvedValue({ data: {}, error: undefined });
-const mockExecUpdate = vi.fn().mockResolvedValue({ data: {}, error: undefined });
 
 vi.mock('urql', () => ({
-  useMutation: vi.fn()
-    .mockImplementation((doc: string) => {
-      if (doc === 'ADD_JARGON_TERM_MUTATION') {
-        return [{ fetching: false }, mockExecAdd];
-      }
-      return [{ fetching: false }, mockExecUpdate];
-    }),
+  useMutation: vi.fn().mockImplementation(() => {
+    return [{ fetching: false }, mockExecAdd];
+  }),
   gql: vi.fn((s: TemplateStringsArray) => String(s)),
 }));
 
@@ -80,7 +70,11 @@ vi.mock('@/components/ui/badge', () => ({
   }: {
     children: React.ReactNode;
     variant?: string;
-  }) => <span data-testid="alt-form-badge" data-variant={variant}>{children}</span>,
+  }) => (
+    <span data-testid="alt-form-badge" data-variant={variant}>
+      {children}
+    </span>
+  ),
 }));
 
 vi.mock('lucide-react', () => ({
@@ -90,26 +84,12 @@ vi.mock('lucide-react', () => ({
 // ── GraphQL queries mock ──────────────────────────────────────────────────────
 vi.mock('@/lib/graphql/jargon.queries', () => ({
   ADD_JARGON_TERM_MUTATION: 'ADD_JARGON_TERM_MUTATION',
-  UPDATE_JARGON_TERM_MUTATION: 'UPDATE_JARGON_TERM_MUTATION',
 }));
 
 // ── Component import (after mocks) ────────────────────────────────────────────
 import { JargonTermForm } from './JargonTermForm';
-import type { JargonTerm } from '@/types/jargon.types';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
-
-const EXISTING_TERM: JargonTerm = {
-  id: 'term-sephirot',
-  domainId: 'domain-kabbalah',
-  canonicalForm: 'ספירות',
-  phoneticHint: 'sefiROT',
-  altForms: ['ספירה', 'sefirot'],
-  definitionShort: 'The ten divine attributes',
-  language: 'he',
-  source: 'MANUAL',
-  confidence: 1.0,
-};
 
 const defaultProps = {
   domainId: 'domain-kabbalah',
@@ -156,39 +136,15 @@ describe('JargonTermForm', () => {
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
-  // ── Edit mode pre-population ──────────────────────────────────────────────
-
-  it('pre-populates canonicalForm when editing an existing term', () => {
-    renderForm({ term: EXISTING_TERM });
-    const input = screen.getByLabelText(/Canonical Form/i) as HTMLInputElement;
-    expect(input.value).toBe('ספירות');
-  });
-
-  it('pre-populates phoneticHint when editing', () => {
-    renderForm({ term: EXISTING_TERM });
-    const input = screen.getByLabelText(/Phonetic Hint/i) as HTMLInputElement;
-    expect(input.value).toBe('sefiROT');
-  });
-
-  it('pre-populates language field when editing', () => {
-    renderForm({ term: EXISTING_TERM });
-    const input = screen.getByLabelText(/Language/i) as HTMLInputElement;
-    expect(input.value).toBe('he');
-  });
-
-  it('shows existing alt_forms as badges when editing', () => {
-    renderForm({ term: EXISTING_TERM });
-    const badges = screen.getAllByTestId('alt-form-badge');
-    expect(badges).toHaveLength(2);
-  });
-
   // ── Validation ────────────────────────────────────────────────────────────
 
   it('shows validation error when canonicalForm is empty and form is submitted', async () => {
     renderForm();
     fireEvent.click(screen.getByText('Save Term'));
     await waitFor(() => {
-      expect(screen.getByText('Canonical form is required')).toBeInTheDocument();
+      expect(
+        screen.getByText('Canonical form is required')
+      ).toBeInTheDocument();
     });
   });
 
@@ -252,14 +208,20 @@ describe('JargonTermForm', () => {
     fireEvent.change(altInput, { target: { value: 'sefirot' } });
     fireEvent.keyDown(altInput, { key: 'Enter' });
 
-    const badges = screen.getAllByTestId('alt-form-badge').filter((b) =>
-      b.textContent?.includes('sefirot')
-    );
+    const badges = screen
+      .getAllByTestId('alt-form-badge')
+      .filter((b) => b.textContent?.includes('sefirot'));
     expect(badges).toHaveLength(1);
   });
 
   it('removes an alt form when X button is clicked', async () => {
-    renderForm({ term: EXISTING_TERM });
+    renderForm();
+    const altInput = screen.getByPlaceholderText(/Type and press Enter/i);
+    fireEvent.change(altInput, { target: { value: 'ספירה' } });
+    fireEvent.keyDown(altInput, { key: 'Enter' });
+    fireEvent.change(altInput, { target: { value: 'sefirot' } });
+    fireEvent.keyDown(altInput, { key: 'Enter' });
+
     const removeButtons = screen.getAllByRole('button', {
       name: /Remove/i,
     });
@@ -287,15 +249,6 @@ describe('JargonTermForm', () => {
 
     await waitFor(() => {
       expect(mockExecAdd).toHaveBeenCalled();
-    });
-  });
-
-  it('calls UPDATE mutation when editing an existing term', async () => {
-    renderForm({ term: EXISTING_TERM });
-    fireEvent.click(screen.getByText('Save Term'));
-
-    await waitFor(() => {
-      expect(mockExecUpdate).toHaveBeenCalled();
     });
   });
 

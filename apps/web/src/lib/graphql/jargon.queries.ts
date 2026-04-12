@@ -100,23 +100,6 @@ export const CREATE_JARGON_DOMAIN_MUTATION = gql`
   }
 `;
 
-export const UPDATE_JARGON_DOMAIN_MUTATION = gql`
-  mutation UpdateJargonDomain($id: ID!, $input: UpdateJargonDomainInput!) {
-    updateJargonDomain(id: $id, input: $input) {
-      id
-      name
-      description
-      language
-    }
-  }
-`;
-
-export const DELETE_JARGON_DOMAIN_MUTATION = gql`
-  mutation DeleteJargonDomain($id: ID!) {
-    deleteJargonDomain(id: $id)
-  }
-`;
-
 export const ADD_JARGON_TERM_MUTATION = gql`
   mutation AddJargonTerm($input: AddJargonTermInput!) {
     addJargonTerm(input: $input) {
@@ -133,40 +116,20 @@ export const ADD_JARGON_TERM_MUTATION = gql`
   }
 `;
 
-export const UPDATE_JARGON_TERM_MUTATION = gql`
-  mutation UpdateJargonTerm($id: ID!, $input: UpdateJargonTermInput!) {
-    updateJargonTerm(id: $id, input: $input) {
-      id
-      canonicalForm
-      phoneticHint
-      altForms
-      definitionShort
-      language
-    }
-  }
-`;
-
-export const DELETE_JARGON_TERM_MUTATION = gql`
-  mutation DeleteJargonTerm($id: ID!) {
-    deleteJargonTerm(id: $id)
-  }
-`;
-
 export const CONFIRM_LESSON_DOMAINS_MUTATION = gql`
-  mutation ConfirmLessonDomains($lessonId: ID!, $domainIds: [ID!]!) {
-    confirmLessonDomains(lessonId: $lessonId, domainIds: $domainIds) {
-      lessonId
-      confirmedDomainIds
+  mutation ConfirmLessonDomains($input: ConfirmDomainInput!) {
+    confirmLessonDomains(input: $input) {
+      id
+      name
+      description
+      language
+      termCount
     }
   }
 `;
 
 export const IMPORT_JARGON_TERMS_MUTATION = gql`
-  mutation ImportJargonTerms($domainId: ID!, $csvContent: String!) {
-    importJargonTerms(domainId: $domainId, csvContent: $csvContent) {
-      imported
-      skipped
-      errors
-    }
+  mutation ImportJargonTerms($domainId: ID!, $terms: [AddJargonTermInput!]!) {
+    importJargonTerms(domainId: $domainId, terms: $terms)
   }
 `;

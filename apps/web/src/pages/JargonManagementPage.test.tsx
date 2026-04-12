@@ -79,7 +79,6 @@ vi.mock('urql', () => ({
 vi.mock('@/lib/graphql/jargon.queries', () => ({
   JARGON_DOMAINS_QUERY: 'JARGON_DOMAINS_QUERY',
   CREATE_JARGON_DOMAIN_MUTATION: 'CREATE_JARGON_DOMAIN_MUTATION',
-  DELETE_JARGON_DOMAIN_MUTATION: 'DELETE_JARGON_DOMAIN_MUTATION',
   JARGON_TERMS_QUERY: 'JARGON_TERMS_QUERY',
 }));
 
@@ -148,13 +147,8 @@ vi.mock('@/components/ui/label', () => ({
 }));
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({
-    open,
-    children,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-  }) => (open ? <div data-testid="dialog">{children}</div> : null),
+  Dialog: ({ open, children }: { open: boolean; children: React.ReactNode }) =>
+    open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
@@ -288,9 +282,9 @@ describe('JargonManagementPage', () => {
     fireEvent.click(screen.getByText('קבלה'));
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId('terms-panel-domain-name').textContent
-      ).toBe('קבלה');
+      expect(screen.getByTestId('terms-panel-domain-name').textContent).toBe(
+        'קבלה'
+      );
     });
   });
 
@@ -298,12 +292,16 @@ describe('JargonManagementPage', () => {
     renderPage();
     fireEvent.click(screen.getByText('קבלה'));
     await waitFor(() =>
-      expect(screen.getByTestId('terms-panel-domain-name').textContent).toBe('קבלה')
+      expect(screen.getByTestId('terms-panel-domain-name').textContent).toBe(
+        'קבלה'
+      )
     );
 
     fireEvent.click(screen.getByText('תלמוד'));
     await waitFor(() =>
-      expect(screen.getByTestId('terms-panel-domain-name').textContent).toBe('תלמוד')
+      expect(screen.getByTestId('terms-panel-domain-name').textContent).toBe(
+        'תלמוד'
+      )
     );
   });
 

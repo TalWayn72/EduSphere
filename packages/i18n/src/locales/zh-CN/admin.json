@@ -30,7 +30,8 @@
       "biExport": "BI Export",
       "securitySettings": "Security Settings",
       "auditLog": "Audit Log",
-      "notificationTemplates": "Notification Templates"
+      "notificationTemplates": "Notification Templates",
+      "jargon": "Jargon"
     }
   },
   "dashboard": {
@@ -466,5 +467,82 @@
     "descriptionPlaceholder": "e.g. Power BI Production",
     "cancel": "Cancel",
     "generate": "Generate"
+  },
+  "jargon": {
+    "management": {
+      "title": "Jargon Management",
+      "description": "Manage professional domain vocabularies and terms.",
+      "domains": "Domains",
+      "noDomains": "No domains yet.",
+      "selectDomainPrompt": "Select a domain to view its terms.",
+      "termCount": "{{count}} terms",
+      "searchTerms": "Search terms...",
+      "addTerm": "Add Term",
+      "addTermTitle": "Add Term",
+      "editTermTitle": "Edit Term",
+      "addDomain": "Add Domain",
+      "createDomainTitle": "Create Domain",
+      "deleteDomainTitle": "Delete Domain",
+      "deleteDomainConfirm": "Delete \"{{name}}\"? All terms will be removed.",
+      "deleteDomain": "Delete domain",
+      "nameLabel": "Name",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language",
+      "cancel": "Cancel",
+      "create": "Create",
+      "creating": "Creating...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "edit": "Edit",
+      "colTerm": "Term",
+      "colDefinition": "Definition",
+      "colAltForms": "Alt Forms",
+      "colConfidence": "Confidence",
+      "noTerms": "No terms found.",
+      "import": "Import CSV",
+      "importTitle": "Import Terms from CSV",
+      "importDescription": "Paste CSV content. Expected columns: canonicalForm, phoneticHint, altForms, definitionShort, language",
+      "importButton": "Import",
+      "importing": "Importing..."
+    },
+    "domainConfirmation": {
+      "title": "Confirm Lesson Domains",
+      "description": "The following professional domains were automatically detected. Select the ones that apply.",
+      "detecting": "Detecting domains...",
+      "detected": "Detected Domains",
+      "addDomain": "+ Add new domain",
+      "newDomainTitle": "Add New Domain",
+      "nameLabel": "Name",
+      "descriptionLabel": "Description",
+      "create": "Create",
+      "creating": "Creating...",
+      "cancel": "Cancel",
+      "confirm": "Confirm {{count}} domain(s)",
+      "confirming": "Confirming..."
+    },
+    "termForm": {
+      "canonicalForm": "Canonical Form",
+      "phoneticHint": "Phonetic Hint",
+      "phoneticHintPlaceholder": "e.g. /ˈɛɡ.zəm.pəl/",
+      "altForms": "Alternative Forms",
+      "altFormsPlaceholder": "Type and press Enter...",
+      "removeAltForm": "Remove {{form}}",
+      "add": "Add",
+      "definition": "Short Definition",
+      "definitionPlaceholder": "Brief definition of the term...",
+      "language": "Language",
+      "save": "Save Term",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "domainSelector": {
+      "ariaLabel": "Select domain",
+      "placeholder": "Select domain...",
+      "title": "Choose Domain",
+      "searchPlaceholder": "Search domains...",
+      "loading": "Loading...",
+      "noResults": "No domains found.",
+      "clear": "Clear selection"
+    }
   }
 }
