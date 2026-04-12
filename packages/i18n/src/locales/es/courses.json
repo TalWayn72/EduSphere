@@ -263,6 +263,34 @@
     "notesFile": "📄 Notes File (PDF)",
     "supportedFormats": "Supports PDF, Word, TXT files",
     "skip": "Skip",
-    "continueToTemplate": "Continue to Template ←"
+    "continueToTemplate": "Continue to Template ←",
+    "pageTitle": "Create New Lesson",
+    "newLesson": "New Lesson",
+    "authError": "Authentication error — please log in again",
+    "networkError": "Network error — cannot connect to server. Try again.",
+    "selectTemplate": "Select Pipeline Template",
+    "thematicDescription": "Instructor-defined topic — 8 processing steps",
+    "sequentialDescription": "Sequential study — 9 steps + citation verification",
+    "creating": "Creating lesson...",
+    "createAndContinue": "Create lesson & continue to Pipeline"
+  },
+  "lesson": {
+    "notFound": "Lesson not found",
+    "sessionExpired": "Session expired",
+    "pleaseLogInAgain": "Please log in again to continue.",
+    "logInAgain": "Log in again",
+    "loadError": "Error loading lesson. Please try again later.",
+    "statusDraft": "Draft",
+    "statusProcessing": "Processing...",
+    "statusReady": "Ready",
+    "statusPublished": "Published",
+    "backToCourse": "Back to Course",
+    "type": "Type",
+    "series": "Series",
+    "date": "Date",
+    "materials": "Materials",
+    "preview": "Preview",
+    "openPipeline": "Open Pipeline",
+    "viewResults": "View Results"
   }
 }
