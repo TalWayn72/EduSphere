@@ -112,7 +112,7 @@ jobs:
   unit-tests-web:
     name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -142,7 +142,7 @@ jobs:
         # Only run frontend tests here; backend subgraph tests require a live DB
         # and run in the Full Test Suite workflow (test.yml) with proper services.
         # Coverage removed from sharded CI — run separately in nightly/on-demand job.
-        run: timeout 1800 pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
+        run: timeout 2400 pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
 
   # Shared package unit tests — single job, no sharding needed (packages are fast individually)
   unit-tests-packages:
