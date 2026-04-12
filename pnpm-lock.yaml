@@ -987,6 +987,9 @@ importers:
 
   apps/subgraph-knowledge:
     dependencies:
+      '@ai-sdk/openai':
+        specifier: ~2.0.0
+        version: 2.0.100(zod@4.3.6)
       '@aws-sdk/client-s3':
         specifier: ^3.993.0
         version: 3.993.0
@@ -1032,6 +1035,9 @@ importers:
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
+      ai:
+        specifier: ^5.0.0
+        version: 5.0.137(zod@4.3.6)
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.16.0)(@upstash/redis@1.36.2)(expo-sqlite@55.0.11(expo@55.0.6)(react-native@0.83.0(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4))(react@19.2.4))(gel@2.2.0)(pg@8.18.0)
@@ -1056,6 +1062,9 @@ importers:
       nestjs-pino:
         specifier: ^4.3.0
         version: 4.6.0(@nestjs/common@11.1.16(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@10.3.1)(rxjs@7.8.2)
+      ollama-ai-provider:
+        specifier: ^1.2.0
+        version: 1.2.0(zod@4.3.6)
       pdf-parse:
         specifier: ^2.4.5
         version: 2.4.5
