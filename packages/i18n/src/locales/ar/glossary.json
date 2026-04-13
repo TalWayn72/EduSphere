@@ -1,0 +1,19 @@
+{
+  "title": "قاموس المصطلحات",
+  "searchPlaceholder": "البحث عن المصطلحات...",
+  "allDomains": "جميع المجالات",
+  "noResults": "لم يتم العثور على مصطلحات",
+  "viewFullPage": "عرض الصفحة الكاملة",
+  "wikiContent": "محتوى الويكي",
+  "lessonReferences": "مراجع الدروس",
+  "relatedTerms": "المصطلحات ذات الصلة",
+  "occurrences": "التكرارات",
+  "centralityScore": "المركزية",
+  "firstMention": "أول ذكر في",
+  "published": "منشور",
+  "unpublished": "مسودة",
+  "editWiki": "تعديل الويكي",
+  "saveWiki": "حفظ",
+  "cancelEdit": "إلغاء",
+  "backToGlossary": "العودة إلى قاموس المصطلحات"
+}

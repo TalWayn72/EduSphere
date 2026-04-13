@@ -1,0 +1,19 @@
+{
+  "title": "Глоссарий",
+  "searchPlaceholder": "Поиск терминов...",
+  "allDomains": "Все области",
+  "noResults": "Термины не найдены",
+  "viewFullPage": "Открыть полную страницу",
+  "wikiContent": "Содержимое Wiki",
+  "lessonReferences": "Ссылки на уроки",
+  "relatedTerms": "Связанные термины",
+  "occurrences": "вхождений",
+  "centralityScore": "Центральность",
+  "firstMention": "Первое упоминание в",
+  "published": "Опубликовано",
+  "unpublished": "Черновик",
+  "editWiki": "Редактировать Wiki",
+  "saveWiki": "Сохранить",
+  "cancelEdit": "Отмена",
+  "backToGlossary": "Назад к глоссарию"
+}

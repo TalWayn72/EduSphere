@@ -235,5 +235,8 @@ export * from './enriched-transcript';
 // Professional Jargon — Phase 1 (domains, terms, embeddings, occurrences)
 export * from './jargon';
 
+// Glossary Wiki — Phase 2.1 (glossary entries + lesson cross-references)
+export * from './glossary';
+
 // Drizzle relations — type-safe relational query API for 5 core entity chains
 export * from './relations';

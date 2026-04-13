@@ -137,6 +137,11 @@ const ManagerDashboardPage = lazy(() =>
     default: m.ManagerDashboardPage,
   }))
 );
+const GlossaryWikiPage = lazy(() =>
+  import('@/pages/GlossaryWikiPage').then((m) => ({
+    default: m.GlossaryWikiPage,
+  }))
+);
 
 /**
  * Learner, dashboard, and general authenticated routes.
@@ -215,4 +220,7 @@ export const learnerRoutes: RouteObject[] = [
   { path: '/manager', element: guarded(<ManagerDashboardPage />) },
   // Onboarding wizard
   { path: '/onboarding', element: guarded(<OnboardingPage />) },
+  // Glossary wiki — list and term detail
+  { path: '/glossary', element: guarded(<GlossaryWikiPage />) },
+  { path: '/glossary/:termId', element: guarded(<GlossaryWikiPage />) },
 ];

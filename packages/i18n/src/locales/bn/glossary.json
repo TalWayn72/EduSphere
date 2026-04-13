@@ -1,0 +1,19 @@
+{
+  "title": "শব্দকোষ",
+  "searchPlaceholder": "শব্দ খুঁজুন...",
+  "allDomains": "সমস্ত ক্ষেত্র",
+  "noResults": "কোনো শব্দ পাওয়া যায়নি",
+  "viewFullPage": "সম্পূর্ণ পৃষ্ঠা দেখুন",
+  "wikiContent": "Wiki বিষয়বস্তু",
+  "lessonReferences": "পাঠের রেফারেন্স",
+  "relatedTerms": "সম্পর্কিত শব্দ",
+  "occurrences": "উপস্থিতি",
+  "centralityScore": "কেন্দ্রীয়তা",
+  "firstMention": "প্রথম উল্লেখ",
+  "published": "প্রকাশিত",
+  "unpublished": "খসড়া",
+  "editWiki": "Wiki সম্পাদনা করুন",
+  "saveWiki": "সংরক্ষণ করুন",
+  "cancelEdit": "বাতিল করুন",
+  "backToGlossary": "শব্দকোষে ফিরে যান"
+}

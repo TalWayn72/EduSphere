@@ -1,0 +1,19 @@
+{
+  "title": "Glosarium",
+  "searchPlaceholder": "Cari istilah...",
+  "allDomains": "Semua Domain",
+  "noResults": "Tidak ada istilah ditemukan",
+  "viewFullPage": "Lihat halaman penuh",
+  "wikiContent": "Konten Wiki",
+  "lessonReferences": "Referensi Pelajaran",
+  "relatedTerms": "Istilah Terkait",
+  "occurrences": "kemunculan",
+  "centralityScore": "Sentralitas",
+  "firstMention": "Penyebutan pertama di",
+  "published": "Diterbitkan",
+  "unpublished": "Draf",
+  "editWiki": "Edit Wiki",
+  "saveWiki": "Simpan",
+  "cancelEdit": "Batal",
+  "backToGlossary": "Kembali ke Glosarium"
+}

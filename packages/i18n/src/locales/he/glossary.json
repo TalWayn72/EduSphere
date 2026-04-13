@@ -1,0 +1,19 @@
+{
+  "title": "מילון מונחים",
+  "searchPlaceholder": "חיפוש מונחים...",
+  "allDomains": "כל התחומים",
+  "noResults": "לא נמצאו מונחים",
+  "viewFullPage": "צפה בדף המלא",
+  "wikiContent": "תוכן ויקי",
+  "lessonReferences": "הפניות לשיעורים",
+  "relatedTerms": "מונחים קשורים",
+  "occurrences": "הופעות",
+  "centralityScore": "מרכזיות",
+  "firstMention": "אזכור ראשון ב",
+  "published": "פורסם",
+  "unpublished": "טיוטה",
+  "editWiki": "עריכת ויקי",
+  "saveWiki": "שמור",
+  "cancelEdit": "ביטול",
+  "backToGlossary": "חזרה למילון המונחים"
+}

@@ -22,6 +22,7 @@ type JargonTerm {
   phoneticHint: String
   altForms: [String!]!
   definitionShort: String
+  definitionFull: String
   language: String!
   source: JargonTermSource!
   confidence: Float
@@ -85,4 +86,34 @@ extend type Mutation {
   addJargonTerm(input: AddJargonTermInput!): JargonTerm! @authenticated @requiresScopes(scopes: [["course:write"]])
   confirmLessonDomains(input: ConfirmDomainInput!): [JargonDomain!]! @authenticated @requiresScopes(scopes: [["course:write"]])
   importJargonTerms(domainId: ID!, terms: [AddJargonTermInput!]!): Int! @authenticated @requiresScopes(scopes: [["course:write"]])
+}
+
+type GlossaryEntry {
+  id: ID!
+  term: JargonTerm!
+  wikiContent: String
+  aggregatedDefinition: String
+  isPublished: Boolean!
+  lessonRefs: [GlossaryLessonRef!]!
+  crossReferences: [JargonTerm!]!
+}
+
+type GlossaryLessonRef {
+  lessonId: ID!
+  lessonTitle: String
+  occurrenceCount: Int!
+  centralityScore: Float!
+  firstMentionTime: Float
+}
+
+extend type Query {
+  glossaryEntry(termId: ID!): GlossaryEntry @authenticated
+  glossaryEntries(domainId: ID!, limit: Int = 50): [GlossaryEntry!]! @authenticated
+  glossarySearch(query: String!, limit: Int = 20): [GlossaryEntry!]! @authenticated
+}
+
+extend type Mutation {
+  updateGlossaryWiki(termId: ID!, wikiContent: String!): GlossaryEntry! @authenticated @requiresScopes(scopes: [["course:write"]])
+  publishGlossaryEntry(termId: ID!): GlossaryEntry! @authenticated @requiresScopes(scopes: [["course:write"]])
+  aggregateGlossaryDefinition(termId: ID!): GlossaryEntry! @authenticated @requiresScopes(scopes: [["course:write"]])
 }

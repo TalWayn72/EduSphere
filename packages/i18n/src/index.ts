@@ -62,5 +62,6 @@ export const NAMESPACES = [
   'orgAnalytics',
   'orgGamification',
   'orgApi',
+  'glossary',
 ] as const;
 export type I18nNamespace = (typeof NAMESPACES)[number];

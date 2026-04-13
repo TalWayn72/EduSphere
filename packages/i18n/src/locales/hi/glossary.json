@@ -1,0 +1,19 @@
+{
+  "title": "शब्दकोश",
+  "searchPlaceholder": "शब्द खोजें...",
+  "allDomains": "सभी क्षेत्र",
+  "noResults": "कोई शब्द नहीं मिला",
+  "viewFullPage": "पूरा पृष्ठ देखें",
+  "wikiContent": "Wiki सामग्री",
+  "lessonReferences": "पाठ संदर्भ",
+  "relatedTerms": "संबंधित शब्द",
+  "occurrences": "उपस्थितियाँ",
+  "centralityScore": "केंद्रीयता",
+  "firstMention": "पहला उल्लेख",
+  "published": "प्रकाशित",
+  "unpublished": "मसौदा",
+  "editWiki": "Wiki संपादित करें",
+  "saveWiki": "सहेजें",
+  "cancelEdit": "रद्द करें",
+  "backToGlossary": "शब्दकोश पर वापस जाएं"
+}

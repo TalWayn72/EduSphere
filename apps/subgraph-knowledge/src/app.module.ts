@@ -13,6 +13,7 @@ import { CohortInsightsModule } from './cohort-insights/cohort-insights.module';
 import { PeerMatchingModule } from './peer-matching/peer-matching.module';
 import { CitationResolutionModule } from './citation/citation-resolution.module';
 import { JargonModule } from './jargon/jargon.module';
+import { GlossaryModule } from './glossary/glossary.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { JargonModule } from './jargon/jargon.module';
     PeerMatchingModule,
     CitationResolutionModule,
     JargonModule,
+    GlossaryModule,
   ],
 })
 export class AppModule {}

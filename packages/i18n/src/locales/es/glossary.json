@@ -1,0 +1,19 @@
+{
+  "title": "Glosario",
+  "searchPlaceholder": "Buscar términos...",
+  "allDomains": "Todos los dominios",
+  "noResults": "No se encontraron términos",
+  "viewFullPage": "Ver página completa",
+  "wikiContent": "Contenido Wiki",
+  "lessonReferences": "Referencias de lecciones",
+  "relatedTerms": "Términos relacionados",
+  "occurrences": "ocurrencias",
+  "centralityScore": "Centralidad",
+  "firstMention": "Primera mención en",
+  "published": "Publicado",
+  "unpublished": "Borrador",
+  "editWiki": "Editar Wiki",
+  "saveWiki": "Guardar",
+  "cancelEdit": "Cancelar",
+  "backToGlossary": "Volver al glosario"
+}

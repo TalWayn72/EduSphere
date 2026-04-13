@@ -9,6 +9,8 @@ import { useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CitationCard } from './CitationCard';
 import { InlineCitationBlock } from './InlineCitationBlock';
+import { JargonHighlighter } from './JargonHighlighter';
+import type { JargonHighlight } from './JargonHighlighter';
 import type { EnrichedTranscriptBlock } from './enriched-transcript.types';
 
 interface EnrichedTranscriptPanelProps {
@@ -105,7 +107,12 @@ export function EnrichedTranscriptPanel({
             );
           }
 
-          // TEXT block (default)
+          // TEXT block (default) — render through JargonHighlighter if highlights present
+          const textContent = getBlockText(block);
+          const jargonHighlights = (
+            block.content as Record<string, unknown>
+          )['jargonHighlights'] as JargonHighlight[] | undefined;
+
           return (
             <button
               key={block.id}
@@ -120,7 +127,14 @@ export function EnrichedTranscriptPanel({
               data-start-time={block.startTime}
               dir="auto"
             >
-              {getBlockText(block)}
+              {jargonHighlights && jargonHighlights.length > 0 ? (
+                <JargonHighlighter
+                  text={textContent}
+                  highlights={jargonHighlights}
+                />
+              ) : (
+                textContent
+              )}
             </button>
           );
         })}

@@ -1,0 +1,19 @@
+{
+  "title": "术语表",
+  "searchPlaceholder": "搜索术语...",
+  "allDomains": "所有领域",
+  "noResults": "未找到术语",
+  "viewFullPage": "查看完整页面",
+  "wikiContent": "Wiki 内容",
+  "lessonReferences": "课程引用",
+  "relatedTerms": "相关术语",
+  "occurrences": "出现次数",
+  "centralityScore": "中心性",
+  "firstMention": "首次提及于",
+  "published": "已发布",
+  "unpublished": "草稿",
+  "editWiki": "编辑 Wiki",
+  "saveWiki": "保存",
+  "cancelEdit": "取消",
+  "backToGlossary": "返回术语表"
+}
