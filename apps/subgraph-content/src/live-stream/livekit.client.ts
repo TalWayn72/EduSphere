@@ -59,19 +59,29 @@ export class LiveKitClient {
 
   async generateToken(opts: LiveKitTokenOptions): Promise<string> {
     try {
-      const { AccessToken, VideoGrant } = await import('livekit-server-sdk');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- livekit-server-sdk dynamic import interop
+      const livekit = await import('livekit-server-sdk') as any;
+      const { AccessToken } = livekit as typeof import('livekit-server-sdk');
+      // VideoGrant may be a class or a plain object depending on SDK version
+      const VideoGrantCtor = livekit.VideoGrant ?? livekit.default?.VideoGrant;
       const at = new AccessToken(this.apiKey, this.apiSecret, {
         identity: opts.userId,
         name: opts.displayName ?? opts.userId,
       });
 
-      const grant = new VideoGrant({
+      const grant = VideoGrantCtor ? new VideoGrantCtor({
         room: opts.roomName,
         roomJoin: true,
         canPublish: opts.isPublisher,
         canSubscribe: true,
         canPublishData: opts.isPublisher,
-      });
+      }) : {
+        room: opts.roomName,
+        roomJoin: true,
+        canPublish: opts.isPublisher,
+        canSubscribe: true,
+        canPublishData: opts.isPublisher,
+      };
 
       at.addGrant(grant);
       return await at.toJwt();

@@ -112,6 +112,7 @@ export async function createMediaAsset(
         })
         .returning({ id: schema.media_assets.id })
   );
+  if (!asset) throw new Error(`Failed to create media asset for session ${sessionId}`);
   return asset.id;
 }
 
@@ -134,7 +135,7 @@ export async function upsertLessonAsset(
     )
     .limit(1);
 
-  if (existing.length > 0) {
+  if (existing.length > 0 && existing[0]) {
     await db
       .update(schema.lesson_assets)
       .set({ media_asset_id: assetId, file_url: recordingKey ?? null })
@@ -170,6 +171,8 @@ export async function seedTranscriptFromLive(
       .insert(schema.transcripts)
       .values({ asset_id: assetId, language: 'he', full_text: segments.map((s) => s.text).join(' ') })
       .returning({ id: schema.transcripts.id });
+
+    if (!transcript) throw new Error(`Failed to create transcript for asset ${assetId}`);
 
     await db.insert(schema.transcript_segments).values(
       segments.map((s) => ({

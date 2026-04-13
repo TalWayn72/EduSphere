@@ -56,7 +56,7 @@ function requireAuth(ctx: GraphQLContext) {
   return {
     userId: ctx.authContext.userId,
     tenantId: extractTenantId(ctx),
-    role: ctx.authContext.role ?? '',
+    role: ctx.authContext.roles?.[0] ?? '',
   };
 }
 

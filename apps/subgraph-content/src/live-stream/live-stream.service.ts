@@ -213,7 +213,7 @@ export class LiveStreamService implements OnModuleDestroy {
 
     await this.db
       .update(schema.liveSessions)
-      .set({ status: actionToStatus[action] })
+      .set({ status: actionToStatus[action] as never })
       .where(eq(schema.liveSessions.id, sessionId));
 
     const subjectMap: Record<string, string> = {
