@@ -134,7 +134,7 @@ export function Step3Confirmation({
       </div>
       {error && (
         <p
-          className="text-sm text-red-500 bg-red-50 rounded px-3 py-2"
+          className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded px-3 py-2"
           role="alert"
         >
           {error}

@@ -80,6 +80,7 @@ export class PeerReviewResolver implements OnModuleDestroy {
     return list.map((a, i) => ({
       id: a.id,
       contentItemId: a.contentItemId,
+      // eslint-disable-next-line security/detect-object-injection
       contentItemTitle: titles[i],
       submitterId: a.submitterId,
       submitterDisplayName: null,
@@ -109,6 +110,7 @@ export class PeerReviewResolver implements OnModuleDestroy {
     return list.map((a, i) => ({
       id: a.id,
       contentItemId: a.contentItemId,
+      // eslint-disable-next-line security/detect-object-injection
       contentItemTitle: titles[i],
       status: a.status,
       score: a.score ?? null,
@@ -197,6 +199,7 @@ export class PeerReviewResolver implements OnModuleDestroy {
     return assignments.map((a, i) => ({
       id: a.id,
       contentItemId: a.contentItemId,
+      // eslint-disable-next-line security/detect-object-injection
       contentItemTitle: titles[i],
       submitterId: a.submitterId,
       submitterDisplayName: null,
