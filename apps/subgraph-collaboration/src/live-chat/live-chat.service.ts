@@ -15,6 +15,7 @@ import {
   eq,
   and,
   desc,
+  lt,
   withTenantContext,
   closeAllPools,
   type Database,
@@ -204,7 +205,7 @@ export class LiveChatService implements OnModuleDestroy {
         const beforeDate = new Date(beforeCursor);
         if (!isNaN(beforeDate.getTime())) {
           conditions.push(
-            schema.live_chat_messages.created_at < beforeDate as never
+            lt(schema.live_chat_messages.created_at, beforeDate)
           );
         }
       }
