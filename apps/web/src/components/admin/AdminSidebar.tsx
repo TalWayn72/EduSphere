@@ -215,7 +215,8 @@ export function AdminSidebar() {
             {group.items
               .filter(
                 ({ allowedRoles }) =>
-                  !allowedRoles || (role !== null && allowedRoles.includes(role))
+                  !allowedRoles ||
+                  (role !== null && allowedRoles.includes(role))
               )
               .map(({ to, icon: Icon, label }) => (
                 <NavLink

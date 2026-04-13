@@ -23,16 +23,16 @@ const blk = (n: number) =>
   `52105dcc-f21a-4b2c-93fd-aa${String(n).padStart(10, '0')}`;
 
 export const BLOCK_IDS = {
-  heading1: blk(1),      // "שיעור קבלה: ספירת העומר ומוחין דקטנות"
-  summary: blk(2),       // overview paragraph
+  heading1: blk(1), // "שיעור קבלה: ספירת העומר ומוחין דקטנות"
+  summary: blk(2), // overview paragraph
   headingMochin: blk(3), // "הגדרת מוחין דקטנות"
-  mochinText: blk(4),    // text about mochin
-  headingSefirah: blk(5),// "ספירת העומר — תהליך העלאת המוחין"
-  sefirahText: blk(6),   // text about sefirat haomer process
-  keyPoints: blk(7),     // key points text
-  headingAri: blk(8),    // "מקורות — ספר הכוונות של האר\"י"
-  ariText: blk(9),       // Ari text
-  shavuotText: blk(10),  // shavuot text
+  mochinText: blk(4), // text about mochin
+  headingSefirah: blk(5), // "ספירת העומר — תהליך העלאת המוחין"
+  sefirahText: blk(6), // text about sefirat haomer process
+  keyPoints: blk(7), // key points text
+  headingAri: blk(8), // "מקורות — ספר הכוונות של האר\"י"
+  ariText: blk(9), // Ari text
+  shavuotText: blk(10), // shavuot text
 };
 
 export interface TermDef {
