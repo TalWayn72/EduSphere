@@ -24,6 +24,7 @@ vi.mock('@edusphere/db', () => ({
     },
   },
   eq: vi.fn((_a, _b) => 'eq'),
+  lt: vi.fn((_a, _b) => 'lt-cond'),
   and: vi.fn((...a: unknown[]) => a),
   desc: vi.fn((f: unknown) => `desc(${String(f)})`),
   withTenantContext: (...args: unknown[]) => mockWithTenantContext(...args),

@@ -99,20 +99,36 @@ describe('LiveQAService', () => {
   });
 
   describe('upvoteQuestion', () => {
-    it('increments upvote count and returns updated question', async () => {
-      // First select: find question; second: count upvotes; then update
+    /**
+     * upvoteQuestion issues 3 DB calls in order:
+     *   1. select().from().where().limit(1)  → find question
+     *   2. select({count}).from().where()    → count upvotes (awaits .where() directly)
+     *   3. update().set().where().returning() → persist new count
+     * The count query does NOT call .limit(), so its .where() must resolve the array.
+     */
+    function setupUpvoteMocks(upvoteCount = 1) {
       let selectCallIdx = 0;
       vi.mocked(mockTx.select).mockImplementation(() => {
         const idx = selectCallIdx++;
-        const returnValue = idx === 0
-          ? [sampleQuestion]
-          : [{ count: 1 }];
+        if (idx === 0) {
+          // First call: fetch question — uses .limit()
+          return {
+            from: vi.fn().mockReturnThis(),
+            where: vi.fn().mockReturnThis(),
+            limit: vi.fn().mockResolvedValue([sampleQuestion]),
+          } as never;
+        }
+        // Second call: count upvotes — awaits .where() directly
         return {
           from: vi.fn().mockReturnThis(),
-          where: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(returnValue),
+          where: vi.fn().mockResolvedValue([{ count: upvoteCount }]),
+          limit: vi.fn().mockResolvedValue([{ count: upvoteCount }]),
         } as never;
       });
+    }
+
+    it('increments upvote count and returns updated question', async () => {
+      setupUpvoteMocks(1);
 
       vi.mocked(mockTx.insert).mockReturnValue({
         values: vi.fn().mockReturnThis(),
@@ -130,16 +146,7 @@ describe('LiveQAService', () => {
     });
 
     it('is idempotent: second upvote no-ops via onConflictDoNothing', async () => {
-      let selectCallIdx = 0;
-      vi.mocked(mockTx.select).mockImplementation(() => {
-        const idx = selectCallIdx++;
-        const returnValue = idx === 0 ? [sampleQuestion] : [{ count: 1 }];
-        return {
-          from: vi.fn().mockReturnThis(),
-          where: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(returnValue),
-        } as never;
-      });
+      setupUpvoteMocks(1);
 
       const onConflictDoNothing = vi.fn().mockResolvedValue(undefined);
       vi.mocked(mockTx.insert).mockReturnValue({
