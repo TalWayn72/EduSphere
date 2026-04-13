@@ -146,28 +146,40 @@ export type LiveChatEvent =
 
 // ─── Type Guards ─────────────────────────────────────────────────────────────
 
-function hasSessionAndTenant(e: unknown): e is { sessionId: string; tenantId: string } {
+function hasSessionAndTenant(
+  e: unknown
+): e is { sessionId: string; tenantId: string } {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['sessionId'] === 'string' && typeof obj['tenantId'] === 'string';
+  return (
+    typeof obj['sessionId'] === 'string' && typeof obj['tenantId'] === 'string'
+  );
 }
 
-export function isLiveChatMessageEvent(e: unknown): e is LiveChatMessagePayload {
+export function isLiveChatMessageEvent(
+  e: unknown
+): e is LiveChatMessagePayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['messageId'] === 'string' && typeof obj['text'] === 'string';
+  return (
+    typeof obj['messageId'] === 'string' && typeof obj['text'] === 'string'
+  );
 }
 
 export function isLiveChatPinEvent(e: unknown): e is LiveChatPinPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['messageId'] === 'string' && typeof obj['pinnedBy'] === 'string';
+  return (
+    typeof obj['messageId'] === 'string' && typeof obj['pinnedBy'] === 'string'
+  );
 }
 
 export function isLiveChatDeleteEvent(e: unknown): e is LiveChatDeletePayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['messageId'] === 'string' && typeof obj['deletedBy'] === 'string';
+  return (
+    typeof obj['messageId'] === 'string' && typeof obj['deletedBy'] === 'string'
+  );
 }
 
 export function isLiveReactionEvent(e: unknown): e is LiveReactionPayload {
@@ -176,7 +188,9 @@ export function isLiveReactionEvent(e: unknown): e is LiveReactionPayload {
   return typeof obj['emoji'] === 'string' && typeof obj['userId'] === 'string';
 }
 
-export function isLiveReactionBurstEvent(e: unknown): e is LiveReactionBurstPayload {
+export function isLiveReactionBurstEvent(
+  e: unknown
+): e is LiveReactionBurstPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return (
@@ -189,25 +203,37 @@ export function isLiveReactionBurstEvent(e: unknown): e is LiveReactionBurstPayl
 export function isLiveQaAskedEvent(e: unknown): e is LiveQaAskedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['questionId'] === 'string' && typeof obj['text'] === 'string';
+  return (
+    typeof obj['questionId'] === 'string' && typeof obj['text'] === 'string'
+  );
 }
 
 export function isLiveQaUpvotedEvent(e: unknown): e is LiveQaUpvotedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['questionId'] === 'string' && typeof obj['upvotes'] === 'number';
+  return (
+    typeof obj['questionId'] === 'string' && typeof obj['upvotes'] === 'number'
+  );
 }
 
 export function isLiveQaAnsweredEvent(e: unknown): e is LiveQaAnsweredPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['questionId'] === 'string' && typeof obj['answeredBy'] === 'string';
+  return (
+    typeof obj['questionId'] === 'string' &&
+    typeof obj['answeredBy'] === 'string'
+  );
 }
 
-export function isLiveQaDismissedEvent(e: unknown): e is LiveQaDismissedPayload {
+export function isLiveQaDismissedEvent(
+  e: unknown
+): e is LiveQaDismissedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['questionId'] === 'string' && typeof obj['dismissedBy'] === 'string';
+  return (
+    typeof obj['questionId'] === 'string' &&
+    typeof obj['dismissedBy'] === 'string'
+  );
 }
 
 export function isLiveInstructorHighlightEvent(
@@ -215,10 +241,15 @@ export function isLiveInstructorHighlightEvent(
 ): e is LiveInstructorHighlightPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['contentRef'] === 'string' && typeof obj['highlightText'] === 'string';
+  return (
+    typeof obj['contentRef'] === 'string' &&
+    typeof obj['highlightText'] === 'string'
+  );
 }
 
-export function isLiveInstructorPollEvent(e: unknown): e is LiveInstructorPollPayload {
+export function isLiveInstructorPollEvent(
+  e: unknown
+): e is LiveInstructorPollPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return (

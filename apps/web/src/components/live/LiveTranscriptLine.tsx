@@ -24,38 +24,29 @@ function formatMs(ms: number): string {
 }
 
 export function LiveTranscriptLine({ segment }: LiveTranscriptLineProps) {
-  const highlights: JargonHighlight[] = segment.jargonHits.map((h) => ({
-    termId: h.termId,
-    canonicalForm: h.canonicalForm,
-    definitionShort: h.definitionShort,
-    start: h.startChar,
-    end: h.endChar,
-  }));
+  // SDL JargonHit only has termId/form/confidence — no character offsets.
+  // Pass empty highlights; jargon terms are shown as plain text for now.
+  const highlights: JargonHighlight[] = [];
+
+  // startTime is a float (seconds); convert to ms for display
+  const startMs =
+    typeof segment.startTime === 'number' ? segment.startTime * 1000 : 0;
 
   return (
     <div
       className={cn(
         'flex gap-2 text-sm py-1 px-2 rounded',
-        segment.isFinal
-          ? 'opacity-100'
-          : 'opacity-50 animate-pulse'
+        segment.isFinal ? 'opacity-100' : 'opacity-50 animate-pulse'
       )}
       data-testid="transcript-line"
       data-final={segment.isFinal}
     >
       {/* Timestamp */}
       <span className="text-xs text-muted-foreground shrink-0 pt-0.5 tabular-nums">
-        {formatMs(segment.startMs)}
+        {formatMs(startMs)}
       </span>
 
       <div className="flex flex-col gap-0.5 min-w-0">
-        {/* Speaker label */}
-        {segment.speakerLabel && (
-          <span className="text-xs font-semibold text-primary truncate" dir="auto">
-            {segment.speakerLabel}
-          </span>
-        )}
-
         {/* Text with jargon highlights */}
         <JargonHighlighter
           text={segment.text}

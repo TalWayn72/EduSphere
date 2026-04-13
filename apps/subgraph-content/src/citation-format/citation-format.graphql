@@ -14,8 +14,7 @@ extend type Query {
   """
   List active citation format configs for a course.
   """
-  citationFormatConfigs(courseId: ID!): [CitationFormatConfig!]!
-    @authenticated
+  citationFormatConfigs(courseId: ID!): [CitationFormatConfig!]! @authenticated
 }
 
 extend type Mutation {

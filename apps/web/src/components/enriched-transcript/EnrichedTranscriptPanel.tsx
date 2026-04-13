@@ -109,9 +109,9 @@ export function EnrichedTranscriptPanel({
 
           // TEXT block (default) — render through JargonHighlighter if highlights present
           const textContent = getBlockText(block);
-          const jargonHighlights = (
-            block.content as Record<string, unknown>
-          )['jargonHighlights'] as JargonHighlight[] | undefined;
+          const jargonHighlights = (block.content as Record<string, unknown>)[
+            'jargonHighlights'
+          ] as JargonHighlight[] | undefined;
 
           return (
             <button

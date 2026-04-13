@@ -15,6 +15,11 @@ import { VodConverterService } from './vod-converter.service';
     PresenceService,
     VodConverterService,
   ],
-  exports: [LiveStreamService, LiveStreamQueryService, PresenceService, VodConverterService],
+  exports: [
+    LiveStreamService,
+    LiveStreamQueryService,
+    PresenceService,
+    VodConverterService,
+  ],
 })
 export class LiveStreamModule {}

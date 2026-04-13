@@ -78,9 +78,18 @@ export class LiveTranscriptionConsumer
     try {
       this.connection = await connect({ servers: natsUrl });
       this.logger.log('LiveTranscriptionConsumer connected to NATS');
-      this.subscribe('EDUSPHERE.stream.started', this.handleStreamStarted.bind(this));
-      this.subscribe('EDUSPHERE.stream.audio.chunk', this.handleAudioChunk.bind(this));
-      this.subscribe('EDUSPHERE.stream.ended', this.handleStreamEnded.bind(this));
+      this.subscribe(
+        'EDUSPHERE.stream.started',
+        this.handleStreamStarted.bind(this)
+      );
+      this.subscribe(
+        'EDUSPHERE.stream.audio.chunk',
+        this.handleAudioChunk.bind(this)
+      );
+      this.subscribe(
+        'EDUSPHERE.stream.ended',
+        this.handleStreamEnded.bind(this)
+      );
     } catch (err) {
       this.logger.error(
         { err },
@@ -99,7 +108,9 @@ export class LiveTranscriptionConsumer
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
   private async handleStreamStarted(raw: string): Promise<void> {
-    const event = StreamStartedSchema.parse(JSON.parse(raw)) as StreamStartedEvent & { language: string };
+    const event = StreamStartedSchema.parse(
+      JSON.parse(raw)
+    ) as StreamStartedEvent & { language: string };
     const session: LiveSession = {
       sessionId: event.sessionId,
       lessonId: event.lessonId,
@@ -113,7 +124,10 @@ export class LiveTranscriptionConsumer
     this.vocabLoader
       .getPrompt(event.sessionId, event.lessonId, event.tenantId)
       .catch((err) =>
-        this.logger.warn({ err, sessionId: event.sessionId }, 'Vocab warm failed')
+        this.logger.warn(
+          { err, sessionId: event.sessionId },
+          'Vocab warm failed'
+        )
       );
 
     this.logger.log({ sessionId: event.sessionId }, 'Live stream started');
@@ -164,7 +178,10 @@ export class LiveTranscriptionConsumer
 
     this.vocabLoader.evict(event.sessionId);
     this.sessions.delete(event.sessionId);
-    this.logger.log({ sessionId: event.sessionId }, 'Live stream ended — session cleaned up');
+    this.logger.log(
+      { sessionId: event.sessionId },
+      'Live stream ended — session cleaned up'
+    );
   }
 
   // ─── Segment pipeline ─────────────────────────────────────────────────────

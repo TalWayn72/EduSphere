@@ -58,12 +58,15 @@ interface InstructorControlsProps {
 
 type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
-const PHASE_BADGE: Record<LiveSessionPhase, { label: string; variant: BadgeVariant }> = {
-  SCHEDULED: { label: 'PRE-LIVE', variant: 'outline' },
-  LIVE:      { label: 'LIVE',     variant: 'destructive' },
-  PAUSED:    { label: 'PAUSED',   variant: 'secondary' },
-  ENDED:     { label: 'ENDED',    variant: 'secondary' },
-  CANCELLED: { label: 'CANCELLED',variant: 'secondary' },
+const PHASE_BADGE: Record<
+  LiveSessionPhase,
+  { label: string; variant: BadgeVariant }
+> = {
+  PRE_LIVE: { label: 'PRE-LIVE', variant: 'outline' },
+  LIVE: { label: 'LIVE', variant: 'destructive' },
+  PAUSED: { label: 'PAUSED', variant: 'secondary' },
+  ENDED: { label: 'ENDED', variant: 'secondary' },
+  VOD_READY: { label: 'VOD', variant: 'secondary' },
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -78,10 +81,10 @@ export function InstructorControls({
 }: InstructorControlsProps) {
   const [busy, setBusy] = useState<string | null>(null);
 
-  const [, executeStart]     = useMutation(START_LIVE_STREAM_MUTATION);
-  const [, executePause]     = useMutation(PAUSE_LIVE_STREAM_MUTATION);
-  const [, executeEnd]       = useMutation(END_LIVE_STREAM_MUTATION);
-  const [, executeScreen]    = useMutation(TOGGLE_SCREEN_SHARE_MUTATION);
+  const [, executeStart] = useMutation(START_LIVE_STREAM_MUTATION);
+  const [, executePause] = useMutation(PAUSE_LIVE_STREAM_MUTATION);
+  const [, executeEnd] = useMutation(END_LIVE_STREAM_MUTATION);
+  const [, executeScreen] = useMutation(TOGGLE_SCREEN_SHARE_MUTATION);
   const [, executeHighlight] = useMutation(HIGHLIGHT_MOMENT_MUTATION);
 
   const run = async (
@@ -99,21 +102,28 @@ export function InstructorControls({
     }
   };
 
-  const handleStart    = () => run('start',     () => executeStart({ sessionId }),   'LIVE');
-  const handlePause    = () => run('pause',     () => executePause({ sessionId }),   'PAUSED');
-  const handleResume   = () => run('resume',    () => executeStart({ sessionId }),   'LIVE');
-  const handleEnd      = () => run('end',       () => executeEnd({ sessionId }),     'ENDED');
-  const handleScreen   = () => run('screen',    () => executeScreen({ sessionId, enabled: !isScreenSharing }));
+  const handleStart = () =>
+    run('start', () => executeStart({ sessionId }), 'LIVE');
+  const handlePause = () =>
+    run('pause', () => executePause({ sessionId }), 'PAUSED');
+  const handleResume = () =>
+    run('resume', () => executeStart({ sessionId }), 'LIVE');
+  const handleEnd = () => run('end', () => executeEnd({ sessionId }), 'ENDED');
+  const handleScreen = () =>
+    run('screen', () => executeScreen({ sessionId, active: !isScreenSharing }));
   const handleHighlight = () => {
     const label = `רגע מודגש ${new Date().toLocaleTimeString('he-IL')}`;
-    void run('highlight', () => executeHighlight({ sessionId, label }));
+    const streamTs = Date.now() / 1000;
+    void run('highlight', () =>
+      executeHighlight({ sessionId, streamTs, label })
+    );
   };
 
-  const badgeInfo   = PHASE_BADGE[phase];
-  const isLive      = phase === 'LIVE';
-  const isPaused    = phase === 'PAUSED';
-  const isScheduled = phase === 'SCHEDULED';
-  const isEnded     = phase === 'ENDED' || phase === 'CANCELLED';
+  const badgeInfo = PHASE_BADGE[phase];
+  const isLive = phase === 'LIVE';
+  const isPaused = phase === 'PAUSED';
+  const isScheduled = phase === 'PRE_LIVE';
+  const isEnded = phase === 'ENDED' || phase === 'VOD_READY';
 
   return (
     <div
@@ -144,13 +154,17 @@ export function InstructorControls({
           size="sm"
           variant="default"
           className="h-7 gap-1 text-xs"
-          onClick={() => { void handleStart(); }}
+          onClick={() => {
+            void handleStart();
+          }}
           disabled={!!busy}
           data-testid="btn-start-stream"
         >
-          {busy === 'start'
-            ? <Loader2 className="h-3 w-3 animate-spin" />
-            : <Play className="h-3 w-3" />}
+          {busy === 'start' ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Play className="h-3 w-3" />
+          )}
           התחל שידור
         </Button>
       )}
@@ -161,13 +175,17 @@ export function InstructorControls({
           size="sm"
           variant="outline"
           className="h-7 gap-1 text-xs"
-          onClick={() => { void handlePause(); }}
+          onClick={() => {
+            void handlePause();
+          }}
           disabled={!!busy}
           data-testid="btn-pause-stream"
         >
-          {busy === 'pause'
-            ? <Loader2 className="h-3 w-3 animate-spin" />
-            : <Pause className="h-3 w-3" />}
+          {busy === 'pause' ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Pause className="h-3 w-3" />
+          )}
           השהה
         </Button>
       )}
@@ -178,13 +196,17 @@ export function InstructorControls({
           size="sm"
           variant="default"
           className="h-7 gap-1 text-xs"
-          onClick={() => { void handleResume(); }}
+          onClick={() => {
+            void handleResume();
+          }}
           disabled={!!busy}
           data-testid="btn-resume-stream"
         >
-          {busy === 'resume'
-            ? <Loader2 className="h-3 w-3 animate-spin" />
-            : <Play className="h-3 w-3" />}
+          {busy === 'resume' ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Play className="h-3 w-3" />
+          )}
           המשך
         </Button>
       )}
@@ -195,13 +217,17 @@ export function InstructorControls({
           size="sm"
           variant={isScreenSharing ? 'secondary' : 'outline'}
           className="h-7 gap-1 text-xs"
-          onClick={() => { void handleScreen(); }}
+          onClick={() => {
+            void handleScreen();
+          }}
           disabled={!!busy}
           data-testid="btn-screen-share"
         >
-          {busy === 'screen'
-            ? <Loader2 className="h-3 w-3 animate-spin" />
-            : <Monitor className="h-3 w-3" />}
+          {busy === 'screen' ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Monitor className="h-3 w-3" />
+          )}
           {isScreenSharing ? 'עצור שיתוף' : 'שתף מסך'}
         </Button>
       )}
@@ -216,9 +242,11 @@ export function InstructorControls({
           disabled={!!busy}
           data-testid="btn-highlight"
         >
-          {busy === 'highlight'
-            ? <Loader2 className="h-3 w-3 animate-spin" />
-            : <Bookmark className="h-3 w-3" />}
+          {busy === 'highlight' ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Bookmark className="h-3 w-3" />
+          )}
           רגע מודגש
         </Button>
       )}
@@ -259,7 +287,9 @@ export function InstructorControls({
             <AlertDialogFooter>
               <AlertDialogCancel dir="auto">ביטול</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => { void handleEnd(); }}
+                onClick={() => {
+                  void handleEnd();
+                }}
                 className="bg-destructive hover:bg-destructive/90"
               >
                 כן, סיים

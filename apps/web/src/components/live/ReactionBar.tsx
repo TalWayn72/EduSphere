@@ -41,7 +41,9 @@ export function ReactionBar({ onSend, className }: ReactionBarProps) {
         <button
           key={emoji}
           type="button"
-          onClick={() => { void handleClick(emoji); }}
+          onClick={() => {
+            void handleClick(emoji);
+          }}
           disabled={reactionCooldown}
           className={cn(
             'text-xl leading-none p-1 rounded-full transition-transform',

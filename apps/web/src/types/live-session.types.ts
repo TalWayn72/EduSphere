@@ -1,67 +1,56 @@
 // ── Enum union types ───────────────────────────────────────────────────────────
 
 export type LiveSessionPhase =
-  | 'SCHEDULED'
+  | 'PRE_LIVE'
   | 'LIVE'
   | 'PAUSED'
   | 'ENDED'
-  | 'CANCELLED';
+  | 'VOD_READY';
 
-export type StreamType =
-  | 'BROADCAST'
-  | 'INTERACTIVE'
-  | 'RECORDED_PLAYBACK';
+export type StreamType = 'BBB' | 'LIVEKIT' | 'EXTERNAL';
 
-export type LiveMessageType = 'TEXT' | 'EMOJI' | 'SYSTEM' | 'ANNOUNCEMENT';
+export type LiveMessageType = 'TEXT' | 'REACTION' | 'SYSTEM' | 'PINNED';
 
-export type QAStatus = 'OPEN' | 'ANSWERED' | 'DISMISSED';
+export type QAStatus = 'PENDING' | 'ANSWERED' | 'DISMISSED';
 
 // ── Session types ──────────────────────────────────────────────────────────────
 
-export interface HighlightMoment {
-  id: string;
-  timestamp: number;
-  label: string;
-  sessionId: string;
-}
-
 export interface LiveStreamSession {
   id: string;
-  title: string;
-  courseId: string;
-  instructorId: string;
-  phase: LiveSessionPhase;
+  lessonId: string | null;
+  meetingName: string;
+  scheduledAt: string;
+  /** status maps to LiveSessionPhase enum */
+  status: LiveSessionPhase;
+  /** Alias for status — used by UI components */
+  phase?: LiveSessionPhase;
   streamType: StreamType;
-  streamUrl: string | null;
-  thumbnailUrl: string | null;
   viewerCount: number;
-  maxViewers: number | null;
-  scheduledAt: string | null;
-  startedAt: string | null;
-  endedAt: string | null;
+  maxViewers: number;
+  instructor: { id: string };
   isScreenSharing: boolean;
-  highlightMoments: HighlightMoment[];
-  recordingUrl: string | null;
-  createdAt: string;
+  // Extended fields used by components (may be null if not in query result)
+  title?: string;
+  startedAt?: string | null;
+  endedAt?: string | null;
+  streamUrl?: string | null;
 }
 
 // ── Transcript types ───────────────────────────────────────────────────────────
 
 export interface JargonHit {
   termId: string;
-  canonicalForm: string;
-  definitionShort: string;
-  startChar: number;
-  endChar: number;
+  form: string;
+  confidence: number | null;
 }
 
 export interface LiveTranscriptSegment {
-  index: number;
+  id: string;
+  segmentIndex: number;
   text: string;
   isFinal: boolean;
-  speakerLabel: string | null;
-  startMs: number;
-  endMs: number;
+  startTime: string | null;
+  endTime: string | null;
   jargonHits: JargonHit[];
 }
 
@@ -69,13 +58,11 @@ export interface LiveTranscriptSegment {
 
 export interface LiveViewer {
   userId: string;
-  displayName: string;
-  avatarUrl: string | null;
   joinedAt: string;
 }
 
 export interface LivePresenceInfo {
-  viewerCount: number;
+  activeViewers: number;
   viewers: LiveViewer[];
 }
 
@@ -85,12 +72,10 @@ export interface LiveChatMessage {
   id: string;
   sessionId: string;
   userId: string;
-  displayName: string;
-  avatarUrl: string | null;
   content: string;
   messageType: LiveMessageType;
   isPinned: boolean;
-  replyToId: string | null;
+  replyTo: { id: string; content: string } | null;
   createdAt: string;
 }
 
@@ -100,23 +85,23 @@ export interface LiveQAQuestion {
   id: string;
   sessionId: string;
   userId: string;
-  displayName: string;
   question: string;
   upvotes: number;
   status: QAStatus;
-  answeredAt: string | null;
-  answeredBy: string | null;
   answer: string | null;
+  isUpvotedByMe: boolean;
+  streamTs: number | null;
   createdAt: string;
+  // UI-only augmented fields
+  displayName?: string;
 }
 
 // ── Reaction types ─────────────────────────────────────────────────────────────
 
 export interface LiveReactionBurst {
-  sessionId: string;
   emoji: string;
   count: number;
-  burstAt: string;
+  recentUsers: string[];
 }
 
 // ── Bookmark types ─────────────────────────────────────────────────────────────
@@ -124,9 +109,8 @@ export interface LiveReactionBurst {
 export interface LiveBookmark {
   id: string;
   sessionId: string;
-  userId: string;
-  label: string;
-  timestampMs: number;
-  transcriptIndex: number | null;
+  streamTs: number;
+  label: string | null;
+  note: string | null;
   createdAt: string;
 }

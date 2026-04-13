@@ -131,7 +131,8 @@ export class LiveChatService implements OnModuleDestroy {
         .where(eq(schema.live_chat_messages.id, messageId))
         .limit(1);
 
-      if (!existing) throw new NotFoundException(`Message ${messageId} not found`);
+      if (!existing)
+        throw new NotFoundException(`Message ${messageId} not found`);
 
       const [updated] = await tx
         .update(schema.live_chat_messages)
@@ -162,7 +163,8 @@ export class LiveChatService implements OnModuleDestroy {
         .where(eq(schema.live_chat_messages.id, messageId))
         .limit(1);
 
-      if (!existing) throw new NotFoundException(`Message ${messageId} not found`);
+      if (!existing)
+        throw new NotFoundException(`Message ${messageId} not found`);
 
       const isOwner = existing.user_id === authContext.userId;
       const isInstructor = INSTRUCTOR_ROLES.includes(role);
@@ -204,9 +206,7 @@ export class LiveChatService implements OnModuleDestroy {
       if (beforeCursor) {
         const beforeDate = new Date(beforeCursor);
         if (!isNaN(beforeDate.getTime())) {
-          conditions.push(
-            lt(schema.live_chat_messages.created_at, beforeDate)
-          );
+          conditions.push(lt(schema.live_chat_messages.created_at, beforeDate));
         }
       }
 

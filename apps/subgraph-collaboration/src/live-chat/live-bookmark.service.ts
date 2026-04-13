@@ -73,7 +73,10 @@ export class LiveBookmarkService implements OnModuleDestroy {
     });
   }
 
-  async removeBookmark(bookmarkId: string, authContext: AuthContext): Promise<boolean> {
+  async removeBookmark(
+    bookmarkId: string,
+    authContext: AuthContext
+  ): Promise<boolean> {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -83,10 +86,11 @@ export class LiveBookmarkService implements OnModuleDestroy {
         .where(eq(schema.live_bookmarks.id, bookmarkId))
         .limit(1);
 
-      if (!existing) throw new NotFoundException(`Bookmark ${bookmarkId} not found`);
+      if (!existing)
+        throw new NotFoundException(`Bookmark ${bookmarkId} not found`);
 
       if (existing.user_id !== authContext.userId) {
-        throw new ForbiddenException('Cannot remove another user\'s bookmark');
+        throw new ForbiddenException("Cannot remove another user's bookmark");
       }
 
       await tx

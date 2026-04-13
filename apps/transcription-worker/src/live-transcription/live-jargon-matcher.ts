@@ -43,10 +43,7 @@ export class LiveJargonMatcher {
 
   // ─── Private ──────────────────────────────────────────────────────────────
 
-  private detectHits(
-    segment: LiveSegment,
-    terms: TermPayload[]
-  ): JargonHit[] {
+  private detectHits(segment: LiveSegment, terms: TermPayload[]): JargonHit[] {
     const hits: JargonHit[] = [];
     const lower = segment.text.toLowerCase();
 

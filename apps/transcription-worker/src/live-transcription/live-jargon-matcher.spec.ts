@@ -66,7 +66,9 @@ describe('LiveJargonMatcher', () => {
 
   describe('match — alt forms', () => {
     it('finds alt form when canonical is absent', async () => {
-      const terms = [makeTerm('t-1', 'Epistemology', ['episteme', 'gnoseology'])];
+      const terms = [
+        makeTerm('t-1', 'Epistemology', ['episteme', 'gnoseology']),
+      ];
       const segment = makeSegment('The concept of episteme was central.');
       const hits = await matcher.match(segment, terms);
       expect(hits).toHaveLength(1);
@@ -139,7 +141,10 @@ describe('LiveJargonMatcher', () => {
       const segment = makeSegment('Ontology is key.');
       await matcher.match(segment, terms);
       expect(mockNatsPublish).toHaveBeenCalledOnce();
-      const [subject, payload] = mockNatsPublish.mock.calls[0] as [string, { hits: unknown[] }];
+      const [subject, payload] = mockNatsPublish.mock.calls[0] as [
+        string,
+        { hits: unknown[] },
+      ];
       expect(subject).toBe('EDUSPHERE.live.jargon.detected');
       expect(payload.hits).toHaveLength(1);
     });

@@ -53,7 +53,10 @@ function AlertDialogHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('flex flex-col space-y-2 text-center sm:text-left', className)}
+      className={cn(
+        'flex flex-col space-y-2 text-center sm:text-left',
+        className
+      )}
       {...props}
     />
   );
@@ -104,11 +107,7 @@ const AlertDialogAction = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
 >(({ className, ...props }, ref) => (
-  <button
-    ref={ref}
-    className={cn(buttonVariants(), className)}
-    {...props}
-  />
+  <button ref={ref} className={cn(buttonVariants(), className)} {...props} />
 ));
 AlertDialogAction.displayName = 'AlertDialogAction';
 
@@ -118,7 +117,11 @@ const AlertDialogCancel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Close
     ref={ref}
-    className={cn(buttonVariants({ variant: 'outline' }), 'mt-2 sm:mt-0', className)}
+    className={cn(
+      buttonVariants({ variant: 'outline' }),
+      'mt-2 sm:mt-0',
+      className
+    )}
     {...props}
   />
 ));

@@ -23,7 +23,11 @@ const sampleTerms: TermPayload[] = [
 
 const sampleDomains = {
   domains: [
-    { domain: { id: 'domain-1', name: 'Philosophy', language: 'en' }, confidence: 0.9, method: 'NLP' },
+    {
+      domain: { id: 'domain-1', name: 'Philosophy', language: 'en' },
+      confidence: 0.9,
+      method: 'NLP',
+    },
   ],
   suggestedTerms: [],
 };
@@ -43,20 +47,33 @@ describe('VocabLoader', () => {
 
       const prompt = await loader.getPrompt(SESSION_ID, LESSON_ID, TENANT_ID);
 
-      expect(mockDetectLessonDomains).toHaveBeenCalledWith(LESSON_ID, TENANT_ID);
-      expect(mockLoadTermsForDomain).toHaveBeenCalledWith('domain-1', TENANT_ID, 50);
+      expect(mockDetectLessonDomains).toHaveBeenCalledWith(
+        LESSON_ID,
+        TENANT_ID
+      );
+      expect(mockLoadTermsForDomain).toHaveBeenCalledWith(
+        'domain-1',
+        TENANT_ID,
+        50
+      );
       expect(prompt).toContain('Ontology');
       expect(prompt).toContain('Epistemology');
     });
 
     it('returns empty string when no terms loaded', async () => {
-      mockDetectLessonDomains.mockResolvedValue({ domains: [], suggestedTerms: [] });
+      mockDetectLessonDomains.mockResolvedValue({
+        domains: [],
+        suggestedTerms: [],
+      });
       const prompt = await loader.getPrompt(SESSION_ID, LESSON_ID, TENANT_ID);
       expect(prompt).toBe('');
     });
 
     it('returns empty string gracefully on empty domains', async () => {
-      mockDetectLessonDomains.mockResolvedValue({ domains: [], suggestedTerms: [] });
+      mockDetectLessonDomains.mockResolvedValue({
+        domains: [],
+        suggestedTerms: [],
+      });
       mockLoadTermsForDomain.mockResolvedValue([]);
       const prompt = await loader.getPrompt(SESSION_ID, LESSON_ID, TENANT_ID);
       expect(prompt).toBe('');

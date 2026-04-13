@@ -83,14 +83,22 @@ function TermRow({ term }: TermRowProps) {
       </button>
 
       {expanded && (
-        <div className="mt-2 space-y-2 pl-1" data-testid="glossary-term-expanded">
+        <div
+          className="mt-2 space-y-2 pl-1"
+          data-testid="glossary-term-expanded"
+        >
           <p className="text-sm leading-relaxed" dir="auto">
             {term.definitionShort}
           </p>
           {term.altForms && term.altForms.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {term.altForms.map((alt) => (
-                <Badge key={alt} variant="outline" className="text-xs" dir="auto">
+                <Badge
+                  key={alt}
+                  variant="outline"
+                  className="text-xs"
+                  dir="auto"
+                >
                   {alt}
                 </Badge>
               ))}

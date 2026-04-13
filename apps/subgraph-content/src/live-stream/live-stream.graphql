@@ -65,7 +65,8 @@ extend type Query {
   liveStreamSession(sessionId: ID!): LiveStreamSession @authenticated
   activeLiveSessions(courseId: ID): [LiveStreamSession!]! @authenticated
   livePresence(sessionId: ID!): LivePresenceInfo! @authenticated
-  liveTranscript(sessionId: ID!, afterIndex: Int): [LiveTranscriptSegment!]! @authenticated
+  liveTranscript(sessionId: ID!, afterIndex: Int): [LiveTranscriptSegment!]!
+    @authenticated
 }
 
 extend type Mutation {
@@ -86,8 +87,10 @@ extend type Mutation {
   startLiveStream(sessionId: ID!): LiveStreamSession! @authenticated
   pauseLiveStream(sessionId: ID!): LiveStreamSession! @authenticated
   endLiveStream(sessionId: ID!): LiveStreamSession! @authenticated
-  toggleScreenShare(sessionId: ID!, active: Boolean!): LiveStreamSession! @authenticated
-  highlightMoment(sessionId: ID!, streamTs: Float!, label: String): Boolean! @authenticated
+  toggleScreenShare(sessionId: ID!, active: Boolean!): LiveStreamSession!
+    @authenticated
+  highlightMoment(sessionId: ID!, streamTs: Float!, label: String): Boolean!
+    @authenticated
 
   joinLiveSession(sessionId: ID!): LivePresenceInfo! @authenticated
   leaveLiveSession(sessionId: ID!): Boolean! @authenticated

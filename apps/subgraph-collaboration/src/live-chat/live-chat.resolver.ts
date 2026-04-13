@@ -47,7 +47,12 @@ export class LiveChatResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.chatService.getMessages(sessionId, limit, context.authContext, before);
+    return this.chatService.getMessages(
+      sessionId,
+      limit,
+      context.authContext,
+      before
+    );
   }
 
   // ─── Mutations ─────────────────────────────────────────────────────────────
@@ -76,7 +81,10 @@ export class LiveChatResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    const updated = await this.chatService.pinMessage(messageId, context.authContext);
+    const updated = await this.chatService.pinMessage(
+      messageId,
+      context.authContext
+    );
     await publishMessageAdded(updated.session_id, updated);
     return updated;
   }

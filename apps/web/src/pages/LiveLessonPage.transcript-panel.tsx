@@ -47,7 +47,10 @@ export function TranscriptPanel({ sessionId }: TranscriptPanelProps) {
         )}
 
         {segments.map((seg) => (
-          <LiveTranscriptLine key={`${seg.index}-${seg.isFinal}`} segment={seg} />
+          <LiveTranscriptLine
+            key={`${seg.segmentIndex}-${seg.isFinal}`}
+            segment={seg}
+          />
         ))}
 
         <div ref={bottomRef} aria-hidden="true" />

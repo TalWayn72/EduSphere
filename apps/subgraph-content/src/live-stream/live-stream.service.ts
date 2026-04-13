@@ -53,7 +53,13 @@ export interface TranscriptSegmentResult {
   jargonHits: unknown[];
 }
 
-type DbSessionStatus = 'SCHEDULED' | 'LIVE' | 'PAUSED' | 'ENDED' | 'RECORDING' | 'CANCELLED';
+type DbSessionStatus =
+  | 'SCHEDULED'
+  | 'LIVE'
+  | 'PAUSED'
+  | 'ENDED'
+  | 'RECORDING'
+  | 'CANCELLED';
 
 function mapPhase(dbStatus: string): string {
   const map: Record<string, string> = {
@@ -110,7 +116,11 @@ export class LiveStreamService implements OnModuleDestroy {
       .limit(1);
     if (!sess) return null;
 
-    const typedSess = sess as { meetingName: string; scheduledAt: Date; status: string };
+    const typedSess = sess as {
+      meetingName: string;
+      scheduledAt: Date;
+      status: string;
+    };
     return {
       id: cfg.id,
       sessionId: cfg.session_id,
@@ -138,7 +148,12 @@ export class LiveStreamService implements OnModuleDestroy {
     sessionId: string,
     tenantId: string,
     instructorId: string,
-    opts: { streamType?: string; lessonId?: string; maxViewers?: number; autoRecord?: boolean }
+    opts: {
+      streamType?: string;
+      lessonId?: string;
+      maxViewers?: number;
+      autoRecord?: boolean;
+    }
   ): Promise<LiveStreamSessionResult> {
     await this.db.insert(schema.live_session_configs).values({
       tenant_id: tenantId,
@@ -151,7 +166,10 @@ export class LiveStreamService implements OnModuleDestroy {
     });
 
     const result = await this.fetchJoined(sessionId, tenantId);
-    if (!result) throw new NotFoundException(`Session ${sessionId} not found after create`);
+    if (!result)
+      throw new NotFoundException(
+        `Session ${sessionId} not found after create`
+      );
     return result;
   }
 
@@ -196,7 +214,10 @@ export class LiveStreamService implements OnModuleDestroy {
 
     const currentStatus = (sess as { status: DbSessionStatus }).status;
     const actionToStatus: Record<string, DbSessionStatus> = {
-      start: 'LIVE', pause: 'PAUSED', resume: 'LIVE', end: 'ENDED',
+      start: 'LIVE',
+      pause: 'PAUSED',
+      resume: 'LIVE',
+      end: 'ENDED',
     };
     const validFrom: Record<string, string[]> = {
       start: ['SCHEDULED'],
@@ -224,12 +245,17 @@ export class LiveStreamService implements OnModuleDestroy {
     };
 
     void this.publishEvent(subjectMap[action] ?? '', {
-      sessionId, tenantId, instructorId,
+      sessionId,
+      tenantId,
+      instructorId,
       timestamp: new Date().toISOString(),
     });
 
     const result = await this.fetchJoined(sessionId, tenantId);
-    if (!result) throw new NotFoundException(`Session ${sessionId} not found after transition`);
+    if (!result)
+      throw new NotFoundException(
+        `Session ${sessionId} not found after transition`
+      );
     return result;
   }
 
@@ -250,7 +276,10 @@ export class LiveStreamService implements OnModuleDestroy {
       );
 
     void this.publishEvent(Subjects.STREAM_SCREEN_SHARE, {
-      sessionId, tenantId, instructorId, active,
+      sessionId,
+      tenantId,
+      instructorId,
+      active,
       timestamp: new Date().toISOString(),
     });
 

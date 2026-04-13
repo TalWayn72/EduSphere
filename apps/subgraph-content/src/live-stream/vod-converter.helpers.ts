@@ -77,7 +77,9 @@ export async function convertBookmarksToAnnotations(
       note: bk.note ?? null,
       sourceSessionId: sessionId,
     },
-    spatial_data: bk.stream_ts ? { contentTimestamp: String(bk.stream_ts) } : null,
+    spatial_data: bk.stream_ts
+      ? { contentTimestamp: String(bk.stream_ts) }
+      : null,
     is_resolved: false,
   }));
 }
@@ -112,7 +114,8 @@ export async function createMediaAsset(
         })
         .returning({ id: schema.media_assets.id })
   );
-  if (!asset) throw new Error(`Failed to create media asset for session ${sessionId}`);
+  if (!asset)
+    throw new Error(`Failed to create media asset for session ${sessionId}`);
   return asset.id;
 }
 
@@ -169,10 +172,15 @@ export async function seedTranscriptFromLive(
 
     const [transcript] = await db
       .insert(schema.transcripts)
-      .values({ asset_id: assetId, language: 'he', full_text: segments.map((s) => s.text).join(' ') })
+      .values({
+        asset_id: assetId,
+        language: 'he',
+        full_text: segments.map((s) => s.text).join(' '),
+      })
       .returning({ id: schema.transcripts.id });
 
-    if (!transcript) throw new Error(`Failed to create transcript for asset ${assetId}`);
+    if (!transcript)
+      throw new Error(`Failed to create transcript for asset ${assetId}`);
 
     await db.insert(schema.transcript_segments).values(
       segments.map((s) => ({
@@ -183,7 +191,10 @@ export async function seedTranscriptFromLive(
         speaker: s.speaker,
       }))
     );
-    log.log({ assetId, segmentCount: segments.length }, 'Live transcript segments seeded');
+    log.log(
+      { assetId, segmentCount: segments.length },
+      'Live transcript segments seeded'
+    );
   } catch (err) {
     log.warn({ err, sessionId }, 'Failed to seed transcript — non-fatal');
   }
@@ -202,11 +213,15 @@ export async function migrateBookmarks(
     const rows = await withTenantContext(
       db,
       { tenantId, userId: instructorId, userRole: 'INSTRUCTOR' },
-      (txDb) => convertBookmarksToAnnotations(txDb, sessionId, assetId, tenantId)
+      (txDb) =>
+        convertBookmarksToAnnotations(txDb, sessionId, assetId, tenantId)
     );
     if (rows.length === 0) return;
     await db.insert(schema.annotations).values(rows);
-    log.log({ sessionId, count: rows.length }, 'Bookmarks migrated to annotations');
+    log.log(
+      { sessionId, count: rows.length },
+      'Bookmarks migrated to annotations'
+    );
   } catch (err) {
     log.warn({ err, sessionId }, 'Failed to migrate bookmarks — non-fatal');
   }

@@ -42,7 +42,11 @@ export class SegmentPublisher {
     try {
       await withTenantContext(
         db,
-        { tenantId: segment.tenantId, userId: 'system', userRole: 'SUPER_ADMIN' },
+        {
+          tenantId: segment.tenantId,
+          userId: 'system',
+          userRole: 'SUPER_ADMIN',
+        },
         async (txDb) => {
           // Check if a row already exists (partial → final update)
           const existing = await txDb
@@ -67,12 +71,12 @@ export class SegmentPublisher {
             session_id: segment.sessionId,
             segment_index: segment.segmentIndex,
             text: segment.text,
-            start_time: segment.startTime !== undefined
-              ? String(segment.startTime)
-              : null,
-            end_time: segment.endTime !== undefined
-              ? String(segment.endTime)
-              : null,
+            start_time:
+              segment.startTime !== undefined
+                ? String(segment.startTime)
+                : null,
+            end_time:
+              segment.endTime !== undefined ? String(segment.endTime) : null,
             is_final: segment.isFinal,
             speaker: segment.speaker ?? null,
             jargon_hits: hits as unknown as Record<string, unknown>[],
@@ -82,13 +86,9 @@ export class SegmentPublisher {
             await txDb
               .update(schema.live_transcript_segments)
               .set(values)
-              .where(
-                eq(schema.live_transcript_segments.id, existing[0].id)
-              );
+              .where(eq(schema.live_transcript_segments.id, existing[0].id));
           } else {
-            await txDb
-              .insert(schema.live_transcript_segments)
-              .values(values);
+            await txDb.insert(schema.live_transcript_segments).values(values);
           }
         }
       );

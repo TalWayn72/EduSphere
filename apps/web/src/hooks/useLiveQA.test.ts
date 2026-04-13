@@ -50,12 +50,9 @@ function makeQuestion(
     id,
     sessionId: 'sess-1',
     userId: 'user-1',
-    displayName: 'Test User',
     question: `Question ${id}`,
     upvotes,
-    status: 'OPEN',
-    answeredAt: null,
-    answeredBy: null,
+    status: 'PENDING',
     answer: null,
     createdAt,
   };
@@ -117,7 +114,11 @@ describe('useLiveQA', () => {
       expect(result.current.sortedQuestions).toHaveLength(3);
     });
 
-    expect(result.current.sortedQuestions.map((q) => q.id)).toEqual(['q2', 'q3', 'q1']);
+    expect(result.current.sortedQuestions.map((q) => q.id)).toEqual([
+      'q2',
+      'q3',
+      'q1',
+    ]);
   });
 
   it('sortedQuestions with equal upvotes ordered by createdAt ascending', async () => {
@@ -203,7 +204,9 @@ describe('useLiveQA', () => {
 
   it('upvoteQuestion reverts optimistic update on error', async () => {
     const initial = [makeQuestion('q1', 3)];
-    const failUpvote = vi.fn().mockResolvedValue({ error: new Error('failed') });
+    const failUpvote = vi
+      .fn()
+      .mockResolvedValue({ error: new Error('failed') });
     setupMocks({ initialQuestions: initial, upvoteMutFn: failUpvote });
     const { result } = renderHook(() => useLiveQA('sess-1'));
 

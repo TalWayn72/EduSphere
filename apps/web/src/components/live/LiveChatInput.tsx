@@ -77,7 +77,9 @@ export function LiveChatInput({ onSend, replyToDisplay }: LiveChatInputProps) {
           type="button"
           size="icon"
           variant="default"
-          onClick={() => { void handleSend(); }}
+          onClick={() => {
+            void handleSend();
+          }}
           disabled={!value.trim() || sending}
           aria-label="Send message"
           className="h-9 w-9 shrink-0"

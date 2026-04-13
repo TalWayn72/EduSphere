@@ -62,12 +62,16 @@ describe('ViewerCount', () => {
   });
 
   it('applies custom className in default mode', () => {
-    const { container } = render(<ViewerCount count={5} className="custom-class" />);
+    const { container } = render(
+      <ViewerCount count={5} className="custom-class" />
+    );
     expect(container.querySelector('.custom-class')).toBeTruthy();
   });
 
   it('applies custom className in compact mode', () => {
-    const { container } = render(<ViewerCount count={5} compact className="compact-custom" />);
+    const { container } = render(
+      <ViewerCount count={5} compact className="compact-custom" />
+    );
     expect(container.querySelector('.compact-custom')).toBeTruthy();
   });
 });

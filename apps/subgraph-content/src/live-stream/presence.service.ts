@@ -2,11 +2,7 @@
  * PresenceService — Manages viewer presence for live stream sessions.
  * Handles join/leave tracking in live_session_presence and broadcasts counts via NATS.
  */
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,

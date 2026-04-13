@@ -60,7 +60,7 @@ export class LiveKitClient {
   async generateToken(opts: LiveKitTokenOptions): Promise<string> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- livekit-server-sdk dynamic import interop
-      const livekit = await import('livekit-server-sdk') as any;
+      const livekit = (await import('livekit-server-sdk')) as any;
       const { AccessToken } = livekit as typeof import('livekit-server-sdk');
       // VideoGrant may be a class or a plain object depending on SDK version
       const VideoGrantCtor = livekit.VideoGrant ?? livekit.default?.VideoGrant;
@@ -69,19 +69,21 @@ export class LiveKitClient {
         name: opts.displayName ?? opts.userId,
       });
 
-      const grant = VideoGrantCtor ? new VideoGrantCtor({
-        room: opts.roomName,
-        roomJoin: true,
-        canPublish: opts.isPublisher,
-        canSubscribe: true,
-        canPublishData: opts.isPublisher,
-      }) : {
-        room: opts.roomName,
-        roomJoin: true,
-        canPublish: opts.isPublisher,
-        canSubscribe: true,
-        canPublishData: opts.isPublisher,
-      };
+      const grant = VideoGrantCtor
+        ? new VideoGrantCtor({
+            room: opts.roomName,
+            roomJoin: true,
+            canPublish: opts.isPublisher,
+            canSubscribe: true,
+            canPublishData: opts.isPublisher,
+          })
+        : {
+            room: opts.roomName,
+            roomJoin: true,
+            canPublish: opts.isPublisher,
+            canSubscribe: true,
+            canPublishData: opts.isPublisher,
+          };
 
       at.addGrant(grant);
       return await at.toJwt();
@@ -136,7 +138,9 @@ export function createLiveKitClient(): LiveKitClient | null {
   const secret = process.env['LIVEKIT_API_SECRET'];
 
   if (!url || !key || !secret) {
-    logger.debug('LiveKit not configured — LIVEKIT_URL/API_KEY/API_SECRET not set');
+    logger.debug(
+      'LiveKit not configured — LIVEKIT_URL/API_KEY/API_SECRET not set'
+    );
     return null;
   }
 

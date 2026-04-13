@@ -44,12 +44,10 @@ function makeMessage(id: string, content = 'Hello'): LiveChatMessage {
     id,
     sessionId: 'sess-1',
     userId: 'user-1',
-    displayName: 'Test User',
-    avatarUrl: null,
     content,
     messageType: 'TEXT',
     isPinned: false,
-    replyToId: null,
+    replyTo: null,
     createdAt: new Date().toISOString(),
   };
 }
@@ -58,7 +56,9 @@ function setupMocks({
   initialMessages = [] as LiveChatMessage[],
   queryFetching = false,
   subMessage = null as LiveChatMessage | null,
-  deleteMutationFn = vi.fn().mockResolvedValue({ data: { deleteLiveChatMessage: { deleted: true } } }),
+  deleteMutationFn = vi
+    .fn()
+    .mockResolvedValue({ data: { deleteLiveChatMessage: { deleted: true } } }),
 } = {}) {
   const executeSend = vi.fn().mockResolvedValue({ data: null });
   const executePin = vi.fn().mockResolvedValue({ data: null });
@@ -69,7 +69,12 @@ function setupMocks({
       data: {
         liveChatMessages: {
           messages: initialMessages,
-          pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: null,
+            endCursor: null,
+          },
         },
       },
       fetching: queryFetching,

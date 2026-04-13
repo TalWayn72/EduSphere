@@ -20,10 +20,15 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {
     live_session_configs: {
-      id: 'id', session_id: 'session_id', tenant_id: 'tenant_id',
-      lesson_id: 'lesson_id', instructor_id: 'instructor_id',
-      stream_type: 'stream_type', viewer_count: 'viewer_count',
-      max_viewers: 'max_viewers', is_screen_sharing: 'is_screen_sharing',
+      id: 'id',
+      session_id: 'session_id',
+      tenant_id: 'tenant_id',
+      lesson_id: 'lesson_id',
+      instructor_id: 'instructor_id',
+      stream_type: 'stream_type',
+      viewer_count: 'viewer_count',
+      max_viewers: 'max_viewers',
+      is_screen_sharing: 'is_screen_sharing',
       auto_record: 'auto_record',
     },
     liveSessions: { id: 'id', status: 'status' },
@@ -41,7 +46,10 @@ vi.mock('nats', () => ({
     publish: vi.fn(),
     drain: vi.fn().mockResolvedValue(undefined),
   }),
-  StringCodec: vi.fn(() => ({ encode: vi.fn((v: string) => v), decode: vi.fn() })),
+  StringCodec: vi.fn(() => ({
+    encode: vi.fn((v: string) => v),
+    decode: vi.fn(),
+  })),
 }));
 
 // Build a chainable mock DB that can return different values per call
@@ -66,15 +74,23 @@ const TENANT_ID = 'tenant-1';
 const INSTRUCTOR_ID = 'instructor-1';
 
 const sampleCfg = {
-  id: 'cfg-1', session_id: SESSION_ID, tenant_id: TENANT_ID,
-  lesson_id: 'lesson-1', instructor_id: INSTRUCTOR_ID,
-  stream_type: 'BBB', viewer_count: 0, max_viewers: 100,
-  is_screen_sharing: false, auto_record: true,
+  id: 'cfg-1',
+  session_id: SESSION_ID,
+  tenant_id: TENANT_ID,
+  lesson_id: 'lesson-1',
+  instructor_id: INSTRUCTOR_ID,
+  stream_type: 'BBB',
+  viewer_count: 0,
+  max_viewers: 100,
+  is_screen_sharing: false,
+  auto_record: true,
 };
 
 const sampleSess = {
-  id: SESSION_ID, status: 'SCHEDULED',
-  meetingName: 'Test Meeting', scheduledAt: new Date('2026-01-01'),
+  id: SESSION_ID,
+  status: 'SCHEDULED',
+  meetingName: 'Test Meeting',
+  scheduledAt: new Date('2026-01-01'),
 };
 
 function resetDb(...sequence: unknown[][]): void {
@@ -99,9 +115,15 @@ describe('LiveStreamService', () => {
   describe('createConfig', () => {
     it('inserts config record and returns session', async () => {
       resetDb([sampleCfg], [sampleSess]);
-      const result = await service.createConfig(SESSION_ID, TENANT_ID, INSTRUCTOR_ID, {
-        streamType: 'BBB', maxViewers: 100,
-      });
+      const result = await service.createConfig(
+        SESSION_ID,
+        TENANT_ID,
+        INSTRUCTOR_ID,
+        {
+          streamType: 'BBB',
+          maxViewers: 100,
+        }
+      );
       expect(mockDb.insert).toHaveBeenCalled();
       expect(result.sessionId).toBe(SESSION_ID);
       expect(result.status).toBe('PRE_LIVE'); // SCHEDULED → PRE_LIVE
@@ -119,7 +141,12 @@ describe('LiveStreamService', () => {
     it('transitions SCHEDULED → LIVE and returns updated session', async () => {
       // transition reads sess first, then fetchJoined reads cfg + sess
       resetDb([sampleSess], [sampleCfg], [{ ...sampleSess, status: 'LIVE' }]);
-      const result = await service.transition(SESSION_ID, TENANT_ID, INSTRUCTOR_ID, 'start');
+      const result = await service.transition(
+        SESSION_ID,
+        TENANT_ID,
+        INSTRUCTOR_ID,
+        'start'
+      );
       expect(mockDb.update).toHaveBeenCalled();
       expect(result).toBeDefined();
     });
@@ -143,7 +170,12 @@ describe('LiveStreamService', () => {
     it('transitions LIVE → PAUSED', async () => {
       const liveSess = { ...sampleSess, status: 'LIVE' };
       resetDb([liveSess], [sampleCfg], [{ ...liveSess, status: 'PAUSED' }]);
-      const result = await service.transition(SESSION_ID, TENANT_ID, INSTRUCTOR_ID, 'pause');
+      const result = await service.transition(
+        SESSION_ID,
+        TENANT_ID,
+        INSTRUCTOR_ID,
+        'pause'
+      );
       expect(result).toBeDefined();
     });
 
@@ -159,7 +191,12 @@ describe('LiveStreamService', () => {
     it('transitions LIVE → ENDED', async () => {
       const liveSess = { ...sampleSess, status: 'LIVE' };
       resetDb([liveSess], [sampleCfg], [{ ...liveSess, status: 'ENDED' }]);
-      const result = await service.transition(SESSION_ID, TENANT_ID, INSTRUCTOR_ID, 'end');
+      const result = await service.transition(
+        SESSION_ID,
+        TENANT_ID,
+        INSTRUCTOR_ID,
+        'end'
+      );
       expect(result).toBeDefined();
     });
 
@@ -190,7 +227,9 @@ describe('LiveStreamService', () => {
   describe('updateConfig', () => {
     it('updates max_viewers and returns session', async () => {
       resetDb([sampleCfg], [sampleSess]);
-      const result = await service.updateConfig(SESSION_ID, TENANT_ID, { maxViewers: 200 });
+      const result = await service.updateConfig(SESSION_ID, TENANT_ID, {
+        maxViewers: 200,
+      });
       expect(mockDb.update).toHaveBeenCalled();
       expect(result).toBeDefined();
     });

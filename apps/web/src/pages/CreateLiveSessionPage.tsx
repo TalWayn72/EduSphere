@@ -44,11 +44,7 @@ const schema = z.object({
     .max(200, 'Title too long'),
   scheduledAt: z.string().optional(),
   streamType: z.enum(STREAM_TYPES),
-  streamUrl: z
-    .string()
-    .url('Must be a valid URL')
-    .optional()
-    .or(z.literal('')),
+  streamUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   maxViewersRaw: z.string().optional(),
   autoRecord: z.boolean(),
 });
@@ -205,7 +201,9 @@ export function CreateLiveSessionPage() {
               type="url"
               placeholder="https://..."
               dir="ltr"
-              aria-describedby={errors.streamUrl ? 'stream-url-error' : undefined}
+              aria-describedby={
+                errors.streamUrl ? 'stream-url-error' : undefined
+              }
               className={cn(errors.streamUrl && 'border-destructive')}
               data-testid="input-stream-url"
             />
@@ -238,11 +236,7 @@ export function CreateLiveSessionPage() {
           {/* Auto-record toggle */}
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div className="space-y-0.5">
-              <Label
-                htmlFor="autoRecord"
-                dir="auto"
-                className="cursor-pointer"
-              >
+              <Label htmlFor="autoRecord" dir="auto" className="cursor-pointer">
                 הקלטה אוטומטית
               </Label>
               <p className="text-xs text-muted-foreground" dir="auto">

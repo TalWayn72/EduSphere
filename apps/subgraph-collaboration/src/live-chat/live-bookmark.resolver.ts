@@ -2,13 +2,7 @@
  * LiveBookmarkResolver — Query and Mutation resolvers for LiveBookmark.
  */
 import type { IncomingMessage } from 'http';
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Context,
-} from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
 import { LiveBookmarkService } from './live-bookmark.service';

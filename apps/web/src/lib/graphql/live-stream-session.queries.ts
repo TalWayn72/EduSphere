@@ -1,61 +1,36 @@
 import { gql } from 'urql';
 
+// ── LiveStreamSession fragment (fields that exist in SDL) ─────────────────────
+
+const LIVE_SESSION_FIELDS = `
+  id
+  lessonId
+  meetingName
+  scheduledAt
+  status
+  streamType
+  viewerCount
+  maxViewers
+  isScreenSharing
+  instructor {
+    id
+  }
+`;
+
 // ── Queries ────────────────────────────────────────────────────────────────────
 
 export const LIVE_STREAM_SESSION_QUERY = gql`
   query LiveStreamSession($sessionId: ID!) {
     liveStreamSession(sessionId: $sessionId) {
-      id
-      title
-      courseId
-      instructorId
-      phase
-      streamType
-      streamUrl
-      thumbnailUrl
-      viewerCount
-      maxViewers
-      scheduledAt
-      startedAt
-      endedAt
-      isScreenSharing
-      highlightMoments {
-        id
-        timestamp
-        label
-        sessionId
-      }
-      recordingUrl
-      createdAt
+      ${LIVE_SESSION_FIELDS}
     }
   }
 `;
 
 export const ACTIVE_LIVE_SESSIONS_QUERY = gql`
-  query ActiveLiveSessions($courseId: ID!) {
+  query ActiveLiveSessions($courseId: ID) {
     activeLiveSessions(courseId: $courseId) {
-      id
-      title
-      courseId
-      instructorId
-      phase
-      streamType
-      streamUrl
-      thumbnailUrl
-      viewerCount
-      maxViewers
-      scheduledAt
-      startedAt
-      endedAt
-      isScreenSharing
-      highlightMoments {
-        id
-        timestamp
-        label
-        sessionId
-      }
-      recordingUrl
-      createdAt
+      ${LIVE_SESSION_FIELDS}
     }
   }
 `;
@@ -63,18 +38,16 @@ export const ACTIVE_LIVE_SESSIONS_QUERY = gql`
 export const LIVE_TRANSCRIPT_QUERY = gql`
   query LiveTranscript($sessionId: ID!, $afterIndex: Int) {
     liveTranscript(sessionId: $sessionId, afterIndex: $afterIndex) {
-      index
+      id
+      segmentIndex
       text
       isFinal
-      speakerLabel
-      startMs
-      endMs
+      startTime
+      endTime
       jargonHits {
         termId
-        canonicalForm
-        definitionShort
-        startChar
-        endChar
+        form
+        confidence
       }
     }
   }
@@ -83,11 +56,9 @@ export const LIVE_TRANSCRIPT_QUERY = gql`
 export const LIVE_PRESENCE_QUERY = gql`
   query LivePresence($sessionId: ID!) {
     livePresence(sessionId: $sessionId) {
-      viewerCount
+      activeViewers
       viewers {
         userId
-        displayName
-        avatarUrl
         joinedAt
       }
     }
@@ -97,55 +68,39 @@ export const LIVE_PRESENCE_QUERY = gql`
 // ── Mutations ─────────────────────────────────────────────────────────────────
 
 export const JOIN_LIVE_SESSION_MUTATION = gql`
-  mutation JoinLiveStream($sessionId: ID!) {
-    joinLiveStream(sessionId: $sessionId) {
-      sessionId
-      viewerToken
-      streamUrl
+  mutation JoinLiveSession($sessionId: ID!) {
+    joinLiveSession(sessionId: $sessionId) {
+      activeViewers
+      viewers {
+        userId
+        joinedAt
+      }
     }
   }
 `;
 
 export const LEAVE_LIVE_SESSION_MUTATION = gql`
-  mutation LeaveLiveStream($sessionId: ID!) {
-    leaveLiveStream(sessionId: $sessionId) {
-      success
-    }
+  mutation LeaveLiveSession($sessionId: ID!) {
+    leaveLiveSession(sessionId: $sessionId)
   }
 `;
 
 export const CREATE_LIVE_STREAM_MUTATION = gql`
   mutation CreateLiveStream(
-    $courseId: ID!
-    $title: String!
-    $scheduledAt: String
-    $streamType: String!
+    $sessionId: ID!
+    $streamType: StreamType!
+    $lessonId: ID
     $maxViewers: Int
+    $autoRecord: Boolean
   ) {
     createLiveStream(
-      courseId: $courseId
-      title: $title
-      scheduledAt: $scheduledAt
+      sessionId: $sessionId
       streamType: $streamType
+      lessonId: $lessonId
       maxViewers: $maxViewers
+      autoRecord: $autoRecord
     ) {
-      id
-      title
-      courseId
-      instructorId
-      phase
-      streamType
-      streamUrl
-      thumbnailUrl
-      viewerCount
-      maxViewers
-      scheduledAt
-      startedAt
-      endedAt
-      isScreenSharing
-      highlightMoments { id timestamp label sessionId }
-      recordingUrl
-      createdAt
+      ${LIVE_SESSION_FIELDS}
     }
   }
 `;
@@ -153,10 +108,8 @@ export const CREATE_LIVE_STREAM_MUTATION = gql`
 export const START_LIVE_STREAM_MUTATION = gql`
   mutation StartLiveStream($sessionId: ID!) {
     startLiveStream(sessionId: $sessionId) {
-      sessionId
-      phase
-      startedAt
-      streamUrl
+      id
+      status
     }
   }
 `;
@@ -164,8 +117,8 @@ export const START_LIVE_STREAM_MUTATION = gql`
 export const PAUSE_LIVE_STREAM_MUTATION = gql`
   mutation PauseLiveStream($sessionId: ID!) {
     pauseLiveStream(sessionId: $sessionId) {
-      sessionId
-      phase
+      id
+      status
     }
   }
 `;
@@ -173,31 +126,24 @@ export const PAUSE_LIVE_STREAM_MUTATION = gql`
 export const END_LIVE_STREAM_MUTATION = gql`
   mutation EndLiveStream($sessionId: ID!) {
     endLiveStream(sessionId: $sessionId) {
-      sessionId
-      phase
-      endedAt
-      recordingUrl
+      id
+      status
     }
   }
 `;
 
 export const TOGGLE_SCREEN_SHARE_MUTATION = gql`
-  mutation ToggleScreenShare($sessionId: ID!, $enabled: Boolean!) {
-    toggleScreenShare(sessionId: $sessionId, enabled: $enabled) {
-      sessionId
+  mutation ToggleScreenShare($sessionId: ID!, $active: Boolean!) {
+    toggleScreenShare(sessionId: $sessionId, active: $active) {
+      id
       isScreenSharing
     }
   }
 `;
 
 export const HIGHLIGHT_MOMENT_MUTATION = gql`
-  mutation HighlightMoment($sessionId: ID!, $label: String!) {
-    highlightMoment(sessionId: $sessionId, label: $label) {
-      id
-      timestamp
-      label
-      sessionId
-    }
+  mutation HighlightMoment($sessionId: ID!, $streamTs: Float!, $label: String) {
+    highlightMoment(sessionId: $sessionId, streamTs: $streamTs, label: $label)
   }
 `;
 
@@ -206,35 +152,28 @@ export const HIGHLIGHT_MOMENT_MUTATION = gql`
 export const LIVE_TRANSCRIPT_UPDATED_SUB = gql`
   subscription LiveTranscriptUpdated($sessionId: ID!) {
     liveTranscriptUpdated(sessionId: $sessionId) {
-      index
+      id
+      segmentIndex
       text
       isFinal
-      speakerLabel
-      startMs
-      endMs
+      startTime
+      endTime
       jargonHits {
         termId
-        canonicalForm
-        definitionShort
-        startChar
-        endChar
+        form
+        confidence
       }
     }
   }
 `;
 
 export const LIVE_SESSION_STATUS_SUB = gql`
-  subscription LiveSessionStatus($sessionId: ID!) {
-    liveSessionStatus(sessionId: $sessionId) {
-      sessionId
-      phase
+  subscription LiveSessionStatusChanged($sessionId: ID!) {
+    liveSessionStatusChanged(sessionId: $sessionId) {
+      id
+      status
       viewerCount
       isScreenSharing
-      highlightMoments {
-        id
-        timestamp
-        label
-      }
     }
   }
 `;
@@ -242,11 +181,9 @@ export const LIVE_SESSION_STATUS_SUB = gql`
 export const LIVE_PRESENCE_CHANGED_SUB = gql`
   subscription LivePresenceChanged($sessionId: ID!) {
     livePresenceChanged(sessionId: $sessionId) {
-      viewerCount
+      activeViewers
       viewers {
         userId
-        displayName
-        avatarUrl
         joinedAt
       }
     }

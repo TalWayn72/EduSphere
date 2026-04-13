@@ -24,10 +24,10 @@ export class LiveStreamSubscriptionResolver {
    * NATS subject: EDUSPHERE.live.transcript.segment
    */
   @Subscription('liveTranscriptUpdated')
-  subscribeTranscript(
-    @Args('sessionId') sessionId: string
-  ) {
-    this.logger.debug(`[Subscription] liveTranscriptUpdated for session ${sessionId}`);
+  subscribeTranscript(@Args('sessionId') sessionId: string) {
+    this.logger.debug(
+      `[Subscription] liveTranscriptUpdated for session ${sessionId}`
+    );
     return subscribeTranscript(sessionId);
   }
 
@@ -36,10 +36,10 @@ export class LiveStreamSubscriptionResolver {
    * NATS subject: EDUSPHERE.live.presence.count
    */
   @Subscription('livePresenceChanged')
-  subscribePresence(
-    @Args('sessionId') sessionId: string
-  ) {
-    this.logger.debug(`[Subscription] livePresenceChanged for session ${sessionId}`);
+  subscribePresence(@Args('sessionId') sessionId: string) {
+    this.logger.debug(
+      `[Subscription] livePresenceChanged for session ${sessionId}`
+    );
     return subscribePresence(sessionId);
   }
 
@@ -48,10 +48,10 @@ export class LiveStreamSubscriptionResolver {
    * NATS subjects: EDUSPHERE.live.stream.*
    */
   @Subscription('liveSessionStatusChanged')
-  subscribeSessionStatus(
-    @Args('sessionId') sessionId: string
-  ) {
-    this.logger.debug(`[Subscription] liveSessionStatusChanged for session ${sessionId}`);
+  subscribeSessionStatus(@Args('sessionId') sessionId: string) {
+    this.logger.debug(
+      `[Subscription] liveSessionStatusChanged for session ${sessionId}`
+    );
     return subscribeSessionStatus(sessionId);
   }
 }

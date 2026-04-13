@@ -10,7 +10,11 @@ interface ViewerCountProps {
   className?: string;
 }
 
-export function ViewerCount({ count, compact = false, className }: ViewerCountProps) {
+export function ViewerCount({
+  count,
+  compact = false,
+  className,
+}: ViewerCountProps) {
   if (compact) {
     return (
       <span
@@ -20,7 +24,10 @@ export function ViewerCount({ count, compact = false, className }: ViewerCountPr
         )}
         aria-label={`${count} viewers`}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-red-400 animate-pulse" aria-hidden="true" />
+        <span
+          className="h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-red-400 animate-pulse"
+          aria-hidden="true"
+        />
         {count}
       </span>
     );
@@ -35,7 +42,10 @@ export function ViewerCount({ count, compact = false, className }: ViewerCountPr
       )}
       aria-label={`${count} viewers watching`}
     >
-      <span className="h-2 w-2 rounded-full bg-red-500 dark:bg-red-400 animate-pulse" aria-hidden="true" />
+      <span
+        className="h-2 w-2 rounded-full bg-red-500 dark:bg-red-400 animate-pulse"
+        aria-hidden="true"
+      />
       <span dir="auto">{count} צופים</span>
     </span>
   );

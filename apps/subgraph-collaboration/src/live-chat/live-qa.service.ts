@@ -88,7 +88,8 @@ export class LiveQAService implements OnModuleDestroy {
         .where(eq(schema.live_qa_questions.id, questionId))
         .limit(1);
 
-      if (!existing) throw new NotFoundException(`Question ${questionId} not found`);
+      if (!existing)
+        throw new NotFoundException(`Question ${questionId} not found`);
 
       // Idempotent: insert ignore on unique constraint
       await tx
@@ -119,7 +120,11 @@ export class LiveQAService implements OnModuleDestroy {
     });
   }
 
-  async answerQuestion(questionId: string, answer: string, authContext: AuthContext) {
+  async answerQuestion(
+    questionId: string,
+    answer: string,
+    authContext: AuthContext
+  ) {
     const role = authContext.roles?.[0] ?? 'STUDENT';
     if (!INSTRUCTOR_ROLES.includes(role)) {
       throw new ForbiddenException('Only instructors can answer questions');
@@ -133,7 +138,8 @@ export class LiveQAService implements OnModuleDestroy {
         .where(eq(schema.live_qa_questions.id, questionId))
         .limit(1);
 
-      if (!existing) throw new NotFoundException(`Question ${questionId} not found`);
+      if (!existing)
+        throw new NotFoundException(`Question ${questionId} not found`);
 
       const [updated] = await tx
         .update(schema.live_qa_questions)
@@ -160,7 +166,8 @@ export class LiveQAService implements OnModuleDestroy {
         .where(eq(schema.live_qa_questions.id, questionId))
         .limit(1);
 
-      if (!existing) throw new NotFoundException(`Question ${questionId} not found`);
+      if (!existing)
+        throw new NotFoundException(`Question ${questionId} not found`);
 
       const [updated] = await tx
         .update(schema.live_qa_questions)
@@ -194,7 +201,11 @@ export class LiveQAService implements OnModuleDestroy {
     });
   }
 
-  async isUpvotedByUser(questionId: string, userId: string, tenantCtx: TenantContext) {
+  async isUpvotedByUser(
+    questionId: string,
+    userId: string,
+    tenantCtx: TenantContext
+  ) {
     const result = await withTenantContext(this.db, tenantCtx, async (tx) => {
       return tx
         .select({ id: schema.live_qa_upvotes.id })

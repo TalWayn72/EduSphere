@@ -20,7 +20,12 @@ import type { LiveChatMessage } from '@/types/live-session.types';
 interface LiveChatMessagesResult {
   liveChatMessages: {
     messages: LiveChatMessage[];
-    pageInfo: { hasNextPage: boolean; hasPreviousPage: boolean; startCursor: string | null; endCursor: string | null };
+    pageInfo: {
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+      endCursor: string | null;
+    };
   } | null;
 }
 
@@ -47,7 +52,9 @@ export function useLiveChat(sessionId: string): UseLiveChatReturn {
 
   useEffect(() => {
     setPaused(false);
-    return () => { setPaused(true); };
+    return () => {
+      setPaused(true);
+    };
   }, []);
 
   const [queryResult] = useQuery<LiveChatMessagesResult>({
@@ -74,7 +81,9 @@ export function useLiveChat(sessionId: string): UseLiveChatReturn {
     setMessages((prev) => {
       if (prev.some((m) => m.id === incoming.id)) return prev;
       const appended = [...prev, incoming];
-      return appended.length > MAX_MESSAGES ? appended.slice(-MAX_MESSAGES) : appended;
+      return appended.length > MAX_MESSAGES
+        ? appended.slice(-MAX_MESSAGES)
+        : appended;
     });
   }, [subResult.data]);
 
@@ -82,20 +91,35 @@ export function useLiveChat(sessionId: string): UseLiveChatReturn {
   const [, executePin] = useMutation(PIN_LIVE_CHAT_MESSAGE_MUTATION);
   const [, executeDelete] = useMutation(DELETE_LIVE_CHAT_MESSAGE_MUTATION);
 
-  const sendMessage = useCallback(async (content: string, replyToId?: string) => {
-    await executeSend({ sessionId, content, replyToId: replyToId ?? null });
-  }, [sessionId, executeSend]);
+  const sendMessage = useCallback(
+    async (content: string, replyToId?: string) => {
+      await executeSend({ sessionId, content, replyToId: replyToId ?? null });
+    },
+    [sessionId, executeSend]
+  );
 
-  const pinMessage = useCallback(async (messageId: string, pinned: boolean) => {
-    await executePin({ sessionId, messageId, pinned });
-  }, [sessionId, executePin]);
+  const pinMessage = useCallback(
+    async (messageId: string, pinned: boolean) => {
+      await executePin({ sessionId, messageId, pinned });
+    },
+    [sessionId, executePin]
+  );
 
-  const deleteMessage = useCallback(async (messageId: string) => {
-    const result = await executeDelete({ sessionId, messageId });
-    if (!result.error) {
-      setMessages((prev) => prev.filter((m) => m.id !== messageId));
-    }
-  }, [sessionId, executeDelete]);
+  const deleteMessage = useCallback(
+    async (messageId: string) => {
+      const result = await executeDelete({ sessionId, messageId });
+      if (!result.error) {
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+      }
+    },
+    [sessionId, executeDelete]
+  );
 
-  return { messages, fetching: queryResult.fetching, sendMessage, pinMessage, deleteMessage };
+  return {
+    messages,
+    fetching: queryResult.fetching,
+    sendMessage,
+    pinMessage,
+    deleteMessage,
+  };
 }

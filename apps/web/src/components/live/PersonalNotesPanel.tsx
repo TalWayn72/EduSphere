@@ -114,9 +114,7 @@ export function PersonalNotesPanel({
             <p dir="auto">No notes yet. Start typing above.</p>
           </div>
         ) : (
-          notes.map((note) => (
-            <NoteItem key={note.id} note={note} />
-          ))
+          notes.map((note) => <NoteItem key={note.id} note={note} />)
         )}
       </div>
     </div>

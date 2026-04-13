@@ -77,25 +77,27 @@ extend type Mutation {
     sessionId: ID!
     content: String!
     replyToId: ID
-  ): LiveChatMessage!
-  pinLiveChatMessage(messageId: ID!): LiveChatMessage!
-  deleteLiveChatMessage(messageId: ID!): Boolean!
+  ): LiveChatMessage! @authenticated
+  pinLiveChatMessage(messageId: ID!): LiveChatMessage! @authenticated
+  deleteLiveChatMessage(messageId: ID!): Boolean! @authenticated
   sendLiveReaction(sessionId: ID!, emoji: String!, streamTs: Float): Boolean!
+    @authenticated
   askLiveQuestion(
     sessionId: ID!
     question: String!
     streamTs: Float
-  ): LiveQAQuestion!
-  upvoteLiveQuestion(questionId: ID!): LiveQAQuestion!
+  ): LiveQAQuestion! @authenticated
+  upvoteLiveQuestion(questionId: ID!): LiveQAQuestion! @authenticated
   answerLiveQuestion(questionId: ID!, answer: String!): LiveQAQuestion!
-  dismissLiveQuestion(questionId: ID!): LiveQAQuestion!
+    @authenticated
+  dismissLiveQuestion(questionId: ID!): LiveQAQuestion! @authenticated
   addLiveBookmark(
     sessionId: ID!
     streamTs: Float!
     label: String
     note: String
-  ): LiveBookmark!
-  removeLiveBookmark(bookmarkId: ID!): Boolean!
+  ): LiveBookmark! @authenticated
+  removeLiveBookmark(bookmarkId: ID!): Boolean! @authenticated
 }
 
 extend type Subscription {

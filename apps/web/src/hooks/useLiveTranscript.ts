@@ -34,14 +34,16 @@ function mergeSegment(
   prev: LiveTranscriptSegment[],
   incoming: LiveTranscriptSegment
 ): LiveTranscriptSegment[] {
-  const existingIdx = prev.findIndex((s) => s.index === incoming.index);
+  const existingIdx = prev.findIndex(
+    (s) => s.segmentIndex === incoming.segmentIndex
+  );
   if (existingIdx !== -1 && !prev[existingIdx]!.isFinal) {
     const updated = [...prev];
     updated[existingIdx] = incoming;
     return updated;
   }
   if (existingIdx !== -1) return prev; // already final — skip
-  return [...prev, incoming].sort((a, b) => a.index - b.index);
+  return [...prev, incoming].sort((a, b) => a.segmentIndex - b.segmentIndex);
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -53,7 +55,9 @@ export function useLiveTranscript(sessionId: string): UseLiveTranscriptReturn {
 
   useEffect(() => {
     setPaused(false);
-    return () => { setPaused(true); };
+    return () => {
+      setPaused(true);
+    };
   }, []);
 
   const [queryResult] = useQuery<LiveTranscriptQueryResult>({
@@ -65,7 +69,7 @@ export function useLiveTranscript(sessionId: string): UseLiveTranscriptReturn {
   useEffect(() => {
     if (!queryResult.data?.liveTranscript || initialLoaded) return;
     const sorted = [...queryResult.data.liveTranscript].sort(
-      (a, b) => a.index - b.index
+      (a, b) => a.segmentIndex - b.segmentIndex
     );
     setSegments(sorted);
     setInitialLoaded(true);

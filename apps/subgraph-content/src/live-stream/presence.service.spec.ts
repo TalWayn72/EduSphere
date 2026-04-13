@@ -45,7 +45,10 @@ vi.mock('nats', () => ({
     publish: vi.fn(),
     drain: vi.fn().mockResolvedValue(undefined),
   }),
-  StringCodec: vi.fn(() => ({ encode: vi.fn((v: string) => v), decode: vi.fn() })),
+  StringCodec: vi.fn(() => ({
+    encode: vi.fn((v: string) => v),
+    decode: vi.fn(),
+  })),
 }));
 
 import { PresenceService } from './presence.service.js';
@@ -57,7 +60,13 @@ const USER_ID = 'user-1';
 const now = new Date('2026-01-01T10:00:00Z');
 
 function makePresenceRow(userId: string, isActive = true) {
-  return { user_id: userId, is_active: isActive, joined_at: now, tenant_id: TENANT_ID, session_id: SESSION_ID };
+  return {
+    user_id: userId,
+    is_active: isActive,
+    joined_at: now,
+    tenant_id: TENANT_ID,
+    session_id: SESSION_ID,
+  };
 }
 
 function _resetDb(...sequences: unknown[][]): void {
@@ -70,7 +79,9 @@ function _resetDb(...sequences: unknown[][]): void {
   });
   vi.mocked(mockDb.insert as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
   vi.mocked(mockDb.values as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
-  vi.mocked(mockDb.onConflictDoUpdate as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+  vi.mocked(
+    mockDb.onConflictDoUpdate as ReturnType<typeof vi.fn>
+  ).mockResolvedValue(undefined);
   vi.mocked(mockDb.update as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
   vi.mocked(mockDb.set as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
 }
@@ -88,10 +99,18 @@ describe('PresenceService', () => {
   describe('join', () => {
     it('inserts presence record and returns active viewer count', async () => {
       // join calls: insert + upsert (via onConflictDoUpdate), then getActiveViewers
-      vi.mocked(mockDb.where as ReturnType<typeof vi.fn>).mockResolvedValue([makePresenceRow(USER_ID)]);
-      vi.mocked(mockDb.insert as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
-      vi.mocked(mockDb.values as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
-      vi.mocked(mockDb.onConflictDoUpdate as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      vi.mocked(mockDb.where as ReturnType<typeof vi.fn>).mockResolvedValue([
+        makePresenceRow(USER_ID),
+      ]);
+      vi.mocked(mockDb.insert as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockDb
+      );
+      vi.mocked(mockDb.values as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockDb
+      );
+      vi.mocked(
+        mockDb.onConflictDoUpdate as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(undefined);
 
       const result = await service.join(SESSION_ID, TENANT_ID, USER_ID);
       expect(mockDb.insert).toHaveBeenCalled();
@@ -101,11 +120,18 @@ describe('PresenceService', () => {
 
     it('upserts on re-join (second join returns updated record)', async () => {
       vi.mocked(mockDb.where as ReturnType<typeof vi.fn>).mockResolvedValue([
-        makePresenceRow(USER_ID), makePresenceRow('user-2'),
+        makePresenceRow(USER_ID),
+        makePresenceRow('user-2'),
       ]);
-      vi.mocked(mockDb.insert as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
-      vi.mocked(mockDb.values as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
-      vi.mocked(mockDb.onConflictDoUpdate as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      vi.mocked(mockDb.insert as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockDb
+      );
+      vi.mocked(mockDb.values as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockDb
+      );
+      vi.mocked(
+        mockDb.onConflictDoUpdate as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(undefined);
 
       const result = await service.join(SESSION_ID, TENANT_ID, USER_ID);
       expect(result.activeViewers).toBe(2);
@@ -115,10 +141,14 @@ describe('PresenceService', () => {
   describe('leave', () => {
     it('marks presence is_active=false and updates left_at', async () => {
       vi.mocked(mockDb.where as ReturnType<typeof vi.fn>).mockResolvedValue([]);
-      vi.mocked(mockDb.update as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
+      vi.mocked(mockDb.update as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockDb
+      );
       vi.mocked(mockDb.set as ReturnType<typeof vi.fn>).mockReturnValue(mockDb);
 
-      await expect(service.leave(SESSION_ID, TENANT_ID, USER_ID)).resolves.toBeUndefined();
+      await expect(
+        service.leave(SESSION_ID, TENANT_ID, USER_ID)
+      ).resolves.toBeUndefined();
       expect(mockDb.update).toHaveBeenCalled();
     });
   });
@@ -144,7 +174,9 @@ describe('PresenceService', () => {
     });
 
     it('maps joined_at to ISO string', async () => {
-      vi.mocked(mockDb.where as ReturnType<typeof vi.fn>).mockResolvedValue([makePresenceRow(USER_ID)]);
+      vi.mocked(mockDb.where as ReturnType<typeof vi.fn>).mockResolvedValue([
+        makePresenceRow(USER_ID),
+      ]);
       const result = await service.getActiveViewers(SESSION_ID, TENANT_ID);
       expect(result.viewers[0].joinedAt).toBe(now.toISOString());
     });

@@ -22,7 +22,9 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const pinned = messages.filter((m) => m.isPinned);
-  const regular = messages.filter((m) => !m.isPinned || m.messageType === 'SYSTEM');
+  const regular = messages.filter(
+    (m) => !m.isPinned || m.messageType === 'SYSTEM'
+  );
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -30,7 +32,10 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   }, [messages.length]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" data-testid="chat-panel">
+    <div
+      className="flex flex-col h-full overflow-hidden"
+      data-testid="chat-panel"
+    >
       {/* Pinned messages */}
       {pinned.length > 0 && (
         <div className="border-b px-3 py-2 bg-amber-50/40 dark:bg-amber-900/10 shrink-0">

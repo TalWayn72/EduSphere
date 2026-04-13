@@ -2,7 +2,12 @@ import { create } from 'zustand';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-export type LiveSessionTab = 'transcript' | 'chat' | 'qa' | 'notes' | 'glossary';
+export type LiveSessionTab =
+  | 'transcript'
+  | 'chat'
+  | 'qa'
+  | 'notes'
+  | 'glossary';
 
 // ── Store interface ────────────────────────────────────────────────────────────
 

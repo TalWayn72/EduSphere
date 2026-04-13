@@ -10,10 +10,10 @@ export const CITATION_FORMAT_CONFIGS_QUERY = gql`
     citationFormatConfigs(courseId: $courseId) {
       id
       courseId
-      preset
-      customDescription
-      createdAt
-      updatedAt
+      presetName
+      formatDescription
+      parsedStructure
+      isActive
     }
   }
 `;
@@ -21,13 +21,21 @@ export const CITATION_FORMAT_CONFIGS_QUERY = gql`
 // ── Mutations ─────────────────────────────────────────────────────────────────
 
 export const SET_CITATION_FORMAT_MUTATION = gql`
-  mutation SetCitationFormat($input: SetCitationFormatInput!) {
-    setCitationFormat(input: $input) {
+  mutation SetCitationFormat(
+    $courseId: ID!
+    $presetName: String!
+    $formatDescription: String
+  ) {
+    setCitationFormat(
+      courseId: $courseId
+      presetName: $presetName
+      formatDescription: $formatDescription
+    ) {
       id
       courseId
-      preset
-      customDescription
-      updatedAt
+      presetName
+      formatDescription
+      isActive
     }
   }
 `;

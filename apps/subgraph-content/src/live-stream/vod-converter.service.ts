@@ -88,20 +88,27 @@ export class VodConverterService implements OnModuleInit, OnModuleDestroy {
 
   private startConsuming(): void {
     if (!this.connection) return;
-    const sub = this.connection.subscribe(S.STREAM_ENDED, { queue: QUEUE_GROUP });
+    const sub = this.connection.subscribe(S.STREAM_ENDED, {
+      queue: QUEUE_GROUP,
+    });
     this.logger.log(`Subscribed to ${S.STREAM_ENDED} (queue: ${QUEUE_GROUP})`);
 
     (async () => {
       for await (const msg of sub) {
         try {
-          const payload = JSON.parse(this.sc.decode(msg.data)) as StreamEndedPayload;
+          const payload = JSON.parse(
+            this.sc.decode(msg.data)
+          ) as StreamEndedPayload;
           await this.handleStreamEnded(payload);
         } catch (err) {
           this.logger.error({ err }, 'Failed to handle stream.ended message');
         }
       }
     })().catch((err) => {
-      this.logger.error({ err }, 'VodConverterService subscription loop crashed');
+      this.logger.error(
+        { err },
+        'VodConverterService subscription loop crashed'
+      );
     });
   }
 
@@ -110,32 +117,62 @@ export class VodConverterService implements OnModuleInit, OnModuleDestroy {
   private async handleStreamEnded(payload: StreamEndedPayload): Promise<void> {
     const { sessionId, tenantId, instructorId } = payload;
     this.logger.log({ sessionId, tenantId }, 'VOD conversion started');
-    void this.publish(S.VOD_STARTED, { sessionId, tenantId, timestamp: new Date().toISOString() });
+    void this.publish(S.VOD_STARTED, {
+      sessionId,
+      tenantId,
+      timestamp: new Date().toISOString(),
+    });
 
     try {
       const cfg = await this.fetchConfig(sessionId, tenantId);
       if (!cfg) {
-        this.logger.warn({ sessionId }, 'No live_session_config found — skipping');
+        this.logger.warn(
+          { sessionId },
+          'No live_session_config found — skipping'
+        );
         return;
       }
 
       const assetId = await createMediaAsset(
-        this.db, tenantId, cfg.lesson_id, cfg.recording_key, sessionId
+        this.db,
+        tenantId,
+        cfg.lesson_id,
+        cfg.recording_key,
+        sessionId
       );
 
       if (cfg.lesson_id) {
-        await upsertLessonAsset(this.db, cfg.lesson_id, assetId, cfg.recording_key);
+        await upsertLessonAsset(
+          this.db,
+          cfg.lesson_id,
+          assetId,
+          cfg.recording_key
+        );
       }
 
       void this.publish(S.RECORDING_READY, {
-        sessionId, tenantId, assetId,
+        sessionId,
+        tenantId,
+        assetId,
         fileKey: cfg.recording_key ?? '',
         lessonId: cfg.lesson_id ?? null,
         timestamp: new Date().toISOString(),
       });
 
-      await seedTranscriptFromLive(this.db, tenantId, instructorId, sessionId, assetId);
-      await migrateBookmarks(this.db, tenantId, instructorId, sessionId, assetId);
+      await seedTranscriptFromLive(
+        this.db,
+        tenantId,
+        instructorId,
+        sessionId,
+        assetId
+      );
+      await migrateBookmarks(
+        this.db,
+        tenantId,
+        instructorId,
+        sessionId,
+        assetId
+      );
 
       await this.db
         .update(schema.liveSessions)
@@ -143,7 +180,9 @@ export class VodConverterService implements OnModuleInit, OnModuleDestroy {
         .where(eq(schema.liveSessions.id, sessionId));
 
       void this.publish(S.VOD_DONE, {
-        sessionId, tenantId, assetId,
+        sessionId,
+        tenantId,
+        assetId,
         lessonId: cfg.lesson_id ?? null,
         timestamp: new Date().toISOString(),
       });
@@ -170,7 +209,10 @@ export class VodConverterService implements OnModuleInit, OnModuleDestroy {
     return cfg ?? null;
   }
 
-  private async publish(subject: string, payload: Record<string, unknown>): Promise<void> {
+  private async publish(
+    subject: string,
+    payload: Record<string, unknown>
+  ): Promise<void> {
     if (!this.connection) return;
     try {
       this.connection.publish(subject, this.sc.encode(JSON.stringify(payload)));

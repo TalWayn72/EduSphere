@@ -10,7 +10,11 @@ const mockTx = {
 };
 
 const mockWithTenantContext = vi.fn(
-  async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+  async (
+    _db: unknown,
+    _ctx: unknown,
+    fn: (tx: typeof mockTx) => Promise<unknown>
+  ) => fn(mockTx)
 );
 
 vi.mock('@edusphere/db', () => ({
@@ -18,17 +22,27 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {
     live_qa_questions: {
-      id: 'id', session_id: 'session_id', user_id: 'user_id',
-      tenant_id: 'tenant_id', status: 'status', upvotes: 'upvotes',
+      id: 'id',
+      session_id: 'session_id',
+      user_id: 'user_id',
+      tenant_id: 'tenant_id',
+      status: 'status',
+      upvotes: 'upvotes',
     },
     live_qa_upvotes: {
-      id: 'id', question_id: 'question_id', user_id: 'user_id', tenant_id: 'tenant_id',
+      id: 'id',
+      question_id: 'question_id',
+      user_id: 'user_id',
+      tenant_id: 'tenant_id',
     },
   },
   eq: vi.fn(() => 'eq'),
   and: vi.fn((...a: unknown[]) => a),
   desc: vi.fn((f: unknown) => `desc(${String(f)})`),
-  sql: Object.assign(vi.fn(() => 'sql'), { raw: vi.fn() }),
+  sql: Object.assign(
+    vi.fn(() => 'sql'),
+    { raw: vi.fn() }
+  ),
   withTenantContext: (...args: unknown[]) => mockWithTenantContext(...args),
 }));
 
@@ -44,17 +58,27 @@ import { LiveQAService } from './live-qa.service.js';
 import { publishQAUpdated } from './nats-pubsub.helper.js';
 
 const instructorCtx: AuthContext = {
-  tenantId: 'tenant-1', userId: 'instructor-1',
-  roles: ['INSTRUCTOR'], scopes: [], sub: 'instructor-1',
+  tenantId: 'tenant-1',
+  userId: 'instructor-1',
+  roles: ['INSTRUCTOR'],
+  scopes: [],
+  sub: 'instructor-1',
 };
 const studentCtx: AuthContext = {
-  tenantId: 'tenant-1', userId: 'student-1',
-  roles: ['STUDENT'], scopes: [], sub: 'student-1',
+  tenantId: 'tenant-1',
+  userId: 'student-1',
+  roles: ['STUDENT'],
+  scopes: [],
+  sub: 'student-1',
 };
 
 const sampleQuestion = {
-  id: 'q-1', session_id: 'sess-1', user_id: 'student-1',
-  question: 'What is ontology?', status: 'PENDING', upvotes: 0,
+  id: 'q-1',
+  session_id: 'sess-1',
+  user_id: 'student-1',
+  question: 'What is ontology?',
+  status: 'PENDING',
+  upvotes: 0,
 };
 
 function chainSelect(returnRows: unknown[]) {
@@ -82,7 +106,11 @@ describe('LiveQAService', () => {
         values: vi.fn().mockReturnThis(),
         returning: vi.fn().mockResolvedValue([sampleQuestion]),
       } as never);
-      const result = await service.askQuestion('sess-1', 'What is ontology?', studentCtx);
+      const result = await service.askQuestion(
+        'sess-1',
+        'What is ontology?',
+        studentCtx
+      );
       expect(mockTx.insert).toHaveBeenCalled();
       expect(result.status).toBe('PENDING');
       expect(result.upvotes).toBe(0);
@@ -138,7 +166,9 @@ describe('LiveQAService', () => {
       vi.mocked(mockTx.update).mockReturnValue({
         set: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([{ ...sampleQuestion, upvotes: 1 }]),
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ ...sampleQuestion, upvotes: 1 }]),
       } as never);
 
       const result = await service.upvoteQuestion('q-1', studentCtx);
@@ -156,7 +186,9 @@ describe('LiveQAService', () => {
       vi.mocked(mockTx.update).mockReturnValue({
         set: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([{ ...sampleQuestion, upvotes: 1 }]),
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ ...sampleQuestion, upvotes: 1 }]),
       } as never);
 
       await service.upvoteQuestion('q-1', studentCtx);
@@ -165,7 +197,9 @@ describe('LiveQAService', () => {
 
     it('throws NotFoundException when question not found', async () => {
       chainSelect([]);
-      await expect(service.upvoteQuestion('q-1', studentCtx)).rejects.toThrow(NotFoundException);
+      await expect(service.upvoteQuestion('q-1', studentCtx)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -175,21 +209,35 @@ describe('LiveQAService', () => {
       vi.mocked(mockTx.update).mockReturnValue({
         set: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([{ ...sampleQuestion, status: 'ANSWERED', answer: 'Because ontology' }]),
+        returning: vi.fn().mockResolvedValue([
+          {
+            ...sampleQuestion,
+            status: 'ANSWERED',
+            answer: 'Because ontology',
+          },
+        ]),
       } as never);
 
-      const result = await service.answerQuestion('q-1', 'Because ontology', instructorCtx);
+      const result = await service.answerQuestion(
+        'q-1',
+        'Because ontology',
+        instructorCtx
+      );
       expect(result.status).toBe('ANSWERED');
       expect(result.answer).toBe('Because ontology');
     });
 
     it('throws ForbiddenException for non-instructor', async () => {
-      await expect(service.answerQuestion('q-1', 'Answer', studentCtx)).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.answerQuestion('q-1', 'Answer', studentCtx)
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('throws NotFoundException when question not found', async () => {
       chainSelect([]);
-      await expect(service.answerQuestion('q-1', 'Answer', instructorCtx)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.answerQuestion('q-1', 'Answer', instructorCtx)
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -199,7 +247,9 @@ describe('LiveQAService', () => {
       vi.mocked(mockTx.update).mockReturnValue({
         set: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([{ ...sampleQuestion, status: 'DISMISSED' }]),
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ ...sampleQuestion, status: 'DISMISSED' }]),
       } as never);
 
       const result = await service.dismissQuestion('q-1', instructorCtx);
@@ -207,7 +257,9 @@ describe('LiveQAService', () => {
     });
 
     it('throws ForbiddenException for student', async () => {
-      await expect(service.dismissQuestion('q-1', studentCtx)).rejects.toThrow(ForbiddenException);
+      await expect(service.dismissQuestion('q-1', studentCtx)).rejects.toThrow(
+        ForbiddenException
+      );
     });
   });
 
@@ -235,7 +287,11 @@ describe('LiveQAService', () => {
         orderBy: vi.fn().mockResolvedValue([sampleQuestion]),
       };
       vi.mocked(mockTx.select).mockReturnValue(chain as never);
-      const result = await service.getQuestions('sess-1', studentCtx, 'PENDING');
+      const result = await service.getQuestions(
+        'sess-1',
+        studentCtx,
+        'PENDING'
+      );
       expect(result).toHaveLength(1);
     });
   });

@@ -36,7 +36,9 @@ export function useLivePresence(sessionId: string): UseLivePresenceReturn {
 
   useEffect(() => {
     setPaused(false);
-    return () => { setPaused(true); };
+    return () => {
+      setPaused(true);
+    };
   }, []);
 
   const [queryResult] = useQuery<LivePresenceQueryResult>({

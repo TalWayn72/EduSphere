@@ -49,7 +49,9 @@ describe('ReactionBar', () => {
 
   it.each(EMOJIS)('renders button for emoji %s', (emoji) => {
     render(<ReactionBar onSend={vi.fn()} />);
-    expect(screen.getByRole('button', { name: `React with ${emoji}` })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `React with ${emoji}` })
+    ).toBeInTheDocument();
   });
 
   it('calls onSend with clicked emoji', async () => {
@@ -124,11 +126,15 @@ describe('ReactionBar', () => {
 
   it('toolbar has accessible label', () => {
     render(<ReactionBar onSend={vi.fn()} />);
-    expect(screen.getByRole('toolbar', { name: 'Send reaction' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('toolbar', { name: 'Send reaction' })
+    ).toBeInTheDocument();
   });
 
   it('applies custom className to container', () => {
-    const { container } = render(<ReactionBar onSend={vi.fn()} className="my-class" />);
+    const { container } = render(
+      <ReactionBar onSend={vi.fn()} className="my-class" />
+    );
     expect(container.querySelector('.my-class')).toBeTruthy();
   });
 });

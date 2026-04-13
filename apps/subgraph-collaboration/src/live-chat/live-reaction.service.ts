@@ -64,12 +64,15 @@ export class LiveReactionService implements OnModuleDestroy {
       };
       if (streamTs !== undefined) values['stream_ts'] = streamTs;
 
-      await tx
-        .insert(schema.live_reactions)
-        .values(values as never);
+      await tx.insert(schema.live_reactions).values(values as never);
     });
 
-    this.accumulateBurst(sessionId, emoji, authContext.userId, tenantCtx.tenantId);
+    this.accumulateBurst(
+      sessionId,
+      emoji,
+      authContext.userId,
+      tenantCtx.tenantId
+    );
     return true;
   }
 

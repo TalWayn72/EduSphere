@@ -30,23 +30,34 @@ vi.mock('./ViewerCount', () => ({
 // ── Mock shadcn/ui components ─────────────────────────────────────────────────
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => (
+  Card: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => (
     <div {...props}>{children}</div>
   ),
-  CardContent: ({ children, ...props }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => (
+  CardContent: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => (
     <div {...props}>{children}</div>
   ),
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, ...props }: React.PropsWithChildren<React.HTMLAttributes<HTMLSpanElement>>) => (
+  Badge: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<React.HTMLAttributes<HTMLSpanElement>>) => (
     <span {...props}>{children}</span>
   ),
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeSession(overrides: Partial<LiveStreamSession> = {}): LiveStreamSession {
+function makeSession(
+  overrides: Partial<LiveStreamSession> = {}
+): LiveStreamSession {
   return {
     id: 'sess-1',
     title: 'React Fundamentals Live',

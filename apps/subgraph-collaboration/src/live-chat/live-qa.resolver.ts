@@ -80,7 +80,11 @@ export class LiveQAResolver {
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
-    return this.qaService.answerQuestion(questionId, answer, context.authContext);
+    return this.qaService.answerQuestion(
+      questionId,
+      answer,
+      context.authContext
+    );
   }
 
   @Mutation('dismissLiveQuestion')
@@ -113,6 +117,10 @@ export class LiveQAResolver {
   ) {
     if (!context.authContext) return false;
     const tenantCtx = this.qaService.toTenantContext(context.authContext);
-    return this.qaService.isUpvotedByUser(row.id, context.authContext.userId, tenantCtx);
+    return this.qaService.isUpvotedByUser(
+      row.id,
+      context.authContext.userId,
+      tenantCtx
+    );
   }
 }

@@ -132,38 +132,58 @@ void (async () => {
     void (async () => {
       for await (const msg of transcriptSub) {
         try {
-          const data = JSON.parse(sc.decode(msg.data)) as { sessionId: string; segment: unknown };
+          const data = JSON.parse(sc.decode(msg.data)) as {
+            sessionId: string;
+            segment: unknown;
+          };
           inProcessPubSub.publish(`transcript_${data.sessionId}`, {
             liveTranscriptUpdated: data.segment,
           });
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-    })().catch(() => { /* ignore */ });
+    })().catch(() => {
+      /* ignore */
+    });
 
     // Bridge presence updates
     void (async () => {
       for await (const msg of presenceSub) {
         try {
-          const data = JSON.parse(sc.decode(msg.data)) as { sessionId: string; presence: unknown };
+          const data = JSON.parse(sc.decode(msg.data)) as {
+            sessionId: string;
+            presence: unknown;
+          };
           inProcessPubSub.publish(`presence_${data.sessionId}`, {
             livePresenceChanged: data.presence,
           });
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-    })().catch(() => { /* ignore */ });
+    })().catch(() => {
+      /* ignore */
+    });
 
     // Bridge session status updates
     void (async () => {
       for await (const msg of statusSub) {
         try {
-          const data = JSON.parse(sc.decode(msg.data)) as { sessionId: string; session: unknown };
+          const data = JSON.parse(sc.decode(msg.data)) as {
+            sessionId: string;
+            session: unknown;
+          };
           inProcessPubSub.publish(`status_${data.sessionId}`, {
             liveSessionStatusChanged: data.session,
           });
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-    })().catch(() => { /* ignore */ });
-
+    })().catch(() => {
+      /* ignore */
+    });
   } catch (err) {
     logger.warn(`NATS subscription setup failed: ${String(err)}`);
   }

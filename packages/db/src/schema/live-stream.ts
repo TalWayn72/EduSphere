@@ -249,10 +249,7 @@ export const live_qa_upvotes = pgTable(
       .defaultNow(),
   },
   (t) => [
-    unique('live_qa_upvotes_question_user_unique').on(
-      t.question_id,
-      t.user_id
-    ),
+    unique('live_qa_upvotes_question_user_unique').on(t.question_id, t.user_id),
     index('idx_live_qa_upvotes_question').on(t.question_id),
     pgPolicy('live_qa_upvotes_tenant_isolation', {
       using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
@@ -280,7 +277,8 @@ export type NewLiveSessionPresence = typeof live_session_presence.$inferInsert;
 export type LiveBookmark = typeof live_bookmarks.$inferSelect;
 export type NewLiveBookmark = typeof live_bookmarks.$inferInsert;
 
-export type LiveTranscriptSegment = typeof live_transcript_segments.$inferSelect;
+export type LiveTranscriptSegment =
+  typeof live_transcript_segments.$inferSelect;
 export type NewLiveTranscriptSegment =
   typeof live_transcript_segments.$inferInsert;
 

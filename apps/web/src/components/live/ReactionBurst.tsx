@@ -17,7 +17,7 @@ function xOffset(key: string): number {
   for (let i = 0; i < key.length; i++) {
     h = (Math.imul(31, h) + key.charCodeAt(i)) | 0;
   }
-  return 10 + ((Math.abs(h) % 80));
+  return 10 + (Math.abs(h) % 80);
 }
 
 export function ReactionBurst({ queue }: ReactionBurstProps) {
@@ -36,9 +36,15 @@ export function ReactionBurst({ queue }: ReactionBurstProps) {
       totals[b.emoji] = (totals[b.emoji] ?? 0) + b.count;
     }
     return (
-      <div className="pointer-events-none absolute bottom-16 inset-x-0 flex justify-center gap-2" aria-hidden="true">
+      <div
+        className="pointer-events-none absolute bottom-16 inset-x-0 flex justify-center gap-2"
+        aria-hidden="true"
+      >
         {Object.entries(totals).map(([emoji, count]) => (
-          <span key={emoji} className="bg-black/50 dark:bg-black/70 text-white dark:text-white text-sm rounded-full px-2 py-0.5">
+          <span
+            key={emoji}
+            className="bg-black/50 dark:bg-black/70 text-white dark:text-white text-sm rounded-full px-2 py-0.5"
+          >
             {emoji} {count}
           </span>
         ))}
@@ -68,7 +74,7 @@ export function ReactionBurst({ queue }: ReactionBurstProps) {
         aria-hidden="true"
       >
         {queue.map((burst, idx) => {
-          const key = `${burst.emoji}-${burst.burstAt}-${uid}-${idx}`;
+          const key = `${burst.emoji}-${uid}-${idx}`;
           const left = xOffset(key);
           return (
             <span

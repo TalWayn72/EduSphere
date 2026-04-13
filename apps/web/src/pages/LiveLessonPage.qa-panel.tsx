@@ -22,8 +22,14 @@ interface QAPanelProps {
 }
 
 export function QAPanel({ sessionId, isInstructor = false }: QAPanelProps) {
-  const { sortedQuestions, fetching, askQuestion, upvoteQuestion, answerQuestion, dismissQuestion } =
-    useLiveQA(sessionId);
+  const {
+    sortedQuestions,
+    fetching,
+    askQuestion,
+    upvoteQuestion,
+    answerQuestion,
+    dismissQuestion,
+  } = useLiveQA(sessionId);
   const [draft, setDraft] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -40,7 +46,10 @@ export function QAPanel({ sessionId, isInstructor = false }: QAPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" data-testid="qa-panel">
+    <div
+      className="flex flex-col h-full overflow-hidden"
+      data-testid="qa-panel"
+    >
       {/* Ask question form */}
       <div className="border-b p-3 shrink-0">
         <div className="flex gap-2">
@@ -57,7 +66,9 @@ export function QAPanel({ sessionId, isInstructor = false }: QAPanelProps) {
           <Button
             type="button"
             size="sm"
-            onClick={() => { void handleAsk(); }}
+            onClick={() => {
+              void handleAsk();
+            }}
             disabled={!draft.trim() || submitting}
             className="self-end"
           >
@@ -79,9 +90,15 @@ export function QAPanel({ sessionId, isInstructor = false }: QAPanelProps) {
             key={q.id}
             question={q}
             isInstructor={isInstructor}
-            onUpvote={() => { void upvoteQuestion(q.id); }}
-            onAnswer={(answer) => { void answerQuestion(q.id, answer); }}
-            onDismiss={() => { void dismissQuestion(q.id); }}
+            onUpvote={() => {
+              void upvoteQuestion(q.id);
+            }}
+            onAnswer={(answer) => {
+              void answerQuestion(q.id, answer);
+            }}
+            onDismiss={() => {
+              void dismissQuestion(q.id);
+            }}
           />
         ))}
       </div>
@@ -99,18 +116,28 @@ interface QuestionItemProps {
   onDismiss: () => void;
 }
 
-function QuestionItem({ question, isInstructor, onUpvote, onAnswer, onDismiss }: QuestionItemProps) {
+function QuestionItem({
+  question,
+  isInstructor,
+  onUpvote,
+  onAnswer,
+  onDismiss,
+}: QuestionItemProps) {
   const [answerDraft, setAnswerDraft] = useState('');
 
   const statusVariant =
-    question.status === 'ANSWERED' ? 'default' :
-    question.status === 'DISMISSED' ? 'secondary' : 'outline';
+    question.status === 'ANSWERED'
+      ? 'default'
+      : question.status === 'DISMISSED'
+        ? 'secondary'
+        : 'outline';
 
   return (
     <div
       className={cn(
         'rounded-lg border p-3 space-y-2',
-        question.status === 'ANSWERED' && 'border-green-300 dark:border-green-700',
+        question.status === 'ANSWERED' &&
+          'border-green-300 dark:border-green-700',
         question.status === 'DISMISSED' && 'opacity-60'
       )}
       data-testid="qa-question"
@@ -129,12 +156,20 @@ function QuestionItem({ question, isInstructor, onUpvote, onAnswer, onDismiss }:
         </button>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm leading-relaxed" dir="auto">{question.question}</p>
+          <p className="text-sm leading-relaxed" dir="auto">
+            {question.question}
+          </p>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-muted-foreground" dir="auto">{question.displayName}</span>
+            <span className="text-xs text-muted-foreground" dir="auto">
+              {question.displayName ?? question.userId}
+            </span>
             <Badge variant={statusVariant} className="text-xs h-4 px-1.5">
-              {question.status === 'ANSWERED' && <CheckCircle className="h-2.5 w-2.5 mr-0.5" />}
-              {question.status === 'DISMISSED' && <XCircle className="h-2.5 w-2.5 mr-0.5" />}
+              {question.status === 'ANSWERED' && (
+                <CheckCircle className="h-2.5 w-2.5 mr-0.5" />
+              )}
+              {question.status === 'DISMISSED' && (
+                <XCircle className="h-2.5 w-2.5 mr-0.5" />
+              )}
               {question.status}
             </Badge>
           </div>
@@ -143,13 +178,16 @@ function QuestionItem({ question, isInstructor, onUpvote, onAnswer, onDismiss }:
 
       {/* Answer */}
       {question.status === 'ANSWERED' && question.answer && (
-        <div className="ml-8 pl-3 border-l-2 border-green-400 dark:border-green-600 text-sm text-muted-foreground" dir="auto">
+        <div
+          className="ml-8 pl-3 border-l-2 border-green-400 dark:border-green-600 text-sm text-muted-foreground"
+          dir="auto"
+        >
           {question.answer}
         </div>
       )}
 
       {/* Instructor controls */}
-      {isInstructor && question.status === 'OPEN' && (
+      {isInstructor && question.status === 'PENDING' && (
         <div className="ml-8 flex flex-col gap-1.5">
           <Textarea
             value={answerDraft}
@@ -164,7 +202,10 @@ function QuestionItem({ question, isInstructor, onUpvote, onAnswer, onDismiss }:
               size="sm"
               variant="default"
               className="h-7 text-xs"
-              onClick={() => { onAnswer(answerDraft); setAnswerDraft(''); }}
+              onClick={() => {
+                onAnswer(answerDraft);
+                setAnswerDraft('');
+              }}
               disabled={!answerDraft.trim()}
             >
               Answer

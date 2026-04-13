@@ -11,7 +11,10 @@ import {
   and,
   sql,
 } from '@edusphere/db';
-import type { LiveStreamSessionResult, TranscriptSegmentResult } from './live-stream.service';
+import type {
+  LiveStreamSessionResult,
+  TranscriptSegmentResult,
+} from './live-stream.service';
 
 type TypedSession = {
   id: string;
@@ -62,7 +65,9 @@ export class LiveStreamQueryService implements OnModuleDestroy {
     const results: LiveStreamSessionResult[] = [];
 
     for (const cfg of cfgs) {
-      const sess = sessions.find((s) => s.id === cfg.session_id) as TypedSession | undefined;
+      const sess = sessions.find((s) => s.id === cfg.session_id) as
+        | TypedSession
+        | undefined;
       if (!sess) continue;
       if (!activeStatuses.has(sess.status)) continue;
       if (courseId && sess.courseId !== courseId) continue;

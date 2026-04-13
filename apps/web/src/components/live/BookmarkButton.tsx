@@ -34,8 +34,8 @@ interface BookmarkButtonProps {
 interface BookmarksQueryResult {
   liveBookmarks: Array<{
     id: string;
-    timestampMs: number;
-    label: string;
+    streamTs: number;
+    label: string | null;
   }>;
 }
 
@@ -59,7 +59,7 @@ export function BookmarkButton({
   // Check if already bookmarked within ±10s of current timestamp
   const THRESHOLD_MS = 10_000;
   const isNearBookmark = (bookmarksResult.data?.liveBookmarks ?? []).some(
-    (b) => Math.abs(b.timestampMs - currentTimestampMs) < THRESHOLD_MS
+    (b) => Math.abs(b.streamTs * 1000 - currentTimestampMs) < THRESHOLD_MS
   );
 
   const isBookmarked = justBookmarked || isNearBookmark;
@@ -75,7 +75,7 @@ export function BookmarkButton({
     const result = await executeAddBookmark({
       sessionId,
       label,
-      timestampMs: currentTimestampMs,
+      streamTs: currentTimestampMs / 1000,
     });
 
     if (!result.error) {
@@ -90,7 +90,9 @@ export function BookmarkButton({
         <TooltipTrigger asChild>
           <button
             type="button"
-            onClick={() => { void handleBookmark(); }}
+            onClick={() => {
+              void handleBookmark();
+            }}
             className={cn(
               'flex items-center justify-center h-8 w-8 rounded-full',
               'bg-black/40 hover:bg-black/60 text-white transition-colors',

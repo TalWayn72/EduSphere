@@ -31,7 +31,10 @@ const BURST_LIFETIME_MS = 2000;
 export function useLiveReactions(sessionId: string): UseLiveReactionsReturn {
   const [paused, setPaused] = useState(false);
   const [animationQueue, setAnimationQueue] = useState<LiveReactionBurst[]>([]);
-  const timerRefs = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const timerRefs = useRef<Map<number, ReturnType<typeof setTimeout>>>(
+    new Map()
+  );
+  const seqRef = useRef(0);
 
   useEffect(() => {
     setPaused(false);
@@ -54,29 +57,37 @@ export function useLiveReactions(sessionId: string): UseLiveReactionsReturn {
     const incoming = subResult.data?.liveReactionBurst;
     if (!incoming) return;
 
-    const key = `${incoming.emoji}-${incoming.burstAt}`;
+    const seq = ++seqRef.current;
 
     setAnimationQueue((prev) => {
       const next = [incoming, ...prev].slice(0, MAX_QUEUE);
       return next;
     });
 
-    // Auto-remove after lifetime
+    // Auto-remove after lifetime (remove oldest entry with this emoji)
     const timer = setTimeout(() => {
-      setAnimationQueue((prev) => prev.filter(
-        (b) => `${b.emoji}-${b.burstAt}` !== key
-      ));
-      timerRefs.current.delete(key);
+      setAnimationQueue((prev) => {
+        const idx = [...prev]
+          .reverse()
+          .findIndex((b) => b.emoji === incoming.emoji);
+        if (idx === -1) return prev;
+        const realIdx = prev.length - 1 - idx;
+        return prev.filter((_, i) => i !== realIdx);
+      });
+      timerRefs.current.delete(seq);
     }, BURST_LIFETIME_MS);
 
-    timerRefs.current.set(key, timer);
+    timerRefs.current.set(seq, timer);
   }, [subResult.data]);
 
   const [, executeSend] = useMutation(SEND_LIVE_REACTION_MUTATION);
 
-  const sendReaction = useCallback(async (emoji: string) => {
-    await executeSend({ sessionId, emoji });
-  }, [sessionId, executeSend]);
+  const sendReaction = useCallback(
+    async (emoji: string) => {
+      await executeSend({ sessionId, emoji });
+    },
+    [sessionId, executeSend]
+  );
 
   return { animationQueue, sendReaction };
 }

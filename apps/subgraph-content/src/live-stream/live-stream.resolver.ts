@@ -22,7 +22,12 @@ import { LiveStreamQueryService } from './live-stream-query.service';
 import { PresenceService } from './presence.service';
 import type { GraphQLContext } from '../auth/auth.middleware';
 
-const INSTRUCTOR_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN', 'ADMIN']);
+const INSTRUCTOR_ROLES = new Set([
+  'INSTRUCTOR',
+  'ORG_ADMIN',
+  'SUPER_ADMIN',
+  'ADMIN',
+]);
 
 const createLiveStreamSchema = z.object({
   sessionId: z.string().uuid(),
@@ -111,7 +116,11 @@ export class LiveStreamResolver {
     @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = requireAuth(ctx);
-    return this.queryService.getTranscript(sessionId, tenantId, afterIndex ?? -1);
+    return this.queryService.getTranscript(
+      sessionId,
+      tenantId,
+      afterIndex ?? -1
+    );
   }
 
   @Mutation('createLiveStream')
@@ -124,12 +133,23 @@ export class LiveStreamResolver {
     @Context() ctx: GraphQLContext
   ) {
     const { userId, tenantId } = requireInstructor(ctx);
-    const input = createLiveStreamSchema.parse({ sessionId, streamType, lessonId, maxViewers, autoRecord });
+    const input = createLiveStreamSchema.parse({
+      sessionId,
+      streamType,
+      lessonId,
+      maxViewers,
+      autoRecord,
+    });
     return this.liveStreamService.createConfig(
       input.sessionId,
       tenantId,
       userId,
-      { streamType: input.streamType, lessonId: input.lessonId, maxViewers: input.maxViewers, autoRecord: input.autoRecord }
+      {
+        streamType: input.streamType,
+        lessonId: input.lessonId,
+        maxViewers: input.maxViewers,
+        autoRecord: input.autoRecord,
+      }
     );
   }
 
@@ -141,7 +161,11 @@ export class LiveStreamResolver {
     @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = requireInstructor(ctx);
-    const input = updateLiveStreamSchema.parse({ sessionId, maxViewers, autoRecord });
+    const input = updateLiveStreamSchema.parse({
+      sessionId,
+      maxViewers,
+      autoRecord,
+    });
     return this.liveStreamService.updateConfig(input.sessionId, tenantId, {
       maxViewers: input.maxViewers,
       autoRecord: input.autoRecord,
@@ -149,21 +173,45 @@ export class LiveStreamResolver {
   }
 
   @Mutation('startLiveStream')
-  async startLiveStream(@Args('sessionId') sessionId: string, @Context() ctx: GraphQLContext) {
+  async startLiveStream(
+    @Args('sessionId') sessionId: string,
+    @Context() ctx: GraphQLContext
+  ) {
     const { userId, tenantId } = requireInstructor(ctx);
-    return this.liveStreamService.transition(sessionId, tenantId, userId, 'start');
+    return this.liveStreamService.transition(
+      sessionId,
+      tenantId,
+      userId,
+      'start'
+    );
   }
 
   @Mutation('pauseLiveStream')
-  async pauseLiveStream(@Args('sessionId') sessionId: string, @Context() ctx: GraphQLContext) {
+  async pauseLiveStream(
+    @Args('sessionId') sessionId: string,
+    @Context() ctx: GraphQLContext
+  ) {
     const { userId, tenantId } = requireInstructor(ctx);
-    return this.liveStreamService.transition(sessionId, tenantId, userId, 'pause');
+    return this.liveStreamService.transition(
+      sessionId,
+      tenantId,
+      userId,
+      'pause'
+    );
   }
 
   @Mutation('endLiveStream')
-  async endLiveStream(@Args('sessionId') sessionId: string, @Context() ctx: GraphQLContext) {
+  async endLiveStream(
+    @Args('sessionId') sessionId: string,
+    @Context() ctx: GraphQLContext
+  ) {
     const { userId, tenantId } = requireInstructor(ctx);
-    return this.liveStreamService.transition(sessionId, tenantId, userId, 'end');
+    return this.liveStreamService.transition(
+      sessionId,
+      tenantId,
+      userId,
+      'end'
+    );
   }
 
   @Mutation('toggleScreenShare')
@@ -173,7 +221,12 @@ export class LiveStreamResolver {
     @Context() ctx: GraphQLContext
   ) {
     const { userId, tenantId } = requireInstructor(ctx);
-    return this.liveStreamService.toggleScreenShare(sessionId, tenantId, userId, active);
+    return this.liveStreamService.toggleScreenShare(
+      sessionId,
+      tenantId,
+      userId,
+      active
+    );
   }
 
   @Mutation('highlightMoment')

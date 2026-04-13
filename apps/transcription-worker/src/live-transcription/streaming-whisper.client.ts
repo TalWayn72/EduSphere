@@ -21,8 +21,8 @@ import { randomUUID } from 'crypto';
 import { WhisperClient } from '../transcription/whisper.client';
 import type { LiveSegment } from './live-transcription.types';
 
-const PARTIAL_INTERVAL_MS = 2_000;  // emit partial every 2 s
-const WINDOW_FLUSH_MS = 8_000;      // flush window every 8 s
+const PARTIAL_INTERVAL_MS = 2_000; // emit partial every 2 s
+const WINDOW_FLUSH_MS = 8_000; // flush window every 8 s
 
 export type SegmentCallback = (segment: LiveSegment) => Promise<void>;
 
@@ -157,8 +157,7 @@ export class StreamingWhisperClient {
 
     const audioData = Buffer.concat(state.buffer);
     const tmpPath = join(tmpdir(), `live-${randomUUID()}.wav`);
-    const startTime =
-      (state.windowStartMs - state.streamStartedAt) / 1_000;
+    const startTime = (state.windowStartMs - state.streamStartedAt) / 1_000;
 
     try {
       writeFileSync(tmpPath, audioData);
@@ -168,8 +167,7 @@ export class StreamingWhisperClient {
         vocabPrompt || undefined
       );
 
-      const endTime =
-        (Date.now() - state.streamStartedAt) / 1_000;
+      const endTime = (Date.now() - state.streamStartedAt) / 1_000;
 
       const segment: LiveSegment = {
         sessionId,

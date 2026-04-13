@@ -46,7 +46,9 @@ export function useLiveQA(sessionId: string): UseLiveQAReturn {
 
   useEffect(() => {
     setPaused(false);
-    return () => { setPaused(true); };
+    return () => {
+      setPaused(true);
+    };
   }, []);
 
   const [queryResult] = useQuery<LiveQAQuestionsResult>({
@@ -95,31 +97,47 @@ export function useLiveQA(sessionId: string): UseLiveQAReturn {
   const [, executeAnswer] = useMutation(ANSWER_LIVE_QUESTION_MUTATION);
   const [, executeDismiss] = useMutation(DISMISS_LIVE_QUESTION_MUTATION);
 
-  const askQuestion = useCallback(async (question: string) => {
-    await executeAsk({ sessionId, question });
-  }, [sessionId, executeAsk]);
+  const askQuestion = useCallback(
+    async (question: string) => {
+      await executeAsk({ sessionId, question });
+    },
+    [sessionId, executeAsk]
+  );
 
-  const upvoteQuestion = useCallback(async (questionId: string) => {
-    // Optimistic update
-    setQuestions((prev) =>
-      prev.map((q) => q.id === questionId ? { ...q, upvotes: q.upvotes + 1 } : q)
-    );
-    const result = await executeUpvote({ questionId });
-    if (result.error) {
-      // Revert optimistic update
+  const upvoteQuestion = useCallback(
+    async (questionId: string) => {
+      // Optimistic update
       setQuestions((prev) =>
-        prev.map((q) => q.id === questionId ? { ...q, upvotes: q.upvotes - 1 } : q)
+        prev.map((q) =>
+          q.id === questionId ? { ...q, upvotes: q.upvotes + 1 } : q
+        )
       );
-    }
-  }, [executeUpvote]);
+      const result = await executeUpvote({ questionId });
+      if (result.error) {
+        // Revert optimistic update
+        setQuestions((prev) =>
+          prev.map((q) =>
+            q.id === questionId ? { ...q, upvotes: q.upvotes - 1 } : q
+          )
+        );
+      }
+    },
+    [executeUpvote]
+  );
 
-  const answerQuestion = useCallback(async (questionId: string, answer: string) => {
-    await executeAnswer({ questionId, answer });
-  }, [executeAnswer]);
+  const answerQuestion = useCallback(
+    async (questionId: string, answer: string) => {
+      await executeAnswer({ questionId, answer });
+    },
+    [executeAnswer]
+  );
 
-  const dismissQuestion = useCallback(async (questionId: string) => {
-    await executeDismiss({ questionId });
-  }, [executeDismiss]);
+  const dismissQuestion = useCallback(
+    async (questionId: string) => {
+      await executeDismiss({ questionId });
+    },
+    [executeDismiss]
+  );
 
   return {
     questions,

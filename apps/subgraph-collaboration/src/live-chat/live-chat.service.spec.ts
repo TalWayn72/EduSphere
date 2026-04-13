@@ -10,7 +10,11 @@ const mockTx = {
 };
 
 const mockWithTenantContext = vi.fn(
-  async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+  async (
+    _db: unknown,
+    _ctx: unknown,
+    fn: (tx: typeof mockTx) => Promise<unknown>
+  ) => fn(mockTx)
 );
 
 vi.mock('@edusphere/db', () => ({
@@ -18,9 +22,13 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {
     live_chat_messages: {
-      id: 'id', session_id: 'session_id', user_id: 'user_id',
-      tenant_id: 'tenant_id', is_deleted: 'is_deleted',
-      is_pinned: 'is_pinned', created_at: 'created_at',
+      id: 'id',
+      session_id: 'session_id',
+      user_id: 'user_id',
+      tenant_id: 'tenant_id',
+      is_deleted: 'is_deleted',
+      is_pinned: 'is_pinned',
+      created_at: 'created_at',
     },
   },
   eq: vi.fn((_a, _b) => 'eq'),
@@ -32,30 +40,48 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('nats', () => ({
-  connect: vi.fn().mockResolvedValue({ publish: vi.fn(), drain: vi.fn().mockResolvedValue(undefined) }),
+  connect: vi.fn().mockResolvedValue({
+    publish: vi.fn(),
+    drain: vi.fn().mockResolvedValue(undefined),
+  }),
   StringCodec: vi.fn(() => ({ encode: vi.fn((v: string) => v) })),
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn(() => ({})),
-  LiveChatSubjects: { CHAT_MESSAGE: 'live.chat.msg', CHAT_PIN: 'live.chat.pin', CHAT_DELETE: 'live.chat.del' },
+  LiveChatSubjects: {
+    CHAT_MESSAGE: 'live.chat.msg',
+    CHAT_PIN: 'live.chat.pin',
+    CHAT_DELETE: 'live.chat.del',
+  },
 }));
 
 import { LiveChatService } from './live-chat.service.js';
 
 const instructorCtx: AuthContext = {
-  tenantId: 'tenant-1', userId: 'instructor-1',
-  roles: ['INSTRUCTOR'], scopes: [], sub: 'instructor-1',
+  tenantId: 'tenant-1',
+  userId: 'instructor-1',
+  roles: ['INSTRUCTOR'],
+  scopes: [],
+  sub: 'instructor-1',
 };
 const studentCtx: AuthContext = {
-  tenantId: 'tenant-1', userId: 'student-1',
-  roles: ['STUDENT'], scopes: [], sub: 'student-1',
+  tenantId: 'tenant-1',
+  userId: 'student-1',
+  roles: ['STUDENT'],
+  scopes: [],
+  sub: 'student-1',
 };
 
 const sampleMsg = {
-  id: 'msg-1', session_id: 'sess-1', user_id: 'student-1',
-  content: 'Hello', message_type: 'TEXT', is_deleted: false,
-  is_pinned: false, created_at: new Date('2026-01-01'),
+  id: 'msg-1',
+  session_id: 'sess-1',
+  user_id: 'student-1',
+  content: 'Hello',
+  message_type: 'TEXT',
+  is_deleted: false,
+  is_pinned: false,
+  created_at: new Date('2026-01-01'),
 };
 
 function chainSelect(returnRows: unknown[]) {
@@ -70,7 +96,10 @@ function chainSelect(returnRows: unknown[]) {
 }
 
 function chainInsert(returnRows: unknown[]) {
-  const chain = { values: vi.fn().mockReturnThis(), returning: vi.fn().mockResolvedValue(returnRows) };
+  const chain = {
+    values: vi.fn().mockReturnThis(),
+    returning: vi.fn().mockResolvedValue(returnRows),
+  };
   vi.mocked(mockTx.insert).mockReturnValue(chain as never);
   return chain;
 }
@@ -108,7 +137,11 @@ describe('LiveChatService', () => {
       vi.mocked(mockTx.insert).mockReturnValue({
         values: vi.fn().mockImplementation((vals: Record<string, unknown>) => {
           capturedContent = vals['content'] as string;
-          return { returning: vi.fn().mockResolvedValue([{ ...sampleMsg, content: capturedContent }]) };
+          return {
+            returning: vi
+              .fn()
+              .mockResolvedValue([{ ...sampleMsg, content: capturedContent }]),
+          };
         }),
       } as never);
       await service.sendMessage('sess-1', '<b>Hello</b>', studentCtx);
@@ -125,12 +158,16 @@ describe('LiveChatService', () => {
     });
 
     it('throws ForbiddenException when student tries to pin', async () => {
-      await expect(service.pinMessage('msg-1', studentCtx)).rejects.toThrow(ForbiddenException);
+      await expect(service.pinMessage('msg-1', studentCtx)).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('throws NotFoundException when message not found', async () => {
       chainSelect([]);
-      await expect(service.pinMessage('msg-1', instructorCtx)).rejects.toThrow(NotFoundException);
+      await expect(service.pinMessage('msg-1', instructorCtx)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -159,14 +196,21 @@ describe('LiveChatService', () => {
     });
 
     it('throws ForbiddenException for non-owner student', async () => {
-      const otherStudent: AuthContext = { ...studentCtx, userId: 'other-student' };
+      const otherStudent: AuthContext = {
+        ...studentCtx,
+        userId: 'other-student',
+      };
       chainSelect([sampleMsg]);
-      await expect(service.deleteMessage('msg-1', otherStudent)).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.deleteMessage('msg-1', otherStudent)
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('throws NotFoundException when message not found', async () => {
       chainSelect([]);
-      await expect(service.deleteMessage('msg-1', instructorCtx)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.deleteMessage('msg-1', instructorCtx)
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -192,7 +236,12 @@ describe('LiveChatService', () => {
         limit: vi.fn().mockResolvedValue([sampleMsg]),
       };
       vi.mocked(mockTx.select).mockReturnValue(chain as never);
-      const result = await service.getMessages('sess-1', 10, studentCtx, '2026-01-01T00:00:00Z');
+      const result = await service.getMessages(
+        'sess-1',
+        10,
+        studentCtx,
+        '2026-01-01T00:00:00Z'
+      );
       expect(result).toHaveLength(1);
     });
   });

@@ -24,7 +24,9 @@ vi.mock('lucide-react', () => ({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeMessage(overrides: Partial<LiveChatMessageType> = {}): LiveChatMessageType {
+function makeMessage(
+  overrides: Partial<LiveChatMessageType> = {}
+): LiveChatMessageType {
   return {
     id: 'msg-1',
     sessionId: 'sess-1',
@@ -44,12 +46,18 @@ function makeMessage(overrides: Partial<LiveChatMessageType> = {}): LiveChatMess
 
 describe('LiveChatMessage', () => {
   it('renders message content', () => {
-    render(<LiveChatMessage message={makeMessage({ content: 'Test message content' })} />);
+    render(
+      <LiveChatMessage
+        message={makeMessage({ content: 'Test message content' })}
+      />
+    );
     expect(screen.getByText('Test message content')).toBeInTheDocument();
   });
 
   it('renders display name', () => {
-    render(<LiveChatMessage message={makeMessage({ displayName: 'Bob Smith' })} />);
+    render(
+      <LiveChatMessage message={makeMessage({ displayName: 'Bob Smith' })} />
+    );
     expect(screen.getByText('Bob Smith')).toBeInTheDocument();
   });
 
@@ -79,7 +87,10 @@ describe('LiveChatMessage', () => {
   it('system message renders content text', () => {
     render(
       <LiveChatMessage
-        message={makeMessage({ messageType: 'SYSTEM', content: 'User joined the session' })}
+        message={makeMessage({
+          messageType: 'SYSTEM',
+          content: 'User joined the session',
+        })}
       />
     );
     expect(screen.getByText('User joined the session')).toBeInTheDocument();
@@ -89,7 +100,9 @@ describe('LiveChatMessage', () => {
     const { container } = render(
       <LiveChatMessage message={makeMessage({ messageType: 'SYSTEM' })} />
     );
-    expect(container.querySelector('[data-testid="chat-message"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="chat-message"]')
+    ).not.toBeInTheDocument();
   });
 
   it('shows reply indicator when replyToId is set', () => {
@@ -103,7 +116,11 @@ describe('LiveChatMessage', () => {
   });
 
   it('shows avatar initials when no avatarUrl', () => {
-    render(<LiveChatMessage message={makeMessage({ displayName: 'Alice Bob', avatarUrl: null })} />);
+    render(
+      <LiveChatMessage
+        message={makeMessage({ displayName: 'Alice Bob', avatarUrl: null })}
+      />
+    );
     // Initials "AB" should be rendered in the avatar div
     expect(screen.getByText('AB')).toBeInTheDocument();
   });
@@ -111,7 +128,9 @@ describe('LiveChatMessage', () => {
   it('renders img tag when avatarUrl is provided', () => {
     const { container } = render(
       <LiveChatMessage
-        message={makeMessage({ avatarUrl: 'https://cdn.example.com/alice.png' })}
+        message={makeMessage({
+          avatarUrl: 'https://cdn.example.com/alice.png',
+        })}
       />
     );
     const img = container.querySelector('img');

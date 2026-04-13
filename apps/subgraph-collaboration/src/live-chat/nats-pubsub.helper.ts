@@ -140,9 +140,13 @@ void (async () => {
             // ignore malformed messages
           }
         }
-      })().catch(() => { /* ignore */ });
+      })().catch(() => {
+        /* ignore */
+      });
     } catch (err) {
-      logger.warn(`NATS subscription setup failed [${pattern}]: ${String(err)}`);
+      logger.warn(
+        `NATS subscription setup failed [${pattern}]: ${String(err)}`
+      );
     }
   };
 

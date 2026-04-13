@@ -33,7 +33,10 @@ export function LiveChatMessage({ message }: LiveChatMessageProps) {
   // System message — centered, muted, italic
   if (message.messageType === 'SYSTEM') {
     return (
-      <div className="text-center text-xs text-muted-foreground italic py-1 px-4" dir="auto">
+      <div
+        className="text-center text-xs text-muted-foreground italic py-1 px-4"
+        dir="auto"
+      >
         {message.content}
       </div>
     );
@@ -43,7 +46,8 @@ export function LiveChatMessage({ message }: LiveChatMessageProps) {
     <div
       className={cn(
         'flex gap-2.5 px-3 py-2 rounded-lg group',
-        message.isPinned && 'bg-amber-50/60 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
+        message.isPinned &&
+          'bg-amber-50/60 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
       )}
       data-testid="chat-message"
       data-pinned={message.isPinned}
@@ -53,18 +57,14 @@ export function LiveChatMessage({ message }: LiveChatMessageProps) {
         className="h-7 w-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
         aria-hidden="true"
       >
-        {message.avatarUrl ? (
-          <img src={message.avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
-        ) : (
-          initials(message.displayName)
-        )}
+        {initials(message.userId)}
       </div>
 
       <div className="flex flex-col gap-0.5 min-w-0 flex-1">
         {/* Header row */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-xs font-semibold truncate" dir="auto">
-            {message.displayName}
+            {message.userId}
           </span>
           <span className="text-xs text-muted-foreground tabular-nums">
             {formatTime(message.createdAt)}
@@ -78,7 +78,7 @@ export function LiveChatMessage({ message }: LiveChatMessageProps) {
         </div>
 
         {/* Reply indicator */}
-        {message.replyToId && (
+        {message.replyTo && (
           <div className="text-xs text-muted-foreground border-l-2 border-muted pl-2 mb-0.5 truncate">
             ↩ Reply
           </div>

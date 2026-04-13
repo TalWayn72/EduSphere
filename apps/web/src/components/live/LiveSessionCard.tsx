@@ -32,7 +32,9 @@ function useCountdown(target: string | null): string {
       setLabel(
         diff === 0
           ? 'Starting…'
-          : [h > 0 && `${h}h`, m > 0 && `${m}m`, `${s}s`].filter(Boolean).join(' ')
+          : [h > 0 && `${h}h`, m > 0 && `${m}m`, `${s}s`]
+              .filter(Boolean)
+              .join(' ')
       );
     };
     tick();
@@ -42,39 +44,47 @@ function useCountdown(target: string | null): string {
   return label;
 }
 
-export function LiveSessionCard({ session, instructorName, className }: LiveSessionCardProps) {
+export function LiveSessionCard({
+  session,
+  instructorName,
+  className,
+}: LiveSessionCardProps) {
+  // Use phase (alias) or status for display logic
+  const phase = session.phase ?? session.status;
   const countdown = useCountdown(
-    session.phase === 'SCHEDULED' ? session.scheduledAt : null
+    phase === 'PRE_LIVE' ? session.scheduledAt : null
   );
 
   return (
-    <Link to={`/live/${session.id}`} className="block focus-visible:outline-none">
+    <Link
+      to={`/live/${session.id}`}
+      className="block focus-visible:outline-none"
+    >
       <Card
         className={cn(
           'hover:shadow-md transition-shadow cursor-pointer',
-          session.phase === 'LIVE' && 'ring-2 ring-red-500',
+          phase === 'LIVE' && 'ring-2 ring-red-500',
           className
         )}
         data-testid="live-session-card"
       >
-        {/* Thumbnail */}
+        {/* Thumbnail placeholder */}
         <div className="relative aspect-video bg-zinc-900 dark:bg-zinc-800 rounded-t-xl overflow-hidden">
-          {session.thumbnailUrl ? (
-            <img src={session.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-zinc-600 dark:text-zinc-400 text-4xl">
-              📺
-            </div>
-          )}
+          <div className="w-full h-full flex items-center justify-center text-zinc-600 dark:text-zinc-400 text-4xl">
+            📺
+          </div>
 
           {/* Phase badge overlay */}
-          {session.phase === 'LIVE' && (
+          {phase === 'LIVE' && (
             <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 dark:bg-red-700 text-white dark:text-white text-xs font-bold shadow">
-              <span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-white animate-pulse" aria-hidden="true" />
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-white dark:bg-white animate-pulse"
+                aria-hidden="true"
+              />
               LIVE
             </div>
           )}
-          {session.phase === 'LIVE' && (
+          {phase === 'LIVE' && (
             <div className="absolute top-2 right-2">
               <ViewerCount count={session.viewerCount} compact />
             </div>
@@ -82,26 +92,35 @@ export function LiveSessionCard({ session, instructorName, className }: LiveSess
         </div>
 
         <CardContent className="p-3 flex flex-col gap-1">
-          <p className="font-semibold text-sm leading-snug line-clamp-2" dir="auto">
-            {session.title}
+          <p
+            className="font-semibold text-sm leading-snug line-clamp-2"
+            dir="auto"
+          >
+            {session.title ?? session.meetingName}
           </p>
 
           {instructorName && (
-            <p className="text-xs text-muted-foreground" dir="auto">{instructorName}</p>
+            <p className="text-xs text-muted-foreground" dir="auto">
+              {instructorName}
+            </p>
           )}
 
           {/* Status row */}
           <div className="flex items-center gap-2 mt-1">
-            {session.phase === 'SCHEDULED' && countdown && (
+            {phase === 'PRE_LIVE' && countdown && (
               <Badge variant="outline" className="text-xs">
                 🕐 {countdown}
               </Badge>
             )}
-            {(session.phase === 'ENDED' || session.phase === 'CANCELLED') && (
-              <Badge variant="secondary" className="text-xs">Ended</Badge>
+            {(phase === 'ENDED' || phase === 'VOD_READY') && (
+              <Badge variant="secondary" className="text-xs">
+                Ended
+              </Badge>
             )}
-            {session.phase === 'PAUSED' && (
-              <Badge variant="outline" className="text-xs">Paused</Badge>
+            {phase === 'PAUSED' && (
+              <Badge variant="outline" className="text-xs">
+                Paused
+              </Badge>
             )}
           </div>
         </CardContent>

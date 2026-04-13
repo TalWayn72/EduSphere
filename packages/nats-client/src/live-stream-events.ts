@@ -167,29 +167,44 @@ export type LiveStreamEvent =
 
 // ─── Type Guards ─────────────────────────────────────────────────────────────
 
-function hasSessionAndTenant(e: unknown): e is { sessionId: string; tenantId: string } {
+function hasSessionAndTenant(
+  e: unknown
+): e is { sessionId: string; tenantId: string } {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['sessionId'] === 'string' && typeof obj['tenantId'] === 'string';
+  return (
+    typeof obj['sessionId'] === 'string' && typeof obj['tenantId'] === 'string'
+  );
 }
 
-export function isLiveStreamStartedEvent(e: unknown): e is LiveStreamStartedPayload {
+export function isLiveStreamStartedEvent(
+  e: unknown
+): e is LiveStreamStartedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['lessonId'] === 'string' && typeof obj['instructorId'] === 'string';
+  return (
+    typeof obj['lessonId'] === 'string' &&
+    typeof obj['instructorId'] === 'string'
+  );
 }
 
-export function isLiveStreamPausedEvent(e: unknown): e is LiveStreamPausedPayload {
+export function isLiveStreamPausedEvent(
+  e: unknown
+): e is LiveStreamPausedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return typeof obj['instructorId'] === 'string' && !('lessonId' in obj);
 }
 
-export function isLiveStreamResumedEvent(e: unknown): e is LiveStreamResumedPayload {
+export function isLiveStreamResumedEvent(
+  e: unknown
+): e is LiveStreamResumedPayload {
   return isLiveStreamPausedEvent(e);
 }
 
-export function isLiveStreamEndedEvent(e: unknown): e is LiveStreamEndedPayload {
+export function isLiveStreamEndedEvent(
+  e: unknown
+): e is LiveStreamEndedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return (
@@ -199,13 +214,20 @@ export function isLiveStreamEndedEvent(e: unknown): e is LiveStreamEndedPayload 
   );
 }
 
-export function isLiveStreamScreenShareEvent(e: unknown): e is LiveStreamScreenSharePayload {
+export function isLiveStreamScreenShareEvent(
+  e: unknown
+): e is LiveStreamScreenSharePayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['active'] === 'boolean' && typeof obj['instructorId'] === 'string';
+  return (
+    typeof obj['active'] === 'boolean' &&
+    typeof obj['instructorId'] === 'string'
+  );
 }
 
-export function isLiveTranscriptSegmentEvent(e: unknown): e is LiveTranscriptSegmentPayload {
+export function isLiveTranscriptSegmentEvent(
+  e: unknown
+): e is LiveTranscriptSegmentPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return (
@@ -215,37 +237,54 @@ export function isLiveTranscriptSegmentEvent(e: unknown): e is LiveTranscriptSeg
   );
 }
 
-export function isLiveTranscriptJargonHitEvent(e: unknown): e is LiveTranscriptJargonHitPayload {
+export function isLiveTranscriptJargonHitEvent(
+  e: unknown
+): e is LiveTranscriptJargonHitPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return typeof obj['termId'] === 'string' && typeof obj['term'] === 'string';
 }
 
-export function isLivePresenceJoinedEvent(e: unknown): e is LivePresenceJoinedPayload {
+export function isLivePresenceJoinedEvent(
+  e: unknown
+): e is LivePresenceJoinedPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return (
     typeof obj['userId'] === 'string' &&
-    (obj['role'] === 'instructor' || obj['role'] === 'student' || obj['role'] === 'observer')
+    (obj['role'] === 'instructor' ||
+      obj['role'] === 'student' ||
+      obj['role'] === 'observer')
   );
 }
 
-export function isLivePresenceLeftEvent(e: unknown): e is LivePresenceLeftPayload {
+export function isLivePresenceLeftEvent(
+  e: unknown
+): e is LivePresenceLeftPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['userId'] === 'string' && typeof obj['durationSeconds'] === 'number';
+  return (
+    typeof obj['userId'] === 'string' &&
+    typeof obj['durationSeconds'] === 'number'
+  );
 }
 
-export function isLivePresenceCountEvent(e: unknown): e is LivePresenceCountPayload {
+export function isLivePresenceCountEvent(
+  e: unknown
+): e is LivePresenceCountPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
   return typeof obj['count'] === 'number' && !('userId' in obj);
 }
 
-export function isLiveRecordingReadyEvent(e: unknown): e is LiveRecordingReadyPayload {
+export function isLiveRecordingReadyEvent(
+  e: unknown
+): e is LiveRecordingReadyPayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['storageKey'] === 'string' && typeof obj['lessonId'] === 'string';
+  return (
+    typeof obj['storageKey'] === 'string' && typeof obj['lessonId'] === 'string'
+  );
 }
 
 export function isLiveVodConversionStartedEvent(
@@ -256,8 +295,13 @@ export function isLiveVodConversionStartedEvent(
   return typeof obj['storageKey'] === 'string' && !('vodUrl' in obj);
 }
 
-export function isLiveVodConversionDoneEvent(e: unknown): e is LiveVodConversionDonePayload {
+export function isLiveVodConversionDoneEvent(
+  e: unknown
+): e is LiveVodConversionDonePayload {
   if (!hasSessionAndTenant(e)) return false;
   const obj = e as Record<string, unknown>;
-  return typeof obj['vodUrl'] === 'string' && typeof obj['durationSeconds'] === 'number';
+  return (
+    typeof obj['vodUrl'] === 'string' &&
+    typeof obj['durationSeconds'] === 'number'
+  );
 }

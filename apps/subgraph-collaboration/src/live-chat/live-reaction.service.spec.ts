@@ -7,7 +7,11 @@ const mockTx = {
 };
 
 const mockWithTenantContext = vi.fn(
-  async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+  async (
+    _db: unknown,
+    _ctx: unknown,
+    fn: (tx: typeof mockTx) => Promise<unknown>
+  ) => fn(mockTx)
 );
 
 vi.mock('@edusphere/db', () => ({
@@ -15,8 +19,12 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {
     live_reactions: {
-      id: 'id', session_id: 'session_id', user_id: 'user_id',
-      tenant_id: 'tenant_id', emoji: 'emoji', stream_ts: 'stream_ts',
+      id: 'id',
+      session_id: 'session_id',
+      user_id: 'user_id',
+      tenant_id: 'tenant_id',
+      emoji: 'emoji',
+      stream_ts: 'stream_ts',
     },
   },
   withTenantContext: (...args: unknown[]) => mockWithTenantContext(...args),
@@ -30,13 +38,19 @@ import { LiveReactionService } from './live-reaction.service.js';
 import { publishReactionBurst } from './nats-pubsub.helper.js';
 
 const studentCtx: AuthContext = {
-  tenantId: 'tenant-1', userId: 'student-1',
-  roles: ['STUDENT'], scopes: [], sub: 'student-1',
+  tenantId: 'tenant-1',
+  userId: 'student-1',
+  roles: ['STUDENT'],
+  scopes: [],
+  sub: 'student-1',
 };
 
 const student2Ctx: AuthContext = {
-  tenantId: 'tenant-1', userId: 'student-2',
-  roles: ['STUDENT'], scopes: [], sub: 'student-2',
+  tenantId: 'tenant-1',
+  userId: 'student-2',
+  roles: ['STUDENT'],
+  scopes: [],
+  sub: 'student-2',
 };
 
 describe('LiveReactionService', () => {
@@ -105,9 +119,9 @@ describe('LiveReactionService', () => {
       await vi.advanceTimersByTimeAsync(2100);
 
       expect(publishReactionBurst).toHaveBeenCalledTimes(2);
-      const emojis = vi.mocked(publishReactionBurst).mock.calls.map(
-        (c) => (c[1] as { emoji: string }).emoji
-      );
+      const emojis = vi
+        .mocked(publishReactionBurst)
+        .mock.calls.map((c) => (c[1] as { emoji: string }).emoji);
       expect(emojis).toContain('👍');
       expect(emojis).toContain('❤️');
     });
@@ -119,7 +133,9 @@ describe('LiveReactionService', () => {
       await vi.advanceTimersByTimeAsync(2100);
 
       expect(publishReactionBurst).toHaveBeenCalledTimes(2);
-      const sessions = vi.mocked(publishReactionBurst).mock.calls.map((c) => c[0]);
+      const sessions = vi
+        .mocked(publishReactionBurst)
+        .mock.calls.map((c) => c[0]);
       expect(sessions).toContain('sess-1');
       expect(sessions).toContain('sess-2');
     });
@@ -132,7 +148,9 @@ describe('LiveReactionService', () => {
 
       await vi.advanceTimersByTimeAsync(2100);
 
-      const burst = vi.mocked(publishReactionBurst).mock.calls[0][1] as { recentUsers: string[] };
+      const burst = vi.mocked(publishReactionBurst).mock.calls[0][1] as {
+        recentUsers: string[];
+      };
       expect(burst.recentUsers.length).toBeLessThanOrEqual(10);
       expect(burst.recentUsers).toContain('student-1');
       expect(burst.recentUsers).toContain('student-2');

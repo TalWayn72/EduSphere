@@ -35,7 +35,11 @@ import type { LiveTranscriptSegment } from '@/types/live-session.types';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeSegment(index: number, text: string, isFinal = true): LiveTranscriptSegment {
+function makeSegment(
+  index: number,
+  text: string,
+  isFinal = true
+): LiveTranscriptSegment {
   return {
     index,
     text,
@@ -89,7 +93,11 @@ describe('useLiveTranscript', () => {
   });
 
   it('sorts initial segments by index', async () => {
-    const segs = [makeSegment(2, 'Third'), makeSegment(0, 'First'), makeSegment(1, 'Second')];
+    const segs = [
+      makeSegment(2, 'Third'),
+      makeSegment(0, 'First'),
+      makeSegment(1, 'Second'),
+    ];
     setupMocks({ querySegments: segs });
     const { result } = renderHook(() => useLiveTranscript('sess-1'));
 
@@ -136,7 +144,12 @@ describe('useLiveTranscript', () => {
 
     // First render: initial segment is partial
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { liveTranscript: [partial] }, fetching: false, error: undefined, stale: false },
+      {
+        data: { liveTranscript: [partial] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+      },
       vi.fn(),
     ] as never);
     vi.mocked(urql.useSubscription).mockReturnValue([
@@ -160,7 +173,12 @@ describe('useLiveTranscript', () => {
     const duplicateFinal = makeSegment(0, 'Duplicate attempt', true);
 
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { liveTranscript: [finalSeg] }, fetching: false, error: undefined, stale: false },
+      {
+        data: { liveTranscript: [finalSeg] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+      },
       vi.fn(),
     ] as never);
     vi.mocked(urql.useSubscription).mockReturnValue([

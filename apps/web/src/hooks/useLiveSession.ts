@@ -12,7 +12,10 @@ import {
   LEAVE_LIVE_SESSION_MUTATION,
   LIVE_SESSION_STATUS_SUB,
 } from '@/lib/graphql/live-stream-session.queries';
-import type { LiveStreamSession, LiveSessionPhase } from '@/types/live-session.types';
+import type {
+  LiveStreamSession,
+  LiveSessionPhase,
+} from '@/types/live-session.types';
 
 // ── Local interfaces ───────────────────────────────────────────────────────────
 
@@ -20,17 +23,19 @@ interface LiveStreamSessionQueryResult {
   liveStreamSession: LiveStreamSession | null;
 }
 
-interface JoinLiveStreamResult {
-  joinLiveStream: { sessionId: string; viewerToken: string; streamUrl: string } | null;
+interface JoinLiveSessionResult {
+  joinLiveSession: {
+    activeViewers: number;
+    viewers: Array<{ userId: string; joinedAt: string }>;
+  } | null;
 }
 
 interface LiveSessionStatusSubResult {
-  liveSessionStatus: {
-    sessionId: string;
-    phase: LiveSessionPhase;
+  liveSessionStatusChanged: {
+    id: string;
+    status: LiveSessionPhase;
     viewerCount: number;
     isScreenSharing: boolean;
-    highlightMoments: Array<{ id: string; timestamp: number; label: string }>;
   } | null;
 }
 
@@ -45,11 +50,14 @@ export interface UseLiveSessionReturn {
 
 export function useLiveSession(sessionId: string): UseLiveSessionReturn {
   const [paused, setPaused] = useState(false);
-  const [viewerToken, setViewerToken] = useState<string | null>(null);
+  // viewerToken kept for API compatibility — joinLiveSession no longer returns one
+  const [viewerToken] = useState<string | null>(null);
 
   useEffect(() => {
     setPaused(false);
-    return () => { setPaused(true); };
+    return () => {
+      setPaused(true);
+    };
   }, []);
 
   const [queryResult] = useQuery<LiveStreamSessionQueryResult>({
@@ -58,16 +66,17 @@ export function useLiveSession(sessionId: string): UseLiveSessionReturn {
     pause: !sessionId,
   });
 
-  const [, executeJoin] = useMutation<JoinLiveStreamResult>(JOIN_LIVE_SESSION_MUTATION);
+  const [, executeJoin] = useMutation<JoinLiveSessionResult>(
+    JOIN_LIVE_SESSION_MUTATION
+  );
   const [, executeLeave] = useMutation(LEAVE_LIVE_SESSION_MUTATION);
 
   useEffect(() => {
     if (!sessionId) return;
     let active = true;
-    executeJoin({ sessionId }).then((result) => {
-      if (active && result.data?.joinLiveStream?.viewerToken) {
-        setViewerToken(result.data.joinLiveStream.viewerToken);
-      }
+    executeJoin({ sessionId }).then(() => {
+      // joinLiveSession returns LivePresenceInfo, no viewerToken
+      if (!active) return;
     });
     return () => {
       active = false;
@@ -83,19 +92,19 @@ export function useLiveSession(sessionId: string): UseLiveSessionReturn {
 
   // Merge subscription status updates into session data
   const session = queryResult.data?.liveStreamSession ?? null;
-  const statusUpdate = subResult.data?.liveSessionStatus;
-  const mergedSession: LiveStreamSession | null = session && statusUpdate
-    ? {
-        ...session,
-        phase: statusUpdate.phase,
-        viewerCount: statusUpdate.viewerCount,
-        isScreenSharing: statusUpdate.isScreenSharing,
-        highlightMoments: statusUpdate.highlightMoments.map((m) => ({
-          ...m,
-          sessionId,
-        })),
-      }
-    : session;
+  const statusUpdate = subResult.data?.liveSessionStatusChanged;
+  const mergedSession: LiveStreamSession | null =
+    session && statusUpdate
+      ? {
+          ...session,
+          status: statusUpdate.status,
+          phase: statusUpdate.status,
+          viewerCount: statusUpdate.viewerCount,
+          isScreenSharing: statusUpdate.isScreenSharing,
+        }
+      : session
+        ? { ...session, phase: session.status }
+        : null;
 
   return {
     session: mergedSession,
