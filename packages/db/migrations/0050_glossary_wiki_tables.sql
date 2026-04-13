@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS "glossary_entries" (
 
 ALTER TABLE "glossary_entries" ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "glossary_entries_tenant_isolation" ON "glossary_entries";
 CREATE POLICY "glossary_entries_tenant_isolation"
   ON "glossary_entries"
   USING  (tenant_id::text = current_setting('app.current_tenant', TRUE))
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS "glossary_lesson_refs" (
 
 ALTER TABLE "glossary_lesson_refs" ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "glossary_lesson_refs_tenant_isolation" ON "glossary_lesson_refs";
 CREATE POLICY "glossary_lesson_refs_tenant_isolation"
   ON "glossary_lesson_refs"
   USING  (tenant_id::text = current_setting('app.current_tenant', TRUE))
