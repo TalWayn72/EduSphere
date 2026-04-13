@@ -129,7 +129,7 @@ export function InstructorControls({
       <Badge variant={badgeInfo.variant} className="text-xs font-mono shrink-0">
         {isLive && (
           <span
-            className="h-1.5 w-1.5 rounded-full bg-white animate-pulse mr-1"
+            className="h-1.5 w-1.5 rounded-full bg-white dark:bg-white animate-pulse mr-1"
             aria-hidden="true"
           />
         )}

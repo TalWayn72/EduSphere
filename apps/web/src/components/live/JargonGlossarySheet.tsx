@@ -147,10 +147,9 @@ export function JargonGlossarySheet({
     pause: !primaryDomainId,
   });
 
-  const terms: JargonTerm[] = termsResult.data?.jargonTerms ?? [];
-
   // Client-side filter for instant feedback on short queries
   const filtered = useMemo(() => {
+    const terms: JargonTerm[] = termsResult.data?.jargonTerms ?? [];
     if (!search.trim()) return terms;
     const q = search.toLowerCase();
     return terms.filter(
@@ -158,7 +157,7 @@ export function JargonGlossarySheet({
         t.canonicalForm.toLowerCase().includes(q) ||
         t.definitionShort?.toLowerCase().includes(q)
     );
-  }, [terms, search]);
+  }, [termsResult.data, search]);
 
   const isLoading =
     lessonDomainsResult.fetching ||

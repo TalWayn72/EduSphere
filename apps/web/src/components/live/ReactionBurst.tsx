@@ -38,7 +38,7 @@ export function ReactionBurst({ queue }: ReactionBurstProps) {
     return (
       <div className="pointer-events-none absolute bottom-16 inset-x-0 flex justify-center gap-2" aria-hidden="true">
         {Object.entries(totals).map(([emoji, count]) => (
-          <span key={emoji} className="bg-black/50 text-white text-sm rounded-full px-2 py-0.5">
+          <span key={emoji} className="bg-black/50 dark:bg-black/70 text-white dark:text-white text-sm rounded-full px-2 py-0.5">
             {emoji} {count}
           </span>
         ))}

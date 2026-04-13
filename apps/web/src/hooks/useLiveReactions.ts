@@ -35,11 +35,12 @@ export function useLiveReactions(sessionId: string): UseLiveReactionsReturn {
 
   useEffect(() => {
     setPaused(false);
+    const timers = timerRefs.current;
     return () => {
       setPaused(true);
       // Clear all pending timers on unmount
-      timerRefs.current.forEach((timer) => clearTimeout(timer));
-      timerRefs.current.clear();
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
     };
   }, []);
 

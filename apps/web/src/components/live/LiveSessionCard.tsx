@@ -58,19 +58,19 @@ export function LiveSessionCard({ session, instructorName, className }: LiveSess
         data-testid="live-session-card"
       >
         {/* Thumbnail */}
-        <div className="relative aspect-video bg-zinc-900 rounded-t-xl overflow-hidden">
+        <div className="relative aspect-video bg-zinc-900 dark:bg-zinc-800 rounded-t-xl overflow-hidden">
           {session.thumbnailUrl ? (
             <img src={session.thumbnailUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-zinc-600 text-4xl">
+            <div className="w-full h-full flex items-center justify-center text-zinc-600 dark:text-zinc-400 text-4xl">
               📺
             </div>
           )}
 
           {/* Phase badge overlay */}
           {session.phase === 'LIVE' && (
-            <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-xs font-bold shadow">
-              <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" aria-hidden="true" />
+            <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 dark:bg-red-700 text-white dark:text-white text-xs font-bold shadow">
+              <span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-white animate-pulse" aria-hidden="true" />
               LIVE
             </div>
           )}

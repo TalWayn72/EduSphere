@@ -58,14 +58,14 @@ export function LiveVideoPlayer({
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <p className="text-zinc-400 text-sm">Connecting to stream…</p>
+          <p className="text-zinc-400 dark:text-zinc-500 text-sm">Connecting to stream…</p>
         </div>
       )}
 
       {/* LIVE badge — top-left */}
       {isLive && (
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600 text-white text-xs font-bold shadow">
-          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" aria-hidden="true" />
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600 dark:bg-red-700 text-white dark:text-white text-xs font-bold shadow">
+          <span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-white animate-pulse" aria-hidden="true" />
           LIVE
         </div>
       )}

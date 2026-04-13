@@ -158,7 +158,7 @@ export function LiveLessonPage() {
         {/* Layout */}
         {isMobile ? (
           <div className="flex flex-col">
-            <div className="w-full sticky top-0 z-10 bg-black">
+            <div className="w-full sticky top-0 z-10 bg-black dark:bg-black">
               {videoPlayer}
             </div>
             <div className="flex-1">{tabPanel}</div>
@@ -166,7 +166,7 @@ export function LiveLessonPage() {
         ) : (
           <ResizablePanelGroup orientation="horizontal" className="flex-1 overflow-hidden border rounded-b-lg">
             <ResizablePanel defaultSize={60} minSize={35} id="live-video">
-              <div className="h-full flex items-center justify-center bg-black p-4">
+              <div className="h-full flex items-center justify-center bg-black dark:bg-black p-4">
                 {videoPlayer}
               </div>
             </ResizablePanel>

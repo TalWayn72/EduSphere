@@ -143,7 +143,7 @@ function QuestionItem({ question, isInstructor, onUpvote, onAnswer, onDismiss }:
 
       {/* Answer */}
       {question.status === 'ANSWERED' && question.answer && (
-        <div className="ml-8 pl-3 border-l-2 border-green-400 text-sm text-muted-foreground" dir="auto">
+        <div className="ml-8 pl-3 border-l-2 border-green-400 dark:border-green-600 text-sm text-muted-foreground" dir="auto">
           {question.answer}
         </div>
       )}
