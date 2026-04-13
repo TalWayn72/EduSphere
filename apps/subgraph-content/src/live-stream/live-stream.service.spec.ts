@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 // ── DB mock ────────────────────────────────────────────────────────────────
-const mockInsert = vi.fn();
-const mockUpdate = vi.fn();
-const mockSelectChain = {
+const _mockInsert = vi.fn();
+const _mockUpdate = vi.fn();
+const _mockSelectChain = {
   select: vi.fn(),
   from: vi.fn(),
   where: vi.fn(),

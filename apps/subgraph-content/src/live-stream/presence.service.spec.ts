@@ -17,7 +17,7 @@ const mockDb: Record<string, unknown> = {
 };
 
 // Override select to return rows array (not paginated)
-const mockSelectFull = vi.fn(async () => selectReturns[selectCalls++] ?? []);
+const _mockSelectFull = vi.fn(async () => selectReturns[selectCalls++] ?? []);
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
@@ -60,7 +60,7 @@ function makePresenceRow(userId: string, isActive = true) {
   return { user_id: userId, is_active: isActive, joined_at: now, tenant_id: TENANT_ID, session_id: SESSION_ID };
 }
 
-function resetDb(...sequences: unknown[][]): void {
+function _resetDb(...sequences: unknown[][]): void {
   selectCalls = 0;
   selectReturns = sequences;
   // The select chain for getActiveViewers resolves without .limit()
