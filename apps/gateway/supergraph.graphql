@@ -2093,37 +2093,52 @@ type Mutation
     sessionId: ID!
     content: String!
     replyToId: ID
-  ): LiveChatMessage! @join__field(graph: COLLABORATION)
+  ): LiveChatMessage!
+    @join__field(graph: COLLABORATION)
+    @authenticated
   pinLiveChatMessage(messageId: ID!): LiveChatMessage!
     @join__field(graph: COLLABORATION)
+    @authenticated
   deleteLiveChatMessage(messageId: ID!): Boolean!
     @join__field(graph: COLLABORATION)
+    @authenticated
   sendLiveReaction(
     sessionId: ID!
     emoji: String!
     streamTs: Float
-  ): Boolean! @join__field(graph: COLLABORATION)
+  ): Boolean!
+    @join__field(graph: COLLABORATION)
+    @authenticated
   askLiveQuestion(
     sessionId: ID!
     question: String!
     streamTs: Float
-  ): LiveQAQuestion! @join__field(graph: COLLABORATION)
+  ): LiveQAQuestion!
+    @join__field(graph: COLLABORATION)
+    @authenticated
   upvoteLiveQuestion(questionId: ID!): LiveQAQuestion!
     @join__field(graph: COLLABORATION)
+    @authenticated
   answerLiveQuestion(
     questionId: ID!
     answer: String!
-  ): LiveQAQuestion! @join__field(graph: COLLABORATION)
+  ): LiveQAQuestion!
+    @join__field(graph: COLLABORATION)
+    @authenticated
   dismissLiveQuestion(questionId: ID!): LiveQAQuestion!
     @join__field(graph: COLLABORATION)
+    @authenticated
   addLiveBookmark(
     sessionId: ID!
     streamTs: Float!
     label: String
     note: String
-  ): LiveBookmark! @join__field(graph: COLLABORATION)
+  ): LiveBookmark!
+    @join__field(graph: COLLABORATION)
+    @authenticated
   removeLiveBookmark(bookmarkId: ID!): Boolean!
     @join__field(graph: COLLABORATION)
+    @authenticated
   generateLiveSessionSummary(sessionId: ID!): LiveSessionSummary!
     @join__field(graph: AGENT)
     @authenticated
