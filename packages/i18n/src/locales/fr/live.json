@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "EN DIRECT",
+    "preLive": "Planifié",
+    "ended": "Terminé",
+    "vodReady": "Enregistrement disponible"
+  },
+  "viewer": {
+    "count": "{{count}} spectateurs"
+  },
+  "transcript": {
+    "waiting": "En attente de transcription...",
+    "partial": "Transcription en cours..."
+  },
+  "chat": {
+    "placeholder": "Tapez un message...",
+    "pinned": "Épinglé",
+    "replyingTo": "Répondre à {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "Posez une question...",
+    "answered": "Répondu",
+    "dismissed": "Rejeté",
+    "upvote": "Voter"
+  },
+  "notes": {
+    "placeholder": "Écrivez une note...",
+    "addNote": "Ajouter une note",
+    "atTimestamp": "à {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "Enregistré !",
+    "bookmark": "Signet"
+  },
+  "glossary": {
+    "title": "Termes de la leçon",
+    "search": "Rechercher des termes...",
+    "noTerms": "Aucun terme pour cette leçon"
+  },
+  "instructor": {
+    "start": "Commencer la diffusion",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "end": "Terminer la diffusion",
+    "endConfirm": "Êtes-vous sûr de vouloir terminer le direct ?",
+    "highlight": "Mettre en valeur un moment",
+    "screenShare": "Partager l'écran"
+  },
+  "reactions": {
+    "cooldown": "Un instant..."
+  },
+  "session": {
+    "create": "Créer une session en direct",
+    "scheduledAt": "Prévu pour",
+    "streamType": "Type de diffusion",
+    "autoRecord": "Enregistrement automatique"
+  },
+  "summary": {
+    "title": "Résumé de la session",
+    "generate": "Générer un résumé",
+    "keyTopics": "Sujets clés",
+    "generating": "Génération du résumé..."
+  }
+}

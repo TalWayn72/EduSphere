@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "ПРЯМОЙ ЭФИР",
+    "preLive": "Запланировано",
+    "ended": "Завершено",
+    "vodReady": "Запись доступна"
+  },
+  "viewer": {
+    "count": "{{count}} зрителей"
+  },
+  "transcript": {
+    "waiting": "Ожидание транскрипции...",
+    "partial": "Транскрибируется..."
+  },
+  "chat": {
+    "placeholder": "Введите сообщение...",
+    "pinned": "Закреплено",
+    "replyingTo": "Ответ {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "Задать вопрос...",
+    "answered": "Отвечено",
+    "dismissed": "Отклонено",
+    "upvote": "Голосовать"
+  },
+  "notes": {
+    "placeholder": "Написать заметку...",
+    "addNote": "Добавить заметку",
+    "atTimestamp": "в {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "Сохранено!",
+    "bookmark": "Закладка"
+  },
+  "glossary": {
+    "title": "Термины урока",
+    "search": "Поиск терминов...",
+    "noTerms": "Нет терминов для этого урока"
+  },
+  "instructor": {
+    "start": "Начать трансляцию",
+    "pause": "Пауза",
+    "resume": "Продолжить",
+    "end": "Завершить трансляцию",
+    "endConfirm": "Вы уверены, что хотите завершить прямой эфир?",
+    "highlight": "Отметить важный момент",
+    "screenShare": "Демонстрация экрана"
+  },
+  "reactions": {
+    "cooldown": "Подождите..."
+  },
+  "session": {
+    "create": "Создать прямую трансляцию",
+    "scheduledAt": "Запланировано на",
+    "streamType": "Тип трансляции",
+    "autoRecord": "Автозапись"
+  },
+  "summary": {
+    "title": "Итоги занятия",
+    "generate": "Создать итоги",
+    "keyTopics": "Основные темы",
+    "generating": "Создание итогов..."
+  }
+}

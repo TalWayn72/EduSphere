@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "直播中",
+    "preLive": "已安排",
+    "ended": "已结束",
+    "vodReady": "录像可用"
+  },
+  "viewer": {
+    "count": "{{count}} 名观看者"
+  },
+  "transcript": {
+    "waiting": "等待转录...",
+    "partial": "转录中..."
+  },
+  "chat": {
+    "placeholder": "输入消息...",
+    "pinned": "已置顶",
+    "replyingTo": "回复 {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "提问...",
+    "answered": "已回答",
+    "dismissed": "已忽略",
+    "upvote": "点赞"
+  },
+  "notes": {
+    "placeholder": "写笔记...",
+    "addNote": "添加笔记",
+    "atTimestamp": "在 {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "已收藏！",
+    "bookmark": "收藏"
+  },
+  "glossary": {
+    "title": "课程术语",
+    "search": "搜索术语...",
+    "noTerms": "本课程暂无术语"
+  },
+  "instructor": {
+    "start": "开始直播",
+    "pause": "暂停",
+    "resume": "继续",
+    "end": "结束直播",
+    "endConfirm": "确定要结束直播吗？",
+    "highlight": "标记精彩时刻",
+    "screenShare": "共享屏幕"
+  },
+  "reactions": {
+    "cooldown": "请稍等..."
+  },
+  "session": {
+    "create": "创建直播课",
+    "scheduledAt": "计划时间",
+    "streamType": "直播类型",
+    "autoRecord": "自动录制"
+  },
+  "summary": {
+    "title": "课程总结",
+    "generate": "生成总结",
+    "keyTopics": "主要话题",
+    "generating": "生成总结中..."
+  }
+}

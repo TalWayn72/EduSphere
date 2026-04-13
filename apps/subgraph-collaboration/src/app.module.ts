@@ -6,6 +6,7 @@ import { createSubgraphLoggerModule } from '@edusphere/metrics';
 import { DiscussionModule } from './discussion/discussion.module';
 import { CrdtModule } from './crdt/crdt.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { LiveChatModule } from './live-chat/live-chat.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
@@ -25,6 +26,7 @@ import { authMiddleware } from './auth/auth.middleware';
     }),
     DiscussionModule,
     CrdtModule,
+    LiveChatModule,
   ],
 })
 export class AppModule {}

@@ -81,6 +81,11 @@ const LessonPreviewPage = lazy(() =>
     default: m.LessonPreviewPage,
   }))
 );
+const CreateLiveSessionPage = lazy(() =>
+  import('@/pages/CreateLiveSessionPage').then((m) => ({
+    default: m.CreateLiveSessionPage,
+  }))
+);
 
 /**
  * Course & lesson routes — discovery, CRUD, analytics, lessons, quizzes.
@@ -107,6 +112,11 @@ export const courseRoutes: RouteObject[] = [
   {
     path: '/courses/:courseId/modules/:moduleId/quiz/new',
     element: guarded(<QuizBuilderPage />),
+  },
+  // Create live session — instructor form
+  {
+    path: '/courses/:courseId/live/new',
+    element: guarded(<CreateLiveSessionPage />),
   },
   // Create lesson — must come before :courseId to avoid route shadowing
   {

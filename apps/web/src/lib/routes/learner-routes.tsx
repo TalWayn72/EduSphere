@@ -142,6 +142,11 @@ const GlossaryWikiPage = lazy(() =>
     default: m.GlossaryWikiPage,
   }))
 );
+const LiveLessonPage = lazy(() =>
+  import('@/pages/LiveLessonPage').then((m) => ({
+    default: m.LiveLessonPage,
+  }))
+);
 
 /**
  * Learner, dashboard, and general authenticated routes.
@@ -190,6 +195,15 @@ export const learnerRoutes: RouteObject[] = [
   // Live sessions
   { path: '/sessions', element: guarded(<LiveSessionsPage />) },
   { path: '/sessions/:sessionId', element: guarded(<LiveSessionDetailPage />) },
+  // Live lesson viewer (Phase 5B)
+  {
+    path: '/live/:sessionId',
+    element: guarded(
+      <Suspense fallback={<PageLoader />}>
+        <LiveLessonPage />
+      </Suspense>
+    ),
+  },
   // Agents
   { path: '/agents', element: guarded(<AgentsPage />) },
   { path: '/agents/studio', element: guarded(<AgentStudioPage />) },

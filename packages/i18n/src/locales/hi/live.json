@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "लाइव",
+    "preLive": "निर्धारित",
+    "ended": "समाप्त",
+    "vodReady": "रिकॉर्डिंग उपलब्ध"
+  },
+  "viewer": {
+    "count": "{{count}} दर्शक"
+  },
+  "transcript": {
+    "waiting": "ट्रांसक्रिप्शन का इंतजार...",
+    "partial": "ट्रांसक्राइब हो रहा है..."
+  },
+  "chat": {
+    "placeholder": "संदेश लिखें...",
+    "pinned": "पिन किया गया",
+    "replyingTo": "{{name}} को उत्तर दे रहे हैं"
+  },
+  "qa": {
+    "askPlaceholder": "प्रश्न पूछें...",
+    "answered": "उत्तर दिया गया",
+    "dismissed": "खारिज किया गया",
+    "upvote": "अपवोट"
+  },
+  "notes": {
+    "placeholder": "नोट लिखें...",
+    "addNote": "नोट जोड़ें",
+    "atTimestamp": "{{time}} पर"
+  },
+  "bookmarks": {
+    "bookmarked": "बुकमार्क किया!",
+    "bookmark": "बुकमार्क"
+  },
+  "glossary": {
+    "title": "पाठ के शब्द",
+    "search": "शब्द खोजें...",
+    "noTerms": "इस पाठ के लिए कोई शब्द नहीं"
+  },
+  "instructor": {
+    "start": "स्ट्रीमिंग शुरू करें",
+    "pause": "रोकें",
+    "resume": "जारी रखें",
+    "end": "स्ट्रीम समाप्त करें",
+    "endConfirm": "क्या आप लाइव स्ट्रीम समाप्त करना चाहते हैं?",
+    "highlight": "महत्वपूर्ण क्षण चिह्नित करें",
+    "screenShare": "स्क्रीन साझा करें"
+  },
+  "reactions": {
+    "cooldown": "एक क्षण रुकें..."
+  },
+  "session": {
+    "create": "लाइव सत्र बनाएं",
+    "scheduledAt": "निर्धारित समय",
+    "streamType": "स्ट्रीम प्रकार",
+    "autoRecord": "स्वचालित रिकॉर्ड"
+  },
+  "summary": {
+    "title": "सत्र सारांश",
+    "generate": "सारांश बनाएं",
+    "keyTopics": "मुख्य विषय",
+    "generating": "सारांश तैयार हो रहा है..."
+  }
+}

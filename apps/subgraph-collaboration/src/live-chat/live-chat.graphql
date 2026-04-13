@@ -1,0 +1,105 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@external"]
+  )
+
+enum LiveMessageType {
+  TEXT
+  REACTION
+  SYSTEM
+  PINNED
+}
+
+enum QAStatus {
+  PENDING
+  ANSWERED
+  DISMISSED
+}
+
+type LiveChatMessage @key(fields: "id") {
+  id: ID!
+  sessionId: ID!
+  userId: ID!
+  user: User!
+  content: String!
+  messageType: LiveMessageType!
+  replyTo: LiveChatMessage
+  isPinned: Boolean!
+  createdAt: DateTime!
+}
+
+type LiveQAQuestion @key(fields: "id") {
+  id: ID!
+  sessionId: ID!
+  userId: ID!
+  user: User!
+  question: String!
+  upvotes: Int!
+  status: QAStatus!
+  answer: String
+  isUpvotedByMe: Boolean!
+  streamTs: Float
+  createdAt: DateTime!
+}
+
+type LiveReactionBurst {
+  emoji: String!
+  count: Int!
+  recentUsers: [ID!]!
+}
+
+type LiveBookmark {
+  id: ID!
+  sessionId: ID!
+  streamTs: Float!
+  label: String
+  note: String
+  createdAt: DateTime!
+}
+
+extend type User @key(fields: "id") {
+  id: ID! @external
+}
+
+extend type Query {
+  liveChatMessages(
+    sessionId: ID!
+    limit: Int
+    before: String
+  ): [LiveChatMessage!]!
+  liveQAQuestions(sessionId: ID!, status: QAStatus): [LiveQAQuestion!]!
+  liveBookmarks(sessionId: ID!): [LiveBookmark!]!
+}
+
+extend type Mutation {
+  sendLiveChatMessage(
+    sessionId: ID!
+    content: String!
+    replyToId: ID
+  ): LiveChatMessage!
+  pinLiveChatMessage(messageId: ID!): LiveChatMessage!
+  deleteLiveChatMessage(messageId: ID!): Boolean!
+  sendLiveReaction(sessionId: ID!, emoji: String!, streamTs: Float): Boolean!
+  askLiveQuestion(
+    sessionId: ID!
+    question: String!
+    streamTs: Float
+  ): LiveQAQuestion!
+  upvoteLiveQuestion(questionId: ID!): LiveQAQuestion!
+  answerLiveQuestion(questionId: ID!, answer: String!): LiveQAQuestion!
+  dismissLiveQuestion(questionId: ID!): LiveQAQuestion!
+  addLiveBookmark(
+    sessionId: ID!
+    streamTs: Float!
+    label: String
+    note: String
+  ): LiveBookmark!
+  removeLiveBookmark(bookmarkId: ID!): Boolean!
+}
+
+extend type Subscription {
+  liveChatMessageAdded(sessionId: ID!): LiveChatMessage!
+  liveReactionBurst(sessionId: ID!): LiveReactionBurst!
+  liveQAUpdated(sessionId: ID!): LiveQAQuestion!
+}

@@ -17,6 +17,8 @@
  *   course-events.ts     — Course enrollment, completion, badge events
  *   gateway-events.ts    — Gateway pub/sub, submission, poll events, NatsSubjects
  *   notification-events.ts — Notification dispatch, delivery status, admin alerts
+ *   live-stream-events.ts — Live stream lifecycle, transcription, presence, VOD events
+ *   live-chat-events.ts   — Live chat, reactions, Q&A, instructor action events
  */
 
 export * from './agent-events.js';
@@ -28,6 +30,8 @@ export * from './social-events.js';
 export * from './course-events.js';
 export * from './gateway-events.js';
 export * from './notification-events.js';
+export * from './live-stream-events.js';
+export * from './live-chat-events.js';
 
 // ─── Discriminated Union ─────────────────────────────────────────────────────
 
@@ -67,6 +71,8 @@ import type {
   DeliveryStatusPayload,
   AdminAlertPayload,
 } from './notification-events.js';
+import type { LiveStreamEvent } from './live-stream-events.js';
+import type { LiveChatEvent } from './live-chat-events.js';
 
 export type NatsEvent =
   | AgentSessionPayload
@@ -90,4 +96,6 @@ export type NatsEvent =
   | DiscussionReplyPayload
   | NotificationDispatchPayload
   | DeliveryStatusPayload
-  | AdminAlertPayload;
+  | AdminAlertPayload
+  | LiveStreamEvent
+  | LiveChatEvent;

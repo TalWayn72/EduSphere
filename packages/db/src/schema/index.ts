@@ -241,5 +241,11 @@ export * from './glossary';
 // Citation Format Configs — Phase 3 (course-level citation style)
 export * from './citation-format';
 
+// Live Lesson Streaming — Phase 1 (session configs, chat, reactions, Q&A, presence, bookmarks, transcripts)
+export * from './live-stream';
+
+// Live Session Summaries — Phase 11 (AI-generated post-session summaries)
+export * from './live-session-summaries';
+
 // Drizzle relations — type-safe relational query API for 5 core entity chains
 export * from './relations';

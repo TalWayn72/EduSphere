@@ -1,0 +1,100 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@external", "@authenticated"]
+  )
+
+enum StreamType {
+  BBB
+  LIVEKIT
+  EXTERNAL
+}
+
+enum LiveSessionPhase {
+  PRE_LIVE
+  LIVE
+  PAUSED
+  ENDED
+  VOD_READY
+}
+
+type LiveStreamSession @key(fields: "id") {
+  id: ID!
+  lessonId: ID
+  meetingName: String!
+  scheduledAt: String!
+  status: LiveSessionPhase!
+  streamType: StreamType!
+  viewerCount: Int!
+  maxViewers: Int!
+  instructor: User!
+  isScreenSharing: Boolean!
+}
+
+type LiveTranscriptSegment {
+  id: ID!
+  segmentIndex: Int!
+  text: String!
+  startTime: String
+  endTime: String
+  isFinal: Boolean!
+  jargonHits: [JargonHit!]!
+}
+
+type LivePresenceInfo {
+  activeViewers: Int!
+  viewers: [LiveViewer!]!
+}
+
+type LiveViewer {
+  userId: ID!
+  joinedAt: String!
+}
+
+type JargonHit {
+  termId: String!
+  form: String!
+  confidence: Float
+}
+
+extend type User @key(fields: "id") {
+  id: ID! @external
+}
+
+extend type Query {
+  liveStreamSession(sessionId: ID!): LiveStreamSession @authenticated
+  activeLiveSessions(courseId: ID): [LiveStreamSession!]! @authenticated
+  livePresence(sessionId: ID!): LivePresenceInfo! @authenticated
+  liveTranscript(sessionId: ID!, afterIndex: Int): [LiveTranscriptSegment!]! @authenticated
+}
+
+extend type Mutation {
+  createLiveStream(
+    sessionId: ID!
+    streamType: StreamType!
+    lessonId: ID
+    maxViewers: Int
+    autoRecord: Boolean
+  ): LiveStreamSession! @authenticated
+
+  updateLiveStream(
+    sessionId: ID!
+    maxViewers: Int
+    autoRecord: Boolean
+  ): LiveStreamSession! @authenticated
+
+  startLiveStream(sessionId: ID!): LiveStreamSession! @authenticated
+  pauseLiveStream(sessionId: ID!): LiveStreamSession! @authenticated
+  endLiveStream(sessionId: ID!): LiveStreamSession! @authenticated
+  toggleScreenShare(sessionId: ID!, active: Boolean!): LiveStreamSession! @authenticated
+  highlightMoment(sessionId: ID!, streamTs: Float!, label: String): Boolean! @authenticated
+
+  joinLiveSession(sessionId: ID!): LivePresenceInfo! @authenticated
+  leaveLiveSession(sessionId: ID!): Boolean! @authenticated
+}
+
+extend type Subscription {
+  liveTranscriptUpdated(sessionId: ID!): LiveTranscriptSegment!
+  livePresenceChanged(sessionId: ID!): LivePresenceInfo!
+  liveSessionStatusChanged(sessionId: ID!): LiveStreamSession!
+}

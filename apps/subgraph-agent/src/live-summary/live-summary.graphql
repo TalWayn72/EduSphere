@@ -1,0 +1,32 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@authenticated", "@requiresRole"]
+  )
+
+type LiveSessionSummary {
+  sessionId: ID!
+  summary: String!
+  keyTopics: [String!]!
+  jargonTermsCovered: [JargonTermRef!]!
+  questionsAsked: Int!
+  peakViewers: Int!
+  duration: Int!
+  generatedAt: DateTime!
+}
+
+type JargonTermRef {
+  termId: ID!
+  canonicalForm: String!
+  occurrenceCount: Int!
+}
+
+extend type Query {
+  liveSessionSummary(sessionId: ID!): LiveSessionSummary @authenticated
+}
+
+extend type Mutation {
+  generateLiveSessionSummary(sessionId: ID!): LiveSessionSummary!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+}

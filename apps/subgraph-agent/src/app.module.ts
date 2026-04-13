@@ -14,6 +14,7 @@ import { ProctoringModule } from './proctoring/proctoring.module';
 import { SkillModule } from './skills/skill.module';
 import { ChavrutaPartnerModule } from './chavruta-partner/chavruta-partner.module';
 import { CertExamGenModule } from './certification/cert-exam-gen.module';
+import { LiveSummaryModule } from './live-summary/live-summary.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
@@ -41,6 +42,7 @@ import { authMiddleware } from './auth/auth.middleware';
     SkillModule,
     ChavrutaPartnerModule,
     CertExamGenModule,
+    LiveSummaryModule,
   ],
 })
 export class AppModule {}

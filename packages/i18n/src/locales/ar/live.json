@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "مباشر",
+    "preLive": "مجدول",
+    "ended": "انتهى",
+    "vodReady": "التسجيل متاح"
+  },
+  "viewer": {
+    "count": "{{count}} مشاهد"
+  },
+  "transcript": {
+    "waiting": "في انتظار النسخ...",
+    "partial": "جارٍ النسخ..."
+  },
+  "chat": {
+    "placeholder": "اكتب رسالة...",
+    "pinned": "مثبت",
+    "replyingTo": "رد على {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "اطرح سؤالاً...",
+    "answered": "تمت الإجابة",
+    "dismissed": "مرفوض",
+    "upvote": "تصويت"
+  },
+  "notes": {
+    "placeholder": "اكتب ملاحظة...",
+    "addNote": "إضافة ملاحظة",
+    "atTimestamp": "في {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "تم الحفظ!",
+    "bookmark": "إشارة مرجعية"
+  },
+  "glossary": {
+    "title": "مصطلحات الدرس",
+    "search": "ابحث عن المصطلحات...",
+    "noTerms": "لا توجد مصطلحات لهذا الدرس"
+  },
+  "instructor": {
+    "start": "بدء البث",
+    "pause": "إيقاف مؤقت",
+    "resume": "استئناف",
+    "end": "إنهاء البث",
+    "endConfirm": "هل أنت متأكد من إنهاء البث المباشر؟",
+    "highlight": "تمييز لحظة",
+    "screenShare": "مشاركة الشاشة"
+  },
+  "reactions": {
+    "cooldown": "انتظر لحظة..."
+  },
+  "session": {
+    "create": "إنشاء جلسة مباشرة",
+    "scheduledAt": "مجدول في",
+    "streamType": "نوع البث",
+    "autoRecord": "تسجيل تلقائي"
+  },
+  "summary": {
+    "title": "ملخص الجلسة",
+    "generate": "إنشاء ملخص",
+    "keyTopics": "المواضيع الرئيسية",
+    "generating": "جارٍ إنشاء الملخص..."
+  }
+}

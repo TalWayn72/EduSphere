@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "EN VIVO",
+    "preLive": "Programado",
+    "ended": "Finalizado",
+    "vodReady": "Grabación disponible"
+  },
+  "viewer": {
+    "count": "{{count}} espectadores"
+  },
+  "transcript": {
+    "waiting": "Esperando transcripción...",
+    "partial": "Transcribiendo..."
+  },
+  "chat": {
+    "placeholder": "Escribe un mensaje...",
+    "pinned": "Fijado",
+    "replyingTo": "Respondiendo a {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "Haz una pregunta...",
+    "answered": "Respondido",
+    "dismissed": "Descartado",
+    "upvote": "Votar"
+  },
+  "notes": {
+    "placeholder": "Escribe una nota...",
+    "addNote": "Agregar nota",
+    "atTimestamp": "en {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "¡Guardado!",
+    "bookmark": "Marcador"
+  },
+  "glossary": {
+    "title": "Términos de la lección",
+    "search": "Buscar términos...",
+    "noTerms": "Sin términos para esta lección"
+  },
+  "instructor": {
+    "start": "Iniciar transmisión",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "end": "Finalizar transmisión",
+    "endConfirm": "¿Estás seguro de que deseas finalizar la transmisión en vivo?",
+    "highlight": "Destacar momento",
+    "screenShare": "Compartir pantalla"
+  },
+  "reactions": {
+    "cooldown": "Un momento..."
+  },
+  "session": {
+    "create": "Crear sesión en vivo",
+    "scheduledAt": "Programado para",
+    "streamType": "Tipo de transmisión",
+    "autoRecord": "Grabación automática"
+  },
+  "summary": {
+    "title": "Resumen de la sesión",
+    "generate": "Generar resumen",
+    "keyTopics": "Temas principales",
+    "generating": "Generando resumen..."
+  }
+}

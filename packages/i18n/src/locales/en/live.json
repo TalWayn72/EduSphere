@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "LIVE",
+    "preLive": "Scheduled",
+    "ended": "Ended",
+    "vodReady": "Recording Available"
+  },
+  "viewer": {
+    "count": "{{count}} viewers"
+  },
+  "transcript": {
+    "waiting": "Waiting for transcription...",
+    "partial": "Transcribing..."
+  },
+  "chat": {
+    "placeholder": "Type a message...",
+    "pinned": "Pinned",
+    "replyingTo": "Replying to {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "Ask a question...",
+    "answered": "Answered",
+    "dismissed": "Dismissed",
+    "upvote": "Upvote"
+  },
+  "notes": {
+    "placeholder": "Write a note...",
+    "addNote": "Add Note",
+    "atTimestamp": "at {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "Bookmarked!",
+    "bookmark": "Bookmark"
+  },
+  "glossary": {
+    "title": "Lesson Terms",
+    "search": "Search terms...",
+    "noTerms": "No terms for this lesson"
+  },
+  "instructor": {
+    "start": "Start Streaming",
+    "pause": "Pause",
+    "resume": "Resume",
+    "end": "End Stream",
+    "endConfirm": "Are you sure you want to end the live stream?",
+    "highlight": "Highlight Moment",
+    "screenShare": "Screen Share"
+  },
+  "reactions": {
+    "cooldown": "Wait a moment..."
+  },
+  "session": {
+    "create": "Create Live Session",
+    "scheduledAt": "Scheduled for",
+    "streamType": "Stream Type",
+    "autoRecord": "Auto-record"
+  },
+  "summary": {
+    "title": "Session Summary",
+    "generate": "Generate Summary",
+    "keyTopics": "Key Topics",
+    "generating": "Generating summary..."
+  }
+}

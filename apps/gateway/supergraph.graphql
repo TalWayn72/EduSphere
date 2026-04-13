@@ -929,6 +929,35 @@ type Query
   citationFormatConfigs(courseId: ID!): [CitationFormatConfig!]!
     @join__field(graph: CONTENT)
     @authenticated
+  liveStreamSession(sessionId: ID!): LiveStreamSession
+    @join__field(graph: CONTENT)
+    @authenticated
+  activeLiveSessions(courseId: ID): [LiveStreamSession!]!
+    @join__field(graph: CONTENT)
+    @authenticated
+  livePresence(sessionId: ID!): LivePresenceInfo!
+    @join__field(graph: CONTENT)
+    @authenticated
+  liveTranscript(
+    sessionId: ID!
+    afterIndex: Int
+  ): [LiveTranscriptSegment!]!
+    @join__field(graph: CONTENT)
+    @authenticated
+  liveChatMessages(
+    sessionId: ID!
+    limit: Int
+    before: String
+  ): [LiveChatMessage!]! @join__field(graph: COLLABORATION)
+  liveQAQuestions(
+    sessionId: ID!
+    status: QAStatus
+  ): [LiveQAQuestion!]! @join__field(graph: COLLABORATION)
+  liveBookmarks(sessionId: ID!): [LiveBookmark!]!
+    @join__field(graph: COLLABORATION)
+  liveSessionSummary(sessionId: ID!): LiveSessionSummary
+    @join__field(graph: AGENT)
+    @authenticated
 }
 
 type Mutation
@@ -2024,6 +2053,80 @@ type Mutation
     presetName: String!
     formatDescription: String
   ): CitationFormatConfig! @join__field(graph: CONTENT) @authenticated
+  createLiveStream(
+    sessionId: ID!
+    streamType: StreamType!
+    lessonId: ID
+    maxViewers: Int
+    autoRecord: Boolean
+  ): LiveStreamSession! @join__field(graph: CONTENT) @authenticated
+  updateLiveStream(
+    sessionId: ID!
+    maxViewers: Int
+    autoRecord: Boolean
+  ): LiveStreamSession! @join__field(graph: CONTENT) @authenticated
+  startLiveStream(sessionId: ID!): LiveStreamSession!
+    @join__field(graph: CONTENT)
+    @authenticated
+  pauseLiveStream(sessionId: ID!): LiveStreamSession!
+    @join__field(graph: CONTENT)
+    @authenticated
+  endLiveStream(sessionId: ID!): LiveStreamSession!
+    @join__field(graph: CONTENT)
+    @authenticated
+  toggleScreenShare(
+    sessionId: ID!
+    active: Boolean!
+  ): LiveStreamSession! @join__field(graph: CONTENT) @authenticated
+  highlightMoment(
+    sessionId: ID!
+    streamTs: Float!
+    label: String
+  ): Boolean! @join__field(graph: CONTENT) @authenticated
+  joinLiveSession(sessionId: ID!): LivePresenceInfo!
+    @join__field(graph: CONTENT)
+    @authenticated
+  leaveLiveSession(sessionId: ID!): Boolean!
+    @join__field(graph: CONTENT)
+    @authenticated
+  sendLiveChatMessage(
+    sessionId: ID!
+    content: String!
+    replyToId: ID
+  ): LiveChatMessage! @join__field(graph: COLLABORATION)
+  pinLiveChatMessage(messageId: ID!): LiveChatMessage!
+    @join__field(graph: COLLABORATION)
+  deleteLiveChatMessage(messageId: ID!): Boolean!
+    @join__field(graph: COLLABORATION)
+  sendLiveReaction(
+    sessionId: ID!
+    emoji: String!
+    streamTs: Float
+  ): Boolean! @join__field(graph: COLLABORATION)
+  askLiveQuestion(
+    sessionId: ID!
+    question: String!
+    streamTs: Float
+  ): LiveQAQuestion! @join__field(graph: COLLABORATION)
+  upvoteLiveQuestion(questionId: ID!): LiveQAQuestion!
+    @join__field(graph: COLLABORATION)
+  answerLiveQuestion(
+    questionId: ID!
+    answer: String!
+  ): LiveQAQuestion! @join__field(graph: COLLABORATION)
+  dismissLiveQuestion(questionId: ID!): LiveQAQuestion!
+    @join__field(graph: COLLABORATION)
+  addLiveBookmark(
+    sessionId: ID!
+    streamTs: Float!
+    label: String
+    note: String
+  ): LiveBookmark! @join__field(graph: COLLABORATION)
+  removeLiveBookmark(bookmarkId: ID!): Boolean!
+    @join__field(graph: COLLABORATION)
+  generateLiveSessionSummary(sessionId: ID!): LiveSessionSummary!
+    @join__field(graph: AGENT)
+    @authenticated
 }
 
 type Subscription
@@ -2074,6 +2177,150 @@ type Subscription
   Real-time user status updates
   """
   userStatusChanged(userId: ID!): UserStatus! @join__field(graph: CORE)
+  liveTranscriptUpdated(sessionId: ID!): LiveTranscriptSegment!
+    @join__field(graph: CONTENT)
+  livePresenceChanged(sessionId: ID!): LivePresenceInfo!
+    @join__field(graph: CONTENT)
+  liveSessionStatusChanged(sessionId: ID!): LiveStreamSession!
+    @join__field(graph: CONTENT)
+  liveChatMessageAdded(sessionId: ID!): LiveChatMessage!
+    @join__field(graph: COLLABORATION)
+  liveReactionBurst(sessionId: ID!): LiveReactionBurst!
+    @join__field(graph: COLLABORATION)
+  liveQAUpdated(sessionId: ID!): LiveQAQuestion!
+    @join__field(graph: COLLABORATION)
+}
+
+enum LiveMessageType
+  @join__type(graph: COLLABORATION)
+  @join__enumValue(graph: COLLABORATION) {
+  TEXT @join__enumValue(graph: COLLABORATION)
+  REACTION @join__enumValue(graph: COLLABORATION)
+  SYSTEM @join__enumValue(graph: COLLABORATION)
+  PINNED @join__enumValue(graph: COLLABORATION)
+}
+
+enum LiveSessionPhase
+  @join__type(graph: CONTENT)
+  @join__enumValue(graph: CONTENT) {
+  PRE_LIVE @join__enumValue(graph: CONTENT)
+  LIVE @join__enumValue(graph: CONTENT)
+  PAUSED @join__enumValue(graph: CONTENT)
+  ENDED @join__enumValue(graph: CONTENT)
+  VOD_READY @join__enumValue(graph: CONTENT)
+}
+
+enum QAStatus
+  @join__type(graph: COLLABORATION)
+  @join__enumValue(graph: COLLABORATION) {
+  PENDING @join__enumValue(graph: COLLABORATION)
+  ANSWERED @join__enumValue(graph: COLLABORATION)
+  DISMISSED @join__enumValue(graph: COLLABORATION)
+}
+
+enum StreamType
+  @join__type(graph: CONTENT)
+  @join__enumValue(graph: CONTENT) {
+  BBB @join__enumValue(graph: CONTENT)
+  LIVEKIT @join__enumValue(graph: CONTENT)
+  EXTERNAL @join__enumValue(graph: CONTENT)
+}
+
+type JargonHit @join__type(graph: CONTENT) {
+  termId: String!
+  form: String!
+  confidence: Float
+}
+
+type JargonTermRef @join__type(graph: AGENT) {
+  termId: ID!
+  canonicalForm: String!
+  occurrenceCount: Int!
+}
+
+type LiveBookmark @join__type(graph: COLLABORATION) {
+  id: ID!
+  sessionId: ID!
+  streamTs: Float!
+  label: String
+  note: String
+  createdAt: DateTime! @join__field(graph: COLLABORATION)
+}
+
+type LiveChatMessage @join__type(graph: COLLABORATION, key: "id") {
+  id: ID!
+  sessionId: ID!
+  userId: ID!
+  user: User! @join__field(graph: COLLABORATION)
+  content: String!
+  messageType: LiveMessageType!
+  replyTo: LiveChatMessage
+  isPinned: Boolean!
+  createdAt: DateTime! @join__field(graph: COLLABORATION)
+}
+
+type LivePresenceInfo @join__type(graph: CONTENT) {
+  activeViewers: Int!
+  viewers: [LiveViewer!]!
+}
+
+type LiveQAQuestion @join__type(graph: COLLABORATION, key: "id") {
+  id: ID!
+  sessionId: ID!
+  userId: ID!
+  user: User! @join__field(graph: COLLABORATION)
+  question: String!
+  upvotes: Int!
+  status: QAStatus!
+  answer: String
+  isUpvotedByMe: Boolean!
+  streamTs: Float
+  createdAt: DateTime! @join__field(graph: COLLABORATION)
+}
+
+type LiveReactionBurst @join__type(graph: COLLABORATION) {
+  emoji: String!
+  count: Int!
+  recentUsers: [ID!]!
+}
+
+type LiveSessionSummary @join__type(graph: AGENT) {
+  sessionId: ID!
+  summary: String!
+  keyTopics: [String!]!
+  jargonTermsCovered: [JargonTermRef!]!
+  questionsAsked: Int!
+  peakViewers: Int!
+  duration: Int!
+  generatedAt: DateTime! @join__field(graph: AGENT)
+}
+
+type LiveStreamSession @join__type(graph: CONTENT, key: "id") {
+  id: ID!
+  lessonId: ID
+  meetingName: String!
+  scheduledAt: String!
+  status: LiveSessionPhase!
+  streamType: StreamType!
+  viewerCount: Int!
+  maxViewers: Int!
+  instructor: User! @join__field(graph: CONTENT)
+  isScreenSharing: Boolean!
+}
+
+type LiveTranscriptSegment @join__type(graph: CONTENT) {
+  id: ID!
+  segmentIndex: Int!
+  text: String!
+  startTime: String
+  endTime: String
+  isFinal: Boolean!
+  jargonHits: [JargonHit!]!
+}
+
+type LiveViewer @join__type(graph: CONTENT) {
+  userId: ID!
+  joinedAt: String!
 }
 
 type AgentExecution @join__type(graph: AGENT, key: "id") {

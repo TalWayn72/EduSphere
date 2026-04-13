@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "שידור חי",
+    "preLive": "מתוכנן",
+    "ended": "הסתיים",
+    "vodReady": "הקלטה זמינה"
+  },
+  "viewer": {
+    "count": "{{count}} צופים"
+  },
+  "transcript": {
+    "waiting": "ממתין לתמלול...",
+    "partial": "מתמלל..."
+  },
+  "chat": {
+    "placeholder": "כתוב הודעה...",
+    "pinned": "נעוץ",
+    "replyingTo": "מגיב ל-{{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "שאל שאלה...",
+    "answered": "נענה",
+    "dismissed": "נדחה",
+    "upvote": "הצבעה"
+  },
+  "notes": {
+    "placeholder": "כתוב הערה...",
+    "addNote": "הוסף הערה",
+    "atTimestamp": "ב-{{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "סומן!",
+    "bookmark": "סימנייה"
+  },
+  "glossary": {
+    "title": "מונחי השיעור",
+    "search": "חיפוש מונחים...",
+    "noTerms": "אין מונחים לשיעור זה"
+  },
+  "instructor": {
+    "start": "התחל שידור",
+    "pause": "השהה",
+    "resume": "המשך",
+    "end": "סיים שידור",
+    "endConfirm": "בטוח שברצונך לסיים את השידור?",
+    "highlight": "סמן רגע חשוב",
+    "screenShare": "שיתוף מסך"
+  },
+  "reactions": {
+    "cooldown": "רגע..."
+  },
+  "session": {
+    "create": "צור שיעור חי",
+    "scheduledAt": "מתוכנן ל-",
+    "streamType": "סוג שידור",
+    "autoRecord": "הקלטה אוטומטית"
+  },
+  "summary": {
+    "title": "סיכום השיעור",
+    "generate": "צור סיכום",
+    "keyTopics": "נושאים מרכזיים",
+    "generating": "מייצר סיכום..."
+  }
+}

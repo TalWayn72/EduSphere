@@ -5,6 +5,7 @@ import { EmbeddingModule } from './embedding/embedding.module';
 import { HlsModule } from './hls/hls.module';
 import { YouTubeTranscriptModule } from './youtube/youtube-transcript.module';
 import { JargonModule } from './jargon/jargon.module';
+import { LiveTranscriptionModule } from './live-transcription/live-transcription.module';
 
 /**
  * Root application module for the transcription worker.
@@ -23,6 +24,7 @@ import { JargonModule } from './jargon/jargon.module';
     HlsModule,
     YouTubeTranscriptModule,
     JargonModule,
+    LiveTranscriptionModule,
   ],
 })
 export class AppModule {}

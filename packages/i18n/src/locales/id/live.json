@@ -1,0 +1,64 @@
+{
+  "badge": {
+    "live": "SIARAN LANGSUNG",
+    "preLive": "Terjadwal",
+    "ended": "Selesai",
+    "vodReady": "Rekaman Tersedia"
+  },
+  "viewer": {
+    "count": "{{count}} penonton"
+  },
+  "transcript": {
+    "waiting": "Menunggu transkripsi...",
+    "partial": "Mentranskrip..."
+  },
+  "chat": {
+    "placeholder": "Ketik pesan...",
+    "pinned": "Disematkan",
+    "replyingTo": "Membalas {{name}}"
+  },
+  "qa": {
+    "askPlaceholder": "Ajukan pertanyaan...",
+    "answered": "Terjawab",
+    "dismissed": "Diabaikan",
+    "upvote": "Dukung"
+  },
+  "notes": {
+    "placeholder": "Tulis catatan...",
+    "addNote": "Tambah Catatan",
+    "atTimestamp": "pada {{time}}"
+  },
+  "bookmarks": {
+    "bookmarked": "Ditandai!",
+    "bookmark": "Tandai"
+  },
+  "glossary": {
+    "title": "Istilah Pelajaran",
+    "search": "Cari istilah...",
+    "noTerms": "Tidak ada istilah untuk pelajaran ini"
+  },
+  "instructor": {
+    "start": "Mulai Siaran",
+    "pause": "Jeda",
+    "resume": "Lanjutkan",
+    "end": "Akhiri Siaran",
+    "endConfirm": "Apakah Anda yakin ingin mengakhiri siaran langsung?",
+    "highlight": "Tandai Momen Penting",
+    "screenShare": "Berbagi Layar"
+  },
+  "reactions": {
+    "cooldown": "Tunggu sebentar..."
+  },
+  "session": {
+    "create": "Buat Sesi Langsung",
+    "scheduledAt": "Dijadwalkan pada",
+    "streamType": "Jenis Siaran",
+    "autoRecord": "Rekam Otomatis"
+  },
+  "summary": {
+    "title": "Ringkasan Sesi",
+    "generate": "Buat Ringkasan",
+    "keyTopics": "Topik Utama",
+    "generating": "Membuat ringkasan..."
+  }
+}
