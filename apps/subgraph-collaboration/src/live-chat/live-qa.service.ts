@@ -23,7 +23,6 @@ import {
 } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import { publishQAUpdated } from './nats-pubsub.helper';
-import { LiveChatSubjects } from '@edusphere/nats-client';
 
 const INSTRUCTOR_ROLES = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'];
 
