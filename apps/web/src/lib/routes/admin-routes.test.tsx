@@ -100,7 +100,12 @@ describe('adminRoutes', () => {
     expect(paths).toContain('/admin/embeddings');
   });
 
-  it('has the expected total number of routes (50)', () => {
-    expect(adminRoutes.length).toBe(50);
+  it('includes jargon management page', () => {
+    const paths = adminRoutes.map((r) => r.path);
+    expect(paths).toContain('/admin/jargon');
+  });
+
+  it('has the expected total number of routes (51)', () => {
+    expect(adminRoutes.length).toBe(51);
   });
 });

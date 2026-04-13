@@ -140,6 +140,7 @@ export const PROTECTED_ROUTES_CONCRETE = [
   '/admin/auto-grading',
   '/admin/gap-analysis',
   '/admin/invoices',
+  '/admin/jargon',
   '/internal/investor-deck',
 ];
 

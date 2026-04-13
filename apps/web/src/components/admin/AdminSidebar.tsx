@@ -1,10 +1,12 @@
 /**
  * AdminSidebar — Left navigation sidebar for all admin pages.
  * Uses NavLink for active state detection.
+ * Items with `allowedRoles` are hidden for roles not in that list.
  */
 import React, { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuthRole } from '@/hooks/useAuthRole';
 import {
   LayoutDashboard,
   Palette,
@@ -35,6 +37,8 @@ interface NavItem {
   to: string;
   icon: React.ElementType;
   label: string;
+  /** If set, only users whose role is in this list will see this item. */
+  allowedRoles?: string[];
 }
 
 interface NavGroup {
@@ -50,6 +54,7 @@ const inactiveClass = `${linkBase} text-muted-foreground hover:text-foreground h
 
 export function AdminSidebar() {
   const { t } = useTranslation('admin');
+  const role = useAuthRole();
 
   const navGroups = useMemo(
     (): NavGroup[] => [
@@ -141,6 +146,7 @@ export function AdminSidebar() {
             to: '/admin/jargon',
             icon: BookMarked,
             label: t('sidebar.nav.jargon', 'Jargon'),
+            allowedRoles: ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'],
           },
         ],
       },
@@ -206,19 +212,24 @@ export function AdminSidebar() {
             <p className="text-xs font-semibold text-muted-foreground px-3 py-1 mt-4 first:mt-0 uppercase tracking-wider">
               {group.heading}
             </p>
-            {group.items.map(({ to, icon: Icon, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/admin'}
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{label}</span>
-              </NavLink>
-            ))}
+            {group.items
+              .filter(
+                ({ allowedRoles }) =>
+                  !allowedRoles || (role !== null && allowedRoles.includes(role))
+              )
+              .map(({ to, icon: Icon, label }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === '/admin'}
+                  className={({ isActive }) =>
+                    isActive ? activeClass : inactiveClass
+                  }
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
           </div>
         ))}
       </nav>

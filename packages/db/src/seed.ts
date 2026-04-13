@@ -12,6 +12,7 @@ import { seedAgentTemplates } from './seed/seed-agent-templates.js';
 import { seedAnnotationsDiscussions } from './seed/seed-annotations-discussions.js';
 import { seedExam } from './seed/seed-exam.js';
 import { seedKabbalahLesson } from './seed/seed-kabbalah-sefirat-haomer.js';
+import { seedJargonKabbalah } from './seed/seed-jargon-kabbalah.js';
 
 const { tenants, users, courses, modules, media_assets } = schema;
 
@@ -240,6 +241,9 @@ async function seed() {
     );
     await seedKabbalahLesson();
 
+    console.log('📖 Seeding Kabbalah jargon domain + 30 terms...');
+    await seedJargonKabbalah();
+
     console.log('✅ Seed completed successfully!');
     console.log('');
     console.log('📊 Summary:');
@@ -267,6 +271,9 @@ async function seed() {
     console.log('   - 1 ACTIVE exam blueprint + 10 MCQ items');
     console.log(
       '   - 1 Kabbalah lesson (ספירת העומר, YouTube 3QTC00L1x1w) + 67 enriched blocks (10 summary + 54 full transcript + 3 headings)'
+    );
+    console.log(
+      '   - 1 jargon domain (קבלה — ספירת העומר) + 30 terms + 10 occurrences'
     );
   } catch (error) {
     console.error('❌ Seed failed:', error);

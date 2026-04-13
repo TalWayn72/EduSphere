@@ -20,7 +20,7 @@ import type { JargonDomain } from '@/types/jargon.types';
 import { DomainsSidebar } from './JargonManagementPage.domains';
 import { TermsPanel } from './JargonManagementPage.terms';
 
-const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
+const CONTENT_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
 
 export function JargonManagementPage() {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export function JargonManagementPage() {
     ? (domains.find((d) => d.id === selectedDomainId) ?? null)
     : null;
 
-  if (!role || !ADMIN_ROLES.has(role)) {
+  if (!role || !CONTENT_ROLES.has(role)) {
     void navigate('/dashboard');
     return null;
   }

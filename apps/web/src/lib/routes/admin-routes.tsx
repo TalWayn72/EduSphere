@@ -247,6 +247,7 @@ const JargonManagementPage = lazy(() =>
 );
 
 const ADMIN_ROLES = { requiredRoles: ['ORG_ADMIN', 'SUPER_ADMIN'] };
+const CONTENT_ROLES = { requiredRoles: ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'] };
 
 /**
  * Admin routes — dashboard, settings, integrations, analytics, management.
@@ -416,6 +417,6 @@ export const adminRoutes: RouteObject[] = [
   },
   {
     path: '/admin/jargon',
-    element: guarded(<JargonManagementPage />, ADMIN_ROLES),
+    element: guarded(<JargonManagementPage />, CONTENT_ROLES),
   },
 ];
