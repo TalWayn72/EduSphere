@@ -8,7 +8,7 @@
  *  4. Cooldown disables all buttons
  *  5. After cooldown, buttons are re-enabled
  */
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 
