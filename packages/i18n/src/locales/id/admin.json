@@ -503,7 +503,11 @@
       "importTitle": "Import Terms from CSV",
       "importDescription": "Paste CSV content. Expected columns: canonicalForm, phoneticHint, altForms, definitionShort, language",
       "importButton": "Import",
-      "importing": "Importing..."
+      "importing": "Importing...",
+      "editTerm": "Edit Istilah",
+      "deleteTerm": "Hapus Istilah",
+      "updateSuccess": "Istilah berhasil diperbarui",
+      "deleteConfirm": "Apakah Anda yakin ingin menghapus istilah ini?"
     },
     "domainConfirmation": {
       "title": "Confirm Lesson Domains",

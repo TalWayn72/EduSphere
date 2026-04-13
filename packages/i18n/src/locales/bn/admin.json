@@ -503,7 +503,11 @@
       "importTitle": "Import Terms from CSV",
       "importDescription": "Paste CSV content. Expected columns: canonicalForm, phoneticHint, altForms, definitionShort, language",
       "importButton": "Import",
-      "importing": "Importing..."
+      "importing": "Importing...",
+      "editTerm": "পদ সম্পাদনা করুন",
+      "deleteTerm": "পদ মুছুন",
+      "updateSuccess": "পদ সফলভাবে আপডেট হয়েছে",
+      "deleteConfirm": "আপনি কি নিশ্চিত যে আপনি এই পদটি মুছতে চান?"
     },
     "domainConfirmation": {
       "title": "Confirm Lesson Domains",

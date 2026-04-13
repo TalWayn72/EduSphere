@@ -503,7 +503,11 @@
       "importTitle": "Import Terms from CSV",
       "importDescription": "Paste CSV content. Expected columns: canonicalForm, phoneticHint, altForms, definitionShort, language",
       "importButton": "Import",
-      "importing": "Importing..."
+      "importing": "Importing...",
+      "editTerm": "Modifier le terme",
+      "deleteTerm": "Supprimer le terme",
+      "updateSuccess": "Terme mis à jour avec succès",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce terme ?"
     },
     "domainConfirmation": {
       "title": "Confirm Lesson Domains",

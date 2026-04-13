@@ -488,7 +488,11 @@
       "importTitle": "ייבוא מונחים מ-CSV",
       "importDescription": "הדבק תוכן CSV. עמודות נדרשות: canonicalForm, phoneticHint, altForms, definitionShort, language",
       "importButton": "ייבא",
-      "importing": "מייבא..."
+      "importing": "מייבא...",
+      "editTerm": "עריכת מונח",
+      "deleteTerm": "מחיקת מונח",
+      "updateSuccess": "המונח עודכן בהצלחה",
+      "deleteConfirm": "האם אתה בטוח שברצונך למחוק מונח זה?"
     },
     "domainConfirmation": {
       "title": "אישור תחומי שיעור",
