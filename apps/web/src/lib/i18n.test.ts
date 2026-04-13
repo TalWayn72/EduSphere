@@ -56,12 +56,12 @@ describe('i18n translation files', () => {
   });
 
   // -------------------------------------------------------------------------
-  // 2. Total file count matches 10 locales x 15 namespaces = 150
+  // 2. Total file count matches 10 locales x 28 namespaces = 280
   // -------------------------------------------------------------------------
   describe('file count', () => {
-    it('has exactly 10 locales x 25 namespaces = 250 JSON files', () => {
+    it('has exactly 10 locales x 28 namespaces = 280 JSON files', () => {
       expect(SUPPORTED_LOCALES).toHaveLength(10);
-      expect(NAMESPACES).toHaveLength(25);
+      expect(NAMESPACES).toHaveLength(28);
 
       let count = 0;
       for (const locale of SUPPORTED_LOCALES) {
@@ -69,7 +69,7 @@ describe('i18n translation files', () => {
         const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
         count += files.length;
       }
-      expect(count).toBe(250);
+      expect(count).toBe(280);
     });
   });
 

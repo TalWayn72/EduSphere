@@ -6295,6 +6295,7 @@ type JargonTerm @join__type(graph: KNOWLEDGE) {
   phoneticHint: String
   altForms: [String!]!
   definitionShort: String
+  definitionFull: String
   language: String!
   source: JargonTermSource!
   confidence: Float

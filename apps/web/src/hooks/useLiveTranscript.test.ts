@@ -36,17 +36,17 @@ import type { LiveTranscriptSegment } from '@/types/live-session.types';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeSegment(
-  index: number,
+  segmentIndex: number,
   text: string,
   isFinal = true
 ): LiveTranscriptSegment {
   return {
-    index,
+    id: `seg-${segmentIndex}`,
+    segmentIndex,
     text,
     isFinal,
-    speakerLabel: null,
-    startMs: index * 1000,
-    endMs: index * 1000 + 500,
+    startTime: segmentIndex,
+    endTime: segmentIndex + 0.5,
     jargonHits: [],
   };
 }
@@ -105,7 +105,9 @@ describe('useLiveTranscript', () => {
       expect(result.current.segments).toHaveLength(3);
     });
 
-    expect(result.current.segments.map((s) => s.index)).toEqual([0, 1, 2]);
+    expect(result.current.segments.map((s) => s.segmentIndex)).toEqual([
+      0, 1, 2,
+    ]);
   });
 
   it('starts with empty segments when query returns empty array', async () => {
@@ -160,7 +162,7 @@ describe('useLiveTranscript', () => {
     const { result } = renderHook(() => useLiveTranscript('sess-1'));
 
     await waitFor(() => {
-      const seg = result.current.segments.find((s) => s.index === 0);
+      const seg = result.current.segments.find((s) => s.segmentIndex === 0);
       expect(seg?.isFinal).toBe(true);
     });
 

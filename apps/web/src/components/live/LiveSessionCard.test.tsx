@@ -4,9 +4,9 @@
  * Covers:
  *  1. LIVE phase: shows LIVE badge
  *  2. LIVE phase: shows viewer count
- *  3. SCHEDULED phase: shows countdown badge
+ *  3. PRE_LIVE phase: shows countdown badge
  *  4. ENDED phase: shows "Ended" badge
- *  5. CANCELLED phase: shows "Ended" badge
+ *  5. VOD_READY phase: shows "Ended" badge
  *  6. PAUSED phase: shows "Paused" badge
  *  7. Renders title
  *  8. Renders instructor name when provided
@@ -60,22 +60,17 @@ function makeSession(
 ): LiveStreamSession {
   return {
     id: 'sess-1',
-    title: 'React Fundamentals Live',
-    courseId: 'course-1',
-    instructorId: 'instr-1',
-    phase: 'LIVE',
-    streamType: 'BROADCAST',
-    streamUrl: 'https://stream.test',
-    thumbnailUrl: null,
+    lessonId: 'lesson-1',
+    meetingName: 'React Fundamentals Live',
+    status: 'LIVE',
+    streamType: 'BBB',
     viewerCount: 55,
     maxViewers: null,
     scheduledAt: null,
-    startedAt: '2026-01-01T10:00:00Z',
-    endedAt: null,
     isScreenSharing: false,
-    highlightMoments: [],
-    recordingUrl: null,
-    createdAt: '2026-01-01T09:00:00Z',
+    // Optional legacy/compat fields
+    title: 'React Fundamentals Live',
+    phase: 'LIVE',
     ...overrides,
   };
 }
@@ -101,42 +96,48 @@ describe('LiveSessionCard', () => {
     expect(screen.getByText('Dr. Cohen')).toBeInTheDocument();
   });
 
-  it('LIVE phase shows LIVE badge text', () => {
-    renderCard(makeSession({ phase: 'LIVE' }));
+  it('LIVE status shows LIVE badge text', () => {
+    renderCard(makeSession({ status: 'LIVE', phase: 'LIVE' }));
     expect(screen.getByText('LIVE')).toBeInTheDocument();
   });
 
-  it('LIVE phase shows viewer count', () => {
-    renderCard(makeSession({ phase: 'LIVE', viewerCount: 99 }));
+  it('LIVE status shows viewer count', () => {
+    renderCard(makeSession({ status: 'LIVE', phase: 'LIVE', viewerCount: 99 }));
     expect(screen.getByTestId('viewer-count')).toHaveTextContent('99');
   });
 
-  it('ENDED phase shows Ended badge', () => {
-    renderCard(makeSession({ phase: 'ENDED' }));
+  it('ENDED status shows Ended badge', () => {
+    renderCard(makeSession({ status: 'ENDED', phase: 'ENDED' }));
     expect(screen.getByText('Ended')).toBeInTheDocument();
   });
 
-  it('CANCELLED phase shows Ended badge', () => {
-    renderCard(makeSession({ phase: 'CANCELLED' }));
+  it('VOD_READY status shows Ended badge', () => {
+    renderCard(makeSession({ status: 'VOD_READY', phase: 'VOD_READY' }));
     expect(screen.getByText('Ended')).toBeInTheDocument();
   });
 
-  it('PAUSED phase shows Paused badge', () => {
-    renderCard(makeSession({ phase: 'PAUSED' }));
+  it('PAUSED status shows Paused badge', () => {
+    renderCard(makeSession({ status: 'PAUSED', phase: 'PAUSED' }));
     expect(screen.getByText('Paused')).toBeInTheDocument();
   });
 
-  it('SCHEDULED phase shows countdown badge when scheduledAt is set', () => {
+  it('PRE_LIVE status shows countdown badge when scheduledAt is set', () => {
     // Set scheduledAt far in future so countdown is non-empty
     const future = new Date(Date.now() + 3_600_000).toISOString();
-    renderCard(makeSession({ phase: 'SCHEDULED', scheduledAt: future }));
+    renderCard(
+      makeSession({
+        status: 'PRE_LIVE',
+        phase: 'PRE_LIVE',
+        scheduledAt: future,
+      })
+    );
     // The badge containing countdown text should appear (it matches /h|m|s/)
     const badges = screen.getAllByText(/\d+[hms]/);
     expect(badges.length).toBeGreaterThan(0);
   });
 
-  it('LIVE phase does not show Ended badge', () => {
-    renderCard(makeSession({ phase: 'LIVE' }));
+  it('LIVE status does not show Ended badge', () => {
+    renderCard(makeSession({ status: 'LIVE', phase: 'LIVE' }));
     expect(screen.queryByText('Ended')).not.toBeInTheDocument();
   });
 

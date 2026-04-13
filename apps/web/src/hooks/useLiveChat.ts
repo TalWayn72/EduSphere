@@ -99,20 +99,20 @@ export function useLiveChat(sessionId: string): UseLiveChatReturn {
   );
 
   const pinMessage = useCallback(
-    async (messageId: string, pinned: boolean) => {
-      await executePin({ sessionId, messageId, pinned });
+    async (messageId: string, _pinned?: boolean) => {
+      await executePin({ messageId });
     },
-    [sessionId, executePin]
+    [executePin]
   );
 
   const deleteMessage = useCallback(
     async (messageId: string) => {
-      const result = await executeDelete({ sessionId, messageId });
+      const result = await executeDelete({ messageId });
       if (!result.error) {
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
       }
     },
-    [sessionId, executeDelete]
+    [executeDelete]
   );
 
   return {

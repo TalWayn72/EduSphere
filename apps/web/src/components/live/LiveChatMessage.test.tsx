@@ -3,12 +3,12 @@
  *
  * Covers:
  *  1. Renders message content text
- *  2. Renders display name and timestamp
+ *  2. Renders userId in header
  *  3. Shows pin indicator when isPinned=true
  *  4. No pin badge when isPinned=false
  *  5. System messages render centered/italic style
  *  6. System messages do not show avatar
- *  7. Reply indicator shown when replyToId is set
+ *  7. Reply indicator shown when replyTo is set
  */
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -30,13 +30,11 @@ function makeMessage(
   return {
     id: 'msg-1',
     sessionId: 'sess-1',
-    userId: 'user-1',
-    displayName: 'Alice',
-    avatarUrl: null,
+    userId: 'alice',
     content: 'Hello world',
     messageType: 'TEXT',
     isPinned: false,
-    replyToId: null,
+    replyTo: null,
     createdAt: '2026-01-01T10:00:00Z',
     ...overrides,
   };
@@ -54,11 +52,9 @@ describe('LiveChatMessage', () => {
     expect(screen.getByText('Test message content')).toBeInTheDocument();
   });
 
-  it('renders display name', () => {
-    render(
-      <LiveChatMessage message={makeMessage({ displayName: 'Bob Smith' })} />
-    );
-    expect(screen.getByText('Bob Smith')).toBeInTheDocument();
+  it('renders userId in header', () => {
+    render(<LiveChatMessage message={makeMessage({ userId: 'bob-smith' })} />);
+    expect(screen.getByText('bob-smith')).toBeInTheDocument();
   });
 
   it('does not show pin icon when isPinned is false', () => {
@@ -105,35 +101,25 @@ describe('LiveChatMessage', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows reply indicator when replyToId is set', () => {
-    render(<LiveChatMessage message={makeMessage({ replyToId: 'msg-0' })} />);
-    expect(screen.getByText(/reply/i)).toBeInTheDocument();
-  });
-
-  it('does not show reply indicator when replyToId is null', () => {
-    render(<LiveChatMessage message={makeMessage({ replyToId: null })} />);
-    expect(screen.queryByText(/reply/i)).not.toBeInTheDocument();
-  });
-
-  it('shows avatar initials when no avatarUrl', () => {
+  it('shows reply indicator when replyTo is set', () => {
     render(
       <LiveChatMessage
-        message={makeMessage({ displayName: 'Alice Bob', avatarUrl: null })}
-      />
-    );
-    // Initials "AB" should be rendered in the avatar div
-    expect(screen.getByText('AB')).toBeInTheDocument();
-  });
-
-  it('renders img tag when avatarUrl is provided', () => {
-    const { container } = render(
-      <LiveChatMessage
         message={makeMessage({
-          avatarUrl: 'https://cdn.example.com/alice.png',
+          replyTo: { id: 'msg-0', content: 'Original message' },
         })}
       />
     );
-    const img = container.querySelector('img');
-    expect(img?.src).toBe('https://cdn.example.com/alice.png');
+    expect(screen.getByText(/reply/i)).toBeInTheDocument();
+  });
+
+  it('does not show reply indicator when replyTo is null', () => {
+    render(<LiveChatMessage message={makeMessage({ replyTo: null })} />);
+    expect(screen.queryByText(/reply/i)).not.toBeInTheDocument();
+  });
+
+  it('renders avatar initials from userId', () => {
+    render(<LiveChatMessage message={makeMessage({ userId: 'alice' })} />);
+    // initials('alice') = 'A'
+    expect(screen.getByText('A')).toBeInTheDocument();
   });
 });
