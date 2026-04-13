@@ -131,7 +131,14 @@ export function UnifiedLearningPage() {
       .join('\n\n');
   })();
 
-  const documentContent: string = rawDocumentContent || enrichedMarkdown;
+  // Only use rawDocumentContent for true document types (MARKDOWN / PDF /
+  // RICH_DOCUMENT). For YOUTUBE content items the `content` field holds the
+  // video ID string — passing it to the document panel renders "3QTC00L1x1w"
+  // as plain text. For all other cases (lesson IDs, unknown types) fall back
+  // to the synthesised enrichedMarkdown from the enriched lesson blocks.
+  const documentContent: string = isDocumentContent
+    ? rawDocumentContent || enrichedMarkdown
+    : enrichedMarkdown || (itemResult.error ? mockDocumentContent : '');
 
   // ── Subtitle tracks (empty array when query not available) ──
   const subtitleTracks = useSubtitleTracks(contentId);

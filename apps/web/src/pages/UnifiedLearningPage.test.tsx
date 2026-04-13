@@ -322,4 +322,31 @@ describe('UnifiedLearningPage', () => {
     renderPage();
     expect(screen.getByTestId('transcript-count')).toHaveTextContent('0');
   });
+
+  it('BUG-FIX: does not render YouTube video ID as document content for YOUTUBE content items', () => {
+    // REGRESSION: when contentType is not MARKDOWN/PDF/RICH_DOCUMENT (e.g. VIDEO/YOUTUBE),
+    // the content field must NOT be passed to the document panel as text.
+    // Previously rawDocumentContent='3QTC00L1x1w' was passed through as document content.
+    renderPage('lesson-1', '', {
+      data: {
+        contentItem: {
+          id: 'lesson-1',
+          title: 'Lesson',
+          contentType: 'VIDEO',
+          // Simulate the video ID stored in the content field
+          content: '3QTC00L1x1w',
+        },
+      },
+    });
+    // Document panel should not show the YouTube video ID as text
+    const docContent = screen.queryByTestId('doc-content');
+    if (docContent) {
+      expect(docContent.textContent).not.toContain('3QTC00L1x1w');
+    }
+    // hasDocument should be false since there are no real document blocks
+    expect(screen.getByTestId('document-panel')).toHaveAttribute(
+      'data-has-doc',
+      'false'
+    );
+  });
 });
