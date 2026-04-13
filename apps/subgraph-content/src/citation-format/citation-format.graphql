@@ -1,0 +1,33 @@
+# ─── Citation Format SDL (Phase 3 — Course-Level Citation Style) ──────────────
+# Manages how a course cites sources — preset or custom format chosen by instructor.
+
+type CitationFormatConfig {
+  id: ID!
+  courseId: ID!
+  presetName: String!
+  formatDescription: String
+  parsedStructure: JSON
+  isActive: Boolean!
+}
+
+extend type Query {
+  """
+  List active citation format configs for a course.
+  """
+  citationFormatConfigs(courseId: ID!): [CitationFormatConfig!]!
+    @authenticated
+}
+
+extend type Mutation {
+  """
+  Create or update a citation format config for a course.
+  presetName values: JEWISH_TEXTS | APA | MLA | CHICAGO | CUSTOM
+  """
+  setCitationFormat(
+    courseId: ID!
+    presetName: String!
+    formatDescription: String
+  ): CitationFormatConfig!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}

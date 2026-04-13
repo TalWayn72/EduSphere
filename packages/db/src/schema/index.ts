@@ -238,5 +238,8 @@ export * from './jargon';
 // Glossary Wiki — Phase 2.1 (glossary entries + lesson cross-references)
 export * from './glossary';
 
+// Citation Format Configs — Phase 3 (course-level citation style)
+export * from './citation-format';
+
 // Drizzle relations — type-safe relational query API for 5 core entity chains
 export * from './relations';

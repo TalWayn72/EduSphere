@@ -1,0 +1,39 @@
+{
+  "citation": {
+    "formatWizard": {
+      "title": "Formato de cita",
+      "choosePreset": "Elegir formato de cita",
+      "jewishTexts": "Textos sagrados judíos",
+      "jewishTextsDesc": "Formato Libro / Parte / Página / Columna",
+      "apa": "APA",
+      "apaDesc": "Autor (Año). Título. Editorial.",
+      "mla": "MLA",
+      "mlaDesc": "Autor. Título. Editorial, Año.",
+      "chicago": "Chicago",
+      "chicagoDesc": "Autor. Título. Lugar: Editorial, Año.",
+      "custom": "Personalizado",
+      "customDesc": "Describe tu formato de cita",
+      "descriptionLabel": "Describe tu formato de cita",
+      "descriptionPlaceholder": "p. ej., Nombre del libro, luego capítulo, luego versículo...",
+      "confirm": "Confirmar",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "save": "Guardar formato",
+      "saved": "Formato guardado correctamente"
+    },
+    "sourceLinking": {
+      "title": "Referencias de fuente",
+      "linkSource": "Vincular fuente",
+      "uploadSource": "Subir fuente",
+      "noSources": "No hay fuentes disponibles",
+      "noCitations": "No se detectaron citas"
+    },
+    "verification": {
+      "verified": "Verificado",
+      "unverified": "Sin verificar",
+      "failed": "Error",
+      "edited": "Editado",
+      "confidence": "Confianza"
+    }
+  }
+}

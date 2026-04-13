@@ -92,6 +92,13 @@
       "when": 1744502400000,
       "tag": "0050_glossary_wiki_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1744588800000,
+      "tag": "0051_citation_format_configs",
+      "breakpoints": true
     }
   ]
 }

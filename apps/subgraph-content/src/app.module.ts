@@ -36,6 +36,7 @@ import { AeoModule } from './aeo/aeo.module';
 import { ExamModule } from './exam/exam.module';
 import { PsychometricsModule } from './psychometrics/psychometrics.module';
 import { EnrichedLessonModule } from './enriched-lesson/enriched-lesson.module';
+import { CitationFormatModule } from './citation-format/citation-format.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { EnrichedLessonModule } from './enriched-lesson/enriched-lesson.module';
     ExamModule,
     PsychometricsModule,
     EnrichedLessonModule,
+    CitationFormatModule,
   ],
 })
 export class AppModule {}

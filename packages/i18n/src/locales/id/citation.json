@@ -1,0 +1,39 @@
+{
+  "citation": {
+    "formatWizard": {
+      "title": "Format Sitasi",
+      "choosePreset": "Pilih format sitasi",
+      "jewishTexts": "Teks Suci Yahudi",
+      "jewishTextsDesc": "Format Buku / Bagian / Halaman / Kolom",
+      "apa": "APA",
+      "apaDesc": "Penulis (Tahun). Judul. Penerbit.",
+      "mla": "MLA",
+      "mlaDesc": "Penulis. Judul. Penerbit, Tahun.",
+      "chicago": "Chicago",
+      "chicagoDesc": "Penulis. Judul. Tempat: Penerbit, Tahun.",
+      "custom": "Kustom",
+      "customDesc": "Jelaskan format sitasi Anda",
+      "descriptionLabel": "Jelaskan format sitasi Anda",
+      "descriptionPlaceholder": "mis., Nama buku, lalu bab, lalu ayat...",
+      "confirm": "Konfirmasi",
+      "back": "Kembali",
+      "next": "Berikutnya",
+      "save": "Simpan Format",
+      "saved": "Format berhasil disimpan"
+    },
+    "sourceLinking": {
+      "title": "Referensi Sumber",
+      "linkSource": "Tautkan Sumber",
+      "uploadSource": "Unggah Sumber",
+      "noSources": "Tidak ada sumber tersedia",
+      "noCitations": "Tidak ada sitasi terdeteksi"
+    },
+    "verification": {
+      "verified": "Terverifikasi",
+      "unverified": "Belum Diverifikasi",
+      "failed": "Gagal",
+      "edited": "Diedit",
+      "confidence": "Kepercayaan"
+    }
+  }
+}

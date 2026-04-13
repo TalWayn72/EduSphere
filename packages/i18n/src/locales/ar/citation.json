@@ -1,0 +1,39 @@
+{
+  "citation": {
+    "formatWizard": {
+      "title": "تنسيق الاستشهاد",
+      "choosePreset": "اختر تنسيق الاستشهاد",
+      "jewishTexts": "النصوص اليهودية المقدسة",
+      "jewishTextsDesc": "تنسيق الكتاب / الجزء / الصفحة / العمود",
+      "apa": "APA",
+      "apaDesc": "المؤلف (السنة). العنوان. الناشر.",
+      "mla": "MLA",
+      "mlaDesc": "المؤلف. العنوان. الناشر، السنة.",
+      "chicago": "شيكاغو",
+      "chicagoDesc": "المؤلف. العنوان. المكان: الناشر، السنة.",
+      "custom": "مخصص",
+      "customDesc": "صف تنسيق الاستشهاد الخاص بك",
+      "descriptionLabel": "صف تنسيق الاستشهاد الخاص بك",
+      "descriptionPlaceholder": "مثال: اسم الكتاب، ثم الفصل، ثم الآية...",
+      "confirm": "تأكيد",
+      "back": "رجوع",
+      "next": "التالي",
+      "save": "حفظ التنسيق",
+      "saved": "تم حفظ التنسيق بنجاح"
+    },
+    "sourceLinking": {
+      "title": "مراجع المصادر",
+      "linkSource": "ربط المصدر",
+      "uploadSource": "رفع المصدر",
+      "noSources": "لا توجد مصادر متاحة",
+      "noCitations": "لم يتم اكتشاف استشهادات"
+    },
+    "verification": {
+      "verified": "تم التحقق",
+      "unverified": "غير محقق",
+      "failed": "فشل",
+      "edited": "تم التعديل",
+      "confidence": "مستوى الثقة"
+    }
+  }
+}

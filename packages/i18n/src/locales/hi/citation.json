@@ -1,0 +1,39 @@
+{
+  "citation": {
+    "formatWizard": {
+      "title": "उद्धरण प्रारूप",
+      "choosePreset": "उद्धरण प्रारूप चुनें",
+      "jewishTexts": "यहूदी पवित्र ग्रंथ",
+      "jewishTextsDesc": "पुस्तक / भाग / पृष्ठ / स्तंभ प्रारूप",
+      "apa": "APA",
+      "apaDesc": "लेखक (वर्ष)। शीर्षक। प्रकाशक।",
+      "mla": "MLA",
+      "mlaDesc": "लेखक। शीर्षक। प्रकाशक, वर्ष।",
+      "chicago": "शिकागो",
+      "chicagoDesc": "लेखक। शीर्षक। स्थान: प्रकाशक, वर्ष।",
+      "custom": "कस्टम",
+      "customDesc": "अपना उद्धरण प्रारूप वर्णन करें",
+      "descriptionLabel": "अपना उद्धरण प्रारूप वर्णन करें",
+      "descriptionPlaceholder": "उदा., पुस्तक का नाम, फिर अध्याय, फिर श्लोक...",
+      "confirm": "पुष्टि करें",
+      "back": "वापस",
+      "next": "अगला",
+      "save": "प्रारूप सहेजें",
+      "saved": "प्रारूप सफलतापूर्वक सहेजा गया"
+    },
+    "sourceLinking": {
+      "title": "स्रोत संदर्भ",
+      "linkSource": "स्रोत लिंक करें",
+      "uploadSource": "स्रोत अपलोड करें",
+      "noSources": "कोई स्रोत उपलब्ध नहीं",
+      "noCitations": "कोई उद्धरण नहीं मिला"
+    },
+    "verification": {
+      "verified": "सत्यापित",
+      "unverified": "असत्यापित",
+      "failed": "विफल",
+      "edited": "संपादित",
+      "confidence": "आत्मविश्वास"
+    }
+  }
+}

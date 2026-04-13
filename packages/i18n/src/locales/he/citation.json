@@ -1,0 +1,39 @@
+{
+  "citation": {
+    "formatWizard": {
+      "title": "פורמט ציטוט",
+      "choosePreset": "בחר פורמט ציטוט",
+      "jewishTexts": "טקסטים יהודיים",
+      "jewishTextsDesc": "פורמט ספר / חלק / עמוד / טור",
+      "apa": "APA",
+      "apaDesc": "מחבר (שנה). כותרת. מוציא לאור.",
+      "mla": "MLA",
+      "mlaDesc": "מחבר. כותרת. מוציא לאור, שנה.",
+      "chicago": "שיקגו",
+      "chicagoDesc": "מחבר. כותרת. מקום: מוציא לאור, שנה.",
+      "custom": "מותאם אישית",
+      "customDesc": "תאר את פורמט הציטוט שלך",
+      "descriptionLabel": "תאר את פורמט הציטוט שלך",
+      "descriptionPlaceholder": "לדוגמה: שם הספר, פרק, פסוק...",
+      "confirm": "אישור",
+      "back": "חזרה",
+      "next": "הבא",
+      "save": "שמור פורמט",
+      "saved": "הפורמט נשמר בהצלחה"
+    },
+    "sourceLinking": {
+      "title": "הפניות למקורות",
+      "linkSource": "קישור מקור",
+      "uploadSource": "העלאת מקור",
+      "noSources": "אין מקורות זמינים",
+      "noCitations": "לא זוהו ציטוטים"
+    },
+    "verification": {
+      "verified": "מאומת",
+      "unverified": "לא מאומת",
+      "failed": "נכשל",
+      "edited": "נערך",
+      "confidence": "רמת ביטחון"
+    }
+  }
+}

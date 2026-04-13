@@ -182,7 +182,7 @@ export const lesson_citations = pgTable('lesson_citations', {
   column: text('column'),
   paragraph: text('paragraph'),
   match_status: text('match_status', {
-    enum: ['VERIFIED', 'UNVERIFIED', 'FAILED'],
+    enum: ['VERIFIED', 'UNVERIFIED', 'FAILED', 'EDITED'],
   })
     .notNull()
     .default('UNVERIFIED'),

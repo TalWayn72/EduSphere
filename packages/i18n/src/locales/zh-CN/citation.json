@@ -1,0 +1,39 @@
+{
+  "citation": {
+    "formatWizard": {
+      "title": "引用格式",
+      "choosePreset": "选择引用格式",
+      "jewishTexts": "犹太圣典",
+      "jewishTextsDesc": "书 / 部分 / 页 / 列 格式",
+      "apa": "APA",
+      "apaDesc": "作者（年份）。标题。出版社。",
+      "mla": "MLA",
+      "mlaDesc": "作者。标题。出版社，年份。",
+      "chicago": "芝加哥",
+      "chicagoDesc": "作者。标题。地点：出版社，年份。",
+      "custom": "自定义",
+      "customDesc": "描述您的引用格式",
+      "descriptionLabel": "描述您的引用格式",
+      "descriptionPlaceholder": "例如：书名，然后章节，然后段落...",
+      "confirm": "确认",
+      "back": "返回",
+      "next": "下一步",
+      "save": "保存格式",
+      "saved": "格式保存成功"
+    },
+    "sourceLinking": {
+      "title": "来源参考",
+      "linkSource": "链接来源",
+      "uploadSource": "上传来源",
+      "noSources": "没有可用来源",
+      "noCitations": "未检测到引用"
+    },
+    "verification": {
+      "verified": "已验证",
+      "unverified": "未验证",
+      "failed": "失败",
+      "edited": "已编辑",
+      "confidence": "置信度"
+    }
+  }
+}
