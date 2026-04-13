@@ -898,6 +898,18 @@ type Query
   lessonJargonOccurrences(lessonId: ID!): [JargonOccurrence!]!
     @join__field(graph: KNOWLEDGE)
     @authenticated
+  glossaryEntry(termId: ID!): GlossaryEntry
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  glossaryEntries(domainId: ID!, limit: Int = 50): [GlossaryEntry!]!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  glossarySearch(query: String!, limit: Int = 20): [GlossaryEntry!]!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+  citationFormatConfigs(courseId: ID!): [CitationFormatConfig!]!
+    @join__field(graph: CONTENT)
+    @authenticated
 }
 
 type Mutation
@@ -1968,6 +1980,25 @@ type Mutation
     @join__field(graph: KNOWLEDGE)
     @authenticated
     @requiresScopes(scopes: [["course:write"]])
+  updateGlossaryWiki(termId: ID!, wikiContent: String!): GlossaryEntry!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  publishGlossaryEntry(termId: ID!): GlossaryEntry!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  aggregateGlossaryDefinition(termId: ID!): GlossaryEntry!
+    @join__field(graph: KNOWLEDGE)
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
+  setCitationFormat(
+    courseId: ID!
+    presetName: String!
+    formatDescription: String
+  ): CitationFormatConfig!
+    @join__field(graph: CONTENT)
+    @authenticated
 }
 
 type Subscription
@@ -6028,4 +6059,31 @@ input AddJargonTermInput @join__type(graph: KNOWLEDGE) {
 input ConfirmDomainInput @join__type(graph: KNOWLEDGE) {
   lessonId: ID!
   domainIds: [ID!]!
+}
+
+type GlossaryEntry @join__type(graph: KNOWLEDGE) {
+  id: ID!
+  term: JargonTerm!
+  wikiContent: String
+  aggregatedDefinition: String
+  isPublished: Boolean!
+  lessonRefs: [GlossaryLessonRef!]!
+  crossReferences: [JargonTerm!]!
+}
+
+type GlossaryLessonRef @join__type(graph: KNOWLEDGE) {
+  lessonId: ID!
+  lessonTitle: String
+  occurrenceCount: Int!
+  centralityScore: Float!
+  firstMentionTime: Float
+}
+
+type CitationFormatConfig @join__type(graph: CONTENT) {
+  id: ID!
+  courseId: ID!
+  presetName: String!
+  formatDescription: String
+  parsedStructure: JSON
+  isActive: Boolean!
 }
