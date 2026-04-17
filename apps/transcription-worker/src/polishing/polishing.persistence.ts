@@ -8,13 +8,14 @@
  */
 import { Logger } from '@nestjs/common';
 import { db, schema, withTenantContext, eq } from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 import type { FormattedBlock, PolishingState } from '@edusphere/langgraph-workflows';
 
 const logger = new Logger('PolishingPersistence');
 
 const AUTO_PUBLISH_THRESHOLD = 0.95;
 
-type TenantCtx = { tenantId: string; userId: string; userRole: string };
+type TenantCtx = TenantContext;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 

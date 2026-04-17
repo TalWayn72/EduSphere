@@ -14,7 +14,12 @@
  * DB persistence is split into polishing.persistence.ts to keep file under 300 lines.
  */
 import { Injectable, Logger } from '@nestjs/common';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createOllama } from 'ollama-ai-provider';
+import { ollamaConfig } from '@edusphere/config';
+import type { LanguageModel } from 'ai';
 import { db, schema, withTenantContext, eq, and, asc, isNull } from '@edusphere/db';
+import type { TenantContext } from '@edusphere/db';
 import { NatsService } from '../nats/nats.service';
 import {
   detectLessonDomains,
@@ -39,9 +44,19 @@ import type {
 // once transcript-polishing-workflow.ts is built and added to the package index.
 import { createTranscriptPolishingWorkflow } from '@edusphere/langgraph-workflows';
 
+function buildPolishingModel(): LanguageModel {
+  const openaiKey = process.env.OPENAI_API_KEY;
+  if (openaiKey) {
+    const openai = createOpenAI({ apiKey: openaiKey });
+    return openai('gpt-4o-mini') as unknown as LanguageModel;
+  }
+  const ollama = createOllama({ baseURL: `${ollamaConfig.url}/api` });
+  return ollama('llama3.2') as unknown as LanguageModel;
+}
+
 const AUTO_PUBLISH_THRESHOLD = 0.95;
 
-type TenantCtx = { tenantId: string; userId: string; userRole: string };
+type TenantCtx = TenantContext;
 type SegmentRow = { id: string; start_time: string; end_time: string; text: string };
 
 @Injectable()
@@ -102,7 +117,7 @@ export class PolishingOrchestratorService {
         progress: 0,
       };
 
-      const workflow = createTranscriptPolishingWorkflow();
+      const workflow = createTranscriptPolishingWorkflow({ model: buildPolishingModel() });
       const result = await this.runWithProgress(
         workflow,
         initialState,
