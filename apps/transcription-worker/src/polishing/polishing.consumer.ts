@@ -1,9 +1,12 @@
 /**
  * PolishingConsumer
  *
- * NATS consumer for `EDUSPHERE.jargon.detection.completed`.
- * Triggers the transcript polishing pipeline for each lesson that completes
- * jargon detection.
+ * NATS consumer for two subjects:
+ *  1. `EDUSPHERE.jargon.detection.completed` — automatic pipeline trigger after
+ *     jargon detection finishes (worker-to-worker handoff).
+ *  2. `EDUSPHERE.polishing.started` — manual trigger published by the
+ *     `regeneratePolishedTranscript` mutation when an instructor clicks
+ *     "Start AI Polishing". The DB record is already created; we receive its id.
  *
  * Follows the pattern established in jargon-post-processor.consumer.ts:
  * direct NATS connection with queue group for horizontal scaling.
@@ -23,7 +26,8 @@ import {
   isJargonDetectionCompleted,
 } from './polishing.events';
 
-const SUBJECT = 'EDUSPHERE.jargon.detection.completed';
+const JARGON_SUBJECT = 'EDUSPHERE.jargon.detection.completed';
+const POLISHING_STARTED_SUBJECT = 'EDUSPHERE.polishing.started';
 const QUEUE_GROUP = 'polishing-workers';
 
 const JargonCompletedSchema = z.object({
@@ -36,7 +40,15 @@ const JargonCompletedSchema = z.object({
   timestamp: z.string(),
 });
 
+const PolishingStartedSchema = z.object({
+  lessonId: z.string().uuid(),
+  tenantId: z.string().uuid(),
+  polishedTranscriptId: z.string().uuid(),
+  timestamp: z.string(),
+});
+
 type JargonCompletedMsg = z.infer<typeof JargonCompletedSchema>;
+type PolishingStartedMsg = z.infer<typeof PolishingStartedSchema>;
 
 @Injectable()
 export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
@@ -74,42 +86,73 @@ export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
 
   private async startConsuming(): Promise<void> {
     if (!this.connection) return;
+    await Promise.all([
+      this.subscribeJargonCompleted(),
+      this.subscribePolishingStarted(),
+    ]);
+  }
 
-    const sub = this.connection.subscribe(SUBJECT, {
+  private async subscribeJargonCompleted(): Promise<void> {
+    if (!this.connection) return;
+    const sub = this.connection.subscribe(JARGON_SUBJECT, {
       queue: QUEUE_GROUP,
     });
-    this.logger.log(`Subscribed to ${SUBJECT} (queue: ${QUEUE_GROUP})`);
-
-    (async () => {
+    this.logger.log(
+      `Subscribed to ${JARGON_SUBJECT} (queue: ${QUEUE_GROUP})`
+    );
+    void (async () => {
       for await (const msg of sub) {
         try {
-          const raw = this.sc.decode(msg.data);
-          const parsed = JSON.parse(raw) as unknown;
-
+          const parsed = JSON.parse(this.sc.decode(msg.data)) as unknown;
           if (!isJargonDetectionCompleted(parsed)) {
             this.logger.warn('Received malformed jargon.detection.completed');
             continue;
           }
-
           const payload = JargonCompletedSchema.parse(parsed);
           await this.handleJargonCompleted(payload);
         } catch (err) {
-          this.logger.error({ err }, `Failed to handle ${SUBJECT}`);
+          this.logger.error({ err }, `Failed to handle ${JARGON_SUBJECT}`);
         }
       }
-    })().catch((err) => {
-      this.logger.error(
-        { err },
-        'Polishing consumer subscription loop crashed'
-      );
+    })();
+  }
+
+  private async subscribePolishingStarted(): Promise<void> {
+    if (!this.connection) return;
+    const sub = this.connection.subscribe(POLISHING_STARTED_SUBJECT, {
+      queue: QUEUE_GROUP,
     });
+    this.logger.log(
+      `Subscribed to ${POLISHING_STARTED_SUBJECT} (queue: ${QUEUE_GROUP})`
+    );
+    void (async () => {
+      for await (const msg of sub) {
+        try {
+          const parsed = JSON.parse(this.sc.decode(msg.data)) as unknown;
+          const result = PolishingStartedSchema.safeParse(parsed);
+          if (!result.success) {
+            this.logger.warn(
+              { issues: result.error.issues },
+              'Received malformed polishing.started payload'
+            );
+            continue;
+          }
+          await this.handlePolishingStarted(result.data);
+        } catch (err) {
+          this.logger.error(
+            { err },
+            `Failed to handle ${POLISHING_STARTED_SUBJECT}`
+          );
+        }
+      }
+    })();
   }
 
   private async handleJargonCompleted(
     payload: JargonCompletedMsg
   ): Promise<void> {
     const { lessonId, tenantId } = payload;
-    this.logger.log({ lessonId }, 'Starting transcript polishing');
+    this.logger.log({ lessonId }, 'Starting transcript polishing (auto)');
 
     try {
       await this.nats.publish(POLISHING_EVENTS.STARTED, {
@@ -120,10 +163,40 @@ export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
 
       await this.orchestrator.startPolishing(lessonId, tenantId);
     } catch (err) {
-      this.logger.error({ err, lessonId }, 'Polishing pipeline failed');
+      this.logger.error({ err, lessonId }, 'Polishing pipeline failed (auto)');
       await this.nats.publish(POLISHING_EVENTS.FAILED, {
         lessonId,
         tenantId,
+        errorMessage: err instanceof Error ? err.message : String(err),
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  private async handlePolishingStarted(
+    payload: PolishingStartedMsg
+  ): Promise<void> {
+    const { lessonId, tenantId, polishedTranscriptId } = payload;
+    this.logger.log(
+      { lessonId, polishedTranscriptId },
+      'Starting transcript polishing (manual regenerate)'
+    );
+
+    try {
+      await this.orchestrator.resumePolishing(
+        lessonId,
+        tenantId,
+        polishedTranscriptId
+      );
+    } catch (err) {
+      this.logger.error(
+        { err, lessonId, polishedTranscriptId },
+        'Polishing pipeline failed (manual)'
+      );
+      await this.nats.publish(POLISHING_EVENTS.FAILED, {
+        lessonId,
+        tenantId,
+        polishedTranscriptId,
         errorMessage: err instanceof Error ? err.message : String(err),
         timestamp: new Date().toISOString(),
       });
