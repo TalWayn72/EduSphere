@@ -54,6 +54,9 @@ export type InstructorVoiceProfile =
 export type NewInstructorVoiceProfile =
   typeof instructor_voice_profiles.$inferInsert;
 
+// Exported for RLS unit tests (mirrors the pgPolicy USING / WITH CHECK clause)
+export const voiceProfilesRlsSql = sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`;
+
 // ─── Polished Transcripts ─────────────────────────────────────────────────────
 // A versioned, AI-polished transcript for a lesson.
 // Status flows: PROCESSING → DRAFT → INSTRUCTOR_REVIEW → APPROVED → PUBLISHED
@@ -106,6 +109,9 @@ export const polished_transcripts = pgTable(
 
 export type PolishedTranscript = typeof polished_transcripts.$inferSelect;
 export type NewPolishedTranscript = typeof polished_transcripts.$inferInsert;
+
+// Exported for RLS unit tests (mirrors the pgPolicy USING / WITH CHECK clause)
+export const polishedTranscriptsRlsSql = sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`;
 
 // ─── Polished Transcript Blocks ───────────────────────────────────────────────
 // Ordered blocks composing a polished transcript.

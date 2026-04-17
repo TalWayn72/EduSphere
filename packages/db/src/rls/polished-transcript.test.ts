@@ -16,6 +16,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   instructor_voice_profiles,
   polished_transcripts,
+  voiceProfilesRlsSql,
+  polishedTranscriptsRlsSql,
 } from '../schema/polished-transcript';
 import { withTenantContext } from './withTenantContext';
 import type { TenantContext } from './withTenantContext';
@@ -25,20 +27,26 @@ import type { DrizzleDB } from '../index';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function extractRlsSql(table: {
-  _: { config?: { policies?: Array<{ config?: { using?: unknown; withCheck?: unknown } }> } };
+function sqlToString(sqlObj: {
+  queryChunks?: unknown[];
+  sql?: string;
 }): string {
-  const policies = table._?.config?.policies ?? [];
-  return policies
-    .map((p) => {
-      const using = p.config?.using;
-      const withCheck = p.config?.withCheck;
-      return [
-        using ? JSON.stringify(using) : '',
-        withCheck ? JSON.stringify(withCheck) : '',
-      ].join(' ');
-    })
-    .join(' ');
+  if (typeof sqlObj.sql === 'string') return sqlObj.sql;
+  if (Array.isArray(sqlObj.queryChunks)) {
+    return sqlObj.queryChunks
+      .map((chunk) => {
+        if (typeof chunk === 'string') return chunk;
+        if (
+          chunk &&
+          typeof (chunk as Record<string, unknown>).value === 'string'
+        ) {
+          return (chunk as Record<string, unknown>).value as string;
+        }
+        return JSON.stringify(chunk);
+      })
+      .join('');
+  }
+  return JSON.stringify(sqlObj);
 }
 
 function buildMockDb(capturedCalls: string[]): DrizzleDB {
@@ -88,10 +96,8 @@ describe('instructor_voice_profiles: RLS policy references app.current_tenant', 
   });
 
   it('RLS policy SQL references app.current_tenant', () => {
-    const raw = extractRlsSql(
-      instructor_voice_profiles as unknown as Parameters<
-        typeof extractRlsSql
-      >[0],
+    const raw = sqlToString(
+      voiceProfilesRlsSql as unknown as Parameters<typeof sqlToString>[0],
     );
     expect(raw).toContain('app.current_tenant');
   });
@@ -110,8 +116,8 @@ describe('polished_transcripts: RLS policy references app.current_tenant', () =>
   });
 
   it('RLS policy SQL references app.current_tenant', () => {
-    const raw = extractRlsSql(
-      polished_transcripts as unknown as Parameters<typeof extractRlsSql>[0],
+    const raw = sqlToString(
+      polishedTranscriptsRlsSql as unknown as Parameters<typeof sqlToString>[0],
     );
     expect(raw).toContain('app.current_tenant');
   });
