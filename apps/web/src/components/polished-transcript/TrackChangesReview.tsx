@@ -143,7 +143,7 @@ export function TrackChangesReview({
             size="sm"
             onClick={() => void handleAcceptAll()}
             disabled={isBusy || pendingCount === 0}
-            className="text-green-700 border-green-300 hover:bg-green-50 dark:hover:bg-green-950 dark:text-green-400"
+            className="text-green-700 border-green-300 hover:bg-green-50 dark:hover:bg-green-950 dark:text-green-400 dark:border-green-700"
             data-testid="accept-all-btn"
           >
             <CheckCheck className="h-3.5 w-3.5 me-1" />
@@ -154,7 +154,7 @@ export function TrackChangesReview({
             size="sm"
             onClick={() => void handleRejectAll()}
             disabled={isBusy || pendingCount === 0}
-            className="text-red-700 border-red-300 hover:bg-red-50 dark:hover:bg-red-950 dark:text-red-400"
+            className="text-red-700 border-red-300 hover:bg-red-50 dark:hover:bg-red-950 dark:text-red-400 dark:border-red-700"
             data-testid="reject-all-btn"
           >
             <XCircle className="h-3.5 w-3.5 me-1" />

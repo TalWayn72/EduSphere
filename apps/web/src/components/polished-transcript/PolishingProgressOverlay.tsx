@@ -54,7 +54,7 @@ export function PolishingProgressOverlay({
       aria-live="polite"
     >
       <Loader2
-        className="h-8 w-8 animate-spin text-blue-500"
+        className="h-8 w-8 animate-spin text-blue-500 dark:text-blue-400"
         aria-hidden="true"
       />
       <p className="text-sm font-medium text-foreground">

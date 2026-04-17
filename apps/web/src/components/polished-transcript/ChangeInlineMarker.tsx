@@ -88,7 +88,7 @@ export function ChangeInlineMarker({
             <Button
               variant="ghost"
               size="icon"
-              className="h-4 w-4 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+              className="h-4 w-4 text-green-600 dark:text-green-400 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
               onClick={() => onAccept(change.id)}
               disabled={disabled}
               aria-label={t('polishedTranscript.acceptChange')}
@@ -106,7 +106,7 @@ export function ChangeInlineMarker({
             <Button
               variant="ghost"
               size="icon"
-              className="h-4 w-4 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+              className="h-4 w-4 text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
               onClick={() => onReject(change.id)}
               disabled={disabled}
               aria-label={t('polishedTranscript.rejectChange')}
