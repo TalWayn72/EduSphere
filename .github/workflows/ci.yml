@@ -108,15 +108,15 @@ jobs:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
-  # Web unit tests with Vitest — sharded into 4 parallel jobs (no coverage — too slow for CI)
+  # Web unit tests with Vitest — sharded into 8 parallel jobs (no coverage — too slow for CI)
   unit-tests-web:
     name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shard: [1/4, 2/4, 3/4, 4/4]
+        shard: [1/8, 2/8, 3/8, 4/8, 5/8, 6/8, 7/8, 8/8]
 
     steps:
       - name: Checkout repository
@@ -142,6 +142,7 @@ jobs:
         # Only run frontend tests here; backend subgraph tests require a live DB
         # and run in the Full Test Suite workflow (test.yml) with proper services.
         # Coverage removed from sharded CI — run separately in nightly/on-demand job.
+        # 8 shards keep each runner well under 30 min for the 4,400+ test suite.
         run: pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
 
   # Shared package unit tests — single job, no sharding needed (packages are fast individually)
@@ -287,15 +288,15 @@ jobs:
             packages/*/dist
           retention-days: 3
 
-  # E2E tests — Playwright, frontend-only (no backend required) — sharded into 2 parallel jobs
+  # E2E tests — Playwright, frontend-only (no backend required) — sharded into 4 parallel jobs
   e2e-tests:
     name: E2E Tests (Playwright ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shard: [1/2, 2/2]
+        shard: [1/4, 2/4, 3/4, 4/4]
 
     steps:
       - name: Checkout repository
