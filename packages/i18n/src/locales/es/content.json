@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "Transcripción Pulida",
+    "processing": "IA procesando... {{progress}}%",
+    "processingHint": "La IA está revisando la transcripción. Esto suele tardar menos de un minuto.",
+    "requestPolishing": "Iniciar pulido con IA",
+    "noTranscript": "No hay transcripción disponible para pulir.",
+    "pendingCount": "{{count}} cambios pendientes",
+    "acceptChange": "Aceptar este cambio",
+    "rejectChange": "Rechazar este cambio",
+    "acceptAll": "Aceptar todo",
+    "rejectAll": "Rechazar todo",
+    "approve": "Aprobar transcripción",
+    "approveConfirm": "¿Aprobar esta transcripción pulida? Se enviará a los estudiantes.",
+    "status": {
+      "processing": "Procesando",
+      "draft": "Borrador",
+      "approved": "Aprobado",
+      "published": "Publicado"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "Palabra de relleno eliminada",
+      "GRAMMAR_FIXED": "Gramática corregida",
+      "CITATION_FORMATTED": "Cita formateada",
+      "REPETITION_REMOVED": "Repetición eliminada",
+      "PUNCTUATION_ADDED": "Puntuación añadida",
+      "PARAGRAPH_BREAK": "Salto de párrafo añadido",
+      "TERM_NORMALIZED": "Término normalizado"
+    },
+    "voiceProfile": {
+      "title": "Perfil de voz",
+      "formality": "Formalidad",
+      "avgWords": "Promedio {{count}} palabras/oración",
+      "topPhrases": "Frases características"
+    },
+    "reader": {
+      "empty": "Sin contenido disponible",
+      "rawToggle": "Transcripción original",
+      "polishedToggle": "Lectura pulida",
+      "draftBadge": "Borrador"
+    }
+  },
   "liveSession": {
     "joinError": "Error al unirse a la sesión",
     "joining": "Uniéndose...",

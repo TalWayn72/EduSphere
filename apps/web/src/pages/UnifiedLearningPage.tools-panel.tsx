@@ -4,7 +4,7 @@
  */
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, FileText, Bot, Network } from 'lucide-react';
+import { FileText, Bot, Network } from 'lucide-react';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/resizable';
 import { VideoPlayerCore } from '@/components/VideoPlayerCore';
 import type { SubtitleTrack } from '@/components/VideoSubtitleSelector';
-import { TranscriptPanel } from '@/components/TranscriptPanel';
 import { VideoProgressMarkers } from '@/components/VideoProgressMarkers';
 import { AddAnnotationOverlay } from '@/components/AddAnnotationOverlay';
 import { ContextPanel } from '@/components/ContextPanel';
@@ -22,14 +21,16 @@ import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
 import type { EnrichedTranscriptBlock } from '@/components/enriched-transcript/enriched-transcript.types';
 import { YouTubeEmbedPlayer } from '@/components/youtube/YouTubeEmbedPlayer';
 import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
-import { SyncTranscriptScroller } from '@/components/enriched-transcript/SyncTranscriptScroller';
 import { AnnotationsTab } from '@/pages/UnifiedLearningPage.annotations-tab';
 import { AiTab } from '@/pages/UnifiedLearningPage.ai-tab';
+import { TranscriptSection } from '@/pages/UnifiedLearningPage.transcript-section';
 import {
   VideoSketchOverlay,
   type SketchPath,
   type ExistingSketch,
 } from '@/components/VideoSketchOverlay';
+import type { PolishedBlock } from '@/components/polished-transcript/polished-transcript-reader.types';
+import type { PolishingStatus } from '@/components/polished-transcript/polished-transcript.types';
 
 type Tab = 'annotations' | 'ai' | 'context';
 
@@ -61,6 +62,10 @@ interface Props {
   youtubeVideoId?: string | null;
   /** Enriched transcript blocks for YouTube content. */
   enrichedBlocks?: EnrichedTranscriptBlock[];
+  /** Pre-parsed polished transcript blocks for the student reading view. */
+  polishedBlocks?: PolishedBlock[];
+  /** Status of the polished transcript — toggle only shown for DRAFT or PUBLISHED. */
+  polishedStatus?: PolishingStatus | null;
 }
 
 export function ToolsPanel({
@@ -85,18 +90,15 @@ export function ToolsPanel({
   subtitleTracks = [],
   youtubeVideoId,
   enrichedBlocks = [],
+  polishedBlocks,
+  polishedStatus,
 }: Props) {
   const { t } = useTranslation('content');
   const [activeTab, setActiveTab] = useState<Tab>('annotations');
   const isYouTube = !!youtubeVideoId;
 
-  // YouTube player hook (only active when YouTube content)
   const ytPlayer = useYouTubePlayer();
 
-  // Forward seekTarget to YouTube player when isYouTube is true.
-  // seekTarget is set by parent (UnifiedLearningPage.seekTo) when transcript
-  // blocks are clicked, but VideoPlayerCore handles it internally via prop.
-  // For YouTube we must imperatively call ytPlayer.seekTo().
   useEffect(() => {
     if (isYouTube && seekTarget !== undefined) {
       ytPlayer.seekTo(seekTarget);
@@ -104,7 +106,6 @@ export function ToolsPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seekTarget, isYouTube]);
 
-  // Find the transcript segment active at currentTime for the Context panel.
   const activeSegment = useMemo((): TranscriptSegment | null => {
     const sorted = [...transcript].sort((a, b) => a.startTime - b.startTime);
     let found: TranscriptSegment | null = null;
@@ -190,28 +191,16 @@ export function ToolsPanel({
             )}
           </div>
 
-          {/* Transcript — enriched scroller for YouTube, standard panel otherwise */}
-          <div className="flex-1 overflow-hidden flex flex-col border-t">
-            <div className="px-3 py-1.5 border-b flex items-center gap-1.5 text-xs font-semibold flex-shrink-0">
-              <BookOpen className="h-3.5 w-3.5" />
-              {t('transcript', 'תמלול')}
-            </div>
-            <div className="flex-1 transcript-scroll">
-              {isYouTube && enrichedBlocks.length > 0 ? (
-                <SyncTranscriptScroller
-                  blocks={enrichedBlocks}
-                  currentTime={currentTime}
-                  onSeek={onSeek}
-                />
-              ) : (
-                <TranscriptPanel
-                  segments={transcript}
-                  currentTime={currentTime}
-                  onSeek={onSeek}
-                />
-              )}
-            </div>
-          </div>
+          {/* Transcript section — with optional raw/polished toggle */}
+          <TranscriptSection
+            transcript={transcript}
+            currentTime={currentTime}
+            onSeek={onSeek}
+            isYouTube={isYouTube}
+            enrichedBlocks={enrichedBlocks}
+            polishedBlocks={polishedBlocks}
+            polishedStatus={polishedStatus}
+          />
         </div>
       </ResizablePanel>
 
@@ -220,7 +209,6 @@ export function ToolsPanel({
       {/* BOTTOM — Tabs */}
       <ResizablePanel defaultSize={55} minSize={25} id="panels">
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Tab bar */}
           <div className="flex border-b flex-shrink-0" role="tablist">
             {tabs.map((tab) => (
               <button
@@ -241,7 +229,6 @@ export function ToolsPanel({
             ))}
           </div>
 
-          {/* Tab content */}
           <div className="flex-1 overflow-hidden">
             {activeTab === 'annotations' && (
               <AnnotationsTab

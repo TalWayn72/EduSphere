@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "精简版转录",
+    "processing": "AI 处理中... {{progress}}%",
+    "processingHint": "AI 正在审核转录内容，通常不到一分钟即可完成。",
+    "requestPolishing": "启动 AI 精简",
+    "noTranscript": "没有可用的转录内容进行精简。",
+    "pendingCount": "{{count}} 项更改待处理",
+    "acceptChange": "接受此更改",
+    "rejectChange": "拒绝此更改",
+    "acceptAll": "全部接受",
+    "rejectAll": "全部拒绝",
+    "approve": "批准转录",
+    "approveConfirm": "批准此精简版转录吗？它将被发送给学生。",
+    "status": {
+      "processing": "处理中",
+      "draft": "草稿",
+      "approved": "已批准",
+      "published": "已发布"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "已删除填充词",
+      "GRAMMAR_FIXED": "语法已纠正",
+      "CITATION_FORMATTED": "引用已格式化",
+      "REPETITION_REMOVED": "已删除重复内容",
+      "PUNCTUATION_ADDED": "已添加标点符号",
+      "PARAGRAPH_BREAK": "已添加段落分隔",
+      "TERM_NORMALIZED": "术语已规范化"
+    },
+    "voiceProfile": {
+      "title": "语音档案",
+      "formality": "正式程度",
+      "avgWords": "平均 {{count}} 词/句",
+      "topPhrases": "特征性短语"
+    },
+    "reader": {
+      "empty": "暂无内容",
+      "rawToggle": "原始转录",
+      "polishedToggle": "精简阅读",
+      "draftBadge": "草稿"
+    }
+  },
   "liveSession": {
     "joinError": "加入会话失败",
     "joining": "正在加入...",

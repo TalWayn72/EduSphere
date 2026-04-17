@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "Transkrip Dipoles",
+    "processing": "AI memproses... {{progress}}%",
+    "processingHint": "AI sedang meninjau transkrip. Biasanya membutuhkan kurang dari satu menit.",
+    "requestPolishing": "Mulai Pemolesan AI",
+    "noTranscript": "Tidak ada transkrip tersedia untuk dipoles.",
+    "pendingCount": "{{count}} perubahan tertunda",
+    "acceptChange": "Terima perubahan ini",
+    "rejectChange": "Tolak perubahan ini",
+    "acceptAll": "Terima Semua",
+    "rejectAll": "Tolak Semua",
+    "approve": "Setujui Transkrip",
+    "approveConfirm": "Setujui transkrip yang telah dipoles ini? Ini akan dikirim ke siswa.",
+    "status": {
+      "processing": "Memproses",
+      "draft": "Draf",
+      "approved": "Disetujui",
+      "published": "Diterbitkan"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "Kata pengisi dihapus",
+      "GRAMMAR_FIXED": "Tata bahasa diperbaiki",
+      "CITATION_FORMATTED": "Kutipan diformat",
+      "REPETITION_REMOVED": "Pengulangan dihapus",
+      "PUNCTUATION_ADDED": "Tanda baca ditambahkan",
+      "PARAGRAPH_BREAK": "Jeda paragraf ditambahkan",
+      "TERM_NORMALIZED": "Istilah dinormalisasi"
+    },
+    "voiceProfile": {
+      "title": "Profil Suara",
+      "formality": "Formalitas",
+      "avgWords": "Rata-rata {{count}} kata/kalimat",
+      "topPhrases": "Frasa khas"
+    },
+    "reader": {
+      "empty": "Tidak ada konten tersedia",
+      "rawToggle": "Transkrip Asli",
+      "polishedToggle": "Bacaan Dipoles",
+      "draftBadge": "Draf"
+    }
+  },
   "liveSession": {
     "joinError": "Gagal bergabung ke sesi",
     "joining": "Bergabung...",

@@ -1,0 +1,174 @@
+# ─── Smart Transcript Polishing SDL ──────────────────────────────────────────
+# Provides Track Changes review, accept/reject, manual edits, and real-time
+# polishing progress for the Smart Transcript Polishing feature.
+
+enum PolishedTranscriptStatus {
+  PROCESSING
+  DRAFT
+  INSTRUCTOR_REVIEW
+  APPROVED
+  PUBLISHED
+}
+
+enum PolishedBlockType {
+  POLISHED_TEXT
+  POLISHED_CITATION
+  POLISHED_HEADING
+}
+
+enum PolishedChangeType {
+  FILLER_REMOVED
+  REPETITION_REMOVED
+  AUDIENCE_ADDRESS_REMOVED
+  IMPERATIVE_TO_DESCRIPTION
+  RHETORICAL_SIMPLIFIED
+  PERSON_CHANGED
+  CITATION_FORMATTED
+  SPELLING_CORRECTED
+  SENTENCE_RESTRUCTURED
+}
+
+enum PolishedChangeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+# ─── Types ────────────────────────────────────────────────────────────────────
+
+type PolishedBlockChange {
+  id: ID!
+  blockId: ID!
+  changeType: PolishedChangeType
+  originalFragment: String!
+  replacementFragment: String
+  charOffsetStart: Int!
+  charOffsetEnd: Int!
+  status: PolishedChangeStatus!
+  reviewedAt: String
+  createdAt: String!
+}
+
+type PolishedTranscriptBlock {
+  id: ID!
+  polishedId: ID!
+  blockType: PolishedBlockType
+  blockOrder: Int!
+  content: String!
+  originalText: String
+  startTime: Float
+  endTime: Float
+  sourceSegmentIds: JSON!
+  instructorEdited: Boolean!
+  instructorText: String
+  changes: [PolishedBlockChange!]!
+}
+
+type PolishedTranscript {
+  id: ID!
+  lessonId: ID!
+  version: Int!
+  status: PolishedTranscriptStatus!
+  fullText: String
+  coverageScore: Float
+  polishedBy: String!
+  approvedBy: ID
+  approvedAt: String
+  blocks: [PolishedTranscriptBlock!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type InstructorVoiceProfile {
+  id: ID!
+  instructorId: ID!
+  voiceData: JSON
+  sampleCount: Int!
+  lastUpdatedFrom: ID
+  updatedAt: String!
+}
+
+type PolishingProgressEvent {
+  lessonId: ID!
+  polishedTranscriptId: ID
+  progress: Int!
+  status: PolishedTranscriptStatus!
+  message: String
+  timestamp: String!
+}
+
+# ─── Inputs ───────────────────────────────────────────────────────────────────
+
+input EditPolishedBlockInput {
+  blockId: ID!
+  content: String!
+}
+
+input ChangeDecisionInput {
+  changeId: ID!
+  decision: PolishedChangeStatus!
+}
+
+input BulkChangeDecisionInput {
+  polishedTranscriptId: ID!
+  decision: PolishedChangeStatus!
+}
+
+# ─── Queries ──────────────────────────────────────────────────────────────────
+
+extend type Query {
+  """Get the latest polished transcript for a lesson (with blocks and changes)."""
+  polishedTranscript(lessonId: ID!): PolishedTranscript @authenticated
+
+  """List all versions of polished transcripts for a lesson."""
+  polishedTranscriptVersions(lessonId: ID!): [PolishedTranscript!]!
+    @authenticated
+
+  """Get the instructor voice profile for the current user."""
+  myVoiceProfile: InstructorVoiceProfile
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+# ─── Mutations ────────────────────────────────────────────────────────────────
+
+extend type Mutation {
+  """Approve the polished transcript → sets status to PUBLISHED."""
+  approvePolishedTranscript(polishedTranscriptId: ID!): PolishedTranscript!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Manually override the content of a polished block."""
+  editPolishedBlock(input: EditPolishedBlockInput!): PolishedTranscriptBlock!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Revert an instructor-edited block back to the AI-generated version."""
+  revertPolishedBlock(blockId: ID!): PolishedTranscriptBlock!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Accept or reject a single tracked change within a block."""
+  decidePolishedChange(input: ChangeDecisionInput!): PolishedBlockChange!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Accept or reject ALL pending changes for a polished transcript."""
+  bulkDecidePolishedChanges(
+    input: BulkChangeDecisionInput!
+  ): PolishedTranscript!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  """Trigger a new polishing run, creating a new version."""
+  regeneratePolishedTranscript(lessonId: ID!): PolishedTranscript!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+# ─── Subscriptions ────────────────────────────────────────────────────────────
+
+extend type Subscription {
+  """Real-time polishing progress for a lesson."""
+  polishingProgress(lessonId: ID!): PolishingProgressEvent! @authenticated
+}

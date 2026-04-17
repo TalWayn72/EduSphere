@@ -38,6 +38,7 @@ import { PsychometricsModule } from './psychometrics/psychometrics.module';
 import { EnrichedLessonModule } from './enriched-lesson/enriched-lesson.module';
 import { CitationFormatModule } from './citation-format/citation-format.module';
 import { LiveStreamModule } from './live-stream/live-stream.module';
+import { PolishedTranscriptModule } from './polished-transcript/polished-transcript.module';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { LiveStreamModule } from './live-stream/live-stream.module';
     EnrichedLessonModule,
     CitationFormatModule,
     LiveStreamModule,
+    PolishedTranscriptModule,
   ],
 })
 export class AppModule {}

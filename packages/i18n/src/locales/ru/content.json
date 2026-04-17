@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "Отполированная транскрипция",
+    "processing": "ИИ обрабатывает... {{progress}}%",
+    "processingHint": "ИИ проверяет транскрипцию. Это обычно занимает меньше минуты.",
+    "requestPolishing": "Запустить полировку ИИ",
+    "noTranscript": "Нет доступной транскрипции для полировки.",
+    "pendingCount": "{{count}} изменений ожидают",
+    "acceptChange": "Принять это изменение",
+    "rejectChange": "Отклонить это изменение",
+    "acceptAll": "Принять все",
+    "rejectAll": "Отклонить все",
+    "approve": "Утвердить транскрипцию",
+    "approveConfirm": "Утвердить эту отполированную транскрипцию? Она будет отправлена студентам.",
+    "status": {
+      "processing": "Обработка",
+      "draft": "Черновик",
+      "approved": "Утверждено",
+      "published": "Опубликовано"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "Слово-заполнитель удалено",
+      "GRAMMAR_FIXED": "Грамматика исправлена",
+      "CITATION_FORMATTED": "Цитата отформатирована",
+      "REPETITION_REMOVED": "Повторение удалено",
+      "PUNCTUATION_ADDED": "Пунктуация добавлена",
+      "PARAGRAPH_BREAK": "Абзацный отступ добавлен",
+      "TERM_NORMALIZED": "Термин нормализован"
+    },
+    "voiceProfile": {
+      "title": "Голосовой профиль",
+      "formality": "Формальность",
+      "avgWords": "Ср. {{count}} слов/предложение",
+      "topPhrases": "Характерные фразы"
+    },
+    "reader": {
+      "empty": "Нет доступного содержимого",
+      "rawToggle": "Исходная транскрипция",
+      "polishedToggle": "Полированное чтение",
+      "draftBadge": "Черновик"
+    }
+  },
   "liveSession": {
     "joinError": "Не удалось подключиться к сессии",
     "joining": "Подключение...",

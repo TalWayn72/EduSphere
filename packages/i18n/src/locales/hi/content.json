@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "परिष्कृत प्रतिलेख",
+    "processing": "AI प्रोसेस कर रहा है... {{progress}}%",
+    "processingHint": "AI प्रतिलेख की समीक्षा कर रहा है। इसमें आमतौर पर एक मिनट से कम समय लगता है।",
+    "requestPolishing": "AI परिष्करण शुरू करें",
+    "noTranscript": "परिष्कृत करने के लिए कोई प्रतिलेख उपलब्ध नहीं है।",
+    "pendingCount": "{{count}} परिवर्तन लंबित",
+    "acceptChange": "यह परिवर्तन स्वीकार करें",
+    "rejectChange": "यह परिवर्तन अस्वीकार करें",
+    "acceptAll": "सभी स्वीकार करें",
+    "rejectAll": "सभी अस्वीकार करें",
+    "approve": "प्रतिलेख अनुमोदित करें",
+    "approveConfirm": "इस परिष्कृत प्रतिलेख को अनुमोदित करें? इसे छात्रों को भेजा जाएगा।",
+    "status": {
+      "processing": "प्रसंस्करण",
+      "draft": "मसौदा",
+      "approved": "अनुमोदित",
+      "published": "प्रकाशित"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "भराव शब्द हटाया गया",
+      "GRAMMAR_FIXED": "व्याकरण सुधारा गया",
+      "CITATION_FORMATTED": "उद्धरण स्वरूपित किया गया",
+      "REPETITION_REMOVED": "पुनरावृत्ति हटाई गई",
+      "PUNCTUATION_ADDED": "विराम चिह्न जोड़ा गया",
+      "PARAGRAPH_BREAK": "अनुच्छेद विराम जोड़ा गया",
+      "TERM_NORMALIZED": "पद सामान्यीकृत किया गया"
+    },
+    "voiceProfile": {
+      "title": "आवाज़ प्रोफ़ाइल",
+      "formality": "औपचारिकता",
+      "avgWords": "औसत {{count}} शब्द/वाक्य",
+      "topPhrases": "विशिष्ट वाक्यांश"
+    },
+    "reader": {
+      "empty": "कोई सामग्री उपलब्ध नहीं",
+      "rawToggle": "मूल प्रतिलेख",
+      "polishedToggle": "परिष्कृत पाठ",
+      "draftBadge": "मसौदा"
+    }
+  },
   "liveSession": {
     "joinError": "सत्र में शामिल होने में विफल",
     "joining": "शामिल हो रहे हैं...",

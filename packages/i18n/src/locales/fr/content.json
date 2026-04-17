@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "Transcription Polie",
+    "processing": "IA en cours... {{progress}}%",
+    "processingHint": "L'IA révise la transcription. Cela prend généralement moins d'une minute.",
+    "requestPolishing": "Lancer le polissage IA",
+    "noTranscript": "Aucune transcription disponible à polir.",
+    "pendingCount": "{{count}} modifications en attente",
+    "acceptChange": "Accepter cette modification",
+    "rejectChange": "Rejeter cette modification",
+    "acceptAll": "Tout accepter",
+    "rejectAll": "Tout rejeter",
+    "approve": "Approuver la transcription",
+    "approveConfirm": "Approuver cette transcription polie ? Elle sera envoyée aux étudiants.",
+    "status": {
+      "processing": "En traitement",
+      "draft": "Brouillon",
+      "approved": "Approuvé",
+      "published": "Publié"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "Mot de remplissage supprimé",
+      "GRAMMAR_FIXED": "Grammaire corrigée",
+      "CITATION_FORMATTED": "Citation formatée",
+      "REPETITION_REMOVED": "Répétition supprimée",
+      "PUNCTUATION_ADDED": "Ponctuation ajoutée",
+      "PARAGRAPH_BREAK": "Saut de paragraphe ajouté",
+      "TERM_NORMALIZED": "Terme normalisé"
+    },
+    "voiceProfile": {
+      "title": "Profil vocal",
+      "formality": "Formalité",
+      "avgWords": "Moy. {{count}} mots/phrase",
+      "topPhrases": "Expressions caractéristiques"
+    },
+    "reader": {
+      "empty": "Aucun contenu disponible",
+      "rawToggle": "Transcription brute",
+      "polishedToggle": "Lecture polie",
+      "draftBadge": "Brouillon"
+    }
+  },
   "liveSession": {
     "joinError": "Échec de la connexion à la session",
     "joining": "Connexion en cours...",

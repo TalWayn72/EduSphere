@@ -9,7 +9,7 @@
  */
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useMutation } from 'urql';
+import { useMutation, useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { PageHeader } from '@/components/PageHeader';
 import {
@@ -32,11 +32,17 @@ import { SyncTranscriptScroller } from '@/components/enriched-transcript/SyncTra
 import { CitationReviewPanel } from '@/components/lesson/CitationReviewPanel';
 import { CitationEditModal } from '@/components/lesson/CitationEditModal';
 import { TimestampAnchorEditor } from '@/components/lesson/TimestampAnchorEditor';
+import { TrackChangesReview } from '@/components/polished-transcript/TrackChangesReview';
+import { PolishingProgressOverlay } from '@/components/polished-transcript/PolishingProgressOverlay';
 import {
   INGEST_YOUTUBE_LESSON_MUTATION,
   SET_BLOCK_ANCHOR_TIMESTAMP_MUTATION,
   PUBLISH_ENRICHED_LESSON_MUTATION,
 } from '@/lib/graphql/enriched-lesson.queries';
+import {
+  POLISHED_TRANSCRIPT_QUERY,
+  REQUEST_TRANSCRIPT_POLISHING_MUTATION,
+} from '@/lib/graphql/polished-transcript.queries';
 
 const PROCESSING_STATUS_LABELS: Record<string, string> = {
   EXTRACTING_TRANSCRIPT: 'Extracting transcript...',
@@ -60,6 +66,21 @@ export function LessonEnrichmentEditor() {
   const [, ingest] = useMutation(INGEST_YOUTUBE_LESSON_MUTATION);
   const [, setTimestamp] = useMutation(SET_BLOCK_ANCHOR_TIMESTAMP_MUTATION);
   const [, publish] = useMutation(PUBLISH_ENRICHED_LESSON_MUTATION);
+
+  // Polished transcript state
+  const [{ data: polishedData }, refetchPolished] = useQuery({
+    query: POLISHED_TRANSCRIPT_QUERY,
+    variables: { lessonId },
+    pause: !lessonId,
+  });
+  const [, requestPolishing] = useMutation(REQUEST_TRANSCRIPT_POLISHING_MUTATION);
+  const polishedTranscript = polishedData?.polishedTranscript ?? null;
+  const isPolishing = polishedTranscript?.status === 'PROCESSING';
+
+  const handleRequestPolishing = useCallback(async () => {
+    await requestPolishing({ lessonId });
+    refetchPolished();
+  }, [requestPolishing, lessonId, refetchPolished]);
 
   usePlayerKeyboardShortcuts({
     play: player.play,
@@ -176,6 +197,7 @@ export function LessonEnrichmentEditor() {
                   <TabsTrigger value="citations">Citations</TabsTrigger>
                   <TabsTrigger value="anchors">Anchors</TabsTrigger>
                   <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="polished">Polished Transcript</TabsTrigger>
                 </TabsList>
                 <TabsContent
                   value="citations"
@@ -201,6 +223,39 @@ export function LessonEnrichmentEditor() {
                     currentTime={player.currentTime}
                     mode="student"
                   />
+                </TabsContent>
+                <TabsContent
+                  value="polished"
+                  className="flex-1 overflow-hidden"
+                >
+                  {isPolishing ? (
+                    <PolishingProgressOverlay
+                      lessonId={lessonId}
+                      onComplete={refetchPolished}
+                      className="h-full"
+                    />
+                  ) : polishedTranscript ? (
+                    <TrackChangesReview
+                      transcript={polishedTranscript}
+                      onApproved={refetchPolished}
+                      className="h-full"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full gap-4 py-12 px-6">
+                      <p className="text-sm text-muted-foreground text-center">
+                        No polished transcript yet. Start AI polishing to review tracked changes.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void handleRequestPolishing()}
+                        disabled={!data?.transcriptReady}
+                        data-testid="request-polishing-btn"
+                      >
+                        Start AI Polishing
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </ResizablePanel>

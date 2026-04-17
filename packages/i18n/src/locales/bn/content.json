@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "পরিমার্জিত প্রতিলিপি",
+    "processing": "AI প্রক্রিয়া করছে... {{progress}}%",
+    "processingHint": "AI প্রতিলিপি পর্যালোচনা করছে। এটি সাধারণত এক মিনিটের কম সময় নেয়।",
+    "requestPolishing": "AI পরিমার্জন শুরু করুন",
+    "noTranscript": "পরিমার্জনের জন্য কোনো প্রতিলিপি পাওয়া যায়নি।",
+    "pendingCount": "{{count}} পরিবর্তন অপেক্ষমান",
+    "acceptChange": "এই পরিবর্তনটি গ্রহণ করুন",
+    "rejectChange": "এই পরিবর্তনটি প্রত্যাখ্যান করুন",
+    "acceptAll": "সব গ্রহণ করুন",
+    "rejectAll": "সব প্রত্যাখ্যান করুন",
+    "approve": "প্রতিলিপি অনুমোদন করুন",
+    "approveConfirm": "এই পরিমার্জিত প্রতিলিপি অনুমোদন করবেন? এটি শিক্ষার্থীদের কাছে পাঠানো হবে।",
+    "status": {
+      "processing": "প্রক্রিয়াকরণ",
+      "draft": "খসড়া",
+      "approved": "অনুমোদিত",
+      "published": "প্রকাশিত"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "ফিলার শব্দ সরানো হয়েছে",
+      "GRAMMAR_FIXED": "ব্যাকরণ সংশোধন করা হয়েছে",
+      "CITATION_FORMATTED": "উদ্ধৃতি ফরম্যাট করা হয়েছে",
+      "REPETITION_REMOVED": "পুনরাবৃত্তি সরানো হয়েছে",
+      "PUNCTUATION_ADDED": "বিরামচিহ্ন যোগ করা হয়েছে",
+      "PARAGRAPH_BREAK": "অনুচ্ছেদ বিরতি যোগ করা হয়েছে",
+      "TERM_NORMALIZED": "পরিভাষা স্বাভাবিক করা হয়েছে"
+    },
+    "voiceProfile": {
+      "title": "ভয়েস প্রোফাইল",
+      "formality": "আনুষ্ঠানিকতা",
+      "avgWords": "গড় {{count}} শব্দ/বাক্য",
+      "topPhrases": "বৈশিষ্ট্যসূচক বাক্যাংশ"
+    },
+    "reader": {
+      "empty": "কোনো বিষয়বস্তু পাওয়া যায়নি",
+      "rawToggle": "মূল প্রতিলিপি",
+      "polishedToggle": "পরিমার্জিত পাঠ",
+      "draftBadge": "খসড়া"
+    }
+  },
   "liveSession": {
     "joinError": "সেশনে যোগ দিতে ব্যর্থ",
     "joining": "যোগ দেওয়া হচ্ছে...",

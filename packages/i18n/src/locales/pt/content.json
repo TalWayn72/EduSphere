@@ -57,6 +57,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "Transcrição Polida",
+    "processing": "IA processando... {{progress}}%",
+    "processingHint": "A IA está revisando a transcrição. Isso geralmente leva menos de um minuto.",
+    "requestPolishing": "Iniciar Polimento com IA",
+    "noTranscript": "Nenhuma transcrição disponível para polir.",
+    "pendingCount": "{{count}} alterações pendentes",
+    "acceptChange": "Aceitar esta alteração",
+    "rejectChange": "Rejeitar esta alteração",
+    "acceptAll": "Aceitar Tudo",
+    "rejectAll": "Rejeitar Tudo",
+    "approve": "Aprovar Transcrição",
+    "approveConfirm": "Aprovar esta transcrição polida? Ela será enviada aos alunos.",
+    "status": {
+      "processing": "Processando",
+      "draft": "Rascunho",
+      "approved": "Aprovado",
+      "published": "Publicado"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "Palavra de preenchimento removida",
+      "GRAMMAR_FIXED": "Gramática corrigida",
+      "CITATION_FORMATTED": "Citação formatada",
+      "REPETITION_REMOVED": "Repetição removida",
+      "PUNCTUATION_ADDED": "Pontuação adicionada",
+      "PARAGRAPH_BREAK": "Quebra de parágrafo adicionada",
+      "TERM_NORMALIZED": "Termo normalizado"
+    },
+    "voiceProfile": {
+      "title": "Perfil de Voz",
+      "formality": "Formalidade",
+      "avgWords": "Média de {{count}} palavras/frase",
+      "topPhrases": "Frases características"
+    },
+    "reader": {
+      "empty": "Nenhum conteúdo disponível",
+      "rawToggle": "Transcrição Original",
+      "polishedToggle": "Leitura Polida",
+      "draftBadge": "Rascunho"
+    }
+  },
   "liveSession": {
     "joinError": "Falha ao entrar na sessão",
     "joining": "Entrando...",

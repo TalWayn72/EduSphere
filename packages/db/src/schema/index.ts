@@ -232,6 +232,9 @@ export * from './gdpr-erasure-log';
 // Enriched Transcript Blocks (FEAT: Semantic-Enriched Lesson Creation)
 export * from './enriched-transcript';
 
+// Smart Transcript Polishing — voice profiles, polished transcripts, blocks, track-changes
+export * from './polished-transcript';
+
 // Professional Jargon — Phase 1 (domains, terms, embeddings, occurrences)
 export * from './jargon';
 

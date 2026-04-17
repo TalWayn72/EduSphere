@@ -11,3 +11,8 @@ export * from './diagramGeneratorWorkflow';
 export * from './citationVerifierWorkflow';
 export * from './qaWorkflow';
 export * from './certExamGen';
+export * from './transcript-polishing-types';
+export * from './polishing-prompts';
+export * from './transcript-polishing-state';
+export * from './transcript-polishing-nodes';
+export * from './transcript-polishing-workflow';

@@ -144,6 +144,47 @@
     "bookNameRequired": "שם הספר הוא שדה חובה",
     "sourceTextRequired": "טקסט המקור הוא שדה חובה"
   },
+  "polishedTranscript": {
+    "tabLabel": "תמליל מעובד",
+    "processing": "AI מעבד תמליל... {{progress}}%",
+    "processingHint": "ה-AI עורך את התמליל. תהליך זה אורך בדרך כלל פחות מדקה.",
+    "requestPolishing": "הפעל עיבוד AI",
+    "noTranscript": "אין תמליל זמין לעיבוד.",
+    "pendingCount": "{{count}} שינויים ממתינים לאישור",
+    "acceptChange": "אשר שינוי זה",
+    "rejectChange": "דחה שינוי זה",
+    "acceptAll": "אשר הכל",
+    "rejectAll": "דחה הכל",
+    "approve": "אשר תמליל",
+    "approveConfirm": "לאשר את התמליל המעובד? הוא יישלח לתלמידים.",
+    "status": {
+      "processing": "בעיבוד",
+      "draft": "טיוטה",
+      "approved": "מאושר",
+      "published": "פורסם"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "מילת מילוי הוסרה",
+      "GRAMMAR_FIXED": "תוקנה שגיאת דקדוק",
+      "CITATION_FORMATTED": "ציטוט עוצב",
+      "REPETITION_REMOVED": "חזרה הוסרה",
+      "PUNCTUATION_ADDED": "פיסוק נוסף",
+      "PARAGRAPH_BREAK": "הוספת מעבר פסקה",
+      "TERM_NORMALIZED": "מונח אוחד"
+    },
+    "voiceProfile": {
+      "title": "פרופיל קול",
+      "formality": "רשמיות",
+      "avgWords": "ממוצע {{count}} מילים/משפט",
+      "topPhrases": "ביטויים אופייניים"
+    },
+    "reader": {
+      "empty": "אין תוכן זמין",
+      "rawToggle": "תמליל גולמי",
+      "polishedToggle": "תמליל ערוך",
+      "draftBadge": "טיוטה"
+    }
+  },
   "liveSession": {
     "joinError": "כניסה לשיחה נכשלה",
     "joining": "מצטרף...",

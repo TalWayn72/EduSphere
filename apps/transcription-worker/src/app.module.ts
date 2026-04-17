@@ -6,6 +6,7 @@ import { HlsModule } from './hls/hls.module';
 import { YouTubeTranscriptModule } from './youtube/youtube-transcript.module';
 import { JargonModule } from './jargon/jargon.module';
 import { LiveTranscriptionModule } from './live-transcription/live-transcription.module';
+import { PolishingModule } from './polishing/polishing.module';
 
 /**
  * Root application module for the transcription worker.
@@ -15,6 +16,7 @@ import { LiveTranscriptionModule } from './live-transcription/live-transcription
  * EmbeddingModule subscribes to embedding.requested and writes pgvector rows.
  * HlsModule provides HLS transcoding after transcription completes.
  * YouTubeTranscriptModule handles YouTube caption extraction and ingest.
+ * PolishingModule consumes jargon.detection.completed and runs AI polishing.
  */
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { LiveTranscriptionModule } from './live-transcription/live-transcription
     YouTubeTranscriptModule,
     JargonModule,
     LiveTranscriptionModule,
+    PolishingModule,
   ],
 })
 export class AppModule {}

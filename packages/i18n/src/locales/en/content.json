@@ -144,6 +144,47 @@
     "bookNameRequired": "Book name is required",
     "sourceTextRequired": "Source text is required"
   },
+  "polishedTranscript": {
+    "tabLabel": "Polished Transcript",
+    "processing": "AI polishing... {{progress}}%",
+    "processingHint": "The AI is reviewing the transcript. This usually takes under a minute.",
+    "requestPolishing": "Start AI Polishing",
+    "noTranscript": "No transcript available to polish.",
+    "pendingCount": "{{count}} changes pending",
+    "acceptChange": "Accept this change",
+    "rejectChange": "Reject this change",
+    "acceptAll": "Accept All",
+    "rejectAll": "Reject All",
+    "approve": "Approve Transcript",
+    "approveConfirm": "Approve this polished transcript? It will be sent to students.",
+    "status": {
+      "processing": "Processing",
+      "draft": "Draft",
+      "approved": "Approved",
+      "published": "Published"
+    },
+    "changeType": {
+      "FILLER_REMOVED": "Filler word removed",
+      "GRAMMAR_FIXED": "Grammar corrected",
+      "CITATION_FORMATTED": "Citation formatted",
+      "REPETITION_REMOVED": "Repetition removed",
+      "PUNCTUATION_ADDED": "Punctuation added",
+      "PARAGRAPH_BREAK": "Paragraph break added",
+      "TERM_NORMALIZED": "Term normalized"
+    },
+    "voiceProfile": {
+      "title": "Voice Profile",
+      "formality": "Formality",
+      "avgWords": "Avg. {{count}} words/sentence",
+      "topPhrases": "Characteristic phrases"
+    },
+    "reader": {
+      "empty": "No content available",
+      "rawToggle": "Raw Transcript",
+      "polishedToggle": "Polished Reading",
+      "draftBadge": "Draft"
+    }
+  },
   "liveSession": {
     "joinError": "Failed to join session",
     "joining": "Joining...",
