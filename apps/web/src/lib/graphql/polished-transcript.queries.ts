@@ -45,6 +45,19 @@ const POLISHED_TRANSCRIPT_BLOCK_FIELDS = gql`
 
 // ── Queries ───────────────────────────────────────────────────────────────────
 
+/**
+ * Lightweight status-only query used by PolishingProgressOverlay for HTTP polling
+ * when WebSocket is unavailable. Avoids fetching heavy block data.
+ */
+export const POLISHED_TRANSCRIPT_STATUS_QUERY = gql`
+  query PolishedTranscriptStatus($lessonId: ID!) {
+    polishedTranscript(lessonId: $lessonId) {
+      id
+      status
+    }
+  }
+`;
+
 export const POLISHED_TRANSCRIPT_QUERY = gql`
   query PolishedTranscript($lessonId: ID!) {
     polishedTranscript(lessonId: $lessonId) {

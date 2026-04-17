@@ -505,6 +505,10 @@ services:
       - NODE_OPTIONS=--max-old-space-size=512
       - ALLOW_DEV_TOKEN=true
       - DEV_TOKEN_ROLE=SUPER_ADMIN
+      # CORS_ORIGIN required for both HTTP CORS and graphql-ws connection_init validation.
+      # Without this, createGatewayRuntime falls back to origin:[] (fail-closed) and
+      # rejects WebSocket subscription connections from the Vite dev server.
+      - CORS_ORIGIN=http://localhost:5173,http://localhost:3000
     ports:
       - "4000:4000"
     restart: unless-stopped

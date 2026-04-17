@@ -101,19 +101,38 @@ const server = createServer(async (req, res) => {
 
 // ── WebSocket server for GraphQL subscriptions (graphql-ws protocol) ────────
 
+// Parse allowed origins once at startup — same list used by createGatewayRuntime cors config.
+const allowedOrigins: Set<string> = new Set(
+  process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+    : []
+);
+
 const wsServer = new WebSocketServer({ noServer: true, path: '/graphql' });
 const wsOptions = getGraphQLWSOptions(gateway, () => ({}));
 useWSServer(wsOptions, wsServer);
 
 server.on('upgrade', (req, socket, head) => {
   const { pathname } = new URL(req.url ?? '/', `http://localhost:${port}`);
-  if (pathname === '/graphql') {
-    wsServer.handleUpgrade(req, socket, head, (ws) => {
-      wsServer.emit('connection', ws, req);
-    });
-  } else {
+  if (pathname !== '/graphql') {
     socket.destroy();
+    return;
   }
+
+  // Origin validation: only allow origins in the CORS allowlist.
+  // Browser WebSocket connections always send an Origin header; reject anything not in the list.
+  // Non-browser clients (server-to-server, integration tests) send no Origin and are allowed through.
+  const origin = req.headers['origin'];
+  if (origin && allowedOrigins.size > 0 && !allowedOrigins.has(origin)) {
+    logger.warn({ origin }, 'WS upgrade rejected: origin not in CORS allowlist');
+    socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+    socket.destroy();
+    return;
+  }
+
+  wsServer.handleUpgrade(req, socket, head, (ws) => {
+    wsServer.emit('connection', ws, req);
+  });
 });
 
 logger.info('WebSocket upgrade handler registered for /graphql');
