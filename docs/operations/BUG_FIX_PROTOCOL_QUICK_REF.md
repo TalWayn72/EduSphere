@@ -1,5 +1,7 @@
 # Bug Fix Protocol — Quick Reference
 
+> **SUPERSEDED by V5:** See [BUG_FIX_PROTOCOL_V5.md](BUG_FIX_PROTOCOL_V5.md) for the latest protocol (2026-04-17).
+
 > **Parent document:** [CLAUDE.md](../../CLAUDE.md)
 > **Full protocol reference:** [docs/reference/BUG_FIX_PROTOCOL.md](../reference/BUG_FIX_PROTOCOL.md)
 

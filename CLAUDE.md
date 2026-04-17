@@ -336,7 +336,7 @@ MCP tools return **structured, typed data** — Bash commands return unstructure
 
 ### Overview
 
-Skills are markdown-based expertise guides that auto-load when Claude detects relevant context (file paths, keywords, patterns). 20 custom EduSphere skills + ~200 external skills are installed in `~/.agents/skills/`.
+Skills are markdown-based expertise guides that auto-load when Claude detects relevant context (file paths, keywords, patterns). 23 custom EduSphere skills + ~200 external skills are installed in `~/.agents/skills/`.
 
 ### EduSphere Custom Skills (Auto-Loaded)
 
@@ -362,11 +362,14 @@ Skills are markdown-based expertise guides that auto-load when Claude detects re
 | `turborepo-edusphere-monorepo`               | `turbo.json`, monorepo config                        | Turborepo caching, workspace filtering, pipeline configuration         |
 | `graphql-authorization-directives-edusphere` | `@authenticated`, `@requiresScopes` directives       | GraphQL authorization directives, scope enforcement                    |
 | `scorm-edusphere-lms-integration`            | SCORM-related code, LMS integration files            | SCORM 1.2/2004 compliance, LMS data model, xAPI integration            |
+| `test-first-bugfix-edusphere`                | Bug investigation, test failures, debugging          | Test-first reproducer protocol, 3-wave discovery, fix rounds, container verification |
+| `browser-verification-edusphere`             | Playwright E2E, screenshot verification, keycloak-login | Zero-mock Playwright patterns, Keycloak login, screenshot capture, visual confirmation |
+| `transcript-click-seek-patterns`             | TranscriptPanel, seekTo, onSeek, useYouTubePlayer    | 3 transcript systems, timestamp data flow, YouTube async seek, failure modes |
 
 ### Skills per Wave (Mandatory Loading)
 
 - **Wave 1 (Product/Arch/UX):** `architecture-patterns`, `architecture-decision-records`, `graphql-federation-edusphere`, `accessibility-compliance`, `wcag-audit-patterns`, `writing-plans`, `brainstorming`, `multi-tenant-architecture-edusphere`, `hive-gateway-v2-patterns`
-- **Wave 2 (FE/BE/DB/Security/QA):** `nestjs-best-practices`, `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `langgraph-agent-workflows`, `nats-jetstream-patterns`, `react-state-management`, `e2e-testing-patterns`, `auth-implementation-patterns`, `secrets-management`, `sast-configuration`, `test-driven-development`, `rls-policy-patterns-edusphere`, `memory-safety-resource-lifecycle-edusphere`, `keycloak-oauth-oidc-edusphere`, `expo-sdk-54-mobile-edusphere`, `react-19-vite-6-edusphere`, `playwright-visual-regression-edusphere`, `graphql-authorization-directives-edusphere`
+- **Wave 2 (FE/BE/DB/Security/QA):** `nestjs-best-practices`, `drizzle-orm-edusphere`, `apache-age-knowledge-graph`, `pgvector-hybrid-rag`, `langgraph-agent-workflows`, `nats-jetstream-patterns`, `react-state-management`, `e2e-testing-patterns`, `auth-implementation-patterns`, `secrets-management`, `sast-configuration`, `test-driven-development`, `rls-policy-patterns-edusphere`, `memory-safety-resource-lifecycle-edusphere`, `keycloak-oauth-oidc-edusphere`, `expo-sdk-54-mobile-edusphere`, `react-19-vite-6-edusphere`, `playwright-visual-regression-edusphere`, `graphql-authorization-directives-edusphere`, `test-first-bugfix-edusphere`, `browser-verification-edusphere`, `transcript-click-seek-patterns`
 - **Wave 3 (Docs/DevOps):** `changelog-automation`, `deployment-pipeline-design`, `distributed-tracing`, `turborepo-caching`, `github-actions-templates`, `docker-blue-green-deployment-edusphere`, `turborepo-edusphere-monorepo`, `scorm-edusphere-lms-integration`
 
 ### Skill Trigger Rules

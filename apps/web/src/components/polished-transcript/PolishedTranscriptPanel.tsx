@@ -39,6 +39,7 @@ interface HeadingBlockProps {
 function HeadingBlock({ block }: HeadingBlockProps) {
   return (
     <h3
+      dir="rtl"
       className="text-sm font-semibold pt-4 pb-2 border-b border-border/50 text-foreground text-right"
       data-block-id={block.id}
       data-start-time={block.startTime ?? undefined}
@@ -64,6 +65,7 @@ function CitationBlock({ block, onSeek }: CitationBlockProps) {
 
   return (
     <blockquote
+      dir="rtl"
       role={hasTimestamp ? 'button' : undefined}
       tabIndex={hasTimestamp ? 0 : undefined}
       aria-label={
@@ -109,6 +111,7 @@ function TextBlock({ block, active, activeRef, onSeek }: TextBlockProps) {
 
   return (
     <button
+      dir="rtl"
       type="button"
       ref={active ? activeRef : null}
       onClick={handleClick}

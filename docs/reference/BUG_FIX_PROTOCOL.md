@@ -1,5 +1,7 @@
 # Bug-Fix Protocol V3 — EduSphere
 
+> **SUPERSEDED by V5:** See [docs/operations/BUG_FIX_PROTOCOL_V5.md](../operations/BUG_FIX_PROTOCOL_V5.md) for the latest protocol (2026-04-17).
+
 > **Effective:** 2026-03-17 | **Applies to:** Every bug fix, no exceptions.
 > **Orchestrator role:** Claude coordinates all agents, reports progress, executes autonomously.
 

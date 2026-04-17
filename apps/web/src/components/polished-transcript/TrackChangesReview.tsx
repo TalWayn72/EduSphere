@@ -231,6 +231,7 @@ export function TrackChangesReview({
           className="p-4 font-serif"
           data-testid="polished-document"
           lang="he"
+          dir="rtl"
         >
           {sortedBlocks.map((block) => (
             <BlockReview
