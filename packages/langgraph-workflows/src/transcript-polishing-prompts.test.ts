@@ -181,9 +181,15 @@ describe('ChangeType enum', () => {
   it('contains all expected string values', () => {
     expect(ChangeType.FILLER_REMOVED).toBe('FILLER_REMOVED');
     expect(ChangeType.STUTTER_REMOVED).toBe('STUTTER_REMOVED');
-    expect(ChangeType.AUDIENCE_ADDRESS_REMOVED).toBe('AUDIENCE_ADDRESS_REMOVED');
-    expect(ChangeType.TECHNICAL_INSTRUCTION_REMOVED).toBe('TECHNICAL_INSTRUCTION_REMOVED');
-    expect(ChangeType.IMPERATIVE_TO_DESCRIPTION).toBe('IMPERATIVE_TO_DESCRIPTION');
+    expect(ChangeType.AUDIENCE_ADDRESS_REMOVED).toBe(
+      'AUDIENCE_ADDRESS_REMOVED'
+    );
+    expect(ChangeType.TECHNICAL_INSTRUCTION_REMOVED).toBe(
+      'TECHNICAL_INSTRUCTION_REMOVED'
+    );
+    expect(ChangeType.IMPERATIVE_TO_DESCRIPTION).toBe(
+      'IMPERATIVE_TO_DESCRIPTION'
+    );
     expect(ChangeType.RHETORICAL_Q_ANSWERED).toBe('RHETORICAL_Q_ANSWERED');
     expect(ChangeType.PRONOUN_PLURALIZED).toBe('PRONOUN_PLURALIZED');
     expect(ChangeType.CITATION_FORMATTED).toBe('CITATION_FORMATTED');

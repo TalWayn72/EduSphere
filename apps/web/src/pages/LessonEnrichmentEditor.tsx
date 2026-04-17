@@ -74,7 +74,9 @@ export function LessonEnrichmentEditor() {
     variables: { lessonId },
     pause: !lessonId,
   });
-  const [{ fetching: polishingRequesting }, requestPolishing] = useMutation(REQUEST_TRANSCRIPT_POLISHING_MUTATION);
+  const [{ fetching: polishingRequesting }, requestPolishing] = useMutation(
+    REQUEST_TRANSCRIPT_POLISHING_MUTATION
+  );
   const polishedTranscript = polishedData?.polishedTranscript ?? null;
   const isPolishing = polishedTranscript?.status === 'PROCESSING';
 
@@ -82,7 +84,8 @@ export function LessonEnrichmentEditor() {
     const result = await requestPolishing({ lessonId });
     if (result.error) {
       toast.error('Failed to start AI polishing', {
-        description: result.error.graphQLErrors?.[0]?.message ?? result.error.message,
+        description:
+          result.error.graphQLErrors?.[0]?.message ?? result.error.message,
       });
       return;
     }
@@ -205,7 +208,9 @@ export function LessonEnrichmentEditor() {
                   <TabsTrigger value="citations">Citations</TabsTrigger>
                   <TabsTrigger value="anchors">Anchors</TabsTrigger>
                   <TabsTrigger value="preview">Preview</TabsTrigger>
-                  <TabsTrigger value="polished">Polished Transcript</TabsTrigger>
+                  <TabsTrigger value="polished">
+                    Polished Transcript
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent
                   value="citations"
@@ -251,7 +256,8 @@ export function LessonEnrichmentEditor() {
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full gap-4 py-12 px-6">
                       <p className="text-sm text-muted-foreground text-center">
-                        No polished transcript yet. Start AI polishing to review tracked changes.
+                        No polished transcript yet. Start AI polishing to review
+                        tracked changes.
                       </p>
                       <Button
                         variant="outline"

@@ -76,7 +76,8 @@ function toPolishedBlocks(
     .map((b) => ({
       id: b.id,
       blockType: b.blockType ?? 'POLISHED_TEXT',
-      text: b.instructorEdited && b.instructorText ? b.instructorText : b.content,
+      text:
+        b.instructorEdited && b.instructorText ? b.instructorText : b.content,
       startTime: b.startTime ?? null,
       endTime: b.endTime ?? null,
     }));

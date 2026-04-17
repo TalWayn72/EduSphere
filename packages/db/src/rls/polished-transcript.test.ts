@@ -57,7 +57,7 @@ function buildMockDb(capturedCalls: string[]): DrizzleDB {
   };
   return {
     transaction: vi.fn(async (cb: (tx: typeof mockTx) => Promise<unknown>) =>
-      cb(mockTx),
+      cb(mockTx)
     ),
   } as unknown as DrizzleDB;
 }
@@ -87,17 +87,17 @@ const SUPER_ADMIN_CTX: TenantContext = {
 describe('instructor_voice_profiles: RLS policy references app.current_tenant', () => {
   it('table has RLS enabled (enableRLS called)', () => {
     const sym = Object.getOwnPropertySymbols(instructor_voice_profiles).find(
-      (s) => s.toString().includes('EnableRLS'),
+      (s) => s.toString().includes('EnableRLS')
     );
     // Drizzle sets a Symbol on the table when enableRLS() is called
     expect(sym !== undefined || 'enableRLS' in instructor_voice_profiles).toBe(
-      true,
+      true
     );
   });
 
   it('RLS policy SQL references app.current_tenant', () => {
     const raw = sqlToString(
-      voiceProfilesRlsSql as unknown as Parameters<typeof sqlToString>[0],
+      voiceProfilesRlsSql as unknown as Parameters<typeof sqlToString>[0]
     );
     expect(raw).toContain('app.current_tenant');
   });
@@ -110,14 +110,14 @@ describe('instructor_voice_profiles: RLS policy references app.current_tenant', 
 describe('polished_transcripts: RLS policy references app.current_tenant', () => {
   it('table has RLS enabled (enableRLS called)', () => {
     const sym = Object.getOwnPropertySymbols(polished_transcripts).find((s) =>
-      s.toString().includes('EnableRLS'),
+      s.toString().includes('EnableRLS')
     );
     expect(sym !== undefined || 'enableRLS' in polished_transcripts).toBe(true);
   });
 
   it('RLS policy SQL references app.current_tenant', () => {
     const raw = sqlToString(
-      polishedTranscriptsRlsSql as unknown as Parameters<typeof sqlToString>[0],
+      polishedTranscriptsRlsSql as unknown as Parameters<typeof sqlToString>[0]
     );
     expect(raw).toContain('app.current_tenant');
   });

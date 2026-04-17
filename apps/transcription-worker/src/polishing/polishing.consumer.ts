@@ -97,9 +97,7 @@ export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
     const sub = this.connection.subscribe(JARGON_SUBJECT, {
       queue: QUEUE_GROUP,
     });
-    this.logger.log(
-      `Subscribed to ${JARGON_SUBJECT} (queue: ${QUEUE_GROUP})`
-    );
+    this.logger.log(`Subscribed to ${JARGON_SUBJECT} (queue: ${QUEUE_GROUP})`);
     void (async () => {
       for await (const msg of sub) {
         try {

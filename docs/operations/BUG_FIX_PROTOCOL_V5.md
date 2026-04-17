@@ -113,12 +113,12 @@ Document: file:line where bug originates + why it happens.
 
 ## Phase 4 — Fix Rounds
 
-| Round | Scope |
-|-------|-------|
+| Round   | Scope                                                            |
+| ------- | ---------------------------------------------------------------- |
 | Round 1 | Original bug + add Pino logging + **INVERT the reproducer test** |
-| Round 2 | All Wave 2 findings |
-| Round 3 | All Wave 3 findings |
-| Round N | Continue until Discovery List 100% empty |
+| Round 2 | All Wave 2 findings                                              |
+| Round 3 | All Wave 3 findings                                              |
+| Round N | Continue until Discovery List 100% empty                         |
 
 **Round Completion Gate (MANDATORY after EVERY round):**
 
@@ -185,6 +185,7 @@ Document: file:line where bug originates + why it happens.
 ## Phase 8 — Container Deploy & Live Verification
 
 **Blue-Green deploy:**
+
 ```bash
 docker-compose build --no-cache   # old container stays running
 # verify build succeeds (exit 0) BEFORE touching running container
@@ -192,6 +193,7 @@ docker-compose down && docker-compose up -d
 ```
 
 **Verification:**
+
 - [ ] `docker ps` — ≥5 containers healthy
 - [ ] `./scripts/health-check.sh` — ALL services PASS
 - [ ] `supervisorctl status` — ALL subgraphs RUNNING
@@ -200,15 +202,16 @@ docker-compose down && docker-compose up -d
 
 **5-User Authentication Test:**
 
-| User | Role | Password |
-|------|------|----------|
+| User                      | Role        | Password       |
+| ------------------------- | ----------- | -------------- |
 | super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
-| instructor@example.com | INSTRUCTOR | Instructor123! |
-| org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
-| researcher@example.com | RESEARCHER | Researcher123! |
-| student@example.com | STUDENT | Student123! |
+| instructor@example.com    | INSTRUCTOR  | Instructor123! |
+| org.admin@example.com     | ORG_ADMIN   | OrgAdmin123!   |
+| researcher@example.com    | RESEARCHER  | Researcher123! |
+| student@example.com       | STUDENT     | Student123!    |
 
 **Container-specific traps:**
+
 - ESM-only packages (file-type v17+) fail under CJS require
 - pnpm hoisting: package in package.json but symlink missing → `pnpm install` inside container
 - Custom directives in SDL must be declared via `@link(import: [...])` or subgraph crashes
@@ -235,6 +238,7 @@ Update `OPEN_ISSUES.md`:
 
 ```markdown
 ## BUG-NNN: [Title]
+
 - **Status:** ✅ Fixed
 - **Severity:** P1
 - **Root Cause:** [layer] → exact issue at file:line

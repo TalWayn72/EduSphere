@@ -16,7 +16,11 @@ import type { EnrichedTranscriptBlock } from './enriched-transcript.types';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('./CitationCard', () => ({
-  CitationCard: ({ citation }: { citation: { id: string; bookName: string } }) => (
+  CitationCard: ({
+    citation,
+  }: {
+    citation: { id: string; bookName: string };
+  }) => (
     <div data-testid={`citation-card-${citation.id}`}>{citation.bookName}</div>
   ),
 }));
@@ -53,7 +57,9 @@ vi.mock('@/components/ui/scroll-area', () => ({
   }: {
     children: React.ReactNode;
     [key: string]: unknown;
-  }) => <div {...(props as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>,
+  }) => (
+    <div {...(props as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>
+  ),
 }));
 
 beforeEach(() => {
@@ -123,80 +129,45 @@ describe('EnrichedTranscriptPanel — click-to-seek', () => {
   });
 
   it('TEXT block without startTime has aria-disabled=true', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[textNoTs]}
-        currentTime={0}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[textNoTs]} currentTime={0} />);
     const btn = screen.getByText('Block without timestamp').closest('button');
     expect(btn).not.toBeNull();
     expect(btn!.getAttribute('aria-disabled')).toBe('true');
   });
 
   it('TEXT block with startTime does NOT have aria-disabled', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[textWithTs]}
-        currentTime={0}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[textWithTs]} currentTime={0} />);
     const btn = screen.getByText('Block with timestamp').closest('button');
     expect(btn).not.toBeNull();
     expect(btn!.getAttribute('aria-disabled')).toBeNull();
   });
 
   it('TEXT block without startTime has cursor-default class', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[textNoTs]}
-        currentTime={0}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[textNoTs]} currentTime={0} />);
     const btn = screen.getByText('Block without timestamp').closest('button');
     expect(btn!.className).toContain('cursor-default');
   });
 
   it('TEXT block with startTime has cursor-pointer class', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[textWithTs]}
-        currentTime={0}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[textWithTs]} currentTime={0} />);
     const btn = screen.getByText('Block with timestamp').closest('button');
     expect(btn!.className).toContain('cursor-pointer');
   });
 
   it('HEADING block renders as h3 — not a button', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[headingBlock]}
-        currentTime={0}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[headingBlock]} currentTime={0} />);
     const heading = screen.getByText('Section Heading');
     expect(heading.tagName).toBe('H3');
   });
 
   it('active TEXT block (currentTime in range) gets bg-primary/10 class', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[textWithTs]}
-        currentTime={15}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[textWithTs]} currentTime={15} />);
     const btn = screen.getByText('Block with timestamp').closest('button');
     expect(btn!.className).toContain('bg-primary/10');
   });
 
   it('inactive TEXT block (currentTime out of range) does not have bg-primary/10', () => {
-    render(
-      <EnrichedTranscriptPanel
-        blocks={[textWithTs]}
-        currentTime={25}
-      />
-    );
+    render(<EnrichedTranscriptPanel blocks={[textWithTs]} currentTime={25} />);
     const btn = screen.getByText('Block with timestamp').closest('button');
     expect(btn!.className).not.toContain('bg-primary/10');
   });

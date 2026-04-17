@@ -65,16 +65,24 @@ export function TranscriptSection({
       {/* Header — label + optional toggle */}
       <div className="px-3 py-1.5 border-b flex items-center gap-1.5 flex-shrink-0">
         <BookOpen className="h-3.5 w-3.5 flex-shrink-0" />
-        <span className="text-xs font-semibold">{t('transcript', 'תמלול')}</span>
+        <span className="text-xs font-semibold">
+          {t('transcript', 'תמלול')}
+        </span>
 
         {hasPolished && (
           <div
             className="mr-auto flex items-center gap-1"
             role="group"
-            aria-label={t('polishedTranscript.reader.polishedToggle', 'תמליל ערוך')}
+            aria-label={t(
+              'polishedTranscript.reader.polishedToggle',
+              'תמליל ערוך'
+            )}
           >
             {polishedStatus === 'DRAFT' && (
-              <PolishingStatusBadge status="DRAFT" className="text-[10px] py-0 px-1.5 h-4" />
+              <PolishingStatusBadge
+                status="DRAFT"
+                className="text-[10px] py-0 px-1.5 h-4"
+              />
             )}
             <button
               type="button"

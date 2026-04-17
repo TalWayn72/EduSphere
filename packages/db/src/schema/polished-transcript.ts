@@ -38,7 +38,7 @@ export const instructor_voice_profiles = pgTable(
   (t) => [
     uniqueIndex('uq_voice_profile_tenant_instructor').on(
       t.tenant_id,
-      t.instructor_id,
+      t.instructor_id
     ),
     index('idx_voice_profiles_tenant').on(t.tenant_id),
     index('idx_voice_profiles_instructor').on(t.instructor_id),
@@ -46,7 +46,7 @@ export const instructor_voice_profiles = pgTable(
       using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type InstructorVoiceProfile =
@@ -95,7 +95,7 @@ export const polished_transcripts = pgTable(
   (t) => [
     uniqueIndex('uq_polished_transcript_lesson_version').on(
       t.lesson_id,
-      t.version,
+      t.version
     ),
     index('idx_polished_transcripts_tenant').on(t.tenant_id),
     index('idx_polished_transcripts_lesson').on(t.lesson_id),
@@ -104,7 +104,7 @@ export const polished_transcripts = pgTable(
       using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type PolishedTranscript = typeof polished_transcripts.$inferSelect;
@@ -139,7 +139,7 @@ export const polished_transcript_blocks = pgTable(
   (t) => [
     index('idx_polished_blocks_polished_id').on(t.polished_id),
     index('idx_polished_blocks_order').on(t.polished_id, t.block_order),
-  ],
+  ]
 );
 
 export type PolishedTranscriptBlock =
@@ -187,7 +187,7 @@ export const polished_block_changes = pgTable(
   (t) => [
     index('idx_polished_changes_block_id').on(t.block_id),
     index('idx_polished_changes_status').on(t.status),
-  ],
+  ]
 );
 
 export type PolishedBlockChange = typeof polished_block_changes.$inferSelect;

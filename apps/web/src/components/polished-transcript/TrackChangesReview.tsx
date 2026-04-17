@@ -55,7 +55,10 @@ function buildBlockSegments(
   let cursor = 0;
   for (const change of sorted) {
     if (change.charOffsetStart > cursor) {
-      segments.push({ type: 'text', content: text.slice(cursor, change.charOffsetStart) });
+      segments.push({
+        type: 'text',
+        content: text.slice(cursor, change.charOffsetStart),
+      });
     }
     segments.push({ type: 'change', change });
     cursor = change.charOffsetEnd;
@@ -79,9 +82,10 @@ function BlockReview({
   onReject: (id: string) => void;
   isBusy: boolean;
 }) {
-  const displayText = block.instructorEdited && block.instructorText
-    ? block.instructorText
-    : block.content;
+  const displayText =
+    block.instructorEdited && block.instructorText
+      ? block.instructorText
+      : block.content;
   const segments = buildBlockSegments(displayText, block.changes);
 
   if (block.blockType === 'POLISHED_HEADING') {
@@ -104,7 +108,11 @@ function BlockReview({
           <ChangeInlineMarker
             key={seg.change.id}
             change={seg.change}
-            localDecision={decisions[seg.change.id] as Parameters<typeof ChangeInlineMarker>[0]['localDecision']}
+            localDecision={
+              decisions[seg.change.id] as Parameters<
+                typeof ChangeInlineMarker
+              >[0]['localDecision']
+            }
             onAccept={onAccept}
             onReject={onReject}
             disabled={isBusy}
@@ -173,7 +181,9 @@ export function TrackChangesReview({
     (c) => (decisions[c.id] ?? c.status) === 'PENDING'
   ).length;
   const isBusy = acceptingAll || rejectingAll || approving;
-  const sortedBlocks = [...transcript.blocks].sort((a, b) => a.blockOrder - b.blockOrder);
+  const sortedBlocks = [...transcript.blocks].sort(
+    (a, b) => a.blockOrder - b.blockOrder
+  );
 
   return (
     <div
@@ -217,7 +227,9 @@ export function TrackChangesReview({
           <Button
             size="sm"
             onClick={() => void handleApprove()}
-            disabled={isBusy || pendingCount > 0 || transcript.status === 'APPROVED'}
+            disabled={
+              isBusy || pendingCount > 0 || transcript.status === 'APPROVED'
+            }
             data-testid="approve-transcript-btn"
           >
             {t('polishedTranscript.approve')}

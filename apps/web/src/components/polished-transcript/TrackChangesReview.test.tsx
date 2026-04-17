@@ -81,7 +81,11 @@ vi.mock('@/components/polished-transcript/ChangeInlineMarker', () => ({
     onAccept,
     onReject,
   }: {
-    change: { id: string; originalFragment: string; replacementFragment: string };
+    change: {
+      id: string;
+      originalFragment: string;
+      replacementFragment: string;
+    };
     onAccept: (id: string) => void;
     onReject: (id: string) => void;
   }) => (

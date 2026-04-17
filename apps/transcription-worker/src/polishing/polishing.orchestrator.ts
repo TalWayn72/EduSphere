@@ -81,7 +81,11 @@ export class PolishingOrchestratorService {
       userId: 'system',
       userRole: 'SUPER_ADMIN',
     };
-    const polishedId = await createPolishedRecord(lessonId, tenantId, tenantCtx);
+    const polishedId = await createPolishedRecord(
+      lessonId,
+      tenantId,
+      tenantCtx
+    );
     await this.nats.publish(POLISHING_EVENTS.STARTED, {
       lessonId,
       tenantId,
@@ -106,7 +110,11 @@ export class PolishingOrchestratorService {
     const segments = await loadSegments(lessonId, tenantCtx);
     if (segments.length === 0) {
       this.logger.warn({ lessonId }, 'No segments — skipping polishing');
-      await markFailed(polishedId, tenantCtx, new Error('No transcript segments found'));
+      await markFailed(
+        polishedId,
+        tenantCtx,
+        new Error('No transcript segments found')
+      );
       return;
     }
 
@@ -157,7 +165,13 @@ export class PolishingOrchestratorService {
         await saveVoiceProfile(tenantId, instructorId, fresh, lessonId);
       }
 
-      await publishCompletion(lessonId, tenantId, polishedId, result, this.nats);
+      await publishCompletion(
+        lessonId,
+        tenantId,
+        polishedId,
+        result,
+        this.nats
+      );
       this.logger.log(
         { lessonId, coverage: result.coverageScore },
         'Polishing pipeline complete'

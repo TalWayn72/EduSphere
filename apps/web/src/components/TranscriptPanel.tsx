@@ -59,7 +59,11 @@ export function TranscriptPanel({
         </div>
       </div>
 
-      <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-2" dir="rtl">
+      <div
+        ref={listRef}
+        className="flex-1 overflow-y-auto p-4 space-y-2"
+        dir="rtl"
+      >
         {filteredSegments.map((segment) => {
           const isActive = isSegmentActive(segment);
           return (

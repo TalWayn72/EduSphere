@@ -373,6 +373,10 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Return total count of xAPI statements for this tenant (optionally filtered by since).
   """
   xapiStatementCount(since: String) : Int! @join__field(graph: CONTENT)  @authenticated
+  """
+  List active citation format configs for a course.
+  """
+  citationFormatConfigs(courseId: ID!) : [CitationFormatConfig!]! @join__field(graph: CONTENT)  @authenticated
   adminOverview: AdminOverview! @join__field(graph: CORE)  @authenticated
   adminDashboardStats: AdminDashboardStats! @join__field(graph: CORE)  @authenticated
   atRiskThresholds: AtRiskThresholds! @join__field(graph: CORE)  @authenticated
@@ -669,6 +673,17 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   updateLessonCitation(citationId: ID!, input: UpdateCitationInput!) : LessonCitation! @join__field(graph: CONTENT)  @authenticated
   setBlockAnchorTimestamp(input: SetBlockAnchorTimestampInput!) : EnrichedTranscriptBlock! @join__field(graph: CONTENT)  @authenticated
   publishEnrichedLesson(lessonId: ID!) : EnrichedLesson! @join__field(graph: CONTENT)  @authenticated
+  """
+  Create or update a citation format config for a course.
+  presetName values: JEWISH_TEXTS | APA | MLA | CHICAGO | CUSTOM
+  """
+  setCitationFormat(courseId: ID!, presetName: String!, formatDescription: String) : CitationFormatConfig! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """
+  Auto-generate enriched transcript blocks from existing transcript segments.
+  Groups consecutive segments into ~2-minute TEXT blocks and prepends a HEADING.
+  Idempotent — safe to call multiple times.
+  """
+  createEnrichedBlocksFromTranscript(lessonId: ID!) : EnrichedLesson! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   """Approve the polished transcript → sets status to PUBLISHED."""
   approvePolishedTranscript(polishedTranscriptId: ID!) : PolishedTranscript! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   """Manually override the content of a polished block."""
@@ -1668,6 +1683,15 @@ type EnrichedLesson @join__type(graph: CONTENT)  {
   youtubeVideoId: String
   transcriptReady: Boolean!
   enrichmentStatus: EnrichmentStatus!
+}
+
+type CitationFormatConfig @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  presetName: String!
+  formatDescription: String
+  parsedStructure: JSON
+  isActive: Boolean!
 }
 
 type ExamSession @join__type(graph: CONTENT)  {

@@ -171,7 +171,9 @@ describe('PolishedTranscriptPanel', () => {
 
   it('CITATION block with startTime calls onSeek on click', () => {
     const onSeek = vi.fn();
-    render(<PolishedTranscriptPanel blocks={[citationBlock]} onSeek={onSeek} />);
+    render(
+      <PolishedTranscriptPanel blocks={[citationBlock]} onSeek={onSeek} />
+    );
     const quote = document.querySelector('blockquote');
     expect(quote).not.toBeNull();
     fireEvent.click(quote!);

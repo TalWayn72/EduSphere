@@ -53,7 +53,8 @@ const MOCK_BLOCK = {
   blockType: 'POLISHED_TEXT',
   blockOrder: 0,
   content: 'The Talmud discusses this passage in tractate Berakhot.',
-  originalText: 'um so basically the Talmud discusses this passage in tractate Berakhot.',
+  originalText:
+    'um so basically the Talmud discusses this passage in tractate Berakhot.',
   startTime: 0,
   endTime: 12,
   sourceSegmentIds: [],
@@ -87,7 +88,9 @@ const MOCK_ENRICHED_LESSON = {
   id: LESSON_ID,
   youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   enrichmentStatus: 'READY',
-  transcript: [{ id: 'seg-1', startTime: 0, endTime: 10, text: 'Raw text here.' }],
+  transcript: [
+    { id: 'seg-1', startTime: 0, endTime: 10, text: 'Raw text here.' },
+  ],
   enrichedBlocks: [],
   citations: [],
 };
@@ -156,9 +159,7 @@ test.describe('Polished Transcript — Instructor Editor', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Click the polished tab
-    const polishedTab = page
-      .getByRole('tab', { name: /polished/i })
-      .first();
+    const polishedTab = page.getByRole('tab', { name: /polished/i }).first();
     await polishedTab.waitFor({ timeout: 10_000 });
     await polishedTab.click();
 
@@ -177,12 +178,12 @@ test.describe('Polished Transcript — Instructor Editor', () => {
     await polishedTab.waitFor({ timeout: 10_000 });
     await polishedTab.click();
 
-    await expect(
-      page.locator('[data-testid="accept-all-btn"]')
-    ).toBeVisible({ timeout: 8_000 });
-    await expect(
-      page.locator('[data-testid="reject-all-btn"]')
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('[data-testid="accept-all-btn"]')).toBeVisible({
+      timeout: 8_000,
+    });
+    await expect(page.locator('[data-testid="reject-all-btn"]')).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('Approve Transcript button is present and disabled while changes are pending', async ({
@@ -212,15 +213,26 @@ test.describe('Polished Transcript — Instructor Editor', () => {
     const mutations: string[] = [];
     await page.route('**/graphql', async (route) => {
       const body = route.request().postData() ?? '';
-      if (body.includes('BulkDecide') || body.includes('bulkDecide')) mutations.push('bulkDecide');
+      if (body.includes('BulkDecide') || body.includes('bulkDecide'))
+        mutations.push('bulkDecide');
       if (body.includes('bulkDecide') || body.includes('BulkDecide')) {
-        await route.fulfill({ status: 200, contentType: 'application/json',
-          body: JSON.stringify({ data: { bulkDecidePolishedChanges: MOCK_POLISHED_APPROVED } }) });
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: { bulkDecidePolishedChanges: MOCK_POLISHED_APPROVED },
+          }),
+        });
         return;
       }
       if (body.includes('Approve') || body.includes('approve')) {
-        await route.fulfill({ status: 200, contentType: 'application/json',
-          body: JSON.stringify({ data: { approvePolishedTranscript: MOCK_POLISHED_APPROVED } }) });
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: { approvePolishedTranscript: MOCK_POLISHED_APPROVED },
+          }),
+        });
         return;
       }
       await route.continue();
@@ -312,7 +324,9 @@ test.describe('Polished Transcript — Student Reading View', () => {
     const polishedVisible = await polishedToggle.isVisible().catch(() => false);
     if (rawVisible && polishedVisible) {
       await polishedToggle.click();
-      const polishedPanel = page.locator('[data-testid="polished-transcript-panel"]');
+      const polishedPanel = page.locator(
+        '[data-testid="polished-transcript-panel"]'
+      );
       await expect(polishedPanel).toBeVisible({ timeout: 5_000 });
     }
   });
