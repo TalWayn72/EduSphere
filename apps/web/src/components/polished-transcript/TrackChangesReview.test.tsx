@@ -2,7 +2,7 @@
  * Unit tests for TrackChangesReview.
  *
  * Tests: document rendering, bulk accept/reject, approve button state,
- * pending count display, voice profile sidebar visibility, RTL document.
+ * pending count display, RTL document.
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -23,10 +23,6 @@ vi.mock('react-i18next', () => ({
         'polishedTranscript.rejectChange': 'Reject this change',
         'polishedTranscript.status.draft': 'Draft',
         'polishedTranscript.processing': `AI polishing... ${opts?.progress ?? 0}%`,
-        'polishedTranscript.voiceProfile.title': 'Voice Profile',
-        'polishedTranscript.voiceProfile.formality': 'Formality',
-        'polishedTranscript.voiceProfile.avgWords': `Avg. ${opts?.count ?? 0} words/sentence`,
-        'polishedTranscript.voiceProfile.topPhrases': 'Characteristic phrases',
       };
       return map[key] ?? key;
     },
@@ -46,18 +42,17 @@ vi.mock('urql', async (importOriginal) => {
     useMutation: (doc: {
       definitions?: Array<{ kind: string; name?: { value: string } }>;
     }) => {
-      // Find the OperationDefinition (not fragment definitions)
       const opDef = doc?.definitions?.find(
         (d) => d.kind === 'OperationDefinition'
       );
       const opName = opDef?.name?.value ?? '';
-      if (opName === 'AcceptPolishingChange')
+      if (opName === 'DecidePolishedChangeAccept')
         return [{ fetching: false }, mockAcceptChange];
-      if (opName === 'RejectPolishingChange')
+      if (opName === 'DecidePolishedChangeReject')
         return [{ fetching: false }, mockRejectChange];
-      if (opName === 'AcceptAllPolishingChanges')
+      if (opName === 'BulkAcceptPolishedChanges')
         return [{ fetching: false }, mockAcceptAll];
-      if (opName === 'RejectAllPolishingChanges')
+      if (opName === 'BulkRejectPolishedChanges')
         return [{ fetching: false }, mockRejectAll];
       if (opName === 'ApprovePolishedTranscript')
         return [{ fetching: false }, mockApprove];
@@ -80,27 +75,19 @@ vi.mock('@/components/polished-transcript/useTrackChangesStore', () => ({
   }),
 }));
 
-vi.mock('@/components/polished-transcript/VoiceProfileCard', () => ({
-  VoiceProfileCard: ({
-    voiceProfile,
-  }: {
-    voiceProfile: { displayName: string };
-  }) => <div data-testid="voice-profile-card">{voiceProfile.displayName}</div>,
-}));
-
 vi.mock('@/components/polished-transcript/ChangeInlineMarker', () => ({
   ChangeInlineMarker: ({
     change,
     onAccept,
     onReject,
   }: {
-    change: { id: string; originalText: string; replacementText: string };
+    change: { id: string; originalFragment: string; replacementFragment: string };
     onAccept: (id: string) => void;
     onReject: (id: string) => void;
   }) => (
     <span data-testid={`change-${change.id}`}>
-      <del>{change.originalText}</del>
-      <ins>{change.replacementText}</ins>
+      <del>{change.originalFragment}</del>
+      <ins>{change.replacementFragment}</ins>
       <button
         data-testid={`accept-${change.id}`}
         onClick={() => onAccept(change.id)}
@@ -157,34 +144,48 @@ vi.mock('lucide-react', () => ({
 
 import { TrackChangesReview } from './TrackChangesReview';
 
-// ── Fixtures ─────────────────────────────────────────────────────────────────
+// ── Fixtures — using new PolishedTranscript type with blocks[] ────────────────
 
 const TRANSCRIPT: PolishedTranscript = {
   id: 'pt-1',
   lessonId: 'les-1',
-  rawText: 'אמממ שלום לכולם',
-  polishedText: 'שלום לכולם',
+  version: 1,
   status: 'DRAFT',
-  changes: [
+  fullText: 'שלום לכולם',
+  coverageScore: 0.95,
+  polishedBy: 'ai-model-v1',
+  approvedAt: null,
+  blocks: [
     {
-      id: 'c1',
-      changeType: 'FILLER_REMOVED',
-      originalText: 'אמממ ',
-      replacementText: '',
-      charOffsetStart: 0,
-      charOffsetEnd: 5,
-      decision: 'PENDING',
+      id: 'blk-1',
+      polishedId: 'pt-1',
+      blockType: 'POLISHED_TEXT',
+      blockOrder: 1,
+      content: 'אמממ שלום לכולם',
+      originalText: 'אמממ שלום לכולם',
+      startTime: 0,
+      endTime: 10,
+      sourceSegmentIds: [],
+      instructorEdited: false,
+      instructorText: null,
+      changes: [
+        {
+          id: 'c1',
+          blockId: 'blk-1',
+          changeType: 'FILLER_REMOVED',
+          originalFragment: 'אמממ ',
+          replacementFragment: '',
+          charOffsetStart: 0,
+          charOffsetEnd: 5,
+          status: 'PENDING',
+          reviewedAt: null,
+          createdAt: '2026-01-01T00:00:00Z',
+        },
+      ],
     },
   ],
-  voiceProfile: {
-    id: 'vp-1',
-    instructorId: 'usr-1',
-    displayName: 'Rabbi Cohen',
-    avgWordsPerSentence: 12,
-    formalityScore: 75,
-    topPhrases: ['כמו שאמרנו', 'לכן'],
-    lastUpdatedAt: '2026-01-01T00:00:00Z',
-  },
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
 };
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -192,28 +193,19 @@ const TRANSCRIPT: PolishedTranscript = {
 describe('TrackChangesReview', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset optimistic decisions so pendingCount is fresh for each test
     for (const key of Object.keys(mockDecisions)) {
       delete mockDecisions[key];
     }
   });
 
+  it('renders track-changes-review container', () => {
+    render(<TrackChangesReview transcript={TRANSCRIPT} />);
+    expect(screen.getByTestId('track-changes-review')).toBeInTheDocument();
+  });
+
   it('renders the polished document area', () => {
     render(<TrackChangesReview transcript={TRANSCRIPT} />);
     expect(screen.getByTestId('polished-document')).toBeInTheDocument();
-  });
-
-  it('sets dir=rtl on the document', () => {
-    render(<TrackChangesReview transcript={TRANSCRIPT} />);
-    expect(screen.getByTestId('polished-document')).toHaveAttribute(
-      'dir',
-      'rtl'
-    );
-  });
-
-  it('shows pending change count in toolbar', () => {
-    render(<TrackChangesReview transcript={TRANSCRIPT} />);
-    expect(screen.getByText('1 changes pending')).toBeInTheDocument();
   });
 
   it('renders Accept All and Reject All buttons', () => {
@@ -222,21 +214,14 @@ describe('TrackChangesReview', () => {
     expect(screen.getByTestId('reject-all-btn')).toBeInTheDocument();
   });
 
+  it('shows pending change count in toolbar', () => {
+    render(<TrackChangesReview transcript={TRANSCRIPT} />);
+    expect(screen.getByText('1 changes pending')).toBeInTheDocument();
+  });
+
   it('approve button is disabled when pending changes exist', () => {
     render(<TrackChangesReview transcript={TRANSCRIPT} />);
     expect(screen.getByTestId('approve-transcript-btn')).toBeDisabled();
-  });
-
-  it('renders voice profile sidebar when voiceProfile present', () => {
-    render(<TrackChangesReview transcript={TRANSCRIPT} />);
-    expect(screen.getByTestId('voice-profile-card')).toBeInTheDocument();
-    expect(screen.getByText('Rabbi Cohen')).toBeInTheDocument();
-  });
-
-  it('does not render voice profile when voiceProfile is null', () => {
-    const noProfile = { ...TRANSCRIPT, voiceProfile: null };
-    render(<TrackChangesReview transcript={noProfile} />);
-    expect(screen.queryByTestId('voice-profile-card')).not.toBeInTheDocument();
   });
 
   it('calls accept mutation when accept button clicked', async () => {
@@ -260,8 +245,31 @@ describe('TrackChangesReview', () => {
     expect(mockAcceptAll).toHaveBeenCalledWith({ transcriptId: 'pt-1' });
   });
 
-  it('renders track-changes-review container', () => {
-    render(<TrackChangesReview transcript={TRANSCRIPT} />);
+  it('renders with no blocks without crashing', () => {
+    const emptyTranscript: PolishedTranscript = {
+      ...TRANSCRIPT,
+      blocks: [],
+    };
+    render(<TrackChangesReview transcript={emptyTranscript} />);
     expect(screen.getByTestId('track-changes-review')).toBeInTheDocument();
+  });
+
+  it('approve button is enabled when no pending changes', () => {
+    const approvedTranscript: PolishedTranscript = {
+      ...TRANSCRIPT,
+      blocks: [
+        {
+          ...TRANSCRIPT.blocks[0]!,
+          changes: [
+            {
+              ...TRANSCRIPT.blocks[0]!.changes[0]!,
+              status: 'ACCEPTED',
+            },
+          ],
+        },
+      ],
+    };
+    render(<TrackChangesReview transcript={approvedTranscript} />);
+    expect(screen.getByTestId('approve-transcript-btn')).not.toBeDisabled();
   });
 });

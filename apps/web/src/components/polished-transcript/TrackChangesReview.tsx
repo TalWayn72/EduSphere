@@ -1,8 +1,8 @@
 /**
  * TrackChangesReview — main component for reviewing AI-polished transcripts.
  *
- * Renders the polished document with inline tracked changes (red strikethrough
- * for deletions, green for additions) plus Accept / Reject controls per change.
+ * Renders polished blocks with inline tracked changes (red strikethrough for
+ * deletions, green for additions) plus Accept / Reject controls per change.
  * Bulk accept/reject all via toolbar. Hebrew RTL text throughout.
  *
  * EXCEPTION NOTE (150-line rule): Document renderer that composes multiple
@@ -17,7 +17,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { ChangeInlineMarker } from './ChangeInlineMarker';
 import { PolishingStatusBadge } from './PolishingStatusBadge';
-import { VoiceProfileCard } from './VoiceProfileCard';
 import { useTrackChangesStore } from './useTrackChangesStore';
 import {
   ACCEPT_POLISHING_CHANGE_MUTATION,
@@ -28,7 +27,8 @@ import {
 } from '@/lib/graphql/polished-transcript.queries';
 import type {
   PolishedTranscript,
-  PolishedChange,
+  PolishedTranscriptBlock,
+  PolishedBlockChange,
 } from './polished-transcript.types';
 
 interface TrackChangesReviewProps {
@@ -37,38 +37,82 @@ interface TrackChangesReviewProps {
   className?: string;
 }
 
-/** Build an array of text segments interleaved with change markers from offsets. */
-function buildSegments(
+/** Build text segments interleaved with change markers from a block's offsets. */
+function buildBlockSegments(
   text: string,
-  changes: PolishedChange[]
+  changes: PolishedBlockChange[]
 ): Array<
-  { type: 'text'; content: string } | { type: 'change'; change: PolishedChange }
+  | { type: 'text'; content: string }
+  | { type: 'change'; change: PolishedBlockChange }
 > {
   const sorted = [...changes].sort(
     (a, b) => a.charOffsetStart - b.charOffsetStart
   );
   const segments: Array<
     | { type: 'text'; content: string }
-    | { type: 'change'; change: PolishedChange }
+    | { type: 'change'; change: PolishedBlockChange }
   > = [];
   let cursor = 0;
-
   for (const change of sorted) {
     if (change.charOffsetStart > cursor) {
-      segments.push({
-        type: 'text',
-        content: text.slice(cursor, change.charOffsetStart),
-      });
+      segments.push({ type: 'text', content: text.slice(cursor, change.charOffsetStart) });
     }
     segments.push({ type: 'change', change });
     cursor = change.charOffsetEnd;
   }
-
   if (cursor < text.length) {
     segments.push({ type: 'text', content: text.slice(cursor) });
   }
-
   return segments;
+}
+
+function BlockReview({
+  block,
+  decisions,
+  onAccept,
+  onReject,
+  isBusy,
+}: {
+  block: PolishedTranscriptBlock;
+  decisions: Record<string, string>;
+  onAccept: (id: string) => void;
+  onReject: (id: string) => void;
+  isBusy: boolean;
+}) {
+  const displayText = block.instructorEdited && block.instructorText
+    ? block.instructorText
+    : block.content;
+  const segments = buildBlockSegments(displayText, block.changes);
+
+  if (block.blockType === 'POLISHED_HEADING') {
+    return (
+      <h3
+        className="text-base font-semibold pt-4 pb-1 border-b border-border/40 text-right"
+        dir="rtl"
+      >
+        {displayText}
+      </h3>
+    );
+  }
+
+  return (
+    <p className="text-sm leading-8 mb-3 text-right" dir="rtl">
+      {segments.map((seg, idx) =>
+        seg.type === 'text' ? (
+          <span key={idx}>{seg.content}</span>
+        ) : (
+          <ChangeInlineMarker
+            key={seg.change.id}
+            change={seg.change}
+            localDecision={decisions[seg.change.id] as Parameters<typeof ChangeInlineMarker>[0]['localDecision']}
+            onAccept={onAccept}
+            onReject={onReject}
+            disabled={isBusy}
+          />
+        )
+      )}
+    </p>
+  );
 }
 
 export function TrackChangesReview({
@@ -92,6 +136,8 @@ export function TrackChangesReview({
     APPROVE_POLISHED_TRANSCRIPT_MUTATION
   );
 
+  const allChanges = transcript.blocks.flatMap((b) => b.changes);
+
   const handleAccept = useCallback(
     (changeId: string) => {
       setDecision(changeId, 'ACCEPTED');
@@ -109,27 +155,25 @@ export function TrackChangesReview({
   );
 
   const handleAcceptAll = useCallback(async () => {
-    const ids = transcript.changes.map((c) => c.id);
-    acceptAll(ids);
+    acceptAll(allChanges.map((c) => c.id));
     await acceptAllMutation({ transcriptId: transcript.id });
-  }, [transcript.changes, transcript.id, acceptAll, acceptAllMutation]);
+  }, [allChanges, transcript.id, acceptAll, acceptAllMutation]);
 
   const handleRejectAll = useCallback(async () => {
-    const ids = transcript.changes.map((c) => c.id);
-    rejectAll(ids);
+    rejectAll(allChanges.map((c) => c.id));
     await rejectAllMutation({ transcriptId: transcript.id });
-  }, [transcript.changes, transcript.id, rejectAll, rejectAllMutation]);
+  }, [allChanges, transcript.id, rejectAll, rejectAllMutation]);
 
   const handleApprove = useCallback(async () => {
     await approveMutation({ transcriptId: transcript.id });
     onApproved?.();
   }, [approveMutation, transcript.id, onApproved]);
 
-  const segments = buildSegments(transcript.polishedText, transcript.changes);
-  const pendingCount = transcript.changes.filter(
-    (c) => (decisions[c.id] ?? c.decision) === 'PENDING'
+  const pendingCount = allChanges.filter(
+    (c) => (decisions[c.id] ?? c.status) === 'PENDING'
   ).length;
   const isBusy = acceptingAll || rejectingAll || approving;
+  const sortedBlocks = [...transcript.blocks].sort((a, b) => a.blockOrder - b.blockOrder);
 
   return (
     <div
@@ -139,10 +183,7 @@ export function TrackChangesReview({
       {/* Toolbar */}
       <div className="flex-shrink-0 flex items-center justify-between gap-2 px-3 py-2 border-b flex-wrap">
         <div className="flex items-center gap-2">
-          <PolishingStatusBadge
-            status={transcript.status}
-            progress={transcript.polishingProgress}
-          />
+          <PolishingStatusBadge status={transcript.status} />
           {pendingCount > 0 && (
             <span className="text-xs text-muted-foreground">
               {t('polishedTranscript.pendingCount', { count: pendingCount })}
@@ -176,9 +217,7 @@ export function TrackChangesReview({
           <Button
             size="sm"
             onClick={() => void handleApprove()}
-            disabled={
-              isBusy || pendingCount > 0 || transcript.status === 'APPROVED'
-            }
+            disabled={isBusy || pendingCount > 0 || transcript.status === 'APPROVED'}
             data-testid="approve-transcript-btn"
           >
             {t('polishedTranscript.approve')}
@@ -186,39 +225,25 @@ export function TrackChangesReview({
         </div>
       </div>
 
-      {/* Document + sidebar */}
-      <div className="flex flex-1 overflow-hidden">
-        <ScrollArea className="flex-1">
-          <div
-            className="p-4 text-sm leading-8 whitespace-pre-wrap font-serif"
-            dir="rtl"
-            data-testid="polished-document"
-            lang="he"
-          >
-            {segments.map((seg, idx) =>
-              seg.type === 'text' ? (
-                <span key={idx}>{seg.content}</span>
-              ) : (
-                <ChangeInlineMarker
-                  key={seg.change.id}
-                  change={seg.change}
-                  localDecision={decisions[seg.change.id]}
-                  onAccept={handleAccept}
-                  onReject={handleReject}
-                  disabled={isBusy}
-                />
-              )
-            )}
-          </div>
-        </ScrollArea>
-
-        {/* Sidebar: voice profile */}
-        {transcript.voiceProfile && (
-          <div className="w-56 flex-shrink-0 border-s overflow-y-auto p-3">
-            <VoiceProfileCard voiceProfile={transcript.voiceProfile} />
-          </div>
-        )}
-      </div>
+      {/* Document */}
+      <ScrollArea className="flex-1">
+        <div
+          className="p-4 font-serif"
+          data-testid="polished-document"
+          lang="he"
+        >
+          {sortedBlocks.map((block) => (
+            <BlockReview
+              key={block.id}
+              block={block}
+              decisions={decisions}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              isBusy={isBusy}
+            />
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 }

@@ -8,28 +8,39 @@ import { gql } from 'urql';
 
 // ── Fragments ─────────────────────────────────────────────────────────────────
 
-const POLISHED_CHANGE_FIELDS = gql`
-  fragment PolishedChangeFields on PolishedChange {
+const POLISHED_BLOCK_CHANGE_FIELDS = gql`
+  fragment PolishedBlockChangeFields on PolishedBlockChange {
     id
+    blockId
     changeType
-    originalText
-    replacementText
+    originalFragment
+    replacementFragment
     charOffsetStart
     charOffsetEnd
-    decision
+    status
+    reviewedAt
+    createdAt
   }
 `;
 
-const VOICE_PROFILE_FIELDS = gql`
-  fragment VoiceProfileFields on VoiceProfile {
+const POLISHED_TRANSCRIPT_BLOCK_FIELDS = gql`
+  fragment PolishedTranscriptBlockFields on PolishedTranscriptBlock {
     id
-    instructorId
-    displayName
-    avgWordsPerSentence
-    formalityScore
-    topPhrases
-    lastUpdatedAt
+    polishedId
+    blockType
+    blockOrder
+    content
+    originalText
+    startTime
+    endTime
+    sourceSegmentIds
+    instructorEdited
+    instructorText
+    changes {
+      ...PolishedBlockChangeFields
+    }
   }
+  ${POLISHED_BLOCK_CHANGE_FIELDS}
 `;
 
 // ── Queries ───────────────────────────────────────────────────────────────────
@@ -39,79 +50,89 @@ export const POLISHED_TRANSCRIPT_QUERY = gql`
     polishedTranscript(lessonId: $lessonId) {
       id
       lessonId
-      rawText
-      polishedText
+      version
       status
-      polishingProgress
-      changes {
-        ...PolishedChangeFields
+      fullText
+      coverageScore
+      polishedBy
+      approvedAt
+      blocks {
+        ...PolishedTranscriptBlockFields
       }
-      voiceProfile {
-        ...VoiceProfileFields
-      }
+      createdAt
+      updatedAt
     }
   }
-  ${POLISHED_CHANGE_FIELDS}
-  ${VOICE_PROFILE_FIELDS}
+  ${POLISHED_TRANSCRIPT_BLOCK_FIELDS}
 `;
 
 // ── Mutations ─────────────────────────────────────────────────────────────────
 
+/** Trigger a new polishing run (creates a new version). */
 export const REQUEST_TRANSCRIPT_POLISHING_MUTATION = gql`
-  mutation RequestTranscriptPolishing($lessonId: ID!) {
-    requestTranscriptPolishing(lessonId: $lessonId) {
+  mutation RegeneratePolishedTranscript($lessonId: ID!) {
+    regeneratePolishedTranscript(lessonId: $lessonId) {
       id
       status
-      polishingProgress
+      version
     }
   }
 `;
 
+/** Accept or reject a single tracked change within a block. */
 export const ACCEPT_POLISHING_CHANGE_MUTATION = gql`
-  mutation AcceptPolishingChange($changeId: ID!) {
-    acceptPolishingChange(changeId: $changeId) {
+  mutation DecidePolishedChangeAccept($changeId: ID!) {
+    decidePolishedChange(input: { changeId: $changeId, decision: ACCEPTED }) {
       id
-      decision
+      status
     }
   }
 `;
 
+/** Reject a single tracked change within a block. */
 export const REJECT_POLISHING_CHANGE_MUTATION = gql`
-  mutation RejectPolishingChange($changeId: ID!) {
-    rejectPolishingChange(changeId: $changeId) {
+  mutation DecidePolishedChangeReject($changeId: ID!) {
+    decidePolishedChange(input: { changeId: $changeId, decision: REJECTED }) {
       id
-      decision
+      status
     }
   }
 `;
 
+/** Accept ALL pending changes for a polished transcript. */
 export const ACCEPT_ALL_POLISHING_CHANGES_MUTATION = gql`
-  mutation AcceptAllPolishingChanges($transcriptId: ID!) {
-    acceptAllPolishingChanges(transcriptId: $transcriptId) {
+  mutation BulkAcceptPolishedChanges($transcriptId: ID!) {
+    bulkDecidePolishedChanges(
+      input: { polishedTranscriptId: $transcriptId, decision: ACCEPTED }
+    ) {
       id
-      changes {
-        ...PolishedChangeFields
+      blocks {
+        ...PolishedTranscriptBlockFields
       }
     }
   }
-  ${POLISHED_CHANGE_FIELDS}
+  ${POLISHED_TRANSCRIPT_BLOCK_FIELDS}
 `;
 
+/** Reject ALL pending changes for a polished transcript. */
 export const REJECT_ALL_POLISHING_CHANGES_MUTATION = gql`
-  mutation RejectAllPolishingChanges($transcriptId: ID!) {
-    rejectAllPolishingChanges(transcriptId: $transcriptId) {
+  mutation BulkRejectPolishedChanges($transcriptId: ID!) {
+    bulkDecidePolishedChanges(
+      input: { polishedTranscriptId: $transcriptId, decision: REJECTED }
+    ) {
       id
-      changes {
-        ...PolishedChangeFields
+      blocks {
+        ...PolishedTranscriptBlockFields
       }
     }
   }
-  ${POLISHED_CHANGE_FIELDS}
+  ${POLISHED_TRANSCRIPT_BLOCK_FIELDS}
 `;
 
+/** Approve the polished transcript → sets status to PUBLISHED. */
 export const APPROVE_POLISHED_TRANSCRIPT_MUTATION = gql`
   mutation ApprovePolishedTranscript($transcriptId: ID!) {
-    approvePolishedTranscript(transcriptId: $transcriptId) {
+    approvePolishedTranscript(polishedTranscriptId: $transcriptId) {
       id
       status
     }

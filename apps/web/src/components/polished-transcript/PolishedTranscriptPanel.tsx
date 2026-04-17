@@ -54,21 +54,35 @@ interface CitationBlockProps {
 }
 
 function CitationBlock({ block, onSeek }: CitationBlockProps) {
+  const hasTimestamp = block.startTime != null;
+
   const handleClick = () => {
-    if (block.startTime != null) {
-      onSeek?.(block.startTime);
+    if (hasTimestamp) {
+      onSeek?.(block.startTime!);
     }
   };
 
   return (
     <blockquote
-      role="button"
-      tabIndex={block.startTime != null ? 0 : undefined}
-      onClick={handleClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') handleClick();
-      }}
-      className="my-3 pr-4 border-r-2 border-primary/40 text-sm text-muted-foreground italic leading-relaxed text-right cursor-pointer"
+      role={hasTimestamp ? 'button' : undefined}
+      tabIndex={hasTimestamp ? 0 : undefined}
+      aria-label={
+        hasTimestamp
+          ? undefined
+          : 'ציטוט ללא חותמת זמן — לחיצה אינה מחפשת בסרטון'
+      }
+      title={hasTimestamp ? undefined : 'אין חותמת זמן לבלוק זה'}
+      onClick={hasTimestamp ? handleClick : undefined}
+      onKeyDown={
+        hasTimestamp
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') handleClick();
+            }
+          : undefined
+      }
+      className={`my-3 pr-4 border-r-2 border-primary/40 text-sm text-muted-foreground italic leading-relaxed text-right ${
+        hasTimestamp ? 'cursor-pointer' : 'cursor-default opacity-70'
+      }`}
       data-block-id={block.id}
       data-start-time={block.startTime ?? undefined}
     >
@@ -85,9 +99,11 @@ interface TextBlockProps {
 }
 
 function TextBlock({ block, active, activeRef, onSeek }: TextBlockProps) {
+  const hasTimestamp = block.startTime != null;
+
   const handleClick = () => {
-    if (block.startTime != null) {
-      onSeek?.(block.startTime);
+    if (hasTimestamp) {
+      onSeek?.(block.startTime!);
     }
   };
 
@@ -96,11 +112,13 @@ function TextBlock({ block, active, activeRef, onSeek }: TextBlockProps) {
       type="button"
       ref={active ? activeRef : null}
       onClick={handleClick}
+      title={hasTimestamp ? undefined : 'אין חותמת זמן לבלוק זה'}
+      aria-disabled={!hasTimestamp || undefined}
       className={`w-full text-right px-2 py-1.5 rounded text-sm leading-relaxed transition-colors ${
         active
           ? 'bg-primary/10 text-foreground'
           : 'text-muted-foreground hover:bg-muted/50'
-      }`}
+      } ${!hasTimestamp ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
       data-block-id={block.id}
       data-start-time={block.startTime ?? undefined}
     >

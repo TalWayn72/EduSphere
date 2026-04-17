@@ -10,6 +10,7 @@
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'urql';
+import { toast } from 'sonner';
 import { Layout } from '@/components/Layout';
 import { PageHeader } from '@/components/PageHeader';
 import {
@@ -73,12 +74,19 @@ export function LessonEnrichmentEditor() {
     variables: { lessonId },
     pause: !lessonId,
   });
-  const [, requestPolishing] = useMutation(REQUEST_TRANSCRIPT_POLISHING_MUTATION);
+  const [{ fetching: polishingRequesting }, requestPolishing] = useMutation(REQUEST_TRANSCRIPT_POLISHING_MUTATION);
   const polishedTranscript = polishedData?.polishedTranscript ?? null;
   const isPolishing = polishedTranscript?.status === 'PROCESSING';
 
   const handleRequestPolishing = useCallback(async () => {
-    await requestPolishing({ lessonId });
+    const result = await requestPolishing({ lessonId });
+    if (result.error) {
+      toast.error('Failed to start AI polishing', {
+        description: result.error.graphQLErrors?.[0]?.message ?? result.error.message,
+      });
+      return;
+    }
+    toast.success('AI polishing started — this may take a few minutes');
     refetchPolished();
   }, [requestPolishing, lessonId, refetchPolished]);
 
@@ -249,10 +257,17 @@ export function LessonEnrichmentEditor() {
                         variant="outline"
                         size="sm"
                         onClick={() => void handleRequestPolishing()}
-                        disabled={!data?.transcriptReady}
+                        disabled={!data?.transcriptReady || polishingRequesting}
                         data-testid="request-polishing-btn"
                       >
-                        Start AI Polishing
+                        {polishingRequesting ? (
+                          <>
+                            <span className="h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full animate-spin me-2" />
+                            Starting...
+                          </>
+                        ) : (
+                          'Start AI Polishing'
+                        )}
                       </Button>
                     </div>
                   )}

@@ -61,7 +61,7 @@ export function VoiceProfileCard({
               {t('polishedTranscript.voiceProfile.topPhrases')}
             </p>
             <div className="flex flex-wrap gap-1" dir="rtl">
-              {voiceProfile.topPhrases.slice(0, 5).map((phrase) => (
+              {voiceProfile.topPhrases.slice(0, 5).map((phrase: string) => (
                 <Badge
                   key={phrase}
                   variant="secondary"

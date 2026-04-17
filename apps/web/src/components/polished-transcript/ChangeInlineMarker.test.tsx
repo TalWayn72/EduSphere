@@ -7,7 +7,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { PolishedChange } from './polished-transcript.types';
+import type { PolishedBlockChange } from './polished-transcript.types';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -67,24 +67,32 @@ vi.mock('lucide-react', () => ({
 
 import { ChangeInlineMarker } from './ChangeInlineMarker';
 
-const PENDING_CHANGE: PolishedChange = {
+// ── Fixtures — using new PolishedBlockChange type ─────────────────────────────
+
+const PENDING_CHANGE: PolishedBlockChange = {
   id: 'chg-1',
+  blockId: 'blk-1',
   changeType: 'FILLER_REMOVED',
-  originalText: 'אמממ',
-  replacementText: '',
+  originalFragment: 'אמממ',
+  replacementFragment: '',
   charOffsetStart: 0,
   charOffsetEnd: 4,
-  decision: 'PENDING',
+  status: 'PENDING',
+  reviewedAt: null,
+  createdAt: '2026-01-01T00:00:00Z',
 };
 
-const GRAMMAR_CHANGE: PolishedChange = {
+const GRAMMAR_CHANGE: PolishedBlockChange = {
   id: 'chg-2',
-  changeType: 'GRAMMAR_FIXED',
-  originalText: 'הלך',
-  replacementText: 'הלכה',
+  blockId: 'blk-1',
+  changeType: 'SPELLING_CORRECTED',
+  originalFragment: 'הלך',
+  replacementFragment: 'הלכה',
   charOffsetStart: 10,
   charOffsetEnd: 13,
-  decision: 'PENDING',
+  status: 'PENDING',
+  reviewedAt: null,
+  createdAt: '2026-01-01T00:00:00Z',
 };
 
 describe('ChangeInlineMarker', () => {

@@ -133,4 +133,48 @@ describe('PolishedTranscriptPanel', () => {
     );
     expect(onSeek).not.toHaveBeenCalled();
   });
+
+  it('TEXT block without startTime has aria-disabled=true', () => {
+    render(<PolishedTranscriptPanel blocks={[noTimestampBlock]} />);
+    const btn = screen.getByRole('button', { name: noTimestampBlock.text });
+    expect(btn.getAttribute('aria-disabled')).toBe('true');
+  });
+
+  it('TEXT block with startTime does NOT have aria-disabled', () => {
+    render(<PolishedTranscriptPanel blocks={[textBlock]} />);
+    const btn = screen.getByRole('button', { name: textBlock.text });
+    expect(btn.getAttribute('aria-disabled')).toBeNull();
+  });
+
+  it('TEXT block without startTime has cursor-default class', () => {
+    render(<PolishedTranscriptPanel blocks={[noTimestampBlock]} />);
+    const btn = screen.getByRole('button', { name: noTimestampBlock.text });
+    expect(btn.className).toContain('cursor-default');
+  });
+
+  it('CITATION block without startTime is not interactive (no role=button)', () => {
+    const citationNoTs: PolishedBlock = {
+      id: 'cno',
+      blockType: 'POLISHED_CITATION',
+      text: 'No timestamp citation',
+      startTime: null,
+      endTime: null,
+    };
+    const onSeek = vi.fn();
+    render(<PolishedTranscriptPanel blocks={[citationNoTs]} onSeek={onSeek} />);
+    const quote = document.querySelector('blockquote');
+    expect(quote).not.toBeNull();
+    expect(quote!.getAttribute('role')).toBeNull();
+    fireEvent.click(quote!);
+    expect(onSeek).not.toHaveBeenCalled();
+  });
+
+  it('CITATION block with startTime calls onSeek on click', () => {
+    const onSeek = vi.fn();
+    render(<PolishedTranscriptPanel blocks={[citationBlock]} onSeek={onSeek} />);
+    const quote = document.querySelector('blockquote');
+    expect(quote).not.toBeNull();
+    fireEvent.click(quote!);
+    expect(onSeek).toHaveBeenCalledWith(25);
+  });
 });

@@ -369,11 +369,13 @@
   text-align: right;
 }
 
-/* Flip text-left / text-right for RTL */
-[dir='rtl'] .text-left {
+/* Flip text-left / text-right for RTL — only at the document (html) level.
+   Do NOT cascade into components that set their own dir="rtl" inline,
+   as those components intentionally use text-right/text-left for Hebrew. */
+html[dir='rtl'] .text-left {
   text-align: right;
 }
-[dir='rtl'] .text-right {
+html[dir='rtl'] .text-right {
   text-align: left;
 }
 

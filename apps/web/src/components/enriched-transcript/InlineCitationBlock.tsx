@@ -125,6 +125,7 @@ export function InlineCitationBlock({
 
   return (
     <div
+      dir="rtl"
       className={`rounded-md border transition-colors ${
         isActive ? 'bg-primary/10 border-primary/30' : 'bg-card border-border'
       }`}
@@ -138,7 +139,7 @@ export function InlineCitationBlock({
           onClick?.();
           toggle();
         }}
-        className="w-full text-start px-3 py-2 flex items-start gap-2"
+        className="w-full text-end px-3 py-2 flex items-start gap-2"
         aria-expanded={expanded}
       >
         <span className="flex-1 text-sm leading-relaxed" dir="auto">

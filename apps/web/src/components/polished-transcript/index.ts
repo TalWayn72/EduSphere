@@ -8,11 +8,13 @@ export { PolishingProgressOverlay } from './PolishingProgressOverlay';
 export { VoiceProfileCard } from './VoiceProfileCard';
 export { useTrackChangesStore } from './useTrackChangesStore';
 export type {
-  PolishingChangeType,
+  PolishedChangeType,
   PolishingStatus,
-  ChangeDecision,
-  PolishedChange,
+  PolishedChangeStatus,
+  PolishedBlockChange,
+  PolishedTranscriptBlock,
   PolishedTranscript,
+  InstructorVoiceProfile,
   VoiceProfile,
   TrackChangesUIState,
 } from './polished-transcript.types';

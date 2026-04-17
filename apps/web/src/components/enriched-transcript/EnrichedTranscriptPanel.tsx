@@ -53,7 +53,7 @@ export function EnrichedTranscriptPanel({
       className={`h-full ${className}`}
       data-testid="enriched-transcript-panel"
     >
-      <div ref={containerRef} className="p-3 space-y-2">
+      <div ref={containerRef} className="p-3 space-y-2" dir="rtl">
         {sorted.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-8">
             No transcript blocks available yet.
@@ -66,7 +66,7 @@ export function EnrichedTranscriptPanel({
             return (
               <h3
                 key={block.id}
-                className="text-sm font-semibold text-foreground pt-3 pb-1"
+                className="text-sm font-semibold text-foreground pt-3 pb-1 text-end"
                 data-block-id={block.id}
               >
                 {getBlockText(block)}
@@ -112,20 +112,22 @@ export function EnrichedTranscriptPanel({
           const jargonHighlights = (block.content as Record<string, unknown>)[
             'jargonHighlights'
           ] as JargonHighlight[] | undefined;
+          const hasTimestamp = block.startTime != null;
 
           return (
             <button
               key={block.id}
               type="button"
               onClick={() => onBlockClick?.(block)}
-              className={`w-full text-start px-2 py-1.5 rounded text-sm leading-relaxed transition-colors ${
+              aria-disabled={!hasTimestamp || undefined}
+              title={hasTimestamp ? undefined : 'אין חותמת זמן לבלוק זה'}
+              className={`w-full text-end px-2 py-1.5 rounded text-sm leading-relaxed transition-colors ${
                 active
                   ? 'bg-primary/10 text-foreground'
                   : 'text-muted-foreground hover:bg-muted/50'
-              }`}
+              } ${!hasTimestamp ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
               data-block-id={block.id}
               data-start-time={block.startTime}
-              dir="auto"
             >
               {jargonHighlights && jargonHighlights.length > 0 ? (
                 <JargonHighlighter

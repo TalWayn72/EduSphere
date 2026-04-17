@@ -35,6 +35,8 @@ interface TranscriptSectionProps {
 /** Only show the polished reading toggle for these statuses. */
 const READABLE_STATUSES: ReadonlySet<PolishingStatus> = new Set([
   'DRAFT',
+  'INSTRUCTOR_REVIEW',
+  'APPROVED',
   'PUBLISHED',
 ]);
 

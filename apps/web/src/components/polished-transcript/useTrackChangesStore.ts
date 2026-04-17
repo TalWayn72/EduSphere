@@ -6,14 +6,14 @@
  */
 import { create } from 'zustand';
 import type {
-  ChangeDecision,
+  PolishedChangeStatus,
   TrackChangesUIState,
 } from './polished-transcript.types';
 
 export const useTrackChangesStore = create<TrackChangesUIState>((set) => ({
   decisions: {},
 
-  setDecision: (changeId: string, decision: ChangeDecision) =>
+  setDecision: (changeId: string, decision: PolishedChangeStatus) =>
     set((state) => ({
       decisions: { ...state.decisions, [changeId]: decision },
     })),
@@ -23,7 +23,7 @@ export const useTrackChangesStore = create<TrackChangesUIState>((set) => ({
       decisions: {
         ...state.decisions,
         ...Object.fromEntries(
-          changeIds.map((id) => [id, 'ACCEPTED' as ChangeDecision])
+          changeIds.map((id) => [id, 'ACCEPTED' as PolishedChangeStatus])
         ),
       },
     })),
@@ -33,7 +33,7 @@ export const useTrackChangesStore = create<TrackChangesUIState>((set) => ({
       decisions: {
         ...state.decisions,
         ...Object.fromEntries(
-          changeIds.map((id) => [id, 'REJECTED' as ChangeDecision])
+          changeIds.map((id) => [id, 'REJECTED' as PolishedChangeStatus])
         ),
       },
     })),

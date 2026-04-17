@@ -17,14 +17,14 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type {
-  PolishedChange,
-  ChangeDecision,
+  PolishedBlockChange,
+  PolishedChangeStatus,
 } from './polished-transcript.types';
 
 interface ChangeInlineMarkerProps {
-  change: PolishedChange;
+  change: PolishedBlockChange;
   /** Optimistic decision from local Zustand store */
-  localDecision?: ChangeDecision;
+  localDecision?: PolishedChangeStatus;
   onAccept: (changeId: string) => void;
   onReject: (changeId: string) => void;
   disabled?: boolean;
@@ -38,7 +38,7 @@ export function ChangeInlineMarker({
   disabled = false,
 }: ChangeInlineMarkerProps) {
   const { t } = useTranslation('content');
-  const decision = localDecision ?? change.decision;
+  const decision = localDecision ?? change.status;
 
   if (decision === 'ACCEPTED') {
     return (
@@ -48,7 +48,7 @@ export function ChangeInlineMarker({
         data-change-id={change.id}
         dir="rtl"
       >
-        {change.replacementText || null}
+        {change.replacementFragment || null}
       </mark>
     );
   }
@@ -61,7 +61,7 @@ export function ChangeInlineMarker({
         data-change-id={change.id}
         dir="rtl"
       >
-        {change.originalText || null}
+        {change.originalFragment || null}
       </span>
     );
   }
@@ -75,14 +75,14 @@ export function ChangeInlineMarker({
       data-change-type={change.changeType}
       dir="rtl"
     >
-      {change.originalText && (
+      {change.originalFragment && (
         <del className="text-red-600 dark:text-red-400 no-underline line-through text-sm">
-          {change.originalText}
+          {change.originalFragment}
         </del>
       )}
-      {change.replacementText && (
+      {change.replacementFragment && (
         <ins className="text-green-700 dark:text-green-400 no-underline text-sm not-italic">
-          {change.replacementText}
+          {change.replacementFragment}
         </ins>
       )}
       <span className="inline-flex items-center gap-0.5 ms-1" dir="ltr">

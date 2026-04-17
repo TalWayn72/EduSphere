@@ -28,8 +28,11 @@ import { useDocumentAnnotations } from '@/hooks/useDocumentAnnotations';
 import { useDocumentScrollMemory } from '@/hooks/useDocumentScrollMemory';
 import { useDocumentUIStore } from '@/lib/store';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
+import { POLISHED_TRANSCRIPT_QUERY } from '@/lib/graphql/polished-transcript.queries';
 import { mockDocumentContent } from '@/lib/mock-content-data';
 import { AnnotationLayer } from '@/types/annotations';
+import type { PolishedTranscript } from '@/components/polished-transcript/polished-transcript.types';
+import type { PolishedBlock } from '@/components/polished-transcript/polished-transcript-reader.types';
 import { DocumentPanel } from '@/pages/UnifiedLearningPage.document-panel';
 import { ToolsPanel } from '@/pages/UnifiedLearningPage.tools-panel';
 import VisualSidebar from '@/components/visual-anchoring/VisualSidebar';
@@ -53,6 +56,30 @@ interface ContentItemResult {
 
 interface VisualAnchorsResult {
   getVisualAnchors: VisualAnchor[];
+}
+
+interface PolishedTranscriptResult {
+  polishedTranscript: PolishedTranscript | null;
+}
+
+/**
+ * Maps backend PolishedTranscriptBlock[] to the PolishedBlock[] shape
+ * used by PolishedTranscriptPanel and TranscriptSection.
+ */
+function toPolishedBlocks(
+  transcript: PolishedTranscript | null | undefined
+): PolishedBlock[] | undefined {
+  if (!transcript) return undefined;
+  return transcript.blocks
+    .slice()
+    .sort((a, b) => a.blockOrder - b.blockOrder)
+    .map((b) => ({
+      id: b.id,
+      blockType: b.blockType ?? 'POLISHED_TEXT',
+      text: b.instructorEdited && b.instructorText ? b.instructorText : b.content,
+      startTime: b.startTime ?? null,
+      endTime: b.endTime ?? null,
+    }));
 }
 
 export function UnifiedLearningPage() {
@@ -104,6 +131,16 @@ export function UnifiedLearningPage() {
   // returns null. We fetch enrichedLesson unconditionally and use its
   // youtubeVideoId as a fallback detection mechanism.
   const enrichedLesson = useEnrichedLesson(contentId);
+
+  // ── Polished transcript — for student reading view with click-to-seek ──
+  const [polishedResult] = useQuery<PolishedTranscriptResult>({
+    query: POLISHED_TRANSCRIPT_QUERY,
+    variables: { lessonId: contentId },
+    pause: !mounted || !contentId,
+  });
+  const polishedTranscript = polishedResult.data?.polishedTranscript ?? null;
+  const polishedBlocks = toPolishedBlocks(polishedTranscript);
+  const polishedStatus = polishedTranscript?.status ?? null;
 
   // Merge YouTube detection: prefer contentItem result, fall back to enrichedLesson.
   const youtubeVideoId =
@@ -349,6 +386,8 @@ export function UnifiedLearningPage() {
                 subtitleTracks={subtitleTracks}
                 youtubeVideoId={youtubeVideoId}
                 enrichedBlocks={enrichedLesson.data?.blocks ?? []}
+                polishedBlocks={polishedBlocks}
+                polishedStatus={polishedStatus}
               />
             </ResizablePanel>
           </ResizablePanelGroup>

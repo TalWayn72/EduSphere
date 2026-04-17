@@ -21,6 +21,7 @@ const STATUS_VARIANT: Record<
 > = {
   PROCESSING: 'secondary',
   DRAFT: 'outline',
+  INSTRUCTOR_REVIEW: 'outline',
   APPROVED: 'default',
   PUBLISHED: 'default',
 };
