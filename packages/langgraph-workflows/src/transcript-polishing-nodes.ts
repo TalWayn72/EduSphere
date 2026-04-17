@@ -49,7 +49,7 @@ export function buildNodes(model: LanguageModel) {
     let chunkStart = segments[0]?.startTime ?? 0;
 
     for (let i = 0; i < segments.length; i++) {
-      const seg = segments[i];
+      const seg = segments[i]!;
       const next = segments[i + 1];
       current.push(seg);
 
@@ -79,13 +79,14 @@ export function buildNodes(model: LanguageModel) {
     if (current.length > 0) {
       const rawText = current.map((s) => s.text).join(' ');
       const prevChunk = chunks[chunks.length - 1];
+      const lastSeg = current[current.length - 1]!;
       chunks.push({
         chunkIndex: chunks.length,
         segmentIds: current.map((s) => s.id),
         rawText,
         overlapPrefix: prevChunk ? lastNSentences(prevChunk.rawText, OVERLAP_SENTENCES) : '',
         startTime: chunkStart,
-        endTime: current[current.length - 1].endTime,
+        endTime: lastSeg.endTime,
       });
     }
 
@@ -160,11 +161,12 @@ export function buildNodes(model: LanguageModel) {
       )
     );
 
-    const newChunks: PolishedChunkResult[] = results.map((r, i) =>
-      r.status === 'fulfilled'
+    const newChunks: PolishedChunkResult[] = results.map((r, i) => {
+      const fallback = remaining[i]!;
+      return r.status === 'fulfilled'
         ? r.value
-        : ({ chunkIndex: remaining[i].chunkIndex, polishedText: remaining[i].rawText, changes: [] } satisfies PolishedChunkResult)
-    );
+        : ({ chunkIndex: fallback.chunkIndex, polishedText: fallback.rawText, changes: [] } satisfies PolishedChunkResult);
+    });
 
     return { polishedChunks: newChunks, progress: 60 };
   }
@@ -175,10 +177,12 @@ export function buildNodes(model: LanguageModel) {
     const sorted = [...state.polishedChunks].sort((a, b) => a.chunkIndex - b.chunkIndex);
     if (sorted.length === 0) return { stitchedText: '', progress: 65 };
 
-    let combined = sorted[0].polishedText;
+    let combined = sorted[0]!.polishedText;
     for (let i = 1; i < sorted.length; i++) {
-      const prevEnd = lastNSentences(sorted[i - 1].polishedText, 2);
-      const nextStart = sorted[i].polishedText.split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
+      const prevChunkSorted = sorted[i - 1]!;
+      const currChunkSorted = sorted[i]!;
+      const prevEnd = lastNSentences(prevChunkSorted.polishedText, 2);
+      const nextStart = currChunkSorted.polishedText.split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
       const transitionRaw = await callLLM(model, buildStitchingPrompt(prevEnd, nextStart));
       const transition = safeParse<{ stitchedTransition?: string }>(transitionRaw, {});
       const overlapChars = (state.chunks[i - 1]?.overlapPrefix.length ?? 0);
@@ -186,7 +190,7 @@ export function buildNodes(model: LanguageModel) {
         '\n\n' +
         (transition.stitchedTransition ?? '') +
         '\n\n' +
-        sorted[i].polishedText.slice(overlapChars > 0 ? overlapChars : 0);
+        currChunkSorted.polishedText.slice(overlapChars > 0 ? overlapChars : 0);
     }
 
     return { stitchedText: combined.trim(), progress: 70 };

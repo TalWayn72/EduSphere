@@ -14,7 +14,7 @@ import type { VoiceProfile } from '@edusphere/langgraph-workflows';
 const logger = new Logger('VoiceProfileHelper');
 const MIN_SAMPLES_FOR_BLEND = 2;
 const EXISTING_WEIGHT = 0.7;
-const FRESH_WEIGHT = 0.3;
+const _FRESH_WEIGHT = 0.3; // reserved for future weighted blending
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
