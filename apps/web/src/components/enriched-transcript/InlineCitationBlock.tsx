@@ -135,11 +135,12 @@ export function InlineCitationBlock({
       {/* Transcript text with citation indicator */}
       <button
         type="button"
+        dir="rtl"
         onClick={() => {
           onClick?.();
           toggle();
         }}
-        className="w-full text-end px-3 py-2 flex items-start gap-2"
+        className="w-full text-right px-3 py-2 flex items-start gap-2"
         aria-expanded={expanded}
       >
         <span className="flex-1 text-sm leading-relaxed" dir="auto">

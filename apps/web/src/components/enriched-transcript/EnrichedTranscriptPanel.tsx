@@ -52,6 +52,7 @@ export function EnrichedTranscriptPanel({
     <ScrollArea
       className={`h-full ${className}`}
       data-testid="enriched-transcript-panel"
+      dir="rtl"
     >
       <div ref={containerRef} className="p-3 space-y-2" dir="rtl">
         {sorted.length === 0 && (
@@ -66,7 +67,8 @@ export function EnrichedTranscriptPanel({
             return (
               <h3
                 key={block.id}
-                className="text-sm font-semibold text-foreground pt-3 pb-1 text-end"
+                dir="rtl"
+                className="text-sm font-semibold text-foreground pt-3 pb-1 text-right"
                 data-block-id={block.id}
               >
                 {getBlockText(block)}
@@ -118,10 +120,11 @@ export function EnrichedTranscriptPanel({
             <button
               key={block.id}
               type="button"
+              dir="rtl"
               onClick={() => onBlockClick?.(block)}
               aria-disabled={!hasTimestamp || undefined}
               title={hasTimestamp ? undefined : 'אין חותמת זמן לבלוק זה'}
-              className={`w-full text-end px-2 py-1.5 rounded text-sm leading-relaxed transition-colors ${
+              className={`w-full text-right px-2 py-1.5 rounded text-sm leading-relaxed transition-colors ${
                 active
                   ? 'bg-primary/10 text-foreground'
                   : 'text-muted-foreground hover:bg-muted/50'

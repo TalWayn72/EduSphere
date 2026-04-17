@@ -63,8 +63,9 @@ export function CitationCard({
           <TooltipTrigger asChild>
             <button
               type="button"
+              dir="rtl"
               onClick={toggle}
-              className="w-full flex items-center gap-2 px-3 py-2 text-start"
+              className="w-full flex items-center gap-2 px-3 py-2 text-right"
               aria-expanded={expanded}
               aria-label={`Citation: ${citation.bookName}`}
             >

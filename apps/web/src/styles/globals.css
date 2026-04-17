@@ -369,13 +369,15 @@
   text-align: right;
 }
 
-/* Flip text-left / text-right for RTL — only at the document (html) level.
-   Do NOT cascade into components that set their own dir="rtl" inline,
-   as those components intentionally use text-right/text-left for Hebrew. */
-html[dir='rtl'] .text-left {
+/* Flip text-left / text-right when the whole document is RTL.
+   The :not([dir]) guard ensures elements that carry their own explicit dir
+   attribute (e.g. EnrichedTranscriptPanel h3/button with dir="rtl") are
+   excluded — those elements intentionally use text-right to align Hebrew
+   content to the physical right edge and must never be flipped. */
+html[dir='rtl'] .text-left:not([dir]) {
   text-align: right;
 }
-html[dir='rtl'] .text-right {
+html[dir='rtl'] .text-right:not([dir]) {
   text-align: left;
 }
 
