@@ -15,11 +15,7 @@ const path = require('path');
 const SRC_DIR = path.join(__dirname, '..', 'src');
 
 // Files to skip
-const SKIP_PATTERNS = [
-  /\.test\.tsx$/,
-  /\.spec\.tsx$/,
-  /\.stories\.tsx$/,
-];
+const SKIP_PATTERNS = [/\.test\.tsx$/, /\.spec\.tsx$/, /\.stories\.tsx$/];
 
 /**
  * Physical Tailwind class patterns and their logical replacements.
@@ -30,7 +26,10 @@ const SKIP_PATTERNS = [
  */
 const TAILWIND_RULES = [
   // margin-left / margin-right (except ml-auto, mr-auto)
-  [/\bml-(?!auto\b)(\[?\d)/g, 'Use `ms-` (margin-inline-start) instead of `ml-`'],
+  [
+    /\bml-(?!auto\b)(\[?\d)/g,
+    'Use `ms-` (margin-inline-start) instead of `ml-`',
+  ],
   [/\bmr-(?!auto\b)(\[?\d)/g, 'Use `me-` (margin-inline-end) instead of `mr-`'],
   // padding-left / padding-right
   [/\bpl-(\[?\d)/g, 'Use `ps-` (padding-inline-start) instead of `pl-`'],
@@ -42,11 +41,23 @@ const TAILWIND_RULES = [
   [/\btext-left\b/g, 'Use `text-start` instead of `text-left`'],
   [/\btext-right\b/g, 'Use `text-end` instead of `text-right`'],
   // border sides
-  [/\bborder-l-/g, 'Use `border-s-` (border-inline-start) instead of `border-l-`'],
-  [/\bborder-r-/g, 'Use `border-e-` (border-inline-end) instead of `border-r-`'],
+  [
+    /\bborder-l-/g,
+    'Use `border-s-` (border-inline-start) instead of `border-l-`',
+  ],
+  [
+    /\bborder-r-/g,
+    'Use `border-e-` (border-inline-end) instead of `border-r-`',
+  ],
   // rounded corners
-  [/\brounded-l-/g, 'Use `rounded-s-` (border-start-radius) instead of `rounded-l-`'],
-  [/\brounded-r-/g, 'Use `rounded-e-` (border-end-radius) instead of `rounded-r-`'],
+  [
+    /\brounded-l-/g,
+    'Use `rounded-s-` (border-start-radius) instead of `rounded-l-`',
+  ],
+  [
+    /\brounded-r-/g,
+    'Use `rounded-e-` (border-end-radius) instead of `rounded-r-`',
+  ],
 ];
 
 /**
@@ -103,14 +114,20 @@ for (const filePath of files) {
     const lineNum = i + 1;
 
     // Skip lines with rtl-safe exemption comment
-    if (line.includes('// rtl-safe') || line.includes('/* rtl-safe */')) continue;
+    if (line.includes('// rtl-safe') || line.includes('/* rtl-safe */'))
+      continue;
 
     // Check Tailwind classes
     for (const [pattern, suggestion] of TAILWIND_RULES) {
       // Reset regex lastIndex for global patterns
       pattern.lastIndex = 0;
       if (pattern.test(line)) {
-        violations.push({ file: relPath, line: lineNum, suggestion, text: line.trim() });
+        violations.push({
+          file: relPath,
+          line: lineNum,
+          suggestion,
+          text: line.trim(),
+        });
       }
     }
 
@@ -118,7 +135,12 @@ for (const filePath of files) {
     for (const [pattern, suggestion] of INLINE_STYLE_RULES) {
       pattern.lastIndex = 0;
       if (pattern.test(line)) {
-        violations.push({ file: relPath, line: lineNum, suggestion, text: line.trim() });
+        violations.push({
+          file: relPath,
+          line: lineNum,
+          suggestion,
+          text: line.trim(),
+        });
       }
     }
   }
@@ -153,6 +175,8 @@ if (violations.length === 0) {
   console.error(
     'Fix: Replace physical direction properties with logical equivalents for RTL support.'
   );
-  console.error('Add `// rtl-safe` comment to exempt intentionally physical properties.\n');
+  console.error(
+    'Add `// rtl-safe` comment to exempt intentionally physical properties.\n'
+  );
   process.exit(1);
 }

@@ -9,7 +9,7 @@ const SCREENSHOTS_DIR = path.join(__dirname, '..', '..', 'docs', 'screenshots');
 const BASE_URL = 'http://localhost:5173';
 
 async function sleep(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 async function main() {
@@ -24,7 +24,7 @@ async function main() {
 
   // Collect console errors
   const consoleErrors = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(msg.text());
   });
 
@@ -51,24 +51,34 @@ async function main() {
     const htmlDir = await page.evaluate(() => document.documentElement.dir);
     report('HTML dir', htmlDir === 'rtl' ? 'PASS' : 'FAIL', `dir="${htmlDir}"`);
 
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-01-landing-he.png') });
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-01-landing-he.png'),
+    });
 
     // Dump all visible text and all links/buttons
     const pageInfo = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('a, button')).map(el => ({
-        tag: el.tagName,
-        text: el.textContent.trim().substring(0, 60),
-        href: el.getAttribute('href') || '',
-        onclick: el.getAttribute('onclick') || '',
-      }));
+      const links = Array.from(document.querySelectorAll('a, button')).map(
+        (el) => ({
+          tag: el.tagName,
+          text: el.textContent.trim().substring(0, 60),
+          href: el.getAttribute('href') || '',
+          onclick: el.getAttribute('onclick') || '',
+        })
+      );
       return { links, bodyText: document.body.innerText.substring(0, 1000) };
     });
-    console.log('Landing buttons/links:', JSON.stringify(pageInfo.links, null, 2));
+    console.log(
+      'Landing buttons/links:',
+      JSON.stringify(pageInfo.links, null, 2)
+    );
 
     // Check if the landing page has Hebrew text
     const landingHebrew = /[\u0590-\u05FF]/.test(pageInfo.bodyText);
-    report('Landing Hebrew text', landingHebrew ? 'PASS' : 'FAIL',
-      `Has Hebrew chars: ${landingHebrew}`);
+    report(
+      'Landing Hebrew text',
+      landingHebrew ? 'PASS' : 'FAIL',
+      `Has Hebrew chars: ${landingHebrew}`
+    );
 
     // Report specific Hebrew phrases found
     const hebrewPhrases = ['ברוכים הבאים', 'כניסה', 'פלטפורמת', 'גרף ידע'];
@@ -94,7 +104,10 @@ async function main() {
         for (const btn of allBtns) {
           const text = await btn.textContent();
           const href = await btn.getAttribute('href');
-          if (text.includes('Keycloak') || (href && href.includes('keycloak'))) {
+          if (
+            text.includes('Keycloak') ||
+            (href && href.includes('keycloak'))
+          ) {
             await btn.click();
             report('Login', 'INFO', `Clicked: "${text.trim()}"`);
             break;
@@ -107,13 +120,19 @@ async function main() {
     }
 
     await sleep(5000);
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-02-keycloak.png') });
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-02-keycloak.png'),
+    });
 
     const currentUrl = page.url();
     report('Login', 'INFO', `URL after KC click: ${currentUrl}`);
 
     // If on Keycloak page, fill form
-    if (currentUrl.includes('8080') || currentUrl.includes('keycloak') || currentUrl.includes('auth/realms')) {
+    if (
+      currentUrl.includes('8080') ||
+      currentUrl.includes('keycloak') ||
+      currentUrl.includes('auth/realms')
+    ) {
       const usernameField = await page.$('#username');
       const passwordField = await page.$('#password');
       if (usernameField && passwordField) {
@@ -122,13 +141,23 @@ async function main() {
         const submitBtn = await page.$('#kc-login');
         if (submitBtn) await submitBtn.click();
         report('Login', 'INFO', 'Submitted Keycloak credentials');
-        await page.waitForURL(url => !url.toString().includes('8080'), { timeout: 15000 }).catch(() => {});
+        await page
+          .waitForURL((url) => !url.toString().includes('8080'), {
+            timeout: 15000,
+          })
+          .catch(() => {});
         await sleep(3000);
       }
     } else {
-      report('Login', 'WARN', 'Did not reach Keycloak - might be a local login page');
+      report(
+        'Login',
+        'WARN',
+        'Did not reach Keycloak - might be a local login page'
+      );
       // Try local login form
-      const emailInput = await page.$('input[type="email"], input[name="email"]');
+      const emailInput = await page.$(
+        'input[type="email"], input[name="email"]'
+      );
       const passInput = await page.$('input[type="password"]');
       if (emailInput && passInput) {
         await emailInput.fill('student@example.com');
@@ -139,12 +168,16 @@ async function main() {
       }
     }
 
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-03-after-login.png') });
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-03-after-login.png'),
+    });
     report('Login', 'INFO', `Post-login URL: ${page.url()}`);
 
     // Handle consent
     await sleep(2000);
-    const consentCheck = await page.$('button:has-text("Accept"), button:has-text("אישור"), button:has-text("I Agree"), button:has-text("Continue"), [data-testid*="consent"]');
+    const consentCheck = await page.$(
+      'button:has-text("Accept"), button:has-text("אישור"), button:has-text("I Agree"), button:has-text("Continue"), [data-testid*="consent"]'
+    );
     if (consentCheck) {
       await consentCheck.click();
       await sleep(2000);
@@ -158,16 +191,31 @@ async function main() {
     });
 
     // Are we authenticated? Check if we can access protected pages
-    const isAuthenticated = !(page.url().includes('/login') || page.url().includes('/auth'));
-    report('Auth', isAuthenticated ? 'PASS' : 'FAIL', `Authenticated: ${isAuthenticated}, URL: ${page.url()}`);
+    const isAuthenticated = !(
+      page.url().includes('/login') || page.url().includes('/auth')
+    );
+    report(
+      'Auth',
+      isAuthenticated ? 'PASS' : 'FAIL',
+      `Authenticated: ${isAuthenticated}, URL: ${page.url()}`
+    );
 
     if (!isAuthenticated) {
-      report('Auth', 'WARN', 'Could not authenticate. Will check public pages only.');
+      report(
+        'Auth',
+        'WARN',
+        'Could not authenticate. Will check public pages only.'
+      );
 
       // Check the login page itself for RTL
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.goto(`${BASE_URL}/login`, {
+        waitUntil: 'networkidle',
+        timeout: 30000,
+      });
       await sleep(2000);
-      await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-login-page-he.png') });
+      await page.screenshot({
+        path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-login-page-he.png'),
+      });
 
       const loginPageInfo = await page.evaluate(() => ({
         dir: document.documentElement.dir,
@@ -175,8 +223,16 @@ async function main() {
         text: document.body.innerText.substring(0, 500),
         hasHebrew: /[\u0590-\u05FF]/.test(document.body.innerText),
       }));
-      report('Login Page RTL', loginPageInfo.dir === 'rtl' ? 'PASS' : 'FAIL', `dir="${loginPageInfo.dir}"`);
-      report('Login Page Hebrew', loginPageInfo.hasHebrew ? 'PASS' : 'WARN', `Hebrew present: ${loginPageInfo.hasHebrew}`);
+      report(
+        'Login Page RTL',
+        loginPageInfo.dir === 'rtl' ? 'PASS' : 'FAIL',
+        `dir="${loginPageInfo.dir}"`
+      );
+      report(
+        'Login Page Hebrew',
+        loginPageInfo.hasHebrew ? 'PASS' : 'WARN',
+        `Hebrew present: ${loginPageInfo.hasHebrew}`
+      );
       console.log('Login page text:', loginPageInfo.text);
     }
 
@@ -191,7 +247,10 @@ async function main() {
 
     for (const { path: pagePath, name } of pagesToCheck) {
       console.log(`\n=== Checking ${name} (${pagePath}) ===`);
-      await page.goto(`${BASE_URL}${pagePath}`, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.goto(`${BASE_URL}${pagePath}`, {
+        waitUntil: 'networkidle',
+        timeout: 30000,
+      });
       await sleep(2000);
 
       const pageCheck = await page.evaluate(() => ({
@@ -199,17 +258,33 @@ async function main() {
         lang: document.documentElement.lang,
         url: window.location.href,
         title: document.title,
-        headings: Array.from(document.querySelectorAll('h1, h2, h3')).map(h => h.textContent.trim()).slice(0, 5),
+        headings: Array.from(document.querySelectorAll('h1, h2, h3'))
+          .map((h) => h.textContent.trim())
+          .slice(0, 5),
         hasHebrew: /[\u0590-\u05FF]/.test(document.body.innerText),
         bodyDirection: getComputedStyle(document.body).direction,
       }));
 
       const screenshotName = `bug097-rtl-${name.toLowerCase()}-he.png`;
-      await page.screenshot({ path: path.join(SCREENSHOTS_DIR, screenshotName) });
+      await page.screenshot({
+        path: path.join(SCREENSHOTS_DIR, screenshotName),
+      });
 
-      report(`${name} RTL`, pageCheck.dir === 'rtl' ? 'PASS' : 'FAIL', `dir="${pageCheck.dir}" bodyDir="${pageCheck.bodyDirection}"`);
-      report(`${name} Hebrew`, pageCheck.hasHebrew ? 'PASS' : 'INFO', `Hebrew: ${pageCheck.hasHebrew}`);
-      report(`${name} Headings`, 'INFO', pageCheck.headings.join(' | ') || 'none');
+      report(
+        `${name} RTL`,
+        pageCheck.dir === 'rtl' ? 'PASS' : 'FAIL',
+        `dir="${pageCheck.dir}" bodyDir="${pageCheck.bodyDirection}"`
+      );
+      report(
+        `${name} Hebrew`,
+        pageCheck.hasHebrew ? 'PASS' : 'INFO',
+        `Hebrew: ${pageCheck.hasHebrew}`
+      );
+      report(
+        `${name} Headings`,
+        'INFO',
+        pageCheck.headings.join(' | ') || 'none'
+      );
 
       if (pageCheck.url.includes('/login') || pageCheck.url.includes('auth')) {
         report(`${name}`, 'INFO', 'Redirected to login (auth required)');
@@ -220,11 +295,16 @@ async function main() {
     console.log('\n=== Final RTL Layout Analysis ===');
     await page.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 30000 });
     await sleep(2000);
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-final.png'), fullPage: true });
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-final.png'),
+      fullPage: true,
+    });
 
     // Check text alignment and layout direction on landing
     const layoutAnalysis = await page.evaluate(() => {
-      const elements = document.querySelectorAll('h1, h2, h3, p, button, a, nav, aside, main, header, footer');
+      const elements = document.querySelectorAll(
+        'h1, h2, h3, p, button, a, nav, aside, main, header, footer'
+      );
       const layoutInfo = [];
       for (const el of elements) {
         const cs = getComputedStyle(el);
@@ -241,18 +321,25 @@ async function main() {
     });
 
     if (layoutAnalysis.ltrElements.length > 0) {
-      report('LTR Elements', 'WARN', `Found ${layoutAnalysis.ltrElements.length} elements with direction:ltr`);
+      report(
+        'LTR Elements',
+        'WARN',
+        `Found ${layoutAnalysis.ltrElements.length} elements with direction:ltr`
+      );
       for (const el of layoutAnalysis.ltrElements) {
-        console.log(`  ${el.tag}: "${el.text}" dir=${el.direction} align=${el.textAlign}`);
+        console.log(
+          `  ${el.tag}: "${el.text}" dir=${el.direction} align=${el.textAlign}`
+        );
       }
     } else {
       report('LTR Elements', 'PASS', 'No LTR elements found (all RTL)');
     }
-
   } catch (err) {
     report('Error', 'FAIL', err.message);
     console.error(err.stack);
-    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-error.png') }).catch(() => {});
+    await page
+      .screenshot({ path: path.join(SCREENSHOTS_DIR, 'bug097-rtl-error.png') })
+      .catch(() => {});
   } finally {
     await browser.close();
   }
@@ -261,9 +348,9 @@ async function main() {
   console.log('\n========================================');
   console.log('       VISUAL QA SUMMARY — BUG-097');
   console.log('========================================');
-  const passes = results.filter(r => r.includes('] PASS')).length;
-  const fails = results.filter(r => r.includes('] FAIL')).length;
-  const warns = results.filter(r => r.includes('] WARN')).length;
+  const passes = results.filter((r) => r.includes('] PASS')).length;
+  const fails = results.filter((r) => r.includes('] FAIL')).length;
+  const warns = results.filter((r) => r.includes('] WARN')).length;
   console.log(`PASS: ${passes} | FAIL: ${fails} | WARN: ${warns}`);
   console.log('');
   for (const r of results) {
@@ -273,7 +360,9 @@ async function main() {
   }
 
   console.log('\n--- Screenshots saved ---');
-  const screenshots = fs.readdirSync(SCREENSHOTS_DIR).filter(f => f.startsWith('bug097'));
+  const screenshots = fs
+    .readdirSync(SCREENSHOTS_DIR)
+    .filter((f) => f.startsWith('bug097'));
   for (const s of screenshots) {
     console.log(`  docs/screenshots/${s}`);
   }
@@ -287,7 +376,7 @@ async function main() {
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('Fatal error:', err);
   process.exit(1);
 });

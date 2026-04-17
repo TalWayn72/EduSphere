@@ -1,7 +1,10 @@
-const { chromium } = require('C:/Users/P0039217/.claude/projects/EduSphere/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core');
+const {
+  chromium,
+} = require('C:/Users/P0039217/.claude/projects/EduSphere/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core');
 const path = require('path');
 
-const SCREENSHOTS_DIR = 'c:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots';
+const SCREENSHOTS_DIR =
+  'c:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots';
 const BASE_URL = 'http://localhost:5173';
 
 async function login(page, email, password) {
@@ -10,14 +13,20 @@ async function login(page, email, password) {
   await page.waitForTimeout(2000);
 
   // Click sign-in to go to Keycloak
-  const signInBtn = await page.$('button:has-text("Sign In"), button:has-text("Login"), button:has-text("כניסה"), button:has-text("התחברות"), button[type="submit"]');
+  const signInBtn = await page.$(
+    'button:has-text("Sign In"), button:has-text("Login"), button:has-text("כניסה"), button:has-text("התחברות"), button[type="submit"]'
+  );
   if (signInBtn) {
     await signInBtn.click();
     await page.waitForTimeout(5000);
   }
 
   const url = page.url();
-  if (url.includes('8080') || url.includes('keycloak') || url.includes('realms')) {
+  if (
+    url.includes('8080') ||
+    url.includes('keycloak') ||
+    url.includes('realms')
+  ) {
     console.log('On Keycloak login page');
     await page.waitForSelector('#username', { timeout: 10000 });
     await page.fill('#username', email);
@@ -43,7 +52,9 @@ async function run() {
   console.log('TEST 1: Instructor — Delete button visible');
   console.log('========================================');
 
-  const ctx1 = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const ctx1 = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+  });
   const page1 = await ctx1.newPage();
 
   await login(page1, 'instructor@example.com', 'Instructor123!');
@@ -55,13 +66,24 @@ async function run() {
   console.log('Courses page URL:', page1.url());
 
   // Find a course link — look for course cards or links
-  const courseLinks = await page1.$$eval('a[href*="/courses/"]', els =>
-    els.map(e => ({
-      href: e.getAttribute('href'),
-      text: (e.textContent || '').trim().substring(0, 80),
-    })).filter(e => e.href && !e.href.includes('/new') && !e.href.includes('/edit') && e.href.match(/\/courses\/[a-zA-Z0-9-]+$/))
+  const courseLinks = await page1.$$eval('a[href*="/courses/"]', (els) =>
+    els
+      .map((e) => ({
+        href: e.getAttribute('href'),
+        text: (e.textContent || '').trim().substring(0, 80),
+      }))
+      .filter(
+        (e) =>
+          e.href &&
+          !e.href.includes('/new') &&
+          !e.href.includes('/edit') &&
+          e.href.match(/\/courses\/[a-zA-Z0-9-]+$/)
+      )
   );
-  console.log('Found course links:', JSON.stringify(courseLinks.slice(0, 5), null, 2));
+  console.log(
+    'Found course links:',
+    JSON.stringify(courseLinks.slice(0, 5), null, 2)
+  );
 
   let courseId = null;
   if (courseLinks.length > 0) {
@@ -77,17 +99,31 @@ async function run() {
     console.log('Edit page URL:', page1.url());
   } else {
     // Try discovery page or look for any course-like navigation
-    console.log('No course links found on /courses, trying /courses/discovery...');
+    console.log(
+      'No course links found on /courses, trying /courses/discovery...'
+    );
     await page1.goto(`${BASE_URL}/courses/discovery`, { timeout: 15000 });
     await page1.waitForTimeout(3000);
 
-    const discoveryLinks = await page1.$$eval('a[href*="/courses/"]', els =>
-      els.map(e => ({
-        href: e.getAttribute('href'),
-        text: (e.textContent || '').trim().substring(0, 80),
-      })).filter(e => e.href && !e.href.includes('/new') && !e.href.includes('/edit') && !e.href.includes('/discovery') && e.href.match(/\/courses\/[a-zA-Z0-9-]+/))
+    const discoveryLinks = await page1.$$eval('a[href*="/courses/"]', (els) =>
+      els
+        .map((e) => ({
+          href: e.getAttribute('href'),
+          text: (e.textContent || '').trim().substring(0, 80),
+        }))
+        .filter(
+          (e) =>
+            e.href &&
+            !e.href.includes('/new') &&
+            !e.href.includes('/edit') &&
+            !e.href.includes('/discovery') &&
+            e.href.match(/\/courses\/[a-zA-Z0-9-]+/)
+        )
     );
-    console.log('Discovery course links:', JSON.stringify(discoveryLinks.slice(0, 5), null, 2));
+    console.log(
+      'Discovery course links:',
+      JSON.stringify(discoveryLinks.slice(0, 5), null, 2)
+    );
 
     if (discoveryLinks.length > 0) {
       const href = discoveryLinks[0].href;
@@ -108,8 +144,8 @@ async function run() {
   } else {
     console.log('❌ Delete Course button NOT FOUND');
     // Check all buttons on page
-    const allBtns = await page1.$$eval('button', els =>
-      els.map(e => ({
+    const allBtns = await page1.$$eval('button', (els) =>
+      els.map((e) => ({
         text: (e.textContent || '').trim().substring(0, 60),
         testid: e.getAttribute('data-testid'),
         classes: e.className.substring(0, 80),
@@ -118,7 +154,10 @@ async function run() {
     console.log('All buttons on page:', JSON.stringify(allBtns, null, 2));
   }
 
-  await page1.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-delete-button-visible.png'), fullPage: false });
+  await page1.screenshot({
+    path: path.join(SCREENSHOTS_DIR, 'feat001-delete-button-visible.png'),
+    fullPage: false,
+  });
   console.log('Screenshot saved: feat001-delete-button-visible.png');
 
   // =============================================
@@ -137,28 +176,46 @@ async function run() {
     if (dialog) {
       console.log('✅ Delete dialog OPENED');
     } else {
-      console.log('⚠️  Dialog element not found by testid, checking for any dialog...');
+      console.log(
+        '⚠️  Dialog element not found by testid, checking for any dialog...'
+      );
       const anyDialog = await page1.$('[role="alertdialog"], [role="dialog"]');
       console.log('Dialog via role:', !!anyDialog);
     }
 
-    await page1.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-delete-dialog.png'), fullPage: false });
+    await page1.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'feat001-delete-dialog.png'),
+      fullPage: false,
+    });
     console.log('Screenshot saved: feat001-delete-dialog.png');
 
     // Type wrong text
-    const confirmInput = await page1.$('[data-testid="delete-course-confirm-input"]');
+    const confirmInput = await page1.$(
+      '[data-testid="delete-course-confirm-input"]'
+    );
     if (confirmInput) {
       await confirmInput.fill('WRONG_TEXT');
       await page1.waitForTimeout(500);
 
       // Check if confirm button is disabled
-      const confirmBtn = await page1.$('[data-testid="delete-course-confirm-btn"]');
+      const confirmBtn = await page1.$(
+        '[data-testid="delete-course-confirm-btn"]'
+      );
       if (confirmBtn) {
         const isDisabled = await confirmBtn.isDisabled();
-        console.log('Confirm button disabled with wrong text:', isDisabled ? '✅ YES (correct)' : '❌ NO (BUG!)');
+        console.log(
+          'Confirm button disabled with wrong text:',
+          isDisabled ? '✅ YES (correct)' : '❌ NO (BUG!)'
+        );
       }
 
-      await page1.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-delete-dialog-wrong-input.png'), fullPage: false });
+      await page1.screenshot({
+        path: path.join(
+          SCREENSHOTS_DIR,
+          'feat001-delete-dialog-wrong-input.png'
+        ),
+        fullPage: false,
+      });
       console.log('Screenshot saved: feat001-delete-dialog-wrong-input.png');
     }
 
@@ -171,7 +228,10 @@ async function run() {
     }
   } else {
     console.log('⚠️  Cannot test dialog — delete button not found');
-    await page1.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-delete-dialog.png'), fullPage: false });
+    await page1.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'feat001-delete-dialog.png'),
+      fullPage: false,
+    });
   }
 
   await ctx1.close();
@@ -183,7 +243,9 @@ async function run() {
   console.log('TEST 3: Student — NO delete button');
   console.log('========================================');
 
-  const ctx2 = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const ctx2 = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+  });
   const page2 = await ctx2.newPage();
 
   await login(page2, 'student@example.com', 'Student123!');
@@ -211,9 +273,15 @@ async function run() {
     console.log('After edit page navigation URL:', page2.url());
 
     const redirected = !page2.url().includes('/edit');
-    console.log('Student redirected away from edit page:', redirected ? '✅ YES (correct)' : '⚠️  NO — check role guard');
+    console.log(
+      'Student redirected away from edit page:',
+      redirected ? '✅ YES (correct)' : '⚠️  NO — check role guard'
+    );
 
-    await page2.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-student-view.png'), fullPage: false });
+    await page2.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'feat001-student-view.png'),
+      fullPage: false,
+    });
     console.log('Screenshot saved: feat001-student-view.png');
   } else {
     // No course found — go to courses page
@@ -221,9 +289,15 @@ async function run() {
     await page2.waitForTimeout(3000);
 
     const studentDeleteBtn = await page2.$('[data-testid="delete-course-btn"]');
-    console.log('Student sees delete button on courses list:', studentDeleteBtn ? '❌ BUG' : '✅ No (correct)');
+    console.log(
+      'Student sees delete button on courses list:',
+      studentDeleteBtn ? '❌ BUG' : '✅ No (correct)'
+    );
 
-    await page2.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-student-view.png'), fullPage: false });
+    await page2.screenshot({
+      path: path.join(SCREENSHOTS_DIR, 'feat001-student-view.png'),
+      fullPage: false,
+    });
     console.log('Screenshot saved: feat001-student-view.png');
   }
 
@@ -240,7 +314,7 @@ async function run() {
   console.log('  - feat001-student-view.png');
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error('FATAL:', err);
   process.exit(1);
 });

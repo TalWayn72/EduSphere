@@ -10,7 +10,9 @@ const PASS = 'Instructor123!';
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+  });
   const page = await context.newPage();
 
   const graphqlResponses = [];
@@ -18,16 +20,28 @@ const PASS = 'Instructor123!';
     if (res.url().includes('/graphql') && res.request().method() === 'POST') {
       try {
         const body = await res.json().catch(() => null);
-        const opName = JSON.parse(res.request().postData() || '{}').operationName || 'unknown';
-        graphqlResponses.push({ op: opName, data: body?.data, errors: body?.errors });
-        if (body?.errors?.length) console.log(`[GQL-ERR] ${opName}: ${body.errors[0].message}`);
-      } catch { /* */ }
+        const opName =
+          JSON.parse(res.request().postData() || '{}').operationName ||
+          'unknown';
+        graphqlResponses.push({
+          op: opName,
+          data: body?.data,
+          errors: body?.errors,
+        });
+        if (body?.errors?.length)
+          console.log(`[GQL-ERR] ${opName}: ${body.errors[0].message}`);
+      } catch {
+        /* */
+      }
     }
   });
 
   // ── Login via Keycloak ──────────────────────────────────────────────────
   console.log('Step 1: Login...');
-  await page.goto(`${BASE}/courses`, { waitUntil: 'networkidle', timeout: 30000 });
+  await page.goto(`${BASE}/courses`, {
+    waitUntil: 'networkidle',
+    timeout: 30000,
+  });
   if (page.url().includes('/login')) {
     await page.locator('button:has-text("Sign In")').first().click();
     await page.waitForURL('**/realms/**', { timeout: 10000 }).catch(() => {});
@@ -43,7 +57,10 @@ const PASS = 'Instructor123!';
   await page.evaluate(() => {
     localStorage.setItem('edusphere_consent_AI_PROCESSING', 'true');
   });
-  await page.goto(`${BASE}/courses`, { waitUntil: 'networkidle', timeout: 15000 });
+  await page.goto(`${BASE}/courses`, {
+    waitUntil: 'networkidle',
+    timeout: 15000,
+  });
   console.log('URL:', page.url());
 
   // ── Click AI Create button ──────────────────────────────────────────────
@@ -62,11 +79,21 @@ const PASS = 'Instructor123!';
   for (const btn of modalButtons) {
     const text = await btn.textContent();
     const disabled = await btn.isDisabled();
-    if (!disabled && text && !text.includes('Close') && !text.includes('ביטול') && !text.includes('Cancel')) {
+    if (
+      !disabled &&
+      text &&
+      !text.includes('Close') &&
+      !text.includes('ביטול') &&
+      !text.includes('Cancel')
+    ) {
       genBtn = btn;
     }
   }
-  if (!genBtn) { console.error('No generate button found'); await browser.close(); process.exit(1); }
+  if (!genBtn) {
+    console.error('No generate button found');
+    await browser.close();
+    process.exit(1);
+  }
   await genBtn.click();
   console.log('Generate clicked');
 
@@ -75,7 +102,8 @@ const PASS = 'Instructor123!';
   const startTime = Date.now();
   let outlineAppeared = false;
 
-  for (let i = 0; i < 60; i++) { // 60 * 5s = 5 min
+  for (let i = 0; i < 60; i++) {
+    // 60 * 5s = 5 min
     await page.waitForTimeout(5000);
     const elapsed = Math.round((Date.now() - startTime) / 1000);
     const h3Count = await page.locator('[role="dialog"] h3').count();
@@ -93,7 +121,8 @@ const PASS = 'Instructor123!';
       break;
     }
 
-    if (elapsed % 30 === 0) console.log(`[${elapsed}s] Still waiting... (RUNNING)`);
+    if (elapsed % 30 === 0)
+      console.log(`[${elapsed}s] Still waiting... (RUNNING)`);
   }
 
   if (!outlineAppeared) {
@@ -118,19 +147,31 @@ const PASS = 'Instructor123!';
   await page.screenshot({ path: 'docs/screenshots/bug095-scrolled.png' });
 
   // Find all buttons after outline — the last non-outline buttons
-  const allBtnsAfterOutline = await page.locator('[role="dialog"] button').all();
+  const allBtnsAfterOutline = await page
+    .locator('[role="dialog"] button')
+    .all();
   let draftBtn = null;
   for (const btn of allBtnsAfterOutline) {
     const text = await btn.textContent();
     const visible = await btn.isVisible().catch(() => false);
     console.log(`  Button: "${text}" visible=${visible}`);
     // The Create Draft button has CheckCircle2 icon and is the primary action
-    if (visible && text && (
-      text.includes('Create') || text.includes('Draft') || text.includes('טיוטה') || text.includes('צור')
-    )) {
+    if (
+      visible &&
+      text &&
+      (text.includes('Create') ||
+        text.includes('Draft') ||
+        text.includes('טיוטה') ||
+        text.includes('צור'))
+    ) {
       // Skip regenerate/discard
-      if (!text.includes('Regenerate') && !text.includes('Discard') &&
-          !text.includes('חזור') && !text.includes('בטל') && !text.includes('Close')) {
+      if (
+        !text.includes('Regenerate') &&
+        !text.includes('Discard') &&
+        !text.includes('חזור') &&
+        !text.includes('בטל') &&
+        !text.includes('Close')
+      ) {
         draftBtn = btn;
       }
     }
@@ -151,7 +192,9 @@ const PASS = 'Instructor123!';
 
   // ── Verify ──────────────────────────────────────────────────────────────
   const courseCreated = /\/courses\/[0-9a-f-]+/.test(finalUrl);
-  const createMutations = graphqlResponses.filter(r => r.op === 'CreateCourse');
+  const createMutations = graphqlResponses.filter(
+    (r) => r.op === 'CreateCourse'
+  );
 
   console.log('\n========================================');
   console.log('BUG-095 VERIFICATION RESULTS');
@@ -164,17 +207,21 @@ const PASS = 'Instructor123!';
     console.log(`  Course ID: ${cd?.id}`);
     console.log(`  Course title: ${cd?.title}`);
     if (createMutations[0].errors) {
-      console.log(`  Errors: ${createMutations[0].errors.map(e => e.message).join('; ')}`);
+      console.log(
+        `  Errors: ${createMutations[0].errors.map((e) => e.message).join('; ')}`
+      );
     }
   }
   console.log(`Redirected to course: ${courseCreated}`);
   console.log(`Final URL: ${finalUrl}`);
-  console.log(`\nRESULT: ${courseCreated ? 'SUCCESS' : 'PARTIAL — outline worked, draft creation check below'}`);
+  console.log(
+    `\nRESULT: ${courseCreated ? 'SUCCESS' : 'PARTIAL — outline worked, draft creation check below'}`
+  );
 
   await page.screenshot({ path: 'docs/screenshots/bug095-final.png' });
   await browser.close();
   process.exit(courseCreated ? 0 : 1);
-})().catch(err => {
+})().catch((err) => {
   console.error('CRASHED:', err);
   process.exit(1);
 });

@@ -6,12 +6,19 @@ const http = require('http');
 
 function httpReq(method, port, path, body, token, ct) {
   return new Promise((resolve, reject) => {
-    const opts = { hostname: 'localhost', port, path, method, headers: {}, timeout: 30000 };
+    const opts = {
+      hostname: 'localhost',
+      port,
+      path,
+      method,
+      headers: {},
+      timeout: 30000,
+    };
     if (token) opts.headers.Authorization = 'Bearer ' + token;
     opts.headers['Content-Type'] = ct || 'application/json';
     const r = http.request(opts, (res) => {
       let d = '';
-      res.on('data', c => (d += c));
+      res.on('data', (c) => (d += c));
       res.on('end', () => resolve({ status: res.statusCode, body: d }));
     });
     r.on('error', reject);
@@ -23,24 +30,40 @@ function httpReq(method, port, path, body, token, ct) {
 async function main() {
   // 1. Get instructor token
   const r1 = await httpReq(
-    'POST', 8080,
+    'POST',
+    8080,
     '/realms/edusphere/protocol/openid-connect/token',
     'client_id=edusphere-web&grant_type=password&username=instructor@example.com&password=Instructor123!',
-    null, 'application/x-www-form-urlencoded'
+    null,
+    'application/x-www-form-urlencoded'
   );
   const token = JSON.parse(r1.body).access_token;
-  if (!token) { console.error('Login failed:', r1.body); process.exit(1); }
+  if (!token) {
+    console.error('Login failed:', r1.body);
+    process.exit(1);
+  }
   console.log('[OK] Token obtained');
 
   // 2. Set AI_PROCESSING consent
-  await httpReq('POST', 4000, '/graphql', {
-    query: 'mutation { updateConsent(input: { consentType: AI_PROCESSING, given: true }) }'
-  }, token);
+  await httpReq(
+    'POST',
+    4000,
+    '/graphql',
+    {
+      query:
+        'mutation { updateConsent(input: { consentType: AI_PROCESSING, given: true }) }',
+    },
+    token
+  );
   console.log('[OK] AI consent set');
 
   // 3. Generate course
-  const r3 = await httpReq('POST', 4000, '/graphql', {
-    query: `mutation {
+  const r3 = await httpReq(
+    'POST',
+    4000,
+    '/graphql',
+    {
+      query: `mutation {
       generateCourseFromPrompt(input: {
         prompt: "Introduction to basic mathematics for beginners"
         targetAudienceLevel: "BEGINNER"
@@ -49,8 +72,10 @@ async function main() {
         executionId
         status
       }
-    }`
-  }, token);
+    }`,
+    },
+    token
+  );
   console.log('[Generate]', r3.body);
 
   const data = JSON.parse(r3.body);
@@ -64,21 +89,27 @@ async function main() {
 
   // 4. Poll for completion
   for (let i = 0; i < 60; i++) {
-    await new Promise(r => setTimeout(r, 3000));
-    const r4 = await httpReq('POST', 4000, '/graphql', {
-      query: `{ agentExecution(id: "${execId}") { id status output completedAt } }`
-    }, token);
+    await new Promise((r) => setTimeout(r, 3000));
+    const r4 = await httpReq(
+      'POST',
+      4000,
+      '/graphql',
+      {
+        query: `{ agentExecution(id: "${execId}") { id status output completedAt } }`,
+      },
+      token
+    );
 
     const result = JSON.parse(r4.body);
     const exec = result?.data?.agentExecution;
     if (!exec) {
-      console.log(`[Poll ${i+1}] No data:`, r4.body.slice(0, 200));
+      console.log(`[Poll ${i + 1}] No data:`, r4.body.slice(0, 200));
       continue;
     }
 
     const output = exec.output;
     const title = output?.courseTitle || 'pending';
-    console.log(`[Poll ${i+1}] status=${exec.status} title=${title}`);
+    console.log(`[Poll ${i + 1}] status=${exec.status} title=${title}`);
 
     if (exec.status === 'COMPLETED') {
       console.log('\n=== COURSE GENERATED ===');
@@ -86,7 +117,9 @@ async function main() {
       console.log('Description:', output.courseDescription);
       console.log('Modules:', output.modules?.length || 0);
       for (const m of output.modules || []) {
-        console.log(`  - ${m.title}: ${m.contentItemTitles?.length || 0} items`);
+        console.log(
+          `  - ${m.title}: ${m.contentItemTitles?.length || 0} items`
+        );
       }
       process.exit(0);
     }
@@ -102,4 +135,7 @@ async function main() {
   process.exit(1);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -16,17 +16,49 @@ const KEYCLOAK_URL = 'http://localhost:8080';
 const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/screenshots');
 
 const USERS = [
-  { name: 'superadmin', email: 'super.admin@edusphere.dev', password: 'SuperAdmin123!', role: 'SUPER_ADMIN' },
-  { name: 'instructor', email: 'instructor@example.com', password: 'Instructor123!', role: 'INSTRUCTOR' },
-  { name: 'orgadmin', email: 'org.admin@example.com', password: 'OrgAdmin123!', role: 'ORG_ADMIN' },
-  { name: 'researcher', email: 'researcher@example.com', password: 'Researcher123!', role: 'RESEARCHER' },
-  { name: 'student', email: 'student@example.com', password: 'Student123!', role: 'STUDENT' },
+  {
+    name: 'superadmin',
+    email: 'super.admin@edusphere.dev',
+    password: 'SuperAdmin123!',
+    role: 'SUPER_ADMIN',
+  },
+  {
+    name: 'instructor',
+    email: 'instructor@example.com',
+    password: 'Instructor123!',
+    role: 'INSTRUCTOR',
+  },
+  {
+    name: 'orgadmin',
+    email: 'org.admin@example.com',
+    password: 'OrgAdmin123!',
+    role: 'ORG_ADMIN',
+  },
+  {
+    name: 'researcher',
+    email: 'researcher@example.com',
+    password: 'Researcher123!',
+    role: 'RESEARCHER',
+  },
+  {
+    name: 'student',
+    email: 'student@example.com',
+    password: 'Student123!',
+    role: 'STUDENT',
+  },
 ];
 
 async function testUser(browser, user) {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+  });
   const page = await context.newPage();
-  const result = { user: user.name, role: user.role, status: 'FAIL', error: null };
+  const result = {
+    user: user.name,
+    role: user.role,
+    status: 'FAIL',
+    error: null,
+  };
 
   try {
     // 1. Navigate to login page with DEV_MODE disabled
@@ -34,7 +66,10 @@ async function testUser(browser, user) {
 
     // Set VITE_DEV_MODE=false equivalent by going directly to login
     // and looking for the Keycloak sign-in button
-    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.goto(`${BASE_URL}/login`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 15000,
+    });
     await page.waitForTimeout(2000);
 
     // Check if we see a dev-login button (DEV_MODE) or a Keycloak button
@@ -58,7 +93,10 @@ async function testUser(browser, user) {
       await devBtn.click();
 
       // Wait for redirect away from /login
-      await page.waitForURL(url => !url.toString().includes('/login'), { timeout: 20000 })
+      await page
+        .waitForURL((url) => !url.toString().includes('/login'), {
+          timeout: 20000,
+        })
         .catch(() => {});
 
       await page.waitForLoadState('domcontentloaded');
@@ -91,7 +129,10 @@ async function testUser(browser, user) {
       await page.click('#kc-login');
 
       // Wait for redirect back to app
-      await page.waitForURL(url => url.toString().includes('localhost:5173'), { timeout: 30000 });
+      await page.waitForURL(
+        (url) => url.toString().includes('localhost:5173'),
+        { timeout: 30000 }
+      );
       await page.waitForTimeout(3000);
 
       const currentUrl = page.url();
@@ -99,7 +140,9 @@ async function testUser(browser, user) {
 
       if (isAuthenticated) {
         result.status = 'PASS';
-        console.log(`[${user.name}] ✅ Authenticated via Keycloak — URL: ${currentUrl}`);
+        console.log(
+          `[${user.name}] ✅ Authenticated via Keycloak — URL: ${currentUrl}`
+        );
       } else {
         result.error = `Still on login page after Keycloak: ${currentUrl}`;
         console.log(`[${user.name}] ❌ Failed — ${result.error}`);
@@ -107,10 +150,12 @@ async function testUser(browser, user) {
     }
 
     // Take screenshot
-    const screenshotPath = path.join(SCREENSHOTS_DIR, `feat001-auth-${user.name}.png`);
+    const screenshotPath = path.join(
+      SCREENSHOTS_DIR,
+      `feat001-auth-${user.name}.png`
+    );
     await page.screenshot({ path: screenshotPath, fullPage: false });
     console.log(`[${user.name}] Screenshot saved: ${screenshotPath}`);
-
   } catch (err) {
     result.status = 'FAIL';
     result.error = err.message;
@@ -118,7 +163,10 @@ async function testUser(browser, user) {
 
     // Take error screenshot
     try {
-      const screenshotPath = path.join(SCREENSHOTS_DIR, `feat001-auth-${user.name}-ERROR.png`);
+      const screenshotPath = path.join(
+        SCREENSHOTS_DIR,
+        `feat001-auth-${user.name}-ERROR.png`
+      );
       await page.screenshot({ path: screenshotPath, fullPage: false });
     } catch (_) {}
   } finally {
@@ -147,21 +195,29 @@ async function main() {
 
   // Summary
   console.log('\n=== AUTHENTICATION VERIFICATION RESULTS ===\n');
-  console.log('User'.padEnd(20) + 'Role'.padEnd(16) + 'Status'.padEnd(8) + 'Error');
+  console.log(
+    'User'.padEnd(20) + 'Role'.padEnd(16) + 'Status'.padEnd(8) + 'Error'
+  );
   console.log('-'.repeat(70));
   for (const r of results) {
-    const line = r.user.padEnd(20) + r.role.padEnd(16) + r.status.padEnd(8) + (r.error || '');
+    const line =
+      r.user.padEnd(20) +
+      r.role.padEnd(16) +
+      r.status.padEnd(8) +
+      (r.error || '');
     console.log(line);
   }
 
-  const passed = results.filter(r => r.status === 'PASS').length;
-  const failed = results.filter(r => r.status === 'FAIL').length;
-  console.log(`\nTotal: ${passed} PASS, ${failed} FAIL out of ${results.length}`);
+  const passed = results.filter((r) => r.status === 'PASS').length;
+  const failed = results.filter((r) => r.status === 'FAIL').length;
+  console.log(
+    `\nTotal: ${passed} PASS, ${failed} FAIL out of ${results.length}`
+  );
 
   process.exit(failed > 0 ? 1 : 0);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('Fatal error:', err);
   process.exit(1);
 });

@@ -124,7 +124,10 @@ server.on('upgrade', (req, socket, head) => {
   // Non-browser clients (server-to-server, integration tests) send no Origin and are allowed through.
   const origin = req.headers['origin'];
   if (origin && allowedOrigins.size > 0 && !allowedOrigins.has(origin)) {
-    logger.warn({ origin }, 'WS upgrade rejected: origin not in CORS allowlist');
+    logger.warn(
+      { origin },
+      'WS upgrade rejected: origin not in CORS allowlist'
+    );
     socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
     socket.destroy();
     return;

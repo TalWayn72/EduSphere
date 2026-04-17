@@ -6,7 +6,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(__dirname, '..');
 
 const vttPath = join(projectRoot, 'docs/transcripts/3QTC00L1x1w.iw.vtt');
-const outputPath = join(projectRoot, 'docs/transcripts/3QTC00L1x1w-transcript.txt');
+const outputPath = join(
+  projectRoot,
+  'docs/transcripts/3QTC00L1x1w-transcript.txt'
+);
 
 const vttContent = readFileSync(vttPath, 'utf-8');
 const lines = vttContent.split('\n');
@@ -14,8 +17,8 @@ const lines = vttContent.split('\n');
 /** Strip VTT inline timing tags and HTML entities */
 function cleanCueText(text) {
   return text
-    .replace(/<\d{2}:\d{2}:\d{2}\.\d{3}>/g, '')   // <HH:MM:SS.mmm>
-    .replace(/<\/?c>/g, '')                          // <c> </c>
+    .replace(/<\d{2}:\d{2}:\d{2}\.\d{3}>/g, '') // <HH:MM:SS.mmm>
+    .replace(/<\/?c>/g, '') // <c> </c>
     .replace(/&gt;/g, '>')
     .replace(/&lt;/g, '<')
     .replace(/&amp;/g, '&')
@@ -31,13 +34,22 @@ let i = 0;
 while (i < lines.length) {
   const line = lines[i].trim();
 
-  if (line.startsWith('WEBVTT') || line.startsWith('Kind:') || line.startsWith('Language:') || line === '') {
+  if (
+    line.startsWith('WEBVTT') ||
+    line.startsWith('Kind:') ||
+    line.startsWith('Language:') ||
+    line === ''
+  ) {
     i++;
     continue;
   }
 
-  if (line.match(/^\d{2}:\d{2}:\d{2}\.\d{3}\s+-->\s+\d{2}:\d{2}:\d{2}\.\d{3}/)) {
-    const timeParts = line.match(/^(\d{2}:\d{2}:\d{2}\.\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2}\.\d{3})/);
+  if (
+    line.match(/^\d{2}:\d{2}:\d{2}\.\d{3}\s+-->\s+\d{2}:\d{2}:\d{2}\.\d{3}/)
+  ) {
+    const timeParts = line.match(
+      /^(\d{2}:\d{2}:\d{2}\.\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2}\.\d{3})/
+    );
     const startTime = timeParts[1];
     const endTime = timeParts[2];
 
@@ -55,11 +67,11 @@ while (i < lines.length) {
     }
 
     // The LAST non-empty line of a cue is the "complete" version (YouTube rolling captions)
-    const validLines = textLines.filter(t => t.length > 0 && t.trim() !== '');
+    const validLines = textLines.filter((t) => t.length > 0 && t.trim() !== '');
     if (validLines.length > 0) {
       // Take the last line — it's the most complete version of this cue
       const text = validLines[validLines.length - 1]
-        .replace(/^>>\s*/g, '')   // remove >> speaker markers
+        .replace(/^>>\s*/g, '') // remove >> speaker markers
         .trim();
 
       if (text.length > 1) {
@@ -68,7 +80,7 @@ while (i < lines.length) {
           endTime,
           startSec: toSec(startTime),
           endSec: toSec(endTime),
-          text
+          text,
         });
       }
     }
@@ -106,7 +118,10 @@ while (j < cues.length) {
     if (next.text.startsWith(longest.text) || next.text === longest.text) {
       longest = next;
       k++;
-    } else if (longest.text.startsWith(next.text) && next.text.length < longest.text.length) {
+    } else if (
+      longest.text.startsWith(next.text) &&
+      next.text.length < longest.text.length
+    ) {
       // Partial rollback — new sentence is shorter, keep longest and advance
       break;
     } else {
@@ -133,8 +148,10 @@ for (const seg of segments) {
 console.log(`After exact-duplicate removal: ${finalSegments.length}`);
 
 // Build output
-const timedLines = finalSegments.map(s => `[${s.startTime}] ${s.text}`).join('\n');
-const plainText = finalSegments.map(s => s.text).join(' ');
+const timedLines = finalSegments
+  .map((s) => `[${s.startTime}] ${s.text}`)
+  .join('\n');
+const plainText = finalSegments.map((s) => s.text).join(' ');
 
 const output = `# YouTube Transcript: 3QTC00L1x1w
 # URL: https://www.youtube.com/live/3QTC00L1x1w

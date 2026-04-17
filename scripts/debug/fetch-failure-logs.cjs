@@ -9,8 +9,8 @@ function get(path) {
       path,
       method: 'GET',
       headers: {
-        'Authorization': 'token ' + TOKEN,
-        'Accept': 'application/vnd.github.v3+json',
+        Authorization: 'token ' + TOKEN,
+        Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'EduSphere',
       },
       rejectUnauthorized: false,
@@ -21,10 +21,14 @@ function get(path) {
         return;
       }
       const chunks = [];
-      res.on('data', d => chunks.push(d));
+      res.on('data', (d) => chunks.push(d));
       res.on('end', () => {
         const body = Buffer.concat(chunks).toString();
-        try { resolve(JSON.parse(body)); } catch { resolve(body); }
+        try {
+          resolve(JSON.parse(body));
+        } catch {
+          resolve(body);
+        }
       });
     });
     req.on('error', reject);
@@ -44,7 +48,7 @@ function getUrl(url) {
     };
     const req = https.request(opts, (res) => {
       const chunks = [];
-      res.on('data', d => chunks.push(d));
+      res.on('data', (d) => chunks.push(d));
       res.on('end', () => resolve(Buffer.concat(chunks).toString()));
     });
     req.on('error', reject);
@@ -53,28 +57,56 @@ function getUrl(url) {
 }
 
 async function getJobLog(jobId, label) {
-  const resp = await get('/repos/TalWayn72/EduSphere/actions/jobs/' + jobId + '/logs');
+  const resp = await get(
+    '/repos/TalWayn72/EduSphere/actions/jobs/' + jobId + '/logs'
+  );
   let url = resp.redirect || (typeof resp === 'string' ? resp.trim() : null);
-  if (!url) { console.log('No log URL for', label); return; }
+  if (!url) {
+    console.log('No log URL for', label);
+    return;
+  }
   const log = await getUrl(url);
   const lines = log.split('\n');
-  const errLines = lines.filter(l =>
-    l.includes('error') || l.includes('Error') || l.includes('FAIL') ||
-    l.includes('warning') || l.includes('prettier') || l.includes('eslint') ||
-    l.includes('failed') || l.includes('Cannot') || l.includes('Module')
+  const errLines = lines.filter(
+    (l) =>
+      l.includes('error') ||
+      l.includes('Error') ||
+      l.includes('FAIL') ||
+      l.includes('warning') ||
+      l.includes('prettier') ||
+      l.includes('eslint') ||
+      l.includes('failed') ||
+      l.includes('Cannot') ||
+      l.includes('Module')
   );
-  console.log('\n=== LOG:', label, '(' + errLines.length + ' relevant lines) ===');
-  errLines.slice(0, 40).forEach(l => console.log(l.replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/, '').slice(0, 200)));
+  console.log(
+    '\n=== LOG:',
+    label,
+    '(' + errLines.length + ' relevant lines) ==='
+  );
+  errLines
+    .slice(0, 40)
+    .forEach((l) =>
+      console.log(
+        l
+          .replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/, '')
+          .slice(0, 200)
+      )
+    );
 }
 
 async function main() {
   const commits = await get('/repos/TalWayn72/EduSphere/commits/master');
   const sha = commits.sha;
 
-  const data = await get('/repos/TalWayn72/EduSphere/commits/' + sha + '/check-runs?per_page=100');
-  const failedRuns = (data.check_runs || []).filter(r => r.conclusion === 'failure');
+  const data = await get(
+    '/repos/TalWayn72/EduSphere/commits/' + sha + '/check-runs?per_page=100'
+  );
+  const failedRuns = (data.check_runs || []).filter(
+    (r) => r.conclusion === 'failure'
+  );
 
-  console.log('Failed runs:', failedRuns.map(r => r.name).join(', '));
+  console.log('Failed runs:', failedRuns.map((r) => r.name).join(', '));
 
   for (const run of failedRuns) {
     await getJobLog(run.id, run.name);

@@ -340,31 +340,31 @@ Skills are markdown-based expertise guides that auto-load when Claude detects re
 
 ### EduSphere Custom Skills (Auto-Loaded)
 
-| Skill                                        | Auto-Triggers On                                     | Content                                                                |
-| -------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------- |
-| `graphql-federation-edusphere`               | `.graphql` files, `apps/gateway/`, resolver files    | Federation v2.7, 6-subgraph map, entity resolution, SDL-first workflow |
-| `apache-age-knowledge-graph`                 | `packages/db/src/graph/`, `apps/subgraph-knowledge/` | Cypher queries, 5-node ontology, executeCypher(), RLS in graph         |
-| `pgvector-hybrid-rag`                        | embeddings schema, `apps/subgraph-knowledge/`        | HNSW indexes, 768-dim embeddings, HybridRAG fusion, RRF reranking      |
-| `langgraph-agent-workflows`                  | `apps/subgraph-agent/`, AI agent code                | StateGraph, assess-quiz-explain-debate, Vercel AI SDK v6, gVisor       |
-| `drizzle-orm-edusphere`                      | `packages/db/`, schema/migration files               | pgTable.withRLS(), withTenantContext(), SI-1/SI-3/SI-8 compliance      |
-| `nats-jetstream-patterns`                    | `packages/nats-client/`, NATS imports                | 23 event subjects, stream retention, KV stores, SI-7 TLS               |
-| `session-completion-gate`                    | task completion, before git push                     | 10-check gate, 5-user auth, Docker health, failure protocol            |
-| `discovery-wave-automator`                   | bug fixes, test failures                             | 3-wave search, 7-dir checklist, Discovery List, pattern-class search   |
-| `rls-policy-patterns-edusphere`              | `packages/db/src/rls/`, RLS policy files             | RLS policy templates, tenant isolation patterns, cross-tenant guards   |
-| `memory-safety-resource-lifecycle-edusphere` | `OnModuleDestroy`, cleanup patterns                  | Resource lifecycle management, connection pool cleanup, timer guards   |
-| `keycloak-oauth-oidc-edusphere`              | Keycloak config, `packages/auth/`, JWT/OIDC code     | OIDC flows, realm config, brute-force protection, JWKS validation      |
-| `expo-sdk-54-mobile-edusphere`               | `apps/mobile/`, Expo config files                    | Expo SDK 54 patterns, expo-sqlite offline-first, React Native 0.81     |
-| `multi-tenant-architecture-edusphere`        | `withTenantContext`, tenant isolation code           | Multi-tenant RLS patterns, tenant context propagation, SI-9 compliance |
-| `react-19-vite-6-edusphere`                  | `apps/web/`, React 19 components, Vite config        | React 19 features, Vite 6 config, mounted-guard patterns               |
-| `hive-gateway-v2-patterns`                   | `apps/gateway/`, supergraph composition              | Hive Gateway v2 config, Federation v2.7, subgraph routing              |
-| `playwright-visual-regression-edusphere`     | `apps/web/e2e/`, visual test files                   | toHaveScreenshot() patterns, visual baseline management                |
-| `docker-blue-green-deployment-edusphere`     | `docker-compose.yml`, Dockerfile                     | Blue-green protocol, mem_limit/mem_reservation, rollback strategy      |
-| `turborepo-edusphere-monorepo`               | `turbo.json`, monorepo config                        | Turborepo caching, workspace filtering, pipeline configuration         |
-| `graphql-authorization-directives-edusphere` | `@authenticated`, `@requiresScopes` directives       | GraphQL authorization directives, scope enforcement                    |
-| `scorm-edusphere-lms-integration`            | SCORM-related code, LMS integration files            | SCORM 1.2/2004 compliance, LMS data model, xAPI integration            |
-| `test-first-bugfix-edusphere`                | Bug investigation, test failures, debugging          | Test-first reproducer protocol, 3-wave discovery, fix rounds, container verification |
+| Skill                                        | Auto-Triggers On                                        | Content                                                                                |
+| -------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `graphql-federation-edusphere`               | `.graphql` files, `apps/gateway/`, resolver files       | Federation v2.7, 6-subgraph map, entity resolution, SDL-first workflow                 |
+| `apache-age-knowledge-graph`                 | `packages/db/src/graph/`, `apps/subgraph-knowledge/`    | Cypher queries, 5-node ontology, executeCypher(), RLS in graph                         |
+| `pgvector-hybrid-rag`                        | embeddings schema, `apps/subgraph-knowledge/`           | HNSW indexes, 768-dim embeddings, HybridRAG fusion, RRF reranking                      |
+| `langgraph-agent-workflows`                  | `apps/subgraph-agent/`, AI agent code                   | StateGraph, assess-quiz-explain-debate, Vercel AI SDK v6, gVisor                       |
+| `drizzle-orm-edusphere`                      | `packages/db/`, schema/migration files                  | pgTable.withRLS(), withTenantContext(), SI-1/SI-3/SI-8 compliance                      |
+| `nats-jetstream-patterns`                    | `packages/nats-client/`, NATS imports                   | 23 event subjects, stream retention, KV stores, SI-7 TLS                               |
+| `session-completion-gate`                    | task completion, before git push                        | 10-check gate, 5-user auth, Docker health, failure protocol                            |
+| `discovery-wave-automator`                   | bug fixes, test failures                                | 3-wave search, 7-dir checklist, Discovery List, pattern-class search                   |
+| `rls-policy-patterns-edusphere`              | `packages/db/src/rls/`, RLS policy files                | RLS policy templates, tenant isolation patterns, cross-tenant guards                   |
+| `memory-safety-resource-lifecycle-edusphere` | `OnModuleDestroy`, cleanup patterns                     | Resource lifecycle management, connection pool cleanup, timer guards                   |
+| `keycloak-oauth-oidc-edusphere`              | Keycloak config, `packages/auth/`, JWT/OIDC code        | OIDC flows, realm config, brute-force protection, JWKS validation                      |
+| `expo-sdk-54-mobile-edusphere`               | `apps/mobile/`, Expo config files                       | Expo SDK 54 patterns, expo-sqlite offline-first, React Native 0.81                     |
+| `multi-tenant-architecture-edusphere`        | `withTenantContext`, tenant isolation code              | Multi-tenant RLS patterns, tenant context propagation, SI-9 compliance                 |
+| `react-19-vite-6-edusphere`                  | `apps/web/`, React 19 components, Vite config           | React 19 features, Vite 6 config, mounted-guard patterns                               |
+| `hive-gateway-v2-patterns`                   | `apps/gateway/`, supergraph composition                 | Hive Gateway v2 config, Federation v2.7, subgraph routing                              |
+| `playwright-visual-regression-edusphere`     | `apps/web/e2e/`, visual test files                      | toHaveScreenshot() patterns, visual baseline management                                |
+| `docker-blue-green-deployment-edusphere`     | `docker-compose.yml`, Dockerfile                        | Blue-green protocol, mem_limit/mem_reservation, rollback strategy                      |
+| `turborepo-edusphere-monorepo`               | `turbo.json`, monorepo config                           | Turborepo caching, workspace filtering, pipeline configuration                         |
+| `graphql-authorization-directives-edusphere` | `@authenticated`, `@requiresScopes` directives          | GraphQL authorization directives, scope enforcement                                    |
+| `scorm-edusphere-lms-integration`            | SCORM-related code, LMS integration files               | SCORM 1.2/2004 compliance, LMS data model, xAPI integration                            |
+| `test-first-bugfix-edusphere`                | Bug investigation, test failures, debugging             | Test-first reproducer protocol, 3-wave discovery, fix rounds, container verification   |
 | `browser-verification-edusphere`             | Playwright E2E, screenshot verification, keycloak-login | Zero-mock Playwright patterns, Keycloak login, screenshot capture, visual confirmation |
-| `transcript-click-seek-patterns`             | TranscriptPanel, seekTo, onSeek, useYouTubePlayer    | 3 transcript systems, timestamp data flow, YouTube async seek, failure modes |
+| `transcript-click-seek-patterns`             | TranscriptPanel, seekTo, onSeek, useYouTubePlayer       | 3 transcript systems, timestamp data flow, YouTube async seek, failure modes           |
 
 ### Skills per Wave (Mandatory Loading)
 

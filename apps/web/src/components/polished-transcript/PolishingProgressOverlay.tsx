@@ -45,7 +45,12 @@ export interface PolishingProgressOverlayProps {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const POLL_INTERVAL_MS = 2000;
-const TERMINAL_STATUSES = new Set(['COMPLETED', 'FAILED', 'APPROVED', 'PUBLISHED']);
+const TERMINAL_STATUSES = new Set([
+  'COMPLETED',
+  'FAILED',
+  'APPROVED',
+  'PUBLISHED',
+]);
 
 // ── Component ─────────────────────────────────────────────────────────────────
 

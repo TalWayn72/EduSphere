@@ -30,37 +30,75 @@ const { chromium } = require('playwright');
 
   const banner1 = page.locator('[data-testid="offline-banner"]');
   const hasBannerUp = (await banner1.count()) > 0;
-  console.log('Gateway UP — offline-banner visible:', hasBannerUp, '(expected: false)', hasBannerUp ? '❌ FAIL' : '✅ OK');
+  console.log(
+    'Gateway UP — offline-banner visible:',
+    hasBannerUp,
+    '(expected: false)',
+    hasBannerUp ? '❌ FAIL' : '✅ OK'
+  );
   await page.screenshot({ path: 'scan-courses-bug039-gateway-up.png' });
   console.log('Screenshot: scan-courses-bug039-gateway-up.png');
 
   // Step 4: Block GraphQL — should show clean banner
-  await page.route('**/graphql', route => route.abort('failed'));
+  await page.route('**/graphql', (route) => route.abort('failed'));
   await page.goto('http://localhost:5175/courses');
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(3000);
 
   const banner2 = page.locator('[data-testid="offline-banner"]');
   const hasBannerDown = (await banner2.count()) > 0;
-  console.log('Gateway BLOCKED — offline-banner visible:', hasBannerDown, '(expected: true)', hasBannerDown ? '✅ OK' : '❌ FAIL (DEV_MODE may show mock data only)');
+  console.log(
+    'Gateway BLOCKED — offline-banner visible:',
+    hasBannerDown,
+    '(expected: true)',
+    hasBannerDown ? '✅ OK' : '❌ FAIL (DEV_MODE may show mock data only)'
+  );
 
   if (hasBannerDown) {
     const bannerText = await banner2.textContent();
     console.log('Banner text:', JSON.stringify(bannerText));
-    const hasRawUrql = bannerText.includes('[GraphQL]') || bannerText.includes('[Network]') || bannerText.includes('Unexpected error');
-    const hasCleanMsg = bannerText.includes('Server unavailable') || bannerText.includes('שרת לא נגיש') || bannerText.includes('unavailable');
-    const hasRetry = (await page.locator('[data-testid="offline-banner-retry"]').count()) > 0;
-    console.log('Banner clean (no raw urql strings):', !hasRawUrql, hasRawUrql ? '❌ FAIL' : '✅ OK');
-    console.log('Banner has clean message:', hasCleanMsg, hasCleanMsg ? '✅ OK' : '❌ FAIL');
-    console.log('Retry button present:', hasRetry, hasRetry ? '✅ OK' : '❌ FAIL');
+    const hasRawUrql =
+      bannerText.includes('[GraphQL]') ||
+      bannerText.includes('[Network]') ||
+      bannerText.includes('Unexpected error');
+    const hasCleanMsg =
+      bannerText.includes('Server unavailable') ||
+      bannerText.includes('שרת לא נגיש') ||
+      bannerText.includes('unavailable');
+    const hasRetry =
+      (await page.locator('[data-testid="offline-banner-retry"]').count()) > 0;
+    console.log(
+      'Banner clean (no raw urql strings):',
+      !hasRawUrql,
+      hasRawUrql ? '❌ FAIL' : '✅ OK'
+    );
+    console.log(
+      'Banner has clean message:',
+      hasCleanMsg,
+      hasCleanMsg ? '✅ OK' : '❌ FAIL'
+    );
+    console.log(
+      'Retry button present:',
+      hasRetry,
+      hasRetry ? '✅ OK' : '❌ FAIL'
+    );
   } else {
-    console.log('NOTE: No banner shown — likely showing MOCK_COURSES_FALLBACK (only shown for students in DEV_MODE)');
+    console.log(
+      'NOTE: No banner shown — likely showing MOCK_COURSES_FALLBACK (only shown for students in DEV_MODE)'
+    );
     // Check if mock courses are shown (page still functional)
     const cards = await page.locator('h3').count();
-    console.log('Course cards visible:', cards, cards > 0 ? '✅ Page functional' : '⚠️  No cards');
+    console.log(
+      'Course cards visible:',
+      cards,
+      cards > 0 ? '✅ Page functional' : '⚠️  No cards'
+    );
   }
   await page.screenshot({ path: 'scan-courses-bug039-offline-banner.png' });
   console.log('Screenshot: scan-courses-bug039-offline-banner.png');
 
   await browser.close();
-})().catch(e => { console.error('ERROR:', e.message); process.exit(1); });
+})().catch((e) => {
+  console.error('ERROR:', e.message);
+  process.exit(1);
+});

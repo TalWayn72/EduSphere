@@ -8,40 +8,50 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const https = require('https');
 
 function getLogs(jobId, token) {
-  return new Promise(function(res, rej) {
+  return new Promise(function (res, rej) {
     const opts = {
       hostname: 'api.github.com',
       path: '/repos/TalWayn72/EduSphere/actions/jobs/' + jobId + '/logs',
       headers: {
         'User-Agent': 'EduSphere',
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token ' + token,
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: 'token ' + token,
       },
       rejectUnauthorized: false,
     };
-    https.get(opts, function(r) {
-      if (r.statusCode === 302 && r.headers.location) {
-        const location = r.headers.location;
-        const urlObj = new URL(location);
-        const followOpts = {
-          hostname: urlObj.hostname,
-          path: urlObj.pathname + urlObj.search,
-          headers: { 'User-Agent': 'EduSphere' },
-          rejectUnauthorized: false,
-        };
-        https.get(followOpts, function(r2) {
-          const chunks = [];
-          r2.on('data', function(c) { chunks.push(c); });
-          r2.on('end', function() {
-            res(Buffer.concat(chunks).toString('utf8'));
+    https
+      .get(opts, function (r) {
+        if (r.statusCode === 302 && r.headers.location) {
+          const location = r.headers.location;
+          const urlObj = new URL(location);
+          const followOpts = {
+            hostname: urlObj.hostname,
+            path: urlObj.pathname + urlObj.search,
+            headers: { 'User-Agent': 'EduSphere' },
+            rejectUnauthorized: false,
+          };
+          https
+            .get(followOpts, function (r2) {
+              const chunks = [];
+              r2.on('data', function (c) {
+                chunks.push(c);
+              });
+              r2.on('end', function () {
+                res(Buffer.concat(chunks).toString('utf8'));
+              });
+            })
+            .on('error', rej);
+        } else {
+          let d = '';
+          r.on('data', function (c) {
+            d += c;
           });
-        }).on('error', rej);
-      } else {
-        let d = '';
-        r.on('data', function(c) { d += c; });
-        r.on('end', function() { res(d); });
-      }
-    }).on('error', rej);
+          r.on('end', function () {
+            res(d);
+          });
+        }
+      })
+      .on('error', rej);
   });
 }
 
@@ -72,7 +82,10 @@ async function main() {
       if (inPnpmSection) {
         pnpmLines.push(line);
         // Stop after we've captured the error and some context
-        if (line.includes('ERROR: failed to build') || line.includes('buildx failed')) {
+        if (
+          line.includes('ERROR: failed to build') ||
+          line.includes('buildx failed')
+        ) {
           // Capture 5 more lines for context
           for (let j = 1; j <= 5 && i + j < lines.length; j++) {
             pnpmLines.push(lines[i + j]);
@@ -90,13 +103,17 @@ async function main() {
     // Also look for the full step 6 output (Build and push Docker image)
     // Find all lines with #17 (the pnpm install docker layer)
     console.log('\n--- All #17 layer lines (pnpm install) ---');
-    const layer17Lines = lines.filter(function(l) {
-      return l.includes('#17') || l.includes('deps 4/4') || l.includes('frozen-lockfile');
+    const layer17Lines = lines.filter(function (l) {
+      return (
+        l.includes('#17') ||
+        l.includes('deps 4/4') ||
+        l.includes('frozen-lockfile')
+      );
     });
     console.log(layer17Lines.join('\n'));
 
     // Show 50 lines before the main error
-    const errorIdx = lines.findIndex(function(l) {
+    const errorIdx = lines.findIndex(function (l) {
       return l.includes('ERROR: failed to build: failed to solve');
     });
     if (errorIdx > 0) {

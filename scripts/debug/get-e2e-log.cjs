@@ -10,8 +10,10 @@ function get(path, raw) {
       path,
       method: 'GET',
       headers: {
-        'Authorization': 'token ' + TOKEN,
-        'Accept': raw ? 'application/vnd.github.v3.raw' : 'application/vnd.github.v3+json',
+        Authorization: 'token ' + TOKEN,
+        Accept: raw
+          ? 'application/vnd.github.v3.raw'
+          : 'application/vnd.github.v3+json',
         'User-Agent': 'EduSphere',
       },
       rejectUnauthorized: false,
@@ -24,12 +26,18 @@ function get(path, raw) {
         return;
       }
       const chunks = [];
-      res.on('data', d => chunks.push(d));
+      res.on('data', (d) => chunks.push(d));
       res.on('end', () => {
         const body = Buffer.concat(chunks).toString();
-        if (raw) { resolve(body); return; }
-        try { resolve(JSON.parse(body)); }
-        catch (e) { resolve(body); }
+        if (raw) {
+          resolve(body);
+          return;
+        }
+        try {
+          resolve(JSON.parse(body));
+        } catch (e) {
+          resolve(body);
+        }
       });
     });
     req.on('error', reject);
@@ -49,7 +57,7 @@ function getUrl(url) {
     };
     const req = https.request(options, (res) => {
       const chunks = [];
-      res.on('data', d => chunks.push(d));
+      res.on('data', (d) => chunks.push(d));
       res.on('end', () => resolve(Buffer.concat(chunks).toString()));
     });
     req.on('error', reject);
@@ -58,31 +66,66 @@ function getUrl(url) {
 }
 
 async function main() {
-  const runs = await get('/repos/TalWayn72/EduSphere/actions/runs?head_sha=' + FULL_SHA + '&per_page=20');
-  const ciRun = (runs.workflow_runs || []).find(r => r.name === 'Continuous Integration');
-  if (!ciRun) { console.log('CI run not found'); return; }
+  const runs = await get(
+    '/repos/TalWayn72/EduSphere/actions/runs?head_sha=' +
+      FULL_SHA +
+      '&per_page=20'
+  );
+  const ciRun = (runs.workflow_runs || []).find(
+    (r) => r.name === 'Continuous Integration'
+  );
+  if (!ciRun) {
+    console.log('CI run not found');
+    return;
+  }
 
-  const jobs = await get('/repos/TalWayn72/EduSphere/actions/runs/' + ciRun.id + '/jobs?per_page=50');
-  const e2eJob = (jobs.jobs || []).find(j => j.name.includes('E2E'));
-  if (!e2eJob) { console.log('E2E job not found'); return; }
+  const jobs = await get(
+    '/repos/TalWayn72/EduSphere/actions/runs/' + ciRun.id + '/jobs?per_page=50'
+  );
+  const e2eJob = (jobs.jobs || []).find((j) => j.name.includes('E2E'));
+  if (!e2eJob) {
+    console.log('E2E job not found');
+    return;
+  }
 
   console.log('E2E Job ID:', e2eJob.id, '| conclusion:', e2eJob.conclusion);
-  const logResp = await get('/repos/TalWayn72/EduSphere/actions/jobs/' + e2eJob.id + '/logs');
+  const logResp = await get(
+    '/repos/TalWayn72/EduSphere/actions/jobs/' + e2eJob.id + '/logs'
+  );
   let logUrl;
   if (logResp && logResp.redirect) {
     logUrl = logResp.redirect;
   } else if (typeof logResp === 'string') {
     logUrl = logResp.trim();
   }
-  if (!logUrl) { console.log('Could not get log URL'); return; }
+  if (!logUrl) {
+    console.log('Could not get log URL');
+    return;
+  }
 
   console.log('Fetching logs...');
   const logText = await getUrl(logUrl);
   // Show last 100 lines with failures
   const lines = logText.split('\n');
-  const failLines = lines.filter(l => l.includes('failed') || l.includes('Error') || l.includes('FAIL') || l.includes('error:') || l.includes('✘') || l.includes('x '));
+  const failLines = lines.filter(
+    (l) =>
+      l.includes('failed') ||
+      l.includes('Error') ||
+      l.includes('FAIL') ||
+      l.includes('error:') ||
+      l.includes('✘') ||
+      l.includes('x ')
+  );
   console.log('\n=== FAILURE LINES (' + failLines.length + ') ===');
-  failLines.slice(0, 50).forEach(l => console.log(l.replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/, '').slice(0, 200)));
+  failLines
+    .slice(0, 50)
+    .forEach((l) =>
+      console.log(
+        l
+          .replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/, '')
+          .slice(0, 200)
+      )
+    );
 
   // Also save full log
   const outPath = 'scripts/ci_log_e2e_5f7.txt';

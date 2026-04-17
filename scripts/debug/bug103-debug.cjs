@@ -7,7 +7,7 @@ const BASE_URL = 'http://localhost:5176';
   const page = await browser.newPage();
 
   // Monitor all requests
-  page.on('request', req => {
+  page.on('request', (req) => {
     if (req.url().includes('graphql')) {
       console.log(`[REQ] ${req.method()} ${req.url()}`);
       try {
@@ -17,7 +17,7 @@ const BASE_URL = 'http://localhost:5176';
     }
   });
 
-  page.on('response', resp => {
+  page.on('response', (resp) => {
     if (resp.url().includes('graphql')) {
       console.log(`[RESP] ${resp.status()} ${resp.url()}`);
     }
@@ -32,7 +32,9 @@ const BASE_URL = 'http://localhost:5176';
   const devBtn = page.locator('[data-testid="dev-login-btn"]');
   await devBtn.waitFor({ timeout: 10000 });
   await devBtn.click();
-  await page.waitForURL(url => !url.toString().includes('/login'), { timeout: 20000 }).catch(() => {});
+  await page
+    .waitForURL((url) => !url.toString().includes('/login'), { timeout: 20000 })
+    .catch(() => {});
   await page.waitForLoadState('domcontentloaded');
   console.log('--- LOGIN COMPLETE ---');
 
@@ -40,28 +42,60 @@ const BASE_URL = 'http://localhost:5176';
   await page.route('**/graphql', async (route) => {
     const req = route.request();
     console.log(`[INTERCEPTED] ${req.method()} ${req.url()}`);
-    
+
     if (req.method() === 'OPTIONS') {
-      await route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, GET, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' }, body: '' });
-      return;
-    }
-
-    let parsed = {};
-    try { parsed = JSON.parse(req.postData() || '{}'); } catch {}
-    const opName = parsed.operationName || '';
-    console.log(`  opName: "${opName}"`);
-
-    if (opName === 'Courses' || (parsed.query && parsed.query.includes('courses('))) {
-      console.log('  -> RETURNING MOCK COURSES');
       await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ data: { courses: [{ id: 'test1', title: 'MOCK COURSE', slug: 'mock', description: 'test', isPublished: true, estimatedHours: 5, thumbnailUrl: null, instructorId: 'dev-user-id' }] } }),
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'content-type, authorization',
+        },
+        body: '',
       });
       return;
     }
 
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+    let parsed = {};
+    try {
+      parsed = JSON.parse(req.postData() || '{}');
+    } catch {}
+    const opName = parsed.operationName || '';
+    console.log(`  opName: "${opName}"`);
+
+    if (
+      opName === 'Courses' ||
+      (parsed.query && parsed.query.includes('courses('))
+    ) {
+      console.log('  -> RETURNING MOCK COURSES');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            courses: [
+              {
+                id: 'test1',
+                title: 'MOCK COURSE',
+                slug: 'mock',
+                description: 'test',
+                isPublished: true,
+                estimatedHours: 5,
+                thumbnailUrl: null,
+                instructorId: 'dev-user-id',
+              },
+            ],
+          },
+        }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: {} }),
+    });
   });
   console.log('--- MOCK REGISTERED ---');
 
@@ -76,7 +110,9 @@ const BASE_URL = 'http://localhost:5176';
   console.log('--- MOCK COURSE found:', content.includes('MOCK COURSE'));
   console.log('--- No courses found:', content.includes('No courses'));
 
-  await page.screenshot({ path: 'c:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots/bug103-debug.png' });
-  
+  await page.screenshot({
+    path: 'c:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots/bug103-debug.png',
+  });
+
   await browser.close();
 })();

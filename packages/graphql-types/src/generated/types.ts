@@ -554,6 +554,11 @@ export type BreakoutRoom = {
   sessionId: Scalars['ID']['output'];
 };
 
+export type BulkChangeDecisionInput = {
+  decision: PolishedChangeStatus;
+  polishedTranscriptId: Scalars['ID']['input'];
+};
+
 export type BulkImportResult = {
   __typename?: 'BulkImportResult';
   created: Scalars['Int']['output'];
@@ -609,6 +614,11 @@ export enum ChallengeType {
   Quiz = 'QUIZ'
 }
 
+export type ChangeDecisionInput = {
+  changeId: Scalars['ID']['input'];
+  decision: PolishedChangeStatus;
+};
+
 export type ChannelAnalytics = {
   __typename?: 'ChannelAnalytics';
   channel: NotificationChannel;
@@ -642,6 +652,16 @@ export type CheckoutSession = {
   __typename?: 'CheckoutSession';
   sessionId: Scalars['String']['output'];
   sessionUrl: Scalars['String']['output'];
+};
+
+export type CitationFormatConfig = {
+  __typename?: 'CitationFormatConfig';
+  courseId: Scalars['ID']['output'];
+  formatDescription?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  parsedStructure?: Maybe<Scalars['JSON']['output']>;
+  presetName: Scalars['String']['output'];
 };
 
 export enum CitationMatchStatus {
@@ -991,6 +1011,10 @@ export type CourseReadiness = {
 
 export type CourseReadinessCheck = {
   __typename?: 'CourseReadinessCheck';
+  /**
+   * Stable ID for urql normalized cache — derived from the check name.
+   * Allows urql to key CourseReadinessCheck objects without querying a DB id.
+   */
   id: Scalars['ID']['output'];
   message?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
@@ -1520,6 +1544,11 @@ export type EarningsSummary = {
   totalEarnedCents: Scalars['Int']['output'];
 };
 
+export type EditPolishedBlockInput = {
+  blockId: Scalars['ID']['input'];
+  content: Scalars['String']['input'];
+};
+
 export type Embedding = {
   __typename?: 'Embedding';
   chunkText: Scalars['String']['output'];
@@ -1842,6 +1871,26 @@ export type GeneratedModule = {
   title: Scalars['String']['output'];
 };
 
+export type GlossaryEntry = {
+  __typename?: 'GlossaryEntry';
+  aggregatedDefinition?: Maybe<Scalars['String']['output']>;
+  crossReferences: Array<JargonTerm>;
+  id: Scalars['ID']['output'];
+  isPublished: Scalars['Boolean']['output'];
+  lessonRefs: Array<GlossaryLessonRef>;
+  term: JargonTerm;
+  wikiContent?: Maybe<Scalars['String']['output']>;
+};
+
+export type GlossaryLessonRef = {
+  __typename?: 'GlossaryLessonRef';
+  centralityScore: Scalars['Float']['output'];
+  firstMentionTime?: Maybe<Scalars['Float']['output']>;
+  lessonId: Scalars['ID']['output'];
+  lessonTitle?: Maybe<Scalars['String']['output']>;
+  occurrenceCount: Scalars['Int']['output'];
+};
+
 export type GroupChallenge = {
   __typename?: 'GroupChallenge';
   challengeType: ChallengeType;
@@ -1913,6 +1962,16 @@ export type InstructorPayout = {
   status: Scalars['String']['output'];
 };
 
+export type InstructorVoiceProfile = {
+  __typename?: 'InstructorVoiceProfile';
+  id: Scalars['ID']['output'];
+  instructorId: Scalars['ID']['output'];
+  lastUpdatedFrom?: Maybe<Scalars['ID']['output']>;
+  sampleCount: Scalars['Int']['output'];
+  updatedAt: Scalars['String']['output'];
+  voiceData?: Maybe<Scalars['JSON']['output']>;
+};
+
 export enum InvitationStatus {
   Accepted = 'ACCEPTED',
   Expired = 'EXPIRED',
@@ -1954,6 +2013,7 @@ export type JargonTerm = {
   altForms: Array<Scalars['String']['output']>;
   canonicalForm: Scalars['String']['output'];
   confidence?: Maybe<Scalars['Float']['output']>;
+  definitionFull?: Maybe<Scalars['String']['output']>;
   definitionShort?: Maybe<Scalars['String']['output']>;
   domain: JargonDomain;
   domainId: Scalars['ID']['output'];
@@ -2107,15 +2167,12 @@ export type LessonCitation = {
   bookName: Scalars['String']['output'];
   column?: Maybe<Scalars['String']['output']>;
   confidence?: Maybe<Scalars['Float']['output']>;
-  graphSourceId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  knowledgeSourceId?: Maybe<Scalars['ID']['output']>;
   lessonId: Scalars['ID']['output'];
   matchStatus: CitationMatchStatus;
   page?: Maybe<Scalars['String']['output']>;
   paragraph?: Maybe<Scalars['String']['output']>;
   part?: Maybe<Scalars['String']['output']>;
-  resolvedText?: Maybe<Scalars['String']['output']>;
   sourceText: Scalars['String']['output'];
 };
 
@@ -2501,9 +2558,14 @@ export type Mutation = {
   adminBulkEnroll: Scalars['Int']['output'];
   adminEnrollUser: AdminEnrollmentRecord;
   adminUnenrollUser: Scalars['Boolean']['output'];
+  aggregateGlossaryDefinition: GlossaryEntry;
   approvePilotRequest: Scalars['Boolean']['output'];
+  /** Approve the polished transcript → sets status to PUBLISHED. */
+  approvePolishedTranscript: PolishedTranscript;
   assignAssetToAnchor: VisualAnchor;
   assignCpdCreditsToCourse: Scalars['Boolean']['output'];
+  /** Accept or reject ALL pending changes for a polished transcript. */
+  bulkDecidePolishedChanges: PolishedTranscript;
   bulkImportUsers: BulkImportResult;
   calibrateExamItems: Scalars['Boolean']['output'];
   cancelAgentExecution: AgentExecution;
@@ -2590,6 +2652,8 @@ export type Mutation = {
   deactivateAgentTemplate: AgentTemplate;
   deactivateLibraryCourse: Scalars['Boolean']['output'];
   deactivateUser: Scalars['Boolean']['output'];
+  /** Accept or reject a single tracked change within a block. */
+  decidePolishedChange: PolishedBlockChange;
   delegateRole: RoleDelegation;
   deleteAgentTemplate: Scalars['Boolean']['output'];
   deleteAnnotation: Scalars['Boolean']['output'];
@@ -2610,6 +2674,8 @@ export type Mutation = {
   deleteVisualAnchor: Scalars['Boolean']['output'];
   deleteWebhook: Scalars['Boolean']['output'];
   disconnectCrm: Scalars['Boolean']['output'];
+  /** Manually override the content of a polished block. */
+  editPolishedBlock: PolishedTranscriptBlock;
   endLiveSession: LiveSession;
   endProctoringSession: ProctoringSession;
   endSession: Scalars['Boolean']['output'];
@@ -2681,6 +2747,7 @@ export type Mutation = {
   publishAnnouncement: Announcement;
   publishCourse: Course;
   publishEnrichedLesson: EnrichedLesson;
+  publishGlossaryEntry: GlossaryEntry;
   publishLesson: Lesson;
   publishLessonPlan: CourseLessonPlan;
   publishListing: Scalars['Boolean']['output'];
@@ -2698,6 +2765,8 @@ export type Mutation = {
    */
   recordScenarioChoice?: Maybe<ScenarioNode>;
   regeneratePartnerApiKey: RegeneratedApiKey;
+  /** Trigger a new polishing run, creating a new version. */
+  regeneratePolishedTranscript: PolishedTranscript;
   /** Register a new LTI 1.3 platform for the current tenant. */
   registerLtiPlatform: LtiPlatform;
   /**
@@ -2733,6 +2802,8 @@ export type Mutation = {
   restoreRun: LessonPipelineRun;
   retireExamItem: ExamItem;
   retryPipelineModule: LessonPipelineRun;
+  /** Revert an instructor-edited block back to the AI-generated version. */
+  revertPolishedBlock: PolishedTranscriptBlock;
   revokeApiKey: Scalars['Boolean']['output'];
   revokeBIApiKey: Scalars['Boolean']['output'];
   /** Revoke a previously issued badge (cannot be undone) */
@@ -2757,6 +2828,11 @@ export type Mutation = {
   sendMessage: AgentMessage;
   sendRoleplayMessage: Scalars['Boolean']['output'];
   setBlockAnchorTimestamp: EnrichedTranscriptBlock;
+  /**
+   * Create or update a citation format config for a course.
+   * presetName values: JEWISH_TEXTS | APA | MLA | CHICAGO | CUSTOM
+   */
+  setCitationFormat: CitationFormatConfig;
   skipOnboarding: OnboardingState;
   startAgentExecution: AgentExecution;
   startAgentSession: AgentSession;
@@ -2800,6 +2876,7 @@ export type Mutation = {
   updateExamBlueprint: ExamBlueprint;
   updateExamItem: ExamItem;
   updateGamificationConfig: GamificationConfig;
+  updateGlossaryWiki: GlossaryEntry;
   updateLesson: Lesson;
   updateLessonCitation: LessonCitation;
   /**
@@ -2936,8 +3013,18 @@ export type MutationAdminUnenrollUserArgs = {
 };
 
 
+export type MutationAggregateGlossaryDefinitionArgs = {
+  termId: Scalars['ID']['input'];
+};
+
+
 export type MutationApprovePilotRequestArgs = {
   requestId: Scalars['ID']['input'];
+};
+
+
+export type MutationApprovePolishedTranscriptArgs = {
+  polishedTranscriptId: Scalars['ID']['input'];
 };
 
 
@@ -2951,6 +3038,11 @@ export type MutationAssignCpdCreditsToCourseArgs = {
   courseId: Scalars['ID']['input'];
   creditHours: Scalars['Float']['input'];
   creditTypeId: Scalars['ID']['input'];
+};
+
+
+export type MutationBulkDecidePolishedChangesArgs = {
+  input: BulkChangeDecisionInput;
 };
 
 
@@ -3321,6 +3413,11 @@ export type MutationDeactivateUserArgs = {
 };
 
 
+export type MutationDecidePolishedChangeArgs = {
+  input: ChangeDecisionInput;
+};
+
+
 export type MutationDelegateRoleArgs = {
   roleId: Scalars['ID']['input'];
   userId: Scalars['ID']['input'];
@@ -3410,6 +3507,11 @@ export type MutationDeleteVisualAnchorArgs = {
 
 export type MutationDeleteWebhookArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationEditPolishedBlockArgs = {
+  input: EditPolishedBlockInput;
 };
 
 
@@ -3689,6 +3791,11 @@ export type MutationPublishEnrichedLessonArgs = {
 };
 
 
+export type MutationPublishGlossaryEntryArgs = {
+  termId: Scalars['ID']['input'];
+};
+
+
 export type MutationPublishLessonArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3729,6 +3836,11 @@ export type MutationRecordScenarioChoiceArgs = {
 
 export type MutationRegeneratePartnerApiKeyArgs = {
   partnerId: Scalars['ID']['input'];
+};
+
+
+export type MutationRegeneratePolishedTranscriptArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -3868,6 +3980,11 @@ export type MutationRetryPipelineModuleArgs = {
 };
 
 
+export type MutationRevertPolishedBlockArgs = {
+  blockId: Scalars['ID']['input'];
+};
+
+
 export type MutationRevokeApiKeyArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3957,6 +4074,13 @@ export type MutationSendRoleplayMessageArgs = {
 
 export type MutationSetBlockAnchorTimestampArgs = {
   input: SetBlockAnchorTimestampInput;
+};
+
+
+export type MutationSetCitationFormatArgs = {
+  courseId: Scalars['ID']['input'];
+  formatDescription?: InputMaybe<Scalars['String']['input']>;
+  presetName: Scalars['String']['input'];
 };
 
 
@@ -4162,6 +4286,12 @@ export type MutationUpdateExamItemArgs = {
 
 export type MutationUpdateGamificationConfigArgs = {
   input: UpdateGamificationConfigInput;
+};
+
+
+export type MutationUpdateGlossaryWikiArgs = {
+  termId: Scalars['ID']['input'];
+  wikiContent: Scalars['String']['input'];
 };
 
 
@@ -4751,6 +4881,94 @@ export type PlatformStats = {
   totalTenants: Scalars['Int']['output'];
 };
 
+export type PolishedBlockChange = {
+  __typename?: 'PolishedBlockChange';
+  blockId: Scalars['ID']['output'];
+  changeType?: Maybe<PolishedChangeType>;
+  charOffsetEnd: Scalars['Int']['output'];
+  charOffsetStart: Scalars['Int']['output'];
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  originalFragment: Scalars['String']['output'];
+  replacementFragment?: Maybe<Scalars['String']['output']>;
+  reviewedAt?: Maybe<Scalars['String']['output']>;
+  status: PolishedChangeStatus;
+};
+
+export enum PolishedBlockType {
+  PolishedCitation = 'POLISHED_CITATION',
+  PolishedHeading = 'POLISHED_HEADING',
+  PolishedText = 'POLISHED_TEXT'
+}
+
+export enum PolishedChangeStatus {
+  Accepted = 'ACCEPTED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED'
+}
+
+export enum PolishedChangeType {
+  AudienceAddressRemoved = 'AUDIENCE_ADDRESS_REMOVED',
+  CitationFormatted = 'CITATION_FORMATTED',
+  FillerRemoved = 'FILLER_REMOVED',
+  ImperativeToDescription = 'IMPERATIVE_TO_DESCRIPTION',
+  PersonChanged = 'PERSON_CHANGED',
+  RepetitionRemoved = 'REPETITION_REMOVED',
+  RhetoricalSimplified = 'RHETORICAL_SIMPLIFIED',
+  SentenceRestructured = 'SENTENCE_RESTRUCTURED',
+  SpellingCorrected = 'SPELLING_CORRECTED'
+}
+
+export type PolishedTranscript = {
+  __typename?: 'PolishedTranscript';
+  approvedAt?: Maybe<Scalars['String']['output']>;
+  approvedBy?: Maybe<Scalars['ID']['output']>;
+  blocks: Array<PolishedTranscriptBlock>;
+  coverageScore?: Maybe<Scalars['Float']['output']>;
+  createdAt: Scalars['String']['output'];
+  fullText?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  polishedBy: Scalars['String']['output'];
+  status: PolishedTranscriptStatus;
+  updatedAt: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+};
+
+export type PolishedTranscriptBlock = {
+  __typename?: 'PolishedTranscriptBlock';
+  blockOrder: Scalars['Int']['output'];
+  blockType?: Maybe<PolishedBlockType>;
+  changes: Array<PolishedBlockChange>;
+  content: Scalars['String']['output'];
+  endTime?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  instructorEdited: Scalars['Boolean']['output'];
+  instructorText?: Maybe<Scalars['String']['output']>;
+  originalText?: Maybe<Scalars['String']['output']>;
+  polishedId: Scalars['ID']['output'];
+  sourceSegmentIds: Scalars['JSON']['output'];
+  startTime?: Maybe<Scalars['Float']['output']>;
+};
+
+export enum PolishedTranscriptStatus {
+  Approved = 'APPROVED',
+  Draft = 'DRAFT',
+  InstructorReview = 'INSTRUCTOR_REVIEW',
+  Processing = 'PROCESSING',
+  Published = 'PUBLISHED'
+}
+
+export type PolishingProgressEvent = {
+  __typename?: 'PolishingProgressEvent';
+  lessonId: Scalars['ID']['output'];
+  message?: Maybe<Scalars['String']['output']>;
+  polishedTranscriptId?: Maybe<Scalars['ID']['output']>;
+  progress: Scalars['Int']['output'];
+  status: PolishedTranscriptStatus;
+  timestamp: Scalars['String']['output'];
+};
+
 export type PollOptionResult = {
   __typename?: 'PollOptionResult';
   count: Scalars['Int']['output'];
@@ -4985,6 +5203,8 @@ export type Query = {
   certificateDownloadUrl: Scalars['String']['output'];
   challengeLeaderboard: Array<ChallengeParticipant>;
   chavrutaPartnerMatches: Array<ChavrutaPartnerMatch>;
+  /** List active citation format configs for a course. */
+  citationFormatConfigs: Array<CitationFormatConfig>;
   cohortInsights: CohortInsightsResult;
   cohortRetention: Array<CohortMetrics>;
   complianceCourses: Array<ComplianceCourse>;
@@ -5041,6 +5261,9 @@ export type Query = {
   getPresignedUploadUrl: PresignedUploadUrl;
   getVisualAnchors: Array<VisualAnchor>;
   getVisualAssets: Array<VisualAsset>;
+  glossaryEntries: Array<GlossaryEntry>;
+  glossaryEntry?: Maybe<GlossaryEntry>;
+  glossarySearch: Array<GlossaryEntry>;
   instructorEarnings: EarningsSummary;
   jargonDomain?: Maybe<JargonDomain>;
   jargonDomains: Array<JargonDomain>;
@@ -5146,6 +5369,8 @@ export type Query = {
   myTopMasteryTopics: Array<UserMasteryTopic>;
   myTotalPoints: Scalars['Int']['output'];
   myUsage?: Maybe<UsageSnapshot>;
+  /** Get the instructor voice profile for the current user. */
+  myVoiceProfile?: Maybe<InstructorVoiceProfile>;
   notificationDeliveryAnalytics: NotificationAnalytics;
   orgAnalytics: OrgAnalytics;
   orgAtRiskLearners: Array<AtRiskLearnerItem>;
@@ -5159,6 +5384,10 @@ export type Query = {
   personByName?: Maybe<Person>;
   pipelineTemplates: Array<LessonPipelineTemplate>;
   platformLiveStats?: Maybe<PlatformStats>;
+  /** Get the latest polished transcript for a lesson (with blocks and changes). */
+  polishedTranscript?: Maybe<PolishedTranscript>;
+  /** List all versions of polished transcripts for a lesson. */
+  polishedTranscriptVersions: Array<PolishedTranscript>;
   pollResults: PollResults;
   /**
    * Find the deepest prerequisite chain leading into a named concept.
@@ -5397,6 +5626,11 @@ export type QueryChavrutaPartnerMatchesArgs = {
 };
 
 
+export type QueryCitationFormatConfigsArgs = {
+  courseId: Scalars['ID']['input'];
+};
+
+
 export type QueryCohortInsightsArgs = {
   conceptId: Scalars['ID']['input'];
   courseId: Scalars['ID']['input'];
@@ -5612,6 +5846,23 @@ export type QueryGetVisualAnchorsArgs = {
 
 export type QueryGetVisualAssetsArgs = {
   courseId: Scalars['ID']['input'];
+};
+
+
+export type QueryGlossaryEntriesArgs = {
+  domainId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGlossaryEntryArgs = {
+  termId: Scalars['ID']['input'];
+};
+
+
+export type QueryGlossarySearchArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
 };
 
 
@@ -5919,6 +6170,16 @@ export type QueryPersonArgs = {
 
 export type QueryPersonByNameArgs = {
   name: Scalars['String']['input'];
+};
+
+
+export type QueryPolishedTranscriptArgs = {
+  lessonId: Scalars['ID']['input'];
+};
+
+
+export type QueryPolishedTranscriptVersionsArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -6605,6 +6866,7 @@ export type SkillTreeNode = {
 
 export type SocialFeedItem = {
   __typename?: 'SocialFeedItem';
+  actorDisplayName: Scalars['String']['output'];
   actorId: Scalars['ID']['output'];
   createdAt: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -6620,6 +6882,7 @@ export type SocialRecommendation = {
   contentTitle: Scalars['String']['output'];
   followersCount: Scalars['Int']['output'];
   isMutualFollower: Scalars['Boolean']['output'];
+  lastActivity: Scalars['String']['output'];
 };
 
 export type Source = {
@@ -6685,6 +6948,8 @@ export type Subscription = {
   messageAdded: DiscussionMessage;
   messageStream: AgentMessage;
   notificationReceived: Notification;
+  /** Real-time polishing progress for a lesson. */
+  polishingProgress: PolishingProgressEvent;
   pollUpdated: PollResults;
   /** User created event */
   userCreated: User;
@@ -6742,6 +7007,11 @@ export type SubscriptionMessageStreamArgs = {
 
 export type SubscriptionNotificationReceivedArgs = {
   userId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionPolishingProgressArgs = {
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -7357,7 +7627,6 @@ export type VisualAnchor = {
   anchorText: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
   documentOrder: Scalars['Int']['output'];
-  endTime?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
   isBroken: Scalars['Boolean']['output'];
   mediaAssetId: Scalars['ID']['output'];
@@ -7369,7 +7638,6 @@ export type VisualAnchor = {
   posXEnd?: Maybe<Scalars['Float']['output']>;
   posY?: Maybe<Scalars['Float']['output']>;
   posYEnd?: Maybe<Scalars['Float']['output']>;
-  startTime?: Maybe<Scalars['Float']['output']>;
   updatedAt: Scalars['String']['output'];
   visualAsset?: Maybe<VisualAsset>;
   visualAssetId?: Maybe<Scalars['ID']['output']>;

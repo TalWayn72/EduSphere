@@ -1,33 +1,62 @@
 const { chromium } = require('playwright');
 
 const USERS = [
-  { email: 'super.admin@edusphere.dev', password: 'SuperAdmin123!', role: 'SUPER_ADMIN' },
-  { email: 'instructor@example.com', password: 'Instructor123!', role: 'INSTRUCTOR' },
-  { email: 'org.admin@example.com', password: 'OrgAdmin123!', role: 'ORG_ADMIN' },
-  { email: 'researcher@example.com', password: 'Researcher123!', role: 'RESEARCHER' },
+  {
+    email: 'super.admin@edusphere.dev',
+    password: 'SuperAdmin123!',
+    role: 'SUPER_ADMIN',
+  },
+  {
+    email: 'instructor@example.com',
+    password: 'Instructor123!',
+    role: 'INSTRUCTOR',
+  },
+  {
+    email: 'org.admin@example.com',
+    password: 'OrgAdmin123!',
+    role: 'ORG_ADMIN',
+  },
+  {
+    email: 'researcher@example.com',
+    password: 'Researcher123!',
+    role: 'RESEARCHER',
+  },
   { email: 'student@example.com', password: 'Student123!', role: 'STUDENT' },
 ];
 
-var SCREENSHOT_DIR = 'C:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots';
+var SCREENSHOT_DIR =
+  'C:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots';
 var screenshotTaken = false;
 
 async function testUserLogin(browser, user) {
   var context = await browser.newContext();
   var page = await context.newPage();
-  var result = { email: user.email, role: user.role, success: false, error: null, details: '' };
+  var result = {
+    email: user.email,
+    role: user.role,
+    success: false,
+    error: null,
+    details: '',
+  };
 
   try {
     // Step 1: Navigate directly to the login page
-    console.log('[' + user.role + '] Navigating to http://localhost:5173/login...');
+    console.log(
+      '[' + user.role + '] Navigating to http://localhost:5173/login...'
+    );
     await page.goto('http://localhost:5173/login', { timeout: 15000 });
-    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(function() {});
+    await page
+      .waitForLoadState('networkidle', { timeout: 10000 })
+      .catch(function () {});
 
     var url1 = page.url();
     console.log('[' + user.role + '] On login page: ' + url1);
 
     // Step 2: Click the "Sign in with Keycloak" button on the app login page
     // This triggers keycloak.login() which redirects to Keycloak
-    console.log('[' + user.role + '] Looking for Sign in button on app login page...');
+    console.log(
+      '[' + user.role + '] Looking for Sign in button on app login page...'
+    );
 
     var signInBtn = null;
     var signInSelectors = [
@@ -45,16 +74,33 @@ async function testUserLogin(browser, user) {
         var el = page.locator(signInSelectors[si]).first();
         if (await el.isVisible({ timeout: 2000 })) {
           signInBtn = el;
-          var btnText = await el.textContent().catch(function() { return '?'; });
-          console.log('[' + user.role + '] Found button: "' + btnText.trim() + '" via ' + signInSelectors[si]);
+          var btnText = await el.textContent().catch(function () {
+            return '?';
+          });
+          console.log(
+            '[' +
+              user.role +
+              '] Found button: "' +
+              btnText.trim() +
+              '" via ' +
+              signInSelectors[si]
+          );
           break;
         }
-      } catch (e) { /* try next */ }
+      } catch (e) {
+        /* try next */
+      }
     }
 
     if (!signInBtn) {
       result.error = 'No sign-in button found on /login page';
-      await page.screenshot({ path: SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '-nobutton.png' });
+      await page.screenshot({
+        path:
+          SCREENSHOT_DIR +
+          '/auth-fail-' +
+          user.role.toLowerCase() +
+          '-nobutton.png',
+      });
       await context.close();
       return result;
     }
@@ -84,7 +130,9 @@ async function testUserLogin(browser, user) {
       await passwordField.fill(user.password);
       console.log('[' + user.role + '] Entered password');
 
-      var submitBtn = page.locator('#kc-login, button[type="submit"], input[type="submit"]').first();
+      var submitBtn = page
+        .locator('#kc-login, button[type="submit"], input[type="submit"]')
+        .first();
       await submitBtn.click({ timeout: 5000 });
       console.log('[' + user.role + '] Clicked Keycloak submit');
 
@@ -92,38 +140,55 @@ async function testUserLogin(browser, user) {
       await page.waitForURL(/localhost:5173/, { timeout: 30000 });
       console.log('[' + user.role + '] Redirected back to app: ' + page.url());
 
-      await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(function() {});
+      await page
+        .waitForLoadState('networkidle', { timeout: 15000 })
+        .catch(function () {});
       await page.waitForTimeout(2000);
 
       // Verify we are logged in (not back on /login)
       var finalUrl = page.url();
       if (finalUrl.includes('/login')) {
-        result.error = 'Redirected back to /login after Keycloak auth - login may have failed';
-        await page.screenshot({ path: SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png' });
+        result.error =
+          'Redirected back to /login after Keycloak auth - login may have failed';
+        await page.screenshot({
+          path:
+            SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png',
+        });
       } else {
         result.success = true;
         result.details = 'Keycloak auth successful. URL: ' + finalUrl;
       }
-
     } else if (url2.includes('localhost:5173') && !url2.includes('/login')) {
       // Dev mode login - redirected back to app directly
-      console.log('[' + user.role + '] Dev mode login - redirected to: ' + url2);
-      await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(function() {});
+      console.log(
+        '[' + user.role + '] Dev mode login - redirected to: ' + url2
+      );
+      await page
+        .waitForLoadState('networkidle', { timeout: 10000 })
+        .catch(function () {});
       await page.waitForTimeout(2000);
       result.success = true;
       result.details = 'Dev mode login successful. URL: ' + url2;
-
     } else if (url2.includes('/login')) {
       // Still on login page - maybe page reloaded for dev mode
       // Wait a bit more and check
       await page.waitForTimeout(3000);
-      await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(function() {});
+      await page
+        .waitForLoadState('networkidle', { timeout: 10000 })
+        .catch(function () {});
       var url3 = page.url();
       console.log('[' + user.role + '] After waiting, URL: ' + url3);
 
       if (url3.includes('/login')) {
         // Check if we need to wait for Keycloak redirect
-        await page.waitForURL(function(u) { return !u.toString().includes('/login'); }, { timeout: 15000 }).catch(function() {});
+        await page
+          .waitForURL(
+            function (u) {
+              return !u.toString().includes('/login');
+            },
+            { timeout: 15000 }
+          )
+          .catch(function () {});
         var url4 = page.url();
         console.log('[' + user.role + '] Final URL: ' + url4);
 
@@ -138,7 +203,9 @@ async function testUserLogin(browser, user) {
           var sb = page.locator('#kc-login, button[type="submit"]').first();
           await sb.click({ timeout: 5000 });
           await page.waitForURL(/localhost:5173/, { timeout: 30000 });
-          await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(function() {});
+          await page
+            .waitForLoadState('networkidle', { timeout: 15000 })
+            .catch(function () {});
           await page.waitForTimeout(2000);
           result.success = true;
           result.details = 'Late Keycloak redirect. URL: ' + page.url();
@@ -147,7 +214,10 @@ async function testUserLogin(browser, user) {
           result.details = 'Login completed. URL: ' + url4;
         } else {
           result.error = 'Stuck on /login page after clicking sign-in button';
-          await page.screenshot({ path: SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png' });
+          await page.screenshot({
+            path:
+              SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png',
+          });
         }
       } else {
         result.success = true;
@@ -155,17 +225,21 @@ async function testUserLogin(browser, user) {
       }
     } else {
       result.error = 'Unexpected URL after login click: ' + url2;
-      await page.screenshot({ path: SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png' });
+      await page.screenshot({
+        path: SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png',
+      });
     }
 
     // Take screenshot of first successful login
     if (result.success && !screenshotTaken) {
       await page.screenshot({
         path: SCREENSHOT_DIR + '/bug104-105-auth-verify.png',
-        fullPage: false
+        fullPage: false,
       });
       screenshotTaken = true;
-      console.log('[' + user.role + '] Screenshot saved to bug104-105-auth-verify.png');
+      console.log(
+        '[' + user.role + '] Screenshot saved to bug104-105-auth-verify.png'
+      );
     }
 
     // Step 5: Log out (try various methods)
@@ -190,12 +264,16 @@ async function testUserLogin(browser, user) {
             await page.waitForTimeout(500);
             break;
           }
-        } catch (e) { /* try next */ }
+        } catch (e) {
+          /* try next */
+        }
       }
 
       // Try settings page which usually has logout
       try {
-        var settingsLink = page.locator('a[href*="settings"], text=Settings').first();
+        var settingsLink = page
+          .locator('a[href*="settings"], text=Settings')
+          .first();
         if (await settingsLink.isVisible({ timeout: 1000 })) {
           await settingsLink.click();
           await page.waitForTimeout(1000);
@@ -223,16 +301,21 @@ async function testUserLogin(browser, user) {
             console.log('[' + user.role + '] Logged out');
             break;
           }
-        } catch (e) { /* try next */ }
+        } catch (e) {
+          /* try next */
+        }
       }
 
       if (!loggedOut) {
-        console.log('[' + user.role + '] No logout button found, using fresh context for next user');
+        console.log(
+          '[' +
+            user.role +
+            '] No logout button found, using fresh context for next user'
+        );
       }
 
       await page.waitForTimeout(2000);
     }
-
   } catch (err) {
     result.error = err.message.split('\n')[0]; // first line only
     console.log('[' + user.role + '] ERROR: ' + result.error);
@@ -240,9 +323,11 @@ async function testUserLogin(browser, user) {
     try {
       await page.screenshot({
         path: SCREENSHOT_DIR + '/auth-fail-' + user.role.toLowerCase() + '.png',
-        fullPage: false
+        fullPage: false,
       });
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
   }
 
   await context.close();
@@ -263,7 +348,9 @@ async function main() {
     var result = await testUserLogin(browser, user);
     results.push(result);
     var statusEmoji = result.success ? 'SUCCESS' : 'FAILED';
-    console.log('Result: ' + statusEmoji + (result.error ? ' - ' + result.error : ''));
+    console.log(
+      'Result: ' + statusEmoji + (result.error ? ' - ' + result.error : '')
+    );
   }
 
   await browser.close();
@@ -282,14 +369,25 @@ async function main() {
   }
   console.log('==========================================');
 
-  var passed = results.filter(function(r) { return r.success; }).length;
-  var failed = results.filter(function(r) { return !r.success; }).length;
-  console.log('Total: ' + passed + ' passed, ' + failed + ' failed out of ' + results.length);
+  var passed = results.filter(function (r) {
+    return r.success;
+  }).length;
+  var failed = results.filter(function (r) {
+    return !r.success;
+  }).length;
+  console.log(
+    'Total: ' +
+      passed +
+      ' passed, ' +
+      failed +
+      ' failed out of ' +
+      results.length
+  );
 
   process.exit(failed > 0 ? 1 : 0);
 }
 
-main().catch(function(err) {
+main().catch(function (err) {
   console.error('Fatal error:', err);
   process.exit(2);
 });

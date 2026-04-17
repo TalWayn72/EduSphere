@@ -15,59 +15,76 @@ function apiCall(path, token) {
       path: path,
       headers: {
         'User-Agent': 'EduSphere',
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token ' + token,
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: 'token ' + token,
       },
       rejectUnauthorized: false,
     };
-    https.get(opts, function(r) {
-      let d = '';
-      r.on('data', function(c) { d += c; });
-      r.on('end', function() {
-        try { res(JSON.parse(d)); }
-        catch(e) { res({ raw: d, status: r.statusCode }); }
-      });
-    }).on('error', rej);
+    https
+      .get(opts, function (r) {
+        let d = '';
+        r.on('data', function (c) {
+          d += c;
+        });
+        r.on('end', function () {
+          try {
+            res(JSON.parse(d));
+          } catch (e) {
+            res({ raw: d, status: r.statusCode });
+          }
+        });
+      })
+      .on('error', rej);
   });
 }
 
 function getLogs(jobId, token) {
-  return new Promise(function(res, rej) {
+  return new Promise(function (res, rej) {
     const opts = {
       hostname: 'api.github.com',
       path: '/repos/TalWayn72/EduSphere/actions/jobs/' + jobId + '/logs',
       headers: {
         'User-Agent': 'EduSphere',
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token ' + token,
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: 'token ' + token,
       },
       rejectUnauthorized: false,
     };
-    https.get(opts, function(r) {
-      if (r.statusCode === 302 && r.headers.location) {
-        // Follow the redirect to the actual log URL
-        const location = r.headers.location;
-        const urlObj = new URL(location);
-        const followOpts = {
-          hostname: urlObj.hostname,
-          path: urlObj.pathname + urlObj.search,
-          headers: { 'User-Agent': 'EduSphere' },
-          rejectUnauthorized: false,
-        };
-        https.get(followOpts, function(r2) {
-          const chunks = [];
-          r2.on('data', function(c) { chunks.push(c); });
-          r2.on('end', function() {
-            const text = Buffer.concat(chunks).toString('utf8');
-            res(text);
+    https
+      .get(opts, function (r) {
+        if (r.statusCode === 302 && r.headers.location) {
+          // Follow the redirect to the actual log URL
+          const location = r.headers.location;
+          const urlObj = new URL(location);
+          const followOpts = {
+            hostname: urlObj.hostname,
+            path: urlObj.pathname + urlObj.search,
+            headers: { 'User-Agent': 'EduSphere' },
+            rejectUnauthorized: false,
+          };
+          https
+            .get(followOpts, function (r2) {
+              const chunks = [];
+              r2.on('data', function (c) {
+                chunks.push(c);
+              });
+              r2.on('end', function () {
+                const text = Buffer.concat(chunks).toString('utf8');
+                res(text);
+              });
+            })
+            .on('error', rej);
+        } else {
+          let d = '';
+          r.on('data', function (c) {
+            d += c;
           });
-        }).on('error', rej);
-      } else {
-        let d = '';
-        r.on('data', function(c) { d += c; });
-        r.on('end', function() { res(d); });
-      }
-    }).on('error', rej);
+          r.on('end', function () {
+            res(d);
+          });
+        }
+      })
+      .on('error', rej);
   });
 }
 
@@ -77,7 +94,11 @@ function extractErrors(logText) {
   const errorLines = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (/error|Error|ERROR|FAILED|failed|FAIL|denied|unauthorized|Unauthorized|no such|not found|Cannot find/i.test(line)) {
+    if (
+      /error|Error|ERROR|FAILED|failed|FAIL|denied|unauthorized|Unauthorized|no such|not found|Cannot find/i.test(
+        line
+      )
+    ) {
       // Include 2 lines before and 2 after for context
       const start = Math.max(0, i - 2);
       const end = Math.min(lines.length - 1, i + 2);
@@ -109,9 +130,15 @@ async function main() {
     console.log('='.repeat(70));
 
     // Get job metadata first
-    const meta = await apiCall('/repos/TalWayn72/EduSphere/actions/jobs/' + job.id, token);
+    const meta = await apiCall(
+      '/repos/TalWayn72/EduSphere/actions/jobs/' + job.id,
+      token
+    );
     if (meta.raw) {
-      console.log('Job metadata fetch failed (status ' + meta.status + '):', meta.raw.slice(0, 200));
+      console.log(
+        'Job metadata fetch failed (status ' + meta.status + '):',
+        meta.raw.slice(0, 200)
+      );
     } else if (meta.message) {
       console.log('API message:', meta.message);
     } else {
@@ -141,7 +168,7 @@ async function main() {
         console.log('\n--- EXTRACTED ERROR LINES ---');
         console.log(extractErrors(logs));
       }
-    } catch(e) {
+    } catch (e) {
       console.log('Error fetching logs:', e.message);
     }
   }

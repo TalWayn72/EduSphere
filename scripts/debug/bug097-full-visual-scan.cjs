@@ -30,21 +30,66 @@ const PAGES = [
 
 // Common English UI words that should be translated
 const ENGLISH_WORDS = [
-  'Save', 'Cancel', 'Edit', 'Delete', 'Submit', 'Loading',
-  'Search', 'Back', 'Close', 'Create', 'New', 'Draft',
-  'Publish', 'Overview', 'Settings', 'Dashboard', 'Courses',
-  'Profile', 'Logout', 'Login', 'Sign', 'Welcome', 'Home',
-  'Next', 'Previous', 'Continue', 'Start', 'Finish', 'Complete',
-  'Error', 'Success', 'Warning', 'Info', 'Help', 'About',
-  'Filter', 'Sort', 'View', 'Download', 'Upload', 'Share',
-  'Notifications', 'Messages', 'Activity', 'Progress',
-  'Leaderboard', 'Achievements', 'Badges', 'Points',
-  'Discussions', 'Comments', 'Reply', 'Post',
+  'Save',
+  'Cancel',
+  'Edit',
+  'Delete',
+  'Submit',
+  'Loading',
+  'Search',
+  'Back',
+  'Close',
+  'Create',
+  'New',
+  'Draft',
+  'Publish',
+  'Overview',
+  'Settings',
+  'Dashboard',
+  'Courses',
+  'Profile',
+  'Logout',
+  'Login',
+  'Sign',
+  'Welcome',
+  'Home',
+  'Next',
+  'Previous',
+  'Continue',
+  'Start',
+  'Finish',
+  'Complete',
+  'Error',
+  'Success',
+  'Warning',
+  'Info',
+  'Help',
+  'About',
+  'Filter',
+  'Sort',
+  'View',
+  'Download',
+  'Upload',
+  'Share',
+  'Notifications',
+  'Messages',
+  'Activity',
+  'Progress',
+  'Leaderboard',
+  'Achievements',
+  'Badges',
+  'Points',
+  'Discussions',
+  'Comments',
+  'Reply',
+  'Post',
 ];
 
 async function login(page) {
   console.log('[LOGIN] Navigating to app to trigger Keycloak redirect...');
-  await page.goto(BASE, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => {});
+  await page
+    .goto(BASE, { waitUntil: 'networkidle', timeout: 30000 })
+    .catch(() => {});
   await page.waitForTimeout(2000);
 
   // Check if we're on Keycloak login page
@@ -59,7 +104,11 @@ async function login(page) {
   } else {
     console.log('[LOGIN] Not redirected to Keycloak. URL:', url);
     // Try clicking a login button if visible
-    const loginBtn = page.locator('button:has-text("Login"), a:has-text("Login"), button:has-text("Sign"), a:has-text("Sign")').first();
+    const loginBtn = page
+      .locator(
+        'button:has-text("Login"), a:has-text("Login"), button:has-text("Sign"), a:has-text("Sign")'
+      )
+      .first();
     if (await loginBtn.isVisible().catch(() => false)) {
       await loginBtn.click();
       await page.waitForTimeout(3000);
@@ -88,10 +137,19 @@ async function checkPage(page, pageInfo) {
     await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 15000 });
   } catch {
     try {
-      await page.goto(fullUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
+      await page.goto(fullUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: 10000,
+      });
     } catch (e2) {
       console.log(`[SCAN] Failed to load ${pageInfo.name}: ${e2.message}`);
-      return { page: pageInfo.name, rtl: 'N/A', lang: 'N/A', englishWords: ['PAGE_LOAD_FAILED'], status: 'SKIP' };
+      return {
+        page: pageInfo.name,
+        rtl: 'N/A',
+        lang: 'N/A',
+        englishWords: ['PAGE_LOAD_FAILED'],
+        status: 'SKIP',
+      };
     }
   }
 
@@ -101,11 +159,20 @@ async function checkPage(page, pageInfo) {
   const currentUrl = page.url();
   if (currentUrl.includes('8080') || currentUrl.includes('keycloak')) {
     console.log(`[SCAN] ${pageInfo.name} redirected to login`);
-    return { page: pageInfo.name, rtl: 'N/A', lang: 'N/A', englishWords: ['REDIRECT_TO_LOGIN'], status: 'SKIP' };
+    return {
+      page: pageInfo.name,
+      rtl: 'N/A',
+      lang: 'N/A',
+      englishWords: ['REDIRECT_TO_LOGIN'],
+      status: 'SKIP',
+    };
   }
 
   // Take screenshot
-  const screenshotPath = path.join(SCREENSHOT_DIR, `bug097-scan-${pageInfo.name}-he.png`);
+  const screenshotPath = path.join(
+    SCREENSHOT_DIR,
+    `bug097-scan-${pageInfo.name}-he.png`
+  );
   await page.screenshot({ path: screenshotPath, fullPage: true });
   console.log(`[SCAN] Screenshot saved: ${screenshotPath}`);
 
@@ -128,11 +195,15 @@ async function checkPage(page, pageInfo) {
           const el = node.parentElement;
           if (!el) return NodeFilter.FILTER_REJECT;
           const style = window.getComputedStyle(el);
-          if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          if (
+            style.display === 'none' ||
+            style.visibility === 'hidden' ||
+            style.opacity === '0'
+          ) {
             return NodeFilter.FILTER_REJECT;
           }
           return NodeFilter.FILTER_ACCEPT;
-        }
+        },
       }
     );
     const texts = [];
@@ -154,19 +225,27 @@ async function checkPage(page, pageInfo) {
     }
   }
 
-  const status = (isRtl && isHe && foundEnglish.length === 0) ? 'PASS' :
-                 (foundEnglish.length > 5) ? 'FAIL' :
-                 (foundEnglish.length > 0) ? 'WARN' :
-                 (!isRtl || !isHe) ? 'FAIL' : 'PASS';
+  const status =
+    isRtl && isHe && foundEnglish.length === 0
+      ? 'PASS'
+      : foundEnglish.length > 5
+        ? 'FAIL'
+        : foundEnglish.length > 0
+          ? 'WARN'
+          : !isRtl || !isHe
+            ? 'FAIL'
+            : 'PASS';
 
-  console.log(`[SCAN] ${pageInfo.name}: RTL=${isRtl}, lang=${lang}, English words: [${foundEnglish.join(', ')}] => ${status}`);
+  console.log(
+    `[SCAN] ${pageInfo.name}: RTL=${isRtl}, lang=${lang}, English words: [${foundEnglish.join(', ')}] => ${status}`
+  );
 
   return {
     page: pageInfo.name,
     rtl: isRtl ? 'YES' : 'NO',
     lang: lang || 'none',
     englishWords: foundEnglish,
-    status
+    status,
   };
 }
 
@@ -185,7 +264,9 @@ async function checkPage(page, pageInfo) {
   const page = await context.newPage();
 
   // Set Hebrew locale before anything
-  await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
+  await page
+    .goto(BASE, { waitUntil: 'domcontentloaded', timeout: 15000 })
+    .catch(() => {});
   await setHebrewLocale(page);
 
   // Login
@@ -193,7 +274,9 @@ async function checkPage(page, pageInfo) {
 
   // Re-set locale after login (in case it was cleared)
   await setHebrewLocale(page);
-  await page.reload({ waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+  await page
+    .reload({ waitUntil: 'networkidle', timeout: 15000 })
+    .catch(() => {});
   await page.waitForTimeout(2000);
 
   // Scan all pages
@@ -231,11 +314,18 @@ async function checkPage(page, pageInfo) {
   console.log(header);
   console.log(separator);
 
-  let passCount = 0, failCount = 0, warnCount = 0, skipCount = 0;
+  let passCount = 0,
+    failCount = 0,
+    warnCount = 0,
+    skipCount = 0;
 
   for (const r of results) {
-    const wordsStr = r.englishWords.length > 0 ? r.englishWords.join(', ') : '(none)';
-    const truncWords = wordsStr.length > colWords ? wordsStr.substring(0, colWords - 3) + '...' : wordsStr;
+    const wordsStr =
+      r.englishWords.length > 0 ? r.englishWords.join(', ') : '(none)';
+    const truncWords =
+      wordsStr.length > colWords
+        ? wordsStr.substring(0, colWords - 3) + '...'
+        : wordsStr;
     const row = [
       r.page.padEnd(colPage),
       r.rtl.padEnd(colRtl),
@@ -252,11 +342,15 @@ async function checkPage(page, pageInfo) {
   }
 
   console.log(separator);
-  console.log(`\nTotals: ${passCount} PASS, ${warnCount} WARN, ${failCount} FAIL, ${skipCount} SKIP`);
+  console.log(
+    `\nTotals: ${passCount} PASS, ${warnCount} WARN, ${failCount} FAIL, ${skipCount} SKIP`
+  );
   console.log(`\nScreenshots saved to: ${SCREENSHOT_DIR}/bug097-scan-*-he.png`);
 
   // Detailed findings for WARN/FAIL pages
-  const issues = results.filter(r => r.status === 'WARN' || r.status === 'FAIL');
+  const issues = results.filter(
+    (r) => r.status === 'WARN' || r.status === 'FAIL'
+  );
   if (issues.length > 0) {
     console.log('\n\n========================================');
     console.log('  DETAILED FINDINGS (WARN + FAIL)');

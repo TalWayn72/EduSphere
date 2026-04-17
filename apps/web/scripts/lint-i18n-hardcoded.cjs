@@ -19,11 +19,7 @@ const SCAN_DIRS = [
 ];
 
 // Files to skip (test/story files)
-const SKIP_PATTERNS = [
-  /\.test\.tsx$/,
-  /\.spec\.tsx$/,
-  /\.stories\.tsx$/,
-];
+const SKIP_PATTERNS = [/\.test\.tsx$/, /\.spec\.tsx$/, /\.stories\.tsx$/];
 
 // Allowlist of pure wrapper/utility components that genuinely have no text.
 // Use basenames (case-insensitive match).
@@ -59,7 +55,8 @@ const JSX_TEXT_PATTERNS = [
 ];
 
 // Pattern for useTranslation import
-const USE_TRANSLATION_PATTERN = /useTranslation|import.*from\s+['"]react-i18next['"]/;
+const USE_TRANSLATION_PATTERN =
+  /useTranslation|import.*from\s+['"]react-i18next['"]/;
 
 // Pattern for t() usage (alternative: sometimes t is imported directly)
 const T_FUNCTION_PATTERN = /\bt\s*\(/;
@@ -109,7 +106,9 @@ function hasJsxText(content) {
  * Check if file imports/uses translation.
  */
 function hasTranslation(content) {
-  return USE_TRANSLATION_PATTERN.test(content) || T_FUNCTION_PATTERN.test(content);
+  return (
+    USE_TRANSLATION_PATTERN.test(content) || T_FUNCTION_PATTERN.test(content)
+  );
 }
 
 // --- Main ---
@@ -142,7 +141,9 @@ if (violations.length === 0) {
   console.log('No hardcoded string violations found.');
   process.exit(0);
 } else {
-  console.error(`Found ${violations.length} file(s) with JSX text but no useTranslation import:\n`);
+  console.error(
+    `Found ${violations.length} file(s) with JSX text but no useTranslation import:\n`
+  );
   for (const v of violations) {
     console.error(`  - ${v}`);
   }

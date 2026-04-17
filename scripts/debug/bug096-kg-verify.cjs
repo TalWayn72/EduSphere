@@ -138,7 +138,9 @@ async function run() {
   // Check for error banner: "שרת לא נגיש"
   const hasServerError =
     pageText.includes('שרת לא נגיש') || pageText.includes('Server unavailable');
-  console.log(`  "שרת לא נגיש" error banner: ${hasServerError ? 'FOUND (BAD)' : 'NOT FOUND (GOOD)'}`);
+  console.log(
+    `  "שרת לא נגיש" error banner: ${hasServerError ? 'FOUND (BAD)' : 'NOT FOUND (GOOD)'}`
+  );
 
   // Check for mock data (fake Jewish philosophy concepts)
   const mockConcepts = [
@@ -150,9 +152,7 @@ async function run() {
     'Torah',
     'Kabbalah',
   ];
-  const foundMockConcepts = mockConcepts.filter((c) =>
-    pageText.includes(c)
-  );
+  const foundMockConcepts = mockConcepts.filter((c) => pageText.includes(c));
   const hasMockData = foundMockConcepts.length > 0;
   console.log(
     `  Mock data present: ${hasMockData ? `YES (BAD) — found: ${foundMockConcepts.join(', ')}` : 'NO (GOOD)'}`
@@ -166,13 +166,13 @@ async function run() {
     pageText.includes('no results') ||
     pageText.includes('אין') ||
     pageText.includes('Get started');
-  console.log(
-    `  Empty state visible: ${hasEmptyState ? 'YES' : 'NO'}`
-  );
+  console.log(`  Empty state visible: ${hasEmptyState ? 'YES' : 'NO'}`);
 
   // Look for knowledge graph specific elements
   const canvas = await page.locator('canvas').count();
-  const svgElements = await page.locator('svg.graph, svg[data-testid*="graph"], div[class*="graph"]').count();
+  const svgElements = await page
+    .locator('svg.graph, svg[data-testid*="graph"], div[class*="graph"]')
+    .count();
   console.log(`  Canvas elements: ${canvas}`);
   console.log(`  Graph SVG/div elements: ${svgElements}`);
 
@@ -190,13 +190,12 @@ async function run() {
   }
 
   // Take a focused screenshot of the main content area
-  const mainContent = page.locator('main, [role="main"], .main-content, #root > div > div');
+  const mainContent = page.locator(
+    'main, [role="main"], .main-content, #root > div > div'
+  );
   if ((await mainContent.count()) > 0) {
     await mainContent.first().screenshot({
-      path: path.join(
-        SCREENSHOTS_DIR,
-        'bug096-04-knowledge-graph-content.png'
-      ),
+      path: path.join(SCREENSHOTS_DIR, 'bug096-04-knowledge-graph-content.png'),
     });
     console.log('  Screenshot: bug096-04-knowledge-graph-content.png');
   }

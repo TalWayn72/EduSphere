@@ -551,6 +551,9 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   jargonTerm(id: ID!) : JargonTerm @join__field(graph: KNOWLEDGE)  @authenticated
   detectLessonDomains(lessonId: ID!) : DomainDetectionResult! @join__field(graph: KNOWLEDGE)  @authenticated
   lessonJargonOccurrences(lessonId: ID!) : [JargonOccurrence!]! @join__field(graph: KNOWLEDGE)  @authenticated
+  glossaryEntry(termId: ID!) : GlossaryEntry @join__field(graph: KNOWLEDGE)  @authenticated
+  glossaryEntries(domainId: ID!, limit: Int = 50) : [GlossaryEntry!]! @join__field(graph: KNOWLEDGE)  @authenticated
+  glossarySearch(query: String!, limit: Int = 20) : [GlossaryEntry!]! @join__field(graph: KNOWLEDGE)  @authenticated
   peerMatches(courseId: String) : [PeerMatch!]! @join__field(graph: KNOWLEDGE)  @authenticated
   myPeerMatchRequests: [PeerMatchRequest!]! @join__field(graph: KNOWLEDGE)  @authenticated
   mentorsByPathTopology(courseId: ID!) : [MentorPathMatch!]! @join__field(graph: KNOWLEDGE)  @authenticated
@@ -989,10 +992,13 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Stored in the user_skill_mastery table (created by migration 0011).
   """
   updateMasteryLevel(nodeId: ID!, level: MasteryLevel!) : SkillTreeNode! @join__field(graph: KNOWLEDGE)  @authenticated
-  createJargonDomain(input: CreateJargonDomainInput!) : JargonDomain! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
-  addJargonTerm(input: AddJargonTermInput!) : JargonTerm! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
-  confirmLessonDomains(input: ConfirmDomainInput!) : [JargonDomain!]! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
-  importJargonTerms(domainId: ID!, terms: [AddJargonTermInput!]!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
+  createJargonDomain(input: CreateJargonDomainInput!) : JargonDomain! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
+  addJargonTerm(input: AddJargonTermInput!) : JargonTerm! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
+  confirmLessonDomains(input: ConfirmDomainInput!) : [JargonDomain!]! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
+  importJargonTerms(domainId: ID!, terms: [AddJargonTermInput!]!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
+  updateGlossaryWiki(termId: ID!, wikiContent: String!) : GlossaryEntry! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
+  publishGlossaryEntry(termId: ID!) : GlossaryEntry! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
+  aggregateGlossaryDefinition(termId: ID!) : GlossaryEntry! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]])
   requestPeerMatch(matchedUserId: ID!, courseId: String) : PeerMatchRequest! @join__field(graph: KNOWLEDGE)  @authenticated
   respondToPeerMatch(requestId: ID!, accept: Boolean!) : PeerMatchRequest! @join__field(graph: KNOWLEDGE)  @authenticated
   ingestContent(file: Upload!, courseId: ID!) : ContentIngestionResult! @join__field(graph: KNOWLEDGE)  @authenticated @requiresScopes(scopes: [["course:write"]]) 
@@ -3700,6 +3706,7 @@ type JargonTerm @join__type(graph: KNOWLEDGE)  {
   phoneticHint: String
   altForms: [String!]!
   definitionShort: String
+  definitionFull: String
   language: String!
   source: JargonTermSource!
   confidence: Float
@@ -3713,6 +3720,24 @@ type JargonOccurrence @join__type(graph: KNOWLEDGE)  {
   endTime: Float
   originalText: String!
   correctedText: String
+}
+
+type GlossaryLessonRef @join__type(graph: KNOWLEDGE)  {
+  lessonId: ID!
+  lessonTitle: String
+  occurrenceCount: Int!
+  centralityScore: Float!
+  firstMentionTime: Float
+}
+
+type GlossaryEntry @join__type(graph: KNOWLEDGE)  {
+  id: ID!
+  term: JargonTerm!
+  wikiContent: String
+  aggregatedDefinition: String
+  isPublished: Boolean!
+  lessonRefs: [GlossaryLessonRef!]!
+  crossReferences: [JargonTerm!]!
 }
 
 type DomainDetectionResult @join__type(graph: KNOWLEDGE)  {

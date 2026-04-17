@@ -5,21 +5,23 @@ const { chromium } = require('playwright');
   const page = await browser.newPage();
 
   console.log('1. Navigating to /solutions/universities...');
-  await page.goto('http://localhost:5173/solutions/universities', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:5173/solutions/universities', {
+    waitUntil: 'networkidle',
+  });
   await page.waitForSelector('footer', { timeout: 15000 });
 
-  const footerLinks = await page.$$eval('footer a', links =>
-    links.map(l => ({
+  const footerLinks = await page.$$eval('footer a', (links) =>
+    links.map((l) => ({
       text: (l.textContent || '').trim(),
       attrHref: l.getAttribute('href'),
     }))
   );
   console.log('2. Footer links found:', footerLinks.length);
 
-  const features = footerLinks.find(l => l.text === 'Features');
-  const pricing = footerLinks.find(l => l.text === 'Pricing');
-  const about = footerLinks.find(l => l.text === 'About');
-  const privacy = footerLinks.find(l => l.text === 'Privacy');
+  const features = footerLinks.find((l) => l.text === 'Features');
+  const pricing = footerLinks.find((l) => l.text === 'Pricing');
+  const about = footerLinks.find((l) => l.text === 'About');
+  const privacy = footerLinks.find((l) => l.text === 'Privacy');
   console.log('3. Features:', JSON.stringify(features));
   console.log('   Pricing:', JSON.stringify(pricing));
   console.log('   About:', JSON.stringify(about));
@@ -33,7 +35,9 @@ const { chromium } = require('playwright');
 
   // Test Features hash link — navigate back first
   console.log('5. Back to /solutions/universities...');
-  await page.goto('http://localhost:5173/solutions/universities', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:5173/solutions/universities', {
+    waitUntil: 'networkidle',
+  });
   await page.waitForSelector('footer', { timeout: 15000 });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(500);
@@ -46,7 +50,9 @@ const { chromium } = require('playwright');
   console.log('   Features nav:', featuresNavOk ? '✓' : '✗');
 
   // Screenshot
-  await page.goto('http://localhost:5173/solutions/universities', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:5173/solutions/universities', {
+    waitUntil: 'networkidle',
+  });
   await page.waitForSelector('footer', { timeout: 15000 });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(500);
@@ -55,7 +61,7 @@ const { chromium } = require('playwright');
 
   await browser.close();
   console.log('\n=== Visual test complete ===');
-})().catch(e => {
+})().catch((e) => {
   console.error('FAIL:', e.message);
   process.exit(1);
 });

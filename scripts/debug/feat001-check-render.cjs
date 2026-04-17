@@ -1,22 +1,31 @@
-const { chromium } = require('C:/Users/P0039217/.claude/projects/EduSphere/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core');
+const {
+  chromium,
+} = require('C:/Users/P0039217/.claude/projects/EduSphere/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core');
 const path = require('path');
 
-const SCREENSHOTS_DIR = 'c:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots';
+const SCREENSHOTS_DIR =
+  'c:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots';
 const BASE_URL = 'http://localhost:5173';
 
 async function run() {
   const browser = await chromium.launch({ headless: true });
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+  });
   const page = await ctx.newPage();
 
   // Capture console messages from the page
-  page.on('console', msg => console.log(`[BROWSER ${msg.type()}]`, msg.text()));
-  page.on('pageerror', err => console.log('[BROWSER ERROR]', err.message));
+  page.on('console', (msg) =>
+    console.log(`[BROWSER ${msg.type()}]`, msg.text())
+  );
+  page.on('pageerror', (err) => console.log('[BROWSER ERROR]', err.message));
 
   // Login as instructor
   await page.goto(`${BASE_URL}/login`, { timeout: 15000 });
   await page.waitForTimeout(2000);
-  const signInBtn = await page.$('button:has-text("Sign In"), button:has-text("כניסה"), button[type="submit"]');
+  const signInBtn = await page.$(
+    'button:has-text("Sign In"), button:has-text("כניסה"), button[type="submit"]'
+  );
   if (signInBtn) {
     await signInBtn.click();
     await page.waitForTimeout(5000);
@@ -42,7 +51,9 @@ async function run() {
   // Dump the header area HTML
   const headerHTML = await page.evaluate(() => {
     // Look for the header section with buttons
-    const headerDiv = document.querySelector('.flex.items-center.justify-between');
+    const headerDiv = document.querySelector(
+      '.flex.items-center.justify-between'
+    );
     return headerDiv ? headerDiv.innerHTML : 'HEADER NOT FOUND';
   });
   console.log('\n=== Header HTML ===');
@@ -52,25 +63,30 @@ async function run() {
   const hasDeleteInBundle = await page.evaluate(() => {
     // Check if the module loaded
     const scripts = document.querySelectorAll('script[type="module"]');
-    return Array.from(scripts).map(s => s.src);
+    return Array.from(scripts).map((s) => s.src);
   });
   console.log('\n=== Module scripts ===');
   console.log(JSON.stringify(hasDeleteInBundle, null, 2));
 
   // Check for any elements with "delete" in data-testid or text
-  const deleteElements = await page.$$eval('*', els =>
-    els.filter(e => {
-      const testid = e.getAttribute('data-testid') || '';
-      const text = (e.textContent || '').toLowerCase();
-      const ariaLabel = e.getAttribute('aria-label') || '';
-      return testid.includes('delete') || ariaLabel.toLowerCase().includes('delete');
-    }).map(e => ({
-      tag: e.tagName,
-      testid: e.getAttribute('data-testid'),
-      text: (e.textContent || '').trim().substring(0, 60),
-      ariaLabel: e.getAttribute('aria-label'),
-      visible: e.offsetParent !== null,
-    }))
+  const deleteElements = await page.$$eval('*', (els) =>
+    els
+      .filter((e) => {
+        const testid = e.getAttribute('data-testid') || '';
+        const text = (e.textContent || '').toLowerCase();
+        const ariaLabel = e.getAttribute('aria-label') || '';
+        return (
+          testid.includes('delete') ||
+          ariaLabel.toLowerCase().includes('delete')
+        );
+      })
+      .map((e) => ({
+        tag: e.tagName,
+        testid: e.getAttribute('data-testid'),
+        text: (e.textContent || '').trim().substring(0, 60),
+        ariaLabel: e.getAttribute('aria-label'),
+        visible: e.offsetParent !== null,
+      }))
   );
   console.log('\n=== Elements with "delete" ===');
   console.log(JSON.stringify(deleteElements, null, 2));
@@ -86,14 +102,17 @@ async function run() {
   console.log('\ni18n check:', i18nCheck);
 
   // Take full-page screenshot
-  await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'feat001-debug-editpage.png'), fullPage: true });
+  await page.screenshot({
+    path: path.join(SCREENSHOTS_DIR, 'feat001-debug-editpage.png'),
+    fullPage: true,
+  });
   console.log('Screenshot saved: feat001-debug-editpage.png');
 
   await ctx.close();
   await browser.close();
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error('FATAL:', err);
   process.exit(1);
 });

@@ -2,7 +2,9 @@ const { chromium } = require('playwright');
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 800 },
+  });
   const page = await context.newPage();
 
   // Try 5174 first, fall back to 5173
@@ -44,7 +46,10 @@ const { chromium } = require('playwright');
 
   for (const p of pages) {
     try {
-      await page.goto(`${BASE}${p.url}`, { waitUntil: 'networkidle', timeout: 15000 });
+      await page.goto(`${BASE}${p.url}`, {
+        waitUntil: 'networkidle',
+        timeout: 15000,
+      });
       await page.waitForTimeout(1000);
 
       // Check dir and lang attributes
@@ -61,20 +66,30 @@ const { chromium } = require('playwright');
 
       // Check for common hardcoded English strings that should be translated
       const englishStrings = [
-        'Sign In', 'Log In', 'Features', 'Pricing', 'About',
-        'Request Demo', 'Start Free', 'Learn More',
-        'Dashboard', 'Settings', 'Profile',
-        'No credit card', 'Get Started'
+        'Sign In',
+        'Log In',
+        'Features',
+        'Pricing',
+        'About',
+        'Request Demo',
+        'Start Free',
+        'Learn More',
+        'Dashboard',
+        'Settings',
+        'Profile',
+        'No credit card',
+        'Get Started',
       ];
 
-      const foundEnglish = englishStrings.filter(s => bodyText.includes(s));
+      const foundEnglish = englishStrings.filter((s) => bodyText.includes(s));
 
-      const status = hebrewRatio > 0.3 ? 'PASS' : (hebrewRatio > 0.1 ? 'PARTIAL' : 'FAIL');
+      const status =
+        hebrewRatio > 0.3 ? 'PASS' : hebrewRatio > 0.1 ? 'PARTIAL' : 'FAIL';
 
       // Take screenshot
       await page.screenshot({
         path: `${SCREENSHOT_DIR}/bug097-r8-${p.name}.png`,
-        fullPage: false
+        fullPage: false,
       });
 
       results.push({
@@ -85,11 +100,14 @@ const { chromium } = require('playwright');
         hebrewChars,
         latinChars,
         hebrewRatio: (hebrewRatio * 100).toFixed(1) + '%',
-        foundEnglish: foundEnglish.length > 0 ? foundEnglish.join(', ') : 'none',
-        status
+        foundEnglish:
+          foundEnglish.length > 0 ? foundEnglish.join(', ') : 'none',
+        status,
       });
 
-      console.log(`${status} | ${p.name.padEnd(15)} | dir=${htmlDir} lang=${htmlLang} | hebrew=${(hebrewRatio*100).toFixed(1).padStart(5)}% (${hebrewChars}h/${latinChars}l) | english=[${foundEnglish.join(', ')}]`);
+      console.log(
+        `${status} | ${p.name.padEnd(15)} | dir=${htmlDir} lang=${htmlLang} | hebrew=${(hebrewRatio * 100).toFixed(1).padStart(5)}% (${hebrewChars}h/${latinChars}l) | english=[${foundEnglish.join(', ')}]`
+      );
     } catch (err) {
       results.push({ page: p.name, status: 'ERROR', error: err.message });
       console.log(`ERROR | ${p.name.padEnd(15)} | ${err.message}`);
@@ -97,19 +115,25 @@ const { chromium } = require('playwright');
   }
 
   console.log('\n=== SUMMARY ===');
-  const pass = results.filter(r => r.status === 'PASS').length;
-  const partial = results.filter(r => r.status === 'PARTIAL').length;
-  const fail = results.filter(r => r.status === 'FAIL').length;
-  const error = results.filter(r => r.status === 'ERROR').length;
-  console.log(`PASS: ${pass} | PARTIAL: ${partial} | FAIL: ${fail} | ERROR: ${error}`);
+  const pass = results.filter((r) => r.status === 'PASS').length;
+  const partial = results.filter((r) => r.status === 'PARTIAL').length;
+  const fail = results.filter((r) => r.status === 'FAIL').length;
+  const error = results.filter((r) => r.status === 'ERROR').length;
+  console.log(
+    `PASS: ${pass} | PARTIAL: ${partial} | FAIL: ${fail} | ERROR: ${error}`
+  );
   console.log(`Total pages tested: ${results.length}`);
 
   // Print detailed table for failures
-  const failures = results.filter(r => r.status === 'FAIL' || r.status === 'PARTIAL');
+  const failures = results.filter(
+    (r) => r.status === 'FAIL' || r.status === 'PARTIAL'
+  );
   if (failures.length > 0) {
     console.log('\n=== PAGES NEEDING ATTENTION ===');
     for (const f of failures) {
-      console.log(`  ${f.page}: ${f.hebrewRatio} hebrew, english=[${f.foundEnglish}]`);
+      console.log(
+        `  ${f.page}: ${f.hebrewRatio} hebrew, english=[${f.foundEnglish}]`
+      );
     }
   }
 

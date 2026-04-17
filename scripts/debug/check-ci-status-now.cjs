@@ -6,9 +6,19 @@ const REPO = 'EduSphere';
 
 // Latest commits on master (newest first)
 const COMMITS = [
-  { sha: '7448935', label: 'fix(i18n): srs namespace + DEV_USER UUID + media/course fixes (HEAD)' },
-  { sha: '34850e32e800997a292c88c7dc61ad54575bb9ee', label: 'ci: add continue-on-error to SBOM generation step' },
-  { sha: '5329438a47c121dab6b8cc292e22bfffadcd55d7', label: 'fix(web): remove raw UUID display from course cards' },
+  {
+    sha: '7448935',
+    label:
+      'fix(i18n): srs namespace + DEV_USER UUID + media/course fixes (HEAD)',
+  },
+  {
+    sha: '34850e32e800997a292c88c7dc61ad54575bb9ee',
+    label: 'ci: add continue-on-error to SBOM generation step',
+  },
+  {
+    sha: '5329438a47c121dab6b8cc292e22bfffadcd55d7',
+    label: 'fix(web): remove raw UUID display from course cards',
+  },
 ];
 
 function get(path) {
@@ -18,15 +28,15 @@ function get(path) {
       path,
       method: 'GET',
       headers: {
-        'Authorization': `token ${TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
+        Authorization: `token ${TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'EduSphere-CI-Checker',
       },
       rejectUnauthorized: false,
     };
     const req = https.request(options, (res) => {
       const chunks = [];
-      res.on('data', d => chunks.push(d));
+      res.on('data', (d) => chunks.push(d));
       res.on('end', () => {
         try {
           resolve(JSON.parse(Buffer.concat(chunks).toString()));
@@ -41,11 +51,21 @@ function get(path) {
 }
 
 async function workflowRuns(sha) {
-  return get('/repos/' + OWNER + '/' + REPO + '/actions/runs?per_page=30&branch=master');
+  return get(
+    '/repos/' + OWNER + '/' + REPO + '/actions/runs?per_page=30&branch=master'
+  );
 }
 
 async function checkRuns(sha) {
-  return get('/repos/' + OWNER + '/' + REPO + '/commits/' + sha + '/check-runs?per_page=100');
+  return get(
+    '/repos/' +
+      OWNER +
+      '/' +
+      REPO +
+      '/commits/' +
+      sha +
+      '/check-runs?per_page=100'
+  );
 }
 
 function statusIcon(status, conclusion) {
@@ -65,7 +85,9 @@ function statusIcon(status, conclusion) {
 async function main() {
   console.log('=== EduSphere CI Status Check ===');
   console.log('Time: ' + new Date().toISOString());
-  console.log('HEAD: 7448935 — fix(i18n): srs namespace + DEV_USER UUID + media/course fixes\n');
+  console.log(
+    'HEAD: 7448935 — fix(i18n): srs namespace + DEV_USER UUID + media/course fixes\n'
+  );
 
   // Workflow-level overview
   console.log('=== WORKFLOW RUNS (master branch, latest per workflow) ===');
@@ -82,11 +104,27 @@ async function main() {
           byWorkflow.set(run.name, run);
         }
       }
-      const TARGET = ['Continuous Integration', 'Full Test Suite', 'GraphQL Federation Validation', 'Docker Image Builds', 'CodeQL Security Analysis', 'CD — Deploy to Kubernetes', 'Performance Tests'];
+      const TARGET = [
+        'Continuous Integration',
+        'Full Test Suite',
+        'GraphQL Federation Validation',
+        'Docker Image Builds',
+        'CodeQL Security Analysis',
+        'CD — Deploy to Kubernetes',
+        'Performance Tests',
+      ];
       const targetRuns = [];
       const otherRuns = [];
       for (const [name, run] of byWorkflow) {
-        if (TARGET.some(t => name.includes(t.replace('GraphQL Federation Validation', 'Federation').replace('CodeQL Security Analysis', 'CodeQL')))) {
+        if (
+          TARGET.some((t) =>
+            name.includes(
+              t
+                .replace('GraphQL Federation Validation', 'Federation')
+                .replace('CodeQL Security Analysis', 'CodeQL')
+            )
+          )
+        ) {
           targetRuns.push([name, run]);
         } else {
           otherRuns.push([name, run]);
@@ -110,41 +148,67 @@ async function main() {
 
   // Per-commit check runs
   for (const { sha, label } of COMMITS) {
-    console.log('\n=== CHECK RUNS: ' + sha.slice(0, 8) + ' — ' + label + ' ===');
+    console.log(
+      '\n=== CHECK RUNS: ' + sha.slice(0, 8) + ' — ' + label + ' ==='
+    );
     try {
       const data = await checkRuns(sha);
-      if (data.message) { console.log('API error: ' + data.message); continue; }
+      if (data.message) {
+        console.log('API error: ' + data.message);
+        continue;
+      }
       const checks = data.check_runs || [];
       console.log('Total checks: ' + checks.length);
 
-      const successes = checks.filter(c => c.status === 'completed' && c.conclusion === 'success');
-      const failures = checks.filter(c => c.status === 'completed' && c.conclusion === 'failure');
-      const cancelled = checks.filter(c => c.status === 'completed' && c.conclusion === 'cancelled');
-      const running = checks.filter(c => c.status === 'in_progress');
-      const queued = checks.filter(c => c.status === 'queued');
-      const skipped = checks.filter(c => c.status === 'completed' && c.conclusion === 'skipped');
+      const successes = checks.filter(
+        (c) => c.status === 'completed' && c.conclusion === 'success'
+      );
+      const failures = checks.filter(
+        (c) => c.status === 'completed' && c.conclusion === 'failure'
+      );
+      const cancelled = checks.filter(
+        (c) => c.status === 'completed' && c.conclusion === 'cancelled'
+      );
+      const running = checks.filter((c) => c.status === 'in_progress');
+      const queued = checks.filter((c) => c.status === 'queued');
+      const skipped = checks.filter(
+        (c) => c.status === 'completed' && c.conclusion === 'skipped'
+      );
 
-      console.log('  OK=' + successes.length + ' FAIL=' + failures.length + ' CANCEL=' + cancelled.length + ' RUN=' + running.length + ' QUEUE=' + queued.length + ' SKIP=' + skipped.length);
+      console.log(
+        '  OK=' +
+          successes.length +
+          ' FAIL=' +
+          failures.length +
+          ' CANCEL=' +
+          cancelled.length +
+          ' RUN=' +
+          running.length +
+          ' QUEUE=' +
+          queued.length +
+          ' SKIP=' +
+          skipped.length
+      );
 
       if (failures.length > 0) {
         console.log('\n  FAILURES:');
-        failures.forEach(c => console.log('    [FAIL] ' + c.name));
+        failures.forEach((c) => console.log('    [FAIL] ' + c.name));
       }
       if (running.length > 0) {
         console.log('\n  RUNNING:');
-        running.forEach(c => console.log('    [RUN] ' + c.name));
+        running.forEach((c) => console.log('    [RUN] ' + c.name));
       }
       if (queued.length > 0) {
         console.log('\n  QUEUED:');
-        queued.forEach(c => console.log('    [QUEUE] ' + c.name));
+        queued.forEach((c) => console.log('    [QUEUE] ' + c.name));
       }
       if (successes.length > 0) {
         console.log('\n  PASSED:');
-        successes.forEach(c => console.log('    [OK] ' + c.name));
+        successes.forEach((c) => console.log('    [OK] ' + c.name));
       }
       if (cancelled.length > 0) {
         console.log('\n  CANCELLED (superseded by newer commit):');
-        cancelled.forEach(c => console.log('    [CANCEL] ' + c.name));
+        cancelled.forEach((c) => console.log('    [CANCEL] ' + c.name));
       }
     } catch (e) {
       console.log('Error: ' + e.message);

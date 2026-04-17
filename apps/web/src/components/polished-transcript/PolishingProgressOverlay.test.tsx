@@ -51,7 +51,13 @@ function setupMocks({
   mockUseSubscription.mockReturnValue([
     {
       data: subStatus
-        ? { polishingProgress: { lessonId: 'l1', progress: subProgress ?? 0, status: subStatus } }
+        ? {
+            polishingProgress: {
+              lessonId: 'l1',
+              progress: subProgress ?? 0,
+              status: subStatus,
+            },
+          }
         : undefined,
     },
   ]);
@@ -77,7 +83,9 @@ describe('PolishingProgressOverlay', () => {
 
     render(<PolishingProgressOverlay lessonId="l1" />);
 
-    expect(screen.getByTestId('polishing-progress-overlay')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('polishing-progress-overlay')
+    ).toBeInTheDocument();
     expect(screen.getByText(/מעבד תמליל/)).toBeInTheDocument();
   });
 
@@ -90,7 +98,11 @@ describe('PolishingProgressOverlay', () => {
   });
 
   it('reflects progress from subscription data', () => {
-    setupMocks({ subStatus: 'PROCESSING', subProgress: 65, pollStatus: 'PROCESSING' });
+    setupMocks({
+      subStatus: 'PROCESSING',
+      subProgress: 65,
+      pollStatus: 'PROCESSING',
+    });
 
     render(<PolishingProgressOverlay lessonId="l1" />);
 
@@ -109,12 +121,18 @@ describe('PolishingProgressOverlay', () => {
     });
 
     // Spinner should not be in DOM after terminal state
-    expect(screen.queryByTestId('polishing-progress-overlay')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('polishing-progress-overlay')
+    ).not.toBeInTheDocument();
   });
 
   it('calls onComplete when subscription delivers COMPLETED', async () => {
     const onComplete = vi.fn();
-    setupMocks({ subStatus: 'COMPLETED', subProgress: 100, pollStatus: 'PROCESSING' });
+    setupMocks({
+      subStatus: 'COMPLETED',
+      subProgress: 100,
+      pollStatus: 'PROCESSING',
+    });
 
     render(<PolishingProgressOverlay lessonId="l1" onComplete={onComplete} />);
 
@@ -144,8 +162,12 @@ describe('PolishingProgressOverlay', () => {
 
     await waitFor(() => expect(onComplete).toHaveBeenCalled());
 
-    rerender(<PolishingProgressOverlay lessonId="l1" onComplete={onComplete} />);
-    rerender(<PolishingProgressOverlay lessonId="l1" onComplete={onComplete} />);
+    rerender(
+      <PolishingProgressOverlay lessonId="l1" onComplete={onComplete} />
+    );
+    rerender(
+      <PolishingProgressOverlay lessonId="l1" onComplete={onComplete} />
+    );
 
     expect(onComplete).toHaveBeenCalledTimes(1);
   });

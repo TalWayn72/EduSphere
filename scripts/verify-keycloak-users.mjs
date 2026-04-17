@@ -4,7 +4,13 @@ async function request(method, urlStr, body, headers) {
   return new Promise((resolve, reject) => {
     const url = new URL(urlStr);
     const req = http.request(
-      { hostname: url.hostname, port: url.port, path: url.pathname + url.search, method, headers },
+      {
+        hostname: url.hostname,
+        port: url.port,
+        path: url.pathname + url.search,
+        method,
+        headers,
+      },
       (res) => {
         let data = '';
         res.on('data', (d) => (data += d));
@@ -28,7 +34,10 @@ async function tryLogin(username, password) {
     'POST',
     'http://localhost:8080/realms/edusphere/protocol/openid-connect/token',
     body,
-    { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(body) }
+    {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(body),
+    }
   );
   const parsed = JSON.parse(res.body);
   return { ok: Boolean(parsed.access_token), error: parsed.error_description };

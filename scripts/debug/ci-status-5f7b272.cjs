@@ -9,18 +9,21 @@ function get(path) {
       path,
       method: 'GET',
       headers: {
-        'Authorization': 'token ' + TOKEN,
-        'Accept': 'application/vnd.github.v3+json',
+        Authorization: 'token ' + TOKEN,
+        Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'EduSphere',
       },
       rejectUnauthorized: false,
     };
     const req = https.request(options, (res) => {
       const chunks = [];
-      res.on('data', d => chunks.push(d));
+      res.on('data', (d) => chunks.push(d));
       res.on('end', () => {
-        try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-        catch (e) { reject(new Error(e.message)); }
+        try {
+          resolve(JSON.parse(Buffer.concat(chunks).toString()));
+        } catch (e) {
+          reject(new Error(e.message));
+        }
       });
     });
     req.on('error', reject);
@@ -29,35 +32,57 @@ function get(path) {
 }
 
 async function main() {
-  const data = await get('/repos/TalWayn72/EduSphere/commits/' + SHA + '/check-runs?per_page=100');
+  const data = await get(
+    '/repos/TalWayn72/EduSphere/commits/' + SHA + '/check-runs?per_page=100'
+  );
   const runs = data.check_runs || [];
   const total = runs.length;
   const byStatus = {};
-  runs.forEach(r => {
+  runs.forEach((r) => {
     const key = r.conclusion || r.status;
     if (!byStatus[key]) byStatus[key] = [];
     byStatus[key].push(r.name);
   });
   console.log('=== CI for 5f7b272 ===');
   console.log('Total check-runs:', total);
-  const order = ['success', 'failure', 'in_progress', 'queued', 'skipped', 'cancelled', 'neutral'];
-  order.forEach(k => {
+  const order = [
+    'success',
+    'failure',
+    'in_progress',
+    'queued',
+    'skipped',
+    'cancelled',
+    'neutral',
+  ];
+  order.forEach((k) => {
     if (byStatus[k]) {
-      const icon = k === 'success' ? '✅' : k === 'failure' ? '❌' : k === 'in_progress' ? '🔄' : k === 'queued' ? '⏳' : '⚪';
+      const icon =
+        k === 'success'
+          ? '✅'
+          : k === 'failure'
+            ? '❌'
+            : k === 'in_progress'
+              ? '🔄'
+              : k === 'queued'
+                ? '⏳'
+                : '⚪';
       console.log(icon + ' ' + k + ' (' + byStatus[k].length + '):');
-      byStatus[k].forEach(n => console.log('   -', n));
+      byStatus[k].forEach((n) => console.log('   -', n));
     }
   });
-  Object.keys(byStatus).forEach(k => {
+  Object.keys(byStatus).forEach((k) => {
     if (!order.includes(k)) {
       console.log('❓ ' + k + ':');
-      byStatus[k].forEach(n => console.log('   -', n));
+      byStatus[k].forEach((n) => console.log('   -', n));
     }
   });
 
-  const failed = (byStatus['failure'] || []);
-  const inProgress = (byStatus['in_progress'] || []).length + (byStatus['queued'] || []).length;
-  console.log('\nSummary: ' + failed.length + ' failed, ' + inProgress + ' in progress');
+  const failed = byStatus['failure'] || [];
+  const inProgress =
+    (byStatus['in_progress'] || []).length + (byStatus['queued'] || []).length;
+  console.log(
+    '\nSummary: ' + failed.length + ' failed, ' + inProgress + ' in progress'
+  );
   if (failed.length > 0) {
     console.log('FAILED:', failed.join(', '));
   }

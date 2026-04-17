@@ -5,24 +5,49 @@ const { chromium } = require('playwright');
 
 const BASE = 'http://localhost:5174';
 const ENGLISH_WORDS = [
-  'Save', 'Cancel', 'Edit', 'Delete', 'Submit', 'Loading',
-  'Search', 'Back', 'Close', 'Create', 'New', 'Draft',
-  'Publish', 'Overview', 'Settings', 'Sign', 'Start', 'Complete',
-  'About', 'View', 'Download', 'Upload', 'Activity', 'Progress',
+  'Save',
+  'Cancel',
+  'Edit',
+  'Delete',
+  'Submit',
+  'Loading',
+  'Search',
+  'Back',
+  'Close',
+  'Create',
+  'New',
+  'Draft',
+  'Publish',
+  'Overview',
+  'Settings',
+  'Sign',
+  'Start',
+  'Complete',
+  'About',
+  'View',
+  'Download',
+  'Upload',
+  'Activity',
+  'Progress',
 ];
 
 async function findEnglishText(page) {
   return page.evaluate((words) => {
     const results = [];
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-      acceptNode: (node) => {
-        const el = node.parentElement;
-        if (!el) return NodeFilter.FILTER_REJECT;
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden') return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: (node) => {
+          const el = node.parentElement;
+          if (!el) return NodeFilter.FILTER_REJECT;
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden')
+            return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
       }
-    });
+    );
     let node;
     while ((node = walker.nextNode())) {
       const t = node.textContent.trim();
@@ -32,7 +57,10 @@ async function findEnglishText(page) {
         if (regex.test(t)) {
           const el = node.parentElement;
           const tag = el.tagName;
-          const cls = (el.className && typeof el.className === 'string') ? el.className.substring(0, 80) : '';
+          const cls =
+            el.className && typeof el.className === 'string'
+              ? el.className.substring(0, 80)
+              : '';
           const id = el.id || '';
           results.push({ text: t.substring(0, 150), word: w, tag, cls, id });
         }
@@ -44,7 +72,10 @@ async function findEnglishText(page) {
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'he-IL' });
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    locale: 'he-IL',
+  });
   const page = await ctx.newPage();
 
   // Set locale
@@ -53,7 +84,9 @@ async function findEnglishText(page) {
     localStorage.setItem('edusphere_locale', 'he');
     localStorage.setItem('i18nextLng', 'he');
   });
-  await page.reload({ waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+  await page
+    .reload({ waitUntil: 'networkidle', timeout: 15000 })
+    .catch(() => {});
   await page.waitForTimeout(3000);
 
   // Check dashboard
@@ -70,7 +103,9 @@ async function findEnglishText(page) {
     localStorage.setItem('edusphere_locale', 'he');
     localStorage.setItem('i18nextLng', 'he');
   });
-  await page.goto(BASE + '/progress', { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+  await page
+    .goto(BASE + '/progress', { waitUntil: 'networkidle', timeout: 15000 })
+    .catch(() => {});
   await page.waitForTimeout(2000);
 
   console.log('=== PROGRESS (/progress) - English text details ===\n');

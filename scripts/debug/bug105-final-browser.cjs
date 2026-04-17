@@ -6,18 +6,21 @@ const { chromium } = require('playwright');
   const page = await context.newPage();
 
   const consoleMessages = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     consoleMessages.push({ type: msg.type(), text: msg.text() });
   });
 
   const pageErrors = [];
-  page.on('pageerror', err => {
+  page.on('pageerror', (err) => {
     pageErrors.push(err.message);
   });
 
   console.log('Navigating to http://localhost:5173/agents ...');
   try {
-    await page.goto('http://localhost:5173/agents', { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto('http://localhost:5173/agents', {
+      waitUntil: 'networkidle',
+      timeout: 30000,
+    });
   } catch (e) {
     console.log('Navigation error:', e.message);
     await browser.close();
@@ -28,8 +31,10 @@ const { chromium } = require('playwright');
   await page.waitForTimeout(3000);
 
   // Check for the specific GraphQL error
-  const hasTemplateTypeError = consoleMessages.some(m =>
-    m.text.includes('Cannot return null for non-nullable field AgentTemplate.templateType')
+  const hasTemplateTypeError = consoleMessages.some((m) =>
+    m.text.includes(
+      'Cannot return null for non-nullable field AgentTemplate.templateType'
+    )
   );
 
   // Check for offline banner
@@ -45,12 +50,14 @@ const { chromium } = require('playwright');
 
   // Check for any alert/banner elements
   const banners = await page.evaluate(() => {
-    const els = document.querySelectorAll('[role=alert], [class*=banner], [class*=warning], [class*=offline]');
+    const els = document.querySelectorAll(
+      '[role=alert], [class*=banner], [class*=warning], [class*=offline]'
+    );
     const results = [];
     for (const el of els) {
       results.push({
         text: (el.textContent || '').trim().substring(0, 200),
-        visible: el.offsetParent !== null
+        visible: el.offsetParent !== null,
       });
     }
     return results;
@@ -59,35 +66,42 @@ const { chromium } = require('playwright');
   // Take screenshot
   await page.screenshot({
     path: 'C:/Users/P0039217/.claude/projects/EduSphere/docs/screenshots/bug105-FINAL-BROWSER.png',
-    fullPage: true
+    fullPage: true,
   });
 
   console.log('\n=== RESULTS ===');
-  console.log('BUG-105 GraphQL error in console:', hasTemplateTypeError ? 'YES (BUG PRESENT)' : 'NO (BUG FIXED)');
+  console.log(
+    'BUG-105 GraphQL error in console:',
+    hasTemplateTypeError ? 'YES (BUG PRESENT)' : 'NO (BUG FIXED)'
+  );
   console.log('Offline banner visible:', offlineBanner ? 'YES' : 'NO');
 
   console.log('\n=== Console Errors/Warnings ===');
-  consoleMessages.forEach(m => {
+  consoleMessages.forEach((m) => {
     if (m.type === 'error' || m.type === 'warning') {
       console.log('[' + m.type + ']', m.text.substring(0, 300));
     }
   });
 
   // Also check for templateType mentions in any message
-  const templateMsgs = consoleMessages.filter(m => m.text.includes('templateType') || m.text.includes('AgentTemplate'));
+  const templateMsgs = consoleMessages.filter(
+    (m) => m.text.includes('templateType') || m.text.includes('AgentTemplate')
+  );
   if (templateMsgs.length > 0) {
     console.log('\n=== templateType-related messages ===');
-    templateMsgs.forEach(m => console.log('[' + m.type + ']', m.text.substring(0, 300)));
+    templateMsgs.forEach((m) =>
+      console.log('[' + m.type + ']', m.text.substring(0, 300))
+    );
   }
 
   if (pageErrors.length > 0) {
     console.log('\n=== Page Errors ===');
-    pageErrors.forEach(e => console.log(e.substring(0, 300)));
+    pageErrors.forEach((e) => console.log(e.substring(0, 300)));
   }
 
   if (banners.length > 0) {
     console.log('\n=== Banners/Alerts Found ===');
-    banners.forEach(b => console.log('visible:', b.visible, '|', b.text));
+    banners.forEach((b) => console.log('visible:', b.visible, '|', b.text));
   }
 
   // Check page body for offline text

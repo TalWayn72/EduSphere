@@ -72,7 +72,9 @@ function startStaticServer() {
 
     server.on('error', reject);
     server.listen(PORT, '127.0.0.1', () => {
-      console.info(`[prerender] Static server listening on http://127.0.0.1:${PORT}`);
+      console.info(
+        `[prerender] Static server listening on http://127.0.0.1:${PORT}`
+      );
       resolve(server);
     });
   });
@@ -83,7 +85,9 @@ async function prerender() {
   try {
     await fs.access(DIST);
   } catch {
-    console.error('[prerender] ERROR: dist/ not found. Run `vite build` first.');
+    console.error(
+      '[prerender] ERROR: dist/ not found. Run `vite build` first.'
+    );
     process.exit(1);
   }
 
@@ -101,8 +105,9 @@ async function prerender() {
 
       // Wait for at least one JSON-LD script to be injected by react-helmet-async
       await page.waitForFunction(
-        () => document.querySelector('script[type="application/ld+json"]') !== null,
-        { timeout: 10_000 },
+        () =>
+          document.querySelector('script[type="application/ld+json"]') !== null,
+        { timeout: 10_000 }
       );
 
       const html = await page.content();
@@ -111,7 +116,10 @@ async function prerender() {
       await fs.writeFile(outFile, html, 'utf-8');
       console.info(`[prerender] ✓ ${route.path} → dist/${route.file}`);
     } catch (err) {
-      console.error(`[prerender] ✗ ${route.path} failed:`, err instanceof Error ? err.message : err);
+      console.error(
+        `[prerender] ✗ ${route.path} failed:`,
+        err instanceof Error ? err.message : err
+      );
       failed++;
     }
   }

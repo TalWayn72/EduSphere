@@ -49,7 +49,10 @@ async function main() {
   console.log('Step 1: Click nav login link...');
 
   // First, go directly to /login page
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+  await page.goto(`${BASE}/login`, {
+    waitUntil: 'networkidle',
+    timeout: 30000,
+  });
   await page.waitForTimeout(2000);
   console.log('On /login page, URL:', page.url());
 
@@ -100,7 +103,9 @@ async function main() {
     // Check for Hebrew
     const bodyText = await page.textContent('body');
     const hasHebrew = HEBREW_RE.test(bodyText || '');
-    console.log(`Hebrew characters on ${pagePath}: ${hasHebrew ? 'YES' : 'NO'}`);
+    console.log(
+      `Hebrew characters on ${pagePath}: ${hasHebrew ? 'YES' : 'NO'}`
+    );
     if (!hasHebrew) {
       console.log('WARNING: No Hebrew characters found on page!');
     }

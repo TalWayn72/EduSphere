@@ -19,12 +19,36 @@ const { parse } = require('graphql');
 const { mergeTypeDefs } = require('@graphql-tools/merge');
 
 const SUBGRAPHS = [
-  { name: 'core',          dir: 'apps/subgraph-core/src',          url: 'http://localhost:4001/graphql' },
-  { name: 'content',       dir: 'apps/subgraph-content/src',       url: 'http://localhost:4002/graphql' },
-  { name: 'annotation',    dir: 'apps/subgraph-annotation/src',    url: 'http://localhost:4003/graphql' },
-  { name: 'collaboration', dir: 'apps/subgraph-collaboration/src', url: 'http://localhost:4004/graphql' },
-  { name: 'agent',         dir: 'apps/subgraph-agent/src',         url: 'http://localhost:4005/graphql' },
-  { name: 'knowledge',     dir: 'apps/subgraph-knowledge/src',     url: 'http://localhost:4006/graphql' },
+  {
+    name: 'core',
+    dir: 'apps/subgraph-core/src',
+    url: 'http://localhost:4001/graphql',
+  },
+  {
+    name: 'content',
+    dir: 'apps/subgraph-content/src',
+    url: 'http://localhost:4002/graphql',
+  },
+  {
+    name: 'annotation',
+    dir: 'apps/subgraph-annotation/src',
+    url: 'http://localhost:4003/graphql',
+  },
+  {
+    name: 'collaboration',
+    dir: 'apps/subgraph-collaboration/src',
+    url: 'http://localhost:4004/graphql',
+  },
+  {
+    name: 'agent',
+    dir: 'apps/subgraph-agent/src',
+    url: 'http://localhost:4005/graphql',
+  },
+  {
+    name: 'knowledge',
+    dir: 'apps/subgraph-knowledge/src',
+    url: 'http://localhost:4006/graphql',
+  },
 ];
 
 /**
@@ -56,16 +80,18 @@ function loadSubgraphSDL(subgraphDir) {
     return null;
   }
 
-  const typeDefs = files.map(file => {
-    const raw = readFileSync(file, 'utf-8');
-    const content = preprocessSDL(raw);
-    try {
-      return parse(content);
-    } catch (err) {
-      console.warn(`  Warning: failed to parse ${file}: ${err.message}`);
-      return null;
-    }
-  }).filter(Boolean);
+  const typeDefs = files
+    .map((file) => {
+      const raw = readFileSync(file, 'utf-8');
+      const content = preprocessSDL(raw);
+      try {
+        return parse(content);
+      } catch (err) {
+        console.warn(`  Warning: failed to parse ${file}: ${err.message}`);
+        return null;
+      }
+    })
+    .filter(Boolean);
 
   if (typeDefs.length === 0) return null;
 
@@ -73,7 +99,9 @@ function loadSubgraphSDL(subgraphDir) {
     const merged = mergeTypeDefs(typeDefs);
     return merged;
   } catch (err) {
-    console.warn(`  Warning: failed to merge typeDefs for ${subgraphDir}: ${err.message}`);
+    console.warn(
+      `  Warning: failed to merge typeDefs for ${subgraphDir}: ${err.message}`
+    );
     return typeDefs[0];
   }
 }
@@ -105,12 +133,14 @@ async function main() {
 
   if (result.errors && result.errors.length > 0) {
     console.error('\nComposition errors:');
-    result.errors.forEach(e => console.error(' -', e.message));
+    result.errors.forEach((e) => console.error(' -', e.message));
     if (!result.supergraphSdl) {
       console.error('\nComposition failed — no supergraph generated.');
       process.exit(1);
     }
-    console.warn('\nComposition completed with warnings (supergraph still generated).');
+    console.warn(
+      '\nComposition completed with warnings (supergraph still generated).'
+    );
   }
 
   const outPath = join(rootDir, 'apps/gateway/supergraph.graphql');
@@ -121,7 +151,7 @@ async function main() {
   console.log(`Schema: ${result.supergraphSdl.length} chars, ${lines} lines`);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('Fatal error:', err);
   process.exit(1);
 });

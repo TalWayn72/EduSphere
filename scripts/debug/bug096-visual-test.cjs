@@ -37,7 +37,10 @@ const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/screenshots');
     console.log(`Landing page status: ${landingResponse?.status()}`);
     await page.waitForTimeout(2000);
 
-    const landingScreenshot = path.join(SCREENSHOTS_DIR, 'bug096-01-landing.png');
+    const landingScreenshot = path.join(
+      SCREENSHOTS_DIR,
+      'bug096-01-landing.png'
+    );
     await page.screenshot({ path: landingScreenshot, fullPage: true });
     console.log(`Screenshot saved: ${landingScreenshot}`);
 
@@ -45,18 +48,26 @@ const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/screenshots');
     const landingTitle = await page.title();
     console.log(`Page title: ${landingTitle}`);
     const landingBodyText = await page.textContent('body');
-    console.log(`Body text (first 500 chars): ${(landingBodyText || '').substring(0, 500)}`);
+    console.log(
+      `Body text (first 500 chars): ${(landingBodyText || '').substring(0, 500)}`
+    );
 
     // 2. Navigate to Knowledge Graph page
     console.log('\n--- Step 2: Navigate to /knowledge-graph ---');
-    const kgResponse = await page.goto('http://localhost:5173/knowledge-graph', {
-      waitUntil: 'networkidle',
-      timeout: 15000,
-    });
+    const kgResponse = await page.goto(
+      'http://localhost:5173/knowledge-graph',
+      {
+        waitUntil: 'networkidle',
+        timeout: 15000,
+      }
+    );
     console.log(`Knowledge Graph page status: ${kgResponse?.status()}`);
     await page.waitForTimeout(3000);
 
-    const kgScreenshot = path.join(SCREENSHOTS_DIR, 'bug096-02-knowledge-graph.png');
+    const kgScreenshot = path.join(
+      SCREENSHOTS_DIR,
+      'bug096-02-knowledge-graph.png'
+    );
     await page.screenshot({ path: kgScreenshot, fullPage: true });
     console.log(`Screenshot saved: ${kgScreenshot}`);
 
@@ -67,10 +78,18 @@ const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/screenshots');
 
     // Check for Hebrew error banner
     const hasServerError = bodyStr.includes('שרת לא נגיש');
-    const hasMockData = bodyStr.includes('נתוני ריצוי') || bodyStr.includes('נתוני דמו');
-    const hasAuthError = bodyStr.includes('Authentication') || bodyStr.includes('אימות') || bodyStr.includes('login');
-    const hasNetworkError = bodyStr.includes('Network') || bodyStr.includes('ECONNREFUSED') || bodyStr.includes('fetch');
-    const hasGraphQLError = bodyStr.includes('GraphQL') || bodyStr.includes('graphql');
+    const hasMockData =
+      bodyStr.includes('נתוני ריצוי') || bodyStr.includes('נתוני דמו');
+    const hasAuthError =
+      bodyStr.includes('Authentication') ||
+      bodyStr.includes('אימות') ||
+      bodyStr.includes('login');
+    const hasNetworkError =
+      bodyStr.includes('Network') ||
+      bodyStr.includes('ECONNREFUSED') ||
+      bodyStr.includes('fetch');
+    const hasGraphQLError =
+      bodyStr.includes('GraphQL') || bodyStr.includes('graphql');
 
     console.log('\n=== VERIFICATION RESULTS ===');
     console.log(`❌ "שרת לא נגיש" error banner visible: ${hasServerError}`);
@@ -80,23 +99,35 @@ const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/screenshots');
     console.log(`🔍 GraphQL error visible: ${hasGraphQLError}`);
 
     // Look for alert/banner elements
-    const alerts = await page.$$('[role="alert"], .alert, .error-banner, .error, [class*="error"], [class*="alert"], [class*="banner"]');
+    const alerts = await page.$$(
+      '[role="alert"], .alert, .error-banner, .error, [class*="error"], [class*="alert"], [class*="banner"]'
+    );
     console.log(`\nAlert/error elements found: ${alerts.length}`);
     for (let i = 0; i < alerts.length; i++) {
       const text = await alerts[i].textContent();
-      console.log(`  Alert ${i + 1}: "${(text || '').trim().substring(0, 200)}"`);
+      console.log(
+        `  Alert ${i + 1}: "${(text || '').trim().substring(0, 200)}"`
+      );
     }
 
     // Look for graph/canvas/svg elements (knowledge graph visualization)
-    const canvasElements = await page.$$('canvas, svg, [class*="graph"], [class*="Graph"], [class*="knowledge"], [class*="Knowledge"]');
-    console.log(`\nGraph/visualization elements found: ${canvasElements.length}`);
+    const canvasElements = await page.$$(
+      'canvas, svg, [class*="graph"], [class*="Graph"], [class*="knowledge"], [class*="Knowledge"]'
+    );
+    console.log(
+      `\nGraph/visualization elements found: ${canvasElements.length}`
+    );
     for (let i = 0; i < Math.min(canvasElements.length, 5); i++) {
-      const tag = await canvasElements[i].evaluate((el) => `${el.tagName} class="${el.className}"`);
+      const tag = await canvasElements[i].evaluate(
+        (el) => `${el.tagName} class="${el.className}"`
+      );
       console.log(`  Element ${i + 1}: ${tag}`);
     }
 
     // Print visible text (truncated)
-    console.log(`\nFull page text (first 1500 chars):\n${bodyStr.substring(0, 1500)}`);
+    console.log(
+      `\nFull page text (first 1500 chars):\n${bodyStr.substring(0, 1500)}`
+    );
 
     // Print console messages from the page
     if (consoleMsgs.length > 0) {
@@ -107,8 +138,13 @@ const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/screenshots');
     console.log('\n=== TEST COMPLETE ===');
   } catch (err) {
     console.error('Test failed:', err.message);
-    if (err.message.includes('ECONNREFUSED') || err.message.includes('ERR_CONNECTION_REFUSED')) {
-      console.error('>>> The dev server at localhost:5173 is NOT running. Start it with: pnpm --filter @edusphere/web dev');
+    if (
+      err.message.includes('ECONNREFUSED') ||
+      err.message.includes('ERR_CONNECTION_REFUSED')
+    ) {
+      console.error(
+        '>>> The dev server at localhost:5173 is NOT running. Start it with: pnpm --filter @edusphere/web dev'
+      );
     }
   } finally {
     if (browser) await browser.close();

@@ -46,6 +46,9 @@ Navigating to lesson pages showed raw error string in the UI. AuthMiddleware thr
 
 `;
 
-const updated = content.replace('## \u2705 BUG-037 \u2014 SourceManager', bug038 + '## \u2705 BUG-037 \u2014 SourceManager');
+const updated = content.replace(
+  '## \u2705 BUG-037 \u2014 SourceManager',
+  bug038 + '## \u2705 BUG-037 \u2014 SourceManager'
+);
 fs.writeFileSync(filePath, updated, 'utf8');
 console.log('BUG-038 section inserted.');

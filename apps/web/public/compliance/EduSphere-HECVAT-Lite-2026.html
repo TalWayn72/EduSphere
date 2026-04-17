@@ -1,129 +1,430 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>EduSphere — HECVAT Lite (Higher Education Community Vendor Assessment Toolkit)</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #1e293b; }
-    h1 { color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 12px; }
-    h2 { color: #334155; margin-top: 32px; }
-    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-    th, td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; font-size: 14px; vertical-align: top; }
-    th { background: #f1f5f9; font-weight: 600; }
-    .yes { color: #16a34a; font-weight: 600; }
-    .no { color: #dc2626; font-weight: 600; }
-    .partial { color: #ca8a04; font-weight: 600; }
-    .header-info { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; }
-    .header-info p { margin: 4px 0; font-size: 14px; }
-    @media print { body { margin: 20px; } }
-  </style>
-</head>
-<body>
-  <h1>EduSphere — HECVAT Lite Assessment</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>
+      EduSphere — HECVAT Lite (Higher Education Community Vendor Assessment
+      Toolkit)
+    </title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+        color: #1e293b;
+      }
+      h1 {
+        color: #4f46e5;
+        border-bottom: 2px solid #4f46e5;
+        padding-bottom: 12px;
+      }
+      h2 {
+        color: #334155;
+        margin-top: 32px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+      }
+      th,
+      td {
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 14px;
+        vertical-align: top;
+      }
+      th {
+        background: #f1f5f9;
+        font-weight: 600;
+      }
+      .yes {
+        color: #16a34a;
+        font-weight: 600;
+      }
+      .no {
+        color: #dc2626;
+        font-weight: 600;
+      }
+      .partial {
+        color: #ca8a04;
+        font-weight: 600;
+      }
+      .header-info {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+      .header-info p {
+        margin: 4px 0;
+        font-size: 14px;
+      }
+      @media print {
+        body {
+          margin: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>EduSphere — HECVAT Lite Assessment</h1>
 
-  <div class="header-info">
-    <p><strong>Product:</strong> EduSphere Knowledge Graph Educational Platform</p>
-    <p><strong>Version:</strong> 1.0.0</p>
-    <p><strong>Vendor:</strong> EduSphere Inc.</p>
-    <p><strong>Assessment Date:</strong> March 2026</p>
-    <p><strong>Contact:</strong> security@edusphere.dev</p>
-    <p><strong>HECVAT Version:</strong> Lite 3.06</p>
-  </div>
+    <div class="header-info">
+      <p>
+        <strong>Product:</strong> EduSphere Knowledge Graph Educational Platform
+      </p>
+      <p><strong>Version:</strong> 1.0.0</p>
+      <p><strong>Vendor:</strong> EduSphere Inc.</p>
+      <p><strong>Assessment Date:</strong> March 2026</p>
+      <p><strong>Contact:</strong> security@edusphere.dev</p>
+      <p><strong>HECVAT Version:</strong> Lite 3.06</p>
+    </div>
 
-  <h2>Company Information</h2>
-  <table>
-    <thead><tr><th style="width:50%">Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>Company legal name</td><td>EduSphere Inc.</td></tr>
-      <tr><td>Product/service name</td><td>EduSphere Knowledge Graph Educational Platform</td></tr>
-      <tr><td>Primary contact for security inquiries</td><td>security@edusphere.dev</td></tr>
-      <tr><td>Does the product process student education records?</td><td class="yes">Yes</td></tr>
-      <tr><td>Is the product FERPA-compliant?</td><td class="yes">Yes</td></tr>
-    </tbody>
-  </table>
+    <h2>Company Information</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50%">Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Company legal name</td>
+          <td>EduSphere Inc.</td>
+        </tr>
+        <tr>
+          <td>Product/service name</td>
+          <td>EduSphere Knowledge Graph Educational Platform</td>
+        </tr>
+        <tr>
+          <td>Primary contact for security inquiries</td>
+          <td>security@edusphere.dev</td>
+        </tr>
+        <tr>
+          <td>Does the product process student education records?</td>
+          <td class="yes">Yes</td>
+        </tr>
+        <tr>
+          <td>Is the product FERPA-compliant?</td>
+          <td class="yes">Yes</td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>QUAL — Qualitative Questions</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>QUAL-01</td><td>Will your organization agree to sign the institution's Data Protection Addendum (DPA)?</td><td class="yes">Yes</td></tr>
-      <tr><td>QUAL-02</td><td>Will your organization comply with FERPA requirements?</td><td class="yes">Yes</td></tr>
-      <tr><td>QUAL-03</td><td>Do you have a SOC 2 Type II report?</td><td class="partial">In progress — expected Q3 2026</td></tr>
-      <tr><td>QUAL-04</td><td>Do you have cyber liability insurance?</td><td class="yes">Yes</td></tr>
-      <tr><td>QUAL-05</td><td>Where is institutional data stored geographically?</td><td>Configurable per tenant: US, EU, or on-premises. Default: US-East (AWS).</td></tr>
-    </tbody>
-  </table>
+    <h2>QUAL — Qualitative Questions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>QUAL-01</td>
+          <td>
+            Will your organization agree to sign the institution's Data
+            Protection Addendum (DPA)?
+          </td>
+          <td class="yes">Yes</td>
+        </tr>
+        <tr>
+          <td>QUAL-02</td>
+          <td>Will your organization comply with FERPA requirements?</td>
+          <td class="yes">Yes</td>
+        </tr>
+        <tr>
+          <td>QUAL-03</td>
+          <td>Do you have a SOC 2 Type II report?</td>
+          <td class="partial">In progress — expected Q3 2026</td>
+        </tr>
+        <tr>
+          <td>QUAL-04</td>
+          <td>Do you have cyber liability insurance?</td>
+          <td class="yes">Yes</td>
+        </tr>
+        <tr>
+          <td>QUAL-05</td>
+          <td>Where is institutional data stored geographically?</td>
+          <td>
+            Configurable per tenant: US, EU, or on-premises. Default: US-East
+            (AWS).
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>DOCU — Documentation</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>DOCU-01</td><td>Do you have a formal Information Security Policy?</td><td class="yes">Yes — ISO 27001-aligned ISMS</td></tr>
-      <tr><td>DOCU-02</td><td>Do you have an Incident Response Plan?</td><td class="yes">Yes — documented IRP with &lt;24h notification SLA</td></tr>
-      <tr><td>DOCU-03</td><td>Do you have a Business Continuity / Disaster Recovery plan?</td><td class="yes">Yes — RTO 4h / RPO 1h</td></tr>
-      <tr><td>DOCU-04</td><td>Do you conduct regular security assessments or penetration testing?</td><td class="yes">Yes — annual 3rd-party pentest + continuous SAST/DAST in CI</td></tr>
-      <tr><td>DOCU-05</td><td>Do you have a VPAT / Accessibility Conformance Report?</td><td class="yes">Yes — VPAT 2.5 (WCAG 2.2 AA) available for download</td></tr>
-    </tbody>
-  </table>
+    <h2>DOCU — Documentation</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DOCU-01</td>
+          <td>Do you have a formal Information Security Policy?</td>
+          <td class="yes">Yes — ISO 27001-aligned ISMS</td>
+        </tr>
+        <tr>
+          <td>DOCU-02</td>
+          <td>Do you have an Incident Response Plan?</td>
+          <td class="yes">
+            Yes — documented IRP with &lt;24h notification SLA
+          </td>
+        </tr>
+        <tr>
+          <td>DOCU-03</td>
+          <td>Do you have a Business Continuity / Disaster Recovery plan?</td>
+          <td class="yes">Yes — RTO 4h / RPO 1h</td>
+        </tr>
+        <tr>
+          <td>DOCU-04</td>
+          <td>
+            Do you conduct regular security assessments or penetration testing?
+          </td>
+          <td class="yes">
+            Yes — annual 3rd-party pentest + continuous SAST/DAST in CI
+          </td>
+        </tr>
+        <tr>
+          <td>DOCU-05</td>
+          <td>Do you have a VPAT / Accessibility Conformance Report?</td>
+          <td class="yes">
+            Yes — VPAT 2.5 (WCAG 2.2 AA) available for download
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>ACCT — Access Control</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>ACCT-01</td><td>Does the system support SSO (SAML 2.0 / OIDC)?</td><td class="yes">Yes — Keycloak-based OIDC + SAML 2.0</td></tr>
-      <tr><td>ACCT-02</td><td>Does the system support MFA?</td><td class="yes">Yes — TOTP + WebAuthn via Keycloak</td></tr>
-      <tr><td>ACCT-03</td><td>Is role-based access control (RBAC) implemented?</td><td class="yes">Yes — 5 roles: Super Admin, Org Admin, Instructor, Researcher, Student</td></tr>
-      <tr><td>ACCT-04</td><td>Are administrator accounts separated from regular user accounts?</td><td class="yes">Yes — separate admin roles with elevated scope requirements</td></tr>
-      <tr><td>ACCT-05</td><td>Is there brute-force protection on login?</td><td class="yes">Yes — account lockout after 5 failed attempts (Keycloak)</td></tr>
-    </tbody>
-  </table>
+    <h2>ACCT — Access Control</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ACCT-01</td>
+          <td>Does the system support SSO (SAML 2.0 / OIDC)?</td>
+          <td class="yes">Yes — Keycloak-based OIDC + SAML 2.0</td>
+        </tr>
+        <tr>
+          <td>ACCT-02</td>
+          <td>Does the system support MFA?</td>
+          <td class="yes">Yes — TOTP + WebAuthn via Keycloak</td>
+        </tr>
+        <tr>
+          <td>ACCT-03</td>
+          <td>Is role-based access control (RBAC) implemented?</td>
+          <td class="yes">
+            Yes — 5 roles: Super Admin, Org Admin, Instructor, Researcher,
+            Student
+          </td>
+        </tr>
+        <tr>
+          <td>ACCT-04</td>
+          <td>
+            Are administrator accounts separated from regular user accounts?
+          </td>
+          <td class="yes">
+            Yes — separate admin roles with elevated scope requirements
+          </td>
+        </tr>
+        <tr>
+          <td>ACCT-05</td>
+          <td>Is there brute-force protection on login?</td>
+          <td class="yes">
+            Yes — account lockout after 5 failed attempts (Keycloak)
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>DATA — Data Protection</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>DATA-01</td><td>Is data encrypted at rest?</td><td class="yes">Yes — AES-256-GCM for PII fields + PostgreSQL TDE</td></tr>
-      <tr><td>DATA-02</td><td>Is data encrypted in transit?</td><td class="yes">Yes — TLS 1.3 for all connections; mTLS between microservices</td></tr>
-      <tr><td>DATA-03</td><td>Is multi-tenant data logically isolated?</td><td class="yes">Yes — PostgreSQL Row-Level Security (RLS) enforced on all 16 tables</td></tr>
-      <tr><td>DATA-04</td><td>Can institutional data be exported upon request?</td><td class="yes">Yes — GDPR data portability export (JSON/CSV)</td></tr>
-      <tr><td>DATA-05</td><td>Can institutional data be fully deleted upon contract termination?</td><td class="yes">Yes — automated tenant erasure pipeline with verification</td></tr>
-      <tr><td>DATA-06</td><td>Are backups encrypted?</td><td class="yes">Yes — encrypted at rest with separate key management</td></tr>
-      <tr><td>DATA-07</td><td>What is the backup retention period?</td><td>30 days (configurable per institution)</td></tr>
-    </tbody>
-  </table>
+    <h2>DATA — Data Protection</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DATA-01</td>
+          <td>Is data encrypted at rest?</td>
+          <td class="yes">Yes — AES-256-GCM for PII fields + PostgreSQL TDE</td>
+        </tr>
+        <tr>
+          <td>DATA-02</td>
+          <td>Is data encrypted in transit?</td>
+          <td class="yes">
+            Yes — TLS 1.3 for all connections; mTLS between microservices
+          </td>
+        </tr>
+        <tr>
+          <td>DATA-03</td>
+          <td>Is multi-tenant data logically isolated?</td>
+          <td class="yes">
+            Yes — PostgreSQL Row-Level Security (RLS) enforced on all 16 tables
+          </td>
+        </tr>
+        <tr>
+          <td>DATA-04</td>
+          <td>Can institutional data be exported upon request?</td>
+          <td class="yes">Yes — GDPR data portability export (JSON/CSV)</td>
+        </tr>
+        <tr>
+          <td>DATA-05</td>
+          <td>
+            Can institutional data be fully deleted upon contract termination?
+          </td>
+          <td class="yes">
+            Yes — automated tenant erasure pipeline with verification
+          </td>
+        </tr>
+        <tr>
+          <td>DATA-06</td>
+          <td>Are backups encrypted?</td>
+          <td class="yes">
+            Yes — encrypted at rest with separate key management
+          </td>
+        </tr>
+        <tr>
+          <td>DATA-07</td>
+          <td>What is the backup retention period?</td>
+          <td>30 days (configurable per institution)</td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>AVAIL — Availability &amp; Performance</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>AVAIL-01</td><td>What is the guaranteed uptime SLA?</td><td>99.9% for SaaS; on-premises availability per institution's infrastructure</td></tr>
-      <tr><td>AVAIL-02</td><td>Is the service hosted in a SOC 2-certified data center?</td><td class="yes">Yes — AWS (SOC 2 Type II certified)</td></tr>
-      <tr><td>AVAIL-03</td><td>Can the product be deployed fully on-premises?</td><td class="yes">Yes — air-gapped deployment option with Docker/Kubernetes</td></tr>
-    </tbody>
-  </table>
+    <h2>AVAIL — Availability &amp; Performance</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AVAIL-01</td>
+          <td>What is the guaranteed uptime SLA?</td>
+          <td>
+            99.9% for SaaS; on-premises availability per institution's
+            infrastructure
+          </td>
+        </tr>
+        <tr>
+          <td>AVAIL-02</td>
+          <td>Is the service hosted in a SOC 2-certified data center?</td>
+          <td class="yes">Yes — AWS (SOC 2 Type II certified)</td>
+        </tr>
+        <tr>
+          <td>AVAIL-03</td>
+          <td>Can the product be deployed fully on-premises?</td>
+          <td class="yes">
+            Yes — air-gapped deployment option with Docker/Kubernetes
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>THRD — Third-Party / AI</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>THRD-01</td><td>Does the product use third-party AI/LLM services?</td><td class="partial">Optional — requires explicit consent (SI-10). On-prem Ollama available.</td></tr>
-      <tr><td>THRD-02</td><td>Is student data sent to third-party AI providers?</td><td>Only with explicit institutional + user consent. Air-gapped mode uses local models only.</td></tr>
-      <tr><td>THRD-03</td><td>Are subprocessors documented?</td><td class="yes">Yes — subprocessor list available upon request</td></tr>
-    </tbody>
-  </table>
+    <h2>THRD — Third-Party / AI</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>THRD-01</td>
+          <td>Does the product use third-party AI/LLM services?</td>
+          <td class="partial">
+            Optional — requires explicit consent (SI-10). On-prem Ollama
+            available.
+          </td>
+        </tr>
+        <tr>
+          <td>THRD-02</td>
+          <td>Is student data sent to third-party AI providers?</td>
+          <td>
+            Only with explicit institutional + user consent. Air-gapped mode
+            uses local models only.
+          </td>
+        </tr>
+        <tr>
+          <td>THRD-03</td>
+          <td>Are subprocessors documented?</td>
+          <td class="yes">Yes — subprocessor list available upon request</td>
+        </tr>
+      </tbody>
+    </table>
 
-  <h2>MAIL — Notification &amp; Communication</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Question</th><th>Response</th></tr></thead>
-    <tbody>
-      <tr><td>MAIL-01</td><td>How will the institution be notified of a data breach?</td><td>Email to designated security contact within 24 hours of confirmed breach</td></tr>
-      <tr><td>MAIL-02</td><td>How will the institution be notified of significant changes?</td><td>30-day advance notice via email for material changes to terms or data handling</td></tr>
-    </tbody>
-  </table>
+    <h2>MAIL — Notification &amp; Communication</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MAIL-01</td>
+          <td>How will the institution be notified of a data breach?</td>
+          <td>
+            Email to designated security contact within 24 hours of confirmed
+            breach
+          </td>
+        </tr>
+        <tr>
+          <td>MAIL-02</td>
+          <td>How will the institution be notified of significant changes?</td>
+          <td>
+            30-day advance notice via email for material changes to terms or
+            data handling
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-  <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">
-    <p>This HECVAT Lite assessment is provided for informational purposes. For the full HECVAT or additional security documentation, contact <strong>security@edusphere.dev</strong>.</p>
-    <p>Based on HECVAT Lite v3.06 by the Higher Education Information Security Council (HEISC).</p>
-  </footer>
-</body>
+    <footer
+      style="
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+        font-size: 13px;
+        color: #64748b;
+      "
+    >
+      <p>
+        This HECVAT Lite assessment is provided for informational purposes. For
+        the full HECVAT or additional security documentation, contact
+        <strong>security@edusphere.dev</strong>.
+      </p>
+      <p>
+        Based on HECVAT Lite v3.06 by the Higher Education Information Security
+        Council (HEISC).
+      </p>
+    </footer>
+  </body>
 </html>
