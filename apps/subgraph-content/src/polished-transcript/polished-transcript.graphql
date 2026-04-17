@@ -117,20 +117,14 @@ input BulkChangeDecisionInput {
 # ─── Queries ──────────────────────────────────────────────────────────────────
 
 extend type Query {
-  """
-  Get the latest polished transcript for a lesson (with blocks and changes).
-  """
+  """Get the latest polished transcript for a lesson (with blocks and changes)."""
   polishedTranscript(lessonId: ID!): PolishedTranscript @authenticated
 
-  """
-  List all versions of polished transcripts for a lesson.
-  """
+  """List all versions of polished transcripts for a lesson."""
   polishedTranscriptVersions(lessonId: ID!): [PolishedTranscript!]!
     @authenticated
 
-  """
-  Get the instructor voice profile for the current user.
-  """
+  """Get the instructor voice profile for the current user."""
   myVoiceProfile: InstructorVoiceProfile
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
@@ -139,46 +133,34 @@ extend type Query {
 # ─── Mutations ────────────────────────────────────────────────────────────────
 
 extend type Mutation {
-  """
-  Approve the polished transcript → sets status to PUBLISHED.
-  """
+  """Approve the polished transcript → sets status to PUBLISHED."""
   approvePolishedTranscript(polishedTranscriptId: ID!): PolishedTranscript!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """
-  Manually override the content of a polished block.
-  """
+  """Manually override the content of a polished block."""
   editPolishedBlock(input: EditPolishedBlockInput!): PolishedTranscriptBlock!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """
-  Revert an instructor-edited block back to the AI-generated version.
-  """
+  """Revert an instructor-edited block back to the AI-generated version."""
   revertPolishedBlock(blockId: ID!): PolishedTranscriptBlock!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """
-  Accept or reject a single tracked change within a block.
-  """
+  """Accept or reject a single tracked change within a block."""
   decidePolishedChange(input: ChangeDecisionInput!): PolishedBlockChange!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """
-  Accept or reject ALL pending changes for a polished transcript.
-  """
+  """Accept or reject ALL pending changes for a polished transcript."""
   bulkDecidePolishedChanges(
     input: BulkChangeDecisionInput!
   ): PolishedTranscript!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 
-  """
-  Trigger a new polishing run, creating a new version.
-  """
+  """Trigger a new polishing run, creating a new version."""
   regeneratePolishedTranscript(lessonId: ID!): PolishedTranscript!
     @authenticated
     @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
@@ -187,8 +169,6 @@ extend type Mutation {
 # ─── Subscriptions ────────────────────────────────────────────────────────────
 
 extend type Subscription {
-  """
-  Real-time polishing progress for a lesson.
-  """
+  """Real-time polishing progress for a lesson."""
   polishingProgress(lessonId: ID!): PolishingProgressEvent! @authenticated
 }

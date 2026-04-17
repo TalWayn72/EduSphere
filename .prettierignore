@@ -12,6 +12,12 @@ pnpm-lock.yaml
 # Prettier must NOT reformat these or the CI codegen-validation step will fail.
 packages/graphql-types/src/generated/
 
+# Subgraph SDL files — Prettier reformats GraphQL docstrings (single-line → multi-line)
+# which causes the CI federation check to fail (SDL change without supergraph recompose).
+# SDL files are already enforced via ESLint graphql plugin; Prettier adds no value here.
+apps/subgraph-*/src/**/*.graphql
+apps/gateway/supergraph.graphql
+
 # Claude Code internal memory files
 memory/
 
