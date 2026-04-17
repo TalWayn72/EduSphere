@@ -112,7 +112,9 @@ jobs:
   unit-tests-web:
     name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    # Realistic ceiling: ~550 tests/shard on vmThreads should finish in ≤15 min;
+    # 30 min gives headroom without masking a real hang for 75 min.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -143,7 +145,18 @@ jobs:
         # and run in the Full Test Suite workflow (test.yml) with proper services.
         # Coverage removed from sharded CI — run separately in nightly/on-demand job.
         # 8 shards keep each runner well under 30 min for the 4,400+ test suite.
-        run: pnpm --filter @edusphere/web test -- --run --reporter=verbose --shard=${{ matrix.shard }}
+        # --run: single-pass (no watch). --reporter=verbose omitted — the config already
+        # declares default+junit reporters; adding verbose here stacks a third reporter
+        # and floods CI logs with ~550 test names per shard, slowing log I/O significantly.
+        run: pnpm --filter @edusphere/web test -- --run --shard=${{ matrix.shard }}
+
+      - name: Upload JUnit test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-web-shard-${{ strategy.job-index }}
+          path: apps/web/test-results/results.xml
+          retention-days: 7
 
   # Shared package unit tests — single job, no sharding needed (packages are fast individually)
   unit-tests-packages:
