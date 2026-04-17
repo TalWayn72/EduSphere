@@ -18,7 +18,15 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createOllama } from 'ollama-ai-provider';
 import { ollamaConfig } from '@edusphere/config';
 import type { LanguageModel } from 'ai';
-import { db, schema, withTenantContext, eq, and, asc, isNull } from '@edusphere/db';
+import {
+  db,
+  schema,
+  withTenantContext,
+  eq,
+  and,
+  asc,
+  isNull,
+} from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { NatsService } from '../nats/nats.service';
 import {
@@ -57,7 +65,12 @@ function buildPolishingModel(): LanguageModel {
 const AUTO_PUBLISH_THRESHOLD = 0.95;
 
 type TenantCtx = TenantContext;
-type SegmentRow = { id: string; start_time: string; end_time: string; text: string };
+type SegmentRow = {
+  id: string;
+  start_time: string;
+  end_time: string;
+  text: string;
+};
 
 @Injectable()
 export class PolishingOrchestratorService {
@@ -89,7 +102,11 @@ export class PolishingOrchestratorService {
       ? await loadVoiceProfile(tenantId, instructorId)
       : null;
 
-    const polishedId = await createPolishedRecord(lessonId, tenantId, tenantCtx);
+    const polishedId = await createPolishedRecord(
+      lessonId,
+      tenantId,
+      tenantCtx
+    );
 
     await this.nats.publish(POLISHING_EVENTS.STARTED, {
       lessonId,
@@ -108,7 +125,7 @@ export class PolishingOrchestratorService {
             text: s.text,
             startTime: Number(s.start_time),
             endTime: Number(s.end_time),
-          }),
+          })
         ),
         jargonGlossary: glossary,
         existingVoiceProfile: existingProfile
@@ -117,13 +134,15 @@ export class PolishingOrchestratorService {
         progress: 0,
       };
 
-      const workflow = createTranscriptPolishingWorkflow({ model: buildPolishingModel() });
+      const workflow = createTranscriptPolishingWorkflow({
+        model: buildPolishingModel(),
+      });
       const result = await this.runWithProgress(
         workflow,
         initialState,
         lessonId,
         tenantId,
-        polishedId,
+        polishedId
       );
 
       await persistResults(polishedId, lessonId, tenantId, result, tenantCtx);
@@ -136,7 +155,7 @@ export class PolishingOrchestratorService {
       await this.publishCompletion(lessonId, tenantId, polishedId, result);
       this.logger.log(
         { lessonId, coverage: result.coverageScore },
-        'Polishing pipeline complete',
+        'Polishing pipeline complete'
       );
     } catch (err) {
       this.logger.error({ err, lessonId }, 'Polishing workflow failed');
@@ -156,7 +175,7 @@ export class PolishingOrchestratorService {
 
   private async loadSegments(
     lessonId: string,
-    tenantCtx: TenantCtx,
+    tenantCtx: TenantCtx
   ): Promise<SegmentRow[]> {
     try {
       return withTenantContext(db, tenantCtx, async (txDb) =>
@@ -170,18 +189,18 @@ export class PolishingOrchestratorService {
           .from(schema.lesson_assets)
           .innerJoin(
             schema.media_assets,
-            eq(schema.lesson_assets.media_asset_id, schema.media_assets.id),
+            eq(schema.lesson_assets.media_asset_id, schema.media_assets.id)
           )
           .innerJoin(
             schema.transcripts,
-            eq(schema.transcripts.asset_id, schema.media_assets.id),
+            eq(schema.transcripts.asset_id, schema.media_assets.id)
           )
           .innerJoin(
             schema.transcript_segments,
-            eq(schema.transcript_segments.transcript_id, schema.transcripts.id),
+            eq(schema.transcript_segments.transcript_id, schema.transcripts.id)
           )
           .where(eq(schema.lesson_assets.lesson_id, lessonId))
-          .orderBy(asc(schema.transcript_segments.start_time)),
+          .orderBy(asc(schema.transcript_segments.start_time))
       );
     } catch (err) {
       this.logger.error({ err, lessonId }, 'Failed to load segments');
@@ -191,7 +210,7 @@ export class PolishingOrchestratorService {
 
   private async loadGlossary(
     lessonId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<JargonEntry[]> {
     const { domains } = await detectLessonDomains(lessonId, tenantId);
     const glossary: JargonEntry[] = [];
@@ -206,7 +225,7 @@ export class PolishingOrchestratorService {
 
   private async loadInstructorId(
     lessonId: string,
-    tenantCtx: TenantCtx,
+    tenantCtx: TenantCtx
   ): Promise<string | null> {
     try {
       const rows = await withTenantContext(db, tenantCtx, async (txDb) =>
@@ -216,10 +235,10 @@ export class PolishingOrchestratorService {
           .where(
             and(
               eq(schema.lessons.id, lessonId),
-              isNull(schema.lessons.deleted_at),
-            ),
+              isNull(schema.lessons.deleted_at)
+            )
           )
-          .limit(1),
+          .limit(1)
       );
       return rows[0]?.instructor_id ?? null;
     } catch {
@@ -232,7 +251,7 @@ export class PolishingOrchestratorService {
     initialState: Partial<PolishingState>,
     lessonId: string,
     tenantId: string,
-    polishedId: string,
+    polishedId: string
   ): Promise<PolishingState> {
     const stream = await workflow.stream(initialState as PolishingState);
     let finalState = initialState as PolishingState;
@@ -257,14 +276,14 @@ export class PolishingOrchestratorService {
     lessonId: string,
     tenantId: string,
     polishedId: string,
-    result: PolishingState,
+    result: PolishingState
   ): Promise<void> {
     const coverageScore = result.coverageScore ?? 0;
     const blockCount = result.formattedBlocks?.length ?? 0;
     const changeCount =
       result.formattedBlocks?.reduce(
         (sum, b: FormattedBlock) => sum + (b.changes?.length ?? 0),
-        0,
+        0
       ) ?? 0;
 
     await this.nats.publish(POLISHING_EVENTS.COMPLETED, {
@@ -287,7 +306,7 @@ export class PolishingOrchestratorService {
       });
       this.logger.log(
         { lessonId, coverageScore },
-        'Transcript auto-published (coverage ≥ 95%)',
+        'Transcript auto-published (coverage ≥ 95%)'
       );
     }
   }

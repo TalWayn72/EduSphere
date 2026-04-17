@@ -5,12 +5,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('ai', () => ({ generateText: vi.fn() }));
 
 vi.mock('@langchain/langgraph', () => {
-  type NodeFn = (s: Record<string, unknown>) => Promise<Record<string, unknown>>;
-  type CondEdge = { from: string; fn: (s: Record<string, unknown>) => string; map: Record<string, string> };
+  type NodeFn = (
+    s: Record<string, unknown>
+  ) => Promise<Record<string, unknown>>;
+  type CondEdge = {
+    from: string;
+    fn: (s: Record<string, unknown>) => string;
+    map: Record<string, string>;
+  };
   const AnnotationFn = (c?: unknown) => c ?? {};
   AnnotationFn.Root = (f: Record<string, unknown>) => f;
   return {
-    Annotation: AnnotationFn, START: '__start__', END: '__end__',
+    Annotation: AnnotationFn,
+    START: '__start__',
+    END: '__end__',
     StateGraph: vi.fn().mockImplementation(function () {
       const nodes: Record<string, NodeFn> = {};
       let entryPoint = '';
@@ -92,8 +100,12 @@ import type { LanguageModel } from 'ai';
 
 const mockGenerateText = vi.mocked(generateText);
 
-const makeSegment = (id: string, text: string, startTime: number, endTime: number): RawSegment =>
-  ({ id, text, startTime, endTime });
+const makeSegment = (
+  id: string,
+  text: string,
+  startTime: number,
+  endTime: number
+): RawSegment => ({ id, text, startTime, endTime });
 
 const SEGMENTS: RawSegment[] = [
   makeSegment('s1', 'שלום לכולם אהה היום נלמד על ספירת הכתר', 0, 30_000),
@@ -111,8 +123,18 @@ const POLISHED_TEXT = 'היום נלמד על ספירת הכתר. הכתר הו
 const POLISHED_RESPONSE = JSON.stringify({
   polishedText: POLISHED_TEXT,
   changes: [
-    { type: ChangeType.FILLER_REMOVED, original: 'אהה', replacement: null, reason: 'מילת מילוי' },
-    { type: ChangeType.AUDIENCE_ADDRESS_REMOVED, original: 'הבנתם?', replacement: null, reason: 'פניה לקהל' },
+    {
+      type: ChangeType.FILLER_REMOVED,
+      original: 'אהה',
+      replacement: null,
+      reason: 'מילת מילוי',
+    },
+    {
+      type: ChangeType.AUDIENCE_ADDRESS_REMOVED,
+      original: 'הבנתם?',
+      replacement: null,
+      reason: 'פניה לקהל',
+    },
   ],
 });
 

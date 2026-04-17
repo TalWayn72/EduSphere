@@ -38,7 +38,9 @@ export function PolishingStatusBadge({
         className={`flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 ${className}`}
         data-testid="polishing-status-badge"
         aria-live="polite"
-        aria-label={t('polishedTranscript.processing', { progress: progress ?? 0 })}
+        aria-label={t('polishedTranscript.processing', {
+          progress: progress ?? 0,
+        })}
       >
         <span
           className="h-3.5 w-3.5 border-2 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full animate-spin"

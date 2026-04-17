@@ -47,13 +47,20 @@ vi.mock('urql', async (importOriginal) => {
       definitions?: Array<{ kind: string; name?: { value: string } }>;
     }) => {
       // Find the OperationDefinition (not fragment definitions)
-      const opDef = doc?.definitions?.find((d) => d.kind === 'OperationDefinition');
+      const opDef = doc?.definitions?.find(
+        (d) => d.kind === 'OperationDefinition'
+      );
       const opName = opDef?.name?.value ?? '';
-      if (opName === 'AcceptPolishingChange') return [{ fetching: false }, mockAcceptChange];
-      if (opName === 'RejectPolishingChange') return [{ fetching: false }, mockRejectChange];
-      if (opName === 'AcceptAllPolishingChanges') return [{ fetching: false }, mockAcceptAll];
-      if (opName === 'RejectAllPolishingChanges') return [{ fetching: false }, mockRejectAll];
-      if (opName === 'ApprovePolishedTranscript') return [{ fetching: false }, mockApprove];
+      if (opName === 'AcceptPolishingChange')
+        return [{ fetching: false }, mockAcceptChange];
+      if (opName === 'RejectPolishingChange')
+        return [{ fetching: false }, mockRejectChange];
+      if (opName === 'AcceptAllPolishingChanges')
+        return [{ fetching: false }, mockAcceptAll];
+      if (opName === 'RejectAllPolishingChanges')
+        return [{ fetching: false }, mockRejectAll];
+      if (opName === 'ApprovePolishedTranscript')
+        return [{ fetching: false }, mockApprove];
       return [{ fetching: false }, vi.fn()];
     },
   };
@@ -74,9 +81,11 @@ vi.mock('@/components/polished-transcript/useTrackChangesStore', () => ({
 }));
 
 vi.mock('@/components/polished-transcript/VoiceProfileCard', () => ({
-  VoiceProfileCard: ({ voiceProfile }: { voiceProfile: { displayName: string } }) => (
-    <div data-testid="voice-profile-card">{voiceProfile.displayName}</div>
-  ),
+  VoiceProfileCard: ({
+    voiceProfile,
+  }: {
+    voiceProfile: { displayName: string };
+  }) => <div data-testid="voice-profile-card">{voiceProfile.displayName}</div>,
 }));
 
 vi.mock('@/components/polished-transcript/ChangeInlineMarker', () => ({
@@ -92,10 +101,16 @@ vi.mock('@/components/polished-transcript/ChangeInlineMarker', () => ({
     <span data-testid={`change-${change.id}`}>
       <del>{change.originalText}</del>
       <ins>{change.replacementText}</ins>
-      <button data-testid={`accept-${change.id}`} onClick={() => onAccept(change.id)}>
+      <button
+        data-testid={`accept-${change.id}`}
+        onClick={() => onAccept(change.id)}
+      >
         Accept
       </button>
-      <button data-testid={`reject-${change.id}`} onClick={() => onReject(change.id)}>
+      <button
+        data-testid={`reject-${change.id}`}
+        onClick={() => onReject(change.id)}
+      >
         Reject
       </button>
     </span>
@@ -190,7 +205,10 @@ describe('TrackChangesReview', () => {
 
   it('sets dir=rtl on the document', () => {
     render(<TrackChangesReview transcript={TRANSCRIPT} />);
-    expect(screen.getByTestId('polished-document')).toHaveAttribute('dir', 'rtl');
+    expect(screen.getByTestId('polished-document')).toHaveAttribute(
+      'dir',
+      'rtl'
+    );
   });
 
   it('shows pending change count in toolbar', () => {

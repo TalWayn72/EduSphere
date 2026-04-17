@@ -20,17 +20,47 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className, 'data-testid': testId }: {
-    children: React.ReactNode; className?: string; 'data-testid'?: string;
-  }) => <div data-testid={testId} className={className}>{children}</div>,
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className}>{children}</div>,
-  CardHeader: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className}>{children}</div>,
-  CardTitle: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <h4 className={className}>{children}</h4>,
-  CardDescription: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <p className={className}>{children}</p>,
+  Card: ({
+    children,
+    className,
+    'data-testid': testId,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+    'data-testid'?: string;
+  }) => (
+    <div data-testid={testId} className={className}>
+      {children}
+    </div>
+  ),
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
+  CardHeader: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
+  CardTitle: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <h4 className={className}>{children}</h4>,
+  CardDescription: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <p className={className}>{children}</p>,
 }));
 
 vi.mock('@/components/ui/progress', () => ({
@@ -40,8 +70,16 @@ vi.mock('@/components/ui/progress', () => ({
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant }: { children: React.ReactNode; variant?: string }) => (
-    <span data-testid="phrase-badge" data-variant={variant}>{children}</span>
+  Badge: ({
+    children,
+    variant,
+  }: {
+    children: React.ReactNode;
+    variant?: string;
+  }) => (
+    <span data-testid="phrase-badge" data-variant={variant}>
+      {children}
+    </span>
   ),
 }));
 
@@ -77,7 +115,10 @@ describe('VoiceProfileCard', () => {
 
   it('renders formality progress bar with correct value', () => {
     render(<VoiceProfileCard voiceProfile={VOICE_PROFILE} />);
-    expect(screen.getByTestId('progress-bar')).toHaveAttribute('data-value', '82');
+    expect(screen.getByTestId('progress-bar')).toHaveAttribute(
+      'data-value',
+      '82'
+    );
   });
 
   it('renders avg words per sentence', () => {
@@ -104,6 +145,8 @@ describe('VoiceProfileCard', () => {
   it('does not render phrase section when topPhrases is empty', () => {
     const noPhrases = { ...VOICE_PROFILE, topPhrases: [] };
     render(<VoiceProfileCard voiceProfile={noPhrases} />);
-    expect(screen.queryByText('Characteristic phrases')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Characteristic phrases')
+    ).not.toBeInTheDocument();
   });
 });

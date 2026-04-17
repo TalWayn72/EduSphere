@@ -21,7 +21,9 @@ vi.mock('@/components/ui/scroll-area', () => ({
   }: {
     children: React.ReactNode;
     [key: string]: unknown;
-  }) => <div {...(props as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>,
+  }) => (
+    <div {...(props as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>
+  ),
 }));
 
 // jsdom does not implement scrollIntoView — stub it globally.
@@ -103,26 +105,20 @@ describe('PolishedTranscriptPanel', () => {
   });
 
   it('active TEXT block gets bg-primary/10 class when currentTime is in range', () => {
-    render(
-      <PolishedTranscriptPanel blocks={[textBlock]} currentTime={10} />
-    );
+    render(<PolishedTranscriptPanel blocks={[textBlock]} currentTime={10} />);
     const btn = screen.getByRole('button', { name: textBlock.text });
     expect(btn.className).toContain('bg-primary/10');
   });
 
   it('inactive TEXT block does not get bg-primary/10 when currentTime is out of range', () => {
-    render(
-      <PolishedTranscriptPanel blocks={[textBlock]} currentTime={30} />
-    );
+    render(<PolishedTranscriptPanel blocks={[textBlock]} currentTime={30} />);
     const btn = screen.getByRole('button', { name: textBlock.text });
     expect(btn.className).not.toContain('bg-primary/10');
   });
 
   it('click on TEXT block calls onSeek with block startTime', () => {
     const onSeek = vi.fn();
-    render(
-      <PolishedTranscriptPanel blocks={[textBlock]} onSeek={onSeek} />
-    );
+    render(<PolishedTranscriptPanel blocks={[textBlock]} onSeek={onSeek} />);
     fireEvent.click(screen.getByRole('button', { name: textBlock.text }));
     expect(onSeek).toHaveBeenCalledWith(5);
   });

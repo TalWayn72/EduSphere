@@ -8,7 +8,11 @@
 
 import { StateGraph, END, START } from '@langchain/langgraph';
 import type { LanguageModel } from 'ai';
-import { PolishingAnnotation, PolishingAnnotationType, MAX_REPAIR_ATTEMPTS } from './transcript-polishing-state';
+import {
+  PolishingAnnotation,
+  PolishingAnnotationType,
+  MAX_REPAIR_ATTEMPTS,
+} from './transcript-polishing-state';
 import { buildNodes } from './transcript-polishing-nodes';
 
 // ---------------------------------------------------------------------------
@@ -19,8 +23,13 @@ function afterPrepare(state: PolishingAnnotationType): 'chunk' | 'errorExit' {
   return state.status === 'ERROR' ? 'errorExit' : 'chunk';
 }
 
-function shouldRepair(state: PolishingAnnotationType): 'repairGaps' | 'generateDiffs' {
-  if (state.coverageGaps.length > 0 && state.repairAttempts < MAX_REPAIR_ATTEMPTS) {
+function shouldRepair(
+  state: PolishingAnnotationType
+): 'repairGaps' | 'generateDiffs' {
+  if (
+    state.coverageGaps.length > 0 &&
+    state.repairAttempts < MAX_REPAIR_ATTEMPTS
+  ) {
     return 'repairGaps';
   }
   return 'generateDiffs';
@@ -46,12 +55,16 @@ export interface TranscriptPolishingConfig {
  * const result = await workflow.invoke({ lessonId: '...', rawSegments: [...], ... });
  * ```
  */
-export function createTranscriptPolishingWorkflow(config: TranscriptPolishingConfig) {
+export function createTranscriptPolishingWorkflow(
+  config: TranscriptPolishingConfig
+) {
   const nodes = buildNodes(config.model);
 
   const graph = new StateGraph(PolishingAnnotation)
     .addNode('prepare', nodes.prepare)
-    .addNode('errorExit', async (_state: PolishingAnnotationType) => ({ progress: 100 }))
+    .addNode('errorExit', async (_state: PolishingAnnotationType) => ({
+      progress: 100,
+    }))
     .addNode('chunk', nodes.chunk)
     .addNode('loadVoice', nodes.loadVoice)
     .addNode('polishChunks', nodes.polishChunks)

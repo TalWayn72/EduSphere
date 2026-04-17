@@ -24,7 +24,7 @@ const _FRESH_WEIGHT = 0.3; // reserved for future weighted blending
  */
 export async function loadVoiceProfile(
   tenantId: string,
-  instructorId: string,
+  instructorId: string
 ): Promise<VoiceProfile | null> {
   try {
     const rows = await withTenantContext(
@@ -37,15 +37,18 @@ export async function loadVoiceProfile(
           .where(
             and(
               eq(schema.instructor_voice_profiles.tenant_id, tenantId),
-              eq(schema.instructor_voice_profiles.instructor_id, instructorId),
-            ),
+              eq(schema.instructor_voice_profiles.instructor_id, instructorId)
+            )
           )
-          .limit(1),
+          .limit(1)
     );
     if (!rows[0]?.voice_data) return null;
     return rows[0].voice_data as VoiceProfile;
   } catch (err) {
-    logger.warn({ err, tenantId, instructorId }, 'Could not load voice profile');
+    logger.warn(
+      { err, tenantId, instructorId },
+      'Could not load voice profile'
+    );
     return null;
   }
 }
@@ -57,26 +60,26 @@ export async function loadVoiceProfile(
 export function mergeVoiceProfiles(
   existing: VoiceProfile | null,
   fresh: VoiceProfile,
-  sampleCount: number,
+  sampleCount: number
 ): VoiceProfile {
   if (!existing || sampleCount < MIN_SAMPLES_FOR_BLEND) return fresh;
 
   const merged: VoiceProfile = {
     avgSentenceLength: pickDominant(
       existing.avgSentenceLength,
-      fresh.avgSentenceLength,
+      fresh.avgSentenceLength
     ) as VoiceProfile['avgSentenceLength'],
     formality: pickDominant(
       existing.formality,
-      fresh.formality,
+      fresh.formality
     ) as VoiceProfile['formality'],
     transitionPhrases: mergeStringArrays(
       existing.transitionPhrases,
-      fresh.transitionPhrases,
+      fresh.transitionPhrases
     ),
     rhythmMarkers: mergeStringArrays(
       existing.rhythmMarkers,
-      fresh.rhythmMarkers,
+      fresh.rhythmMarkers
     ),
     raw: fresh.raw,
   };
@@ -91,7 +94,7 @@ export async function saveVoiceProfile(
   tenantId: string,
   instructorId: string,
   profile: VoiceProfile,
-  lessonId: string,
+  lessonId: string
 ): Promise<void> {
   try {
     await withTenantContext(
@@ -108,8 +111,8 @@ export async function saveVoiceProfile(
           .where(
             and(
               eq(schema.instructor_voice_profiles.tenant_id, tenantId),
-              eq(schema.instructor_voice_profiles.instructor_id, instructorId),
-            ),
+              eq(schema.instructor_voice_profiles.instructor_id, instructorId)
+            )
           )
           .limit(1);
 
@@ -127,7 +130,7 @@ export async function saveVoiceProfile(
           const merged = mergeVoiceProfiles(
             prev.voiceData as VoiceProfile | null,
             profile,
-            newCount,
+            newCount
           );
           await txDb
             .update(schema.instructor_voice_profiles)
@@ -138,11 +141,14 @@ export async function saveVoiceProfile(
             })
             .where(eq(schema.instructor_voice_profiles.id, prev.id));
         }
-      },
+      }
     );
     logger.log({ tenantId, instructorId }, 'Voice profile saved');
   } catch (err) {
-    logger.error({ err, tenantId, instructorId }, 'Failed to save voice profile');
+    logger.error(
+      { err, tenantId, instructorId },
+      'Failed to save voice profile'
+    );
     throw err;
   }
 }

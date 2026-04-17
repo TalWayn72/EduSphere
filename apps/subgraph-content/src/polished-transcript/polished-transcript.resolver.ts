@@ -57,7 +57,10 @@ export class PolishedTranscriptResolver {
     @Args('lessonId') lessonId: string,
     @Context() ctx: GqlContext
   ) {
-    return this.queries.listPolishedTranscriptVersions(lessonId, requireAuth(ctx));
+    return this.queries.listPolishedTranscriptVersions(
+      lessonId,
+      requireAuth(ctx)
+    );
   }
 
   @Query('myVoiceProfile')
@@ -72,7 +75,10 @@ export class PolishedTranscriptResolver {
     @Args('polishedTranscriptId') polishedTranscriptId: string,
     @Context() ctx: GqlContext
   ) {
-    return this.mutations.approvePolishedTranscript(polishedTranscriptId, requireAuth(ctx));
+    return this.mutations.approvePolishedTranscript(
+      polishedTranscriptId,
+      requireAuth(ctx)
+    );
   }
 
   @Mutation('editPolishedBlock')
@@ -81,7 +87,8 @@ export class PolishedTranscriptResolver {
     @Context() ctx: GqlContext
   ) {
     const parsed = EditPolishedBlockSchema.safeParse(input);
-    if (!parsed.success) throw new BadRequestException(parsed.error.issues[0]?.message);
+    if (!parsed.success)
+      throw new BadRequestException(parsed.error.issues[0]?.message);
     return this.mutations.editPolishedBlock(parsed.data, requireAuth(ctx));
   }
 
@@ -99,7 +106,8 @@ export class PolishedTranscriptResolver {
     @Context() ctx: GqlContext
   ) {
     const parsed = ChangeDecisionSchema.safeParse(input);
-    if (!parsed.success) throw new BadRequestException(parsed.error.issues[0]?.message);
+    if (!parsed.success)
+      throw new BadRequestException(parsed.error.issues[0]?.message);
     return this.mutations.decidePolishedChange(parsed.data, requireAuth(ctx));
   }
 
@@ -109,8 +117,12 @@ export class PolishedTranscriptResolver {
     @Context() ctx: GqlContext
   ) {
     const parsed = BulkChangeDecisionSchema.safeParse(input);
-    if (!parsed.success) throw new BadRequestException(parsed.error.issues[0]?.message);
-    return this.mutations.bulkDecidePolishedChanges(parsed.data, requireAuth(ctx));
+    if (!parsed.success)
+      throw new BadRequestException(parsed.error.issues[0]?.message);
+    return this.mutations.bulkDecidePolishedChanges(
+      parsed.data,
+      requireAuth(ctx)
+    );
   }
 
   @Mutation('regeneratePolishedTranscript')
@@ -118,7 +130,10 @@ export class PolishedTranscriptResolver {
     @Args('lessonId') lessonId: string,
     @Context() ctx: GqlContext
   ) {
-    return this.mutations.regeneratePolishedTranscript(lessonId, requireAuth(ctx));
+    return this.mutations.regeneratePolishedTranscript(
+      lessonId,
+      requireAuth(ctx)
+    );
   }
 
   // ── Subscriptions ──────────────────────────────────────────────────────────
@@ -128,7 +143,8 @@ export class PolishedTranscriptResolver {
       payload: { polishingProgress: { lessonId: string } },
       variables: { lessonId: string }
     ) => payload.polishingProgress.lessonId === variables.lessonId,
-    resolve: (payload: { polishingProgress: unknown }) => payload.polishingProgress,
+    resolve: (payload: { polishingProgress: unknown }) =>
+      payload.polishingProgress,
   })
   async polishingProgress(
     @Args('lessonId') lessonId: string,

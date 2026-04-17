@@ -46,7 +46,7 @@ export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly orchestrator: PolishingOrchestratorService,
-    private readonly nats: NatsService,
+    private readonly nats: NatsService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -58,7 +58,7 @@ export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
     } catch (err) {
       this.logger.error(
         { err },
-        'Failed to connect to NATS — polishing consumer inactive',
+        'Failed to connect to NATS — polishing consumer inactive'
       );
     }
   }
@@ -94,19 +94,19 @@ export class PolishingConsumer implements OnModuleInit, OnModuleDestroy {
           const payload = JargonCompletedSchema.parse(parsed);
           await this.handleJargonCompleted(payload);
         } catch (err) {
-          this.logger.error(
-            { err },
-            `Failed to handle ${SUBJECT}`,
-          );
+          this.logger.error({ err }, `Failed to handle ${SUBJECT}`);
         }
       }
     })().catch((err) => {
-      this.logger.error({ err }, 'Polishing consumer subscription loop crashed');
+      this.logger.error(
+        { err },
+        'Polishing consumer subscription loop crashed'
+      );
     });
   }
 
   private async handleJargonCompleted(
-    payload: JargonCompletedMsg,
+    payload: JargonCompletedMsg
   ): Promise<void> {
     const { lessonId, tenantId } = payload;
     this.logger.log({ lessonId }, 'Starting transcript polishing');

@@ -26,7 +26,10 @@ import {
   REJECT_ALL_POLISHING_CHANGES_MUTATION,
   APPROVE_POLISHED_TRANSCRIPT_MUTATION,
 } from '@/lib/graphql/polished-transcript.queries';
-import type { PolishedTranscript, PolishedChange } from './polished-transcript.types';
+import type {
+  PolishedTranscript,
+  PolishedChange,
+} from './polished-transcript.types';
 
 interface TrackChangesReviewProps {
   transcript: PolishedTranscript;
@@ -38,16 +41,24 @@ interface TrackChangesReviewProps {
 function buildSegments(
   text: string,
   changes: PolishedChange[]
-): Array<{ type: 'text'; content: string } | { type: 'change'; change: PolishedChange }> {
-  const sorted = [...changes].sort((a, b) => a.charOffsetStart - b.charOffsetStart);
+): Array<
+  { type: 'text'; content: string } | { type: 'change'; change: PolishedChange }
+> {
+  const sorted = [...changes].sort(
+    (a, b) => a.charOffsetStart - b.charOffsetStart
+  );
   const segments: Array<
-    { type: 'text'; content: string } | { type: 'change'; change: PolishedChange }
+    | { type: 'text'; content: string }
+    | { type: 'change'; change: PolishedChange }
   > = [];
   let cursor = 0;
 
   for (const change of sorted) {
     if (change.charOffsetStart > cursor) {
-      segments.push({ type: 'text', content: text.slice(cursor, change.charOffsetStart) });
+      segments.push({
+        type: 'text',
+        content: text.slice(cursor, change.charOffsetStart),
+      });
     }
     segments.push({ type: 'change', change });
     cursor = change.charOffsetEnd;
@@ -66,7 +77,8 @@ export function TrackChangesReview({
   className = '',
 }: TrackChangesReviewProps) {
   const { t } = useTranslation('content');
-  const { decisions, setDecision, acceptAll, rejectAll } = useTrackChangesStore();
+  const { decisions, setDecision, acceptAll, rejectAll } =
+    useTrackChangesStore();
 
   const [, acceptChange] = useMutation(ACCEPT_POLISHING_CHANGE_MUTATION);
   const [, rejectChange] = useMutation(REJECT_POLISHING_CHANGE_MUTATION);
@@ -164,7 +176,9 @@ export function TrackChangesReview({
           <Button
             size="sm"
             onClick={() => void handleApprove()}
-            disabled={isBusy || pendingCount > 0 || transcript.status === 'APPROVED'}
+            disabled={
+              isBusy || pendingCount > 0 || transcript.status === 'APPROVED'
+            }
             data-testid="approve-transcript-btn"
           >
             {t('polishedTranscript.approve')}

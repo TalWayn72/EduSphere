@@ -133,7 +133,10 @@ export class PolishingSubscriptionService implements OnModuleDestroy {
     });
   }
 
-  private deriveProgress(payload: AnyPolishingPayload, subject: string): number {
+  private deriveProgress(
+    payload: AnyPolishingPayload,
+    subject: string
+  ): number {
     if (subject === POLISHING_EVENTS.STARTED) return 0;
     if (subject === POLISHING_EVENTS.COMPLETED) return 100;
     if (subject === POLISHING_EVENTS.FAILED) return 0;

@@ -34,26 +34,49 @@ export const PolishingAnnotation = Annotation.Root({
   lessonId: Annotation<string>(),
   tenantId: Annotation<string>(),
   transcriptId: Annotation<string>(),
-  rawSegments: Annotation<RawSegment[]>({ value: (_, u) => u, default: () => [] }),
-  jargonGlossary: Annotation<JargonEntry[]>({ value: (_, u) => u, default: () => [] }),
-  existingVoiceProfile: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  chunks: Annotation<PolishingChunk[]>({ value: (_, u) => u, default: () => [] }),
+  rawSegments: Annotation<RawSegment[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  jargonGlossary: Annotation<JargonEntry[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  existingVoiceProfile: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  chunks: Annotation<PolishingChunk[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
   voiceProfile: Annotation<string>({ value: (_, u) => u, default: () => '' }),
   polishedChunks: Annotation<PolishedChunkResult[]>({
     reducer: (existing, incoming) => {
       const map = new Map(existing.map((c) => [c.chunkIndex, c]));
       incoming.forEach((c) => map.set(c.chunkIndex, c));
-      return Array.from(map.values()).sort((a, b) => a.chunkIndex - b.chunkIndex);
+      return Array.from(map.values()).sort(
+        (a, b) => a.chunkIndex - b.chunkIndex
+      );
     },
     default: () => [],
   }),
   stitchedText: Annotation<string>({ value: (_, u) => u, default: () => '' }),
   coverageGaps: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
   repairAttempts: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
-  formattedBlocks: Annotation<FormattedBlock[]>({ value: (_, u) => u, default: () => [] }),
+  formattedBlocks: Annotation<FormattedBlock[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
   coverageScore: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
-  status: Annotation<string>({ value: (_, u) => u, default: () => 'PROCESSING' }),
-  error: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  status: Annotation<string>({
+    value: (_, u) => u,
+    default: () => 'PROCESSING',
+  }),
+  error: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   progress: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
 });
 
@@ -84,7 +107,10 @@ export function safeParse<T>(json: string, fallback: T): T {
   }
 }
 
-export async function callLLM(model: LanguageModel, prompt: string): Promise<string> {
+export async function callLLM(
+  model: LanguageModel,
+  prompt: string
+): Promise<string> {
   const { text } = await generateText({ model, prompt });
   return text;
 }

@@ -9,7 +9,10 @@
 import { Logger } from '@nestjs/common';
 import { db, schema, withTenantContext, eq } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import type { FormattedBlock, PolishingState } from '@edusphere/langgraph-workflows';
+import type {
+  FormattedBlock,
+  PolishingState,
+} from '@edusphere/langgraph-workflows';
 
 const logger = new Logger('PolishingPersistence');
 
@@ -22,7 +25,7 @@ type TenantCtx = TenantContext;
 export async function createPolishedRecord(
   lessonId: string,
   tenantId: string,
-  tenantCtx: TenantCtx,
+  tenantCtx: TenantCtx
 ): Promise<string> {
   const rows = await withTenantContext(db, tenantCtx, async (txDb) =>
     txDb
@@ -33,7 +36,7 @@ export async function createPolishedRecord(
         status: 'PROCESSING',
         metadata: {},
       })
-      .returning({ id: schema.polished_transcripts.id }),
+      .returning({ id: schema.polished_transcripts.id })
   );
   return rows[0].id;
 }
@@ -41,7 +44,7 @@ export async function createPolishedRecord(
 export async function markFailed(
   polishedId: string,
   tenantCtx: TenantCtx,
-  err: unknown,
+  err: unknown
 ): Promise<void> {
   try {
     await withTenantContext(db, tenantCtx, async (txDb) =>
@@ -54,7 +57,7 @@ export async function markFailed(
             failedAt: new Date().toISOString(),
           },
         })
-        .where(eq(schema.polished_transcripts.id, polishedId)),
+        .where(eq(schema.polished_transcripts.id, polishedId))
     );
   } catch (updateErr) {
     logger.error({ updateErr }, 'Failed to mark polished record as failed');
@@ -66,7 +69,7 @@ export async function persistResults(
   lessonId: string,
   tenantId: string,
   result: PolishingState,
-  tenantCtx: TenantCtx,
+  tenantCtx: TenantCtx
 ): Promise<void> {
   const blocks = result.formattedBlocks ?? [];
   const coverageScore = result.coverageScore ?? 0;
@@ -78,8 +81,7 @@ export async function persistResults(
     await txDb
       .update(schema.polished_transcripts)
       .set({
-        status:
-          coverageScore >= AUTO_PUBLISH_THRESHOLD ? 'PUBLISHED' : 'DRAFT',
+        status: coverageScore >= AUTO_PUBLISH_THRESHOLD ? 'PUBLISHED' : 'DRAFT',
         full_text: result.stitchedText ?? null,
         coverage_score: String(coverageScore),
         voice_profile_snapshot: voiceSnapshot,
@@ -100,7 +102,7 @@ export async function persistResults(
           start_time: String(b.startTime),
           end_time: String(b.endTime),
           source_segment_ids: b.sourceSegmentIds,
-        })),
+        }))
       )
       .returning({
         id: schema.polished_transcript_blocks.id,
@@ -112,7 +114,7 @@ export async function persistResults(
 
   logger.log(
     { polishedId, lessonId, tenantId, blocks: blocks.length },
-    'Persisted polishing results',
+    'Persisted polishing results'
   );
 }
 
@@ -121,14 +123,14 @@ export async function persistResults(
 async function insertBlockChanges(
   txDb: typeof db,
   blockRows: Array<{ id: string; block_order: number }>,
-  blocks: FormattedBlock[],
+  blocks: FormattedBlock[]
 ): Promise<void> {
   const changeInserts: (typeof schema.polished_block_changes.$inferInsert)[] =
     [];
 
   for (const blockRow of blockRows) {
     const block = blocks.find(
-      (b: FormattedBlock) => b.blockOrder === blockRow.block_order,
+      (b: FormattedBlock) => b.blockOrder === blockRow.block_order
     );
     if (!block?.changes?.length) continue;
 
@@ -157,7 +159,7 @@ async function insertBlockChanges(
 }
 
 function mapChangeType(
-  type: string,
+  type: string
 ): typeof schema.polished_block_changes.$inferInsert.change_type {
   const map: Record<
     string,

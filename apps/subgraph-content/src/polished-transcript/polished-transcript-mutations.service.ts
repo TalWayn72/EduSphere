@@ -21,7 +21,11 @@ import type {
   ChangeDecisionInput,
   BulkChangeDecisionInput,
 } from './polished-transcript.schemas';
-import { mapChange, mapBlock, mapTranscript } from './polished-transcript.helpers';
+import {
+  mapChange,
+  mapBlock,
+  mapTranscript,
+} from './polished-transcript.helpers';
 import type { PolishedTranscriptView } from './polished-transcript.helpers';
 import { PolishedTranscriptService } from './polished-transcript.service';
 
@@ -53,9 +57,14 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
     return this.nc;
   }
 
-  private publishEvent(subject: string, payload: Record<string, unknown>): void {
+  private publishEvent(
+    subject: string,
+    payload: Record<string, unknown>
+  ): void {
     this.getNats()
-      .then((nc) => nc.publish(subject, this.sc.encode(JSON.stringify(payload))))
+      .then((nc) =>
+        nc.publish(subject, this.sc.encode(JSON.stringify(payload)))
+      )
       .catch((err: unknown) => {
         this.logger.warn(`Failed to publish ${subject}: ${String(err)}`);
       });
@@ -69,7 +78,12 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
     const [updated] = await withTenantContext(this.db, tenantCtx, async (db) =>
       db
         .update(schema.polished_transcripts)
-        .set({ status: 'PUBLISHED', approved_by: tenantCtx.userId, approved_at: now, updated_at: now })
+        .set({
+          status: 'PUBLISHED',
+          approved_by: tenantCtx.userId,
+          approved_at: now,
+          updated_at: now,
+        })
         .where(
           and(
             eq(schema.polished_transcripts.id, polishedTranscriptId),
@@ -79,7 +93,9 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
         .returning()
     );
     if (!updated) {
-      throw new NotFoundException(`PolishedTranscript ${polishedTranscriptId} not found`);
+      throw new NotFoundException(
+        `PolishedTranscript ${polishedTranscriptId} not found`
+      );
     }
     this.publishEvent(POLISHING_EVENTS.APPROVED, {
       lessonId: updated.lesson_id,
@@ -93,14 +109,22 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
     return mapTranscript(updated, blocks);
   }
 
-  async editPolishedBlock(input: EditPolishedBlockInput, tenantCtx: TenantContext) {
+  async editPolishedBlock(
+    input: EditPolishedBlockInput,
+    tenantCtx: TenantContext
+  ) {
     await this.queries.findBlockOrThrow(input.blockId, tenantCtx);
     const [updated] = await this.db
       .update(schema.polished_transcript_blocks)
-      .set({ instructor_text: input.content, instructor_edited: true, updated_at: new Date() })
+      .set({
+        instructor_text: input.content,
+        instructor_edited: true,
+        updated_at: new Date(),
+      })
       .where(eq(schema.polished_transcript_blocks.id, input.blockId))
       .returning();
-    if (!updated) throw new NotFoundException(`Block ${input.blockId} not found`);
+    if (!updated)
+      throw new NotFoundException(`Block ${input.blockId} not found`);
     const changes = await this.queries.loadChangesForBlock(input.blockId);
     return mapBlock(updated, changes.map(mapChange));
   }
@@ -109,7 +133,11 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
     await this.queries.findBlockOrThrow(blockId, tenantCtx);
     const [updated] = await this.db
       .update(schema.polished_transcript_blocks)
-      .set({ instructor_text: null, instructor_edited: false, updated_at: new Date() })
+      .set({
+        instructor_text: null,
+        instructor_edited: false,
+        updated_at: new Date(),
+      })
       .where(eq(schema.polished_transcript_blocks.id, blockId))
       .returning();
     if (!updated) throw new NotFoundException(`Block ${blockId} not found`);
@@ -117,7 +145,10 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
     return mapBlock(updated, changes.map(mapChange));
   }
 
-  async decidePolishedChange(input: ChangeDecisionInput, tenantCtx: TenantContext) {
+  async decidePolishedChange(
+    input: ChangeDecisionInput,
+    tenantCtx: TenantContext
+  ) {
     const now = new Date();
     const [updated] = await withTenantContext(this.db, tenantCtx, async (db) =>
       db
@@ -126,7 +157,8 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
         .where(eq(schema.polished_block_changes.id, input.changeId))
         .returning()
     );
-    if (!updated) throw new NotFoundException(`Change ${input.changeId} not found`);
+    if (!updated)
+      throw new NotFoundException(`Change ${input.changeId} not found`);
     return mapChange(updated);
   }
 
@@ -134,7 +166,10 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
     input: BulkChangeDecisionInput,
     tenantCtx: TenantContext
   ): Promise<PolishedTranscriptView> {
-    const transcript = await this.queries.findTranscriptOrThrow(input.polishedTranscriptId, tenantCtx);
+    const transcript = await this.queries.findTranscriptOrThrow(
+      input.polishedTranscriptId,
+      tenantCtx
+    );
     const now = new Date();
     const blockRows = await this.db
       .select({ id: schema.polished_transcript_blocks.id })
@@ -176,7 +211,8 @@ export class PolishedTranscriptMutationsService implements OnModuleDestroy {
         })
         .returning()
     );
-    if (!created) throw new BadRequestException('Failed to create transcript record');
+    if (!created)
+      throw new BadRequestException('Failed to create transcript record');
     this.publishEvent(POLISHING_EVENTS.STARTED, {
       lessonId,
       tenantId: tenantCtx.tenantId,

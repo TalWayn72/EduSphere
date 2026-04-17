@@ -15,7 +15,12 @@ import {
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { withTenantContext } from '@edusphere/db';
-import { mapChange, mapBlock, mapTranscript, mapVoiceProfile } from './polished-transcript.helpers';
+import {
+  mapChange,
+  mapBlock,
+  mapTranscript,
+  mapVoiceProfile,
+} from './polished-transcript.helpers';
 import type { PolishedTranscriptView } from './polished-transcript.helpers';
 
 /**

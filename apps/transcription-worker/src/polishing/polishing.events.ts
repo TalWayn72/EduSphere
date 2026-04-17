@@ -97,7 +97,7 @@ export interface JargonDetectionCompletedPayload {
 
 /** Zod-compatible type guard for the inbound trigger payload. */
 export function isJargonDetectionCompleted(
-  v: unknown,
+  v: unknown
 ): v is JargonDetectionCompletedPayload {
   if (!v || typeof v !== 'object') return false;
   const obj = v as Record<string, unknown>;

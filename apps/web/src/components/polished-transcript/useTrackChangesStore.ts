@@ -5,7 +5,10 @@
  * while GraphQL mutations propagate in the background.
  */
 import { create } from 'zustand';
-import type { ChangeDecision, TrackChangesUIState } from './polished-transcript.types';
+import type {
+  ChangeDecision,
+  TrackChangesUIState,
+} from './polished-transcript.types';
 
 export const useTrackChangesStore = create<TrackChangesUIState>((set) => ({
   decisions: {},
@@ -19,7 +22,9 @@ export const useTrackChangesStore = create<TrackChangesUIState>((set) => ({
     set((state) => ({
       decisions: {
         ...state.decisions,
-        ...Object.fromEntries(changeIds.map((id) => [id, 'ACCEPTED' as ChangeDecision])),
+        ...Object.fromEntries(
+          changeIds.map((id) => [id, 'ACCEPTED' as ChangeDecision])
+        ),
       },
     })),
 
@@ -27,7 +32,9 @@ export const useTrackChangesStore = create<TrackChangesUIState>((set) => ({
     set((state) => ({
       decisions: {
         ...state.decisions,
-        ...Object.fromEntries(changeIds.map((id) => [id, 'REJECTED' as ChangeDecision])),
+        ...Object.fromEntries(
+          changeIds.map((id) => [id, 'REJECTED' as ChangeDecision])
+        ),
       },
     })),
 

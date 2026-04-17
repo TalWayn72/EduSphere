@@ -16,7 +16,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { PolishedChange, ChangeDecision } from './polished-transcript.types';
+import type {
+  PolishedChange,
+  ChangeDecision,
+} from './polished-transcript.types';
 
 interface ChangeInlineMarkerProps {
   change: PolishedChange;

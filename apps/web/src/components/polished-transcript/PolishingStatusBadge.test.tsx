@@ -20,13 +20,22 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant, className, 'data-testid': testId }: {
+  Badge: ({
+    children,
+    variant,
+    className,
+    'data-testid': testId,
+  }: {
     children: React.ReactNode;
     variant?: string;
     className?: string;
     'data-testid'?: string;
   }) => (
-    <span data-testid={testId ?? 'badge'} data-variant={variant} className={className}>
+    <span
+      data-testid={testId ?? 'badge'}
+      data-variant={variant}
+      className={className}
+    >
       {children}
     </span>
   ),

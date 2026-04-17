@@ -20,7 +20,10 @@ import type {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function isActiveBlock(block: PolishedBlock, currentTime: number | undefined): boolean {
+function isActiveBlock(
+  block: PolishedBlock,
+  currentTime: number | undefined
+): boolean {
   if (block.blockType !== 'POLISHED_TEXT') return false;
   if (currentTime === undefined || block.startTime == null) return false;
   const end = block.endTime ?? block.startTime + 10;
@@ -120,7 +123,10 @@ export function PolishedTranscriptPanel({
   // Auto-scroll active block into view whenever currentTime changes.
   useEffect(() => {
     if (activeRef.current) {
-      activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      activeRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
     }
   }, [currentTime]);
 
@@ -132,7 +138,10 @@ export function PolishedTranscriptPanel({
     >
       <div className="p-3 space-y-1">
         {blocks.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-8" dir="rtl">
+          <p
+            className="text-sm text-muted-foreground text-center py-8"
+            dir="rtl"
+          >
             {t('polishedTranscript.reader.empty', 'אין תוכן זמין')}
           </p>
         )}
