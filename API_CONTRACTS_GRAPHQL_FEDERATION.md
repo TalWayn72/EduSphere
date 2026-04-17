@@ -7734,3 +7734,89 @@ input PipelineTemplateModuleInput {
 
 _Section 30 reflects Phase 65 Lesson Pipeline Production Hardening (2026-03-17)._
 _All mutations require `@authenticated`. Scope and role guards as specified per resolver above._
+
+---
+
+## Section 31 — Polished Transcripts (Smart Transcript Polishing, 2026-04-17)
+
+### GraphQL Types
+
+```graphql
+enum PolishedTranscriptStatus {
+  PROCESSING
+  DRAFT
+  PUBLISHED
+}
+
+enum PolishedBlockType {
+  POLISHED_TEXT
+  POLISHED_HEADING
+  POLISHED_CITATION
+}
+
+enum PolishedChangeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+type PolishedTranscript {
+  id: ID!
+  lessonId: ID!
+  status: PolishedTranscriptStatus!
+  fullText: String
+  coverageScore: Float
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  blocks: [PolishedTranscriptBlock!]!
+}
+
+type PolishedTranscriptBlock {
+  id: ID!
+  blockType: PolishedBlockType!
+  blockOrder: Int!
+  content: String!
+  originalText: String!
+  startTime: Float!
+  endTime: Float!
+  sourceSegmentIds: [String!]!
+  changes: [PolishedBlockChange!]!
+}
+
+type PolishedBlockChange {
+  id: ID!
+  changeType: String!
+  originalFragment: String!
+  replacementFragment: String
+  charOffsetStart: Int!
+  charOffsetEnd: Int!
+  status: PolishedChangeStatus!
+}
+```
+
+### Queries
+
+| Query | Auth | Description |
+|---|---|---|
+| `polishedTranscript(lessonId: ID!): PolishedTranscript` | `@authenticated` | Fetch polished transcript for a lesson |
+
+### Mutations
+
+| Mutation | Scope | Description |
+|---|---|---|
+| `startPolishing(lessonId: ID!): PolishedTranscript!` | `content:write` | Trigger LangGraph polishing pipeline |
+| `acceptChange(changeId: ID!): PolishedBlockChange!` | `content:write` + INSTRUCTOR | Accept a single track-change |
+| `rejectChange(changeId: ID!): PolishedBlockChange!` | `content:write` + INSTRUCTOR | Reject a single track-change |
+| `acceptAllChanges(polishedTranscriptId: ID!): PolishedTranscript!` | `content:write` + INSTRUCTOR | Bulk accept all pending changes |
+| `rejectAllChanges(polishedTranscriptId: ID!): PolishedTranscript!` | `content:write` + INSTRUCTOR | Bulk reject all pending changes |
+| `publishPolishedTranscript(polishedTranscriptId: ID!): PolishedTranscript!` | `content:write` + INSTRUCTOR | Publish draft as final |
+
+### NATS Subjects (Polishing Pipeline)
+
+| Subject | Publisher | Consumer | Payload |
+|---|---|---|---|
+| `EDUSPHERE.polishing.started` | `PolishingOrchestratorService` | Gateway (PubSub) | `{ tenantId, lessonId, polishedTranscriptId, timestamp }` |
+| `EDUSPHERE.polishing.progress` | `PolishingOrchestratorService` | Gateway (PubSub) | `{ tenantId, lessonId, polishedTranscriptId, progress, timestamp }` |
+| `EDUSPHERE.polishing.completed` | `PolishingOrchestratorService` | Gateway (PubSub) | `{ tenantId, lessonId, polishedTranscriptId, coverageScore, blockCount, changeCount, timestamp }` |
+| `EDUSPHERE.polishing.failed` | `PolishingOrchestratorService` | Gateway (PubSub) | `{ tenantId, lessonId, polishedTranscriptId, errorMessage, timestamp }` |
+| `EDUSPHERE.polishing.auto_published` | `PolishingOrchestratorService` | Gateway (PubSub) | `{ tenantId, lessonId, polishedTranscriptId, coverageScore, timestamp }` |

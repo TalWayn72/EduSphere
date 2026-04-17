@@ -6,6 +6,24 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [Unreleased] — 2026-04-17
+
+### Added
+
+- **Smart Transcript Polishing** — LangGraph workflow (`TranscriptPolishingWorkflow`) converting raw transcripts into polished publication-ready text across 10 stages: prepare → chunk → loadVoice → polishChunks → stitch → verifyCoverage → repairGaps → generateDiffs → formatOutput → autoPublish
+- **Instructor Voice Profiles** — Per-instructor writing style extraction stored in `instructor_voice_profiles`; weighted merge (70% existing / 30% fresh) after ≥2 lessons
+- **Polished Transcript Viewer/Editor** — Student read-only viewer and instructor editor with inline track-changes, accept/reject controls, bulk actions, and dark-mode support
+- **Polishing progress overlay** — Real-time progress streaming 0–100% via NATS subscription (`PolishingProgressOverlay`)
+- **DB schema** — `polished_transcripts`, `polished_transcript_blocks`, `polished_block_changes`, `instructor_voice_profiles` tables with RLS and indexes
+
+### Fixed
+
+- TypeScript strict errors in `transcript-polishing-nodes.ts` — non-null assertions for array element access
+- `TenantCtx` local type replaced with imported `TenantContext` union in polishing orchestrator/persistence
+- Dark-mode orphan color lint errors in `ChangeInlineMarker`, `PolishingProgressOverlay`, `TrackChangesReview`
+
+---
+
 ## [Unreleased] — 2026-04-09
 
 ### Added
