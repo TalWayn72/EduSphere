@@ -256,6 +256,12 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   cpdCreditTypes: [CpdCreditType!]! @join__field(graph: CONTENT)  @authenticated
   getDocumentVersions(mediaAssetId: ID!) : [DocumentVersion!]! @join__field(graph: CONTENT)  @authenticated @requiresScopes(scopes: [["content:read"]]) 
   enrichedLesson(lessonId: ID!) : EnrichedLesson @join__field(graph: CONTENT)  @authenticated
+  """Get the latest polished transcript for a lesson (with blocks and changes)."""
+  polishedTranscript(lessonId: ID!) : PolishedTranscript @join__field(graph: CONTENT)  @authenticated
+  """List all versions of polished transcripts for a lesson."""
+  polishedTranscriptVersions(lessonId: ID!) : [PolishedTranscript!]! @join__field(graph: CONTENT)  @authenticated
+  """Get the instructor voice profile for the current user."""
+  myVoiceProfile: InstructorVoiceProfile @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   examItemBank(courseId: ID!, filters: ExamItemFilterInput, first: Int, after: String) : ExamItemConnection! @join__field(graph: CONTENT)  @authenticated
   examBlueprints(courseId: ID!) : [ExamBlueprint!]! @join__field(graph: CONTENT)  @authenticated
   examBlueprint(id: ID!) : ExamBlueprint @join__field(graph: CONTENT)  @authenticated
@@ -663,6 +669,18 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   updateLessonCitation(citationId: ID!, input: UpdateCitationInput!) : LessonCitation! @join__field(graph: CONTENT)  @authenticated
   setBlockAnchorTimestamp(input: SetBlockAnchorTimestampInput!) : EnrichedTranscriptBlock! @join__field(graph: CONTENT)  @authenticated
   publishEnrichedLesson(lessonId: ID!) : EnrichedLesson! @join__field(graph: CONTENT)  @authenticated
+  """Approve the polished transcript → sets status to PUBLISHED."""
+  approvePolishedTranscript(polishedTranscriptId: ID!) : PolishedTranscript! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """Manually override the content of a polished block."""
+  editPolishedBlock(input: EditPolishedBlockInput!) : PolishedTranscriptBlock! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """Revert an instructor-edited block back to the AI-generated version."""
+  revertPolishedBlock(blockId: ID!) : PolishedTranscriptBlock! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """Accept or reject a single tracked change within a block."""
+  decidePolishedChange(input: ChangeDecisionInput!) : PolishedBlockChange! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """Accept or reject ALL pending changes for a polished transcript."""
+  bulkDecidePolishedChanges(input: BulkChangeDecisionInput!) : PolishedTranscript! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  """Trigger a new polishing run, creating a new version."""
+  regeneratePolishedTranscript(lessonId: ID!) : PolishedTranscript! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   createExamItem(input: CreateExamItemInput!) : ExamItem! @join__field(graph: CONTENT)  @authenticated
   updateExamItem(id: ID!, input: UpdateExamItemInput!) : ExamItem! @join__field(graph: CONTENT)  @authenticated
   retireExamItem(id: ID!) : ExamItem! @join__field(graph: CONTENT)  @authenticated
@@ -1011,6 +1029,8 @@ type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @jo
   pollUpdated(pollId: ID!) : PollResults! @join__field(graph: CONTENT)  @authenticated
   anchorDeleted(mediaAssetId: ID!) : ID! @join__field(graph: CONTENT)  @authenticated
   anchorCreated(mediaAssetId: ID!) : VisualAnchor! @join__field(graph: CONTENT)  @authenticated
+  """Real-time polishing progress for a lesson."""
+  polishingProgress(lessonId: ID!) : PolishingProgressEvent! @join__field(graph: CONTENT)  @authenticated
   notificationReceived(userId: ID!) : Notification! @join__field(graph: CORE)  @authenticated
   """
   User created event
@@ -2283,6 +2303,67 @@ type PlagiarismReport @join__type(graph: CONTENT)  {
   highestSimilarity: Float!
   similarSubmissions: [SimilarSubmission!]!
   checkedAt: DateTime!
+}
+
+type PolishedBlockChange @join__type(graph: CONTENT)  {
+  id: ID!
+  blockId: ID!
+  changeType: PolishedChangeType
+  originalFragment: String!
+  replacementFragment: String
+  charOffsetStart: Int!
+  charOffsetEnd: Int!
+  status: PolishedChangeStatus!
+  reviewedAt: String
+  createdAt: String!
+}
+
+type PolishedTranscriptBlock @join__type(graph: CONTENT)  {
+  id: ID!
+  polishedId: ID!
+  blockType: PolishedBlockType
+  blockOrder: Int!
+  content: String!
+  originalText: String
+  startTime: Float
+  endTime: Float
+  sourceSegmentIds: JSON!
+  instructorEdited: Boolean!
+  instructorText: String
+  changes: [PolishedBlockChange!]!
+}
+
+type PolishedTranscript @join__type(graph: CONTENT)  {
+  id: ID!
+  lessonId: ID!
+  version: Int!
+  status: PolishedTranscriptStatus!
+  fullText: String
+  coverageScore: Float
+  polishedBy: String!
+  approvedBy: ID
+  approvedAt: String
+  blocks: [PolishedTranscriptBlock!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type InstructorVoiceProfile @join__type(graph: CONTENT)  {
+  id: ID!
+  instructorId: ID!
+  voiceData: JSON
+  sampleCount: Int!
+  lastUpdatedFrom: ID
+  updatedAt: String!
+}
+
+type PolishingProgressEvent @join__type(graph: CONTENT)  {
+  lessonId: ID!
+  polishedTranscriptId: ID
+  progress: Int!
+  status: PolishedTranscriptStatus!
+  message: String
+  timestamp: String!
 }
 
 type TextSubmission @join__type(graph: CONTENT)  {
@@ -4073,11 +4154,43 @@ enum TranslationStatus @join__type(graph: CONTENT)  {
 }
 
 enum ScanStatus @join__type(graph: CONTENT)  {
-  PENDING @join__enumValue(graph: CONTENT) 
-  SCANNING @join__enumValue(graph: CONTENT) 
-  CLEAN @join__enumValue(graph: CONTENT) 
-  INFECTED @join__enumValue(graph: CONTENT) 
-  ERROR @join__enumValue(graph: CONTENT) 
+  PENDING @join__enumValue(graph: CONTENT)
+  SCANNING @join__enumValue(graph: CONTENT)
+  CLEAN @join__enumValue(graph: CONTENT)
+  INFECTED @join__enumValue(graph: CONTENT)
+  ERROR @join__enumValue(graph: CONTENT)
+}
+
+enum PolishedTranscriptStatus @join__type(graph: CONTENT)  {
+  PROCESSING @join__enumValue(graph: CONTENT)
+  DRAFT @join__enumValue(graph: CONTENT)
+  INSTRUCTOR_REVIEW @join__enumValue(graph: CONTENT)
+  APPROVED @join__enumValue(graph: CONTENT)
+  PUBLISHED @join__enumValue(graph: CONTENT)
+}
+
+enum PolishedBlockType @join__type(graph: CONTENT)  {
+  POLISHED_TEXT @join__enumValue(graph: CONTENT)
+  POLISHED_CITATION @join__enumValue(graph: CONTENT)
+  POLISHED_HEADING @join__enumValue(graph: CONTENT)
+}
+
+enum PolishedChangeType @join__type(graph: CONTENT)  {
+  FILLER_REMOVED @join__enumValue(graph: CONTENT)
+  REPETITION_REMOVED @join__enumValue(graph: CONTENT)
+  AUDIENCE_ADDRESS_REMOVED @join__enumValue(graph: CONTENT)
+  IMPERATIVE_TO_DESCRIPTION @join__enumValue(graph: CONTENT)
+  RHETORICAL_SIMPLIFIED @join__enumValue(graph: CONTENT)
+  PERSON_CHANGED @join__enumValue(graph: CONTENT)
+  CITATION_FORMATTED @join__enumValue(graph: CONTENT)
+  SPELLING_CORRECTED @join__enumValue(graph: CONTENT)
+  SENTENCE_RESTRUCTURED @join__enumValue(graph: CONTENT)
+}
+
+enum PolishedChangeStatus @join__type(graph: CONTENT)  {
+  PENDING @join__enumValue(graph: CONTENT)
+  ACCEPTED @join__enumValue(graph: CONTENT)
+  REJECTED @join__enumValue(graph: CONTENT)
 }
 
 enum PilotRequestStatus @join__type(graph: CORE)  {
@@ -4439,6 +4552,21 @@ input SetBlockAnchorTimestampInput @join__type(graph: CONTENT)  {
   blockId: ID!
   startTime: Float!
   endTime: Float
+}
+
+input EditPolishedBlockInput @join__type(graph: CONTENT)  {
+  blockId: ID!
+  content: String!
+}
+
+input ChangeDecisionInput @join__type(graph: CONTENT)  {
+  changeId: ID!
+  decision: PolishedChangeStatus!
+}
+
+input BulkChangeDecisionInput @join__type(graph: CONTENT)  {
+  polishedTranscriptId: ID!
+  decision: PolishedChangeStatus!
 }
 
 input CreateExamItemInput @join__type(graph: CONTENT)  {
