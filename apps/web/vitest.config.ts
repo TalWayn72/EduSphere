@@ -23,14 +23,11 @@ export default defineConfig({
     // hangs much sooner and prevents a single flaky test burning 30 s of shard time.
     testTimeout: 10000,
     hookTimeout: 10000,
-    // 'vmThreads' shares a single Node process (one V8 isolate per worker) so
-    // fork-spawn overhead is eliminated.  GitHub-hosted runners have 2 vCPUs;
-    // 2 workers saturates them without OOM risk.  Memory cap raised from 512 MB
-    // to 1 GB to reduce GC pressure across the 4,400+ test suite.
-    pool: 'vmThreads',
-    vmThreadOptions: {
-      memoryLimit: '1gb',
-    },
+    // 'threads' runs in real V8 threads where Web globals (TransformStream, etc.)
+    // are available — required by @mswjs/interceptors.  Faster than 'forks' since
+    // it shares the Node process; vmThreads was dropped because VM contexts lack
+    // TransformStream, breaking MSW.
+    pool: 'threads',
     reporters: [
       'default',
       ['junit', { outputFile: './test-results/results.xml', suiteName: 'web' }],
