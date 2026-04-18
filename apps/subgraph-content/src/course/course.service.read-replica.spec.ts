@@ -26,10 +26,17 @@ const mocks = vi.hoisted(() => {
   const mockLimit = vi.fn(() => ({ offset: mockOffset }));
   const mockOrderBy = vi.fn(() => ({ limit: mockLimit }));
   const mockSelectWhere = vi.fn(() => ({ orderBy: mockOrderBy }));
-  const mockFrom = vi.fn(() => ({ where: mockSelectWhere, orderBy: mockOrderBy }));
+  const mockFrom = vi.fn(() => ({
+    where: mockSelectWhere,
+    orderBy: mockOrderBy,
+  }));
   const mockSelect = vi.fn(() => ({ from: mockFrom }));
 
-  const mockWriteDb = { insert: mockInsert, update: mockUpdate, select: mockSelect };
+  const mockWriteDb = {
+    insert: mockInsert,
+    update: mockUpdate,
+    select: mockSelect,
+  };
 
   // withReadReplica — default impl returns empty array; tests override per-call
   const withReadReplicaMock = vi.fn((_fn: (db: unknown) => unknown) =>
@@ -73,7 +80,12 @@ vi.mock('@edusphere/db', () => ({
       tenant_id: 'tenant_id',
       is_published: 'is_published',
     },
-    lessons: { id: 'id', course_id: 'course_id', status: 'status', deleted_at: 'deleted_at' },
+    lessons: {
+      id: 'id',
+      course_id: 'course_id',
+      status: 'status',
+      deleted_at: 'deleted_at',
+    },
     lesson_pipeline_runs: { id: 'id', lesson_id: 'lesson_id' },
   },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
@@ -140,7 +152,11 @@ describe('CourseService — read-replica routing', () => {
   });
 
   describe('findAll()', () => {
-    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+    const tenantCtx = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      userRole: 'STUDENT' as const,
+    };
 
     it('calls withTenantContext (not withReadReplica) to satisfy RLS', async () => {
       await service.findAll(10, 0, tenantCtx);
@@ -150,7 +166,11 @@ describe('CourseService — read-replica routing', () => {
 
     it('passes a callback function to withTenantContext', async () => {
       await service.findAll(10, 0, tenantCtx);
-      const [, , fn] = mocks.withTenantContextMock.mock.calls[0] as [unknown, unknown, unknown];
+      const [, , fn] = mocks.withTenantContextMock.mock.calls[0] as [
+        unknown,
+        unknown,
+        unknown,
+      ];
       expect(typeof fn).toBe('function');
     });
 

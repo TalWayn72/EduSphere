@@ -123,9 +123,9 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(
-        resolver.getCourses(10, 0, NO_AUTH_CTX)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getCourses(10, 0, NO_AUTH_CTX)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 

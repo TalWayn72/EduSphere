@@ -14,7 +14,12 @@ const mockUserService = {
   deactivateUser: vi.fn(),
   resetUserPassword: vi.fn(),
   bulkImportUsers: vi.fn(),
-  mapUser: vi.fn((row: Record<string, unknown>) => ({ ...row, firstName: '', lastName: '', tenantId: row['tenant_id'] ?? '' })),
+  mapUser: vi.fn((row: Record<string, unknown>) => ({
+    ...row,
+    firstName: '',
+    lastName: '',
+    tenantId: row['tenant_id'] ?? '',
+  })),
 };
 
 // Mock UserStatsService

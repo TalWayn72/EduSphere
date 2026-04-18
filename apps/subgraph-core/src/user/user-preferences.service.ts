@@ -67,7 +67,9 @@ export class UserPreferencesService implements OnModuleDestroy {
     authContext: AuthContext
   ) {
     if (!authContext.tenantId && !authContext.isSuperAdmin) {
-      throw new UnauthorizedException('Tenant context required to update preferences');
+      throw new UnauthorizedException(
+        'Tenant context required to update preferences'
+      );
     }
 
     const tenantCtx = this.toTenantContext(authContext);

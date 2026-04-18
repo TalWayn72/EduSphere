@@ -33,15 +33,12 @@ const mocks = vi.hoisted(() => {
    * "returned courses" in the same test.
    */
   const withTenantContextMock = vi.fn(
-    (
-      _db: unknown,
-      _ctx: unknown,
-      fn: (db: typeof mockDb) => unknown
-    ) => fn(mockDb)
+    (_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) =>
+      fn(mockDb)
   );
 
-  const withReadReplicaMock = vi.fn(
-    (fn: (db: typeof mockDb) => unknown) => fn(mockDb)
+  const withReadReplicaMock = vi.fn((fn: (db: typeof mockDb) => unknown) =>
+    fn(mockDb)
   );
 
   return {
@@ -73,7 +70,12 @@ vi.mock('@edusphere/db', () => ({
       createdAt: 'created_at',
       deleted_at: 'deleted_at',
     },
-    lessons: { id: 'id', course_id: 'course_id', status: 'status', deleted_at: 'deleted_at' },
+    lessons: {
+      id: 'id',
+      course_id: 'course_id',
+      status: 'status',
+      deleted_at: 'deleted_at',
+    },
     lesson_pipeline_runs: { id: 'id', lesson_id: 'lesson_id' },
   },
   eq: vi.fn((col, val) => ({ col, val })),

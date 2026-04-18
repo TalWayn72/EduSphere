@@ -48,7 +48,6 @@ vi.mock('./activity-feed.service');
 vi.mock('./in-progress-courses.service');
 vi.mock('./recommended-courses.service');
 
-
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const STORED_PREFS = {
@@ -101,8 +100,9 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
 
     // Configure mapUser() on the auto-mocked UserService to return the mapped shape
     const mockedUserService = new UserService() as unknown as UserService;
-    vi.mocked(mockedUserService).mapUser = vi.fn().mockImplementation(
-      (row: Record<string, unknown>) => ({
+    vi.mocked(mockedUserService).mapUser = vi
+      .fn()
+      .mockImplementation((row: Record<string, unknown>) => ({
         ...row,
         firstName: '',
         lastName: '',
@@ -110,8 +110,7 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         preferences: (row['preferences'] as object) ?? {},
-      })
-    );
+      }));
 
     resolver = new UserResolver(
       mockedUserService,
@@ -127,10 +126,10 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
   // ── Happy path ────────────────────────────────────────────────────────────
 
   it('resolver returns mapUser()-ed result (camelCase fields) on success', async () => {
-    const result = await resolver.updateUserPreferences(
+    const result = (await resolver.updateUserPreferences(
       { locale: 'he' },
       makeContext(AUTH_CTX)
-    ) as Record<string, unknown>;
+    )) as Record<string, unknown>;
     // Verifies that resolver calls mapUser() — mapped result has camelCase tenantId, not snake_case tenant_id only
     expect(result).toBeDefined();
     expect(result['tenantId']).toBe('tenant-1');
@@ -144,10 +143,10 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
     );
     // The mapUser mock was configured on mockedUserService — verify it was invoked
     // by checking the resolver returned a mapped shape (not the raw MOCK_USER_ROW with only tenant_id)
-    const result = await resolver.updateUserPreferences(
+    const result = (await resolver.updateUserPreferences(
       { locale: 'fr' },
       makeContext(AUTH_CTX)
-    ) as Record<string, unknown>;
+    )) as Record<string, unknown>;
     expect(result).not.toEqual(MOCK_USER_ROW);
     expect(result['tenantId']).toBe('tenant-1');
   });

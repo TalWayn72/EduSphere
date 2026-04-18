@@ -119,7 +119,11 @@ describe('CourseService', () => {
   });
 
   describe('findAll()', () => {
-    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+    const tenantCtx = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      userRole: 'STUDENT' as const,
+    };
 
     beforeEach(() => {
       mockOffset.mockResolvedValue([MOCK_COURSE]);
@@ -397,7 +401,11 @@ describe('CourseService', () => {
   });
 
   describe('search()', () => {
-    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+    const tenantCtx = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      userRole: 'STUDENT' as const,
+    };
 
     beforeEach(() => {
       mockLimit.mockResolvedValue([MOCK_COURSE]);
