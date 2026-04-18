@@ -48,24 +48,6 @@ vi.mock('./activity-feed.service');
 vi.mock('./in-progress-courses.service');
 vi.mock('./recommended-courses.service');
 
-// Mapped user shape that UserService.mapUser() would produce from MOCK_USER_ROW
-const MAPPED_USER_ROW = {
-  id: 'user-1',
-  tenant_id: 'tenant-1',
-  email: 'user@example.com',
-  preferences: {
-    locale: 'en',
-    theme: 'system',
-    emailNotifications: true,
-    pushNotifications: true,
-    isPublicProfile: false,
-  },
-  firstName: '',
-  lastName: '',
-  tenantId: 'tenant-1',
-  createdAt: expect.any(String),
-  updatedAt: expect.any(String),
-};
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
