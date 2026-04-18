@@ -106,16 +106,26 @@ describe('CourseResolver', () => {
   });
 
   describe('getCourses()', () => {
-    it('delegates to service.findAll with limit and offset', async () => {
+    it('delegates to service.findAll with limit, offset and tenantCtx', async () => {
       mockCourseService.findAll.mockResolvedValue([MOCK_COURSE]);
-      const result = await resolver.getCourses(10, 0);
-      expect(mockCourseService.findAll).toHaveBeenCalledWith(10, 0);
+      const result = await resolver.getCourses(10, 0, AUTH_CTX);
+      expect(mockCourseService.findAll).toHaveBeenCalledWith(
+        10,
+        0,
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' })
+      );
       expect(result).toEqual([MOCK_COURSE]);
     });
 
     it('returns empty array when no courses', async () => {
       mockCourseService.findAll.mockResolvedValue([]);
-      expect(await resolver.getCourses(10, 0)).toEqual([]);
+      expect(await resolver.getCourses(10, 0, AUTH_CTX)).toEqual([]);
+    });
+
+    it('throws UnauthorizedException when unauthenticated', async () => {
+      await expect(
+        resolver.getCourses(10, 0, NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 

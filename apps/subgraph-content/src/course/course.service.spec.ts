@@ -119,6 +119,8 @@ describe('CourseService', () => {
   });
 
   describe('findAll()', () => {
+    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+
     beforeEach(() => {
       mockOffset.mockResolvedValue([MOCK_COURSE]);
       mockLimit.mockReturnValue({ offset: mockOffset });
@@ -130,23 +132,23 @@ describe('CourseService', () => {
     });
 
     it('returns array of courses', async () => {
-      const result = await service.findAll(10, 0);
+      const result = await service.findAll(10, 0, tenantCtx);
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('applies the given limit', async () => {
-      await service.findAll(25, 0);
+      await service.findAll(25, 0, tenantCtx);
       expect(mockLimit).toHaveBeenCalledWith(25);
     });
 
     it('applies the given offset', async () => {
-      await service.findAll(10, 50);
+      await service.findAll(10, 50, tenantCtx);
       expect(mockOffset).toHaveBeenCalledWith(50);
     });
 
     it('uses desc ordering', async () => {
       const { desc } = await import('@edusphere/db');
-      await service.findAll(10, 0);
+      await service.findAll(10, 0, tenantCtx);
       expect(desc).toHaveBeenCalled();
       expect(mockOrderBy).toHaveBeenCalled();
     });
@@ -154,7 +156,7 @@ describe('CourseService', () => {
     it('returns multiple courses', async () => {
       const courses = [MOCK_COURSE, { ...MOCK_COURSE, id: 'course-2' }];
       mockOffset.mockResolvedValue(courses);
-      const result = await service.findAll(10, 0);
+      const result = await service.findAll(10, 0, tenantCtx);
       expect(result).toHaveLength(2);
     });
   });
@@ -395,6 +397,8 @@ describe('CourseService', () => {
   });
 
   describe('search()', () => {
+    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+
     beforeEach(() => {
       mockLimit.mockResolvedValue([MOCK_COURSE]);
       mockOrderBy.mockReturnValue({ limit: mockLimit });
@@ -405,7 +409,7 @@ describe('CourseService', () => {
 
     it('returns courses matching title', async () => {
       mockLimit.mockResolvedValue([MOCK_COURSE]);
-      const result = await service.search('Test', 10);
+      const result = await service.search('Test', 10, tenantCtx);
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(1);
     });
@@ -413,26 +417,26 @@ describe('CourseService', () => {
     it('returns courses matching description', async () => {
       const descMatch = { ...MOCK_COURSE, description: 'Advanced topic' };
       mockLimit.mockResolvedValue([descMatch]);
-      const result = await service.search('Advanced', 10);
+      const result = await service.search('Advanced', 10, tenantCtx);
       expect(result).toHaveLength(1);
     });
 
     it('returns empty array for query shorter than 2 characters', async () => {
-      const result = await service.search('a', 10);
+      const result = await service.search('a', 10, tenantCtx);
       expect(result).toEqual([]);
-      // withReadReplica should NOT be called for short queries
-      const { withReadReplica } = await import('@edusphere/db');
-      expect(withReadReplica).not.toHaveBeenCalled();
+      // withTenantContext should NOT be called for short queries
+      const { withTenantContext } = await import('@edusphere/db');
+      expect(withTenantContext).not.toHaveBeenCalled();
     });
 
     it('returns empty array for empty string query', async () => {
-      const result = await service.search('', 10);
+      const result = await service.search('', 10, tenantCtx);
       expect(result).toEqual([]);
     });
 
     it('logs error and throws BadRequestException on DB failure', async () => {
       mockLimit.mockRejectedValue(new Error('DB connection lost'));
-      await expect(service.search('hello', 10)).rejects.toThrow(
+      await expect(service.search('hello', 10, tenantCtx)).rejects.toThrow(
         'Failed to search courses. Please try again.'
       );
     });
@@ -440,20 +444,20 @@ describe('CourseService', () => {
     it('calls ilike() on title and description columns', async () => {
       const { ilike } = await import('@edusphere/db');
       mockLimit.mockResolvedValue([]);
-      await service.search('test query', 10);
+      await service.search('test query', 10, tenantCtx);
       expect(ilike).toHaveBeenCalledTimes(2);
     });
 
     it('calls or() to combine title and description conditions', async () => {
       const { or } = await import('@edusphere/db');
       mockLimit.mockResolvedValue([]);
-      await service.search('test query', 10);
+      await service.search('test query', 10, tenantCtx);
       expect(or).toHaveBeenCalled();
     });
 
     it('applies the given limit', async () => {
       mockLimit.mockResolvedValue([]);
-      await service.search('test', 5);
+      await service.search('test', 5, tenantCtx);
       expect(mockLimit).toHaveBeenCalledWith(5);
     });
   });

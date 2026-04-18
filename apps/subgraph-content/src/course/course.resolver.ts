@@ -79,9 +79,11 @@ export class CourseResolver {
   @Query('courses')
   async getCourses(
     @Args('limit') limit: number,
-    @Args('offset') offset: number
+    @Args('offset') offset: number,
+    @Context() ctx: GqlContext
   ) {
-    return this.courseService.findAll(limit, offset);
+    const tenantCtx = requireAuth(ctx);
+    return this.courseService.findAll(limit, offset, tenantCtx);
   }
 
   @Query('searchCourses')
@@ -90,8 +92,8 @@ export class CourseResolver {
     @Args('limit') limit: number,
     @Context() ctx: GqlContext
   ) {
-    requireAuth(ctx);
-    return this.courseService.search(query, limit);
+    const tenantCtx = requireAuth(ctx);
+    return this.courseService.search(query, limit, tenantCtx);
   }
 
   @Mutation('createCourse')

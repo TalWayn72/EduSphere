@@ -96,13 +96,18 @@ export class CourseService implements OnModuleDestroy {
     return this.mapCourse(course as Record<string, unknown>) || null;
   }
 
-  async findAll(limit: number, offset: number) {
+  async findAll(limit: number, offset: number, tenantCtx: TenantContext) {
     try {
-      const rows = await withReadReplica((db) =>
+      const rows = await withTenantContext(this.db, tenantCtx, (db) =>
         db
           .select()
           .from(schema.courses)
-          .where(isNull(schema.courses.deleted_at))
+          .where(
+            and(
+              isNull(schema.courses.deleted_at),
+              eq(schema.courses.is_published, true)
+            )
+          )
           .orderBy(desc(schema.courses.created_at))
           .limit(limit)
           .offset(offset)
@@ -116,11 +121,11 @@ export class CourseService implements OnModuleDestroy {
     }
   }
 
-  async search(query: string, limit: number = 20) {
+  async search(query: string, limit: number = 20, tenantCtx: TenantContext) {
     if (!query || query.trim().length < 2) return [];
     const pattern = `%${query.trim()}%`;
     try {
-      const rows = await withReadReplica((db) =>
+      const rows = await withTenantContext(this.db, tenantCtx, (db) =>
         db
           .select()
           .from(schema.courses)
