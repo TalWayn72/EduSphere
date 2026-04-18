@@ -112,9 +112,9 @@ jobs:
   unit-tests-web:
     name: Unit Tests — Web (Vitest ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    # Realistic ceiling: ~550 tests/shard on vmThreads should finish in ≤15 min;
-    # 30 min gives headroom without masking a real hang for 75 min.
-    timeout-minutes: 30
+    # threads pool with 8 shards and reduced testTimeout should finish in ~35 min;
+    # 45 min gives headroom without masking a real hang for 90 min.
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
