@@ -16,7 +16,6 @@ export function CourseList() {
   const {
     isInstructor,
     fetching,
-    error: _error,
     isNetworkError,
     reexecuteCourses,
     search,
