@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   OnModuleDestroy,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -65,6 +66,10 @@ export class UserPreferencesService implements OnModuleDestroy {
     input: UpdateUserPreferencesInput,
     authContext: AuthContext
   ) {
+    if (!authContext.tenantId && !authContext.isSuperAdmin) {
+      throw new UnauthorizedException('Tenant context required to update preferences');
+    }
+
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {

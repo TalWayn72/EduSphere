@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import {
   parsePreferences,
   UserPreferencesService,
@@ -222,14 +222,20 @@ describe('UserPreferencesService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('passes empty string as tenantId when authContext.tenantId is undefined-like', async () => {
-      const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await service.updatePreferences('user-1', {}, noTenantAuth);
-      expect(withTenantContext).toHaveBeenCalledWith(
-        mockDb,
-        expect.objectContaining({ tenantId: '' }),
-        expect.any(Function)
-      );
+    it('throws UnauthorizedException when tenantId is empty and not SUPER_ADMIN', async () => {
+      const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '', isSuperAdmin: false };
+      await expect(
+        service.updatePreferences('user-1', {}, noTenantAuth)
+      ).rejects.toThrow(UnauthorizedException);
+      // withTenantContext must NOT be called (guard fires before DB access)
+      expect(withTenantContext).not.toHaveBeenCalled();
+    });
+
+    it('allows SUPER_ADMIN to update preferences without tenantId', async () => {
+      const superAdminAuth: AuthContext = { ...MOCK_AUTH, tenantId: '', isSuperAdmin: true };
+      await expect(
+        service.updatePreferences('user-1', {}, superAdminAuth)
+      ).resolves.toBeDefined();
     });
 
     it('performs a full PATCH merge — all fields supplied', async () => {

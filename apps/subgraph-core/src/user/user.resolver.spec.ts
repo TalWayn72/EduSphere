@@ -14,6 +14,7 @@ const mockUserService = {
   deactivateUser: vi.fn(),
   resetUserPassword: vi.fn(),
   bulkImportUsers: vi.fn(),
+  mapUser: vi.fn((row: Record<string, unknown>) => ({ ...row, firstName: '', lastName: '', tenantId: row['tenant_id'] ?? '' })),
 };
 
 // Mock UserStatsService
@@ -222,7 +223,7 @@ describe('UserResolver', () => {
   // ─── updateUserPreferences ───────────────────────────────────────────────
 
   describe('updateUserPreferences()', () => {
-    it('updates preferences and returns user', async () => {
+    it('updates preferences, calls mapUser(), and returns mapped user', async () => {
       const updated = { ...MOCK_USER };
       mockUserPreferencesService.updatePreferences.mockResolvedValue(updated);
       const ctx = { req: {}, authContext: MOCK_AUTH };
@@ -233,7 +234,10 @@ describe('UserResolver', () => {
         expect.objectContaining({ locale: 'fr', theme: 'dark' }),
         MOCK_AUTH
       );
-      expect(result).toEqual(updated);
+      // Resolver now wraps result with mapUser() — verify mapUser was called
+      expect(mockUserService.mapUser).toHaveBeenCalledWith(updated);
+      // Result should be the mapped output (with camelCase tenantId)
+      expect(result).toMatchObject({ tenantId: 'tenant-1' });
     });
 
     it('throws UnauthorizedException when no authContext', async () => {

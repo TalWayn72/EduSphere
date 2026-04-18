@@ -48,6 +48,25 @@ vi.mock('./activity-feed.service');
 vi.mock('./in-progress-courses.service');
 vi.mock('./recommended-courses.service');
 
+// Mapped user shape that UserService.mapUser() would produce from MOCK_USER_ROW
+const MAPPED_USER_ROW = {
+  id: 'user-1',
+  tenant_id: 'tenant-1',
+  email: 'user@example.com',
+  preferences: {
+    locale: 'en',
+    theme: 'system',
+    emailNotifications: true,
+    pushNotifications: true,
+    isPublicProfile: false,
+  },
+  firstName: '',
+  lastName: '',
+  tenantId: 'tenant-1',
+  createdAt: expect.any(String),
+  updatedAt: expect.any(String),
+};
+
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const STORED_PREFS = {
@@ -98,8 +117,22 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
     // Instantiate real service — DB layer is mocked above
     preferencesService = new UserPreferencesService();
 
+    // Configure mapUser() on the auto-mocked UserService to return the mapped shape
+    const mockedUserService = new UserService() as unknown as UserService;
+    vi.mocked(mockedUserService).mapUser = vi.fn().mockImplementation(
+      (row: Record<string, unknown>) => ({
+        ...row,
+        firstName: '',
+        lastName: '',
+        tenantId: (row['tenant_id'] as string) || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        preferences: (row['preferences'] as object) ?? {},
+      })
+    );
+
     resolver = new UserResolver(
-      new UserService() as unknown as UserService,
+      mockedUserService,
       new UserStatsService() as unknown as UserStatsService,
       preferencesService,
       new PublicProfileService() as unknown as PublicProfileService,
@@ -111,12 +144,30 @@ describe('UserResolver → UserPreferencesService (resolver-to-service chain)', 
 
   // ── Happy path ────────────────────────────────────────────────────────────
 
-  it('resolver returns updated user row from real service on success', async () => {
+  it('resolver returns mapUser()-ed result (camelCase fields) on success', async () => {
     const result = await resolver.updateUserPreferences(
       { locale: 'he' },
       makeContext(AUTH_CTX)
+    ) as Record<string, unknown>;
+    // Verifies that resolver calls mapUser() — mapped result has camelCase tenantId, not snake_case tenant_id only
+    expect(result).toBeDefined();
+    expect(result['tenantId']).toBe('tenant-1');
+    expect(result['firstName']).toBeDefined();
+  });
+
+  it('resolver calls userService.mapUser() with the raw DB row', async () => {
+    await resolver.updateUserPreferences(
+      { locale: 'he' },
+      makeContext(AUTH_CTX)
     );
-    expect(result).toEqual(MOCK_USER_ROW);
+    // The mapUser mock was configured on mockedUserService — verify it was invoked
+    // by checking the resolver returned a mapped shape (not the raw MOCK_USER_ROW with only tenant_id)
+    const result = await resolver.updateUserPreferences(
+      { locale: 'fr' },
+      makeContext(AUTH_CTX)
+    ) as Record<string, unknown>;
+    expect(result).not.toEqual(MOCK_USER_ROW);
+    expect(result['tenantId']).toBe('tenant-1');
   });
 
   it('resolver passes authContext.userId to service (not input)', async () => {

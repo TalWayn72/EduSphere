@@ -141,11 +141,12 @@ export class UserResolver {
     if (!context.authContext)
       throw new UnauthorizedException('Unauthenticated');
     const validated = UpdateUserPreferencesSchema.parse(input);
-    return this.userPreferencesService.updatePreferences(
+    const updated = await this.userPreferencesService.updatePreferences(
       context.authContext.userId,
       validated,
       context.authContext
     );
+    return this.userService.mapUser(updated as Record<string, unknown>);
   }
 
   @Mutation('updateProfileVisibility')
