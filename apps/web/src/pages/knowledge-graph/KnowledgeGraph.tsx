@@ -66,7 +66,7 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
             <span data-testid="graph-error-message">
               {graph.errorKind === 'auth'
                 ? t('authRequired')
-                : graph.errorKind === 'graphql'
+                : graph.errorKind === 'graphql' || graph.errorKind === 'unknown'
                   ? t('loadError')
                   : t('networkUnavailable')}
             </span>

@@ -26,7 +26,7 @@ const EMPTY_GRAPH: { nodes: GraphNode[]; edges: GraphEdge[] } = {
  * Classify a urql CombinedError into a category so the UI can show
  * an appropriate message instead of the generic "server not accessible".
  */
-export type GraphErrorKind = 'network' | 'auth' | 'graphql' | null;
+export type GraphErrorKind = 'network' | 'auth' | 'graphql' | 'unknown' | null;
 
 const AUTH_PATTERNS = [
   'unauthorized',
@@ -54,7 +54,10 @@ export function classifyGraphError(
   });
   if (hasAuthCode) return 'auth';
   if (error.graphQLErrors?.length) return 'graphql';
-  return 'network';
+  // At this point there is an error object but no networkError and no
+  // graphQLErrors — classify as unknown rather than defaulting to 'network',
+  // which would incorrectly trigger "server unavailable" UI in consumers.
+  return 'unknown';
 }
 
 export function useGraphData() {

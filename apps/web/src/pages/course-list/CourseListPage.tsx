@@ -16,7 +16,8 @@ export function CourseList() {
   const {
     isInstructor,
     fetching,
-    error,
+    error: _error,
+    isNetworkError,
     reexecuteCourses,
     search,
     setSearch,
@@ -44,7 +45,7 @@ export function CourseList() {
       )}
 
       <div className="space-y-6">
-        {error && (
+        {isNetworkError && !fetching && (
           <OfflineBanner
             onRetry={() => reexecuteCourses({ requestPolicy: 'network-only' })}
           />

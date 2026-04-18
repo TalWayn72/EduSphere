@@ -46,11 +46,18 @@ vi.mock('./CourseGrid', () => ({
   CourseGrid: () => <div data-testid="course-grid" />,
 }));
 
+const mockUseCourseListData = vi.fn();
+
 vi.mock('./useCourseListData', () => ({
-  useCourseListData: () => ({
+  useCourseListData: () => mockUseCourseListData(),
+}));
+
+function makeDefaultHookReturn(overrides: Record<string, unknown> = {}) {
+  return {
     isInstructor: true,
     fetching: false,
     error: null,
+    isNetworkError: false,
     reexecuteCourses: vi.fn(),
     search: '',
     setSearch: vi.fn(),
@@ -66,13 +73,17 @@ vi.mock('./useCourseListData', () => ({
     handleEnroll: vi.fn(),
     togglePublish: vi.fn(),
     isPublished: vi.fn(),
-  }),
-}));
+    ...overrides,
+  };
+}
 
 import { CourseList } from './CourseListPage';
 
 describe('CourseListPage', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseCourseListData.mockReturnValue(makeDefaultHookReturn());
+  });
 
   it('renders inside Layout', () => {
     render(
@@ -126,5 +137,47 @@ describe('CourseListPage', () => {
       </MemoryRouter>
     );
     expect(screen.getByText('aiCreator.aiCreateCourse')).toBeInTheDocument();
+  });
+
+  // ── OfflineBanner visibility rules ───────────────────────────────────────
+
+  it('does NOT show OfflineBanner for a GraphQL error (server responded)', () => {
+    // isNetworkError=false means the server responded with GraphQL errors —
+    // not a network failure. The banner must stay hidden.
+    mockUseCourseListData.mockReturnValue(
+      makeDefaultHookReturn({ isNetworkError: false, fetching: false })
+    );
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
+    expect(screen.queryByTestId('offline-banner')).not.toBeInTheDocument();
+  });
+
+  it('does NOT show OfflineBanner while a retry is in-flight (fetching=true)', () => {
+    // Even when a network error has been set, if fetching=true the user already
+    // triggered a retry — the banner should be suppressed to avoid flicker.
+    mockUseCourseListData.mockReturnValue(
+      makeDefaultHookReturn({ isNetworkError: true, fetching: true })
+    );
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
+    expect(screen.queryByTestId('offline-banner')).not.toBeInTheDocument();
+  });
+
+  it('DOES show OfflineBanner for a genuine network error when not fetching', () => {
+    mockUseCourseListData.mockReturnValue(
+      makeDefaultHookReturn({ isNetworkError: true, fetching: false })
+    );
+    render(
+      <MemoryRouter>
+        <CourseList />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('offline-banner')).toBeInTheDocument();
   });
 });

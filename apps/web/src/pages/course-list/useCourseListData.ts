@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import type { CombinedError } from 'urql';
 import { getCurrentUser, DEV_MODE } from '@/lib/auth';
 import { COURSES_QUERY } from '@/lib/queries';
 import {
@@ -20,6 +21,18 @@ import type {
   TabOption,
 } from './types';
 
+/**
+ * Returns true only when the urql error is a genuine network failure
+ * (i.e. no HTTP response was received). GraphQL errors — where the server
+ * responded but returned error objects — do NOT indicate the server is
+ * unavailable and must not trigger the "showing cached data" offline banner.
+ */
+export function isNetworkOnlyError(error: CombinedError | undefined): boolean {
+  if (!error) return false;
+  // networkError is set by urql only when no HTTP response was received
+  return Boolean(error.networkError) && !error.graphQLErrors?.length;
+}
+
 export function useCourseListData() {
   const location = useLocation();
   const user = getCurrentUser();
@@ -30,18 +43,10 @@ export function useCourseListData() {
     useQuery<CoursesQueryResult>({
       query: COURSES_QUERY,
       variables: { limit: 50, offset: 0 },
+      // cache-and-network ensures stale error state is cleared on re-mount
+      // and that fresh data is always fetched while stale cache is shown first.
+      requestPolicy: 'cache-and-network',
     });
-
-  // Log network errors once per error instance via useEffect to avoid
-  // logging on every render and to keep the component pure.
-  useEffect(() => {
-    if (error?.networkError) {
-      console.error(
-        '[CourseList] GraphQL network error:',
-        error.networkError.message
-      );
-    }
-  }, [error]);
 
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({
@@ -186,9 +191,14 @@ export function useCourseListData() {
       : course.isPublished;
 
   // ── Derived data ─────────────────────────────────────────
+  const networkError = isNetworkOnlyError(error);
+
+  // Only fall back to mock courses when there is a genuine network failure
+  // (no server response at all). For GraphQL errors the server responded —
+  // partial or empty real data is better than stale mock content.
   const allCourses = useMemo(
-    () => (error ? MOCK_COURSES_FALLBACK : (data?.courses ?? [])),
-    [error, data]
+    () => (networkError ? MOCK_COURSES_FALLBACK : (data?.courses ?? [])),
+    [networkError, data]
   );
 
   const filteredCourses = useMemo(() => {
@@ -224,6 +234,8 @@ export function useCourseListData() {
     isInstructor,
     fetching,
     error,
+    /** True only when a genuine network failure occurred (no server response). */
+    isNetworkError: networkError,
     reexecuteCourses,
     search,
     setSearch,

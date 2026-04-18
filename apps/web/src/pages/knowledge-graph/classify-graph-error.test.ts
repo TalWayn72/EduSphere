@@ -78,9 +78,11 @@ describe('classifyGraphError — BUG-096', () => {
     expect(classifyGraphError(err)).toBe('graphql');
   });
 
-  it('returns "network" as fallback for unknown errors', () => {
+  it('returns "unknown" as fallback for errors with no networkError and no graphQLErrors', () => {
+    // Previously this returned 'network', which incorrectly triggered the
+    // "server unavailable" offline banner for non-connection errors.
     const err = fakeError({ message: 'Something went wrong' });
-    expect(classifyGraphError(err)).toBe('network');
+    expect(classifyGraphError(err)).toBe('unknown');
   });
 
   // BUG-096: networkError takes priority over auth message
