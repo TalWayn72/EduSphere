@@ -56,6 +56,12 @@ vi.mock('@/lib/auth', () => ({
   DEV_MODE: false,
 }));
 
+const mockUseAuthRole = vi.fn<() => string | null>(() => null);
+
+vi.mock('@/hooks/useAuthRole', () => ({
+  useAuthRole: () => mockUseAuthRole(),
+}));
+
 import { LessonDetailPage } from './LessonDetailPage';
 import * as urql from 'urql';
 import * as rrdom from 'react-router-dom';
@@ -99,6 +105,7 @@ function makeQuery(overrides: Record<string, unknown> = {}) {
 describe('LessonDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuthRole.mockReturnValue(null);
     vi.mocked(rrdom.useParams).mockReturnValue({
       courseId: 'cc000000-0000-0000-0000-000000000002',
       lessonId: 'ad0b6070-9b21-4601-8046-ff4292dc73b1',
@@ -366,5 +373,73 @@ describe('LessonDetailPage', () => {
     expect(
       screen.queryByText(/Session expired|הסשן פג תוקף/)
     ).not.toBeInTheDocument();
+  });
+
+  // ── AI Enrich button (role-gated) ────────────────────────────────────────────
+
+  it('shows AI Enrich button for INSTRUCTOR role', () => {
+    mockUseAuthRole.mockReturnValue('INSTRUCTOR');
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('ai-enrich-btn')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /AI Enrich/i })
+    ).toBeInTheDocument();
+  });
+
+  it('shows AI Enrich button for ORG_ADMIN role', () => {
+    mockUseAuthRole.mockReturnValue('ORG_ADMIN');
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('ai-enrich-btn')).toBeInTheDocument();
+  });
+
+  it('shows AI Enrich button for SUPER_ADMIN role', () => {
+    mockUseAuthRole.mockReturnValue('SUPER_ADMIN');
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('ai-enrich-btn')).toBeInTheDocument();
+  });
+
+  it('does NOT show AI Enrich button for STUDENT role', () => {
+    mockUseAuthRole.mockReturnValue('STUDENT');
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.queryByTestId('ai-enrich-btn')).not.toBeInTheDocument();
+  });
+
+  it('does NOT show AI Enrich button when unauthenticated (role=null)', () => {
+    mockUseAuthRole.mockReturnValue(null);
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.queryByTestId('ai-enrich-btn')).not.toBeInTheDocument();
+  });
+
+  it('clicking AI Enrich button navigates to /lesson/:lessonId/edit', () => {
+    mockUseAuthRole.mockReturnValue('INSTRUCTOR');
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByTestId('ai-enrich-btn'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/lesson/ad0b6070-9b21-4601-8046-ff4292dc73b1/edit'
+    );
   });
 });

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { useTranslation } from 'react-i18next';
+import { Sparkles } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { PageShell } from '@/components/PageShell';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,9 @@ import { LESSON_QUERY } from '@/lib/graphql/lesson.queries';
 import { login } from '@/lib/auth';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { useAuthRole } from '@/hooks/useAuthRole';
+
+const EDITOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -56,6 +60,8 @@ export function LessonDetailPage() {
   }>();
   const navigate = useNavigate();
   const { t } = useTranslation('courses');
+  const role = useAuthRole();
+  const canEnrich = EDITOR_ROLES.has(role ?? '');
 
   // Defer query to prevent urql cache race with concurrently-unmounting siblings
   const [mounted, setMounted] = useState(false);
@@ -253,6 +259,17 @@ export function LessonDetailPage() {
           >
             🔧 {t('lesson.openPipeline', 'Open Pipeline')}
           </Button>
+          {canEnrich && (
+            <Button
+              variant="outline"
+              className="flex-1 gap-2"
+              data-testid="ai-enrich-btn"
+              onClick={() => navigate(`/lesson/${lessonId}/edit`)}
+            >
+              <Sparkles className="h-4 w-4" />
+              {t('lesson.aiEnrich', 'AI Enrich')}
+            </Button>
+          )}
           {(lesson.status === 'READY' || lesson.status === 'PUBLISHED') && (
             <Button
               className="flex-1"

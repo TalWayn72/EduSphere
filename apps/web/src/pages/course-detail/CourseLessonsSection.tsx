@@ -3,6 +3,7 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { LessonSummary } from './types';
 
@@ -48,20 +49,39 @@ export function CourseLessonsSection({ courseId, lessons, canEdit }: Props) {
       {lessons.length > 0 ? (
         <div className="divide-y">
           {lessons.map((lesson) => (
-            <button
+            <div
               key={lesson.id}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted text-sm text-left"
-              onClick={() =>
-                navigate(`/courses/${courseId}/lessons/${lesson.id}`)
-              }
+              className="flex items-center justify-between px-4 py-3 hover:bg-muted text-sm"
             >
-              <span className="font-medium">{lesson.title}</span>
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses(lesson.status)}`}
+              <button
+                className="flex-1 text-left font-medium truncate"
+                onClick={() =>
+                  navigate(`/courses/${courseId}/lessons/${lesson.id}`)
+                }
               >
-                {lesson.status}
-              </span>
-            </button>
+                {lesson.title}
+              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses(lesson.status)}`}
+                >
+                  {lesson.status}
+                </span>
+                {canEdit && (
+                  <button
+                    aria-label={`AI Enrich ${lesson.title}`}
+                    data-testid={`enrich-lesson-${lesson.id}`}
+                    className="p-1 rounded hover:bg-muted-foreground/10 text-muted-foreground hover:text-foreground"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/lesson/${lesson.id}/edit`);
+                    }}
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
         </div>
       ) : (
