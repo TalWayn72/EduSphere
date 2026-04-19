@@ -12,6 +12,7 @@ import {
   Brain,
   Trophy,
   BarChart2,
+  BarChart3,
   Award,
   FileQuestion,
   Target,
@@ -23,6 +24,17 @@ import {
   Swords,
   UserCheck,
   Lightbulb,
+  GitBranch,
+  TrendingUp,
+  Medal,
+  RotateCcw,
+  Highlighter,
+  Map,
+  MessageSquareMore,
+  DollarSign,
+  GitMerge,
+  Library,
+  GraduationCap,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -45,12 +57,15 @@ const LEARNING_ITEMS: NavItem[] = [
   { to: '/courses', icon: BookOpen, labelKey: 'myCourses' },
   { to: '/explore', icon: Compass, labelKey: 'discover' },
   { to: '/knowledge-graph', icon: Network, labelKey: 'knowledgeGraph' },
+  { to: '/skill-tree', icon: GitBranch, labelKey: 'skillTree' },
   { to: '/agents', icon: Bot, labelKey: 'aiTutor' },
   { to: '/sessions', icon: Video, labelKey: 'liveSessions' },
-  { to: '/srs-review', icon: Brain, labelKey: 'srsReview' },
+  { to: '/srs-review', icon: RotateCcw, labelKey: 'srsReview' },
   { to: '/skills', icon: Target, labelKey: 'skillPaths' },
+  { to: '/my-progress', icon: TrendingUp, labelKey: 'myProgress' },
   { to: '/gamification', icon: Trophy, labelKey: 'gamification' },
   { to: '/certificates', icon: Award, labelKey: 'certificates' },
+  { to: '/my-badges', icon: Medal, labelKey: 'myBadges' },
 ];
 
 /** Social group -- visible to all authenticated users */
@@ -59,6 +74,10 @@ const SOCIAL_ITEMS: NavItem[] = [
   { to: '/social', icon: Users, labelKey: 'socialFeed' },
   { to: '/people', icon: Search, labelKey: 'findPeople' },
   { to: '/challenges', icon: Swords, labelKey: 'groupChallenges' },
+  { to: '/chavruta', icon: MessageSquareMore, labelKey: 'chavruta' },
+  { to: '/collaboration', icon: Brain, labelKey: 'collaboration' },
+  { to: '/annotations', icon: Highlighter, labelKey: 'myAnnotations' },
+  { to: '/scenarios', icon: Map, labelKey: 'scenarios' },
 ];
 
 /** Teaching group -- INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN */
@@ -73,6 +92,31 @@ const TEACHING_ITEMS: NavItem[] = [
 const ANALYTICS_ITEMS: NavItem[] = [
   { to: '/manager', icon: BarChart2, labelKey: 'managerDashboard' },
   { to: '/cohort-insights', icon: Lightbulb, labelKey: 'cohortInsights' },
+];
+
+/** Instructor tools group -- INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN */
+const INSTRUCTOR_ITEMS: NavItem[] = [
+  {
+    to: '/instructor/analytics',
+    icon: BarChart3,
+    labelKey: 'instructorAnalytics',
+  },
+  {
+    to: '/instructor/earnings',
+    icon: DollarSign,
+    labelKey: 'instructorEarnings',
+  },
+  {
+    to: '/instructor/merge-queue',
+    icon: GitMerge,
+    labelKey: 'mergeQueue',
+  },
+  { to: '/library', icon: Library, labelKey: 'courseLibrary' },
+];
+
+/** Marketplace group -- visible to all authenticated users */
+const MARKETPLACE_ITEMS: NavItem[] = [
+  { to: '/programs', icon: GraduationCap, labelKey: 'programs' },
 ];
 
 const TEACHING_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
@@ -98,6 +142,17 @@ export const NAV_GROUPS: NavGroup[] = [
     headingKey: 'groupAnalytics',
     items: ANALYTICS_ITEMS,
     allowedRoles: ANALYTICS_ROLES,
+  },
+  {
+    key: 'instructor',
+    headingKey: 'groupInstructor',
+    items: INSTRUCTOR_ITEMS,
+    allowedRoles: TEACHING_ROLES,
+  },
+  {
+    key: 'marketplace',
+    headingKey: 'groupMarketplace',
+    items: MARKETPLACE_ITEMS,
   },
 ];
 

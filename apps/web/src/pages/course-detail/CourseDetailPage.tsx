@@ -18,6 +18,7 @@ import { EDITOR_ROLES } from './types';
 import { useCourseDetailQueries } from './useCourseDetailQueries';
 import { CourseHeaderCard } from './CourseHeaderCard';
 import { CourseLessonsSection } from './CourseLessonsSection';
+import { CourseExamsSection } from './CourseExamsSection';
 import { CourseSourcesPanel } from './CourseSourcesPanel';
 import { CourseModuleList } from '../CourseDetailPage.modules';
 
@@ -116,6 +117,8 @@ export function CourseDetailPage() {
           lessons={lessons}
           canEdit={canEdit}
         />
+
+        <CourseExamsSection courseId={courseId} canEdit={canEdit} />
 
         <CourseSourcesPanel courseId={courseId} />
       </PageShell>

@@ -2,8 +2,8 @@
  * AdminDashboardPage — Platform overview for ORG_ADMIN / SUPER_ADMIN.
  * Route: /admin
  */
-import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -13,15 +13,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AdminActivityFeed } from '@/components/AdminActivityFeed';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { AdminStatCards } from '@/components/admin/AdminStatCards';
+import { AdminQuickLinksGrid } from '@/components/admin/AdminQuickLinksGrid';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import {
-  Palette,
-  Users,
-  ClipboardCheck,
-  Trophy,
-  Lock,
-  ScrollText,
-} from 'lucide-react';
 
 const ADMIN_OVERVIEW_QUERY = `
   query AdminOverview {
@@ -65,48 +58,6 @@ export function AdminDashboardPage() {
     pause: !mounted,
   });
 
-  const quickLinks = useMemo(
-    () => [
-      {
-        to: '/admin/branding',
-        icon: Palette,
-        label: t('dashboard.quickLinks.branding.label'),
-        desc: t('dashboard.quickLinks.branding.desc'),
-      },
-      {
-        to: '/admin/users',
-        icon: Users,
-        label: t('dashboard.quickLinks.users.label'),
-        desc: t('dashboard.quickLinks.users.desc'),
-      },
-      {
-        to: '/admin/compliance',
-        icon: ClipboardCheck,
-        label: t('dashboard.quickLinks.compliance.label'),
-        desc: t('dashboard.quickLinks.compliance.desc'),
-      },
-      {
-        to: '/admin/gamification',
-        icon: Trophy,
-        label: t('dashboard.quickLinks.gamification.label'),
-        desc: t('dashboard.quickLinks.gamification.desc'),
-      },
-      {
-        to: '/admin/security',
-        icon: Lock,
-        label: t('dashboard.quickLinks.security.label'),
-        desc: t('dashboard.quickLinks.security.desc'),
-      },
-      {
-        to: '/admin/audit',
-        icon: ScrollText,
-        label: t('dashboard.quickLinks.auditLog.label'),
-        desc: t('dashboard.quickLinks.auditLog.desc'),
-      },
-    ],
-    [t]
-  );
-
   if (!role || !ADMIN_ROLES.has(role)) {
     navigate('/dashboard');
     return null;
@@ -133,26 +84,12 @@ export function AdminDashboardPage() {
 
         {data && <AdminStatCards overview={data.adminOverview} />}
 
-        {/* Quick Links */}
+        {/* All Admin Quick Links — grouped by functional area */}
         <div className="mt-8">
           <h2 className="text-lg font-semibold mb-4">
             {t('dashboard.adminTools')}
           </h2>
-          <div className="grid grid-cols-2 gap-4">
-            {quickLinks.map(({ to, icon: Icon, label, desc }) => (
-              <Link key={to} to={to}>
-                <Card className="hover:border-primary/40 transition-colors cursor-pointer">
-                  <CardContent className="flex items-start gap-3 py-4">
-                    <Icon className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                    <div>
-                      <p className="font-medium text-sm">{label}</p>
-                      <p className="text-xs text-muted-foreground">{desc}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <AdminQuickLinksGrid />
         </div>
 
         {/* Recent Activity */}
