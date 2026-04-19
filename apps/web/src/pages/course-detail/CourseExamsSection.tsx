@@ -46,13 +46,17 @@ export function CourseExamsSection({
     {
       label: t('examItemBank', 'Item Bank'),
       description: t('examItemBankDesc', 'Manage question items'),
-      icon: <FileQuestion className="h-4 w-4 text-blue-500 dark:text-blue-400" />,
+      icon: (
+        <FileQuestion className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+      ),
       path: `/courses/${courseId}/exams/items`,
     },
     {
       label: t('examBlueprints', 'Blueprints'),
       description: t('examBlueprintsDesc', 'Design exam blueprints'),
-      icon: <ClipboardList className="h-4 w-4 text-violet-500 dark:text-violet-400" />,
+      icon: (
+        <ClipboardList className="h-4 w-4 text-violet-500 dark:text-violet-400" />
+      ),
       path: `/courses/${courseId}/exams/blueprints`,
     },
     {
@@ -113,9 +117,7 @@ export function CourseExamsSection({
             size="sm"
             className="gap-2 shrink-0"
             data-testid="take-exam-btn"
-            onClick={() =>
-              navigate(`/exams/${publishedBlueprintId}/start`)
-            }
+            onClick={() => navigate(`/exams/${publishedBlueprintId}/start`)}
           >
             <PlayCircle className="h-4 w-4" />
             {t('takeExam', 'Take Exam')}
