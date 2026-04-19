@@ -40,7 +40,8 @@ const mockDb = {
 };
 
 const mockWithTenantContext = vi.fn(
-  (_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) => fn(mockDb)
+  (_db: unknown, _ctx: unknown, fn: (db: typeof mockDb) => unknown) =>
+    fn(mockDb)
 );
 
 vi.mock('@edusphere/db', () => ({
@@ -133,7 +134,12 @@ describe('EnrichedLessonService — RLS tenant-context regression', () => {
   it('getEnrichedLesson() routes ALL DB calls through withTenantContext', async () => {
     // findLessonOrThrow → lesson found
     mockSelectBuilder.limit.mockResolvedValueOnce([
-      { id: LESSON_ID, courseId: 'c1', tenant_id: TENANT_CTX.tenantId, title: 'My Lesson' },
+      {
+        id: LESSON_ID,
+        courseId: 'c1',
+        tenant_id: TENANT_CTX.tenantId,
+        title: 'My Lesson',
+      },
     ]);
     // getBlocks → empty
     mockSelectBuilder.orderBy.mockResolvedValueOnce([]);
@@ -154,7 +160,12 @@ describe('EnrichedLessonService — RLS tenant-context regression', () => {
 
   it('getEnrichedLesson() never calls this.db.select() directly', async () => {
     mockSelectBuilder.limit.mockResolvedValueOnce([
-      { id: LESSON_ID, courseId: 'c1', tenant_id: TENANT_CTX.tenantId, title: 'My Lesson' },
+      {
+        id: LESSON_ID,
+        courseId: 'c1',
+        tenant_id: TENANT_CTX.tenantId,
+        title: 'My Lesson',
+      },
     ]);
     mockSelectBuilder.orderBy.mockResolvedValueOnce([]);
     mockSelectBuilder.limit.mockResolvedValueOnce([]);
@@ -177,7 +188,12 @@ describe('EnrichedLessonService — RLS tenant-context regression', () => {
   it('ingestYoutubeLesson() routes lesson_assets lookup through withTenantContext', async () => {
     // findLessonOrThrow
     mockSelectBuilder.limit.mockResolvedValueOnce([
-      { id: LESSON_ID, courseId: 'c1', tenant_id: TENANT_CTX.tenantId, title: 'My Lesson' },
+      {
+        id: LESSON_ID,
+        courseId: 'c1',
+        tenant_id: TENANT_CTX.tenantId,
+        title: 'My Lesson',
+      },
     ]);
     // linkYoutubeVideoId: lesson_assets select → mediaAssetId found
     mockSelectBuilder.limit.mockResolvedValueOnce([{ mediaAssetId: 'ma-001' }]);

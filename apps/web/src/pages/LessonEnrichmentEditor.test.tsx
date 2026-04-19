@@ -71,7 +71,8 @@ vi.mock('@/lib/graphql/enriched-lesson.queries', () => ({
 
 vi.mock('@/lib/graphql/polished-transcript.queries', () => ({
   POLISHED_TRANSCRIPT_QUERY: 'POLISHED_TRANSCRIPT_QUERY',
-  REQUEST_TRANSCRIPT_POLISHING_MUTATION: 'REQUEST_TRANSCRIPT_POLISHING_MUTATION',
+  REQUEST_TRANSCRIPT_POLISHING_MUTATION:
+    'REQUEST_TRANSCRIPT_POLISHING_MUTATION',
 }));
 
 vi.mock('@/components/Layout', () => ({
@@ -85,11 +86,13 @@ vi.mock('@/components/PageHeader', () => ({
 }));
 
 vi.mock('@/components/lesson/YouTubeUrlInput', () => ({
-  YouTubeUrlInput: () => React.createElement('div', { 'data-testid': 'yt-url-input' }),
+  YouTubeUrlInput: () =>
+    React.createElement('div', { 'data-testid': 'yt-url-input' }),
 }));
 
 vi.mock('@/components/youtube/YouTubeEmbedPlayer', () => ({
-  YouTubeEmbedPlayer: () => React.createElement('div', { 'data-testid': 'yt-player' }),
+  YouTubeEmbedPlayer: () =>
+    React.createElement('div', { 'data-testid': 'yt-player' }),
 }));
 
 vi.mock('@/components/enriched-transcript/SyncTranscriptScroller', () => ({
@@ -189,7 +192,10 @@ function renderPage(lessonId = 'lesson-001') {
   return render(
     <MemoryRouter initialEntries={[`/lesson/${lessonId}/edit`]}>
       <Routes>
-        <Route path="/lesson/:lessonId/edit" element={<LessonEnrichmentEditor />} />
+        <Route
+          path="/lesson/:lessonId/edit"
+          element={<LessonEnrichmentEditor />}
+        />
       </Routes>
     </MemoryRouter>
   );
