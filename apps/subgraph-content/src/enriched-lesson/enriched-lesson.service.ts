@@ -254,22 +254,27 @@ export class EnrichedLessonService implements OnModuleDestroy {
   // ─── Private helpers ────────────────────────────────────────────────────────
 
   private async findLessonOrThrow(lessonId: string, tenantCtx: TenantContext) {
-    const [lesson] = await this.db
-      .select({
-        id: schema.lessons.id,
-        courseId: schema.lessons.course_id,
-        tenant_id: schema.lessons.tenant_id,
-        title: schema.lessons.title,
-      })
-      .from(schema.lessons)
-      .where(
-        and(
-          eq(schema.lessons.id, lessonId),
-          eq(schema.lessons.tenant_id, tenantCtx.tenantId),
-          isNull(schema.lessons.deleted_at)
+    // BUG-FIX: use withTenantContext so RLS SET LOCAL app.current_tenant is set.
+    // Previously this.db was used directly, causing PostgreSQL RLS to reject the
+    // query when current_setting('app.current_tenant') was not available.
+    const [lesson] = await withTenantContext(this.db, tenantCtx, async (db) =>
+      db
+        .select({
+          id: schema.lessons.id,
+          courseId: schema.lessons.course_id,
+          tenant_id: schema.lessons.tenant_id,
+          title: schema.lessons.title,
+        })
+        .from(schema.lessons)
+        .where(
+          and(
+            eq(schema.lessons.id, lessonId),
+            eq(schema.lessons.tenant_id, tenantCtx.tenantId),
+            isNull(schema.lessons.deleted_at)
+          )
         )
-      )
-      .limit(1);
+        .limit(1)
+    );
 
     if (!lesson) throw new NotFoundException(`Lesson ${lessonId} not found`);
     return lesson;
@@ -280,11 +285,14 @@ export class EnrichedLessonService implements OnModuleDestroy {
     videoId: string,
     tenantCtx: TenantContext
   ): Promise<void> {
-    const assets = await this.db
-      .select({ mediaAssetId: schema.lesson_assets.media_asset_id })
-      .from(schema.lesson_assets)
-      .where(eq(schema.lesson_assets.lesson_id, lessonId))
-      .limit(1);
+    // BUG-FIX: use withTenantContext for RLS compliance on lesson_assets query.
+    const assets = await withTenantContext(this.db, tenantCtx, async (db) =>
+      db
+        .select({ mediaAssetId: schema.lesson_assets.media_asset_id })
+        .from(schema.lesson_assets)
+        .where(eq(schema.lesson_assets.lesson_id, lessonId))
+        .limit(1)
+    );
 
     const mediaAssetId = assets[0]?.mediaAssetId;
     if (mediaAssetId) {

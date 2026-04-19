@@ -21,7 +21,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Send } from 'lucide-react';
+import { Send, AlertCircle } from 'lucide-react';
 import { YouTubeEmbedPlayer } from '@/components/youtube/YouTubeEmbedPlayer';
 import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
 import { useEnrichedLesson } from '@/hooks/useEnrichedLesson';
@@ -55,7 +55,7 @@ const TERMINAL_STATUSES = new Set(['READY', 'PUBLISHED', 'PENDING', undefined]);
 
 export function LessonEnrichmentEditor() {
   const { lessonId = '' } = useParams<{ lessonId: string }>();
-  const { data, fetching, refetch } = useEnrichedLesson(lessonId, {
+  const { data, fetching, error, refetch } = useEnrichedLesson(lessonId, {
     pollWhileProcessing: true,
   });
   const { approve, reject } = useCitationReview();
@@ -124,6 +124,31 @@ export function LessonEnrichmentEditor() {
 
   const title = data?.lesson?.title ?? 'Lesson Enrichment Editor';
   const videoId = data?.youtubeVideoId;
+
+  // BUG-FIX: When the GraphQL query fails (e.g. RLS rejection, lesson not found,
+  // auth error), show a user-friendly error instead of a blank editor. Previously
+  // the error was silently ignored and the component rendered an empty shell,
+  // which could also trigger the Error Boundary if nested components tried to
+  // access properties on null data without guards.
+  if (error && !fetching) {
+    return (
+      <Layout>
+        <div
+          role="alert"
+          className="flex flex-col items-center justify-center gap-4 py-16 px-4 text-center"
+        >
+          <AlertCircle className="h-10 w-10 text-destructive" />
+          <div>
+            <h2 className="text-lg font-semibold">Failed to load lesson</h2>
+            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={refetch}>
+            Try again
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
