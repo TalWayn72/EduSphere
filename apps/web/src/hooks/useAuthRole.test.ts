@@ -88,7 +88,7 @@ describe('useAuthRole', () => {
     } as ReturnType<typeof auth.getCurrentUser>);
 
     act(() => {
-      window.dispatchEvent(new StorageEvent('storage'));
+      window.dispatchEvent(new Event('storage'));
     });
 
     expect(result.current).toBe('SUPER_ADMIN');
