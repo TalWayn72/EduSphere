@@ -116,17 +116,19 @@ export interface TestUser {
 export const TEST_USERS = {
   superAdmin: {
     email: process.env.E2E_SUPER_ADMIN_EMAIL ?? 'super.admin@edusphere.dev',
-    password: process.env.E2E_SUPER_ADMIN_PASSWORD ?? 'SuperAdmin123!',
+    password:
+      process.env.E2E_SUPER_ADMIN_PASSWORD ?? 'EduSphereTest2026!',
     role: 'SUPER_ADMIN',
   },
   instructor: {
     email: process.env.E2E_INSTRUCTOR_EMAIL ?? 'instructor@example.com',
-    password: process.env.E2E_INSTRUCTOR_PASSWORD ?? 'Instructor123!',
+    password:
+      process.env.E2E_INSTRUCTOR_PASSWORD ?? 'EduSphereTest2026!',
     role: 'INSTRUCTOR',
   },
   student: {
     email: process.env.E2E_STUDENT_EMAIL ?? 'student@example.com',
-    password: process.env.E2E_STUDENT_PASSWORD ?? 'Student123!',
+    password: process.env.E2E_STUDENT_PASSWORD ?? 'EduSphereTest2026!',
     role: 'STUDENT',
   },
 } as const satisfies Record<string, TestUser>;
