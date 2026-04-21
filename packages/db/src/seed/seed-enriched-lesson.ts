@@ -18,8 +18,16 @@ import 'dotenv/config';
 import { createDatabaseConnection, closeAllPools, schema } from '../index.js';
 import { withBypassRLS } from '../rls/withTenantContext.js';
 import {
-  DEMO_TENANT, INSTRUCTOR_ID, COURSE_ID, MODULE_ID, IDS,
-  YOUTUBE_VIDEO_ID, SEGMENTS, VISUAL_ASSETS, VISUAL_ANCHORS, CITATIONS,
+  DEMO_TENANT,
+  INSTRUCTOR_ID,
+  COURSE_ID,
+  MODULE_ID,
+  IDS,
+  YOUTUBE_VIDEO_ID,
+  SEGMENTS,
+  VISUAL_ASSETS,
+  VISUAL_ANCHORS,
+  CITATIONS,
 } from './seed-enriched-lesson-data.js';
 
 export async function seedEnrichedLesson(): Promise<void> {
@@ -60,7 +68,11 @@ export async function seedEnrichedLesson(): Promise<void> {
         youtube_video_id: YOUTUBE_VIDEO_ID,
         duration: 400,
         transcription_status: 'COMPLETED',
-        metadata: { language: 'he', source: 'youtube', channel: 'Kabbalah Teachings' },
+        metadata: {
+          language: 'he',
+          source: 'youtube',
+          channel: 'Kabbalah Teachings',
+        },
       })
       .onConflictDoNothing();
 
@@ -168,16 +180,129 @@ export async function seedEnrichedLesson(): Promise<void> {
     await tx
       .insert(schema.enriched_transcript_blocks)
       .values([
-        { id: IDS.blk(1), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, block_type: 'HEADING', block_order: 0, content: { text: 'עץ חיים — מבוא לצמצום ולעשר הספירות', level: 1 }, start_time: '0', end_time: '12.5' },
-        { id: IDS.blk(2), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(1), block_type: 'TEXT', block_order: 1, content: { text: SEGMENTS[0].text }, start_time: '0', end_time: '12.5' },
-        { id: IDS.blk(3), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(2), block_type: 'TEXT', block_order: 2, content: { text: SEGMENTS[1].text }, start_time: '12.5', end_time: '28.0' },
-        { id: IDS.blk(4), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(3), block_type: 'HEADING', block_order: 3, content: { text: 'הצמצום — יסוד הבריאה', level: 2 }, start_time: '28.0', end_time: '45.3' },
-        { id: IDS.blk(5), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(4), block_type: 'TEXT', block_order: 4, content: { text: SEGMENTS[3].text }, start_time: '45.3', end_time: '62.8' },
-        { id: IDS.blk(6), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(5), block_type: 'VISUAL_ANCHOR', block_order: 5, anchor_id: IDS.anchor2, content: { caption: 'תרשים הצמצום — חלל ורשימו', alt: 'Tzimtzum diagram' }, start_time: '28.0', end_time: '80.0' },
-        { id: IDS.blk(7), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(4), block_type: 'CITATION', block_order: 6, citation_id: IDS.cit1, content: { quote: 'דע כי קודם שנאצלו הנאצלים ונבראו הנבראים היה אור עליון פשוט ממלא כל המציאות', source: 'עץ חיים, שער א, ענף א' }, start_time: '45.3', end_time: '80.0' },
-        { id: IDS.blk(8), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(10), block_type: 'TEXT', block_order: 7, content: { text: SEGMENTS[9].text }, start_time: '158.5', end_time: '180.0' },
-        { id: IDS.blk(9), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(10), block_type: 'VISUAL_ANCHOR', block_order: 8, anchor_id: IDS.anchor1, content: { caption: 'עץ חיים — עשר הספירות', alt: 'Sefirot diagram' }, start_time: '158.5', end_time: '200.3' },
-        { id: IDS.blk(10), tenant_id: DEMO_TENANT, lesson_id: IDS.lesson, segment_id: IDS.seg(6), block_type: 'CITATION', block_order: 9, citation_id: IDS.cit3, content: { quote: 'בְּרֵאשִׁית — בָּהּ שִׁית — בָּהּ שִׁיתָא סִטְרִין', source: 'זוהר, חלק א, פרשת בראשית' }, start_time: '80.0', end_time: '118.2' },
+        {
+          id: IDS.blk(1),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          block_type: 'HEADING',
+          block_order: 0,
+          content: { text: 'עץ חיים — מבוא לצמצום ולעשר הספירות', level: 1 },
+          start_time: '0',
+          end_time: '12.5',
+        },
+        {
+          id: IDS.blk(2),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(1),
+          block_type: 'TEXT',
+          block_order: 1,
+          content: { text: SEGMENTS[0].text },
+          start_time: '0',
+          end_time: '12.5',
+        },
+        {
+          id: IDS.blk(3),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(2),
+          block_type: 'TEXT',
+          block_order: 2,
+          content: { text: SEGMENTS[1].text },
+          start_time: '12.5',
+          end_time: '28.0',
+        },
+        {
+          id: IDS.blk(4),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(3),
+          block_type: 'HEADING',
+          block_order: 3,
+          content: { text: 'הצמצום — יסוד הבריאה', level: 2 },
+          start_time: '28.0',
+          end_time: '45.3',
+        },
+        {
+          id: IDS.blk(5),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(4),
+          block_type: 'TEXT',
+          block_order: 4,
+          content: { text: SEGMENTS[3].text },
+          start_time: '45.3',
+          end_time: '62.8',
+        },
+        {
+          id: IDS.blk(6),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(5),
+          block_type: 'VISUAL_ANCHOR',
+          block_order: 5,
+          anchor_id: IDS.anchor2,
+          content: {
+            caption: 'תרשים הצמצום — חלל ורשימו',
+            alt: 'Tzimtzum diagram',
+          },
+          start_time: '28.0',
+          end_time: '80.0',
+        },
+        {
+          id: IDS.blk(7),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(4),
+          block_type: 'CITATION',
+          block_order: 6,
+          citation_id: IDS.cit1,
+          content: {
+            quote:
+              'דע כי קודם שנאצלו הנאצלים ונבראו הנבראים היה אור עליון פשוט ממלא כל המציאות',
+            source: 'עץ חיים, שער א, ענף א',
+          },
+          start_time: '45.3',
+          end_time: '80.0',
+        },
+        {
+          id: IDS.blk(8),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(10),
+          block_type: 'TEXT',
+          block_order: 7,
+          content: { text: SEGMENTS[9].text },
+          start_time: '158.5',
+          end_time: '180.0',
+        },
+        {
+          id: IDS.blk(9),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(10),
+          block_type: 'VISUAL_ANCHOR',
+          block_order: 8,
+          anchor_id: IDS.anchor1,
+          content: { caption: 'עץ חיים — עשר הספירות', alt: 'Sefirot diagram' },
+          start_time: '158.5',
+          end_time: '200.3',
+        },
+        {
+          id: IDS.blk(10),
+          tenant_id: DEMO_TENANT,
+          lesson_id: IDS.lesson,
+          segment_id: IDS.seg(6),
+          block_type: 'CITATION',
+          block_order: 9,
+          citation_id: IDS.cit3,
+          content: {
+            quote: 'בְּרֵאשִׁית — בָּהּ שִׁית — בָּהּ שִׁיתָא סִטְרִין',
+            source: 'זוהר, חלק א, פרשת בראשית',
+          },
+          start_time: '80.0',
+          end_time: '118.2',
+        },
       ])
       .onConflictDoNothing();
   });
@@ -186,13 +311,20 @@ export async function seedEnrichedLesson(): Promise<void> {
   console.log(`   Lesson UUID:  ${IDS.lesson}`);
   console.log(`   Course UUID:  ${COURSE_ID}`);
   console.log(`   YouTube:      ${YOUTUBE_VIDEO_ID}`);
-  console.log(`   Segments:     ${SEGMENTS.length} | Citations: 4 | Blocks: 10`);
-  console.log(`   URL: http://localhost:5173/courses/${COURSE_ID}/lessons/${IDS.lesson}`);
+  console.log(
+    `   Segments:     ${SEGMENTS.length} | Citations: 4 | Blocks: 10`
+  );
+  console.log(
+    `   URL: http://localhost:5173/courses/${COURSE_ID}/lessons/${IDS.lesson}`
+  );
 }
 
 // ─── Standalone entry point ───────────────────────────────────────────────────
 if (import.meta.url === new URL(process.argv[1], 'file://').href) {
   seedEnrichedLesson()
-    .catch((err) => { console.error('❌ Seed failed:', err); process.exit(1); })
+    .catch((err) => {
+      console.error('❌ Seed failed:', err);
+      process.exit(1);
+    })
     .finally(() => closeAllPools());
 }

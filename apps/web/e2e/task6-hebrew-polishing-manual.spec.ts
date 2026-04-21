@@ -34,9 +34,16 @@ const SCREENSHOTS_DIR = path.resolve(__dirname, '../../../docs/screenshots');
 const POLL_INTERVAL_MS = 30_000;
 const MAX_WAIT_MS = 5 * 60 * 1_000; // 5 minutes
 const LANG_GRAPH_NODES = [
-  'prepare', 'chunk', 'loadVoice', 'polishChunks',
-  'stitch', 'verifyCoverage', 'repairGaps',
-  'generateDiffs', 'formatOutput', 'autoPublish',
+  'prepare',
+  'chunk',
+  'loadVoice',
+  'polishChunks',
+  'stitch',
+  'verifyCoverage',
+  'repairGaps',
+  'generateDiffs',
+  'formatOutput',
+  'autoPublish',
 ] as const;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -53,17 +60,17 @@ function screenshotPath(name: string): string {
 
 function captureDockerLogs(container: string): string {
   try {
-    return execSync(
-      `docker logs --tail 200 ${container} 2>&1`,
-      { encoding: 'utf8', timeout: 10_000 }
-    );
+    return execSync(`docker logs --tail 200 ${container} 2>&1`, {
+      encoding: 'utf8',
+      timeout: 10_000,
+    });
   } catch {
     return `[could not read logs for ${container}]`;
   }
 }
 
 function findNodesInLogs(logs: string): string[] {
-  return LANG_GRAPH_NODES.filter(node =>
+  return LANG_GRAPH_NODES.filter((node) =>
     new RegExp(`\\b${node}\\b`, 'i').test(logs)
   );
 }
@@ -87,16 +94,21 @@ function extractTimestampedNodes(logs: string): string[] {
 test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
   test.setTimeout(370_000); // 6 min hard limit
 
-  test('LangGraph 10-node polishing — observe and capture evidence', async ({ page }) => {
+  test('LangGraph 10-node polishing — observe and capture evidence', async ({
+    page,
+  }) => {
     ensureScreenshotsDir();
 
     const consoleErrors: string[] = [];
     const graphqlErrors: string[] = [];
 
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
       const t = msg.text();
-      if (t.includes('GRAPHQL_VALIDATION_FAILED') || t.includes('Cannot query field')) {
+      if (
+        t.includes('GRAPHQL_VALIDATION_FAILED') ||
+        t.includes('Cannot query field')
+      ) {
         graphqlErrors.push(t);
       }
     });
@@ -109,14 +121,20 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
 
     // ── Step 2: Navigate to lesson editor ──────────────────────────────────
     await page.goto(EDITOR_URL, { waitUntil: 'networkidle', timeout: 30_000 });
-    await page.screenshot({ path: screenshotPath('01-editor-loaded'), fullPage: true });
+    await page.screenshot({
+      path: screenshotPath('01-editor-loaded'),
+      fullPage: true,
+    });
 
     // ── Step 3: Click "Polished Transcript" tab ────────────────────────────
     const polishedTab = page.getByRole('tab', { name: /polished transcript/i });
     await polishedTab.waitFor({ timeout: 15_000 });
     await polishedTab.click();
     await page.waitForTimeout(1_000);
-    await page.screenshot({ path: screenshotPath('02-polished-tab'), fullPage: true });
+    await page.screenshot({
+      path: screenshotPath('02-polished-tab'),
+      fullPage: true,
+    });
 
     // ── Step 4: Click "Start AI Polishing" ────────────────────────────────
     const polishBtn = page.getByTestId('request-polishing-btn');
@@ -125,15 +143,19 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
 
     // Capture pre-click logs baseline
     const preClickContentLogs = captureDockerLogs('edusphere-subgraph-content');
-    const preClickAgentLogs   = captureDockerLogs('edusphere-subgraph-agent');
+    const preClickAgentLogs = captureDockerLogs('edusphere-subgraph-agent');
 
     await polishBtn.click();
-    await page.screenshot({ path: screenshotPath('03-after-click'), fullPage: true });
+    await page.screenshot({
+      path: screenshotPath('03-after-click'),
+      fullPage: true,
+    });
 
     // ── Step 5: Poll for up to 5 minutes ──────────────────────────────────
     const startTime = Date.now();
     let pollCount = 0;
-    let finalState: 'POLISHED' | 'FAILED' | 'TIMEOUT' | 'IN_PROGRESS' = 'IN_PROGRESS';
+    let finalState: 'POLISHED' | 'FAILED' | 'TIMEOUT' | 'IN_PROGRESS' =
+      'IN_PROGRESS';
 
     while (Date.now() - startTime < MAX_WAIT_MS) {
       await page.waitForTimeout(POLL_INTERVAL_MS);
@@ -145,7 +167,10 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
       });
 
       // Check for terminal states in page text
-      const bodyText = await page.locator('body').innerText().catch(() => '');
+      const bodyText = await page
+        .locator('body')
+        .innerText()
+        .catch(() => '');
 
       if (/polished/i.test(bodyText) && !/start ai polishing/i.test(bodyText)) {
         finalState = 'POLISHED';
@@ -158,10 +183,16 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
 
       // Also check status badge / data-testid
       const statusBadge = page.locator('[data-testid="polished-status"]');
-      if (await statusBadge.count() > 0) {
+      if ((await statusBadge.count()) > 0) {
         const statusText = await statusBadge.innerText();
-        if (/polished/i.test(statusText)) { finalState = 'POLISHED'; break; }
-        if (/failed/i.test(statusText))   { finalState = 'FAILED'; break; }
+        if (/polished/i.test(statusText)) {
+          finalState = 'POLISHED';
+          break;
+        }
+        if (/failed/i.test(statusText)) {
+          finalState = 'FAILED';
+          break;
+        }
       }
     }
 
@@ -172,7 +203,7 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
 
     // ── Step 7: Capture Docker logs for node evidence ──────────────────────
     const postContentLogs = captureDockerLogs('edusphere-subgraph-content');
-    const postAgentLogs   = captureDockerLogs('edusphere-subgraph-agent');
+    const postAgentLogs = captureDockerLogs('edusphere-subgraph-agent');
 
     const combinedLogs = postContentLogs + '\n' + postAgentLogs;
     const observedNodes = findNodesInLogs(combinedLogs);
@@ -210,10 +241,16 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
       ...graphqlErrors,
       ``,
       `=== subgraph-content logs (tail 200, diff) ===`,
-      postContentLogs.replace(preClickContentLogs.slice(-500), '[...pre-click baseline omitted...]'),
+      postContentLogs.replace(
+        preClickContentLogs.slice(-500),
+        '[...pre-click baseline omitted...]'
+      ),
       ``,
       `=== subgraph-agent logs (tail 200, diff) ===`,
-      postAgentLogs.replace(preClickAgentLogs.slice(-500), '[...pre-click baseline omitted...]'),
+      postAgentLogs.replace(
+        preClickAgentLogs.slice(-500),
+        '[...pre-click baseline omitted...]'
+      ),
     ].join('\n');
 
     fs.writeFileSync(evidencePath, evidence, 'utf8');
@@ -225,7 +262,9 @@ test.describe('Task 6 — Hebrew Kabbalistic polishing workflow (live)', () => {
 
     console.log(`\n=== TASK 6 SUMMARY ===`);
     console.log(`Final state: ${finalState}`);
-    console.log(`LangGraph nodes observed: ${observedNodes.join(', ') || 'none'}`);
+    console.log(
+      `LangGraph nodes observed: ${observedNodes.join(', ') || 'none'}`
+    );
     console.log(`RTL elements: ${rtlElements} | Hebrew chars: ${hebrewChars}`);
     console.log(`Screenshots: docs/screenshots/task6-*.png`);
     console.log(`Evidence: ${evidencePath}`);

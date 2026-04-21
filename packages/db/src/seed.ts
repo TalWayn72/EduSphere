@@ -251,7 +251,9 @@ async function seed() {
     );
     await seedKabbalahEtzChaim();
 
-    console.log('📜 Seeding enriched lesson (visual assets, citations, enriched blocks)...');
+    console.log(
+      '📜 Seeding enriched lesson (visual assets, citations, enriched blocks)...'
+    );
     await seedEnrichedLesson();
 
     console.log('✅ Seed completed successfully!');
