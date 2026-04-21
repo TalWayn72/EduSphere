@@ -2,7 +2,7 @@
 
 # EduSphere Health Check Script
 # Verifies all infrastructure services are healthy
-# Supports both: individual containers (docker-compose.dev.yml) and all-in-one
+# Multi-container dev setup (docker-compose.yml)
 
 set -e
 
@@ -56,29 +56,14 @@ check_warn() {
   fi
 }
 
-# Detect architecture: all-in-one vs individual containers
-AIO_RUNNING=false
-if docker inspect edusphere-all-in-one --format '{{.State.Running}}' 2>/dev/null | grep -q true; then
-  AIO_RUNNING=true
-  echo "Mode: all-in-one container"
-else
-  echo "Mode: individual containers (dev)"
-fi
+echo "Mode: individual containers (docker-compose.yml)"
 
 # 1. PostgreSQL
-if [ "$AIO_RUNNING" = true ]; then
-  if ! check_service "PostgreSQL" \
-    "docker exec edusphere-all-in-one pg_isready -U edusphere -d edusphere"; then
-    FAILED=$((FAILED + 1))
-  fi
-  PG_EXEC="docker exec edusphere-all-in-one"
-else
-  if ! check_service "PostgreSQL" \
-    "docker exec edusphere-postgres pg_isready -U edusphere -d edusphere"; then
-    FAILED=$((FAILED + 1))
-  fi
-  PG_EXEC="docker exec edusphere-postgres"
+if ! check_service "PostgreSQL" \
+  "docker exec edusphere-postgres pg_isready -U edusphere -d edusphere"; then
+  FAILED=$((FAILED + 1))
 fi
+PG_EXEC="docker exec edusphere-postgres"
 
 # 2. PostgreSQL Extensions
 echo -n "Checking PostgreSQL extensions... "
@@ -107,29 +92,15 @@ else
 fi
 
 # 4. Redis
-if [ "$AIO_RUNNING" = true ]; then
-  if ! check_service "Redis" \
-    "docker exec edusphere-all-in-one redis-cli -a edusphere_redis_password ping"; then
-    FAILED=$((FAILED + 1))
-  fi
-else
-  if ! check_service "Redis" \
-    "docker exec edusphere-redis redis-cli ping"; then
-    FAILED=$((FAILED + 1))
-  fi
+if ! check_service "Redis" \
+  "docker exec edusphere-redis redis-cli ping"; then
+  FAILED=$((FAILED + 1))
 fi
 
 # 5. NATS
-if [ "$AIO_RUNNING" = true ]; then
-  if ! check_service "NATS" \
-    "docker exec edusphere-all-in-one bash -c 'curl -sf http://127.0.0.1:8222/healthz'"; then
-    FAILED=$((FAILED + 1))
-  fi
-else
-  if ! check_service "NATS" \
-    "curl -sf http://localhost:8222/healthz"; then
-    FAILED=$((FAILED + 1))
-  fi
+if ! check_service "NATS" \
+  "curl -sf http://localhost:8222/healthz"; then
+  FAILED=$((FAILED + 1))
 fi
 
 # 6. Keycloak

@@ -15,8 +15,8 @@ NC='\033[0m'
 
 WARNINGS=0
 
-# Required services inside edusphere-all-in-one container
-REQUIRED_SERVICES=("postgres" "keycloak" "nats" "minio" "redis")
+# Required individual containers (multi-container dev setup)
+REQUIRED_SERVICES=("edusphere-postgres" "edusphere-keycloak" "edusphere-nats" "edusphere-minio" "edusphere-redis")
 REQUIRED_COUNT=5
 
 echo ""
@@ -34,18 +34,7 @@ if ! docker ps > /dev/null 2>&1; then
   exit 0
 fi
 
-# Step 2: Check all-in-one container is running
-CONTAINER_RUNNING=$(docker inspect edusphere-all-in-one --format '{{.State.Running}}' 2>/dev/null || echo "false")
-
-if [ "$CONTAINER_RUNNING" != "true" ]; then
-  echo -e "${YELLOW}WARNING: edusphere-all-in-one container is NOT running${NC}"
-  echo -e "${YELLOW}  Run: docker-compose up -d${NC}"
-  WARNINGS=$((WARNINGS + 1))
-else
-  echo -e "${GREEN}Container (edusphere-all-in-one): running${NC}"
-fi
-
-# Step 3: Check individual services inside the container
+# Step 2: Check individual containers are running (multi-container dev setup)
 check_service_quiet() {
   local name=$1
   local cmd=$2
@@ -58,39 +47,54 @@ check_service_quiet() {
   fi
 }
 
-if [ "$CONTAINER_RUNNING" = "true" ]; then
-  echo ""
-  echo -e "${BOLD}Service status:${NC}"
-
-  # PostgreSQL
-  if ! check_service_quiet "PostgreSQL" \
-    "docker exec edusphere-all-in-one pg_isready -U edusphere -d edusphere"; then
-    WARNINGS=$((WARNINGS + 1))
+CONTAINERS_HEALTHY=0
+for container in "edusphere-postgres" "edusphere-keycloak" "edusphere-nats" "edusphere-minio" "edusphere-redis"; do
+  RUNNING=$(docker inspect "$container" --format '{{.State.Running}}' 2>/dev/null || echo "false")
+  if [ "$RUNNING" = "true" ]; then
+    CONTAINERS_HEALTHY=$((CONTAINERS_HEALTHY + 1))
   fi
+done
 
-  # Redis
-  if ! check_service_quiet "Redis" \
-    "docker exec edusphere-all-in-one redis-cli -a edusphere_redis_password ping"; then
-    WARNINGS=$((WARNINGS + 1))
-  fi
+if [ "$CONTAINERS_HEALTHY" -lt "$REQUIRED_COUNT" ]; then
+  echo -e "${YELLOW}WARNING: Only $CONTAINERS_HEALTHY/$REQUIRED_COUNT infrastructure containers are running${NC}"
+  echo -e "${YELLOW}  Run: docker-compose up -d${NC}"
+  WARNINGS=$((WARNINGS + 1))
+else
+  echo -e "${GREEN}Infrastructure containers ($CONTAINERS_HEALTHY/$REQUIRED_COUNT): running${NC}"
+fi
 
-  # NATS
-  if ! check_service_quiet "NATS" \
-    "docker exec edusphere-all-in-one bash -c 'curl -sf http://127.0.0.1:8222/healthz'"; then
-    WARNINGS=$((WARNINGS + 1))
-  fi
+# Step 3: Check individual services
+echo ""
+echo -e "${BOLD}Service status:${NC}"
 
-  # Keycloak
-  if ! check_service_quiet "Keycloak" \
-    "curl -sf --max-time 5 http://localhost:8080/realms/edusphere/.well-known/openid-configuration"; then
-    WARNINGS=$((WARNINGS + 1))
-  fi
+# PostgreSQL
+if ! check_service_quiet "PostgreSQL" \
+  "docker exec edusphere-postgres pg_isready -U edusphere -d edusphere"; then
+  WARNINGS=$((WARNINGS + 1))
+fi
 
-  # MinIO
-  if ! check_service_quiet "MinIO" \
-    "curl -sf --max-time 5 http://localhost:9000/minio/health/live"; then
-    WARNINGS=$((WARNINGS + 1))
-  fi
+# Redis
+if ! check_service_quiet "Redis" \
+  "docker exec edusphere-redis redis-cli -a edusphere_redis_password ping"; then
+  WARNINGS=$((WARNINGS + 1))
+fi
+
+# NATS
+if ! check_service_quiet "NATS" \
+  "curl -sf --max-time 5 http://localhost:8222/healthz"; then
+  WARNINGS=$((WARNINGS + 1))
+fi
+
+# Keycloak
+if ! check_service_quiet "Keycloak" \
+  "curl -sf --max-time 5 http://localhost:8080/realms/edusphere/.well-known/openid-configuration"; then
+  WARNINGS=$((WARNINGS + 1))
+fi
+
+# MinIO
+if ! check_service_quiet "MinIO" \
+  "curl -sf --max-time 5 http://localhost:9000/minio/health/live"; then
+  WARNINGS=$((WARNINGS + 1))
 fi
 
 # Step 4: Summary
