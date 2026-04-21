@@ -13,6 +13,8 @@ import { seedAnnotationsDiscussions } from './seed/seed-annotations-discussions.
 import { seedExam } from './seed/seed-exam.js';
 import { seedKabbalahLesson } from './seed/seed-kabbalah-sefirat-haomer.js';
 import { seedJargonKabbalah } from './seed/seed-jargon-kabbalah.js';
+import { seedKabbalahEtzChaim } from './seed/seed-kabbalah-etz-chaim.js';
+import { seedEnrichedLesson } from './seed/seed-enriched-lesson.js';
 
 const { tenants, users, courses, modules, media_assets } = schema;
 
@@ -243,6 +245,14 @@ async function seed() {
 
     console.log('📖 Seeding Kabbalah jargon domain + 30 terms...');
     await seedJargonKabbalah();
+
+    console.log(
+      "🔯 Seeding קבלה — יסודות: מקור עץ חיים שיעור א' (task-6 polishing lesson)..."
+    );
+    await seedKabbalahEtzChaim();
+
+    console.log('📜 Seeding enriched lesson (visual assets, citations, enriched blocks)...');
+    await seedEnrichedLesson();
 
     console.log('✅ Seed completed successfully!');
     console.log('');
