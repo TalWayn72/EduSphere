@@ -23,6 +23,7 @@
     "@nestjs/platform-express": "^11.1.14",
     "ai": "^5.0.0",
     "drizzle-orm": "^0.45.1",
+    "livekit-server-sdk": "^2.15.1",
     "mime-types": "^2.1.35",
     "nats": "^2.29.3",
     "ollama-ai-provider": "^1.2.0",
