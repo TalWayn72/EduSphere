@@ -41,7 +41,7 @@
     "clamscan": "^2.4.0",
     "dataloader": "^2.2.3",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.45.2",
     "fast-xml-parser": "^5.3.6",
     "file-type": "^21.3.0",
     "graphql": "^16.13.2",
