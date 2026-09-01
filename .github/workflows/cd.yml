@@ -208,7 +208,7 @@ jobs:
 
       # ── Tooling setup ──────────────────────────────────────────────────────
       - name: Set up kubectl ${{ env.KUBECTL_VERSION }}
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
         with:
           version: ${{ env.KUBECTL_VERSION }}
 
@@ -412,7 +412,7 @@ jobs:
 
       # ── Tooling setup ──────────────────────────────────────────────────────
       - name: Set up kubectl ${{ env.KUBECTL_VERSION }}
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
         with:
           version: ${{ env.KUBECTL_VERSION }}
 
@@ -635,7 +635,7 @@ jobs:
       # Set up kubectl for emergency rollback if smoke tests fail
       - name: Set up kubectl for emergency rollback
         if: failure()
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
         with:
           version: ${{ env.KUBECTL_VERSION }}
 
@@ -687,7 +687,7 @@ jobs:
 
       # ── Tooling setup ──────────────────────────────────────────────────────
       - name: Set up kubectl ${{ env.KUBECTL_VERSION }}
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
         with:
           version: ${{ env.KUBECTL_VERSION }}
 
