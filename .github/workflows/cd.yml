@@ -213,7 +213,7 @@ jobs:
           version: ${{ env.KUBECTL_VERSION }}
 
       - name: Set up Helm ${{ env.HELM_VERSION }}
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
         with:
           version: ${{ env.HELM_VERSION }}
 
@@ -417,7 +417,7 @@ jobs:
           version: ${{ env.KUBECTL_VERSION }}
 
       - name: Set up Helm ${{ env.HELM_VERSION }}
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
         with:
           version: ${{ env.HELM_VERSION }}
 
@@ -641,7 +641,7 @@ jobs:
 
       - name: Set up Helm for emergency rollback
         if: failure()
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
         with:
           version: ${{ env.HELM_VERSION }}
 
@@ -692,7 +692,7 @@ jobs:
           version: ${{ env.KUBECTL_VERSION }}
 
       - name: Set up Helm ${{ env.HELM_VERSION }}
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
         with:
           version: ${{ env.HELM_VERSION }}
 
