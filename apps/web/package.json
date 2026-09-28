@@ -147,7 +147,7 @@
     "jsdom": "^29.0.1",
     "lost-pixel": "^3.22.0",
     "msw": "^2.12.10",
-    "postcss": "^8.5.1",
+    "postcss": "^8.5.9",
     "remotion": "^4.0.434",
     "storybook": "^8.6.18",
     "tailwindcss": "^4.0.12",
