@@ -208,7 +208,7 @@ jobs:
 
     steps:
       - name: Check for approvals
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -346,7 +346,7 @@ jobs:
           echo "This PR is ready to merge! 🚀"
 
       - name: Comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         continue-on-error: true # Comment is cosmetic; don't fail the gate if it errors
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
