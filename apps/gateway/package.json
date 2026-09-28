@@ -17,7 +17,7 @@
     "@edusphere/config": "workspace:*",
     "@edusphere/telemetry": "workspace:*",
     "@graphql-hive/gateway": "^2.5.1",
-    "@graphql-yoga/plugin-response-cache": "^3.0.0",
+    "@graphql-yoga/plugin-response-cache": "^3.23.0",
     "graphql": "^16.13.2",
     "graphql-ws": "^6.0.6",
     "graphql-yoga": "^5.18.0",
